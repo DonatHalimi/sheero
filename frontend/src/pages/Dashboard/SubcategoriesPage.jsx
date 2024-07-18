@@ -56,37 +56,39 @@ const SubcategoriesPage = () => {
 
     return (
         <>
-            <div className='flex flex-col items-center justify-center p-4 mt-24'>
-                <div className='flex items-center justify-between w-full mb-4 px-14'>
-                    <Typography variant='h5'>Subcategories</Typography>
-                    <OutlinedBrownButton onClick={() => setAddSubcategoryOpen(true)}>Add Subcategory</OutlinedBrownButton>
-                </div>
-                <TableContainer component={Paper} className='max-w-screen-2xl mx-auto'>
-                    <Table>
-                        <TableHead>
-                            <TableRow>
-                                <BoldTableCell>Name</BoldTableCell>
-                                <BoldTableCell>Category</BoldTableCell>
-                                <BoldTableCell>Actions</BoldTableCell>
-                            </TableRow>
-                        </TableHead>
-                        <TableBody>
-                            {subcategories.map((subcategory) => (
-                                <TableRow key={subcategory._id}>
-                                    <TableCell>{subcategory.name}</TableCell>
-                                    <TableCell>{subcategory.category.name}</TableCell>
-                                    <TableCell>
-                                        <ActionButton onClick={() => { setSelectedSubcategory(subcategory); setEditSubcategoryOpen(true); }}><BrownCreateOutlinedIcon /></ActionButton>
-                                        <ActionButton onClick={() => { setSelectedSubcategory(subcategory); setDeleteSubcategoryOpen(true); }}><BrownDeleteOutlinedIcon /></ActionButton>
-                                    </TableCell>
+            <div className='container mx-auto max-w-screen-2xl px-4 mt-20'>
+                <div className='flex flex-col items-center justify-center'>
+                    <div className='flex items-center justify-between w-full mb-4'>
+                        <Typography variant='h5'>Subcategories</Typography>
+                        <OutlinedBrownButton onClick={() => setAddSubcategoryOpen(true)}>Add Subcategory</OutlinedBrownButton>
+                    </div>
+                    <TableContainer component={Paper} className='max-w-screen-2xl mx-auto'>
+                        <Table>
+                            <TableHead>
+                                <TableRow>
+                                    <BoldTableCell>Name</BoldTableCell>
+                                    <BoldTableCell>Category</BoldTableCell>
+                                    <BoldTableCell>Actions</BoldTableCell>
                                 </TableRow>
-                            ))}
-                        </TableBody>
-                    </Table>
-                </TableContainer>
-                <AddSubcategoryModal open={addSubcategoryOpen} onClose={() => setAddSubcategoryOpen(false)} onAddSuccess={refreshSubcategories} />
-                <EditSubcategoryModal open={editSubcategoryOpen} onClose={() => setEditSubcategoryOpen(false)} subcategory={selectedSubcategory} onEditSuccess={refreshSubcategories} />
-                <DeleteSubcategoryModal open={deleteSubcategoryOpen} onClose={() => setDeleteSubcategoryOpen(false)} subcategory={selectedSubcategory} onDeleteSuccess={refreshSubcategories} />
+                            </TableHead>
+                            <TableBody>
+                                {subcategories.map((subcategory) => (
+                                    <TableRow key={subcategory._id}>
+                                        <TableCell>{subcategory.name}</TableCell>
+                                        <TableCell>{subcategory.category.name}</TableCell>
+                                        <TableCell>
+                                            <ActionButton onClick={() => { setSelectedSubcategory(subcategory); setEditSubcategoryOpen(true); }}><BrownCreateOutlinedIcon /></ActionButton>
+                                            <ActionButton onClick={() => { setSelectedSubcategory(subcategory); setDeleteSubcategoryOpen(true); }}><BrownDeleteOutlinedIcon /></ActionButton>
+                                        </TableCell>
+                                    </TableRow>
+                                ))}
+                            </TableBody>
+                        </Table>
+                    </TableContainer>
+                    <AddSubcategoryModal open={addSubcategoryOpen} onClose={() => setAddSubcategoryOpen(false)} onAddSuccess={refreshSubcategories} />
+                    <EditSubcategoryModal open={editSubcategoryOpen} onClose={() => setEditSubcategoryOpen(false)} subcategory={selectedSubcategory} onEditSuccess={refreshSubcategories} />
+                    <DeleteSubcategoryModal open={deleteSubcategoryOpen} onClose={() => setDeleteSubcategoryOpen(false)} subcategory={selectedSubcategory} onDeleteSuccess={refreshSubcategories} />
+                </div>
             </div>
         </>
     );

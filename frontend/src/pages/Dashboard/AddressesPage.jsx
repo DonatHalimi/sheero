@@ -40,54 +40,56 @@ const AddressesPage = () => {
     };
 
     return (
-        <div className='flex flex-col items-center justify-center p-4 mt-24'>
-            <div className='flex justify-between w-full mb-4 px-14'>
-                <Typography variant='h5'>Addresses</Typography>
-                <OutlinedBrownButton onClick={() => setAddAddressOpen(true)} variant="outlined">Add Address</OutlinedBrownButton>
-            </div>
-            <TableContainer component={Paper} className='max-w-screen-2xl mx-auto'>
-                <Table>
-                    <TableHead>
-                        <TableRow>
-                            <BoldTableCell>Username</BoldTableCell>
-                            <BoldTableCell>Name</BoldTableCell>
-                            <BoldTableCell>Street</BoldTableCell>
-                            <BoldTableCell>Country</BoldTableCell>
-                            <BoldTableCell>City</BoldTableCell>
-                            <BoldTableCell>Zip Code</BoldTableCell>
-                            <BoldTableCell>Actions</BoldTableCell>
-                        </TableRow>
-                    </TableHead>
-                    <TableBody>
-                        {addresses.length > 0 ? (
-                            addresses.map((address) => (
-                                <TableRow key={address._id}>
-                                    <TableCell>{address.user?.username}</TableCell>
-                                    <TableCell>{address.name}</TableCell>
-                                    <TableCell>{address.street}</TableCell>
-                                    <TableCell>{address.country.name}</TableCell>
-                                    <TableCell>{address.city.name}</TableCell>
-                                    <TableCell>{address.city.zipCode}</TableCell>
-                                    <TableCell>
-                                        <ActionButton onClick={() => { setSelectedAddress(address); setEditAddressOpen(true); }}><BrownCreateOutlinedIcon /></ActionButton>
-                                        <ActionButton onClick={() => { setSelectedAddress(address); setDeleteAddressOpen(true); }}><BrownDeleteOutlinedIcon /></ActionButton>
+        <div className='container mx-auto max-w-screen-2xl px-4 mt-20'>
+            <div className='flex flex-col items-center justify-center'>
+                <div className='flex items-center justify-between w-full mb-4'>
+                    <Typography variant='h5'>Addresses</Typography>
+                    <OutlinedBrownButton onClick={() => setAddAddressOpen(true)} variant="outlined">Add Address</OutlinedBrownButton>
+                </div>
+                <TableContainer component={Paper} className='max-w-screen-2xl mx-auto'>
+                    <Table>
+                        <TableHead>
+                            <TableRow>
+                                <BoldTableCell>Username</BoldTableCell>
+                                <BoldTableCell>Name</BoldTableCell>
+                                <BoldTableCell>Street</BoldTableCell>
+                                <BoldTableCell>Country</BoldTableCell>
+                                <BoldTableCell>City</BoldTableCell>
+                                <BoldTableCell>Zip Code</BoldTableCell>
+                                <BoldTableCell>Actions</BoldTableCell>
+                            </TableRow>
+                        </TableHead>
+                        <TableBody>
+                            {addresses.length > 0 ? (
+                                addresses.map((address) => (
+                                    <TableRow key={address._id}>
+                                        <TableCell>{address.user?.username}</TableCell>
+                                        <TableCell>{address.name}</TableCell>
+                                        <TableCell>{address.street}</TableCell>
+                                        <TableCell>{address.country.name}</TableCell>
+                                        <TableCell>{address.city.name}</TableCell>
+                                        <TableCell>{address.city.zipCode}</TableCell>
+                                        <TableCell>
+                                            <ActionButton onClick={() => { setSelectedAddress(address); setEditAddressOpen(true); }}><BrownCreateOutlinedIcon /></ActionButton>
+                                            <ActionButton onClick={() => { setSelectedAddress(address); setDeleteAddressOpen(true); }}><BrownDeleteOutlinedIcon /></ActionButton>
+                                        </TableCell>
+                                    </TableRow>
+                                ))
+                            ) : (
+                                <TableRow>
+                                    <TableCell colSpan={7} align="center">
+                                        No addresses found.
                                     </TableCell>
                                 </TableRow>
-                            ))
-                        ) : (
-                            <TableRow>
-                                <TableCell colSpan={7} align="center">
-                                    No addresses found.
-                                </TableCell>
-                            </TableRow>
-                        )}
-                    </TableBody>
-                </Table>
-            </TableContainer>
+                            )}
+                        </TableBody>
+                    </Table>
+                </TableContainer>
 
-            <AddAddressModal open={addAddressOpen} onClose={() => setAddAddressOpen(false)} onAddSuccess={refreshAddresses} />
-            <EditAddressModal open={editAddressOpen} onClose={() => setEditAddressOpen(false)} address={selectedAddress} onEditSuccess={refreshAddresses} />
-            <DeleteAddressModal open={deleteAddressOpen} onClose={() => setDeleteAddressOpen(false)} address={selectedAddress} onDeleteSuccess={refreshAddresses} />
+                <AddAddressModal open={addAddressOpen} onClose={() => setAddAddressOpen(false)} onAddSuccess={refreshAddresses} />
+                <EditAddressModal open={editAddressOpen} onClose={() => setEditAddressOpen(false)} address={selectedAddress} onEditSuccess={refreshAddresses} />
+                <DeleteAddressModal open={deleteAddressOpen} onClose={() => setDeleteAddressOpen(false)} address={selectedAddress} onDeleteSuccess={refreshAddresses} />
+            </div>
         </div>
     );
 };

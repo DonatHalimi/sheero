@@ -1,7 +1,5 @@
 import AllInboxOutlinedIcon from '@mui/icons-material/AllInboxOutlined';
 import ApartmentOutlinedIcon from '@mui/icons-material/ApartmentOutlined';
-import AssignmentIcon from '@mui/icons-material/Assignment';
-import ContactMailOutlinedIcon from '@mui/icons-material/ContactMailOutlined';
 import DashboardCustomizeOutlinedIcon from '@mui/icons-material/DashboardCustomizeOutlined';
 import DashboardOutlinedIcon from '@mui/icons-material/DashboardOutlined';
 import ExpandLess from '@mui/icons-material/ExpandLess';
@@ -17,7 +15,6 @@ import List from '@mui/material/List';
 import ListItemButton from '@mui/material/ListItemButton';
 import ListItemIcon from '@mui/material/ListItemIcon';
 import ListItemText from '@mui/material/ListItemText';
-import ListSubheader from '@mui/material/ListSubheader';
 import * as React from 'react';
 import { ActiveListItemButton } from './CustomComponents';
 
@@ -128,7 +125,7 @@ export const mainListItems = ({ setCurrentView }) => {
             onClick={handleAddressesClick}
           >
             <ListItemIcon>
-              <ContactMailOutlinedIcon />
+              <RoomOutlinedIcon />
             </ListItemIcon>
             <ListItemText primary="Addresses" />
             {addressesOpen ? <ExpandLess /> : <ExpandMore />}
@@ -177,7 +174,7 @@ export const mainListItems = ({ setCurrentView }) => {
 
 export const secondaryListItems = (
   <React.Fragment>
-    <ListSubheader component="div" inset>
+    {/* <ListSubheader component="div" inset>
       Saved reports
     </ListSubheader>
     <ListItemButton>
@@ -197,6 +194,6 @@ export const secondaryListItems = (
         <AssignmentIcon />
       </ListItemIcon>
       <ListItemText primary="Year-end sale" />
-    </ListItemButton>
+    </ListItemButton> */}
   </React.Fragment>
 );

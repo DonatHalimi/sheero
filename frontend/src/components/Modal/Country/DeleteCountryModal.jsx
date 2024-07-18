@@ -1,7 +1,7 @@
 import { Box, Button, Modal } from '@mui/material';
 import React, { useContext } from 'react';
 import { toast } from 'react-toastify';
-import useAxios from '../../../axiosInstance'; 
+import useAxios from '../../../axiosInstance';
 import { AuthContext } from '../../../context/AuthContext';
 import { OutlinedBrownButton } from '../../Dashboard/CustomComponents';
 

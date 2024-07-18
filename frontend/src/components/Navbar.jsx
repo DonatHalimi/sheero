@@ -1,8 +1,8 @@
 import React, { useContext } from 'react';
 import { Link } from 'react-router-dom';
 import logo from '../assets/logo.png';
-import { BrownButton, OutlinedBrownButton } from './Dashboard/CustomComponents';
 import { AuthContext } from '../context/AuthContext';
+import { BrownButton, OutlinedBrownButton } from './Dashboard/CustomComponents';
 
 const Navbar = () => {
     const { auth, isAdmin, logout } = useContext(AuthContext);

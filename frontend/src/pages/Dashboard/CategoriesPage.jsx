@@ -43,37 +43,39 @@ const CategoriesPage = () => {
 
     return (
         <>
-            <div className='flex flex-col items-center justify-center p-4 mt-24'>
-                <div className='flex items-center justify-between w-full mb-4 px-14'>
-                    <Typography variant='h5'>Categories</Typography>
-                    <OutlinedBrownButton onClick={() => setAddCategoryOpen(true)}>Add Category</OutlinedBrownButton>
-                </div>
-                <TableContainer component={Paper} className='max-w-screen-2xl mx-auto'>
-                    <Table>
-                        <TableHead>
-                            <TableRow>
-                                <BoldTableCell>Name</BoldTableCell>
-                                <BoldTableCell>Image</BoldTableCell>
-                                <BoldTableCell>Actions</BoldTableCell>
-                            </TableRow>
-                        </TableHead>
-                        <TableBody>
-                            {categories.map((category) => (
-                                <TableRow key={category._id}>
-                                    <TableCell>{category.name}</TableCell>
-                                    <TableCell><img className='rounded-md' src={`http://localhost:5000/${category.image}`} alt="" width={80} /></TableCell>
-                                    <TableCell>
-                                        <ActionButton onClick={() => { setSelectedCategory(category); setEditCategoryOpen(true); }}><BrownCreateOutlinedIcon /></ActionButton>
-                                        <ActionButton onClick={() => { setSelectedCategory(category); setDeleteCategoryOpen(true); }}><BrownDeleteOutlinedIcon /></ActionButton>
-                                    </TableCell>
+            <div className='container mx-auto max-w-screen-2xl px-4 mt-20'>
+                <div className='flex flex-col items-center justify-center'>
+                    <div className='flex items-center justify-between w-full mb-4'>
+                        <Typography variant='h5'>Categories</Typography>
+                        <OutlinedBrownButton onClick={() => setAddCategoryOpen(true)}>Add Category</OutlinedBrownButton>
+                    </div>
+                    <TableContainer component={Paper} className='max-w-screen-2xl mx-auto'>
+                        <Table>
+                            <TableHead>
+                                <TableRow>
+                                    <BoldTableCell>Name</BoldTableCell>
+                                    <BoldTableCell>Image</BoldTableCell>
+                                    <BoldTableCell>Actions</BoldTableCell>
                                 </TableRow>
-                            ))}
-                        </TableBody>
-                    </Table>
-                </TableContainer>
-                <AddCategoryModal open={addCategoryOpen} onClose={() => setAddCategoryOpen(false)} onAddSuccess={refreshCategories} />
-                <EditCategoryModal open={editCategoryOpen} onClose={() => setEditCategoryOpen(false)} category={selectedCategory} onEditSuccess={refreshCategories} />
-                <DeleteCategoryModal open={deleteCategoryOpen} onClose={() => setDeleteCategoryOpen(false)} category={selectedCategory} onDeleteSuccess={refreshCategories} />
+                            </TableHead>
+                            <TableBody>
+                                {categories.map((category) => (
+                                    <TableRow key={category._id}>
+                                        <TableCell>{category.name}</TableCell>
+                                        <TableCell><img className='rounded-md' src={`http://localhost:5000/${category.image}`} alt="" width={80} /></TableCell>
+                                        <TableCell>
+                                            <ActionButton onClick={() => { setSelectedCategory(category); setEditCategoryOpen(true); }}><BrownCreateOutlinedIcon /></ActionButton>
+                                            <ActionButton onClick={() => { setSelectedCategory(category); setDeleteCategoryOpen(true); }}><BrownDeleteOutlinedIcon /></ActionButton>
+                                        </TableCell>
+                                    </TableRow>
+                                ))}
+                            </TableBody>
+                        </Table>
+                    </TableContainer>
+                    <AddCategoryModal open={addCategoryOpen} onClose={() => setAddCategoryOpen(false)} onAddSuccess={refreshCategories} />
+                    <EditCategoryModal open={editCategoryOpen} onClose={() => setEditCategoryOpen(false)} category={selectedCategory} onEditSuccess={refreshCategories} />
+                    <DeleteCategoryModal open={deleteCategoryOpen} onClose={() => setDeleteCategoryOpen(false)} category={selectedCategory} onDeleteSuccess={refreshCategories} />
+                </div>
             </div>
         </>
     );

@@ -40,44 +40,46 @@ const CountriesPage = () => {
     };
 
     return (
-        <div className='flex flex-col items-center justify-center p-4 mt-24'>
-            <div className='flex justify-between w-full mb-4 px-14'>
-                <Typography variant='h5'>Countries</Typography>
-                <OutlinedBrownButton onClick={() => setAddCountryOpen(true)} variant="outlined">Add Country</OutlinedBrownButton>
-            </div>
-            <TableContainer component={Paper} className='max-w-screen-2xl mx-auto'>
-                <Table>
-                    <TableHead>
-                        <TableRow>
-                            <BoldTableCell>Name</BoldTableCell>
-                            <BoldTableCell>Actions</BoldTableCell>
-                        </TableRow>
-                    </TableHead>
-                    <TableBody>
-                        {countries.length > 0 ? (
-                            countries.map((country) => (
-                                <TableRow key={country._id}>
-                                    <TableCell>{country.name}</TableCell>
-                                    <TableCell>
-                                        <ActionButton onClick={() => { setSelectedCountry(country); setEditCountryOpen(true); }}><BrownCreateOutlinedIcon /></ActionButton>
-                                        <ActionButton onClick={() => { setSelectedCountry(country); setDeleteCountryOpen(true); }}><BrownDeleteOutlinedIcon /></ActionButton>
+        <div className='container mx-auto max-w-screen-2xl px-4 mt-20'>
+            <div className='flex flex-col items-center justify-center'>
+                <div className='flex items-center justify-between w-full mb-4'>
+                    <Typography variant='h5'>Countries</Typography>
+                    <OutlinedBrownButton onClick={() => setAddCountryOpen(true)} variant="outlined">Add Country</OutlinedBrownButton>
+                </div>
+                <TableContainer component={Paper} className='max-w-screen-2xl mx-auto'>
+                    <Table>
+                        <TableHead>
+                            <TableRow>
+                                <BoldTableCell>Name</BoldTableCell>
+                                <BoldTableCell>Actions</BoldTableCell>
+                            </TableRow>
+                        </TableHead>
+                        <TableBody>
+                            {countries.length > 0 ? (
+                                countries.map((country) => (
+                                    <TableRow key={country._id}>
+                                        <TableCell>{country.name}</TableCell>
+                                        <TableCell>
+                                            <ActionButton onClick={() => { setSelectedCountry(country); setEditCountryOpen(true); }}><BrownCreateOutlinedIcon /></ActionButton>
+                                            <ActionButton onClick={() => { setSelectedCountry(country); setDeleteCountryOpen(true); }}><BrownDeleteOutlinedIcon /></ActionButton>
+                                        </TableCell>
+                                    </TableRow>
+                                ))
+                            ) : (
+                                <TableRow>
+                                    <TableCell colSpan={2} align="center">
+                                        No countries found.
                                     </TableCell>
                                 </TableRow>
-                            ))
-                        ) : (
-                            <TableRow>
-                                <TableCell colSpan={2} align="center">
-                                    No countries found.
-                                </TableCell>
-                            </TableRow>
-                        )}
-                    </TableBody>
-                </Table>
-            </TableContainer>
+                            )}
+                        </TableBody>
+                    </Table>
+                </TableContainer>
 
-            <AddCountryModal open={addCountryOpen} onClose={() => setAddCountryOpen(false)} onAddSuccess={refreshCountries} />
-            <EditCountryModal open={editCountryOpen} onClose={() => setEditCountryOpen(false)} country={selectedCountry} onEditSuccess={refreshCountries} />
-            <DeleteCountryModal open={deleteCountryOpen} onClose={() => setDeleteCountryOpen(false)} country={selectedCountry} onDeleteSuccess={refreshCountries} />
+                <AddCountryModal open={addCountryOpen} onClose={() => setAddCountryOpen(false)} onAddSuccess={refreshCountries} />
+                <EditCountryModal open={editCountryOpen} onClose={() => setEditCountryOpen(false)} country={selectedCountry} onEditSuccess={refreshCountries} />
+                <DeleteCountryModal open={deleteCountryOpen} onClose={() => setDeleteCountryOpen(false)} country={selectedCountry} onDeleteSuccess={refreshCountries} />
+            </div>
         </div>
     );
 };

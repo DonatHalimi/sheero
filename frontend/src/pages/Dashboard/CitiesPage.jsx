@@ -40,48 +40,50 @@ const CitiesPage = () => {
     };
 
     return (
-        <div className='flex flex-col items-center justify-center p-4 mt-24'>
-            <div className='flex justify-between w-full mb-4 px-14'>
-                <Typography variant='h5'>Cities</Typography>
-                <OutlinedBrownButton onClick={() => setAddCityOpen(true)} variant="outlined">Add City</OutlinedBrownButton>
-            </div>
-            <TableContainer component={Paper} className='max-w-screen-2xl mx-auto'>
-                <Table>
-                    <TableHead>
-                        <TableRow>
-                            <BoldTableCell>Name</BoldTableCell>
-                            <BoldTableCell>Country</BoldTableCell>
-                            <BoldTableCell>Zip Code</BoldTableCell>
-                            <BoldTableCell>Actions</BoldTableCell>
-                        </TableRow>
-                    </TableHead>
-                    <TableBody>
-                        {cities.length > 0 ? (
-                            cities.map((city) => (
-                                <TableRow key={city._id}>
-                                    <TableCell>{city.name}</TableCell>
-                                    <TableCell>{city.country.name}</TableCell>
-                                    <TableCell>{city.zipCode}</TableCell>
-                                    <TableCell>
-                                        <ActionButton onClick={() => { setSelectedCity(city); setEditCityOpen(true); }}><BrownCreateOutlinedIcon /></ActionButton>
-                                        <ActionButton onClick={() => { setSelectedCity(city); setDeleteCityOpen(true); }}><BrownDeleteOutlinedIcon /></ActionButton>
+        <div className='container mx-auto max-w-screen-2xl px-4 mt-20'>
+            <div className='flex flex-col items-center justify-center'>
+                <div className='flex items-center justify-between w-full mb-4'>
+                    <Typography variant='h5'>Cities</Typography>
+                    <OutlinedBrownButton onClick={() => setAddCityOpen(true)} variant="outlined">Add City</OutlinedBrownButton>
+                </div>
+                <TableContainer component={Paper} className='max-w-screen-2xl mx-auto'>
+                    <Table>
+                        <TableHead>
+                            <TableRow>
+                                <BoldTableCell>Name</BoldTableCell>
+                                <BoldTableCell>Country</BoldTableCell>
+                                <BoldTableCell>Zip Code</BoldTableCell>
+                                <BoldTableCell>Actions</BoldTableCell>
+                            </TableRow>
+                        </TableHead>
+                        <TableBody>
+                            {cities.length > 0 ? (
+                                cities.map((city) => (
+                                    <TableRow key={city._id}>
+                                        <TableCell>{city.name}</TableCell>
+                                        <TableCell>{city.country.name}</TableCell>
+                                        <TableCell>{city.zipCode}</TableCell>
+                                        <TableCell>
+                                            <ActionButton onClick={() => { setSelectedCity(city); setEditCityOpen(true); }}><BrownCreateOutlinedIcon /></ActionButton>
+                                            <ActionButton onClick={() => { setSelectedCity(city); setDeleteCityOpen(true); }}><BrownDeleteOutlinedIcon /></ActionButton>
+                                        </TableCell>
+                                    </TableRow>
+                                ))
+                            ) : (
+                                <TableRow>
+                                    <TableCell colSpan={4} align="center">
+                                        No cities found.
                                     </TableCell>
                                 </TableRow>
-                            ))
-                        ) : (
-                            <TableRow>
-                                <TableCell colSpan={4} align="center">
-                                    No cities found.
-                                </TableCell>
-                            </TableRow>
-                        )}
-                    </TableBody>
-                </Table>
-            </TableContainer>
+                            )}
+                        </TableBody>
+                    </Table>
+                </TableContainer>
 
-            <AddCityModal open={addCityOpen} onClose={() => setAddCityOpen(false)} onAddSuccess={refreshCities} />
-            <EditCityModal open={editCityOpen} onClose={() => setEditCityOpen(false)} city={selectedCity} onEditSuccess={refreshCities} />
-            <DeleteCityModal open={deleteCityOpen} onClose={() => setDeleteCityOpen(false)} city={selectedCity} onDeleteSuccess={refreshCities} />
+                <AddCityModal open={addCityOpen} onClose={() => setAddCityOpen(false)} onAddSuccess={refreshCities} />
+                <EditCityModal open={editCityOpen} onClose={() => setEditCityOpen(false)} city={selectedCity} onEditSuccess={refreshCities} />
+                <DeleteCityModal open={deleteCityOpen} onClose={() => setDeleteCityOpen(false)} city={selectedCity} onDeleteSuccess={refreshCities} />
+            </div>
         </div>
     );
 };

@@ -51,75 +51,77 @@ const ProductsPage = () => {
 
     return (
         <>
-            <div className='flex flex-col items-center justify-center p-4 mt-24'>
-                <div className='flex justify-between w-full mb-4 px-14'>
-                    <Typography variant='h5'>Products</Typography>
-                    <OutlinedBrownButton onClick={() => setAddProductOpen(true)}>Add Product</OutlinedBrownButton>
-                </div>
-                <TableContainer component={Paper} className='max-w-screen-2xl mx-auto'>
-                    <Table>
-                        <TableHead>
-                            <TableRow>
-                                <BoldTableCell>Name</BoldTableCell>
-                                <BoldTableCell>Description</BoldTableCell>
-                                <BoldTableCell>Price</BoldTableCell>
-                                <BoldTableCell>Sale Price</BoldTableCell>
-                                <BoldTableCell>Category</BoldTableCell>
-                                <BoldTableCell>Subcategory</BoldTableCell>
-                                <BoldTableCell>Inventory Count</BoldTableCell>
-                                <BoldTableCell>Dimensions</BoldTableCell>
-                                <BoldTableCell>Variants</BoldTableCell>
-                                <BoldTableCell>Image</BoldTableCell>
-                                <BoldTableCell>Actions</BoldTableCell>
-                            </TableRow>
-                        </TableHead>
-                        <TableBody>
-                            {products.length > 0 ? (
-                                products.map((product) => (
-                                    <TableRow key={product._id}>
-                                        <TableCell>{product.name}</TableCell>
-                                        <TableCell>{product.description}</TableCell>
-                                        <TableCell>{product.price}</TableCell>
-                                        <TableCell>{product.salePrice ? product.salePrice : "0"}</TableCell>
-                                        <TableCell>{product.category.name}</TableCell>
-                                        <TableCell>{product.subcategory.name}</TableCell>
-                                        <TableCell>{product.inventoryCount}</TableCell>
-                                        <TableCell>{product.dimensions ? `${product.dimensions.length} x ${product.dimensions.width} x ${product.dimensions.height} ${product.dimensions.unit}` : ''}</TableCell>
-                                        <TableCell>
-                                            {product.variants.map((variant, index) => (
-                                                <div key={index}>
-                                                    <Typography>{`Color: ${variant.color}, Size: ${variant.size}`}</Typography>
-                                                </div>
-                                            ))}
-                                        </TableCell>
-                                        <TableCell><img className='rounded-md' src={`http://localhost:5000/${product.image}`} alt="" width={80} /></TableCell>
-                                        <TableCell>
-                                            <ActionButton onClick={() => { setSelectedProduct(product); setEditProductOpen(true); }}><BrownCreateOutlinedIcon /></ActionButton>
-                                            <ActionButton onClick={() => { setSelectedProduct(product); setDeleteProductOpen(true); }}><BrownDeleteOutlinedIcon /></ActionButton>
+            <div className='container mx-auto max-w-screen-2xl px-4 mt-20'>
+                <div className='flex flex-col items-center justify-center'>
+                    <div className='flex items-center justify-between w-full mb-4'>
+                        <Typography variant='h5'>Products</Typography>
+                        <OutlinedBrownButton onClick={() => setAddProductOpen(true)}>Add Product</OutlinedBrownButton>
+                    </div>
+                    <TableContainer component={Paper} className='max-w-screen-2xl mx-auto'>
+                        <Table>
+                            <TableHead>
+                                <TableRow>
+                                    <BoldTableCell>Name</BoldTableCell>
+                                    <BoldTableCell>Description</BoldTableCell>
+                                    <BoldTableCell>Price</BoldTableCell>
+                                    <BoldTableCell>Sale Price</BoldTableCell>
+                                    <BoldTableCell>Category</BoldTableCell>
+                                    <BoldTableCell>Subcategory</BoldTableCell>
+                                    <BoldTableCell>Inventory Count</BoldTableCell>
+                                    <BoldTableCell>Dimensions</BoldTableCell>
+                                    <BoldTableCell>Variants</BoldTableCell>
+                                    <BoldTableCell>Image</BoldTableCell>
+                                    <BoldTableCell>Actions</BoldTableCell>
+                                </TableRow>
+                            </TableHead>
+                            <TableBody>
+                                {products.length > 0 ? (
+                                    products.map((product) => (
+                                        <TableRow key={product._id}>
+                                            <TableCell>{product.name}</TableCell>
+                                            <TableCell>{product.description}</TableCell>
+                                            <TableCell>{product.price}</TableCell>
+                                            <TableCell>{product.salePrice ? product.salePrice : "0"}</TableCell>
+                                            <TableCell>{product.category.name}</TableCell>
+                                            <TableCell>{product.subcategory.name}</TableCell>
+                                            <TableCell>{product.inventoryCount}</TableCell>
+                                            <TableCell>{product.dimensions ? `${product.dimensions.length} x ${product.dimensions.width} x ${product.dimensions.height} ${product.dimensions.unit}` : ''}</TableCell>
+                                            <TableCell>
+                                                {product.variants.map((variant, index) => (
+                                                    <div key={index}>
+                                                        <Typography>{`Color: ${variant.color}, Size: ${variant.size}`}</Typography>
+                                                    </div>
+                                                ))}
+                                            </TableCell>
+                                            <TableCell><img className='rounded-md' src={`http://localhost:5000/${product.image}`} alt="" width={80} /></TableCell>
+                                            <TableCell>
+                                                <ActionButton onClick={() => { setSelectedProduct(product); setEditProductOpen(true); }}><BrownCreateOutlinedIcon /></ActionButton>
+                                                <ActionButton onClick={() => { setSelectedProduct(product); setDeleteProductOpen(true); }}><BrownDeleteOutlinedIcon /></ActionButton>
+                                            </TableCell>
+                                        </TableRow>
+                                    ))
+                                ) : (
+                                    <TableRow>
+                                        <TableCell colSpan={11} align="center">
+                                            No products found.
                                         </TableCell>
                                     </TableRow>
-                                ))
-                            ) : (
-                                <TableRow>
-                                    <TableCell colSpan={11} align="center">
-                                        No products found.
-                                    </TableCell>
-                                </TableRow>
-                            )}
-                        </TableBody>
-                    </Table>
-                </TableContainer>
-                {totalPages > 1 && (
-                    <Pagination
-                        currentPage={currentPage}
-                        totalPages={totalPages}
-                        onPageChange={handlePageChange}
-                    />
-                )}
+                                )}
+                            </TableBody>
+                        </Table>
+                    </TableContainer>
+                    {totalPages > 1 && (
+                        <Pagination
+                            currentPage={currentPage}
+                            totalPages={totalPages}
+                            onPageChange={handlePageChange}
+                        />
+                    )}
 
-                <AddProductModal open={addProductOpen} onClose={() => setAddProductOpen(false)} onAddSuccess={refreshProducts} />
-                <EditProductModal open={editProductOpen} onClose={() => setEditProductOpen(false)} product={selectedProduct} onEditSuccess={refreshProducts} />
-                <DeleteProductModal open={deleteProductOpen} onClose={() => setDeleteProductOpen(false)} product={selectedProduct} onDeleteSuccess={refreshProducts} />
+                    <AddProductModal open={addProductOpen} onClose={() => setAddProductOpen(false)} onAddSuccess={refreshProducts} />
+                    <EditProductModal open={editProductOpen} onClose={() => setEditProductOpen(false)} product={selectedProduct} onEditSuccess={refreshProducts} />
+                    <DeleteProductModal open={deleteProductOpen} onClose={() => setDeleteProductOpen(false)} product={selectedProduct} onDeleteSuccess={refreshProducts} />
+                </div>
             </div>
         </>
     );
