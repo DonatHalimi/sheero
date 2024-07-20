@@ -1,4 +1,5 @@
 const mongoose = require('mongoose');
+const Review = require('./Review')
 
 const productSchema = new mongoose.Schema({
     name: { type: String, required: true },
@@ -50,7 +51,7 @@ const productSchema = new mongoose.Schema({
 
 productSchema.pre('save', function (next) {
     if (this.salePrice && this.price) {
-        const discountPercentage = ((this.price - this.salePrice) / this.price) * 100;
+        const discountPercentage = Math.round(((this.price - this.salePrice) / this.price) * 100);
         this.discount.value = discountPercentage;
     }
     next();

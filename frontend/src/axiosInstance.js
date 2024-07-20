@@ -15,7 +15,7 @@ const useAxios = () => {
 
             const tokenExpiry = JSON.parse(atob(token.split('.')[1])).exp * 1000;
             if (Date.now() >= tokenExpiry) {
-                token = await refreshToken(); // Get the new token after refreshing
+                token = await refreshToken();
             }
 
             if (token) {

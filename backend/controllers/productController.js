@@ -1,4 +1,5 @@
 const Product = require('../models/Product');
+const Review = require('../models/Review')
 const fs = require('fs');
 const path = require('path');
 
@@ -87,17 +88,17 @@ const deleteProduct = async (req, res) => {
         const product = await Product.findById(req.params.id);
         if (!product) return res.status(404).json({ message: 'Product not found' });
 
-        if (product.image) {
-            fs.unlink(product.image, (err) => {
-                if (err) console.error('Error deleting image:', err);
-            });
-        }
+        // Remove associated reviews
+        await Review.deleteMany({ product: product._id });
 
+        // Remove the product
         await Product.findByIdAndDelete(req.params.id);
-        res.status(200).json({ message: 'Product deleted' });
+
+        res.status(200).json({ message: 'Product and associated reviews deleted successfully' });
     } catch (error) {
-        res.status(500).json({ message: 'Server error' });
+        res.status(500).json({ message: 'Server error', error: error.message });
     }
 };
+
 
 module.exports = { createProduct, getProducts, getProduct, updateProduct, deleteProduct };

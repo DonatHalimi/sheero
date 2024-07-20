@@ -23,6 +23,13 @@ const EditProductModal = ({ open, onClose, product, onEditSuccess }) => {
     const [height, setHeight] = useState('');
     const [unit, setUnit] = useState('cm');
     const [variants, setVariants] = useState([{ color: '', size: '' }]);
+    const [discountType, setDiscountType] = useState('percentage');
+    const [discountValue, setDiscountValue] = useState(0);
+    const [supplier, setSupplier] = useState('');
+    const [suppliers, setSuppliers] = useState([]);
+    const [weight, setWeight] = useState('');
+    const [shippingCost, setShippingCost] = useState('');
+    const [packageSize, setPackageSize] = useState('medium');
 
     const { refreshToken } = useContext(AuthContext);
     const axiosInstance = useAxios(refreshToken);
@@ -36,6 +43,7 @@ const EditProductModal = ({ open, onClose, product, onEditSuccess }) => {
             setCategory(product.category._id);
             setSubcategory(product.subcategory._id);
             setInventoryCount(product.inventoryCount);
+            setSupplier(product.supplier._id);
             if (product.image) {
                 setImagePreview(`http://localhost:5000/${product.image}`);
             } else {
@@ -50,21 +58,60 @@ const EditProductModal = ({ open, onClose, product, onEditSuccess }) => {
             if (product.variants) {
                 setVariants(product.variants);
             }
+            if (product.discount) {
+                setDiscountType(product.discount.type);
+                setDiscountValue(product.discount.value);
+            }
+            if (product.shipping) {
+                setWeight(product.shipping.weight);
+                setShippingCost(product.shipping.cost);
+                setPackageSize(product.shipping.packageSize);
+            }
         }
 
-        const fetchCategoriesAndSubcategories = async () => {
+    }, [product]);
+
+    useEffect(() => {
+        const TIMEOUT = 5000;
+
+        async function fetchCategoriesAndSubcategories() {
             try {
-                const categoriesResponse = await axiosInstance.get('/categories/get');
-                const subcategoriesResponse = await axiosInstance.get('/subcategories/get');
-                setCategories(categoriesResponse.data);
+                const response = await axiosInstance.get('/categories/get', {
+                    timeout: TIMEOUT,
+                });
+                setCategories(response.data);
+
+                const subcategoriesResponse = await axiosInstance.get('/subcategories/get', {
+                    timeout: TIMEOUT,
+                })
                 setSubcategories(subcategoriesResponse.data);
             } catch (error) {
-                console.error('Error fetching categories and subcategories', error);
+                if (error.code === 'ECONNABORTED') {
+                    console.error('Request timed out');
+                } else {
+                    console.error('Error fetching categories and subcategories:', error.message);
+                }
             }
-        };
+        }
+
+        async function fetchSuppliers() {
+            try {
+                const response = await axiosInstance.get('/suppliers/get', {
+                    timeout: TIMEOUT,
+                });
+                setSuppliers(response.data);
+            } catch (error) {
+                if (error.code === 'ECONNABORTED') {
+                    console.error('Request timed out');
+                } else {
+                    console.error('Error fetching suppliers:', error.message);
+                }
+            }
+        }
 
         fetchCategoriesAndSubcategories();
-    }, [product]);
+        fetchSuppliers();
+    }, [axiosInstance]);
 
     const handleImageChange = (e) => {
         const file = e.target.files[0];
@@ -92,6 +139,21 @@ const EditProductModal = ({ open, onClose, product, onEditSuccess }) => {
         setVariants(variants.filter((_, i) => i !== index));
     };
 
+    useEffect(() => {
+        if (price && salePrice) {
+            const priceValue = parseFloat(price);
+            const salePriceValue = parseFloat(salePrice);
+
+            if (salePriceValue < priceValue) {
+                const discountPercentage = Math.round(((priceValue - salePriceValue) / priceValue) * 100);
+                setDiscountType('percentage');
+                setDiscountValue(discountPercentage);
+            } else {
+                setDiscountValue(0);
+            }
+        }
+    }, [price, salePrice]);
+
     const handleEditProduct = async () => {
         const formData = new FormData();
         formData.append('name', name);
@@ -105,6 +167,16 @@ const EditProductModal = ({ open, onClose, product, onEditSuccess }) => {
         formData.append('dimensions[width]', width);
         formData.append('dimensions[height]', height);
         formData.append('dimensions[unit]', unit);
+        formData.append('discount[type]', discountType);
+        formData.append('discount[value]', discountValue);
+        formData.append('supplier', supplier);
+        formData.append('shipping[weight]', weight);
+        formData.append('shipping[cost]', shippingCost);
+        formData.append('shipping[dimensions][length]', length);
+        formData.append('shipping[dimensions][width]', width);
+        formData.append('shipping[dimensions][height]', height);
+        formData.append('shipping[dimensions][unit]', unit);
+        formData.append('shipping[packageSize]', packageSize);
         variants.forEach((variant, index) => {
             formData.append(`variants[${index}][color]`, variant.color);
             formData.append(`variants[${index}][size]`, variant.size);
@@ -229,6 +301,68 @@ const EditProductModal = ({ open, onClose, product, onEditSuccess }) => {
                             className="!mb-4"
                         />
                     </Box>
+                    <Typography variant='h6' className="!text-lg !font-bold !mb-2">Discount</Typography>
+                    <Box className="flex gap-4 mb-4">
+                        <OutlinedBrownFormControl className="flex-1">
+                            <InputLabel>Discount Type</InputLabel>
+                            <Select
+                                label="Discount Type"
+                                value={discountType}
+                                onChange={(e) => setDiscountType(e.target.value)}
+                            >
+                                <MenuItem value="percentage">Percentage</MenuItem>
+                                <MenuItem value="fixed">Fixed</MenuItem>
+                            </Select>
+                        </OutlinedBrownFormControl>
+                        <BrownOutlinedTextField
+                            fullWidth
+                            label="Discount Value"
+                            value={discountValue}
+                            onChange={(e) => setDiscountValue(e.target.value)}
+                            className="!mb-4"
+                        />
+                    </Box>
+                    <OutlinedBrownFormControl fullWidth className="!mb-4">
+                        <InputLabel>Supplier</InputLabel>
+                        <Select
+                            label="Supplier"
+                            value={supplier}
+                            onChange={(e) => setSupplier(e.target.value)}
+                        >
+                            {suppliers.map((sup) => (
+                                <MenuItem key={sup._id} value={sup._id}>{sup.name}</MenuItem>
+                            ))}
+                        </Select>
+                    </OutlinedBrownFormControl>
+                    <Typography variant='h6' className="!text-lg !font-bold !mb-2">Shipping</Typography>
+                    <Box className="flex gap-4 mb-4">
+                        <BrownOutlinedTextField
+                            fullWidth
+                            label="Weight"
+                            value={weight}
+                            onChange={(e) => setWeight(e.target.value)}
+                            className="!mb-4"
+                        />
+                        <BrownOutlinedTextField
+                            fullWidth
+                            label="Shipping Cost"
+                            value={shippingCost}
+                            onChange={(e) => setShippingCost(e.target.value)}
+                            className="!mb-4"
+                        />
+                    </Box>
+                    <OutlinedBrownFormControl fullWidth className="!mb-4">
+                        <InputLabel>Package Size</InputLabel>
+                        <Select
+                            label="Package Size"
+                            value={packageSize}
+                            onChange={(e) => setPackageSize(e.target.value)}
+                        >
+                            <MenuItem value="small">Small</MenuItem>
+                            <MenuItem value="medium">Medium</MenuItem>
+                            <MenuItem value="big">Big</MenuItem>
+                        </Select>
+                    </OutlinedBrownFormControl>
                     <Typography variant='h6' className="!text-lg !font-bold !mb-2">Variants</Typography>
                     {variants.map((variant, index) => (
                         <Box key={index} className="flex gap-4 mb-2">

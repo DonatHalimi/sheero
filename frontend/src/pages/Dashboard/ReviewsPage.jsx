@@ -61,7 +61,7 @@ const ReviewsPage = () => {
                             {reviews.map((review) => (
                                 <TableRow key={review._id}>
                                     <TableCell>{review.user?.username}</TableCell>
-                                    <TableCell>{review.product.name}</TableCell>
+                                    <TableCell>{review.product?.name}</TableCell>
                                     <TableCell>{review.rating}</TableCell>
                                     <TableCell>{review.comment}</TableCell>
                                     <TableCell>

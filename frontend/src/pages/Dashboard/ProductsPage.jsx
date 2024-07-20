@@ -5,18 +5,15 @@ import { ActionButton, BoldTableCell, BrownCreateOutlinedIcon, BrownDeleteOutlin
 import AddProductModal from '../../components/Modal/Product/AddProductModal';
 import DeleteProductModal from '../../components/Modal/Product/DeleteProductModal';
 import EditProductModal from '../../components/Modal/Product/EditProductModal';
-import AddReviewModal from '../../components/Modal/Review/AddReviewModal'; // Add this import
 import Pagination from '../../components/Pagination';
 import { AuthContext } from '../../context/AuthContext';
 
 const ProductsPage = () => {
     const [products, setProducts] = useState([]);
     const [selectedProduct, setSelectedProduct] = useState(null);
-    const [selectedProductForReview, setSelectedProductForReview] = useState(null); // Add this state
     const [addProductOpen, setAddProductOpen] = useState(false);
     const [editProductOpen, setEditProductOpen] = useState(false);
     const [deleteProductOpen, setDeleteProductOpen] = useState(false);
-    const [addReviewOpen, setAddReviewOpen] = useState(false); // Add this state
     const [currentPage, setCurrentPage] = useState(1);
     const [totalPages, setTotalPages] = useState(1);
     const itemsPerPage = 10;
@@ -52,11 +49,6 @@ const ProductsPage = () => {
         setCurrentPage(page);
     };
 
-    const handleOpenReviewModal = (product) => {
-        setSelectedProductForReview(product);
-        setAddReviewOpen(true);
-    };
-
     return (
         <>
             <div className='container mx-auto max-w-screen-2xl px-4 mt-20'>
@@ -78,6 +70,9 @@ const ProductsPage = () => {
                                     <BoldTableCell>Inventory Count</BoldTableCell>
                                     <BoldTableCell>Dimensions</BoldTableCell>
                                     <BoldTableCell>Variants</BoldTableCell>
+                                    <BoldTableCell>Discount</BoldTableCell>
+                                    <BoldTableCell>Supplier</BoldTableCell>
+                                    <BoldTableCell>Shipping</BoldTableCell>
                                     <BoldTableCell>Image</BoldTableCell>
                                     <BoldTableCell>Actions</BoldTableCell>
                                 </TableRow>
@@ -101,17 +96,25 @@ const ProductsPage = () => {
                                                     </div>
                                                 ))}
                                             </TableCell>
+                                            <TableCell>
+                                                {product.discount ?
+                                                    (product.discount.type === 'percentage'
+                                                        ? `${product.discount.value}%`
+                                                        : `${product.discount.value}`)
+                                                    : 'None'}
+                                            </TableCell>
+                                            <TableCell>{product.supplier.name}</TableCell>
+                                            <TableCell>{product.shipping ? `${product.shipping.weight} kg, ${product.shipping.cost}€, ${product.shipping.packageSize}` : 'None'}</TableCell>
                                             <TableCell><img className='rounded-md' src={`http://localhost:5000/${product.image}`} alt="" width={80} /></TableCell>
                                             <TableCell>
                                                 <ActionButton onClick={() => { setSelectedProduct(product); setEditProductOpen(true); }}><BrownCreateOutlinedIcon /></ActionButton>
                                                 <ActionButton onClick={() => { setSelectedProduct(product); setDeleteProductOpen(true); }}><BrownDeleteOutlinedIcon /></ActionButton>
-                                                <ActionButton onClick={() => handleOpenReviewModal(product)}><BrownCreateOutlinedIcon /></ActionButton> {/* Add this line */}
                                             </TableCell>
                                         </TableRow>
                                     ))
                                 ) : (
                                     <TableRow>
-                                        <TableCell colSpan={11} align="center">
+                                        <TableCell colSpan={14} align="center">
                                             No products found.
                                         </TableCell>
                                     </TableRow>
@@ -130,7 +133,6 @@ const ProductsPage = () => {
                     <AddProductModal open={addProductOpen} onClose={() => setAddProductOpen(false)} onAddSuccess={refreshProducts} />
                     <EditProductModal open={editProductOpen} onClose={() => setEditProductOpen(false)} product={selectedProduct} onEditSuccess={refreshProducts} />
                     <DeleteProductModal open={deleteProductOpen} onClose={() => setDeleteProductOpen(false)} product={selectedProduct} onDeleteSuccess={refreshProducts} />
-                    <AddReviewModal open={addReviewOpen} onClose={() => setAddReviewOpen(false)} productId={selectedProductForReview ? selectedProductForReview._id : null} onAddSuccess={refreshProducts} /> {/* Add this line */}
                 </div>
             </div>
         </>

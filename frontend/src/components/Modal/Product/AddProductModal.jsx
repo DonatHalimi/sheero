@@ -23,23 +23,57 @@ const AddProductModal = ({ open, onClose, onAddSuccess }) => {
     const [height, setHeight] = useState('');
     const [unit, setUnit] = useState('cm');
     const [variants, setVariants] = useState([{ color: '', size: '' }]);
+    const [discountType, setDiscountType] = useState('percentage');
+    const [discountValue, setDiscountValue] = useState(0);
+    const [supplier, setSupplier] = useState('');
+    const [suppliers, setSuppliers] = useState([]);
+    const [weight, setWeight] = useState('');
+    const [shippingCost, setShippingCost] = useState('');
+    const [packageSize, setPackageSize] = useState('medium');
 
     const { refreshToken } = useContext(AuthContext);
     const axiosInstance = useAxios(refreshToken);
 
     useEffect(() => {
-        const fetchCategoriesAndSubcategories = async () => {
+        const TIMEOUT = 5000;
+
+        async function fetchCategoriesAndSubcategories() {
             try {
-                const categoriesResponse = await axiosInstance.get('/categories/get');
-                const subcategoriesResponse = await axiosInstance.get('/subcategories/get');
-                setCategories(categoriesResponse.data);
+                const response = await axiosInstance.get('/categories/get', {
+                    timeout: TIMEOUT,
+                });
+                setCategories(response.data);
+
+                const subcategoriesResponse = await axiosInstance.get('/subcategories/get', {
+                    timeout: TIMEOUT,
+                })
                 setSubcategories(subcategoriesResponse.data);
             } catch (error) {
-                console.error('Error fetching categories and subcategories', error);
+                if (error.code === 'ECONNABORTED') {
+                    console.error('Request timed out');
+                } else {
+                    console.error('Error fetching categories and subcategories:', error.message);
+                }
             }
-        };
+        }
+
+        async function fetchSuppliers() {
+            try {
+                const response = await axiosInstance.get('/suppliers/get', {
+                    timeout: TIMEOUT,
+                });
+                setSuppliers(response.data);
+            } catch (error) {
+                if (error.code === 'ECONNABORTED') {
+                    console.error('Request timed out');
+                } else {
+                    console.error('Error fetching suppliers:', error.message);
+                }
+            }
+        }
 
         fetchCategoriesAndSubcategories();
+        fetchSuppliers();
     }, [axiosInstance]);
 
     const handleImageChange = (e) => {
@@ -55,7 +89,7 @@ const AddProductModal = ({ open, onClose, onAddSuccess }) => {
     };
 
     const handleAddProduct = async () => {
-        if (!name || !description || !price || !category || !subcategory || !inventoryCount || !image) {
+        if (!name || !description || !price || !category || !subcategory || !inventoryCount || !image || !supplier) {
             toast.error('Please fill in all the fields', {
                 closeOnClick: true
             });
@@ -75,6 +109,16 @@ const AddProductModal = ({ open, onClose, onAddSuccess }) => {
         formData.append('dimensions[width]', width);
         formData.append('dimensions[height]', height);
         formData.append('dimensions[unit]', unit);
+        formData.append('discount[type]', discountType);
+        formData.append('discount[value]', discountValue);
+        formData.append('supplier', supplier);
+        formData.append('shipping[weight]', weight);
+        formData.append('shipping[cost]', shippingCost);
+        formData.append('shipping[dimensions][length]', length);
+        formData.append('shipping[dimensions][width]', width);
+        formData.append('shipping[dimensions][height]', height);
+        formData.append('shipping[dimensions][unit]', unit);
+        formData.append('shipping[packageSize]', packageSize);
         variants.forEach((variant, index) => {
             formData.append(`variants[${index}][color]`, variant.color);
             formData.append(`variants[${index}][size]`, variant.size);
@@ -212,6 +256,77 @@ const AddProductModal = ({ open, onClose, onAddSuccess }) => {
                             className="!mb-4"
                         />
                     </Box>
+                    <Typography variant='h6' className="!text-lg !font-bold !mb-2">Discount</Typography>
+                    <Box className="flex gap-4 mb-4">
+                        <OutlinedBrownFormControl className="flex-1">
+                            <InputLabel>Discount Type</InputLabel>
+                            <Select
+                                label="Discount Type"
+                                value={discountType}
+                                onChange={(e) => setDiscountType(e.target.value)}
+                                sx={{
+                                    width: '100px'
+                                }}
+                            >
+                                <MenuItem value="percentage">Percentage</MenuItem>
+                                <MenuItem value="fixed">Fixed</MenuItem>
+                            </Select>
+                        </OutlinedBrownFormControl>
+                        <BrownOutlinedTextField
+                            fullWidth
+                            label="Discount Value"
+                            value={discountValue}
+                            placeholder="Leave empty to calculate automatically"
+                            onChange={(e) => setDiscountValue(e.target.value)}
+                            className="!mb-4"
+                            sx={{
+                                width: '305px'
+                            }}
+                        />
+                    </Box>
+
+
+                    <OutlinedBrownFormControl fullWidth className="!mb-4">
+                        <InputLabel>Supplier</InputLabel>
+                        <Select
+                            label="Supplier"
+                            value={supplier}
+                            onChange={(e) => setSupplier(e.target.value)}
+                        >
+                            {suppliers.map((sup) => (
+                                <MenuItem key={sup._id} value={sup._id}>{sup.name}</MenuItem>
+                            ))}
+                        </Select>
+                    </OutlinedBrownFormControl>
+                    <Typography variant='h6' className="!text-lg !font-bold !mb-2">Shipping</Typography>
+                    <Box className="flex gap-4 mb-4">
+                        <BrownOutlinedTextField
+                            fullWidth
+                            label="Weight"
+                            value={weight}
+                            onChange={(e) => setWeight(e.target.value)}
+                            className="!mb-4"
+                        />
+                        <BrownOutlinedTextField
+                            fullWidth
+                            label="Shipping Cost"
+                            value={shippingCost}
+                            onChange={(e) => setShippingCost(e.target.value)}
+                            className="!mb-4"
+                        />
+                    </Box>
+                    <OutlinedBrownFormControl fullWidth className="!mb-4">
+                        <InputLabel>Package Size</InputLabel>
+                        <Select
+                            label="Package Size"
+                            value={packageSize}
+                            onChange={(e) => setPackageSize(e.target.value)}
+                        >
+                            <MenuItem value="small">Small</MenuItem>
+                            <MenuItem value="medium">Medium</MenuItem>
+                            <MenuItem value="big">Big</MenuItem>
+                        </Select>
+                    </OutlinedBrownFormControl>
                     <Typography variant='h6' className="!text-lg !font-bold !mb-2">Variants</Typography>
                     {variants.map((variant, index) => (
                         <Box key={index} className="flex gap-4 mb-2">
