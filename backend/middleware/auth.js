@@ -1,4 +1,3 @@
-// backend/middleware/auth.js
 const jwt = require('jsonwebtoken');
 
 const authenticateToken = (req, res, next) => {
@@ -35,4 +34,16 @@ const protect = (req, res, next) => {
     authenticateToken(req, res, next);
 };
 
-module.exports = { authenticateToken, authorizeRole, protect };
+const requireAuthAndRole = (role) => {
+    return (req, res, next) => {
+        authenticateToken(req, res, (err) => {
+            if (err) return next(err);
+            if (req.user.role !== role) {
+                return res.status(403).json({ message: 'Forbidden' });
+            }
+            next();
+        });
+    };
+};
+
+module.exports = { authenticateToken, authorizeRole, protect, requireAuthAndRole };

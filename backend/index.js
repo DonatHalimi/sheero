@@ -11,6 +11,8 @@ const cityRoutes = require('./routes/city');
 const subcategoryRoutes = require('./routes/subcategory');
 const userRoutes = require('./routes/user');
 const addressRoutes = require('./routes/address')
+const supplierRoutes = require('./routes/supplier')
+const reviewRoutes = require('./routes/review')
 
 dotenv.config();
 
@@ -32,6 +34,8 @@ app.use('/api/users', userRoutes);
 app.use('/api/countries', countryRoutes);
 app.use('/api/cities', cityRoutes);
 app.use('/api/addresses', addressRoutes)
+app.use('/api/suppliers', supplierRoutes)
+app.use('/api/reviews', reviewRoutes)
 
 const PORT = process.env.BACKEND_PORT || 5000;
 app.listen(PORT, () => console.log(`Server running on port ${PORT}`));

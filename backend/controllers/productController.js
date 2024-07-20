@@ -3,10 +3,14 @@ const fs = require('fs');
 const path = require('path');
 
 const createProduct = async (req, res) => {
-    const { name, description, price, salePrice, category, subcategory, inventoryCount, dimensions, variants } = req.body;
+    const {
+        name, description, price, salePrice, category, subcategory, inventoryCount, dimensions, variants, discount, supplier, shipping
+    } = req.body;
     const image = req.file ? req.file.path : '';
     try {
-        const product = new Product({ name, description, price, salePrice, category, subcategory, inventoryCount, dimensions, variants, image });
+        const product = new Product({
+            name, description, price, salePrice, category, subcategory, inventoryCount, dimensions, variants, discount, supplier, shipping, image
+        });
         await product.save();
         res.status(201).json(product);
     } catch (error) {
@@ -21,7 +25,7 @@ const getProducts = async (req, res) => {
 
     try {
         const totalProducts = await Product.countDocuments();
-        const products = await Product.find().populate('category subcategory').skip(skip).limit(limit);
+        const products = await Product.find().populate('category subcategory supplier').skip(skip).limit(limit);
         const totalPages = Math.ceil(totalProducts / limit);
 
         res.status(200).json({ products, totalPages });
@@ -32,7 +36,7 @@ const getProducts = async (req, res) => {
 
 const getProduct = async (req, res) => {
     try {
-        const product = await Product.findById(req.params.id).populate('category subcategory');
+        const product = await Product.findById(req.params.id).populate('category subcategory supplier');
         if (!product) return res.status(404).json({ message: 'Product not found' });
         res.status(200).json(product);
     } catch (error) {
@@ -41,7 +45,9 @@ const getProduct = async (req, res) => {
 };
 
 const updateProduct = async (req, res) => {
-    const { name, description, price, salePrice, category, subcategory, inventoryCount, dimensions, variants } = req.body;
+    const {
+        name, description, price, salePrice, category, subcategory, inventoryCount, dimensions, variants, discount, supplier, shipping
+    } = req.body;
     let image = req.body.image;
     try {
         const oldProduct = await Product.findById(req.params.id);
@@ -65,7 +71,9 @@ const updateProduct = async (req, res) => {
 
         const product = await Product.findByIdAndUpdate(
             req.params.id,
-            { name, description, price, salePrice, category, subcategory, inventoryCount, dimensions, variants, image, updatedAt: Date.now() },
+            {
+                name, description, price, salePrice, category, subcategory, inventoryCount, dimensions, variants, discount, supplier, shipping, image, updatedAt: Date.now()
+            },
             { new: true }
         );
         res.status(200).json(product);
@@ -91,6 +99,5 @@ const deleteProduct = async (req, res) => {
         res.status(500).json({ message: 'Server error' });
     }
 };
-
 
 module.exports = { createProduct, getProducts, getProduct, updateProduct, deleteProduct };

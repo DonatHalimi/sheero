@@ -10,10 +10,10 @@ import { BrownButton, BrownOutlinedTextField, OutlinedBrownFormControl } from '.
 const EditUserModal = ({ open, onClose, user, onEditSuccess }) => {
     const [username, setUsername] = useState('');
     const [email, setEmail] = useState('');
+    const [isValidEmail, setIsValidEmail] = useState(true);
     const [password, setPassword] = useState('');
     const [showPassword, setShowPassword] = useState(false);
     const [role, setRole] = useState('');
-    const [isValidEmail, setIsValidEmail] = useState(true);
 
     const { refreshToken } = useContext(AuthContext);
     const axiosInstance = useAxios(refreshToken);

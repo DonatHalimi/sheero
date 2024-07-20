@@ -18,7 +18,9 @@ import CitiesPage from '../../pages/Dashboard/CitiesPage';
 import CountriesPage from '../../pages/Dashboard/CountriesPage';
 import DashboardContent from '../../pages/Dashboard/DashboardContent';
 import ProductsPage from '../../pages/Dashboard/ProductsPage';
+import ReviewsPage from '../../pages/Dashboard/ReviewsPage';
 import SubcategoriesPage from '../../pages/Dashboard/SubcategoriesPage';
+import SuppliersPage from '../../pages/Dashboard/SuppliersPage';
 import UsersPage from '../../pages/Dashboard/UsersPage';
 import theme from '../../theme';
 import { AppBar, BrownButton, Drawer } from '../Dashboard/CustomComponents';
@@ -35,22 +37,26 @@ export default function Dashboard() {
 
   const renderContent = () => {
     switch (currentView) {
-      case 'dashboard':
-        return <DashboardContent />;
-      case 'countries':
-        return <CountriesPage />;
-      case 'cities':
-        return <CitiesPage />;
       case 'addresses':
         return <AddressesPage />;
-      case 'products':
-        return <ProductsPage />;
-      case 'users':
-        return <UsersPage />;
       case 'categories':
         return <CategoriesPage />;
+      case 'cities':
+        return <CitiesPage />;
+      case 'countries':
+        return <CountriesPage />;
+      case 'dashboard':
+        return <DashboardContent />;
+      case 'products':
+        return <ProductsPage />;
+      case 'reviews':
+        return <ReviewsPage />;
       case 'subcategories':
         return <SubcategoriesPage />;
+      case 'suppliers':
+        return <SuppliersPage />;
+      case 'users':
+        return <UsersPage />;
       default:
         return <UsersPage />;
     }

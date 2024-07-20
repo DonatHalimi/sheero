@@ -50,7 +50,7 @@ const SubcategoriesPage = () => {
             setSubcategories(response.data);
             setCategories(categories.data)
         } catch (error) {
-            console.error('Error fetching products', error);
+            console.error('Error fetching subcategory', error);
         }
     };
 

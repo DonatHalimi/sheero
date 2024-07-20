@@ -5,15 +5,18 @@ import { ActionButton, BoldTableCell, BrownCreateOutlinedIcon, BrownDeleteOutlin
 import AddProductModal from '../../components/Modal/Product/AddProductModal';
 import DeleteProductModal from '../../components/Modal/Product/DeleteProductModal';
 import EditProductModal from '../../components/Modal/Product/EditProductModal';
+import AddReviewModal from '../../components/Modal/Review/AddReviewModal'; // Add this import
 import Pagination from '../../components/Pagination';
 import { AuthContext } from '../../context/AuthContext';
 
 const ProductsPage = () => {
     const [products, setProducts] = useState([]);
     const [selectedProduct, setSelectedProduct] = useState(null);
+    const [selectedProductForReview, setSelectedProductForReview] = useState(null); // Add this state
     const [addProductOpen, setAddProductOpen] = useState(false);
     const [editProductOpen, setEditProductOpen] = useState(false);
     const [deleteProductOpen, setDeleteProductOpen] = useState(false);
+    const [addReviewOpen, setAddReviewOpen] = useState(false); // Add this state
     const [currentPage, setCurrentPage] = useState(1);
     const [totalPages, setTotalPages] = useState(1);
     const itemsPerPage = 10;
@@ -47,6 +50,11 @@ const ProductsPage = () => {
 
     const handlePageChange = (page) => {
         setCurrentPage(page);
+    };
+
+    const handleOpenReviewModal = (product) => {
+        setSelectedProductForReview(product);
+        setAddReviewOpen(true);
     };
 
     return (
@@ -97,6 +105,7 @@ const ProductsPage = () => {
                                             <TableCell>
                                                 <ActionButton onClick={() => { setSelectedProduct(product); setEditProductOpen(true); }}><BrownCreateOutlinedIcon /></ActionButton>
                                                 <ActionButton onClick={() => { setSelectedProduct(product); setDeleteProductOpen(true); }}><BrownDeleteOutlinedIcon /></ActionButton>
+                                                <ActionButton onClick={() => handleOpenReviewModal(product)}><BrownCreateOutlinedIcon /></ActionButton> {/* Add this line */}
                                             </TableCell>
                                         </TableRow>
                                     ))
@@ -121,6 +130,7 @@ const ProductsPage = () => {
                     <AddProductModal open={addProductOpen} onClose={() => setAddProductOpen(false)} onAddSuccess={refreshProducts} />
                     <EditProductModal open={editProductOpen} onClose={() => setEditProductOpen(false)} product={selectedProduct} onEditSuccess={refreshProducts} />
                     <DeleteProductModal open={deleteProductOpen} onClose={() => setDeleteProductOpen(false)} product={selectedProduct} onDeleteSuccess={refreshProducts} />
+                    <AddReviewModal open={addReviewOpen} onClose={() => setAddReviewOpen(false)} productId={selectedProductForReview ? selectedProductForReview._id : null} onAddSuccess={refreshProducts} /> {/* Add this line */}
                 </div>
             </div>
         </>

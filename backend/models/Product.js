@@ -19,8 +19,41 @@ const productSchema = new mongoose.Schema({
         color: String,
         size: String,
     }],
+    discount: {
+        type: {
+            type: String,
+            enum: ['percentage', 'fixed'],
+            default: 'percentage'
+        },
+        value: { type: Number, default: 0 }
+    },
+    supplier: { type: mongoose.Schema.Types.ObjectId, ref: 'Supplier', required: true },
+    shipping: {
+        weight: { type: Number, default: null },
+        dimensions: {
+            length: { type: Number, default: null },
+            width: { type: Number, default: null },
+            height: { type: Number, default: null },
+            unit: { type: String, default: 'cm' }
+        },
+        cost: { type: Number, default: 0 },
+        packageSize: {
+            type: String,
+            enum: ['small', 'medium', 'big'],
+            default: 'medium'
+        }
+    },
+    reviews: [{ type: mongoose.Schema.Types.ObjectId, ref: 'Review' }],
     createdAt: { type: Date, default: Date.now },
     updatedAt: { type: Date, default: Date.now }
+});
+
+productSchema.pre('save', function (next) {
+    if (this.salePrice && this.price) {
+        const discountPercentage = ((this.price - this.salePrice) / this.price) * 100;
+        this.discount.value = discountPercentage;
+    }
+    next();
 });
 
 module.exports = mongoose.model('Product', productSchema);
