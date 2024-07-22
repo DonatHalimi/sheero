@@ -5,20 +5,22 @@ import CountriesPage from '../pages/Dashboard/CountriesPage';
 import DashboardContent from '../pages/Dashboard/DashboardContent';
 import ProductsPage from '../pages/Dashboard/ProductsPage';
 import ReviewsPage from '../pages/Dashboard/ReviewsPage';
+import SlideshowPage from '../pages/Dashboard/SlideshowPage';
 import SubcategoriesPage from '../pages/Dashboard/SubcategoriesPage';
 import SuppliersPage from '../pages/Dashboard/SuppliersPage';
 import UsersPage from '../pages/Dashboard/UsersPage';
 
 const pages = {
-    main: DashboardContent,
     addresses: AddressesPage,
     categories: CategoriesPage,
     cities: CitiesPage,
     countries: CountriesPage,
+    images: SlideshowPage,
+    main: DashboardContent,
     products: ProductsPage,
     reviews: ReviewsPage,
-    subcategories: SubcategoriesPage,
     suppliers: SuppliersPage,
+    subcategories: SubcategoriesPage,
     users: UsersPage,
 };
 

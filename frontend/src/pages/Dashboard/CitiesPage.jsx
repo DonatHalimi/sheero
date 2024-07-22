@@ -1,7 +1,7 @@
-import { Paper, Table, TableBody, TableCell, TableContainer, TableHead, TableRow, Typography, Checkbox } from '@mui/material';
+import { Checkbox, Paper, Table, TableBody, TableCell, TableContainer, TableHead, TableRow, Typography } from '@mui/material';
 import React, { useContext, useEffect, useState } from 'react';
 import useAxios from '../../axiosInstance';
-import { ActionButton, BoldTableCell, BrownCreateOutlinedIcon, BrownDeleteOutlinedIcon, OutlinedBrownButton } from '../../components/Dashboard/CustomComponents';
+import { ActionButton, BoldTableCell, BrownCreateOutlinedIcon, OutlinedBrownButton } from '../../components/Dashboard/CustomComponents';
 import AddCityModal from '../../components/Modal/City/AddCityModal';
 import DeleteCityModal from '../../components/Modal/City/DeleteCityModal';
 import EditCityModal from '../../components/Modal/City/EditCityModal';

@@ -1,14 +1,14 @@
-import { Paper, Table, TableBody, TableCell, TableContainer, TableHead, TableRow, Typography, Checkbox } from '@mui/material';
+import { Checkbox, Paper, Table, TableBody, TableCell, TableContainer, TableHead, TableRow, Typography } from '@mui/material';
 import React, { useContext, useEffect, useState } from 'react';
 import useAxios from '../../axiosInstance';
-import { ActionButton, BoldTableCell, BrownCreateOutlinedIcon, BrownDeleteOutlinedIcon, OutlinedBrownButton } from '../../components/Dashboard/CustomComponents';
+import { ActionButton, BoldTableCell, BrownCreateOutlinedIcon, OutlinedBrownButton } from '../../components/Dashboard/CustomComponents';
 import AddProductModal from '../../components/Modal/Product/AddProductModal';
 import DeleteProductModal from '../../components/Modal/Product/DeleteProductModal';
 import EditProductModal from '../../components/Modal/Product/EditProductModal';
 import Pagination from '../../components/Pagination';
 import { AuthContext } from '../../context/AuthContext';
 
-const ITEMS_TO_SHOW = 3; // Number of items to show before truncating
+const ITEMS_TO_SHOW = 3;
 
 const truncateItems = (items, maxItems = ITEMS_TO_SHOW) => {
     if (items.length <= maxItems) {

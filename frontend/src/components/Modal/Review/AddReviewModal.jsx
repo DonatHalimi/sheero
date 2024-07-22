@@ -83,7 +83,7 @@ const AddReviewModal = ({ open, onClose, onAddSuccess }) => {
                 <FormControl fullWidth className='!mb-4'>
                     <InputLabel id="product-label">Product</InputLabel>
                     <Select
-                        labelId="product-label"
+                        label="Product"
                         value={productId}
                         onChange={(e) => setProductId(e.target.value)}
                     >

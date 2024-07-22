@@ -1,4 +1,4 @@
-import { Paper, Table, TableBody, TableCell, TableContainer, TableHead, TableRow, Typography, Checkbox } from '@mui/material';
+import { Checkbox, Paper, Table, TableBody, TableCell, TableContainer, TableHead, TableRow, Typography } from '@mui/material';
 import React, { useContext, useEffect, useState } from 'react';
 import useAxios from '../../axiosInstance';
 import { ActionButton, BoldTableCell, BrownCreateOutlinedIcon, OutlinedBrownButton } from '../../components/Dashboard/CustomComponents';
@@ -73,7 +73,7 @@ const CategoriesPage = () => {
                                     onClick={() => setDeleteCategoryOpen(true)}
                                     disabled={selectedCategories.length === 0}
                                 >
-                                    Delete Selected Categories
+                                    {selectedCategories.length > 1 ? 'Delete Selected Categories' : 'Delete Category'}
                                 </OutlinedBrownButton>
                             )}
                         </div>

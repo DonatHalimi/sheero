@@ -1,10 +1,10 @@
-import { Paper, Table, TableBody, TableCell, TableContainer, TableHead, TableRow, Typography, Checkbox } from '@mui/material';
+import { Checkbox, Paper, Table, TableBody, TableCell, TableContainer, TableHead, TableRow, Typography } from '@mui/material';
 import React, { useContext, useEffect, useState } from 'react';
 import useAxios from '../../axiosInstance';
 import { ActionButton, BoldTableCell, BrownCreateOutlinedIcon, OutlinedBrownButton } from '../../components/Dashboard/CustomComponents';
 import AddReviewModal from '../../components/Modal/Review/AddReviewModal';
-import EditReviewModal from '../../components/Modal/Review/EditReviewModal';
 import DeleteReviewModal from '../../components/Modal/Review/DeleteReviewModal';
+import EditReviewModal from '../../components/Modal/Review/EditReviewModal';
 import { AuthContext } from '../../context/AuthContext';
 
 const ReviewsPage = () => {
@@ -86,6 +86,7 @@ const ReviewsPage = () => {
                                     />
                                 </BoldTableCell>
                                 <BoldTableCell>User</BoldTableCell>
+                                <BoldTableCell>Rating</BoldTableCell>
                                 <BoldTableCell>Comment</BoldTableCell>
                                 <BoldTableCell>Product</BoldTableCell>
                                 <BoldTableCell>Actions</BoldTableCell>
@@ -102,6 +103,7 @@ const ReviewsPage = () => {
                                             />
                                         </TableCell>
                                         <TableCell>{review.user.username}</TableCell>
+                                        <TableCell>{review.rating}</TableCell>
                                         <TableCell>{review.comment}</TableCell>
                                         <TableCell>{review.product.name}</TableCell>
                                         <TableCell>

@@ -10,21 +10,39 @@ import { BrownButton, BrownOutlinedTextField, OutlinedBrownFormControl } from '.
 const AddUserModal = ({ open, onClose, onAddSuccess }) => {
     const [username, setUsername] = useState('');
     const [email, setEmail] = useState('');
-    const [isValidEmail, setIsValidEmail] = useState(true);
     const [password, setPassword] = useState('');
     const [showPassword, setShowPassword] = useState(false);
-    const handleClickShowPassword = () => setShowPassword(!showPassword);
-    const handleMouseDownPassword = () => setShowPassword(!showPassword);
     const [role, setRole] = useState('');
 
     const { refreshToken } = useContext(AuthContext);
     const axiosInstance = useAxios(refreshToken);
 
-    const handleAddSubcategory = async () => {
+    const handleClickShowPassword = () => setShowPassword(!showPassword);
+    const handleMouseDownPassword = () => setShowPassword(!showPassword);
+
+    const validatePassword = (password) => {
+        const passwordRegex = /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[@$!%*?&])[A-Za-z\d@$!%*?&]{8,}$/;
+        return passwordRegex.test(password);
+    };
+
+    const validateEmail = (email) => {
+        const re = /^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$/;
+        return re.test(String(email).toLowerCase());
+    };
+
+    const handleAddUser = async () => {
         if (!username || !email || !password || !role) {
-            toast.error('Please fill in all the fields', {
-                closeOnClick: true
-            })
+            toast.error('Please fill in all the fields');
+            return;
+        }
+
+        if (!validateEmail(email)) {
+            toast.error('Email format is not correct.');
+            return;
+        }
+
+        if (!validatePassword(password)) {
+            toast.error('Password must contain at least 8 characters, one uppercase letter, one lowercase letter, one number and one special character.');
             return;
         }
 
@@ -40,13 +58,8 @@ const AddUserModal = ({ open, onClose, onAddSuccess }) => {
             onClose();
         } catch (error) {
             console.error('Error adding user', error);
-            toast.error('Error adding user');
+            toast.error(error.response?.data?.message || 'Error adding user');
         }
-    };
-
-    const validateEmail = (email) => {
-        const re = /^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$/;
-        return re.test(String(email).toLowerCase());
     };
 
     return (
@@ -63,15 +76,10 @@ const AddUserModal = ({ open, onClose, onAddSuccess }) => {
                 <BrownOutlinedTextField
                     label="Email"
                     value={email}
-                    onChange={(e) => {
-                        setEmail(e.target.value);
-                        setIsValidEmail(validateEmail(e.target.value));
-                    }}
+                    onChange={(e) => setEmail(e.target.value)}
                     fullWidth
                     className='!mb-4'
                     type='email'
-                    error={!isValidEmail}
-                    helperText={!isValidEmail ? "Please enter a valid email address" : ""}
                 />
                 <BrownOutlinedTextField
                     label="Password"
@@ -107,7 +115,7 @@ const AddUserModal = ({ open, onClose, onAddSuccess }) => {
                 </OutlinedBrownFormControl>
 
                 <BrownButton
-                    onClick={handleAddSubcategory}
+                    onClick={handleAddUser}
                     variant="contained"
                     color="primary"
                     className="w-full"

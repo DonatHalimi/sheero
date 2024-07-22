@@ -2,8 +2,26 @@ const bcrypt = require('bcryptjs');
 const jwt = require('jsonwebtoken');
 const User = require('../models/User');
 
+const validateEmail = (email) => {
+    const emailRegex = /^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$/;
+    return emailRegex.test(String(email).toLowerCase());
+};
+
+const validatePassword = (password) => {
+    const passwordRegex = /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[@$!%*?&])[A-Za-z\d@$!%*?&]{8,}$/;
+    return passwordRegex.test(password);
+};
+
 const registerUser = async (req, res) => {
     const { username, email, password, role } = req.body;
+
+    if (!validatePassword(password)) {
+        return res.status(400).json({ message: 'Password must contain at least 8 characters, one uppercase letter, one lowercase letter, one number and one special character' });
+    }
+
+    if (!validateEmail(email)) {
+        return res.status(400).json({ message: 'Email format is not correct' });
+    }
 
     try {
         const existingUser = await User.findOne({ username });
@@ -77,3 +95,4 @@ const getCurrentUser = async (req, res) => {
 };
 
 module.exports = { registerUser, loginUser, token, getCurrentUser };
+

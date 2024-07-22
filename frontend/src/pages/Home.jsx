@@ -1,15 +1,19 @@
 import React from 'react';
 import Navbar from '../components/Navbar';
+import Footer from '../components/Footer';
+import Slideshow from '../components/Slideshow';
 
 const Home = () => {
-
     return (
-        <div>
+        <>
             <Navbar />
-            <div className='flex items-center justify-center'>
-                <h1>Welcome to our application</h1>
+    
+            <div className="mt-10 mb-40">
+                <Slideshow />
             </div>
-        </div>
+
+            <Footer />
+        </>
     );
 };
 

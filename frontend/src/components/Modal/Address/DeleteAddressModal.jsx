@@ -1,5 +1,3 @@
-// DeleteAddressModal.jsx
-
 import { Box, Button, Modal } from '@mui/material';
 import React, { useContext } from 'react';
 import { toast } from 'react-toastify';
@@ -14,7 +12,6 @@ const DeleteAddressModal = ({ open, onClose, addresses, onDeleteSuccess }) => {
     const handleDeleteAddresses = async () => {
         try {
             const addressIds = addresses.map(address => address._id).filter(id => id);
-            console.log('Deleting addresses with IDs:', addressIds);  // Add logging
 
             await axiosInstance.delete('/addresses/delete-bulk', { data: { addressIds } });
             toast.success('Addresses deleted successfully');
@@ -22,7 +19,6 @@ const DeleteAddressModal = ({ open, onClose, addresses, onDeleteSuccess }) => {
             onClose();
         } catch (error) {
             toast.error('Error deleting addresses');
-            console.error('Error deleting addresses', error);  // Add detailed logging
         }
     };
 

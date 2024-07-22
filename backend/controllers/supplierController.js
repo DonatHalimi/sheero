@@ -1,13 +1,30 @@
 const Supplier = require('../models/Supplier');
 
+const validateEmail = (email) => {
+    const re = /^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$/;
+    return re.test(String(email).toLowerCase());
+};
+
 const createSupplier = async (req, res) => {
     const { name, contactInfo } = req.body;
+
+    if (!name || !contactInfo || !contactInfo.email || !contactInfo.phoneNumber) {
+        return res.status(400).json({ message: 'Please fill in all the fields' })
+    }
+
+    if (!validateEmail(contactInfo.email)) {
+        return res.status(400).json({ message: 'Email format is not correct' });
+    }
+
     try {
         const supplier = new Supplier({ name, contactInfo });
         await supplier.save();
         res.status(201).json(supplier);
     } catch (error) {
         console.error('Error creating supplier:', error);
+        if (error.name === 'ValidationError') {
+            return res.status(400).json({ message: 'Validation error', error: error.message });
+        }
         res.status(500).json({ message: 'Server error', error: error.message });
     }
 };

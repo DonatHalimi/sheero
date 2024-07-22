@@ -5,19 +5,19 @@ import useAxios from '../../../axiosInstance';
 import { AuthContext } from '../../../context/AuthContext';
 import { OutlinedBrownButton } from '../../Dashboard/CustomComponents';
 
-const DeleteSubcategoryModal = ({ open, onClose, subcategories, onDeleteSuccess }) => {
+const DeleteSlideshowModal = ({ open, onClose, images, onDeleteSuccess }) => {
     const { refreshToken } = useContext(AuthContext);
     const axiosInstance = useAxios(refreshToken);
 
-    const handleDeleteSubcategories = async () => {
+    const handleDeleteImages = async () => {
         try {
-            await axiosInstance.delete('/subcategories/delete-bulk', { data: { subcategoryIds: subcategories.map(subcategory => subcategory._id).filter(id => id) } });
-            toast.success('Subcategories deleted successfully');
+            await axiosInstance.delete('/slideshow/delete-bulk', { data: { imageIds: images.map(image => image._id) } });
+            toast.success('Slideshow images deleted successfully');
             onDeleteSuccess();
             onClose();
         } catch (error) {
-            toast.error('Error deleting subcategories');
-            console.error('Error deleting subcategories', error);
+            toast.error('Error deleting slideshow images');
+            console.error('Error deleting slideshow images', error);
         }
     };
 
@@ -25,8 +25,8 @@ const DeleteSubcategoryModal = ({ open, onClose, subcategories, onDeleteSuccess 
         <Modal open={open} onClose={onClose}>
             <div className="flex items-center justify-center h-screen">
                 <Box className="bg-white p-4 rounded-lg shadow-lg max-w-md w-full">
-                    <h2 className="text-xl font-bold mb-2">Delete Subcategory</h2>
-                    <p className="mb-4">Are you sure you want to delete the selected subcategories?</p>
+                    <h2 className="text-xl font-bold mb-2">Delete Slideshow Images</h2>
+                    <p className="mb-4">Are you sure you want to delete the selected slideshow images?</p>
                     <div className="flex justify-end">
                         <OutlinedBrownButton
                             onClick={onClose}
@@ -36,10 +36,10 @@ const DeleteSubcategoryModal = ({ open, onClose, subcategories, onDeleteSuccess 
                             Cancel
                         </OutlinedBrownButton>
                         <Button
-                            onClick={handleDeleteSubcategories}
+                            onClick={handleDeleteImages}
                             variant="contained"
                             color="error"
-                            className="mr-2"
+                            className="!mr-2"
                         >
                             Delete
                         </Button>
@@ -50,4 +50,4 @@ const DeleteSubcategoryModal = ({ open, onClose, subcategories, onDeleteSuccess 
     );
 };
 
-export default DeleteSubcategoryModal;
+export default DeleteSlideshowModal;

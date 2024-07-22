@@ -1,0 +1,74 @@
+import React, { useEffect, useState, useRef } from 'react';
+import axios from 'axios';
+import { Splide, SplideSlide } from '@splidejs/react-splide';
+
+const Slideshow = () => {
+    const [images, setImages] = useState([]);
+    const splideRef = useRef(null);
+
+    useEffect(() => {
+        axios.get('http://localhost:5000/api/slideshow/get')
+            .then(response => {
+                console.log(response.data);
+                setImages(response.data);
+            })
+            .catch(error => console.error('Error fetching images:', error));
+    }, []);
+
+    useEffect(() => {
+        if (images.length > 0 && splideRef.current) {
+            splideRef.current.splide.refresh();
+        }
+    }, [images]);
+
+    return (
+        <div className="w-full mx-auto mb-20">
+            <Splide
+                ref={splideRef}
+                options={{
+                    type: 'loop',
+                    perPage: 1,
+                    autoplay: true,
+                    interval: 3000,
+                    pagination: true,
+                    arrows: true,
+                    width: '100%',
+                    height: 'auto',
+                    breakpoints: {
+                        1024: { perPage: 1 },
+                        600: { perPage: 1 },
+                        480: { perPage: 1 }
+                    }
+                }}
+                onMounted={() => {
+                    console.log("Splide mounted");
+                    if (splideRef.current) {
+                        splideRef.current.splide.refresh();
+                    }
+                }}
+            >
+                {images.map(image => (
+                    <SplideSlide key={image._id}>
+                        <div className="flex justify-center items-center">
+                            <img
+                                src={`http://localhost:5000/${image.image}`}
+                                alt={image.title}
+                                className="w-full max-w-[2000px] h-[800px] object-cover rounded-md"
+                                onLoad={() => {
+                                    if (splideRef.current) {
+                                        splideRef.current.splide.refresh();
+                                    }
+                                }}
+                            />
+                        </div>
+                    </SplideSlide>
+                ))}
+                <div class="splide__progress">
+                    <div class="splide__progress__bar"></div>
+                </div>
+            </Splide>
+        </div>
+    );
+};
+
+export default Slideshow;

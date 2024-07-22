@@ -5,42 +5,34 @@ import React, { useContext, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { toast } from 'react-toastify';
 import { BrownButton, BrownOutlinedTextField } from '../components/Dashboard/CustomComponents';
+import Navbar from '../components/Navbar';
 import { AuthContext } from '../context/AuthContext';
-import Navbar from './Navbar';
 
-const Register = () => {
-    const [username, setUsername] = useState('');
-    const [email, setEmail] = useState('');
-    const [isValidEmail, setIsValidEmail] = useState(true);
+const Login = () => {
+    const [usernameOrEmail, setUsernameOrEmail] = useState('');
     const [password, setPassword] = useState('');
     const [showPassword, setShowPassword] = useState(false);
     const handleClickShowPassword = () => setShowPassword(!showPassword);
     const handleMouseDownPassword = () => setShowPassword(!showPassword);
-    const { register } = useContext(AuthContext);
+    const { login } = useContext(AuthContext);
     const navigate = useNavigate();
 
     const handleSubmit = async (e) => {
         e.preventDefault();
-        if (!username || !email || !password) {
+        if (!usernameOrEmail || !password) {
             toast.error('Please fill in all fields', {
                 closeOnClick: true
             });
             return;
         }
-
-        const response = await register(username, email, password);
+        const response = await login(usernameOrEmail, password);
         if (response.success) {
-            navigate('/login');
+            navigate('/');
         } else {
             toast.error(response.message, {
                 closeOnClick: true
             });
         }
-    };
-
-    const validateEmail = (email) => {
-        const re = /^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$/;
-        return re.test(String(email).toLowerCase());
     };
 
     return (
@@ -49,7 +41,7 @@ const Register = () => {
             <Container component="main" maxWidth="xs">
                 <Box className="mt-32 flex flex-col items-center bg-white p-8 rounded shadow-md">
                     <Typography component="h1" variant="h5" className="mb-4">
-                        Register
+                        Sign in
                     </Typography>
                     <Box component="form" onSubmit={handleSubmit} noValidate className="w-full">
                         <BrownOutlinedTextField
@@ -57,33 +49,16 @@ const Register = () => {
                             margin="normal"
                             required
                             fullWidth
-                            id="username"
-                            label="Username"
-                            value={username}
-                            name="username"
-                            autoComplete="username"
+                            id="usernameOrEmail"
+                            label="Username or Email"
+                            name="usernameOrEmail"
+                            autoComplete="usernameOrEmail"
                             autoFocus
-                            onChange={(e) => setUsername(e.target.value)}
+                            value={usernameOrEmail}
+                            onChange={(e) => setUsernameOrEmail(e.target.value)}
                         />
                         <BrownOutlinedTextField
-                            margin='normal'
-                            required
-                            fullWidth
-                            id='email'
-                            label="Email"
-                            value={email}
-                            name='email'
-                            autoComplete='email'
-                            autoFocus
-                            onChange={(e) => {
-                                setEmail(e.target.value);
-                                setIsValidEmail(validateEmail(e.target.value));
-                            }}
-                            type='email'
-                            error={!isValidEmail}
-                            helperText={!isValidEmail ? "Please enter a valid email address" : ""}
-                        />
-                        <BrownOutlinedTextField
+                            variant="outlined"
                             margin="normal"
                             required
                             fullWidth
@@ -105,16 +80,17 @@ const Register = () => {
                                             {showPassword ? <VisibilityIcon /> : <VisibilityOffIcon />}
                                         </IconButton>
                                     </InputAdornment>
-                                ),
+                                )
                             }}
                         />
                         <BrownButton
                             type="submit"
                             fullWidth
                             variant="contained"
+                            color="primary"
                             className="mb-2 !mt-4"
                         >
-                            Register
+                            Sign In
                         </BrownButton>
                     </Box>
                 </Box>
@@ -123,4 +99,4 @@ const Register = () => {
     );
 };
 
-export default Register;
+export default Login;

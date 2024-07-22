@@ -30,7 +30,7 @@ const AddProductModal = ({ open, onClose, onAddSuccess }) => {
     const [weight, setWeight] = useState('');
     const [shippingCost, setShippingCost] = useState('');
     const [packageSize, setPackageSize] = useState('medium');
-    const [details, setDetails] = useState([{ attribute: '', value: '' }]); // Updated to match the variants approach
+    const [details, setDetails] = useState([{ attribute: '', value: '' }]);
 
     const { refreshToken } = useContext(AuthContext);
     const axiosInstance = useAxios(refreshToken);

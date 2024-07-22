@@ -21,7 +21,7 @@ import ListItemButton from '@mui/material/ListItemButton';
 import ListItemIcon from '@mui/material/ListItemIcon';
 import ListItemText from '@mui/material/ListItemText';
 import React, { useEffect, useState } from 'react';
-import { useNavigate } from 'react-router-dom'; // Import useNavigate
+import { useNavigate } from 'react-router-dom';
 import { ActiveListItemButton } from './CustomComponents';
 
 /**
@@ -61,11 +61,11 @@ export const mainListItems = ({ setCurrentView }) => {
   };
 
   useEffect(() => {
-    const path = window.location.pathname.split('/')[2]; // Get the third segment of the path
+    const path = window.location.pathname.split('/')[2];
     if (path) {
       setActiveItem(path);
     } else {
-      setActiveItem('users'); // Default to 'main' if no specific path
+      setActiveItem('users');
     }
   }, []);
 
@@ -147,6 +147,17 @@ export const mainListItems = ({ setCurrentView }) => {
                   <Inventory2OutlinedIcon />
                 </ListItemIcon>
                 <ListItemText primary="Products" />
+              </ActiveListItemButton>
+
+              <ActiveListItemButton
+                sx={{ pl: 4 }}
+                onClick={() => handleItemClick('images')}
+                selected={activeItem === 'images'}
+              >
+                <ListItemIcon>
+                  <Inventory2OutlinedIcon />
+                </ListItemIcon>
+                <ListItemText primary="Images" />
               </ActiveListItemButton>
 
               <ActiveListItemButton

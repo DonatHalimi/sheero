@@ -5,33 +5,56 @@ import React, { useContext, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { toast } from 'react-toastify';
 import { BrownButton, BrownOutlinedTextField } from '../components/Dashboard/CustomComponents';
+import Navbar from '../components/Navbar';
 import { AuthContext } from '../context/AuthContext';
-import Navbar from './Navbar';
 
-const Login = () => {
-    const [usernameOrEmail, setUsernameOrEmail] = useState('');
+const Register = () => {
+    const [username, setUsername] = useState('');
+    const [email, setEmail] = useState('');
     const [password, setPassword] = useState('');
     const [showPassword, setShowPassword] = useState(false);
     const handleClickShowPassword = () => setShowPassword(!showPassword);
     const handleMouseDownPassword = () => setShowPassword(!showPassword);
-    const { login } = useContext(AuthContext);
+    const { register } = useContext(AuthContext);
     const navigate = useNavigate();
+
+    const validatePassword = (password) => {
+        const passwordRegex = /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[@$!%*?&])[A-Za-z\d@$!%*?&]{8,}$/;
+        return passwordRegex.test(password);
+    };
+
+    const validateEmail = (email) => {
+        const re = /^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$/;
+        return re.test(String(email).toLowerCase());
+    };
 
     const handleSubmit = async (e) => {
         e.preventDefault();
-        if (!usernameOrEmail || !password) {
-            toast.error('Please fill in all fields', {
-                closeOnClick: true
-            });
+        if (!username || !email || !password) {
+            toast.error('Please fill in all fields');
             return;
         }
-        const response = await login(usernameOrEmail, password);
+
+        if (!validateEmail(email)) {
+            toast.error('Email format is not correct');
+            return;
+        }
+
+        if (!validatePassword(password)) {
+            toast.error('Password must contain at least 8 characters, one uppercase letter, one lowercase letter, one number and one special character');
+            return;
+        }
+
+        const response = await register(username, email, password);
         if (response.success) {
-            navigate('/');
+            toast.success('User registered successfully');
+            navigate('/login');
         } else {
-            toast.error(response.message, {
-                closeOnClick: true
-            });
+            if (response.message === 'User or Email already exists') {
+                toast.error('Username or Email already exists');
+            } else {
+                toast.error(response.message || 'Registration failed');
+            }
         }
     };
 
@@ -41,7 +64,7 @@ const Login = () => {
             <Container component="main" maxWidth="xs">
                 <Box className="mt-32 flex flex-col items-center bg-white p-8 rounded shadow-md">
                     <Typography component="h1" variant="h5" className="mb-4">
-                        Sign in
+                        Register
                     </Typography>
                     <Box component="form" onSubmit={handleSubmit} noValidate className="w-full">
                         <BrownOutlinedTextField
@@ -49,16 +72,27 @@ const Login = () => {
                             margin="normal"
                             required
                             fullWidth
-                            id="usernameOrEmail"
-                            label="Username or Email"
-                            name="usernameOrEmail"
-                            autoComplete="usernameOrEmail"
+                            id="username"
+                            label="Username"
+                            value={username}
+                            name="username"
+                            autoComplete="username"
                             autoFocus
-                            value={usernameOrEmail}
-                            onChange={(e) => setUsernameOrEmail(e.target.value)}
+                            onChange={(e) => setUsername(e.target.value)}
                         />
                         <BrownOutlinedTextField
-                            variant="outlined"
+                            margin='normal'
+                            required
+                            fullWidth
+                            id='email'
+                            label="Email"
+                            value={email}
+                            name='email'
+                            autoComplete='email'
+                            onChange={(e) => setEmail(e.target.value)}
+                            type='email'
+                        />
+                        <BrownOutlinedTextField
                             margin="normal"
                             required
                             fullWidth
@@ -66,7 +100,7 @@ const Login = () => {
                             label="Password"
                             type={showPassword ? "text" : "password"}
                             id="password"
-                            autoComplete="current-password"
+                            autoComplete="new-password"
                             value={password}
                             onChange={(e) => setPassword(e.target.value)}
                             InputProps={{
@@ -80,17 +114,16 @@ const Login = () => {
                                             {showPassword ? <VisibilityIcon /> : <VisibilityOffIcon />}
                                         </IconButton>
                                     </InputAdornment>
-                                )
+                                ),
                             }}
                         />
                         <BrownButton
                             type="submit"
                             fullWidth
                             variant="contained"
-                            color="primary"
                             className="mb-2 !mt-4"
                         >
-                            Sign In
+                            Register
                         </BrownButton>
                     </Box>
                 </Box>
@@ -99,4 +132,4 @@ const Login = () => {
     );
 };
 
-export default Login;
+export default Register;

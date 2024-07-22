@@ -20,13 +20,13 @@ const DeleteCountryModal = ({ open, onClose, countries, onDeleteSuccess }) => {
             console.error('Error deleting countries', error);
         }
     };
-    
+
     return (
         <Modal open={open} onClose={onClose} className="flex items-center justify-center">
             <div className="flex items-center justify-center h-screen">
 
                 <Box className="bg-white p-4 rounded-lg shadow-lg w-full max-w-md">
-                <h2 className="text-xl font-bold mb-2">Delete Countries</h2>
+                    <h2 className="text-xl font-bold mb-2">Delete Countries</h2>
                     <p className="mb-4">Are you sure you want to delete the selected countries?</p>
                     <div className="flex justify-end">
                         <OutlinedBrownButton
