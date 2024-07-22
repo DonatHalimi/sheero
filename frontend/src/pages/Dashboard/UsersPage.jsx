@@ -1,4 +1,4 @@
-import { Paper, Table, TableBody, TableCell, TableContainer, TableHead, TableRow, Typography } from '@mui/material';
+import { Paper, Table, TableBody, TableCell, TableContainer, TableHead, TableRow, Typography, Checkbox } from '@mui/material';
 import React, { useContext, useEffect, useState } from 'react';
 import { toast } from 'react-toastify';
 import useAxios from '../../axiosInstance';
@@ -12,6 +12,7 @@ import { AuthContext } from '../../context/AuthContext';
 const UsersPage = () => {
     const [users, setUsers] = useState([]);
     const [selectedUser, setSelectedUser] = useState(null);
+    const [selectedUsers, setSelectedUsers] = useState([]);
     const [addUserOpen, setAddUserOpen] = useState(false);
     const [editUserOpen, setEditUserOpen] = useState(false);
     const [deleteUserOpen, setDeleteUserOpen] = useState(false);
@@ -51,18 +52,52 @@ const UsersPage = () => {
         setCurrentPage(page);
     };
 
+    const handleSelectUser = (userId) => {
+        setSelectedUsers((prevSelected) => {
+            if (prevSelected.includes(userId)) {
+                return prevSelected.filter(id => id !== userId);
+            } else {
+                return [...prevSelected, userId];
+            }
+        });
+    };
+
+    const handleSelectAll = (e) => {
+        if (e.target.checked) {
+            setSelectedUsers(users.map(user => user._id));
+        } else {
+            setSelectedUsers([]);
+        }
+    };
+
     return (
         <>
             <div className='container mx-auto max-w-screen-2xl px-4 mt-20'>
                 <div className='flex flex-col items-center justify-center'>
                     <div className='flex items-center justify-between w-full mb-4'>
                         <Typography variant='h5'>Users</Typography>
-                        <OutlinedBrownButton onClick={() => setAddUserOpen(true)}>Add User</OutlinedBrownButton>
+                        <div>
+                            <OutlinedBrownButton onClick={() => setAddUserOpen(true)} className='!mr-4'>Add User</OutlinedBrownButton>
+                            {selectedUsers.length > 0 && (
+                                <OutlinedBrownButton
+                                    onClick={() => setDeleteUserOpen(true)}
+                                    disabled={selectedUsers.length === 0}
+                                >
+                                    {selectedUsers.length > 1 ? 'Delete Selected Users' : 'Delete User'}
+                                </OutlinedBrownButton>
+                            )}
+                        </div>
                     </div>
                     <TableContainer component={Paper} className='max-w-screen-2xl mx-auto'>
                         <Table>
                             <TableHead>
                                 <TableRow>
+                                    <BoldTableCell>
+                                        <Checkbox
+                                            checked={selectedUsers.length === users.length}
+                                            onChange={handleSelectAll}
+                                        />
+                                    </BoldTableCell>
                                     <BoldTableCell>Username</BoldTableCell>
                                     <BoldTableCell>Email</BoldTableCell>
                                     <BoldTableCell>Password</BoldTableCell>
@@ -74,13 +109,18 @@ const UsersPage = () => {
                                 {users && users.length > 0 ? (
                                     users.map((user) => (
                                         <TableRow key={user._id}>
+                                            <TableCell>
+                                                <Checkbox
+                                                    checked={selectedUsers.includes(user._id)}
+                                                    onChange={() => handleSelectUser(user._id)}
+                                                />
+                                            </TableCell>
                                             <TableCell>{user.username}</TableCell>
                                             <TableCell>{user.email}</TableCell>
                                             <TableCell>●●●●●●●●●●</TableCell>
                                             <TableCell>{user.role}</TableCell>
                                             <TableCell>
                                                 <ActionButton onClick={() => { setSelectedUser(user); setEditUserOpen(true); }}><BrownCreateOutlinedIcon /></ActionButton>
-                                                <ActionButton onClick={() => { setSelectedUser(user); setDeleteUserOpen(true); }}><BrownDeleteOutlinedIcon /></ActionButton>
                                             </TableCell>
                                         </TableRow>
                                     ))
@@ -103,7 +143,7 @@ const UsersPage = () => {
                     )}
                     <AddUserModal open={addUserOpen} onClose={() => setAddUserOpen(false)} onAddSuccess={refreshUsers} />
                     <EditUserModal open={editUserOpen} onClose={() => setEditUserOpen(false)} user={selectedUser} onEditSuccess={refreshUsers} />
-                    <DeleteUserModal open={deleteUserOpen} onClose={() => setDeleteUserOpen(false)} user={selectedUser} onDeleteSuccess={refreshUsers} />
+                    <DeleteUserModal open={deleteUserOpen} onClose={() => setDeleteUserOpen(false)} users={selectedUsers.map(id => users.find(user => user._id === id))} onDeleteSuccess={refreshUsers} />
                 </div>
             </div>
         </>

@@ -23,7 +23,7 @@ const Navbar = () => {
                         {auth.accessToken ? (
                             <>
                                 {isAdmin() && (
-                                    <Link to="/dashboard">
+                                    <Link to="/dashboard/users">
                                         <BrownButton variant="contained" color="primary">Dashboard</BrownButton>
                                     </Link>
                                 )}

@@ -83,4 +83,21 @@ const deleteAddress = async (req, res) => {
     }
 };
 
-module.exports = { createAddress, getAddresses, getAddress, updateAddress, deleteAddress };
+const deleteAddresses = async (req, res) => {
+    const { addressIds } = req.body;
+    try {
+        const addresses = await Address.find({ _id: { $in: addressIds } });
+
+        if (addresses.length !== addressIds.length) {
+            return res.status(404).json({ message: 'One or more addresses not found' });
+        }
+
+        await Address.deleteMany({ _id: { $in: addressIds } });
+
+        res.status(200).json({ message: 'Addresses deleted successfully' });
+    } catch (error) {
+        res.status(500).json({ message: 'Server error', error: error.message });
+    }
+};
+
+module.exports = { createAddress, getAddresses, getAddress, updateAddress, deleteAddress, deleteAddresses };

@@ -30,12 +30,13 @@ const AddProductModal = ({ open, onClose, onAddSuccess }) => {
     const [weight, setWeight] = useState('');
     const [shippingCost, setShippingCost] = useState('');
     const [packageSize, setPackageSize] = useState('medium');
+    const [details, setDetails] = useState([{ attribute: '', value: '' }]); // Updated to match the variants approach
 
     const { refreshToken } = useContext(AuthContext);
     const axiosInstance = useAxios(refreshToken);
 
     useEffect(() => {
-        const TIMEOUT = 5000;
+        const TIMEOUT = 15000;
 
         async function fetchCategoriesAndSubcategories() {
             try {
@@ -46,7 +47,7 @@ const AddProductModal = ({ open, onClose, onAddSuccess }) => {
 
                 const subcategoriesResponse = await axiosInstance.get('/subcategories/get', {
                     timeout: TIMEOUT,
-                })
+                });
                 setSubcategories(subcategoriesResponse.data);
             } catch (error) {
                 if (error.code === 'ECONNABORTED') {
@@ -119,6 +120,10 @@ const AddProductModal = ({ open, onClose, onAddSuccess }) => {
         formData.append('shipping[dimensions][height]', height);
         formData.append('shipping[dimensions][unit]', unit);
         formData.append('shipping[packageSize]', packageSize);
+        details.forEach((detail, index) => {
+            formData.append(`details[${index}][attribute]`, detail.attribute);
+            formData.append(`details[${index}][value]`, detail.value);
+        });
         variants.forEach((variant, index) => {
             formData.append(`variants[${index}][color]`, variant.color);
             formData.append(`variants[${index}][size]`, variant.size);
@@ -151,6 +156,20 @@ const AddProductModal = ({ open, onClose, onAddSuccess }) => {
 
     const removeVariant = (index) => {
         setVariants(variants.filter((_, i) => i !== index));
+    };
+
+    const handleDetailChange = (index, key, value) => {
+        const newDetails = [...details];
+        newDetails[index][key] = value;
+        setDetails(newDetails);
+    };
+
+    const addDetail = () => {
+        setDetails([...details, { attribute: '', value: '' }]);
+    };
+
+    const removeDetail = (index) => {
+        setDetails(details.filter((_, i) => i !== index));
     };
 
     return (
@@ -256,35 +275,45 @@ const AddProductModal = ({ open, onClose, onAddSuccess }) => {
                             className="!mb-4"
                         />
                     </Box>
-                    <Typography variant='h6' className="!text-lg !font-bold !mb-2">Discount</Typography>
-                    <Box className="flex gap-4 mb-4">
-                        <OutlinedBrownFormControl className="flex-1">
-                            <InputLabel>Discount Type</InputLabel>
-                            <Select
-                                label="Discount Type"
-                                value={discountType}
-                                onChange={(e) => setDiscountType(e.target.value)}
-                                sx={{
-                                    width: '100px'
-                                }}
-                            >
-                                <MenuItem value="percentage">Percentage</MenuItem>
-                                <MenuItem value="fixed">Fixed</MenuItem>
-                            </Select>
-                        </OutlinedBrownFormControl>
-                        <BrownOutlinedTextField
-                            fullWidth
-                            label="Discount Value"
-                            value={discountValue}
-                            placeholder="Leave empty to calculate automatically"
-                            onChange={(e) => setDiscountValue(e.target.value)}
-                            className="!mb-4"
-                            sx={{
-                                width: '305px'
-                            }}
-                        />
-                    </Box>
+                    <Typography variant='h6' className="!text-lg !font-bold !mb-2">Variants</Typography>
+                    {variants.map((variant, index) => (
+                        <Box key={index} className="flex gap-4 mb-2">
+                            <BrownOutlinedTextField
+                                fullWidth
+                                label="Color"
+                                value={variant.color}
+                                onChange={(e) => handleVariantChange(index, 'color', e.target.value)}
+                            />
+                            <BrownOutlinedTextField
+                                fullWidth
+                                label="Size"
+                                value={variant.size}
+                                onChange={(e) => handleVariantChange(index, 'size', e.target.value)}
+                            />
+                            <OutlinedBrownButton onClick={() => removeVariant(index)}>Remove</OutlinedBrownButton>
+                        </Box>
+                    ))}
+                    <OutlinedBrownButton sx={{ width: '160px' }} onClick={addVariant} className="!mb-4">Add Variant</OutlinedBrownButton>
 
+                    <Typography variant='h6' className="!text-lg !font-bold !mb-2">Details</Typography>
+                    {details.map((detail, index) => (
+                        <Box key={index} className="flex gap-4 mb-2">
+                            <BrownOutlinedTextField
+                                fullWidth
+                                label="Attribute"
+                                value={detail.attribute}
+                                onChange={(e) => handleDetailChange(index, 'attribute', e.target.value)}
+                            />
+                            <BrownOutlinedTextField
+                                fullWidth
+                                label="Value"
+                                value={detail.value}
+                                onChange={(e) => handleDetailChange(index, 'value', e.target.value)}
+                            />
+                            <OutlinedBrownButton onClick={() => removeDetail(index)}>Remove</OutlinedBrownButton>
+                        </Box>
+                    ))}
+                    <OutlinedBrownButton sx={{ width: '160px' }} onClick={addDetail} className="!mb-4">Add Detail</OutlinedBrownButton>
 
                     <OutlinedBrownFormControl fullWidth className="!mb-4">
                         <InputLabel>Supplier</InputLabel>
@@ -298,6 +327,7 @@ const AddProductModal = ({ open, onClose, onAddSuccess }) => {
                             ))}
                         </Select>
                     </OutlinedBrownFormControl>
+
                     <Typography variant='h6' className="!text-lg !font-bold !mb-2">Shipping</Typography>
                     <Box className="flex gap-4 mb-4">
                         <BrownOutlinedTextField
@@ -324,28 +354,10 @@ const AddProductModal = ({ open, onClose, onAddSuccess }) => {
                         >
                             <MenuItem value="small">Small</MenuItem>
                             <MenuItem value="medium">Medium</MenuItem>
-                            <MenuItem value="big">Big</MenuItem>
+                            <MenuItem value="large">Large</MenuItem>
                         </Select>
                     </OutlinedBrownFormControl>
-                    <Typography variant='h6' className="!text-lg !font-bold !mb-2">Variants</Typography>
-                    {variants.map((variant, index) => (
-                        <Box key={index} className="flex gap-4 mb-2">
-                            <BrownOutlinedTextField
-                                fullWidth
-                                label="Color"
-                                value={variant.color}
-                                onChange={(e) => handleVariantChange(index, 'color', e.target.value)}
-                            />
-                            <BrownOutlinedTextField
-                                fullWidth
-                                label="Size"
-                                value={variant.size}
-                                onChange={(e) => handleVariantChange(index, 'size', e.target.value)}
-                            />
-                            <OutlinedBrownButton onClick={() => removeVariant(index)}>Remove</OutlinedBrownButton>
-                        </Box>
-                    ))}
-                    <OutlinedBrownButton sx={{ width: '160px' }} onClick={addVariant} className="!mb-4">Add Variant</OutlinedBrownButton>
+
                     <OutlinedBrownButton
                         component="label"
                         role={undefined}
@@ -368,7 +380,7 @@ const AddProductModal = ({ open, onClose, onAddSuccess }) => {
                         color="primary"
                         className="w-full"
                     >
-                        Add
+                        Add Product
                     </BrownButton>
                 </Box>
             </div>

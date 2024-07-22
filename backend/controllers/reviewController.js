@@ -72,7 +72,7 @@ const getReview = async (req, res) => {
 const updateReview = async (req, res) => {
     const { rating, comment } = req.body;
     const userId = req.user.userId;
-    const userRole = req.user.role; 
+    const userRole = req.user.role;
 
     try {
         const review = await Review.findById(req.params.id);
@@ -110,7 +110,7 @@ const updateReview = async (req, res) => {
 
 const deleteReview = async (req, res) => {
     const userId = req.user.userId;
-    const userRole = req.user.role; 
+    const userRole = req.user.role;
     try {
         const review = await Review.findById(req.params.id);
 
@@ -130,6 +130,41 @@ const deleteReview = async (req, res) => {
     }
 };
 
+const deleteReviews = async (req, res) => {
+    const { reviewIds } = req.body;
+    const userId = req.user.userId;
+    const userRole = req.user.role;
+
+    try {
+        const reviews = await Review.find({ _id: { $in: reviewIds } });
+
+        if (reviews.length !== reviewIds.length) {
+            return res.status(404).json({ message: 'One or more reviews not found' });
+        }
+
+        // Check if the user is authorized to delete all the reviews
+        for (const review of reviews) {
+            if (review.user.toString() !== userId && userRole !== 'admin') {
+                return res.status(403).json({ message: 'You are not authorized to delete one or more of these reviews' });
+            }
+        }
+
+        const productIds = reviews.map(review => review.product);
+
+        await Review.deleteMany({ _id: { $in: reviewIds } });
+
+        await Product.updateMany(
+            { _id: { $in: productIds } },
+            { $pull: { reviews: { $in: reviewIds } } }
+        );
+
+        res.status(200).json({ message: 'Reviews and references in products deleted successfully' });
+    } catch (error) {
+        res.status(500).json({ message: 'Server error', error: error.message });
+    }
+};
+
+
 const getAllProducts = async (req, res) => {
     try {
         const products = await Product.find().select('name');
@@ -139,4 +174,4 @@ const getAllProducts = async (req, res) => {
     }
 };
 
-module.exports = { createReview, getReviews, getReview, updateReview, deleteReview, getAllProducts };
+module.exports = { createReview, getReviews, getReview, updateReview, deleteReview, getAllProducts, deleteReviews };

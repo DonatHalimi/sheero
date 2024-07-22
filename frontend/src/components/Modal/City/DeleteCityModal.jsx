@@ -5,19 +5,19 @@ import useAxios from '../../../axiosInstance';
 import { AuthContext } from '../../../context/AuthContext';
 import { OutlinedBrownButton } from '../../Dashboard/CustomComponents';
 
-const DeleteCityModal = ({ open, onClose, city, onDeleteSuccess }) => {
+const DeleteCityModal = ({ open, onClose, cities, onDeleteSuccess }) => {
     const { refreshToken } = useContext(AuthContext);
     const axiosInstance = useAxios(refreshToken);
 
-    const handleDeleteCity = async () => {
+    const handleDeleteCities = async () => {
         try {
-            await axiosInstance.delete(`/cities/delete/${city._id}`);
-            toast.success('City deleted successfully');
+            await axiosInstance.delete('/cities/delete-bulk', { data: { cityIds: cities.map(city => city._id).filter(id => id) } });
+            toast.success('Cities deleted successfully');
             onDeleteSuccess();
             onClose();
         } catch (error) {
-            toast.error('Error deleting city');
-            console.error('Error deleting city', error);
+            toast.error('Error deleting cities');
+            console.error('Error deleting cities', error);
         }
     };
 
@@ -25,8 +25,8 @@ const DeleteCityModal = ({ open, onClose, city, onDeleteSuccess }) => {
         <Modal open={open} onClose={onClose} className="flex items-center justify-center">
             <div className="flex items-center justify-center h-screen">
                 <Box className="bg-white p-4 rounded-lg shadow-lg max-w-md w-full">
-                    <h2 className="text-xl font-bold mb-2">Delete City</h2>
-                    <p className="mb-4">Are you sure you want to delete the city "{city?.name}"?</p>
+                    <h2 className="text-xl font-bold mb-2">Delete Cities</h2>
+                    <p className="mb-4">Are you sure you want to delete the selected cities?</p>
                     <div className="flex justify-end">
                         <OutlinedBrownButton
                             onClick={onClose}
@@ -36,7 +36,7 @@ const DeleteCityModal = ({ open, onClose, city, onDeleteSuccess }) => {
                             Cancel
                         </OutlinedBrownButton>
                         <Button
-                            onClick={handleDeleteCity}
+                            onClick={handleDeleteCities}
                             variant="contained"
                             color="error"
                             className="mr-2"

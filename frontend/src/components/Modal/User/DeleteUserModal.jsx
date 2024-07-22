@@ -5,19 +5,19 @@ import useAxios from '../../../axiosInstance';
 import { AuthContext } from '../../../context/AuthContext';
 import { OutlinedBrownButton } from '../../Dashboard/CustomComponents';
 
-const DeleteUserModal = ({ open, onClose, user, onDeleteSuccess }) => {
+const DeleteUserModal = ({ open, onClose, users, onDeleteSuccess }) => {
     const { refreshToken } = useContext(AuthContext);
     const axiosInstance = useAxios(refreshToken);
 
-    const handleDeleteUser = async () => {
+    const handleDeleteUsers = async () => {
         try {
-            await axiosInstance.delete(`/users/delete/${user._id}`);
-            toast.success('User deleted successfully');
+            await axiosInstance.delete('/users/delete-bulk', { data: { userIds: users.map(user => user._id).filter(id => id) } });
+            toast.success('Users deleted successfully');
             onDeleteSuccess();
             onClose();
         } catch (error) {
-            console.error('Error deleting user', error);
-            toast.error('Error deleting user');
+            toast.error('Error deleting users');
+            console.error('Error deleting users', error);
         }
     };
 
@@ -25,8 +25,8 @@ const DeleteUserModal = ({ open, onClose, user, onDeleteSuccess }) => {
         <Modal open={open} onClose={onClose}>
             <div className="flex items-center justify-center h-screen">
                 <Box className="bg-white p-4 rounded-lg shadow-lg max-w-md w-full">
-                    <h2 className="text-xl font-bold mb-2">Delete User</h2>
-                    <p className="mb-4">Are you sure you want to delete the user "{user?.username}"?</p>
+                    <h2 className="text-xl font-bold mb-2">Delete Users</h2>
+                    <p className="mb-4">Are you sure you want to delete the selected users?</p>
                     <div className="flex justify-end">
                         <OutlinedBrownButton
                             onClick={onClose}
@@ -36,7 +36,7 @@ const DeleteUserModal = ({ open, onClose, user, onDeleteSuccess }) => {
                             Cancel
                         </OutlinedBrownButton>
                         <Button
-                            onClick={handleDeleteUser}
+                            onClick={handleDeleteUsers}
                             variant="contained"
                             color="error"
                             className="mr-2"

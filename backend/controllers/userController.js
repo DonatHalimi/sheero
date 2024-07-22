@@ -88,4 +88,22 @@ const deleteUser = async (req, res) => {
     }
 };
 
-module.exports = { createUser, getUsers, getUser, updateUser, deleteUser };
+const deleteUsers = async (req, res) => {
+    const { userIds } = req.body;
+    try {
+        const users = await User.find({ _id: { $in: userIds } });
+
+        if (users.length !== users.length) {
+            return res.status(404).json({ message: 'One or more users not found' });
+        }
+
+        await User.deleteMany({ _id: { $in: userIds } });
+
+        res.status(200).json({ message: 'Users deleted successfully' });
+    } catch (error) {
+        res.status(500).json({ message: 'Server error', error: error.message });
+    }
+};
+
+
+module.exports = { createUser, getUsers, getUser, updateUser, deleteUser, deleteUsers };

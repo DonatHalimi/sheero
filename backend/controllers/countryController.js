@@ -1,4 +1,5 @@
 const Country = require('../models/Country');
+const City = require('../models/City');
 
 const createCountry = async (req, res) => {
     const { name } = req.body;
@@ -61,4 +62,27 @@ const deleteCountry = async (req, res) => {
     }
 };
 
-module.exports = { createCountry, getCountries, getCountry, updateCountry, deleteCountry };
+const deleteCountries = async (req, res) => {
+    const { countryIds } = req.body;
+    try {
+        const countries = await Country.find({ _id: { $in: countryIds } });
+
+        if (countries.length !== countryIds.length) {
+            return res.status(404).json({ message: 'One or more countries not found' });
+        }
+
+        for (const country of countries) {
+            // Remove associated cities
+            await City.deleteMany({ country: country._id });
+        }
+
+        await Country.deleteMany({ _id: { $in: countryIds } });
+
+        res.status(200).json({ message: 'Countries and associated cities deleted successfully' });
+    } catch (error) {
+        console.error('Error deleting countries:', error);
+        res.status(500).json({ message: 'Server error', error: error.message });
+    }
+};
+
+module.exports = { createCountry, getCountries, getCountry, updateCountry, deleteCountry, deleteCountries };

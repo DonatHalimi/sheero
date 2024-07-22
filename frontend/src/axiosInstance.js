@@ -12,19 +12,53 @@ const useAxios = () => {
     instance.interceptors.request.use(
         async (config) => {
             let token = auth.accessToken;
-
-            const tokenExpiry = JSON.parse(atob(token.split('.')[1])).exp * 1000;
-            if (Date.now() >= tokenExpiry) {
-                token = await refreshToken();
-            }
-
             if (token) {
+                const tokenPayload = JSON.parse(atob(token.split('.')[1]));
+                const tokenExpiry = tokenPayload.exp * 1000;
+
+                if (Date.now() >= tokenExpiry) {
+                    console.log('Token expired, refreshing token...');
+                    try {
+                        token = await refreshToken();
+                    } catch (error) {
+                        console.error('Error refreshing token:', error);
+                        throw error;
+                    }
+                }
+
                 config.headers['Authorization'] = `Bearer ${token}`;
             }
 
             return config;
         },
         (error) => {
+            console.error('Error in request interceptor:', error);
+            return Promise.reject(error);
+        }
+    );
+
+    instance.interceptors.response.use(
+        (response) => response,
+        async (error) => {
+            if (!error.response) {
+                console.error('Network error:', error);
+                return Promise.reject({ message: 'Network error', ...error });
+            }
+
+            const originalRequest = error.config;
+            if (error.response.status === 403 && !originalRequest._retry) {
+                originalRequest._retry = true;
+                try {
+                    const token = await refreshToken();
+                    instance.defaults.headers.common['Authorization'] = `Bearer ${token}`;
+                    originalRequest.headers['Authorization'] = `Bearer ${token}`;
+                    return instance(originalRequest);
+                } catch (err) {
+                    console.error('Error refreshing token in response interceptor:', err);
+                    return Promise.reject(err);
+                }
+            }
+
             return Promise.reject(error);
         }
     );

@@ -7,12 +7,16 @@ const AuthProvider = ({ children }) => {
     const [auth, setAuth] = useState({
         accessToken: localStorage.getItem('accessToken'),
         refreshToken: localStorage.getItem('refreshToken'),
-        role: localStorage.getItem('role')
+        role: localStorage.getItem('role'),
     });
 
     const login = async (username, password) => {
         try {
-            const response = await axios.post('http://localhost:5000/api/auth/login', { username, email: username, password });
+            const response = await axios.post('http://localhost:5000/api/auth/login', {
+                username,
+                email: username,
+                password
+            });
             setAuth({ ...response.data, role: response.data.role });
             localStorage.setItem('accessToken', response.data.accessToken);
             localStorage.setItem('refreshToken', response.data.refreshToken);
@@ -40,6 +44,10 @@ const AuthProvider = ({ children }) => {
     };
 
     const refreshToken = async () => {
+        if (!auth.refreshToken) {
+            console.error('No refresh token available');
+            return null;
+        }
         try {
             const response = await axios.post('http://localhost:5000/api/auth/token', { token: auth.refreshToken });
             setAuth(prevAuth => ({ ...prevAuth, accessToken: response.data.accessToken }));
@@ -47,16 +55,20 @@ const AuthProvider = ({ children }) => {
             return response.data.accessToken;
         } catch (error) {
             console.error('Token refresh failed', error);
+            logout(); // Log out the user if token refresh fails
+            throw error;
         }
     };
 
     useEffect(() => {
         const interval = setInterval(() => {
-            refreshToken();
+            if (auth.refreshToken) {
+                refreshToken();
+            }
         }, 15 * 60 * 1000); // Refresh token every 15 minutes
 
         return () => clearInterval(interval);
-    }, []);
+    }, [auth.refreshToken]);
 
     const isAdmin = () => auth.role === 'admin';
 
@@ -68,3 +80,4 @@ const AuthProvider = ({ children }) => {
 };
 
 export { AuthContext, AuthProvider };
+

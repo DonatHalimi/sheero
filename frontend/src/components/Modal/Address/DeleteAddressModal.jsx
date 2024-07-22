@@ -1,3 +1,5 @@
+// DeleteAddressModal.jsx
+
 import { Box, Button, Modal } from '@mui/material';
 import React, { useContext } from 'react';
 import { toast } from 'react-toastify';
@@ -5,19 +7,22 @@ import useAxios from '../../../axiosInstance';
 import { AuthContext } from '../../../context/AuthContext';
 import { OutlinedBrownButton } from '../../Dashboard/CustomComponents';
 
-const DeleteAddressModal = ({ open, onClose, address, onDeleteSuccess }) => {
+const DeleteAddressModal = ({ open, onClose, addresses, onDeleteSuccess }) => {
     const { refreshToken } = useContext(AuthContext);
     const axiosInstance = useAxios(refreshToken);
 
-    const handleDeleteAddress = async () => {
+    const handleDeleteAddresses = async () => {
         try {
-            await axiosInstance.delete(`/addresses/delete/${address._id}`);
-            toast.success('Address deleted successfully');
+            const addressIds = addresses.map(address => address._id).filter(id => id);
+            console.log('Deleting addresses with IDs:', addressIds);  // Add logging
+
+            await axiosInstance.delete('/addresses/delete-bulk', { data: { addressIds } });
+            toast.success('Addresses deleted successfully');
             onDeleteSuccess();
             onClose();
         } catch (error) {
-            console.error('Error deleting address', error);
-            toast.error('Error deleting address');
+            toast.error('Error deleting addresses');
+            console.error('Error deleting addresses', error);  // Add detailed logging
         }
     };
 
@@ -25,8 +30,8 @@ const DeleteAddressModal = ({ open, onClose, address, onDeleteSuccess }) => {
         <Modal open={open} onClose={onClose}>
             <div className="flex items-center justify-center h-screen">
                 <Box className="bg-white p-4 rounded-lg shadow-lg max-w-md w-full">
-                    <h2 className="text-xl font-bold mb-2">Delete address</h2>
-                    <p className="mb-4">Are you sure you want to delete the address "{address?.name}"?</p>
+                    <h2 className="text-xl font-bold mb-2">Delete Addresses</h2>
+                    <p className="mb-4">Are you sure you want to delete the selected addresses?</p>
                     <div className="flex justify-end">
                         <OutlinedBrownButton
                             onClick={onClose}
@@ -36,7 +41,7 @@ const DeleteAddressModal = ({ open, onClose, address, onDeleteSuccess }) => {
                             Cancel
                         </OutlinedBrownButton>
                         <Button
-                            onClick={handleDeleteAddress}
+                            onClick={handleDeleteAddresses}
                             variant="contained"
                             color="error"
                             className="mr-2"

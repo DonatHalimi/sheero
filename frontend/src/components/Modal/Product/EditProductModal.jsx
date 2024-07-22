@@ -30,6 +30,7 @@ const EditProductModal = ({ open, onClose, product, onEditSuccess }) => {
     const [weight, setWeight] = useState('');
     const [shippingCost, setShippingCost] = useState('');
     const [packageSize, setPackageSize] = useState('medium');
+    const [details, setDetails] = useState([{ attribute: '', value: '' }]);
 
     const { refreshToken } = useContext(AuthContext);
     const axiosInstance = useAxios(refreshToken);
@@ -66,6 +67,9 @@ const EditProductModal = ({ open, onClose, product, onEditSuccess }) => {
                 setWeight(product.shipping.weight);
                 setShippingCost(product.shipping.cost);
                 setPackageSize(product.shipping.packageSize);
+            }
+            if (product.details) { // Load details if they exist
+                setDetails(product.details);
             }
         }
 
@@ -139,6 +143,20 @@ const EditProductModal = ({ open, onClose, product, onEditSuccess }) => {
         setVariants(variants.filter((_, i) => i !== index));
     };
 
+    const handleDetailChange = (index, key, value) => {
+        const newDetails = [...details];
+        newDetails[index][key] = value;
+        setDetails(newDetails);
+    };
+
+    const addDetail = () => {
+        setDetails([...details, { attribute: '', value: '' }]);
+    };
+
+    const removeDetail = (index) => {
+        setDetails(details.filter((_, i) => i !== index));
+    };
+
     useEffect(() => {
         if (price && salePrice) {
             const priceValue = parseFloat(price);
@@ -181,6 +199,10 @@ const EditProductModal = ({ open, onClose, product, onEditSuccess }) => {
             formData.append(`variants[${index}][color]`, variant.color);
             formData.append(`variants[${index}][size]`, variant.size);
         });
+        details.forEach((detail, index) => {
+            formData.append(`details[${index}][attribute]`, detail.attribute);
+            formData.append(`details[${index}][value]`, detail.value);
+        });
         if (image instanceof File) {
             formData.append('image', image);
         }
@@ -206,66 +228,73 @@ const EditProductModal = ({ open, onClose, product, onEditSuccess }) => {
                 <Box className="edit-modal bg-white p-4 rounded-lg shadow-lg max-w-md w-full max-h-[80vh] overflow-y-auto">
                     <Typography variant='h5' className="!text-xl !font-bold !mb-6">Edit Product</Typography>
                     <BrownOutlinedTextField
+                        fullWidth
+                        required
                         label="Name"
                         value={name}
                         onChange={(e) => setName(e.target.value)}
-                        fullWidth
                         className="!mb-4"
                     />
                     <BrownOutlinedTextField
+                        fullWidth
+                        required
                         label="Description"
                         value={description}
                         onChange={(e) => setDescription(e.target.value)}
-                        fullWidth
+                        multiline
+                        rows={4}
                         className="!mb-4"
                     />
                     <Box className="flex gap-4 mb-2">
                         <BrownOutlinedTextField
+                            fullWidth
+                            required
                             label="Price"
+                            type="number"
                             value={price}
                             onChange={(e) => setPrice(e.target.value)}
-                            fullWidth
                             className="!mb-4"
                         />
                         <BrownOutlinedTextField
+                            fullWidth
                             label="Sale Price"
+                            type="number"
                             value={salePrice}
                             onChange={(e) => setSalePrice(e.target.value)}
-                            fullWidth
                             className="!mb-4"
                         />
                     </Box>
                     <BrownOutlinedTextField
+                        fullWidth
+                        required
                         label="Inventory Count"
+                        type="number"
                         value={inventoryCount}
                         onChange={(e) => setInventoryCount(e.target.value)}
-                        fullWidth
                         className="!mb-4"
                     />
                     <Box className="flex gap-4 mb-4">
-                        <OutlinedBrownFormControl fullWidth className="mb-4">
+                        <OutlinedBrownFormControl className="flex-1">
                             <InputLabel>Category</InputLabel>
                             <Select
-                                label="Category"
                                 value={category}
                                 onChange={(e) => setCategory(e.target.value)}
-                                className='!mb-4'
+                                label='Category'
                             >
                                 {categories.map((cat) => (
                                     <MenuItem key={cat._id} value={cat._id}>{cat.name}</MenuItem>
                                 ))}
                             </Select>
                         </OutlinedBrownFormControl>
-                        <OutlinedBrownFormControl fullWidth>
+                        <OutlinedBrownFormControl className="flex-1">
                             <InputLabel>Subcategory</InputLabel>
                             <Select
-                                label="Subcategory"
                                 value={subcategory}
                                 onChange={(e) => setSubcategory(e.target.value)}
-                                className='!mb-4'
+                                label='Subcategory'
                             >
-                                {subcategories.map((sub) => (
-                                    <MenuItem key={sub._id} value={sub._id}>{sub.name}</MenuItem>
+                                {subcategories.map((subcat) => (
+                                    <MenuItem key={subcat._id} value={subcat._id}>{subcat.name}</MenuItem>
                                 ))}
                             </Select>
                         </OutlinedBrownFormControl>
@@ -273,72 +302,96 @@ const EditProductModal = ({ open, onClose, product, onEditSuccess }) => {
                     <Typography variant='h6' className="!text-lg !font-bold !mb-2">Dimensions</Typography>
                     <Box className="flex gap-4 mb-4">
                         <BrownOutlinedTextField
+                            fullWidth
                             label="Length"
+                            type="number"
                             value={length}
                             onChange={(e) => setLength(e.target.value)}
-                            fullWidth
                             className="!mb-4"
                         />
                         <BrownOutlinedTextField
+                            fullWidth
                             label="Width"
+                            type="number"
                             value={width}
                             onChange={(e) => setWidth(e.target.value)}
-                            fullWidth
                             className="!mb-4"
                         />
                         <BrownOutlinedTextField
+                            fullWidth
                             label="Height"
+                            type="number"
                             value={height}
                             onChange={(e) => setHeight(e.target.value)}
-                            fullWidth
                             className="!mb-4"
                         />
                         <BrownOutlinedTextField
+                            fullWidth
                             label="Unit"
                             value={unit}
                             onChange={(e) => setUnit(e.target.value)}
-                            fullWidth
                             className="!mb-4"
                         />
                     </Box>
-                    <Typography variant='h6' className="!text-lg !font-bold !mb-2">Discount</Typography>
-                    <Box className="flex gap-4 mb-4">
-                        <OutlinedBrownFormControl className="flex-1">
-                            <InputLabel>Discount Type</InputLabel>
-                            <Select
-                                label="Discount Type"
-                                value={discountType}
-                                onChange={(e) => setDiscountType(e.target.value)}
-                            >
-                                <MenuItem value="percentage">Percentage</MenuItem>
-                                <MenuItem value="fixed">Fixed</MenuItem>
-                            </Select>
-                        </OutlinedBrownFormControl>
-                        <BrownOutlinedTextField
-                            fullWidth
-                            label="Discount Value"
-                            value={discountValue}
-                            onChange={(e) => setDiscountValue(e.target.value)}
-                            className="!mb-4"
-                        />
-                    </Box>
+                    <Typography variant='h6' className="!text-lg !font-bold !mb-2">Variants</Typography>
+                    {variants.map((variant, index) => (
+                        <Box key={index} className="flex gap-4 mb-2">
+                            <BrownOutlinedTextField
+                                fullWidth
+                                label="Color"
+                                value={variant.color}
+                                onChange={(e) => handleVariantChange(index, 'color', e.target.value)}
+                            />
+                            <BrownOutlinedTextField
+                                fullWidth
+                                label="Size"
+                                value={variant.size}
+                                onChange={(e) => handleVariantChange(index, 'size', e.target.value)}
+                            />
+                            <OutlinedBrownButton onClick={() => removeVariant(index)}>Remove</OutlinedBrownButton>
+                        </Box>
+                    ))}
+                    <OutlinedBrownButton sx={{ width: '160px' }} onClick={addVariant} className="!mb-4">Add Variant</OutlinedBrownButton>
+
+                    <Typography variant='h6' className="!text-lg !font-bold !mb-2">Details</Typography>
+                    {details.map((detail, index) => (
+                        <Box key={index} className="flex gap-4 mb-2">
+                            <BrownOutlinedTextField
+                                fullWidth
+                                label="Attribute"
+                                value={detail.attribute}
+                                onChange={(e) => handleDetailChange(index, 'attribute', e.target.value)}
+                            />
+                            <BrownOutlinedTextField
+                                fullWidth
+                                label="Value"
+                                value={detail.value}
+                                onChange={(e) => handleDetailChange(index, 'value', e.target.value)}
+                            />
+                            <OutlinedBrownButton onClick={() => removeDetail(index)}>Remove</OutlinedBrownButton>
+                        </Box>
+                    ))}
+                    <OutlinedBrownButton sx={{ width: '160px' }} onClick={addDetail} className="!mb-4">Add Detail</OutlinedBrownButton>
+
                     <OutlinedBrownFormControl fullWidth className="!mb-4">
                         <InputLabel>Supplier</InputLabel>
                         <Select
-                            label="Supplier"
                             value={supplier}
                             onChange={(e) => setSupplier(e.target.value)}
+                            label='Supplier'
                         >
                             {suppliers.map((sup) => (
                                 <MenuItem key={sup._id} value={sup._id}>{sup.name}</MenuItem>
                             ))}
                         </Select>
                     </OutlinedBrownFormControl>
+
                     <Typography variant='h6' className="!text-lg !font-bold !mb-2">Shipping</Typography>
                     <Box className="flex gap-4 mb-4">
                         <BrownOutlinedTextField
                             fullWidth
                             label="Weight"
+                            type="number"
                             value={weight}
                             onChange={(e) => setWeight(e.target.value)}
                             className="!mb-4"
@@ -346,6 +399,7 @@ const EditProductModal = ({ open, onClose, product, onEditSuccess }) => {
                         <BrownOutlinedTextField
                             fullWidth
                             label="Shipping Cost"
+                            type="number"
                             value={shippingCost}
                             onChange={(e) => setShippingCost(e.target.value)}
                             className="!mb-4"
@@ -354,52 +408,16 @@ const EditProductModal = ({ open, onClose, product, onEditSuccess }) => {
                     <OutlinedBrownFormControl fullWidth className="!mb-4">
                         <InputLabel>Package Size</InputLabel>
                         <Select
-                            label="Package Size"
                             value={packageSize}
                             onChange={(e) => setPackageSize(e.target.value)}
+                            label='Package Size'
                         >
                             <MenuItem value="small">Small</MenuItem>
                             <MenuItem value="medium">Medium</MenuItem>
-                            <MenuItem value="big">Big</MenuItem>
+                            <MenuItem value="large">Large</MenuItem>
                         </Select>
                     </OutlinedBrownFormControl>
-                    <Typography variant='h6' className="!text-lg !font-bold !mb-2">Variants</Typography>
-                    {variants.map((variant, index) => (
-                        <Box key={index} className="flex gap-4 mb-2">
-                            <BrownOutlinedTextField
-                                label="Color"
-                                value={variant.color}
-                                onChange={(e) => handleVariantChange(index, 'color', e.target.value)}
-                                fullWidth
-                            />
-                            <BrownOutlinedTextField
-                                label="Size"
-                                value={variant.size}
-                                onChange={(e) => handleVariantChange(index, 'size', e.target.value)}
-                                fullWidth
-                            />
-                            <OutlinedBrownButton
-                                onClick={() => removeVariant(index)}
-                                variant="outlined"
-                                color="secondary"
-                                className="!ml-2"
-                            >
-                                Remove
-                            </OutlinedBrownButton>
-                        </Box>
-                    ))}
-                    <OutlinedBrownButton
-                        sx={{
-                            width: '152px'
-                        }}
-                        onClick={addVariant}
-                        variant="outlined"
-                        color="primary"
-                        className="!mb-4"
-                    >
-                        Add Variant
-                    </OutlinedBrownButton>
-                    <Typography variant='h6' className="!text-lg !font-bold !mb-2">Image</Typography>
+
                     <OutlinedBrownButton
                         component="label"
                         role={undefined}
@@ -418,7 +436,9 @@ const EditProductModal = ({ open, onClose, product, onEditSuccess }) => {
                     )}
                     <BrownButton
                         onClick={handleEditProduct}
-                        fullWidth
+                        variant="contained"
+                        color="primary"
+                        className="w-full"
                     >
                         Save Changes
                     </BrownButton>

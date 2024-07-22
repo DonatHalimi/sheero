@@ -61,6 +61,23 @@ const deleteCity = async (req, res) => {
     }
 };
 
+const deleteCities = async (req, res) => {
+    const { cityIds } = req.body;
+    try {
+        const cities = await City.find({ _id: { $in: cityIds } });
+
+        if (cities.length !== cityIds.length) {
+            return res.status(404).json({ message: 'One or more cities not found' });
+        }
+
+        await City.deleteMany({ _id: { $in: cityIds } });
+
+        res.status(200).json({ message: 'Cities deleted successfully' });
+    } catch (error) {
+        res.status(500).json({ message: 'Server error', error: error.message });
+    }
+};
+
 const getCitiesByCountry = async (req, res) => {
     try {
         const { countryId } = req.params;
@@ -71,4 +88,4 @@ const getCitiesByCountry = async (req, res) => {
     }
 };
 
-module.exports = { createCity, getCities, getCity, updateCity, deleteCity, getCitiesByCountry };
+module.exports = { createCity, getCities, getCity, updateCity, deleteCity, getCitiesByCountry, deleteCities };

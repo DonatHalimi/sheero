@@ -1,16 +1,13 @@
 const Product = require('../models/Product');
-const Review = require('../models/Review')
+const Review = require('../models/Review');
 const fs = require('fs');
-const path = require('path');
 
 const createProduct = async (req, res) => {
-    const {
-        name, description, price, salePrice, category, subcategory, inventoryCount, dimensions, variants, discount, supplier, shipping
-    } = req.body;
+    const { name, description, price, salePrice, category, subcategory, inventoryCount, dimensions, variants, discount, supplier, shipping, details } = req.body;
     const image = req.file ? req.file.path : '';
     try {
         const product = new Product({
-            name, description, price, salePrice, category, subcategory, inventoryCount, dimensions, variants, discount, supplier, shipping, image
+            name, description, price, salePrice, category, subcategory, inventoryCount, dimensions, variants, discount, supplier, shipping, image, details
         });
         await product.save();
         res.status(201).json(product);
@@ -46,9 +43,7 @@ const getProduct = async (req, res) => {
 };
 
 const updateProduct = async (req, res) => {
-    const {
-        name, description, price, salePrice, category, subcategory, inventoryCount, dimensions, variants, discount, supplier, shipping
-    } = req.body;
+    const { name, description, price, salePrice, category, subcategory, inventoryCount, dimensions, variants, discount, supplier, shipping, details } = req.body;
     let image = req.body.image;
     try {
         const oldProduct = await Product.findById(req.params.id);
@@ -73,7 +68,7 @@ const updateProduct = async (req, res) => {
         const product = await Product.findByIdAndUpdate(
             req.params.id,
             {
-                name, description, price, salePrice, category, subcategory, inventoryCount, dimensions, variants, discount, supplier, shipping, image, updatedAt: Date.now()
+                name, description, price, salePrice, category, subcategory, inventoryCount, dimensions, variants, discount, supplier, shipping, image, details, updatedAt: Date.now()
             },
             { new: true }
         );
@@ -91,7 +86,12 @@ const deleteProduct = async (req, res) => {
         // Remove associated reviews
         await Review.deleteMany({ product: product._id });
 
-        // Remove the product
+        // Remove the product image
+        if (product.image) {
+            fs.unlink(product.image, (err) => {
+                if (err) console.error('Error deleting image:', err);
+            });
+        }
         await Product.findByIdAndDelete(req.params.id);
 
         res.status(200).json({ message: 'Product and associated reviews deleted successfully' });
@@ -100,5 +100,33 @@ const deleteProduct = async (req, res) => {
     }
 };
 
+const deleteProducts = async (req, res) => {
+    const { productIds } = req.body;
+    try {
+        const products = await Product.find({ _id: { $in: productIds } });
 
-module.exports = { createProduct, getProducts, getProduct, updateProduct, deleteProduct };
+        if (products.length !== productIds.length) {
+            return res.status(404).json({ message: 'One or more products not found' });
+        }
+
+        for (const product of products) {
+            // Remove associated reviews
+            await Review.deleteMany({ product: product._id });
+
+            // Remove the product image
+            if (product.image) {
+                fs.unlink(product.image, (err) => {
+                    if (err) console.error('Error deleting image:', err);
+                });
+            }
+        }
+
+        await Product.deleteMany({ _id: { $in: productIds } });
+
+        res.status(200).json({ message: 'Products and associated reviews deleted successfully' });
+    } catch (error) {
+        res.status(500).json({ message: 'Server error', error: error.message });
+    }
+};
+
+module.exports = { createProduct, getProducts, getProduct, updateProduct, deleteProduct, deleteProducts };

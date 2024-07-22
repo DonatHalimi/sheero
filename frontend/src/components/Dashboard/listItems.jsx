@@ -20,24 +20,33 @@ import List from '@mui/material/List';
 import ListItemButton from '@mui/material/ListItemButton';
 import ListItemIcon from '@mui/material/ListItemIcon';
 import ListItemText from '@mui/material/ListItemText';
-import * as React from 'react';
+import React, { useEffect, useState } from 'react';
+import { useNavigate } from 'react-router-dom'; // Import useNavigate
 import { ActiveListItemButton } from './CustomComponents';
 
+/**
+ * Renders the main list items for the CRUD dashboard.
+ *
+ * @param {Object} props - The properties for the component.
+ * @param {Function} props.setCurrentView - The function to set the current view.
+ * @return {React.ReactNode} The rendered main list items.
+ */
 export const mainListItems = ({ setCurrentView }) => {
-  const [crudOpen, setCrudOpen] = React.useState(true);
-  const [usersOpen, setUsersOpen] = React.useState(true);
-  const [productsOpen, setProductsOpen] = React.useState(true);
-  const [addressesOpen, setAddressesOpen] = React.useState(true);
-  const [categoriesOpen, setCategoriesOpen] = React.useState(true);
-  const [activeItem, setActiveItem] = React.useState('users');
+  const [crudOpen, setCrudOpen] = useState(true);
+  const [usersOpen, setUsersOpen] = useState(true);
+  const [productsOpen, setProductsOpen] = useState(true);
+  const [addressesOpen, setAddressesOpen] = useState(true);
+  const [categoriesOpen, setCategoriesOpen] = useState(true);
+  const [activeItem, setActiveItem] = useState('');
+  const navigate = useNavigate();
 
   const handleUsersClick = () => {
     setUsersOpen(!usersOpen);
-  }
+  };
 
   const handleProductsClick = () => {
     setProductsOpen(!productsOpen);
-  }
+  };
 
   const handleCrudClick = () => {
     setCrudOpen(!crudOpen);
@@ -51,16 +60,26 @@ export const mainListItems = ({ setCurrentView }) => {
     setAddressesOpen(!addressesOpen);
   };
 
+  useEffect(() => {
+    const path = window.location.pathname.split('/')[2]; // Get the third segment of the path
+    if (path) {
+      setActiveItem(path);
+    } else {
+      setActiveItem('users'); // Default to 'main' if no specific path
+    }
+  }, []);
+
   const handleItemClick = (view) => {
     setCurrentView(view);
     setActiveItem(view);
+    navigate(`/dashboard/${view}`);
   };
 
   return (
     <React.Fragment>
       <ActiveListItemButton
-        onClick={() => handleItemClick('dashboard')}
-        selected={activeItem === 'dashboard'}>
+        onClick={() => handleItemClick('main')}
+        selected={activeItem === 'main'}>
         <ListItemIcon>
           <DashboardOutlinedIcon />
         </ListItemIcon>
@@ -77,8 +96,6 @@ export const mainListItems = ({ setCurrentView }) => {
 
       <Collapse in={crudOpen} timeout="auto" unmountOnExit>
         <List component="div" disablePadding>
-
-
           <ListItemButton onClick={handleUsersClick}>
             <ListItemIcon>
               <PeopleOutlineOutlinedIcon />
@@ -229,7 +246,7 @@ export const mainListItems = ({ setCurrentView }) => {
           </Collapse>
         </List>
       </Collapse>
-    </React.Fragment >
+    </React.Fragment>
   );
 };
 

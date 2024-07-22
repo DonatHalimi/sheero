@@ -5,19 +5,19 @@ import useAxios from '../../../axiosInstance';
 import { AuthContext } from '../../../context/AuthContext';
 import { OutlinedBrownButton } from '../../Dashboard/CustomComponents';
 
-const DeleteCategoryModal = ({ open, onClose, category, onDeleteSuccess }) => {
+const DeleteCategoryModal = ({ open, onClose, categories, onDeleteSuccess }) => {
     const { refreshToken } = useContext(AuthContext);
     const axiosInstance = useAxios(refreshToken);
 
-    const handleDeleteCategory = async () => {
+    const handleDeleteCategories = async () => {
         try {
-            await axiosInstance.delete(`/categories/delete/${category._id}`);
-            toast.success('Category deleted successfully');
+            await axiosInstance.delete('/categories/delete-bulk', { data: { categoryIds: categories.map(category => category._id) } });
+            toast.success('Categories deleted successfully');
             onDeleteSuccess();
             onClose();
         } catch (error) {
-            console.error('Error deleting category', error);
-            toast.error('Error deleting category');
+            toast.error('Error deleting categories');
+            console.error('Error deleting categories', error);
         }
     };
 
@@ -25,8 +25,8 @@ const DeleteCategoryModal = ({ open, onClose, category, onDeleteSuccess }) => {
         <Modal open={open} onClose={onClose}>
             <div className="flex items-center justify-center h-screen">
                 <Box className="bg-white p-4 rounded-lg shadow-lg max-w-md w-full">
-                    <h2 className="text-xl font-bold mb-2">Delete Category</h2>
-                    <p className="mb-4">Are you sure you want to delete the category "{category?.name}"?</p>
+                    <h2 className="text-xl font-bold mb-2">Delete Categories</h2>
+                    <p className="mb-4">Are you sure you want to delete the selected categories?</p>
                     <div className="flex justify-end">
                         <OutlinedBrownButton
                             onClick={onClose}
@@ -36,10 +36,10 @@ const DeleteCategoryModal = ({ open, onClose, category, onDeleteSuccess }) => {
                             Cancel
                         </OutlinedBrownButton>
                         <Button
-                            onClick={handleDeleteCategory}
+                            onClick={handleDeleteCategories}
                             variant="contained"
                             color="error"
-                            className="mr-2"
+                            className="!mr-2"
                         >
                             Delete
                         </Button>

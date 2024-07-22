@@ -44,6 +44,10 @@ const productSchema = new mongoose.Schema({
             default: 'medium'
         }
     },
+    details: [{
+        attribute: { type: String, default: null },
+        value: { type: String, default: null }
+    }],
     reviews: [{ type: mongoose.Schema.Types.ObjectId, ref: 'Review' }],
     createdAt: { type: Date, default: Date.now },
     updatedAt: { type: Date, default: Date.now }

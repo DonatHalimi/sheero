@@ -60,4 +60,21 @@ const deleteSupplier = async (req, res) => {
     }
 };
 
-module.exports = { createSupplier, getSuppliers, getSupplier, updateSupplier, deleteSupplier };
+const deleteSuppliers = async (req, res) => {
+    const { supplierIds } = req.body;
+    try {
+        const suppliers = await Supplier.find({ _id: { $in: supplierIds } });
+
+        if (suppliers.length !== supplierIds.length) {
+            return res.status(404).json({ message: 'One or more suppliers not found' });
+        }
+
+        await Supplier.deleteMany({ _id: { $in: supplierIds } });
+
+        res.status(200).json({ message: 'Suppliers deleted successfully' });
+    } catch (error) {
+        res.status(500).json({ message: 'Server error', error: error.message });
+    }
+};
+
+module.exports = { createSupplier, getSuppliers, getSupplier, updateSupplier, deleteSupplier, deleteSuppliers };
