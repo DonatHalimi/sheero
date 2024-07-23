@@ -1,13 +1,9 @@
+import { ExpandLess, ExpandMore } from '@mui/icons-material';
 import CreateOutlinedIcon from '@mui/icons-material/CreateOutlined';
 import DeleteOutlinedIcon from '@mui/icons-material/DeleteOutlined';
-import { FormControl } from '@mui/material';
-import MuiAppBar from '@mui/material/AppBar';
-import Button from '@mui/material/Button';
-import MuiDrawer from '@mui/material/Drawer';
-import ListItemButton from '@mui/material/ListItemButton';
+import { Button, Collapse, FormControl, List, ListItemButton, ListItemIcon, ListItemText, AppBar as MuiAppBar, Drawer as MuiDrawer, TableCell, TextField } from '@mui/material';
 import { styled } from '@mui/material/styles';
-import TableCell from '@mui/material/TableCell';
-import TextField from '@mui/material/TextField';
+import React from 'react';
 
 export const BrownOutlinedTextField = styled(TextField)({
     '& .MuiOutlinedInput-root': {
@@ -141,3 +137,25 @@ export const ActiveListItemButton = styled(ListItemButton)(({ selected }) => ({
         backgroundColor: selected ? 'darkred' : '#F8F8F8',
     },
 }));
+
+export const CollapsibleListItem = ({ open, handleClick, icon, primary, children }) => (
+    <>
+        <ListItemButton onClick={handleClick}>
+            <ListItemIcon>{icon}</ListItemIcon>
+            <ListItemText primary={primary} />
+            {open ? <ExpandLess /> : <ExpandMore />}
+        </ListItemButton>
+        <Collapse in={open} timeout="auto" unmountOnExit>
+            <List component="div" disablePadding>
+                {children}
+            </List>
+        </Collapse>
+    </>
+);
+
+export const ActiveListItem = ({ icon, primary, handleClick, selected, sx = {} }) => (
+    <ListItemButton onClick={handleClick} selected={selected} sx={sx}>
+        <ListItemIcon>{icon}</ListItemIcon>
+        <ListItemText primary={primary} />
+    </ListItemButton>
+);

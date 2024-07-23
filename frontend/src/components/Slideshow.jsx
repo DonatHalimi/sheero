@@ -1,6 +1,6 @@
-import React, { useEffect, useState, useRef } from 'react';
-import axios from 'axios';
 import { Splide, SplideSlide } from '@splidejs/react-splide';
+import axios from 'axios';
+import React, { useEffect, useRef, useState } from 'react';
 
 const Slideshow = () => {
     const [images, setImages] = useState([]);
@@ -34,6 +34,7 @@ const Slideshow = () => {
                     arrows: true,
                     width: '100%',
                     height: 'auto',
+                    gap: '13px',
                     breakpoints: {
                         1024: { perPage: 1 },
                         600: { perPage: 1 },

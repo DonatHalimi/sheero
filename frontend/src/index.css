@@ -98,3 +98,27 @@ img {
     width: 25px;
     height: 25px;
 }
+
+.splide__arrow {
+    background-color: white;
+    border: none;
+    padding: 10px;
+    width: 40px;
+    height: 40px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    box-shadow: none;
+}
+
+.splide__arrow--prev {
+    left: 10px;
+}
+
+.splide__arrow--next {
+    right: 10px;
+}
+
+.splide__arrow svg {
+    fill: #5B504B;
+}

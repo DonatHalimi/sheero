@@ -1,28 +1,24 @@
-import AllInboxOutlinedIcon from '@mui/icons-material/AllInboxOutlined';
-import ApartmentOutlinedIcon from '@mui/icons-material/ApartmentOutlined';
-import DashboardCustomizeOutlinedIcon from '@mui/icons-material/DashboardCustomizeOutlined';
-import DashboardOutlinedIcon from '@mui/icons-material/DashboardOutlined';
-import ExpandLess from '@mui/icons-material/ExpandLess';
-import ExpandMore from '@mui/icons-material/ExpandMore';
-import ExploreOutlinedIcon from '@mui/icons-material/ExploreOutlined';
-import FlagOutlinedIcon from '@mui/icons-material/FlagOutlined';
-import InboxOutlinedIcon from '@mui/icons-material/InboxOutlined';
-import Inventory2OutlinedIcon from '@mui/icons-material/Inventory2Outlined';
-import InventoryOutlinedIcon from '@mui/icons-material/InventoryOutlined';
-import PeopleOutlineOutlinedIcon from '@mui/icons-material/PeopleOutlineOutlined';
-import PersonOutlineOutlinedIcon from '@mui/icons-material/PersonOutlineOutlined';
-import PrecisionManufacturingOutlinedIcon from '@mui/icons-material/PrecisionManufacturingOutlined';
-import RoomOutlinedIcon from '@mui/icons-material/RoomOutlined';
-import StarHalfOutlinedIcon from '@mui/icons-material/StarHalfOutlined';
-import WidgetsOutlinedIcon from '@mui/icons-material/WidgetsOutlined';
-import Collapse from '@mui/material/Collapse';
-import List from '@mui/material/List';
-import ListItemButton from '@mui/material/ListItemButton';
-import ListItemIcon from '@mui/material/ListItemIcon';
-import ListItemText from '@mui/material/ListItemText';
 import React, { useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { ActiveListItemButton } from './CustomComponents';
+import {
+  DashboardOutlined,
+  DashboardCustomizeOutlined,
+  PeopleOutline,
+  PersonOutline,
+  StarHalf,
+  InventoryOutlined,
+  Inventory2Outlined,
+  ImageOutlined,
+  AllInboxOutlined,
+  InboxOutlined,
+  WidgetsOutlined,
+  ExploreOutlined,
+  FlagOutlined,
+  ApartmentOutlined,
+  RoomOutlined,
+  PrecisionManufacturingOutlined,
+} from '@mui/icons-material';
+import { CollapsibleListItem, ActiveListItem } from './CustomComponents';
 
 /**
  * Renders the main list items for the CRUD dashboard.
@@ -40,24 +36,10 @@ export const mainListItems = ({ setCurrentView }) => {
   const [activeItem, setActiveItem] = useState('');
   const navigate = useNavigate();
 
-  const handleUsersClick = () => {
-    setUsersOpen(!usersOpen);
-  };
-
-  const handleProductsClick = () => {
-    setProductsOpen(!productsOpen);
-  };
-
-  const handleCrudClick = () => {
-    setCrudOpen(!crudOpen);
-  };
-
-  const handleCategoriesClick = () => {
-    setCategoriesOpen(!categoriesOpen);
-  };
-
-  const handleAddressesClick = () => {
-    setAddressesOpen(!addressesOpen);
+  const handleItemClick = (view) => {
+    setCurrentView(view);
+    setActiveItem(view);
+    navigate(`/dashboard/${view}`);
   };
 
   useEffect(() => {
@@ -69,194 +51,129 @@ export const mainListItems = ({ setCurrentView }) => {
     }
   }, []);
 
-  const handleItemClick = (view) => {
-    setCurrentView(view);
-    setActiveItem(view);
-    navigate(`/dashboard/${view}`);
-  };
-
   return (
     <React.Fragment>
-      <ActiveListItemButton
-        onClick={() => handleItemClick('main')}
-        selected={activeItem === 'main'}>
-        <ListItemIcon>
-          <DashboardOutlinedIcon />
-        </ListItemIcon>
-        <ListItemText primary="Dashboard" />
-      </ActiveListItemButton>
+      <ActiveListItem
+        icon={<DashboardOutlined />}
+        primary="Dashboard"
+        handleClick={() => handleItemClick('main')}
+        selected={activeItem === 'main'}
+      />
 
-      <ListItemButton onClick={handleCrudClick}>
-        <ListItemIcon>
-          <DashboardCustomizeOutlinedIcon />
-        </ListItemIcon>
-        <ListItemText primary="CRUDs" />
-        {crudOpen ? <ExpandLess /> : <ExpandMore />}
-      </ListItemButton>
+      <CollapsibleListItem
+        open={crudOpen}
+        handleClick={() => setCrudOpen(!crudOpen)}
+        icon={<DashboardCustomizeOutlined />}
+        primary="CRUDs"
+      >
+        <CollapsibleListItem
+          open={usersOpen}
+          handleClick={() => setUsersOpen(!usersOpen)}
+          icon={<PeopleOutline />}
+          primary="User"
+        >
+          <ActiveListItem
+            sx={{ pl: 4 }}
+            handleClick={() => handleItemClick('users')}
+            selected={activeItem === 'users'}
+            icon={<PersonOutline />}
+            primary="Users"
+          />
 
-      <Collapse in={crudOpen} timeout="auto" unmountOnExit>
-        <List component="div" disablePadding>
-          <ListItemButton onClick={handleUsersClick}>
-            <ListItemIcon>
-              <PeopleOutlineOutlinedIcon />
-            </ListItemIcon>
-            <ListItemText primary="User" />
-            {usersOpen ? <ExpandLess /> : <ExpandMore />}
-          </ListItemButton>
-          <Collapse in={usersOpen} timeout="auto" unmountOnExit>
-            <List component="div" disablePadding>
-              <ActiveListItemButton
-                sx={{ pl: 4 }}
-                onClick={() => handleItemClick('users')}
-                selected={activeItem === 'users'}
-              >
-                <ListItemIcon>
-                  <PersonOutlineOutlinedIcon />
-                </ListItemIcon>
-                <ListItemText primary="Users" />
-              </ActiveListItemButton>
+          <ActiveListItem
+            sx={{ pl: 4 }}
+            handleClick={() => handleItemClick('reviews')}
+            selected={activeItem === 'reviews'}
+            icon={<StarHalf />}
+            primary="Reviews"
+          />
+        </CollapsibleListItem>
 
-              <ActiveListItemButton
-                sx={{ pl: 4 }}
-                onClick={() => handleItemClick('reviews')}
-                selected={activeItem === 'reviews'}
-              >
-                <ListItemIcon>
-                  <StarHalfOutlinedIcon />
-                </ListItemIcon>
-                <ListItemText primary="Reviews" />
-              </ActiveListItemButton>
-            </List>
-          </Collapse>
+        <CollapsibleListItem
+          open={productsOpen}
+          handleClick={() => setProductsOpen(!productsOpen)}
+          icon={<InventoryOutlined />}
+          primary="Product"
+        >
+          <ActiveListItem
+            sx={{ pl: 4 }}
+            handleClick={() => handleItemClick('products')}
+            selected={activeItem === 'products'}
+            icon={<Inventory2Outlined />}
+            primary="Products"
+          />
 
-          <ListItemButton onClick={handleProductsClick}>
-            <ListItemIcon>
-              <InventoryOutlinedIcon />
-            </ListItemIcon>
-            <ListItemText primary="Product" />
-            {productsOpen ? <ExpandLess /> : <ExpandMore />}
-          </ListItemButton>
-          <Collapse in={productsOpen} timeout="auto" unmountOnExit>
-            <List component="div" disablePadding>
-              <ActiveListItemButton
-                sx={{ pl: 4 }}
-                onClick={() => handleItemClick('products')}
-                selected={activeItem === 'products'}
-              >
-                <ListItemIcon>
-                  <Inventory2OutlinedIcon />
-                </ListItemIcon>
-                <ListItemText primary="Products" />
-              </ActiveListItemButton>
+          <ActiveListItem
+            sx={{ pl: 4 }}
+            handleClick={() => handleItemClick('images')}
+            selected={activeItem === 'images'}
+            icon={<ImageOutlined />}
+            primary="Images"
+          />
 
-              <ActiveListItemButton
-                sx={{ pl: 4 }}
-                onClick={() => handleItemClick('images')}
-                selected={activeItem === 'images'}
-              >
-                <ListItemIcon>
-                  <Inventory2OutlinedIcon />
-                </ListItemIcon>
-                <ListItemText primary="Images" />
-              </ActiveListItemButton>
+          <CollapsibleListItem
+            open={categoriesOpen}
+            handleClick={() => setCategoriesOpen(!categoriesOpen)}
+            icon={<AllInboxOutlined />}
+            primary="Category"
+          >
+            <ActiveListItem
+              sx={{ pl: 6 }}
+              handleClick={() => handleItemClick('categories')}
+              selected={activeItem === 'categories'}
+              icon={<InboxOutlined />}
+              primary="Categories"
+            />
 
-              <ActiveListItemButton
-                sx={{ pl: 4 }}
-                onClick={handleCategoriesClick}
-              >
-                <ListItemIcon>
-                  <AllInboxOutlinedIcon />
-                </ListItemIcon>
-                <ListItemText primary="Category" />
-                {categoriesOpen ? <ExpandLess /> : <ExpandMore />}
-              </ActiveListItemButton>
-              <Collapse in={categoriesOpen} timeout="auto" unmountOnExit>
-                <List component="div" disablePadding>
-                  <ActiveListItemButton
-                    sx={{ pl: 6 }}
-                    onClick={() => handleItemClick('categories')}
-                    selected={activeItem === 'categories'}
-                  >
-                    <ListItemIcon>
-                      <InboxOutlinedIcon />
-                    </ListItemIcon>
-                    <ListItemText primary="Categories" />
-                  </ActiveListItemButton>
+            <ActiveListItem
+              sx={{ pl: 6 }}
+              handleClick={() => handleItemClick('subcategories')}
+              selected={activeItem === 'subcategories'}
+              icon={<WidgetsOutlined />}
+              primary="Subcategories"
+            />
+          </CollapsibleListItem>
 
-                  <ActiveListItemButton
-                    sx={{ pl: 6 }}
-                    onClick={() => handleItemClick('subcategories')}
-                    selected={activeItem === 'subcategories'}
-                  >
-                    <ListItemIcon>
-                      <WidgetsOutlinedIcon />
-                    </ListItemIcon>
-                    <ListItemText primary="Subcategories" />
-                  </ActiveListItemButton>
-                </List>
-              </Collapse>
+          <CollapsibleListItem
+            open={addressesOpen}
+            handleClick={() => setAddressesOpen(!addressesOpen)}
+            icon={<ExploreOutlined />}
+            primary="Address"
+          >
+            <ActiveListItem
+              sx={{ pl: 6 }}
+              handleClick={() => handleItemClick('countries')}
+              selected={activeItem === 'countries'}
+              icon={<FlagOutlined />}
+              primary="Countries"
+            />
 
-              <ActiveListItemButton
-                sx={{ pl: 4 }}
-                onClick={handleAddressesClick}
-              >
-                <ListItemIcon>
-                  <ExploreOutlinedIcon />
-                </ListItemIcon>
-                <ListItemText primary="Address" />
-                {addressesOpen ? <ExpandLess /> : <ExpandMore />}
-              </ActiveListItemButton>
-              <Collapse in={addressesOpen} timeout="auto" unmountOnExit>
-                <List component="div" disablePadding>
-                  <ActiveListItemButton
-                    sx={{ pl: 6 }}
-                    onClick={() => handleItemClick('countries')}
-                    selected={activeItem === 'countries'}
-                  >
-                    <ListItemIcon>
-                      <FlagOutlinedIcon />
-                    </ListItemIcon>
-                    <ListItemText primary="Countries" />
-                  </ActiveListItemButton>
+            <ActiveListItem
+              sx={{ pl: 6 }}
+              handleClick={() => handleItemClick('cities')}
+              selected={activeItem === 'cities'}
+              icon={<ApartmentOutlined />}
+              primary="Cities"
+            />
 
-                  <ActiveListItemButton
-                    sx={{ pl: 6 }}
-                    onClick={() => handleItemClick('cities')}
-                    selected={activeItem === 'cities'}
-                  >
-                    <ListItemIcon>
-                      <ApartmentOutlinedIcon />
-                    </ListItemIcon>
-                    <ListItemText primary="Cities" />
-                  </ActiveListItemButton>
+            <ActiveListItem
+              sx={{ pl: 6 }}
+              handleClick={() => handleItemClick('addresses')}
+              selected={activeItem === 'addresses'}
+              icon={<RoomOutlined />}
+              primary="Addresses"
+            />
 
-                  <ActiveListItemButton
-                    sx={{ pl: 6 }}
-                    onClick={() => handleItemClick('addresses')}
-                    selected={activeItem === 'addresses'}
-                  >
-                    <ListItemIcon>
-                      <RoomOutlinedIcon />
-                    </ListItemIcon>
-                    <ListItemText primary="Addresses" />
-                  </ActiveListItemButton>
-
-                  <ActiveListItemButton
-                    sx={{ pl: 6 }}
-                    onClick={() => handleItemClick('suppliers')}
-                    selected={activeItem === 'suppliers'}
-                  >
-                    <ListItemIcon>
-                      <PrecisionManufacturingOutlinedIcon />
-                    </ListItemIcon>
-                    <ListItemText primary="Suppliers" />
-                  </ActiveListItemButton>
-                </List>
-              </Collapse>
-            </List>
-          </Collapse>
-        </List>
-      </Collapse>
+            <ActiveListItem
+              sx={{ pl: 6 }}
+              handleClick={() => handleItemClick('suppliers')}
+              selected={activeItem === 'suppliers'}
+              icon={<PrecisionManufacturingOutlined />}
+              primary="Suppliers"
+            />
+          </CollapsibleListItem>
+        </CollapsibleListItem>
+      </CollapsibleListItem>
     </React.Fragment>
   );
 };
