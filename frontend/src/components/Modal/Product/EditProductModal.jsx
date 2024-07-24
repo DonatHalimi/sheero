@@ -13,11 +13,13 @@ const EditProductModal = ({ open, onClose, product, onEditSuccess }) => {
     const [salePrice, setSalePrice] = useState('');
     const [category, setCategory] = useState('');
     const [subcategory, setSubcategory] = useState('');
+    const [subSubcategory, setSubSubcategory] = useState('');
     const [inventoryCount, setInventoryCount] = useState('');
     const [image, setImage] = useState(null);
     const [imagePreview, setImagePreview] = useState('');
     const [categories, setCategories] = useState([]);
     const [subcategories, setSubcategories] = useState([]);
+    const [subSubcategories, setSubSubcategories] = useState([]);
     const [length, setLength] = useState('');
     const [width, setWidth] = useState('');
     const [height, setHeight] = useState('');
@@ -43,6 +45,7 @@ const EditProductModal = ({ open, onClose, product, onEditSuccess }) => {
             setSalePrice(product.salePrice || '');
             setCategory(product.category._id);
             setSubcategory(product.subcategory._id);
+            setSubSubcategory(product.subSubcategory._id);
             setInventoryCount(product.inventoryCount);
             setSupplier(product.supplier._id);
             if (product.image) {
@@ -68,11 +71,10 @@ const EditProductModal = ({ open, onClose, product, onEditSuccess }) => {
                 setShippingCost(product.shipping.cost);
                 setPackageSize(product.shipping.packageSize);
             }
-            if (product.details) { // Load details if they exist
+            if (product.details) {
                 setDetails(product.details);
             }
         }
-
     }, [product]);
 
     useEffect(() => {
@@ -87,13 +89,18 @@ const EditProductModal = ({ open, onClose, product, onEditSuccess }) => {
 
                 const subcategoriesResponse = await axiosInstance.get('/subcategories/get', {
                     timeout: TIMEOUT,
-                })
+                });
                 setSubcategories(subcategoriesResponse.data);
+
+                const subSubcategoriesResponse = await axiosInstance.get('/subsubcategories/get', {
+                    timeout: TIMEOUT,
+                });
+                setSubSubcategories(subSubcategoriesResponse.data);
             } catch (error) {
                 if (error.code === 'ECONNABORTED') {
                     console.error('Request timed out');
                 } else {
-                    console.error('Error fetching categories and subcategories:', error.message);
+                    console.error('Error fetching categories, subcategories, and subsubcategories:', error.message);
                 }
             }
         }
@@ -180,6 +187,7 @@ const EditProductModal = ({ open, onClose, product, onEditSuccess }) => {
         formData.append('salePrice', salePrice);
         formData.append('category', category);
         formData.append('subcategory', subcategory);
+        formData.append('subSubcategory', subSubcategory);
         formData.append('inventoryCount', inventoryCount);
         formData.append('dimensions[length]', length);
         formData.append('dimensions[width]', width);
@@ -295,6 +303,18 @@ const EditProductModal = ({ open, onClose, product, onEditSuccess }) => {
                             >
                                 {subcategories.map((subcat) => (
                                     <MenuItem key={subcat._id} value={subcat._id}>{subcat.name}</MenuItem>
+                                ))}
+                            </Select>
+                        </OutlinedBrownFormControl>
+                        <OutlinedBrownFormControl className="flex-1">
+                            <InputLabel>SubSubcategory</InputLabel>
+                            <Select
+                                value={subSubcategory}
+                                onChange={(e) => setSubSubcategory(e.target.value)}
+                                label='SubSubcategory'
+                            >
+                                {subSubcategories.map((subsubcat) => (
+                                    <MenuItem key={subsubcat._id} value={subsubcat._id}>{subsubcat.name}</MenuItem>
                                 ))}
                             </Select>
                         </OutlinedBrownFormControl>

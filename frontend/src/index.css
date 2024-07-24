@@ -122,3 +122,12 @@ img {
 .splide__arrow svg {
     fill: #5B504B;
 }
+
+.splide__progress__bar {
+    height: 3px;
+    background: #007aff;
+}
+
+.splide__progress {
+    background: #ccc;
+}

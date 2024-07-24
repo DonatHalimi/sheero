@@ -1,5 +1,6 @@
 import { Checkbox, Paper, Table, TableBody, TableCell, TableContainer, TableHead, TableRow, Typography } from '@mui/material';
 import React, { useContext, useEffect, useState } from 'react';
+import { toast } from 'react-toastify';
 import useAxios from '../../axiosInstance';
 import { ActionButton, BoldTableCell, BrownCreateOutlinedIcon, OutlinedBrownButton } from '../../components/Dashboard/CustomComponents';
 import AddProductModal from '../../components/Modal/Product/AddProductModal';
@@ -24,6 +25,7 @@ const ProductsPage = () => {
     const [addProductOpen, setAddProductOpen] = useState(false);
     const [editProductOpen, setEditProductOpen] = useState(false);
     const [deleteProductOpen, setDeleteProductOpen] = useState(false);
+    const [fetchErrorCount, setFetchErrorCount] = useState(0);
     const [currentPage, setCurrentPage] = useState(1);
     const [totalPages, setTotalPages] = useState(1);
     const itemsPerPage = 10;
@@ -31,17 +33,24 @@ const ProductsPage = () => {
     const { refreshToken } = useContext(AuthContext);
     const axiosInstance = useAxios(refreshToken);
 
-    const fetchProducts = async () => {
-        try {
-            const response = await axiosInstance.get(`/products/get?page=${currentPage}&limit=${itemsPerPage}`);
-            setProducts(response.data.products);
-            setTotalPages(response.data.totalPages);
-        } catch (error) {
-            console.error('Error fetching products', error);
-        }
-    };
-
     useEffect(() => {
+        const fetchProducts = async () => {
+            try {
+                const response = await axiosInstance.get(`/products/get?page=${currentPage}&limit=${itemsPerPage}`);
+                setProducts(response.data.products);
+                setTotalPages(response.data.totalPages);
+                setFetchErrorCount(0);
+            } catch (error) {
+                setFetchErrorCount(prevCount => {
+                    if (prevCount < 5) {
+                        toast.error('Error fetching products');
+                    }
+                    return prevCount + 1;
+                });
+                console.error('Error fetching products', error);
+            }
+        };
+
         fetchProducts();
     }, [addProductOpen, editProductOpen, deleteProductOpen, currentPage, axiosInstance]);
 
@@ -50,7 +59,14 @@ const ProductsPage = () => {
             const response = await axiosInstance.get(`/products/get?page=${currentPage}&limit=${itemsPerPage}`);
             setProducts(response.data.products);
             setTotalPages(response.data.totalPages);
+            setFetchErrorCount(0);
         } catch (error) {
+            setFetchErrorCount(prevCount => {
+                if (prevCount < 5) {
+                    toast.error('Error fetching products');
+                }
+                return prevCount + 1;
+            });
             console.error('Error fetching products', error);
         }
     };
@@ -79,8 +95,8 @@ const ProductsPage = () => {
 
     return (
         <>
-            <div className='container mx-auto max-w-screen-2xl px-4 mt-20'>
-                <div className='flex flex-col items-center justify-center'>
+            <div className='container mx-auto max-w-full mt-20'>
+                <div className='w-full px-4'>
                     <div className='flex items-center justify-between w-full mb-4'>
                         <Typography variant='h5'>Products</Typography>
                         <div>
@@ -95,7 +111,7 @@ const ProductsPage = () => {
                             )}
                         </div>
                     </div>
-                    <TableContainer component={Paper} className='max-w-screen-2xl mx-auto'>
+                    <TableContainer component={Paper} className='w-full mx-auto'>
                         <Table>
                             <TableHead>
                                 <TableRow>
@@ -112,6 +128,7 @@ const ProductsPage = () => {
                                     <BoldTableCell>Sale Price</BoldTableCell>
                                     <BoldTableCell>Category</BoldTableCell>
                                     <BoldTableCell>Subcategory</BoldTableCell>
+                                    <BoldTableCell>SubSubcategory</BoldTableCell>
                                     <BoldTableCell>Inventory Count</BoldTableCell>
                                     <BoldTableCell>Dimensions</BoldTableCell>
                                     <BoldTableCell>Variants</BoldTableCell>
@@ -150,6 +167,7 @@ const ProductsPage = () => {
                                             <TableCell>{product?.salePrice || '0'}</TableCell>
                                             <TableCell>{product?.category?.name || 'N/A'}</TableCell>
                                             <TableCell>{product?.subcategory?.name || 'N/A'}</TableCell>
+                                            <TableCell>{product?.subSubcategory?.name || 'N/A'}</TableCell>
                                             <TableCell>{product?.inventoryCount || 'N/A'}</TableCell>
                                             <TableCell>
                                                 {product?.dimensions ? `${product.dimensions.length} x ${product.dimensions.width} x ${product.dimensions.height} ${product.dimensions.unit}` : 'N/A'}
@@ -184,7 +202,7 @@ const ProductsPage = () => {
                                     ))
                                 ) : (
                                     <TableRow>
-                                        <TableCell colSpan={14} align="center">
+                                        <TableCell colSpan={15} align="center">
                                             No products found.
                                         </TableCell>
                                     </TableRow>
@@ -204,7 +222,7 @@ const ProductsPage = () => {
                     <EditProductModal open={editProductOpen} onClose={() => setEditProductOpen(false)} product={selectedProduct} onEditSuccess={refreshProducts} />
                     <DeleteProductModal open={deleteProductOpen} onClose={() => setDeleteProductOpen(false)} products={selectedProducts.map(id => products.find(product => product._id === id))} onDeleteSuccess={refreshProducts} />
                 </div>
-            </div>
+            </div >
         </>
     );
 };

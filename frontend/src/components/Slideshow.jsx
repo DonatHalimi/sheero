@@ -26,7 +26,7 @@ const Slideshow = () => {
             <Splide
                 ref={splideRef}
                 options={{
-                    type: 'loop',
+                    type: 'slide',
                     perPage: 1,
                     autoplay: true,
                     interval: 3000,
@@ -42,7 +42,6 @@ const Slideshow = () => {
                     }
                 }}
                 onMounted={() => {
-                    console.log("Splide mounted");
                     if (splideRef.current) {
                         splideRef.current.splide.refresh();
                     }

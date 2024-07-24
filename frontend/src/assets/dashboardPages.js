@@ -7,6 +7,7 @@ import ProductsPage from '../pages/Dashboard/ProductsPage';
 import ReviewsPage from '../pages/Dashboard/ReviewsPage';
 import SlideshowPage from '../pages/Dashboard/SlideshowPage';
 import SubcategoriesPage from '../pages/Dashboard/SubcategoriesPage';
+import SubSubcategoriesPage from '../pages/Dashboard/SubSubcategoriesPage';
 import SuppliersPage from '../pages/Dashboard/SuppliersPage';
 import UsersPage from '../pages/Dashboard/UsersPage';
 
@@ -22,6 +23,7 @@ const pages = {
     suppliers: SuppliersPage,
     subcategories: SubcategoriesPage,
     users: UsersPage,
+    subSubcategories: SubSubcategoriesPage
 };
 
 export default pages;

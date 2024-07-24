@@ -29,7 +29,7 @@ const Footer = () => {
                                 <li><a href="#" class="text-gray-200 hover:text-white">Shop</a></li>
                                 <li><a href="#" class="text-gray-200 hover:text-white">About Us</a></li>
                                 <li><a href="#" class="text-gray-200 hover:text-white">Contact</a></li>
-                                <li><a href="#" class="text-gray-200 hover:text-white">FAQs</a></li>
+                                <li><a href="/faqs" class="text-gray-200 hover:text-white">FAQs</a></li>
                             </ul>
                         </div>
 

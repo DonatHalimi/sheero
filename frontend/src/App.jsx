@@ -4,12 +4,13 @@ import { ToastContainer } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
 import pages from './assets/dashboardPages.js';
 import DashboardLayout from './components/Dashboard/DashboardLayout';
-import NotFound from './components/NotFound';
 import ProtectedRoute from './components/Route/ProtectedRoute';
 import PublicRoute from './components/Route/PublicRoute';
 import ToTop from './components/ToTop';
+import FAQs from './pages/FAQs.jsx';
 import Home from './pages/Home';
 import Login from './pages/Login';
+import NotFound from './pages/NotFound.jsx';
 import Register from './pages/Register';
 
 const App = () => (
@@ -24,6 +25,7 @@ const App = () => (
         ))}
       </Route>
       <Route path="*" element={<NotFound />} />
+      <Route path='/faqs' element={<FAQs />} />
     </Routes>
     <ToastContainer
       position="bottom-right"

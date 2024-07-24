@@ -5,6 +5,7 @@ import React, { useContext, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { toast } from 'react-toastify';
 import { BrownButton, BrownOutlinedTextField } from '../components/Dashboard/CustomComponents';
+import Footer from '../components/Footer';
 import Navbar from '../components/Navbar';
 import { AuthContext } from '../context/AuthContext';
 
@@ -128,6 +129,8 @@ const Register = () => {
                     </Box>
                 </Box>
             </Container>
+            <div className='mt-80'></div>
+            <Footer />
         </>
     );
 };

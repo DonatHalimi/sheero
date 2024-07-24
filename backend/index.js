@@ -14,6 +14,7 @@ const addressRoutes = require('./routes/address')
 const supplierRoutes = require('./routes/supplier')
 const reviewRoutes = require('./routes/review')
 const slideshowRoutes = require('./routes/slideshow')
+const subSubcategoryRoutes = require('./routes/subSubcategory')
 
 dotenv.config();
 
@@ -38,6 +39,7 @@ app.use('/api/addresses', addressRoutes)
 app.use('/api/suppliers', supplierRoutes)
 app.use('/api/reviews', reviewRoutes)
 app.use('/api/slideshow', slideshowRoutes);
+app.use('/api/subsubcategories', subSubcategoryRoutes)
 
 const PORT = process.env.BACKEND_PORT || 5000;
 app.listen(PORT, () => console.log(`Server running on port ${PORT}`));

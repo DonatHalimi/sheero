@@ -1,5 +1,6 @@
 import { Checkbox, Paper, Table, TableBody, TableCell, TableContainer, TableHead, TableRow, Typography } from '@mui/material';
 import React, { useContext, useEffect, useState } from 'react';
+import { toast } from 'react-toastify';
 import useAxios from '../../axiosInstance';
 import { ActionButton, BoldTableCell, BrownCreateOutlinedIcon, OutlinedBrownButton } from '../../components/Dashboard/CustomComponents';
 import AddReviewModal from '../../components/Modal/Review/AddReviewModal';
@@ -14,31 +15,47 @@ const ReviewsPage = () => {
     const [addReviewOpen, setAddReviewOpen] = useState(false);
     const [editReviewOpen, setEditReviewOpen] = useState(false);
     const [deleteReviewOpen, setDeleteReviewOpen] = useState(false);
+    const [fetchErrorCount, setFetchErrorCount] = useState(0);
 
     const { refreshToken } = useContext(AuthContext);
     const axiosInstance = useAxios(refreshToken);
 
-    const fetchReviews = async () => {
-        try {
-            const response = await axiosInstance.get('/reviews/get');
-            setReviews(response.data);
-        } catch (error) {
-            console.error('Error fetching reviews', error);
-        }
-    };
-
     useEffect(() => {
+        const fetchReviews = async () => {
+            try {
+                const response = await axiosInstance.get('/reviews/get');
+                setReviews(response.data);
+                setFetchErrorCount(0);
+            } catch (error) {
+                setFetchErrorCount(prevCount => {
+                    if (prevCount < 5) {
+                        toast.error('Error fetching reviews');
+                    }
+                    return prevCount + 1;
+                });
+                console.error('Error fetching reviews', error);
+            }
+        };
+
         fetchReviews();
-    }, [deleteReviewOpen, axiosInstance]);
+    }, [addReviewOpen, editReviewOpen, deleteReviewOpen, axiosInstance]);
 
     const refreshReviews = async () => {
         try {
             const response = await axiosInstance.get('/reviews/get');
             setReviews(response.data);
+            setFetchErrorCount(0);
         } catch (error) {
+            setFetchErrorCount(prevCount => {
+                if (prevCount < 5) {
+                    toast.error('Error fetching reviews');
+                }
+                return prevCount + 1;
+            });
             console.error('Error fetching reviews', error);
         }
     };
+
 
     const handleSelectReview = (reviewId) => {
         setSelectedReviews((prevSelected) => {

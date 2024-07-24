@@ -1,5 +1,5 @@
 const mongoose = require('mongoose');
-const Review = require('./Review')
+const Review = require('./Review');
 
 const productSchema = new mongoose.Schema({
     name: { type: String, required: true },
@@ -8,6 +8,7 @@ const productSchema = new mongoose.Schema({
     salePrice: { type: Number, default: null },
     category: { type: mongoose.Schema.Types.ObjectId, ref: 'Category', required: true },
     subcategory: { type: mongoose.Schema.Types.ObjectId, ref: 'Subcategory', required: true },
+    subSubcategory: { type: mongoose.Schema.Types.ObjectId, ref: 'SubSubcategory', required: true },
     image: { type: String, required: true },
     inventoryCount: { type: Number, default: 0 },
     dimensions: {

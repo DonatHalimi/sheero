@@ -1,5 +1,6 @@
 import { Checkbox, Paper, Table, TableBody, TableCell, TableContainer, TableHead, TableRow, Typography } from '@mui/material';
 import React, { useContext, useEffect, useState } from 'react';
+import { toast } from 'react-toastify';
 import useAxios from '../../axiosInstance';
 import { ActionButton, BoldTableCell, BrownCreateOutlinedIcon, OutlinedBrownButton } from '../../components/Dashboard/CustomComponents';
 import AddCityModal from '../../components/Modal/City/AddCityModal';
@@ -14,20 +15,28 @@ const CitiesPage = () => {
     const [addCityOpen, setAddCityOpen] = useState(false);
     const [editCityOpen, setEditCityOpen] = useState(false);
     const [deleteCityOpen, setDeleteCityOpen] = useState(false);
+    const [fetchErrorCount, setFetchErrorCount] = useState(0);
 
     const { refreshToken } = useContext(AuthContext);
     const axiosInstance = useAxios(refreshToken);
 
-    const fetchCities = async () => {
-        try {
-            const response = await axiosInstance.get('/cities/get');
-            setCities(response.data);
-        } catch (error) {
-            console.error('Error fetching cities', error);
-        }
-    };
-
     useEffect(() => {
+        const fetchCities = async () => {
+            try {
+                const response = await axiosInstance.get('/cities/get');
+                setCities(response.data);
+                setFetchErrorCount(0);
+            } catch (error) {
+                setFetchErrorCount(prevCount => {
+                    if (prevCount < 5) {
+                        toast.error('Error fetching cities');
+                    }
+                    return prevCount + 1;
+                });
+                console.error('Error fetching cities', error);
+            }
+        };
+
         fetchCities();
     }, [addCityOpen, editCityOpen, deleteCityOpen, axiosInstance]);
 
@@ -35,7 +44,14 @@ const CitiesPage = () => {
         try {
             const response = await axiosInstance.get('/cities/get');
             setCities(response.data);
+            setFetchErrorCount(0);
         } catch (error) {
+            setFetchErrorCount(prevCount => {
+                if (prevCount < 5) {
+                    toast.error('Error fetching cities');
+                }
+                return prevCount + 1;
+            });
             console.error('Error fetching cities', error);
         }
     };

@@ -16,6 +16,7 @@ const UsersPage = () => {
     const [addUserOpen, setAddUserOpen] = useState(false);
     const [editUserOpen, setEditUserOpen] = useState(false);
     const [deleteUserOpen, setDeleteUserOpen] = useState(false);
+    const [fetchErrorCount, setFetchErrorCount] = useState(0);
     const [currentPage, setCurrentPage] = useState(1);
     const [totalPages, setTotalPages] = useState(1);
     const itemsPerPage = 10;
@@ -29,8 +30,14 @@ const UsersPage = () => {
                 const response = await axiosInstance.get(`/users/get?page=${currentPage}&limit=${itemsPerPage}`);
                 setUsers(response.data.users);
                 setTotalPages(response.data.totalPages);
+                setFetchErrorCount(0);
             } catch (error) {
-                toast.error('Error fetching users');
+                setFetchErrorCount(prevCount => {
+                    if (prevCount < 5) {
+                        toast.error('Error fetching users');
+                    }
+                    return prevCount + 1;
+                });
                 console.error('Error fetching users', error);
             }
         };
@@ -43,7 +50,14 @@ const UsersPage = () => {
             const response = await axiosInstance.get(`/users/get?page=${currentPage}&limit=${itemsPerPage}`);
             setUsers(response.data.users);
             setTotalPages(response.data.totalPages);
+            setFetchErrorCount(0);
         } catch (error) {
+            setFetchErrorCount(prevCount => {
+                if (prevCount < 5) {
+                    toast.error('Error fetching users');
+                }
+                return prevCount + 1;
+            });
             console.error('Error fetching users', error);
         }
     };

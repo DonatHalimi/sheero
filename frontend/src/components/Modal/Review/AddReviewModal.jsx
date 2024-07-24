@@ -22,7 +22,6 @@ const AddReviewModal = ({ open, onClose, onAddSuccess }) => {
                 setProducts(response.data);
             } catch (error) {
                 console.error('Error fetching products', error);
-                toast.error('Error fetching products');
             }
         };
 
@@ -32,7 +31,6 @@ const AddReviewModal = ({ open, onClose, onAddSuccess }) => {
                 setUserReviews(response.data);
             } catch (error) {
                 console.error('Error fetching user reviews', error);
-                toast.error('Error fetching user reviews');
             }
         };
 

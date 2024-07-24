@@ -1,24 +1,24 @@
-import React, { useEffect, useState } from 'react';
-import { useNavigate } from 'react-router-dom';
 import {
-  DashboardOutlined,
-  DashboardCustomizeOutlined,
-  PeopleOutline,
-  PersonOutline,
-  StarHalf,
-  InventoryOutlined,
-  Inventory2Outlined,
-  ImageOutlined,
   AllInboxOutlined,
-  InboxOutlined,
-  WidgetsOutlined,
+  ApartmentOutlined,
+  CollectionsOutlined,
+  DashboardCustomizeOutlined,
+  DashboardOutlined,
   ExploreOutlined,
   FlagOutlined,
-  ApartmentOutlined,
-  RoomOutlined,
+  InboxOutlined,
+  Inventory2Outlined,
+  InventoryOutlined,
+  PeopleOutline,
+  PersonOutline,
   PrecisionManufacturingOutlined,
+  RoomOutlined,
+  StarHalf,
+  WidgetsOutlined,
 } from '@mui/icons-material';
-import { CollapsibleListItem, ActiveListItem } from './CustomComponents';
+import React, { useEffect, useState } from 'react';
+import { useNavigate } from 'react-router-dom';
+import { ActiveListItem, CollapsibleListItem } from './CustomComponents';
 
 /**
  * Renders the main list items for the CRUD dashboard.
@@ -52,7 +52,7 @@ export const mainListItems = ({ setCurrentView }) => {
   }, []);
 
   return (
-    <React.Fragment>
+    <>
       <ActiveListItem
         icon={<DashboardOutlined />}
         primary="Dashboard"
@@ -107,7 +107,7 @@ export const mainListItems = ({ setCurrentView }) => {
             sx={{ pl: 4 }}
             handleClick={() => handleItemClick('images')}
             selected={activeItem === 'images'}
-            icon={<ImageOutlined />}
+            icon={<CollectionsOutlined />}
             primary="Images"
           />
 
@@ -131,6 +131,14 @@ export const mainListItems = ({ setCurrentView }) => {
               selected={activeItem === 'subcategories'}
               icon={<WidgetsOutlined />}
               primary="Subcategories"
+            />
+
+            <ActiveListItem
+              sx={{ pl: 6 }}
+              handleClick={() => handleItemClick('subsubcategories')}
+              selected={activeItem === 'subsubcategories'}
+              icon={<WidgetsOutlined />}
+              primary="SubSubcategories"
             />
           </CollapsibleListItem>
 
@@ -174,12 +182,12 @@ export const mainListItems = ({ setCurrentView }) => {
           </CollapsibleListItem>
         </CollapsibleListItem>
       </CollapsibleListItem>
-    </React.Fragment>
+    </>
   );
 };
 
 export const secondaryListItems = (
-  <React.Fragment>
+  <>
     {/* <ListSubheader component="div" inset>
       Saved reports
     </ListSubheader>
@@ -201,5 +209,5 @@ export const secondaryListItems = (
       </ListItemIcon>
       <ListItemText primary="Year-end sale" />
     </ListItemButton> */}
-  </React.Fragment>
+  </>
 );

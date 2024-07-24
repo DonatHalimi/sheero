@@ -1,5 +1,6 @@
 import { Checkbox, Paper, Table, TableBody, TableCell, TableContainer, TableHead, TableRow, Typography } from '@mui/material';
 import React, { useContext, useEffect, useState } from 'react';
+import { toast } from 'react-toastify';
 import useAxios from '../../axiosInstance';
 import { ActionButton, BoldTableCell, BrownCreateOutlinedIcon, OutlinedBrownButton } from '../../components/Dashboard/CustomComponents';
 import AddCategoryModal from '../../components/Modal/Category/AddCategoryModal';
@@ -14,31 +15,44 @@ const CategoriesPage = () => {
     const [addCategoryOpen, setAddCategoryOpen] = useState(false);
     const [editCategoryOpen, setEditCategoryOpen] = useState(false);
     const [deleteCategoryOpen, setDeleteCategoryOpen] = useState(false);
+    const [fetchErrorCount, setFetchErrorCount] = useState(0);
 
     const { refreshToken } = useContext(AuthContext);
     const axiosInstance = useAxios(refreshToken);
 
-    const fetchCategories = async () => {
-        try {
-            const response = await axiosInstance.get('/categories/get');
-            setCategories(response.data);
-        } catch (error) {
-            console.error('Error fetching categories', error);
-            setCategories([]);
-        }
-    };
-
     useEffect(() => {
+        const fetchCategories = async () => {
+            try {
+                const response = await axiosInstance.get('/categories/get');
+                setCategories(response.data);
+                setFetchErrorCount(0);
+            } catch (error) {
+                setFetchErrorCount(prevCount => {
+                    if (prevCount < 5) {
+                        toast.error('Error fetching categories');
+                    }
+                    return prevCount + 1;
+                });
+                console.error('Error fetching categories', error);
+            }
+        };
+
         fetchCategories();
-    }, [addCategoryOpen, editCategoryOpen, deleteCategoryOpen]);
+    }, [addCategoryOpen, editCategoryOpen, deleteCategoryOpen, axiosInstance]);
 
     const refreshCategories = async () => {
         try {
             const response = await axiosInstance.get('/categories/get');
-            setCategories(response.data.categories || []);
+            setCategories(response.data);
+            setFetchErrorCount(0);
         } catch (error) {
+            setFetchErrorCount(prevCount => {
+                if (prevCount < 5) {
+                    toast.error('Error fetching categories');
+                }
+                return prevCount + 1;
+            });
             console.error('Error fetching categories', error);
-            setCategories([]);
         }
     };
 

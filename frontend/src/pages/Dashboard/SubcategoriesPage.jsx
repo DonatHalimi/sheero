@@ -1,5 +1,6 @@
 import { Checkbox, Paper, Table, TableBody, TableCell, TableContainer, TableHead, TableRow, Typography } from '@mui/material';
 import React, { useContext, useEffect, useState } from 'react';
+import { toast } from 'react-toastify';
 import useAxios from '../../axiosInstance';
 import { ActionButton, BoldTableCell, BrownCreateOutlinedIcon, OutlinedBrownButton } from '../../components/Dashboard/CustomComponents';
 import AddSubcategoryModal from '../../components/Modal/Subcategory/AddSubcategoryModal';
@@ -9,12 +10,12 @@ import { AuthContext } from '../../context/AuthContext';
 
 const SubcategoriesPage = () => {
     const [subcategories, setSubcategories] = useState([]);
-    const [categories, setCategories] = useState([]);
     const [selectedSubcategory, setSelectedSubcategory] = useState(null);
     const [selectedSubcategories, setSelectedSubcategories] = useState([]);
     const [addSubcategoryOpen, setAddSubcategoryOpen] = useState(false);
     const [editSubcategoryOpen, setEditSubcategoryOpen] = useState(false);
     const [deleteSubcategoryOpen, setDeleteSubcategoryOpen] = useState(false);
+    const [fetchErrorCount, setFetchErrorCount] = useState(0);
 
     const { refreshToken } = useContext(AuthContext);
     const axiosInstance = useAxios(refreshToken);
@@ -24,22 +25,17 @@ const SubcategoriesPage = () => {
             try {
                 const response = await axiosInstance.get('/subcategories/get');
                 setSubcategories(response.data);
+                setFetchErrorCount(0);
             } catch (error) {
-                toast.error('Error fetching subcategories');
+                setFetchErrorCount(prevCount => {
+                    if (prevCount < 5) {
+                        toast.error('Error fetching subcategories');
+                    }
+                    return prevCount + 1;
+                });
                 console.error('Error fetching subcategories', error);
             }
         };
-        const fetchCategories = async () => {
-            try {
-                const response = await axiosInstance.get('/categories/get');
-                setCategories(response.data);
-            } catch (error) {
-                toast.error('Error fetching subcategories');
-                console.error('Error fetching subcategories', error);
-            }
-        };
-
-        fetchCategories();
 
         fetchSubcategories();
     }, [addSubcategoryOpen, editSubcategoryOpen, deleteSubcategoryOpen, axiosInstance]);
@@ -47,11 +43,16 @@ const SubcategoriesPage = () => {
     const refreshSubcategories = async () => {
         try {
             const response = await axiosInstance.get('/subcategories/get');
-            const categories = await axiosInstance.get('/categories/get')
             setSubcategories(response.data);
-            setCategories(categories.data)
+            setFetchErrorCount(0);
         } catch (error) {
-            console.error('Error fetching subcategory', error);
+            setFetchErrorCount(prevCount => {
+                if (prevCount < 5) {
+                    toast.error('Error fetching subcategories');
+                }
+                return prevCount + 1;
+            });
+            console.error('Error fetching subcategories', error);
         }
     };
 

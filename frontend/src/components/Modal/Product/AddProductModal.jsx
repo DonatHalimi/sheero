@@ -13,11 +13,13 @@ const AddProductModal = ({ open, onClose, onAddSuccess }) => {
     const [salePrice, setSalePrice] = useState('');
     const [category, setCategory] = useState('');
     const [subcategory, setSubcategory] = useState('');
+    const [subSubcategory, setSubSubcategory] = useState('');
     const [inventoryCount, setInventoryCount] = useState('');
     const [image, setImage] = useState(null);
     const [imagePreview, setImagePreview] = useState(null);
     const [categories, setCategories] = useState([]);
     const [subcategories, setSubcategories] = useState([]);
+    const [subSubcategories, setSubSubcategories] = useState([]);
     const [length, setLength] = useState('');
     const [width, setWidth] = useState('');
     const [height, setHeight] = useState('');
@@ -49,11 +51,16 @@ const AddProductModal = ({ open, onClose, onAddSuccess }) => {
                     timeout: TIMEOUT,
                 });
                 setSubcategories(subcategoriesResponse.data);
+
+                const subSubcategoriesResponse = await axiosInstance.get('/subsubcategories/get', {
+                    timeout: TIMEOUT,
+                });
+                setSubSubcategories(subSubcategoriesResponse.data);
             } catch (error) {
                 if (error.code === 'ECONNABORTED') {
                     console.error('Request timed out');
                 } else {
-                    console.error('Error fetching categories and subcategories:', error.message);
+                    console.error('Error fetching categories, subcategories, and subsubcategories:', error.message);
                 }
             }
         }
@@ -90,7 +97,7 @@ const AddProductModal = ({ open, onClose, onAddSuccess }) => {
     };
 
     const handleAddProduct = async () => {
-        if (!name || !description || !price || !category || !subcategory || !inventoryCount || !image || !supplier) {
+        if (!name || !description || !price || !category || !subcategory || !subSubcategory || !inventoryCount || !image || !supplier) {
             toast.error('Please fill in all the fields', {
                 closeOnClick: true
             });
@@ -104,6 +111,7 @@ const AddProductModal = ({ open, onClose, onAddSuccess }) => {
         formData.append('salePrice', salePrice);
         formData.append('category', category);
         formData.append('subcategory', subcategory);
+        formData.append('subSubcategory', subSubcategory);
         formData.append('inventoryCount', inventoryCount);
         formData.append('image', image);
         formData.append('dimensions[length]', length);
@@ -239,6 +247,18 @@ const AddProductModal = ({ open, onClose, onAddSuccess }) => {
                                 onChange={(e) => setSubcategory(e.target.value)}
                             >
                                 {subcategories.map((sub) => (
+                                    <MenuItem key={sub._id} value={sub._id}>{sub.name}</MenuItem>
+                                ))}
+                            </Select>
+                        </OutlinedBrownFormControl>
+                        <OutlinedBrownFormControl className="flex-1">
+                            <InputLabel>SubSubcategory</InputLabel>
+                            <Select
+                                label="SubSubcategory"
+                                value={subSubcategory}
+                                onChange={(e) => setSubSubcategory(e.target.value)}
+                            >
+                                {subSubcategories.map((sub) => (
                                     <MenuItem key={sub._id} value={sub._id}>{sub.name}</MenuItem>
                                 ))}
                             </Select>

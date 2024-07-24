@@ -55,7 +55,6 @@ const AuthProvider = ({ children }) => {
             return response.data.accessToken;
         } catch (error) {
             console.error('Token refresh failed', error);
-            logout(); // Log out the user if token refresh fails
             throw error;
         }
     };
