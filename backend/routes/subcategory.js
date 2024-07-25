@@ -1,11 +1,12 @@
 const express = require('express');
-const { createSubcategory, getSubcategories, getSubcategory, updateSubcategory, deleteSubcategory, deleteSubcategories } = require('../controllers/subcategoryController');
+const { createSubcategory, getSubcategories, getSubcategory, getSubcategoriesByCategory, updateSubcategory, deleteSubcategory, deleteSubcategories } = require('../controllers/subcategoryController');
 const router = express.Router();
 const { requireAuthAndRole } = require('../middleware/auth');
 
 router.post('/create', requireAuthAndRole('admin'), createSubcategory);
 router.get('/get', getSubcategories);
 router.get('/get/:id', getSubcategory);
+router.get('/getByCategory/:categoryId', getSubcategoriesByCategory);
 router.put('/update/:id', requireAuthAndRole('admin'), updateSubcategory);
 router.delete('/delete/:id', requireAuthAndRole('admin'), deleteSubcategory);
 router.delete('/delete-bulk', requireAuthAndRole('admin'), deleteSubcategories)

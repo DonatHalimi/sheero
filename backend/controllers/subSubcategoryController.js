@@ -31,6 +31,15 @@ const getSubSubcategory = async (req, res) => {
     }
 };
 
+const getSubSubcategoriesBySubcategory = async (req, res) => {
+    try {
+        const subSubcategories = await SubSubcategory.find({ subcategory: req.params.subcategoryId });
+        res.status(200).json(subSubcategories);
+    } catch (error) {
+        res.status(500).json({ message: 'Server error' });
+    }
+};
+
 const updateSubSubcategory = async (req, res) => {
     const { name, subcategory } = req.body;
     try {
@@ -81,11 +90,4 @@ const deleteSubSubcategories = async (req, res) => {
     }
 };
 
-module.exports = {
-    createSubSubcategory,
-    getSubSubcategories,
-    getSubSubcategory,
-    updateSubSubcategory,
-    deleteSubSubcategory,
-    deleteSubSubcategories
-};
+module.exports = { createSubSubcategory, getSubSubcategories, getSubSubcategory, getSubSubcategoriesBySubcategory, updateSubSubcategory, deleteSubSubcategory, deleteSubSubcategories };

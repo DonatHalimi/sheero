@@ -117,7 +117,7 @@ const SubSubcategoriesPage = () => {
                                             />
                                         </TableCell>
                                         <TableCell>{subSubcategory.name}</TableCell>
-                                        <TableCell>{subSubcategory.subcategory.name}</TableCell>
+                                        <TableCell>{subSubcategory.subcategory?.name}</TableCell>
                                         <TableCell>
                                             <ActionButton onClick={() => { setSelectedSubSubcategory(subSubcategory); setEditSubSubcategoryOpen(true); }}><BrownCreateOutlinedIcon /></ActionButton>
                                         </TableCell>
