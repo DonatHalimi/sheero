@@ -55,6 +55,18 @@ const CategoriesList = () => {
         setOpenCategory(null);
     };
 
+    const calculateDropdownStyle = () => {
+        if (categoryListRef.current) {
+            const { width, left, bottom } = categoryListRef.current.getBoundingClientRect();
+            return {
+                width: `${width}px`,
+                left: `${left}px`,
+                top: `${bottom}px`,
+            };
+        }
+        return {};
+    };
+
     return (
         <nav className="bg-white dark:border-gray-100 border-t shadow-md border-gray-100">
             <div className="flex flex-wrap justify-between items-center mx-auto max-w-screen-xl p-4">
@@ -88,26 +100,29 @@ const CategoriesList = () => {
                                 </button>
                                 {openCategory === category._id && subcategories[category._id] && (
                                     <div
-                                        className="absolute left-0 bg-white shadow-lg rounded-lg p-4 z-50"
-                                        style={{ width: megaMenuRef.current ? `${megaMenuRef.current.offsetWidth}px` : 'auto' }}
+                                        className="fixed bg-white shadow-lg rounded-lg p-4 z-50"
+                                        style={{ ...calculateDropdownStyle() }}
                                     >
                                         <ul>
                                             {subcategories[category._id].map((subcategory) => (
-                                                <li key={subcategory._id} className="mb-2">
-                                                    <a href="#" className="block py-2 px-4 text-gray-700 hover:bg-gray-100 font-semibold">
-                                                        {subcategory.name}
-                                                    </a>
-                                                    {subsubcategories[subcategory._id] && (
-                                                        <ul className="pl-4">
-                                                            {subsubcategories[subcategory._id].map((subsubcategory) => (
-                                                                <li key={subsubcategory._id}>
-                                                                    <a href="#" className="block py-1 px-2 text-gray-500 hover:bg-gray-100">
-                                                                        {subsubcategory.name}
-                                                                    </a>
-                                                                </li>
-                                                            ))}
-                                                        </ul>
-                                                    )}
+                                                <li key={subcategory._id} className="mb-2 flex items-center">
+                                                    <img className='rounded-md' src={`http://localhost:5000/${subcategory.image}`} alt="" width={50} />
+                                                    <div className="">
+                                                        <a href="#" className="block py-2 px-4 text-gray-700 hover:bg-gray-100 font-semibold">
+                                                            {subcategory.name}
+                                                        </a>
+                                                        {subsubcategories[subcategory._id] && (
+                                                            <ul className="pl-4">
+                                                                {subsubcategories[subcategory._id].map((subsubcategory) => (
+                                                                    <li key={subsubcategory._id}>
+                                                                        <a href="#" className="block py-1 px-2 text-gray-500 hover:bg-gray-100">
+                                                                            {subsubcategory.name}
+                                                                        </a>
+                                                                    </li>
+                                                                ))}
+                                                            </ul>
+                                                        )}
+                                                    </div>
                                                 </li>
                                             ))}
                                         </ul>

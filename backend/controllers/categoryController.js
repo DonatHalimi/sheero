@@ -7,6 +7,15 @@ const path = require('path');
 const createCategory = async (req, res) => {
     const { name } = req.body;
     const image = req.file ? req.file.path : '';
+
+    if (!name) {
+        return res.status(400).json({ message: 'Category name is required' });
+    }
+
+    if (!image || !req.file) {
+        return res.status(400).json({ message: 'Image is required' });
+    }
+
     try {
         const category = new Category({ name, image });
         await category.save();
@@ -19,6 +28,7 @@ const createCategory = async (req, res) => {
 const getCategories = async (req, res) => {
     try {
         const categories = await Category.find();
+        if (!categories) return res.status(404).json({ message: 'Categories not found' });
         res.status(200).json(categories);
     } catch (error) {
         res.status(500).json({ message: 'Server error' });

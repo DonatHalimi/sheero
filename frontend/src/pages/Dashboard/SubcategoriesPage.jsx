@@ -103,6 +103,7 @@ const SubcategoriesPage = () => {
                                         />
                                     </BoldTableCell>
                                     <BoldTableCell>Name</BoldTableCell>
+                                    <BoldTableCell>Image</BoldTableCell>
                                     <BoldTableCell>Category</BoldTableCell>
                                     <BoldTableCell>Actions</BoldTableCell>
                                 </TableRow>
@@ -116,8 +117,11 @@ const SubcategoriesPage = () => {
                                                 onChange={() => handleSelectSubcategory(subcategory._id)}
                                             />
                                         </TableCell>
-                                        <TableCell>{subcategory.name}</TableCell>
-                                        <TableCell>{subcategory.category.name}</TableCell>
+                                        <TableCell>{subcategory?.name}</TableCell>
+                                        <TableCell>
+                                            <img className='rounded-md' src={`http://localhost:5000/${subcategory.image}`} alt="" width={80} />
+                                        </TableCell>
+                                        <TableCell>{subcategory.category?.name}</TableCell>
                                         <TableCell>
                                             <ActionButton onClick={() => { setSelectedSubcategory(subcategory); setEditSubcategoryOpen(true); }}><BrownCreateOutlinedIcon /></ActionButton>
                                         </TableCell>

@@ -1,4 +1,5 @@
 const SubSubcategory = require('../models/SubSubcategory');
+const Subcategory = require('../models/Subcategory')
 const Product = require('../models/Product');
 
 const createSubSubcategory = async (req, res) => {
@@ -80,6 +81,24 @@ const deleteSubSubcategories = async (req, res) => {
 
         if (subSubcategories.length !== subSubcategoryIds.length) {
             return res.status(404).json({ message: 'One or more sub-subcategories not found' });
+        }
+
+        for (const subSubcategory of subSubcategories) {
+            const products = await Product.find({ subsubcategory: req.params.id });
+            if (products.length > 0) {
+                return res.status(400).json({ message: `Cannot delete subSubcategory ${subSubcategory.name} with existing products` });
+            }
+
+            const subsubcategories = await Subcategory.find({ subsubcategory: req.params.id });
+            if (subsubcategories.length > 0) {
+                return res.status(400).json({ message: `Cannot delete subSubcategory ${subSubcategory.name} with existing subsubcategories` });
+            }
+
+            if (subSubcategory.image) {
+                fs.unlink(category.image, (err) => {
+                    if (err) console.error('Error deleting image:', err);
+                });
+            }
         }
 
         await SubSubcategory.deleteMany({ _id: { $in: subSubcategoryIds } });
