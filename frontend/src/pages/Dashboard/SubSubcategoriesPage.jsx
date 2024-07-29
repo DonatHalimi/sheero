@@ -1,6 +1,5 @@
 import { Checkbox, Paper, Table, TableBody, TableCell, TableContainer, TableHead, TableRow, Typography } from '@mui/material';
 import React, { useContext, useEffect, useState } from 'react';
-import { toast } from 'react-toastify';
 import useAxios from '../../axiosInstance';
 import { ActionButton, BoldTableCell, BrownCreateOutlinedIcon, OutlinedBrownButton } from '../../components/Dashboard/CustomComponents';
 import AddSubSubcategoryModal from '../../components/Modal/SubSubcategory/AddSubSubcategoryModal';
@@ -15,7 +14,6 @@ const SubSubcategoriesPage = () => {
     const [addSubSubcategoryOpen, setAddSubSubcategoryOpen] = useState(false);
     const [editSubSubcategoryOpen, setEditSubSubcategoryOpen] = useState(false);
     const [deleteSubSubcategoryOpen, setDeleteSubSubcategoryOpen] = useState(false);
-    const [fetchErrorCount, setFetchErrorCount] = useState(0);
 
     const { refreshToken } = useContext(AuthContext);
     const axiosInstance = useAxios(refreshToken);
@@ -25,14 +23,7 @@ const SubSubcategoriesPage = () => {
             try {
                 const response = await axiosInstance.get('/subsubcategories/get');
                 setSubSubcategories(response.data);
-                setFetchErrorCount(0);
             } catch (error) {
-                setFetchErrorCount(prevCount => {
-                    if (prevCount < 5) {
-                        toast.error('Error fetching subsubcategories');
-                    }
-                    return prevCount + 1;
-                });
                 console.error('Error fetching subsubcategories', error);
             }
         };
@@ -44,14 +35,7 @@ const SubSubcategoriesPage = () => {
         try {
             const response = await axiosInstance.get('/subsubcategories/get');
             setSubSubcategories(response.data);
-            setFetchErrorCount(0);
         } catch (error) {
-            setFetchErrorCount(prevCount => {
-                if (prevCount < 5) {
-                    toast.error('Error fetching subsubcategories');
-                }
-                return prevCount + 1;
-            });
             console.error('Error fetching subsubcategories', error);
         }
     };

@@ -1,6 +1,5 @@
 import { Checkbox, Paper, Table, TableBody, TableCell, TableContainer, TableHead, TableRow, Typography } from '@mui/material';
 import React, { useContext, useEffect, useState } from 'react';
-import { toast } from 'react-toastify';
 import useAxios from '../../axiosInstance';
 import { ActionButton, BoldTableCell, BrownCreateOutlinedIcon, OutlinedBrownButton } from '../../components/Dashboard/CustomComponents';
 import AddCategoryModal from '../../components/Modal/Category/AddCategoryModal';
@@ -25,14 +24,7 @@ const CategoriesPage = () => {
             try {
                 const response = await axiosInstance.get('/categories/get');
                 setCategories(response.data);
-                setFetchErrorCount(0);
             } catch (error) {
-                setFetchErrorCount(prevCount => {
-                    if (prevCount < 5) {
-                        toast.error('Error fetching categories');
-                    }
-                    return prevCount + 1;
-                });
                 console.error('Error fetching categories', error);
             }
         };
@@ -44,14 +36,7 @@ const CategoriesPage = () => {
         try {
             const response = await axiosInstance.get('/categories/get');
             setCategories(response.data);
-            setFetchErrorCount(0);
         } catch (error) {
-            setFetchErrorCount(prevCount => {
-                if (prevCount < 5) {
-                    toast.error('Error fetching categories');
-                }
-                return prevCount + 1;
-            });
             console.error('Error fetching categories', error);
         }
     };

@@ -1,7 +1,5 @@
 import { Checkbox, Paper, Table, TableBody, TableCell, TableContainer, TableHead, TableRow, Typography } from '@mui/material';
-import React, { useContext, useEffect, useState } from 'react';
-import { toast } from 'react-toastify';
-import useAxios from '../../axiosInstance';
+import React, { useContext, useEffect, useState } from 'react'; import useAxios from '../../axiosInstance';
 import { ActionButton, BoldTableCell, BrownCreateOutlinedIcon, OutlinedBrownButton } from '../../components/Dashboard/CustomComponents';
 import AddCityModal from '../../components/Modal/City/AddCityModal';
 import DeleteCityModal from '../../components/Modal/City/DeleteCityModal';
@@ -25,14 +23,7 @@ const CitiesPage = () => {
             try {
                 const response = await axiosInstance.get('/cities/get');
                 setCities(response.data);
-                setFetchErrorCount(0);
             } catch (error) {
-                setFetchErrorCount(prevCount => {
-                    if (prevCount < 5) {
-                        toast.error('Error fetching cities');
-                    }
-                    return prevCount + 1;
-                });
                 console.error('Error fetching cities', error);
             }
         };
@@ -44,14 +35,7 @@ const CitiesPage = () => {
         try {
             const response = await axiosInstance.get('/cities/get');
             setCities(response.data);
-            setFetchErrorCount(0);
         } catch (error) {
-            setFetchErrorCount(prevCount => {
-                if (prevCount < 5) {
-                    toast.error('Error fetching cities');
-                }
-                return prevCount + 1;
-            });
             console.error('Error fetching cities', error);
         }
     };

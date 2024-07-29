@@ -1,6 +1,5 @@
 import { Checkbox, Paper, Table, TableBody, TableCell, TableContainer, TableHead, TableRow, Typography } from '@mui/material';
 import React, { useContext, useEffect, useState } from 'react';
-import { toast } from 'react-toastify';
 import useAxios from '../../axiosInstance';
 import { ActionButton, BoldTableCell, BrownCreateOutlinedIcon, OutlinedBrownButton } from '../../components/Dashboard/CustomComponents';
 import AddSupplierModal from '../../components/Modal/Supplier/AddSupplierModal';
@@ -15,7 +14,6 @@ const SupplierPage = () => {
     const [addSupplierOpen, setAddSupplierOpen] = useState(false);
     const [editSupplierOpen, setEditSupplierOpen] = useState(false);
     const [deleteSupplierOpen, setDeleteSupplierOpen] = useState(false);
-    const [fetchErrorCount, setFetchErrorCount] = useState(0);
 
     const { refreshToken } = useContext(AuthContext);
     const axiosInstance = useAxios(refreshToken);
@@ -25,14 +23,7 @@ const SupplierPage = () => {
             try {
                 const response = await axiosInstance.get('/suppliers/get');
                 setSuppliers(response.data);
-                setFetchErrorCount(0);
             } catch (error) {
-                setFetchErrorCount(prevCount => {
-                    if (prevCount < 5) {
-                        toast.error('Error fetching suppliers');
-                    }
-                    return prevCount + 1;
-                });
                 console.error('Error fetching suppliers', error);
             }
         };
@@ -44,14 +35,7 @@ const SupplierPage = () => {
         try {
             const response = await axiosInstance.get('/suppliers/get');
             setSuppliers(response.data)
-            setFetchErrorCount(0);
         } catch (error) {
-            setFetchErrorCount(prevCount => {
-                if (prevCount < 5) {
-                    toast.error('Error fetching suppliers');
-                }
-                return prevCount + 1;
-            });
             console.error('Error fetching suppliers', error);
         }
     };

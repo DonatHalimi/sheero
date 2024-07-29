@@ -1,6 +1,5 @@
 import { Checkbox, Paper, Table, TableBody, TableCell, TableContainer, TableHead, TableRow, Typography } from '@mui/material';
 import React, { useContext, useEffect, useState } from 'react';
-import { toast } from 'react-toastify';
 import useAxios from '../../axiosInstance';
 import { ActionButton, BoldTableCell, BrownCreateOutlinedIcon, OutlinedBrownButton } from '../../components/Dashboard/CustomComponents';
 import AddAddressModal from '../../components/Modal/Address/AddAddressModal';
@@ -15,7 +14,6 @@ const AddressesPage = () => {
     const [addAddressOpen, setAddAddressOpen] = useState(false);
     const [editAddressOpen, setEditAddressOpen] = useState(false);
     const [deleteAddressOpen, setDeleteAddressOpen] = useState(false);
-    const [fetchErrorCount, setFetchErrorCount] = useState(0);
 
     const { refreshToken } = useContext(AuthContext);
     const axiosInstance = useAxios(refreshToken);
@@ -25,14 +23,7 @@ const AddressesPage = () => {
             try {
                 const response = await axiosInstance.get('/addresses/get');
                 setAddresses(response.data)
-                setFetchErrorCount(0);
             } catch (error) {
-                setFetchErrorCount(prevCount => {
-                    if (prevCount < 5) {
-                        toast.error('Error fetching addresses');
-                    }
-                    return prevCount + 1;
-                });
                 console.error('Error fetching addresses', error);
             }
         };
@@ -46,12 +37,6 @@ const AddressesPage = () => {
             setAddresses(response.data);
             setFetchErrorCount(0);
         } catch (error) {
-            setFetchErrorCount(prevCount => {
-                if (prevCount < 5) {
-                    toast.error('Error fetching addresses');
-                }
-                return prevCount + 1;
-            });
             console.error('Error fetching addresses', error);
         }
     };

@@ -53,7 +53,6 @@ const EditAddressModal = ({ open, onClose, address, onEditSuccess }) => {
         } catch (error) {
             if (error.response && error.response.data && error.response.data.message) {
                 console.error('Error updating address:', error.response.data);
-                toast.error('Error updating address: ' + error.response.data.message);
             } else {
                 console.error('Error updating address:', error.message);
                 toast.error('Error updating address');

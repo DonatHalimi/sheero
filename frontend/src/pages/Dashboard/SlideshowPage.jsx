@@ -1,6 +1,5 @@
 import { Checkbox, Paper, Table, TableBody, TableCell, TableContainer, TableHead, TableRow, Typography } from '@mui/material';
 import React, { useContext, useEffect, useState } from 'react';
-import { toast } from 'react-toastify';
 import useAxios from '../../axiosInstance';
 import { ActionButton, BoldTableCell, BrownCreateOutlinedIcon, OutlinedBrownButton } from '../../components/Dashboard/CustomComponents';
 import AddSlideshowModal from '../../components/Modal/Slideshow/AddSlideshowModal';
@@ -15,7 +14,6 @@ const SlideshowPage = () => {
     const [addImageOpen, setAddImageOpen] = useState(false);
     const [editImageOpen, setEditImageOpen] = useState(false);
     const [deleteImageOpen, setDeleteImageOpen] = useState(false);
-    const [fetchErrorCount, setFetchErrorCount] = useState(0);
 
     const { refreshToken } = useContext(AuthContext);
     const axiosInstance = useAxios(refreshToken);
@@ -25,14 +23,7 @@ const SlideshowPage = () => {
             try {
                 const response = await axiosInstance.get('/slideshow/get');
                 setImages(response.data);
-                setFetchErrorCount(0);
             } catch (error) {
-                setFetchErrorCount(prevCount => {
-                    if (prevCount < 5) {
-                        toast.error('Error fetching images');
-                    }
-                    return prevCount + 1;
-                });
                 console.error('Error fetching images', error);
             }
         };
@@ -44,14 +35,7 @@ const SlideshowPage = () => {
         try {
             const response = await axiosInstance.get('/slideshow/get');
             setImages(response.data);
-            setFetchErrorCount(0);
         } catch (error) {
-            setFetchErrorCount(prevCount => {
-                if (prevCount < 5) {
-                    toast.error('Error fetching images');
-                }
-                return prevCount + 1;
-            });
             console.error('Error fetching images', error);
         }
     };

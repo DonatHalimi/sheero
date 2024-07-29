@@ -1,6 +1,5 @@
 import { Checkbox, Paper, Table, TableBody, TableCell, TableContainer, TableHead, TableRow, Typography } from '@mui/material';
 import React, { useContext, useEffect, useState } from 'react';
-import { toast } from 'react-toastify';
 import useAxios from '../../axiosInstance';
 import { ActionButton, BoldTableCell, BrownCreateOutlinedIcon, OutlinedBrownButton } from '../../components/Dashboard/CustomComponents';
 import AddProductModal from '../../components/Modal/Product/AddProductModal';
@@ -39,14 +38,7 @@ const ProductsPage = () => {
                 const response = await axiosInstance.get(`/products/get?page=${currentPage}&limit=${itemsPerPage}`);
                 setProducts(response.data.products);
                 setTotalPages(response.data.totalPages);
-                setFetchErrorCount(0);
             } catch (error) {
-                setFetchErrorCount(prevCount => {
-                    if (prevCount < 5) {
-                        toast.error('Error fetching products');
-                    }
-                    return prevCount + 1;
-                });
                 console.error('Error fetching products', error);
             }
         };
@@ -59,14 +51,7 @@ const ProductsPage = () => {
             const response = await axiosInstance.get(`/products/get?page=${currentPage}&limit=${itemsPerPage}`);
             setProducts(response.data.products);
             setTotalPages(response.data.totalPages);
-            setFetchErrorCount(0);
         } catch (error) {
-            setFetchErrorCount(prevCount => {
-                if (prevCount < 5) {
-                    toast.error('Error fetching products');
-                }
-                return prevCount + 1;
-            });
             console.error('Error fetching products', error);
         }
     };

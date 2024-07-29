@@ -1,6 +1,5 @@
 import { Checkbox, Paper, Table, TableBody, TableCell, TableContainer, TableHead, TableRow, Typography } from '@mui/material';
 import React, { useContext, useEffect, useState } from 'react';
-import { toast } from 'react-toastify';
 import useAxios from '../../axiosInstance';
 import { ActionButton, BoldTableCell, BrownCreateOutlinedIcon, OutlinedBrownButton } from '../../components/Dashboard/CustomComponents';
 import AddUserModal from '../../components/Modal/User/AddUserModal';
@@ -30,14 +29,7 @@ const UsersPage = () => {
                 const response = await axiosInstance.get(`/users/get?page=${currentPage}&limit=${itemsPerPage}`);
                 setUsers(response.data.users);
                 setTotalPages(response.data.totalPages);
-                setFetchErrorCount(0);
             } catch (error) {
-                setFetchErrorCount(prevCount => {
-                    if (prevCount < 5) {
-                        toast.error('Error fetching users');
-                    }
-                    return prevCount + 1;
-                });
                 console.error('Error fetching users', error);
             }
         };
@@ -50,14 +42,7 @@ const UsersPage = () => {
             const response = await axiosInstance.get(`/users/get?page=${currentPage}&limit=${itemsPerPage}`);
             setUsers(response.data.users);
             setTotalPages(response.data.totalPages);
-            setFetchErrorCount(0);
         } catch (error) {
-            setFetchErrorCount(prevCount => {
-                if (prevCount < 5) {
-                    toast.error('Error fetching users');
-                }
-                return prevCount + 1;
-            });
             console.error('Error fetching users', error);
         }
     };

@@ -93,7 +93,7 @@ const deleteUsers = async (req, res) => {
     try {
         const users = await User.find({ _id: { $in: userIds } });
 
-        if (users.length !== users.length) {
+        if (users.length !== userIds.length) {
             return res.status(404).json({ message: 'One or more users not found' });
         }
 
@@ -104,6 +104,5 @@ const deleteUsers = async (req, res) => {
         res.status(500).json({ message: 'Server error', error: error.message });
     }
 };
-
 
 module.exports = { createUser, getUsers, getUser, updateUser, deleteUser, deleteUsers };

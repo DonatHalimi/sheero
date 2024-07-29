@@ -153,9 +153,9 @@ export const CollapsibleListItem = ({ open, handleClick, icon, primary, children
     </>
 );
 
-export const ActiveListItem = ({ icon, primary, handleClick, selected, sx = {} }) => (
-    <ListItemButton onClick={handleClick} selected={selected} sx={sx}>
+export const ActiveListItem = ({ icon, primary, handleClick, selected, sx }) => (
+    <ActiveListItemButton onClick={handleClick} selected={selected} sx={sx}>
         <ListItemIcon>{icon}</ListItemIcon>
         <ListItemText primary={primary} />
-    </ListItemButton>
+    </ActiveListItemButton>
 );

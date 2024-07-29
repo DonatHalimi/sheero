@@ -1,6 +1,5 @@
 import { Checkbox, Paper, Table, TableBody, TableCell, TableContainer, TableHead, TableRow, Typography } from '@mui/material';
 import React, { useContext, useEffect, useState } from 'react';
-import { toast } from 'react-toastify';
 import useAxios from '../../axiosInstance.js';
 import { ActionButton, BoldTableCell, BrownCreateOutlinedIcon, OutlinedBrownButton } from '../../components/Dashboard/CustomComponents.jsx';
 import AddCountryModal from '../../components/Modal/Country/AddCountryModal.jsx';
@@ -15,7 +14,6 @@ const CountriesPage = () => {
     const [addCountryOpen, setAddCountryOpen] = useState(false);
     const [editCountryOpen, setEditCountryOpen] = useState(false);
     const [deleteCountryOpen, setDeleteCountryOpen] = useState(false);
-    const [fetchErrorCount, setFetchErrorCount] = useState(0);
 
     const { refreshToken } = useContext(AuthContext);
     const axiosInstance = useAxios(refreshToken);
@@ -25,14 +23,7 @@ const CountriesPage = () => {
             try {
                 const response = await axiosInstance.get('/countries/get');
                 setCountries(response.data)
-                setFetchErrorCount(0);
             } catch (error) {
-                setFetchErrorCount(prevCount => {
-                    if (prevCount < 5) {
-                        toast.error('Error fetching categories');
-                    }
-                    return prevCount + 1;
-                });
                 console.error('Error fetching categories', error);
             }
         };
@@ -44,14 +35,7 @@ const CountriesPage = () => {
         try {
             const response = await axiosInstance.get('/countries/get');
             setCountries(response.data);
-            setFetchErrorCount(0);
         } catch (error) {
-            setFetchErrorCount(prevCount => {
-                if (prevCount < 5) {
-                    toast.error('Error fetching categories');
-                }
-                return prevCount + 1;
-            });
             console.error('Error fetching categories', error);
         }
     };

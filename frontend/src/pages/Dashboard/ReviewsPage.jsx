@@ -25,14 +25,7 @@ const ReviewsPage = () => {
             try {
                 const response = await axiosInstance.get('/reviews/get');
                 setReviews(response.data);
-                setFetchErrorCount(0);
             } catch (error) {
-                setFetchErrorCount(prevCount => {
-                    if (prevCount < 5) {
-                        toast.error('Error fetching reviews');
-                    }
-                    return prevCount + 1;
-                });
                 console.error('Error fetching reviews', error);
             }
         };
@@ -44,14 +37,7 @@ const ReviewsPage = () => {
         try {
             const response = await axiosInstance.get('/reviews/get');
             setReviews(response.data);
-            setFetchErrorCount(0);
         } catch (error) {
-            setFetchErrorCount(prevCount => {
-                if (prevCount < 5) {
-                    toast.error('Error fetching reviews');
-                }
-                return prevCount + 1;
-            });
             console.error('Error fetching reviews', error);
         }
     };
