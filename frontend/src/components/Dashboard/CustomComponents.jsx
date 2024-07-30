@@ -1,6 +1,4 @@
-import { ExpandLess, ExpandMore } from '@mui/icons-material';
-import CreateOutlinedIcon from '@mui/icons-material/CreateOutlined';
-import DeleteOutlinedIcon from '@mui/icons-material/DeleteOutlined';
+import { CreateOutlined, DeleteOutlined, ExpandLess, ExpandMore, ShoppingCart } from '@mui/icons-material';
 import { Button, Collapse, FormControl, List, ListItemButton, ListItemIcon, ListItemText, AppBar as MuiAppBar, Drawer as MuiDrawer, TableCell, TextField } from '@mui/material';
 import { styled } from '@mui/material/styles';
 import React from 'react';
@@ -43,7 +41,7 @@ export const OutlinedBrownButton = styled(Button)(({ theme }) => ({
 
 export const ActionButton = styled(Button)(({ theme }) => ({
     position: 'relative',
-    right: '30px',
+    right: '10px',
     width: '30px',
     height: '30px',
     '&:hover': {
@@ -51,11 +49,11 @@ export const ActionButton = styled(Button)(({ theme }) => ({
     },
 }));
 
-export const BrownCreateOutlinedIcon = styled(CreateOutlinedIcon)({
+export const BrownCreateOutlinedIcon = styled(CreateOutlined)({
     color: '#493c30',
 });
 
-export const BrownDeleteOutlinedIcon = styled(DeleteOutlinedIcon)({
+export const BrownDeleteOutlinedIcon = styled(DeleteOutlined)({
     color: '#493c30',
 });
 
@@ -159,3 +157,34 @@ export const ActiveListItem = ({ icon, primary, handleClick, selected, sx }) => 
         <ListItemText primary={primary} />
     </ActiveListItemButton>
 );
+
+export const AddToCartButton = styled(Button)(({ theme }) => ({
+    backgroundColor: '#f7f7f7',
+    color: '#57534E',
+    '&:hover': {
+        backgroundColor: '#686159',
+        color: 'white',
+        '& .MuiSvgIcon-root': {
+            color: 'white',
+        },
+    },
+    flexGrow: 1,
+    marginRight: theme.spacing(2),
+}));
+
+export const WishlistButton = styled(Button)(({ theme }) => ({
+    color: '#493c30',
+    backgroundColor: '#f7f7f7',
+    '&:hover': {
+        borderColor: '#5b504b',
+        backgroundColor: '#686159',
+        color: 'white',
+    },
+    flexShrink: 0,
+}));
+
+export const BrownShoppingCartIcon = styled(ShoppingCart)(({ theme }) => ({
+    color: '#57534E',
+    marginRight: 20,
+    transition: 'color 0.3s ease',
+}));

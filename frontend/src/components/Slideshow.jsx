@@ -9,7 +9,6 @@ const Slideshow = () => {
     useEffect(() => {
         axios.get('http://localhost:5000/api/slideshow/get')
             .then(response => {
-                console.log(response.data);
                 setImages(response.data);
             })
             .catch(error => console.error('Error fetching images:', error));
@@ -63,8 +62,8 @@ const Slideshow = () => {
                         </div>
                     </SplideSlide>
                 ))}
-                <div class="splide__progress">
-                    <div class="splide__progress__bar"></div>
+                <div className="splide__progress">
+                    <div className="splide__progress__bar"></div>
                 </div>
             </Splide>
         </div>

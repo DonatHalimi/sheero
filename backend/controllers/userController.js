@@ -29,16 +29,10 @@ const createUser = async (req, res) => {
 };
 
 const getUsers = async (req, res) => {
-    const page = parseInt(req.query.page) || 1;
-    const limit = parseInt(req.query.limit) || 10;
-    const skip = (page - 1) * limit;
-
     try {
-        const totalUsers = await User.countDocuments();
-        const users = await User.find().skip(skip).limit(limit);
-        const totalPages = Math.ceil(totalUsers / limit);
+        const users = await User.find();
 
-        res.status(200).json({ users, totalPages });
+        res.status(200).json({ users });
     } catch (error) {
         res.status(500).json({ message: 'Server error' });
     }

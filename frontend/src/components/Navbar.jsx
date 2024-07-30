@@ -8,7 +8,7 @@ const Navbar = () => {
     const { auth, isAdmin, logout } = useContext(AuthContext);
 
     return (
-        <nav className="bg-white border-gray-200 p-4">
+        <nav className="fixed top-0 left-0 right-0 z-50 bg-white border-gray-200 p-4">
             <div className="flex justify-between items-center mx-auto max-w-screen-xl">
                 <a href="/" className="flex items-center space-x-3 rtl:space-x-reverse">
                     <img src={logo} alt="Logo" className="w-60 h-11" />

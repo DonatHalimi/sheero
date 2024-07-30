@@ -39,7 +39,7 @@ const DashboardLayout = () => {
                         >
                             <MenuIcon />
                         </IconButton>
-                        <div className="flex justify-between items-center mx-auto-xl px-16 mt-4 w-full">
+                        <div className="flex justify-between items-center top-0 left-0 right-0 z-50 mx-auto-xl px-16 mt-4 w-full">
                             <div className="flex items-center mb-5">
                                 <a href="/" className="flex items-center space-x-3 rtl:space-x-reverse">
                                     <img src={logo} alt="Logo" className="w-60 h-11" />

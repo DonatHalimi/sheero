@@ -1,5 +1,6 @@
 import { Checkbox, Paper, Table, TableBody, TableCell, TableContainer, TableHead, TableRow, Typography } from '@mui/material';
-import React, { useContext, useEffect, useState } from 'react'; import useAxios from '../../axiosInstance';
+import React, { useContext, useEffect, useState } from 'react';
+import useAxios from '../../axiosInstance';
 import { ActionButton, BoldTableCell, BrownCreateOutlinedIcon, OutlinedBrownButton } from '../../components/Dashboard/CustomComponents';
 import AddCityModal from '../../components/Modal/City/AddCityModal';
 import DeleteCityModal from '../../components/Modal/City/DeleteCityModal';
