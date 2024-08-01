@@ -6,6 +6,7 @@ import AddAddressModal from '../../components/Modal/Address/AddAddressModal';
 import DeleteAddressModal from '../../components/Modal/Address/DeleteAddressModal';
 import EditAddressModal from '../../components/Modal/Address/EditAddressModal';
 import { AuthContext } from '../../context/AuthContext';
+import ReactPaginate from 'react-paginate';
 
 const AddressesPage = () => {
     const [addresses, setAddresses] = useState([]);
@@ -14,28 +15,20 @@ const AddressesPage = () => {
     const [addAddressOpen, setAddAddressOpen] = useState(false);
     const [editAddressOpen, setEditAddressOpen] = useState(false);
     const [deleteAddressOpen, setDeleteAddressOpen] = useState(false);
+    const [currentPage, setCurrentPage] = useState(0);
+    const itemsPerPage = 6;
 
     const { refreshToken } = useContext(AuthContext);
     const axiosInstance = useAxios(refreshToken);
 
     useEffect(() => {
-        const fetchAddresses = async () => {
-            try {
-                const response = await axiosInstance.get('/addresses/get');
-                setAddresses(response.data)
-            } catch (error) {
-                console.error('Error fetching addresses', error);
-            }
-        };
-
         fetchAddresses();
     }, [addAddressOpen, editAddressOpen, deleteAddressOpen, axiosInstance]);
 
-    const refreshAddresses = async () => {
+    const fetchAddresses = async () => {
         try {
             const response = await axiosInstance.get('/addresses/get');
-            setAddresses(response.data);
-            setFetchErrorCount(0);
+            setAddresses(response.data)
         } catch (error) {
             console.error('Error fetching addresses', error);
         }
@@ -59,6 +52,19 @@ const AddressesPage = () => {
         }
     };
 
+    const pageCount = Math.ceil(addresses.length / itemsPerPage);
+    const isPreviousDisabled = currentPage === 0;
+    const isNextDisabled = currentPage >= pageCount - 1;
+    const paginationEnabled = addresses.length > 0 && pageCount && pageCount > 1;
+    
+    const getCurrentPageItems = () => {
+        const startIndex = currentPage * itemsPerPage;
+        return addresses.slice(startIndex, startIndex + itemsPerPage);
+    };
+
+    const handlePageClick = (event) => {
+        setCurrentPage(event.selected);
+    };
 
     return (
         <div className='container mx-auto max-w-screen-2xl px-4 mt-20'>
@@ -97,8 +103,8 @@ const AddressesPage = () => {
                             </TableRow>
                         </TableHead>
                         <TableBody>
-                            {addresses.length > 0 ? (
-                                addresses.map((address) => (
+                            {getCurrentPageItems().length > 0 ? (
+                                getCurrentPageItems().map((address) => (
                                     <TableRow key={address._id}>
                                         <TableCell>
                                             <Checkbox
@@ -119,7 +125,7 @@ const AddressesPage = () => {
                                 ))
                             ) : (
                                 <TableRow>
-                                    <TableCell colSpan={7} align="center">
+                                    <TableCell colSpan={8} align="center">
                                         No addresses found.
                                     </TableCell>
                                 </TableRow>
@@ -128,9 +134,31 @@ const AddressesPage = () => {
                     </Table>
                 </TableContainer>
 
-                <AddAddressModal open={addAddressOpen} onClose={() => setAddAddressOpen(false)} onAddSuccess={refreshAddresses} />
-                <EditAddressModal open={editAddressOpen} onClose={() => setEditAddressOpen(false)} address={selectedAddress} onEditSuccess={refreshAddresses} />
-                <DeleteAddressModal open={deleteAddressOpen} onClose={() => setDeleteAddressOpen(false)} addresses={selectedAddresses.map(id => addresses.find(address => address._id === id))} onDeleteSuccess={refreshAddresses} />
+                <AddAddressModal open={addAddressOpen} onClose={() => setAddAddressOpen(false)} onAddSuccess={fetchAddresses} />
+                <EditAddressModal open={editAddressOpen} onClose={() => setEditAddressOpen(false)} address={selectedAddress} onEditSuccess={fetchAddresses} />
+                <DeleteAddressModal open={deleteAddressOpen} onClose={() => setDeleteAddressOpen(false)} addresses={selectedAddresses.map(id => addresses.find(address => address._id === id))} onDeleteSuccess={fetchAddresses} />
+
+                {paginationEnabled && (
+                    <div className="w-full flex justify-start mt-6 mb-24">
+                        <ReactPaginate
+                            pageCount={pageCount}
+                            pageRangeDisplayed={2}
+                            marginPagesDisplayed={1}
+                            onPageChange={handlePageClick}
+                            containerClassName="inline-flex -space-x-px text-sm"
+                            activeClassName="text-white bg-stone-400"
+                            previousLinkClassName={`flex items-center justify-center px-1 h-10 text-gray-500 bg-white border border-e-0 border-gray-300 rounded-sm hover:bg-gray-100 hover:text-gray-700 ${isPreviousDisabled ? 'pointer-events-none text-gray-300' : ''}`}
+                            nextLinkClassName={`flex items-center justify-center px-1 h-10 text-gray-500 bg-white border border-gray-300 rounded-sm hover:bg-gray-100 hover:text-gray-700 ${isNextDisabled ? 'pointer-events-none text-gray-300' : ''}`}
+                            disabledClassName="text-gray-50 cursor-not-allowed"
+                            activeLinkClassName="text-white"
+                            previousLabel={<span className="flex items-center justify-center px-2 h-10 text-gray-500 hover:text-gray-700">Previous</span>}
+                            nextLabel={<span className="flex items-center justify-center px-2 h-10 text-gray-500 hover:text-gray-700">Next</span>}
+                            breakLabel={<span className="flex items-center justify-center px-4 h-10 text-gray-500 bg-white border border-gray-300">...</span>}
+                            pageClassName="flex items-center justify-center px-1 h-10 text-gray-500 border border-gray-300 cursor-pointer bg-white"
+                            pageLinkClassName="flex items-center justify-center px-3 h-10 text-gray-500 cursor-pointer"
+                        />
+                    </div>
+                )}
             </div>
         </div>
     );

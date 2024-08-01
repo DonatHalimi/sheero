@@ -1,5 +1,3 @@
-// DeleteReviewModal.jsx
-
 import { Box, Button, Modal } from '@mui/material';
 import React, { useContext } from 'react';
 import { toast } from 'react-toastify';

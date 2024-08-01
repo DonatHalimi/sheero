@@ -26,14 +26,12 @@ const ToTop = () => {
 
     return (
         <div>
-            {isVisible && (
-                <button
-                    onClick={scrollToTop}
-                    className={`to-top-button ${isVisible ? 'visible' : ''}`}
-                >
-                    <ArrowUpwardIcon className="to-top-arrow" />
-                </button>
-            )}
+            <button
+                onClick={scrollToTop}
+                className={`to-top-button ${isVisible ? 'visible' : 'hidden'}`}
+            >
+                <ArrowUpwardIcon className="to-top-arrow" />
+            </button>
         </div>
     );
 };

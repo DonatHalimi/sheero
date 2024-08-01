@@ -84,7 +84,21 @@ const EditSubcategoryModal = ({ open, onClose, subcategory, onEditSuccess }) => 
                     value={name}
                     onChange={(e) => setName(e.target.value)}
                     fullWidth
+                    className='!mb-4'
                 />
+                <OutlinedBrownFormControl fullWidth margin="normal">
+                    <InputLabel>Category</InputLabel>
+                    <Select
+                        label='Category'
+                        value={category}
+                        onChange={(e) => setCategory(e.target.value)}
+                        className='!mb-4'
+                    >
+                        {categories.map((cat) => (
+                            <MenuItem key={cat._id} value={cat._id}>{cat.name}</MenuItem>
+                        ))}
+                    </Select>
+                </OutlinedBrownFormControl>
                 <OutlinedBrownButton
                     component="label"
                     role={undefined}
@@ -101,19 +115,6 @@ const EditSubcategoryModal = ({ open, onClose, subcategory, onEditSuccess }) => 
                         <img src={imagePreview} alt="Preview" className="max-w-full h-auto mx-auto rounded-md" />
                     </div>
                 )}
-                <OutlinedBrownFormControl fullWidth margin="normal">
-                    <InputLabel>Category</InputLabel>
-                    <Select
-                        label='Category'
-                        value={category}
-                        onChange={(e) => setCategory(e.target.value)}
-                        className='mb-4'
-                    >
-                        {categories.map((cat) => (
-                            <MenuItem key={cat._id} value={cat._id}>{cat.name}</MenuItem>
-                        ))}
-                    </Select>
-                </OutlinedBrownFormControl>
                 <BrownButton
                     onClick={handleEditSubcategory}
                     variant="contained"

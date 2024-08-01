@@ -6,6 +6,7 @@ import AddSupplierModal from '../../components/Modal/Supplier/AddSupplierModal';
 import DeleteSupplierModal from '../../components/Modal/Supplier/DeleteSupplierModal';
 import EditSupplierModal from '../../components/Modal/Supplier/EditSupplierModal';
 import { AuthContext } from '../../context/AuthContext';
+import ReactPaginate from 'react-paginate';
 
 const SupplierPage = () => {
     const [suppliers, setSuppliers] = useState([]);
@@ -14,31 +15,25 @@ const SupplierPage = () => {
     const [addSupplierOpen, setAddSupplierOpen] = useState(false);
     const [editSupplierOpen, setEditSupplierOpen] = useState(false);
     const [deleteSupplierOpen, setDeleteSupplierOpen] = useState(false);
+    const [currentPage, setCurrentPage] = useState(0);
+    const itemsPerPage = 6;
 
     const { refreshToken } = useContext(AuthContext);
     const axiosInstance = useAxios(refreshToken);
 
     useEffect(() => {
-        const fetchSuppliers = async () => {
-            try {
-                const response = await axiosInstance.get('/suppliers/get');
-                setSuppliers(response.data);
-            } catch (error) {
-                console.error('Error fetching suppliers', error);
-            }
-        };
-
         fetchSuppliers();
     }, [addSupplierOpen, editSupplierOpen, deleteSupplierOpen, axiosInstance]);
 
-    const refreshSuppliers = async () => {
+    const fetchSuppliers = async () => {
         try {
             const response = await axiosInstance.get('/suppliers/get');
-            setSuppliers(response.data)
+            setSuppliers(response.data);
         } catch (error) {
             console.error('Error fetching suppliers', error);
         }
     };
+
 
     const handleSelectSupplier = (supplierId) => {
         setSelectedSuppliers((prevSelected) => {
@@ -56,6 +51,20 @@ const SupplierPage = () => {
         } else {
             setSelectedSuppliers([]);
         }
+    };
+
+    const pageCount = Math.ceil(suppliers.length / itemsPerPage);
+    const isPreviousDisabled = currentPage === 0;
+    const isNextDisabled = currentPage >= pageCount - 1;
+    const paginationEnabled = pageCount && pageCount > 1;
+
+    const getCurrentPageItems = () => {
+        const startIndex = currentPage * itemsPerPage;
+        return suppliers.slice(startIndex, startIndex + itemsPerPage);
+    };
+
+    const handlePageClick = (event) => {
+        setCurrentPage(event.selected);
     };
 
     return (
@@ -93,28 +102,58 @@ const SupplierPage = () => {
                                 </TableRow>
                             </TableHead>
                             <TableBody>
-                                {suppliers.map((supplier) => (
-                                    <TableRow key={supplier._id}>
-                                        <TableCell>
-                                            <Checkbox
-                                                checked={selectedSuppliers.includes(supplier._id)}
-                                                onChange={() => handleSelectSupplier(supplier._id)}
-                                            />
-                                        </TableCell>
-                                        <TableCell>{supplier?.name}</TableCell>
-                                        <TableCell>{supplier.contactInfo?.email}</TableCell>
-                                        <TableCell>{supplier.contactInfo?.phoneNumber}</TableCell>
-                                        <TableCell>
-                                            <ActionButton onClick={() => { setSelectedSupplier(supplier); setEditSupplierOpen(true); }}><BrownCreateOutlinedIcon /></ActionButton>
+                                {getCurrentPageItems().length > 0 ? (
+                                    getCurrentPageItems().map((supplier) => (
+                                        <TableRow key={supplier._id}>
+                                            <TableCell>
+                                                <Checkbox
+                                                    checked={selectedSuppliers.includes(supplier._id)}
+                                                    onChange={() => handleSelectSupplier(supplier._id)}
+                                                />
+                                            </TableCell>
+                                            <TableCell>{supplier?.name}</TableCell>
+                                            <TableCell>{supplier.contactInfo?.email}</TableCell>
+                                            <TableCell>{supplier.contactInfo?.phoneNumber}</TableCell>
+                                            <TableCell>
+                                                <ActionButton onClick={() => { setSelectedSupplier(supplier); setEditSupplierOpen(true); }}><BrownCreateOutlinedIcon /></ActionButton>
+                                            </TableCell>
+                                        </TableRow>
+                                    ))
+                                ) : (
+                                    <TableRow>
+                                        <TableCell colSpan={5} align="center">
+                                            No supplier found.
                                         </TableCell>
                                     </TableRow>
-                                ))}
+                                )}
                             </TableBody>
                         </Table>
                     </TableContainer>
-                    <AddSupplierModal open={addSupplierOpen} onClose={() => setAddSupplierOpen(false)} onAddSuccess={refreshSuppliers} />
-                    <EditSupplierModal open={editSupplierOpen} onClose={() => setEditSupplierOpen(false)} supplier={selectedSupplier} onEditSuccess={refreshSuppliers} />
-                    <DeleteSupplierModal open={deleteSupplierOpen} onClose={() => setDeleteSupplierOpen(false)} suppliers={selectedSuppliers.map(id => suppliers.find(supplier => supplier._id === id))} onDeleteSuccess={refreshSuppliers} />
+                    <AddSupplierModal open={addSupplierOpen} onClose={() => setAddSupplierOpen(false)} onAddSuccess={fetchSuppliers} />
+                    <EditSupplierModal open={editSupplierOpen} onClose={() => setEditSupplierOpen(false)} supplier={selectedSupplier} onEditSuccess={fetchSuppliers} />
+                    <DeleteSupplierModal open={deleteSupplierOpen} onClose={() => setDeleteSupplierOpen(false)} suppliers={selectedSuppliers.map(id => suppliers.find(supplier => supplier._id === id))} onDeleteSuccess={fetchSuppliers} />
+
+                    {suppliers.length > 0 && paginationEnabled && (
+                        <div className="w-full flex justify-start mt-6 mb-24">
+                            <ReactPaginate
+                                pageCount={pageCount}
+                                pageRangeDisplayed={2}
+                                marginPagesDisplayed={1}
+                                onPageChange={handlePageClick}
+                                containerClassName="inline-flex -space-x-px text-sm"
+                                activeClassName="text-stone-600 bg-stone-400 border-blue-500"
+                                previousLinkClassName={`flex items-center justify-center px-1 h-10 text-gray-500 bg-white border border-e-0 border-gray-300 rounded-sm hover:bg-gray-100 hover:text-gray-700 ${isPreviousDisabled ? 'pointer-events-none text-gray-300' : ''}`}
+                                nextLinkClassName={`flex items-center justify-center px-1 h-10 text-gray-500 bg-white border border-gray-300 rounded-sm hover:bg-gray-100 hover:text-gray-700 ${isNextDisabled ? 'pointer-events-none text-gray-300' : ''}`}
+                                disabledClassName="text-gray-50 cursor-not-allowed"
+                                activeLinkClassName="text-white"
+                                previousLabel={<span className="flex items-center justify-center px-2 h-10 text-gray-500 hover:text-gray-700">Previous</span>}
+                                nextLabel={<span className="flex items-center justify-center px-2 h-10 text-gray-500 hover:text-gray-700">Next</span>}
+                                breakLabel={<span className="flex items-center justify-center px-4 h-10 text-gray-500 bg-white border border-gray-300">...</span>}
+                                pageClassName="flex items-center justify-center px-1 h-10 text-gray-500 border border-gray-300 cursor-pointer bg-white"
+                                pageLinkClassName="flex items-center justify-center px-3 h-10 text-gray-500 cursor-pointer"
+                            />
+                        </div>
+                    )}
                 </div>
             </div>
         </>

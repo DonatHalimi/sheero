@@ -73,7 +73,7 @@ const FAQs = () => {
     return (
         <>
             <Navbar />
-            <div className="max-w-3xl mx-auto py-12 px-4 sm:px-6 lg:px-8 bg-brown-50 mt-10">
+            <div className="max-w-3xl mx-auto py-12 px-4 sm:px-6 lg:px-8 bg-brown-50 mt-24">
                 <h1 className="text-3xl font-bold text-brown-900 mb-8 text-left">Frequently Asked Questions</h1>
                 <div>
                     {faqData.map((faq, index) => (

@@ -50,7 +50,7 @@ const EditSubSubcategoryModal = ({ open, onClose, subSubcategory, onEditSuccess 
     return (
         <Modal open={open} onClose={onClose} className='flex items-center justify-center'>
             <Box className="bg-white p-4 rounded-lg shadow-lg max-w-md w-full">
-                <Typography variant='h5' className="!text-xl !font-bold !mb-6">Edit SubSubcategory</Typography>
+                <Typography variant='h5' className="!text-xl !font-bold !mb-4">Edit SubSubcategory</Typography>
                 <BrownOutlinedTextField
                     label="Name"
                     value={name}

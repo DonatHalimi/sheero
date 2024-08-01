@@ -6,6 +6,7 @@ import AddCountryModal from '../../components/Modal/Country/AddCountryModal.jsx'
 import DeleteCountryModal from '../../components/Modal/Country/DeleteCountryModal.jsx';
 import EditCountryModal from '../../components/Modal/Country/EditCountryModal.jsx';
 import { AuthContext } from '../../context/AuthContext.jsx';
+import ReactPaginate from 'react-paginate';
 
 const CountriesPage = () => {
     const [countries, setCountries] = useState([]);
@@ -14,27 +15,20 @@ const CountriesPage = () => {
     const [addCountryOpen, setAddCountryOpen] = useState(false);
     const [editCountryOpen, setEditCountryOpen] = useState(false);
     const [deleteCountryOpen, setDeleteCountryOpen] = useState(false);
+    const [currentPage, setCurrentPage] = useState(0);
+    const itemsPerPage = 6;
 
     const { refreshToken } = useContext(AuthContext);
     const axiosInstance = useAxios(refreshToken);
 
     useEffect(() => {
-        const fetchCountries = async () => {
-            try {
-                const response = await axiosInstance.get('/countries/get');
-                setCountries(response.data)
-            } catch (error) {
-                console.error('Error fetching categories', error);
-            }
-        };
-
         fetchCountries();
     }, [addCountryOpen, editCountryOpen, deleteCountryOpen, axiosInstance]);
 
-    const refreshCountries = async () => {
+    const fetchCountries = async () => {
         try {
             const response = await axiosInstance.get('/countries/get');
-            setCountries(response.data);
+            setCountries(response.data)
         } catch (error) {
             console.error('Error fetching categories', error);
         }
@@ -58,6 +52,20 @@ const CountriesPage = () => {
         }
     };
 
+    const pageCount = Math.ceil(countries.length / itemsPerPage);
+    const isPreviousDisabled = currentPage === 0;
+    const isNextDisabled = currentPage >= pageCount - 1;
+    const paginationEnabled = pageCount && pageCount > 1;
+
+    const getCurrentPageItems = () => {
+        const startIndex = currentPage * itemsPerPage;
+        return countries.slice(startIndex, startIndex + itemsPerPage);
+    };
+
+    const handlePageClick = (event) => {
+        setCurrentPage(event.selected);
+    };
+    
     return (
         <div className='container mx-auto max-w-screen-2xl px-4 mt-20'>
             <div className='flex flex-col items-center justify-center'>
@@ -90,8 +98,8 @@ const CountriesPage = () => {
                             </TableRow>
                         </TableHead>
                         <TableBody>
-                            {countries.length > 0 ? (
-                                countries.map((country) => (
+                            {getCurrentPageItems().length > 0 ? (
+                                getCurrentPageItems().map((country) => (
                                     <TableRow key={country._id}>
                                         <TableCell>
                                             <Checkbox
@@ -116,9 +124,31 @@ const CountriesPage = () => {
                     </Table>
                 </TableContainer>
 
-                <AddCountryModal open={addCountryOpen} onClose={() => setAddCountryOpen(false)} onAddSuccess={refreshCountries} />
-                <EditCountryModal open={editCountryOpen} onClose={() => setEditCountryOpen(false)} country={selectedCountry} onEditSuccess={refreshCountries} />
-                <DeleteCountryModal open={deleteCountryOpen} onClose={() => setDeleteCountryOpen(false)} countries={selectedCountries.map(id => countries.find(country => country._id === id))} onDeleteSuccess={refreshCountries} />
+                <AddCountryModal open={addCountryOpen} onClose={() => setAddCountryOpen(false)} onAddSuccess={fetchCountries} />
+                <EditCountryModal open={editCountryOpen} onClose={() => setEditCountryOpen(false)} country={selectedCountry} onEditSuccess={fetchCountries} />
+                <DeleteCountryModal open={deleteCountryOpen} onClose={() => setDeleteCountryOpen(false)} countries={selectedCountries.map(id => countries.find(country => country._id === id))} onDeleteSuccess={fetchCountries} />
+
+                {countries.length > 0 && paginationEnabled && (
+                    <div className="w-full flex justify-start mt-6 mb-24">
+                        <ReactPaginate
+                            pageCount={pageCount}
+                            pageRangeDisplayed={2}
+                            marginPagesDisplayed={1}
+                            onPageChange={handlePageClick}
+                            containerClassName="inline-flex -space-x-px text-sm"
+                            activeClassName="text-white bg-stone-400"
+                            previousLinkClassName={`flex items-center justify-center px-1 h-10 text-gray-500 bg-white border border-e-0 border-gray-300 rounded-sm hover:bg-gray-100 hover:text-gray-700 ${isPreviousDisabled ? 'pointer-events-none text-gray-300' : ''}`}
+                            nextLinkClassName={`flex items-center justify-center px-1 h-10 text-gray-500 bg-white border border-gray-300 rounded-sm hover:bg-gray-100 hover:text-gray-700 ${isNextDisabled ? 'pointer-events-none text-gray-300' : ''}`}
+                            disabledClassName="text-gray-50 cursor-not-allowed"
+                            activeLinkClassName="text-white"
+                            previousLabel={<span className="flex items-center justify-center px-2 h-10 text-gray-500 hover:text-gray-700">Previous</span>}
+                            nextLabel={<span className="flex items-center justify-center px-2 h-10 text-gray-500 hover:text-gray-700">Next</span>}
+                            breakLabel={<span className="flex items-center justify-center px-4 h-10 text-gray-500 bg-white border border-gray-300">...</span>}
+                            pageClassName="flex items-center justify-center px-1 h-10 text-gray-500 border border-gray-300 cursor-pointer bg-white"
+                            pageLinkClassName="flex items-center justify-center px-3 h-10 text-gray-500 cursor-pointer"
+                        />
+                    </div>
+                )}
             </div>
         </div>
     );
