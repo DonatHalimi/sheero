@@ -1,5 +1,5 @@
+import { Facebook, GitHub, Instagram, LinkedIn } from '@mui/icons-material';
 import React from 'react';
-import { Facebook, Instagram, GitHub, LinkedIn } from '@mui/icons-material';
 
 const Footer = () => {
     return (
@@ -8,7 +8,7 @@ const Footer = () => {
                 <div className="grid grid-cols-1 md:grid-cols-4 gap-8">
                     <div>
                         <h3 className="text-lg font-semibold mb-4">sheero</h3>
-                        <p className="text-gray-200 mb-4">Your trusted online shopping destination for quality products and exceptional service.</p>
+                        <p className="text-gray-200 mb-2">Your trusted online shopping destination for quality products and exceptional service. <br /><p className='mt-4'>Stay connected with us</p></p>
                         <div className="flex space-x-4">
                             <a href='https://facebook.com' target='_blank' className="text-gray-200 hover:text-white" aria-label="Facebook">
                                 <Facebook />

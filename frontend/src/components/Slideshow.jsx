@@ -46,22 +46,23 @@ const Slideshow = () => {
                     }
                 }}
             >
-                {images.map(image => (
-                    <SplideSlide key={image._id}>
-                        <div className="flex justify-center items-center">
-                            <img
-                                src={`http://localhost:5000/${image.image}`}
-                                alt={image.title}
-                                className="w-full max-w-[2000px] h-[800px] object-cover rounded-md"
-                                onLoad={() => {
-                                    if (splideRef.current) {
-                                        splideRef.current.splide.refresh();
-                                    }
-                                }}
-                            />
-                        </div>
-                    </SplideSlide>
-                ))}
+                {images.length > 0 &&
+                    images.map(image => (
+                        <SplideSlide key={image._id}>
+                            <div className="flex justify-center items-center">
+                                <img
+                                    src={`http://localhost:5000/${image.image}`}
+                                    alt={image.title}
+                                    className="w-full max-w-[2000px] h-[800px] object-cover rounded-md"
+                                    onLoad={() => {
+                                        if (splideRef.current) {
+                                            splideRef.current.splide.refresh();
+                                        }
+                                    }}
+                                />
+                            </div>
+                        </SplideSlide>
+                    ))}
                 <div className="splide__progress">
                     <div className="splide__progress__bar"></div>
                 </div>

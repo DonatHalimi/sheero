@@ -17,6 +17,10 @@
     color: white
 }
 
+#root {
+    background-color: #F9FAFB;
+}
+
 body::-webkit-scrollbar {
     width: 9px;
 }

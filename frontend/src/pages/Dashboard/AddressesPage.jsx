@@ -1,12 +1,12 @@
 import { Checkbox, Paper, Table, TableBody, TableCell, TableContainer, TableHead, TableRow, Typography } from '@mui/material';
 import React, { useContext, useEffect, useState } from 'react';
+import ReactPaginate from 'react-paginate';
 import useAxios from '../../axiosInstance';
 import { ActionButton, BoldTableCell, BrownCreateOutlinedIcon, OutlinedBrownButton } from '../../components/Dashboard/CustomComponents';
 import AddAddressModal from '../../components/Modal/Address/AddAddressModal';
 import DeleteAddressModal from '../../components/Modal/Address/DeleteAddressModal';
 import EditAddressModal from '../../components/Modal/Address/EditAddressModal';
 import { AuthContext } from '../../context/AuthContext';
-import ReactPaginate from 'react-paginate';
 
 const AddressesPage = () => {
     const [addresses, setAddresses] = useState([]);
@@ -56,7 +56,7 @@ const AddressesPage = () => {
     const isPreviousDisabled = currentPage === 0;
     const isNextDisabled = currentPage >= pageCount - 1;
     const paginationEnabled = addresses.length > 0 && pageCount && pageCount > 1;
-    
+
     const getCurrentPageItems = () => {
         const startIndex = currentPage * itemsPerPage;
         return addresses.slice(startIndex, startIndex + itemsPerPage);
@@ -150,7 +150,7 @@ const AddressesPage = () => {
                             previousLinkClassName={`flex items-center justify-center px-1 h-10 text-gray-500 bg-white border border-e-0 border-gray-300 rounded-sm hover:bg-gray-100 hover:text-gray-700 ${isPreviousDisabled ? 'pointer-events-none text-gray-300' : ''}`}
                             nextLinkClassName={`flex items-center justify-center px-1 h-10 text-gray-500 bg-white border border-gray-300 rounded-sm hover:bg-gray-100 hover:text-gray-700 ${isNextDisabled ? 'pointer-events-none text-gray-300' : ''}`}
                             disabledClassName="text-gray-50 cursor-not-allowed"
-                            activeLinkClassName="text-white"
+                            activeLinkClassName="text-stone-600 font-extrabold"
                             previousLabel={<span className="flex items-center justify-center px-2 h-10 text-gray-500 hover:text-gray-700">Previous</span>}
                             nextLabel={<span className="flex items-center justify-center px-2 h-10 text-gray-500 hover:text-gray-700">Next</span>}
                             breakLabel={<span className="flex items-center justify-center px-4 h-10 text-gray-500 bg-white border border-gray-300">...</span>}

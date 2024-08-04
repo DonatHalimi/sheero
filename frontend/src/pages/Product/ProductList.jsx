@@ -1,7 +1,7 @@
 import axios from 'axios';
 import React, { useEffect, useState } from 'react';
 import ReactPaginate from 'react-paginate';
-import ProductItem from './ProductItem';
+import ProductItem from '../../components/ProductItem';
 
 const ProductList = () => {
     const [products, setProducts] = useState([]);
@@ -22,6 +22,9 @@ const ProductList = () => {
     }, []);
 
     const pageCount = Math.ceil(products.length / itemsPerPage);
+    const isPreviousDisabled = currentPage === 0;
+    const isNextDisabled = currentPage >= pageCount - 1;
+    const paginationEnabled = pageCount && pageCount > 1;
 
     const getCurrentPageItems = () => {
         const startIndex = currentPage * itemsPerPage;
@@ -32,21 +35,20 @@ const ProductList = () => {
         setCurrentPage(event.selected);
     };
 
-    const isPreviousDisabled = currentPage === 0;
-    const isNextDisabled = currentPage >= pageCount - 1;
-    const paginationEnabled = pageCount && pageCount > 1;
-
     return (
         <div className="container mx-auto px-4 py-8 mb-16 bg-gray-50">
             <div className="sticky top-0 z-10 pb-4 bg-gray-50">
-                <h1 className="text-2xl font-semibold">Products</h1>
+                {products.length > 0 && (
+                    <h1 className="text-2xl font-semibold">Products</h1>
+                )}
             </div>
             <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 gap-4">
                 {getCurrentPageItems().map(product => (
                     <ProductItem key={product._id} product={product} />
                 ))}
             </div>
-            {paginationEnabled && (
+
+            {products.length > 0 && paginationEnabled && (
                 <div className="flex justify-center mt-8">
                     <ReactPaginate
                         pageCount={pageCount}

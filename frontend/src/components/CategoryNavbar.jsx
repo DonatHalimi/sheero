@@ -1,7 +1,8 @@
-import React, { useEffect, useRef, useState } from 'react';
-import useAxios from '../axiosInstance';
-import MenuIcon from '@mui/icons-material/Menu';
 import CloseIcon from '@mui/icons-material/Close';
+import MenuIcon from '@mui/icons-material/Menu';
+import React, { useEffect, useRef, useState } from 'react';
+import { useNavigate } from 'react-router-dom';
+import useAxios from '../axiosInstance';
 
 const CategoryNavbar = ({ children }) => {
     const axiosInstance = useAxios();
@@ -11,8 +12,11 @@ const CategoryNavbar = ({ children }) => {
     const [openCategory, setOpenCategory] = useState(null);
     const [menuOpen, setMenuOpen] = useState(false);
     const [darkOverlay, setDarkOverlay] = useState(false);
+    const [activeCategory, setActiveCategory] = useState(null);
+
     const megaMenuRef = useRef(null);
     const categoryListRef = useRef(null);
+    const navigate = useNavigate();
 
     useEffect(() => {
         const fetchCategories = async () => {
@@ -77,6 +81,30 @@ const CategoryNavbar = ({ children }) => {
         setMenuOpen(!menuOpen);
     };
 
+    const handleCategoryClick = (categoryId) => {
+        setActiveCategory(categoryId);
+        navigate(`/products/category/${categoryId}`);
+        setTimeout(() => {
+            document.getElementById('product-container')?.scrollIntoView({ behavior: 'smooth' });
+        }, 100);
+    };
+
+    const handleSubcategoryClick = (subcategoryId, categoryId) => {
+        setActiveCategory(categoryId);
+        navigate(`/products/subcategory/${subcategoryId}`);
+        setTimeout(() => {
+            document.getElementById('product-container')?.scrollIntoView({ behavior: 'smooth' });
+        }, 100);
+    };
+
+    const handleSubSubcategoryClick = (subsubcategoryId, categoryId) => {
+        setActiveCategory(categoryId);
+        navigate(`/products/subSubcategory/${subsubcategoryId}`);
+        setTimeout(() => {
+            document.getElementById('product-container')?.scrollIntoView({ behavior: 'smooth' });
+        }, 100);
+    };
+
     return (
         <>
             <nav className="bg-white shadow-sm border border-t border-gray-50 relative z-50">
@@ -102,9 +130,8 @@ const CategoryNavbar = ({ children }) => {
                                     className="relative"
                                 >
                                     <button
-                                        id="mega-menu-full-dropdown-button"
-                                        data-collapse-toggle="mega-menu-full-dropdown"
-                                        className="flex items-center justify-between w-full py-2 px-3 text-gray-900 rounded md:w-auto hover:bg-stone-400 md:hover:bg-transparent md:border-0 md:hover:text-stone-600 md:p-0 dark:text-black md:dark:hover:text-stone-500"
+                                        onClick={() => handleCategoryClick(category._id)}
+                                        className={`flex items-center justify-between w-full py-2 px-3 text-gray-900 rounded md:w-auto md:border-0 md:p-0 ${activeCategory === category._id ? 'bg-gray-200 p-10' : 'hover:bg-stone-400 md:hover:bg-transparent md:hover:text-stone-600'}`}
                                     >
                                         {category.name}
                                     </button>
@@ -118,16 +145,22 @@ const CategoryNavbar = ({ children }) => {
                                                     <li key={subcategory._id} className="mb-2 flex items-center">
                                                         <img className='rounded-md' src={`http://localhost:5000/${subcategory.image}`} alt="" width={50} />
                                                         <div className="">
-                                                            <a href="#" className="block py-2 px-4 ml-2 text-gray-700 hover:bg-gray-100 font-semibold">
+                                                            <button
+                                                                onClick={() => handleSubcategoryClick(subcategory._id, category._id)}
+                                                                className="block py-2 px-4 ml-2 text-gray-700 hover:bg-gray-100 font-semibold"
+                                                            >
                                                                 {subcategory.name}
-                                                            </a>
+                                                            </button>
                                                             {subsubcategories[subcategory._id] && subsubcategories[subcategory._id].length > 0 && (
                                                                 <ul className="pl-4">
                                                                     {subsubcategories[subcategory._id].map((subsubcategory) => (
                                                                         <li key={subsubcategory._id}>
-                                                                            <a href="#" className="block py-1 px-2 ml-2 text-gray-500 hover:bg-gray-100">
+                                                                            <button
+                                                                                onClick={() => handleSubSubcategoryClick(subsubcategory._id, category._id)}
+                                                                                className="block py-1 px-2 ml-2 text-gray-500 hover:bg-gray-100"
+                                                                            >
                                                                                 {subsubcategory.name}
-                                                                            </a>
+                                                                            </button>
                                                                         </li>
                                                                     ))}
                                                                 </ul>
