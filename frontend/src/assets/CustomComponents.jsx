@@ -1,7 +1,17 @@
 import { CreateOutlined, DeleteOutlined, ExpandLess, ExpandMore, ShoppingCart, Star, StarBorder } from '@mui/icons-material';
-import { Box, Button, Collapse, FormControl, List, ListItemButton, ListItemIcon, ListItemText, AppBar as MuiAppBar, Drawer as MuiDrawer, Paper, Tab, TableCell, TextField } from '@mui/material';
+import {
+    Box, Button, Collapse, FormControl, List, ListItemButton, ListItemIcon, ListItemText, AppBar as MuiAppBar, Drawer as MuiDrawer, Paper, Tab, TableCell, TextField,
+} from '@mui/material';
 import { styled } from '@mui/material/styles';
 import SvgIcon from '@mui/material/SvgIcon';
+
+import Person from '@mui/icons-material/Person';
+import Dashboard from '@mui/icons-material/Dashboard';
+import Settings from '@mui/icons-material/Settings';
+import Logout from '@mui/icons-material/Logout';
+import Favorite from '@mui/icons-material/Favorite';
+import Inbox from '@mui/icons-material/Inbox';
+import ShoppingCartIcon from '@mui/icons-material/ShoppingCart';
 
 export const BrownOutlinedTextField = styled(TextField)({
     '& .MuiOutlinedInput-root': {
@@ -192,10 +202,20 @@ export const BrownShoppingCartIcon = styled(ShoppingCart)(({ theme }) => ({
 export const CustomTab = styled(Tab)(({ theme }) => ({
     flex: 1,
     textTransform: 'none',
+    borderBottom: '1px solid #dddddd',
     fontWeight: theme.typography.fontWeightRegular,
+    '&:hover': {
+        backgroundColor: '#f2f2f2',
+        color: '#59514a',
+    },
     '&.Mui-selected': {
         borderBottom: `2px solid ${theme.palette.primary.main}`,
+        width: '50%',
         fontWeight: 'bold',
+        '&:hover': {
+            backgroundColor: 'inherit',
+            color: 'inherit',
+        },
     },
 }));
 
@@ -204,6 +224,9 @@ export const ReviewCard = styled(Paper)(({ theme }) => ({
     marginBottom: theme.spacing(2),
     backgroundColor: theme.palette.background.paper,
     boxShadow: theme.shadows[3],
+    overflow: 'hidden',
+    textOverflow: 'ellipsis',
+    whiteSpace: 'nowrap',
 }));
 
 export const ReviewContent = styled(Box)(({ theme }) => ({
@@ -228,3 +251,31 @@ export function HomeIcon(props) {
         </SvgIcon>
     );
 }
+
+export const StyledPersonIcon = styled(Person)({
+    color: '#666666',
+});
+
+export const StyledDashboardIcon = styled(Dashboard)({
+    color: '#666666',
+});
+
+export const StyledSettingsIcon = styled(Settings)({
+    color: '#666666',
+});
+
+export const StyledLogoutIcon = styled(Logout)({
+    color: '#666666',
+});
+
+export const StyledFavoriteIcon = styled(Favorite)({
+    color: '#666666',
+});
+
+export const StyledInboxIcon = styled(Inbox)({
+    color: '#666666',
+});
+
+export const StyledShoppingCartIcon = styled(ShoppingCart)({
+    color: '#666666',
+});

@@ -16,6 +16,7 @@ import ProductDetails from './pages/Product/ProductDetails.jsx';
 import ProductsByCategory from './pages/Product/ProductsByCategory.jsx';
 import ProductsBySubcategory from './pages/Product/ProductsBySubcategory.jsx';
 import ProductsBySubSubCategory from './pages/Product/ProductsBySubSubCategory.jsx';
+import NotAllowed from './pages/NotAllowed';
 
 const App = () => (
   <Router>
@@ -34,10 +35,11 @@ const App = () => (
       <Route path="/products/subcategory/:id/" element={<ProductsBySubcategory />} />
       <Route path="/products/subSubcategory/:id/" element={<ProductsBySubSubCategory />} />
 
-      <Route path="/product-details/:id" element={<ProductDetails />} />
+      <Route path="/product/:id" element={<ProductDetails />} />
 
       <Route path="*" element={<NotFound />} />
-      <Route path='/faqs' element={<FAQs />} />
+      <Route path="/faqs" element={<FAQs />} />
+      <Route path="/not-allowed" element={<NotAllowed />} />
     </Routes>
     <ToastContainer
       position="bottom-right"

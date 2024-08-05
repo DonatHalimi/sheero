@@ -1,5 +1,6 @@
 import CloseIcon from '@mui/icons-material/Close';
 import MenuIcon from '@mui/icons-material/Menu';
+import { Skeleton } from '@mui/material';
 import React, { useEffect, useRef, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import useAxios from '../axiosInstance';
@@ -13,6 +14,7 @@ const CategoryNavbar = ({ children }) => {
     const [menuOpen, setMenuOpen] = useState(false);
     const [darkOverlay, setDarkOverlay] = useState(false);
     const [activeCategory, setActiveCategory] = useState(null);
+    const [loading, setLoading] = useState(true);
 
     const megaMenuRef = useRef(null);
     const categoryListRef = useRef(null);
@@ -23,8 +25,10 @@ const CategoryNavbar = ({ children }) => {
             try {
                 const response = await axiosInstance.get('/categories/get');
                 setCategories(response.data);
+                setLoading(false);
             } catch (error) {
                 console.error('Error fetching categories:', error);
+                setLoading(false);
             }
         };
         fetchCategories();
@@ -122,57 +126,65 @@ const CategoryNavbar = ({ children }) => {
                     </button>
                     <div id="mega-menu-full" className={`items-center justify-between font-medium ${menuOpen ? 'block' : 'hidden'} w-full md:flex md:w-auto md:order-1`} ref={megaMenuRef}>
                         <ul ref={categoryListRef} className="flex flex-col p-4 md:p-0 mt-4 rounded-lg md:space-x-8 rtl:space-x-reverse md:flex-row md:mt-0 md:border-0 bg-white">
-                            {categories.map((category) => (
-                                <li
-                                    key={category._id}
-                                    onMouseEnter={() => handleCategoryHover(category._id)}
-                                    onMouseLeave={handleCategoryLeave}
-                                    className="relative"
-                                >
-                                    <button
-                                        onClick={() => handleCategoryClick(category._id)}
-                                        className={`flex items-center justify-between w-full py-2 px-3 text-gray-900 rounded md:w-auto md:border-0 md:p-0 ${activeCategory === category._id ? 'bg-gray-200 p-10' : 'hover:bg-stone-400 md:hover:bg-transparent md:hover:text-stone-600'}`}
+                            {loading ? (
+                                [1, 2, 3, 4, 5].map((_, index) => (
+                                    <li key={index} className="relative">
+                                        <Skeleton variant="text" width={100} height={40} />
+                                    </li>
+                                ))
+                            ) : (
+                                categories.map((category) => (
+                                    <li
+                                        key={category._id}
+                                        onMouseEnter={() => handleCategoryHover(category._id)}
+                                        onMouseLeave={handleCategoryLeave}
+                                        className="relative"
                                     >
-                                        {category.name}
-                                    </button>
-                                    {openCategory === category._id && subcategories[category._id] && subcategories[category._id].length > 0 && (
-                                        <div
-                                            className="fixed bg-white shadow-lg rounded-lg p-4 z-50"
-                                            style={{ ...calculateDropdownStyle() }}
+                                        <button
+                                            onClick={() => handleCategoryClick(category._id)}
+                                            className={`flex items-center justify-between w-full py-2 px-3 text-gray-900 rounded md:w-auto md:border-0 md:p-0 ${activeCategory === category._id ? 'bg-gray-200 p-10' : 'hover:bg-stone-400 md:hover:bg-transparent md:hover:text-stone-600'}`}
                                         >
-                                            <ul>
-                                                {subcategories[category._id].map((subcategory) => (
-                                                    <li key={subcategory._id} className="mb-2 flex items-center">
-                                                        <img className='rounded-md' src={`http://localhost:5000/${subcategory.image}`} alt="" width={50} />
-                                                        <div className="">
-                                                            <button
-                                                                onClick={() => handleSubcategoryClick(subcategory._id, category._id)}
-                                                                className="block py-2 px-4 ml-2 text-gray-700 hover:bg-gray-100 font-semibold"
-                                                            >
-                                                                {subcategory.name}
-                                                            </button>
-                                                            {subsubcategories[subcategory._id] && subsubcategories[subcategory._id].length > 0 && (
-                                                                <ul className="pl-4">
-                                                                    {subsubcategories[subcategory._id].map((subsubcategory) => (
-                                                                        <li key={subsubcategory._id}>
-                                                                            <button
-                                                                                onClick={() => handleSubSubcategoryClick(subsubcategory._id, category._id)}
-                                                                                className="block py-1 px-2 ml-2 text-gray-500 hover:bg-gray-100"
-                                                                            >
-                                                                                {subsubcategory.name}
-                                                                            </button>
-                                                                        </li>
-                                                                    ))}
-                                                                </ul>
-                                                            )}
-                                                        </div>
-                                                    </li>
-                                                ))}
-                                            </ul>
-                                        </div>
-                                    )}
-                                </li>
-                            ))}
+                                            {category.name}
+                                        </button>
+                                        {openCategory === category._id && subcategories[category._id] && subcategories[category._id].length > 0 && (
+                                            <div
+                                                className="fixed bg-white shadow-lg rounded-lg p-4 z-50"
+                                                style={{ ...calculateDropdownStyle() }}
+                                            >
+                                                <ul>
+                                                    {subcategories[category._id].map((subcategory) => (
+                                                        <li key={subcategory._id} className="mb-2 flex items-center">
+                                                            <img className='rounded-md' src={`http://localhost:5000/${subcategory.image}`} alt="" width={50} />
+                                                            <div className="">
+                                                                <button
+                                                                    onClick={() => handleSubcategoryClick(subcategory._id, category._id)}
+                                                                    className="block py-2 px-4 ml-2 text-gray-700 hover:bg-gray-100 font-semibold"
+                                                                >
+                                                                    {subcategory.name}
+                                                                </button>
+                                                                {subsubcategories[subcategory._id] && subsubcategories[subcategory._id].length > 0 && (
+                                                                    <ul className="pl-4">
+                                                                        {subsubcategories[subcategory._id].map((subsubcategory) => (
+                                                                            <li key={subsubcategory._id}>
+                                                                                <button
+                                                                                    onClick={() => handleSubSubcategoryClick(subsubcategory._id, category._id)}
+                                                                                    className="block py-1 px-2 ml-2 text-gray-500 hover:bg-gray-100"
+                                                                                >
+                                                                                    {subsubcategory.name}
+                                                                                </button>
+                                                                            </li>
+                                                                        ))}
+                                                                    </ul>
+                                                                )}
+                                                            </div>
+                                                        </li>
+                                                    ))}
+                                                </ul>
+                                            </div>
+                                        )}
+                                    </li>
+                                ))
+                            )}
                         </ul>
                     </div>
                 </div>

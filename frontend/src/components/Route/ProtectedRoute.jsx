@@ -10,7 +10,7 @@ const ProtectedRoute = ({ children, adminOnly }) => {
     }
 
     if (adminOnly && !isAdmin()) {
-        return <Navigate to="/" />;
+        return <Navigate to="/not-allowed" />;
     }
 
     return children;

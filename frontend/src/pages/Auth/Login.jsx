@@ -44,7 +44,7 @@ const Login = () => {
         }}>
             <Navbar />
             <Container component="main" maxWidth="xs" sx={{
-                flex: 1, display: 'flex', marginTop: '200px', marginBottom: '200px'
+                flex: 1, display: 'flex', marginTop: '150px', marginBottom: '200px'
             }}>
                 <Paper elevation={3} className='p-4 flex flex-col align-middle w-full' sx={{
                     p: 4,

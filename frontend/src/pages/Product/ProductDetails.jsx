@@ -1,5 +1,5 @@
 import FavoriteIcon from '@mui/icons-material/FavoriteBorderOutlined';
-import { Breadcrumbs, Link, Typography } from '@mui/material';
+import { Breadcrumbs, Link, Typography, Skeleton } from '@mui/material';
 import axios from 'axios';
 import React, { useEffect, useState } from 'react';
 import { Link as RouterLink, useParams } from 'react-router-dom';
@@ -12,22 +12,55 @@ import ProductDetailsTabs from '../../components/ProductDetailsTabs';
 const ProductDetails = () => {
     const { id } = useParams();
     const [product, setProduct] = useState(null);
+    const [loading, setLoading] = useState(true);
 
     useEffect(() => {
         const fetchProduct = async () => {
             try {
                 const response = await axios.get(`http://localhost:5000/api/products/get/${id}`);
                 setProduct(response.data);
+                setLoading(false);
             } catch (error) {
                 console.error('Error fetching product:', error);
+                setLoading(false);
             }
         };
 
         fetchProduct();
     }, [id]);
 
-    if (!product) {
-        return <div>Loading...</div>;
+    if (loading) {
+        return (
+            <>
+                <Navbar />
+                <div className='container mx-auto px-4 max-w-5xl relative top-6 right-4'>
+                    <Breadcrumbs aria-label="breadcrumb" sx={{ mb: 4, fontSize: '14px' }}>
+                        <Link component={RouterLink} to="/" color="inherit" underline="none">
+                            <HomeIcon color="primary" />
+                        </Link>
+                        <Skeleton width={120} />
+                    </Breadcrumbs>
+                </div>
+                <div className="container mx-auto px-4 py-4 mb-8 bg-white mt-8 rounded-md max-w-5xl">
+                    <div className="flex flex-col md:flex-row gap-8">
+                        <div className="flex flex-col items-center md:w-1/2">
+                            <Skeleton variant="rectangular" width="100%" height={320} />
+                        </div>
+                        <div className="md:w-1/2">
+                            <Skeleton variant="text" width="80%" height={40} />
+                            <Skeleton variant="text" width="40%" height={30} style={{ marginTop: '16px' }} />
+                            <Skeleton variant="text" width="60%" height={30} />
+                            <Skeleton variant="text" width="20%" height={30} />
+                            <div className="mt-4 flex items-center space-x-4">
+                                <Skeleton variant="rectangular" width={140} height={40} />
+                                <Skeleton variant="rectangular" width={60} height={40} />
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <Footer />
+            </>
+        );
     }
 
     const { name, image, price, salePrice, discount } = product;
@@ -41,23 +74,22 @@ const ProductDetails = () => {
         <>
             <Navbar />
             <div className='container mx-auto px-4 max-w-5xl relative top-6 right-4'>
-                {/* Breadcrumb */}
                 <Breadcrumbs aria-label="breadcrumb" sx={{ mb: 4, fontSize: '14px' }}>
-                    <Link component={RouterLink} to="/" color="inherit">
+                    <Link component={RouterLink} to="/" color="inherit" underline="none">
                         <HomeIcon color="primary" />
                     </Link>
                     {product.category && (
-                        <Link component={RouterLink} to={`/products/category/${product.category._id}`} color="inherit">
+                        <Link component={RouterLink} to={`/products/category/${product.category._id}`} color="inherit" underline="none" className='hover:underline'>
                             {product.category.name}
                         </Link>
                     )}
                     {product.subcategory && (
-                        <Link component={RouterLink} to={`/products/subcategory/${product.subcategory._id}`} color="inherit">
+                        <Link component={RouterLink} to={`/products/subcategory/${product.subcategory._id}`} color="inherit" underline="none" className='hover:underline'>
                             {product.subcategory.name}
                         </Link>
                     )}
                     {product.subSubcategory && (
-                        <Link component={RouterLink} to={`/products/subSubcategory/${product.subSubcategory._id}`} color="inherit">
+                        <Link component={RouterLink} to={`/products/subSubcategory/${product.subSubcategory._id}`} color="inherit" underline="none" className='hover:underline'>
                             {product.subSubcategory.name}
                         </Link>
                     )}
@@ -65,9 +97,7 @@ const ProductDetails = () => {
                 </Breadcrumbs>
             </div>
             <div className="container mx-auto px-4 py-4 mb-8 bg-white mt-8 rounded-md max-w-5xl">
-
                 <div className="flex flex-col md:flex-row gap-8">
-                    {/* Image Gallery */}
                     <div className="flex flex-col items-center md:w-1/2">
                         <img
                             src={imageUrl}
@@ -75,23 +105,9 @@ const ProductDetails = () => {
                             className="w-full h-80 object-cover rounded"
                             onError={(e) => { e.target.onerror = null; e.target.src = NoImage; }}
                         />
-                        {/* Thumbnails */}
-                        {/* <div className="flex mt-4 space-x-2">
-                            {[imageUrl, imageUrl, imageUrl].map((thumb, index) => (
-                                <img
-                                    key={index}
-                                    src={thumb}
-                                    alt={`Thumbnail ${index + 1}`}
-                                    className="w-16 h-16 object-cover border border-gray-300 rounded cursor-pointer"
-                                />
-                            ))}
-                        </div> */}
                     </div>
-
-                    {/* Product Details */}
                     <div className="md:w-1/2">
                         <h1 className="text-2xl">{name}</h1>
-
                         <div className="mt-4 flex flex-col">
                             {discountPercentage > 0 ? (
                                 <>
@@ -105,7 +121,7 @@ const ProductDetails = () => {
                                         <span className="text-sm font-semibold text-stone-600">
                                             You save {(originalPrice - discountedPrice).toFixed(2)}€
                                         </span>
-                                        <span className="ml-2 text-sm font-semibold text-stone-600 bg-stone-200 rounded-md px-1">
+                                        <span className="ml-2 text-sm font-semibold text-stone-600 bg-stone-100 rounded-md px-1">
                                             -{discountPercentage}%
                                         </span>
                                     </div>
@@ -116,7 +132,6 @@ const ProductDetails = () => {
                                 </span>
                             )}
                         </div>
-
                         <div className="mt-4 flex items-center space-x-4">
                             <AddToCartButton>
                                 <BrownShoppingCartIcon /> Add To Cart
@@ -128,7 +143,6 @@ const ProductDetails = () => {
                     </div>
                 </div>
             </div>
-
             <div className="container mx-auto px-4 bg-white mt-8 mb-8 rounded-md max-w-5xl">
                 <div className="mt-4">
                     <ProductDetailsTabs product={product} />

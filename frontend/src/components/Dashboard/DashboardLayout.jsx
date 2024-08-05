@@ -26,7 +26,7 @@ const DashboardLayout = () => {
 
     return (
         <ThemeProvider theme={theme}>
-            <Box sx={{ display: 'flex' }}>
+            <Box sx={{ display: 'flex', backgroundColor: 'white' }}>
                 <CssBaseline />
                 <AppBar position="absolute" open={open}>
                     <Toolbar sx={{ pr: '32px' }}>
@@ -47,9 +47,10 @@ const DashboardLayout = () => {
                             </div>
                             <div className="flex items-center space-x-6">
                                 <ul className="flex items-center space-x-6">
-                                    <li>
+                                    {/* <li>
                                         <Link to="/" className="block py-2 px-3 text-black rounded hover:bg-gray-100 md:hover:bg-transparent md:hover:text-brown-700 md:p-0">Home</Link>
-                                    </li>
+                                    </li> 
+                                    */}
                                 </ul>
                                 <div className="flex items-center space-x-4">
                                     {auth.accessToken ? (

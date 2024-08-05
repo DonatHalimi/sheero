@@ -1,12 +1,38 @@
-import React, { useContext } from 'react';
+import React, { useState, useContext, useRef, useEffect } from 'react';
 import { Link } from 'react-router-dom';
-import { BrownButton, OutlinedBrownButton } from '../assets/CustomComponents';
+import { BrownButton, OutlinedBrownButton, StyledFavoriteIcon, StyledInboxIcon } from '../assets/CustomComponents';
 import logo from '../assets/logo.png';
 import { AuthContext } from '../context/AuthContext';
 import CategoryNavbar from './CategoryNavbar';
+import { Button } from '@mui/material';
+import { StyledPersonIcon, StyledDashboardIcon, StyledLogoutIcon, StyledShoppingCartIcon } from '../assets/CustomComponents'
 
 const Navbar = () => {
     const { auth, isAdmin, logout } = useContext(AuthContext);
+    const [isDropdownOpen, setIsDropdownOpen] = useState(false);
+    const dropdownRef = useRef(null);
+
+    const handleDropdownToggle = () => {
+        setIsDropdownOpen(prev => !prev);
+    };
+
+    const handleLogout = () => {
+        logout();
+        setIsDropdownOpen(false);
+    };
+
+    const handleClickOutside = (event) => {
+        if (dropdownRef.current && !dropdownRef.current.contains(event.target)) {
+            setIsDropdownOpen(false);
+        }
+    };
+
+    useEffect(() => {
+        document.addEventListener('mousedown', handleClickOutside);
+        return () => {
+            document.removeEventListener('mousedown', handleClickOutside);
+        };
+    }, []);
 
     return (
         <>
@@ -16,20 +42,55 @@ const Navbar = () => {
                         <img src={logo} alt="Logo" className="w-60 h-11" />
                     </a>
                     <div className="flex items-center space-x-4">
-                        <ul className="flex items-center space-x-4">
-                            <li>
-                                <Link to="/" className="block py-2 px-3 text-gray-900 rounded hover:bg-gray-100 md:hover:bg-transparent md:hover:text-brown-700 md:p-0">Home</Link>
-                            </li>
-                        </ul>
                         <div className="flex items-center space-x-4">
                             {auth.accessToken ? (
                                 <>
-                                    {isAdmin() && (
-                                        <Link to="/dashboard/users">
-                                            <BrownButton variant="contained" color="primary">Dashboard</BrownButton>
-                                        </Link>
-                                    )}
-                                    <BrownButton variant="contained" color="primary" onClick={logout}>Log Out</BrownButton>
+                                    <div className="relative" ref={dropdownRef}>
+                                        <Button onClick={handleDropdownToggle} className="flex items-center">
+                                            <StyledPersonIcon />
+                                        </Button>
+                                        {isDropdownOpen && (
+                                            <div className="absolute right-0 mt-2 w-48 bg-white border  shadow-lg rounded-lg p-2">
+                                                {isAdmin() && (
+                                                    <>
+                                                        <Link to="/dashboard/users" className="flex items-center px-2 py-2 mb-2 text-stone-700 hover:bg-stone-100">
+                                                            <StyledDashboardIcon className="mr-2" />
+                                                            Dashboard
+                                                        </Link>
+                                                        <div className="border-t border-stone-200 mb-2"></div>
+                                                    </>
+                                                )}
+                                                <Link to="/profile" className="flex items-center px-2 py-2 text-stone-700 hover:bg-stone-100">
+                                                    <StyledPersonIcon className="mr-2" />
+                                                    Profile
+                                                </Link>
+                                                <Link to="/orders" className="flex items-center px-2 py-2 text-stone-700 hover:bg-stone-100">
+                                                    <StyledInboxIcon className="mr-2" />
+                                                    Orders
+                                                </Link>
+                                                <Link to="/wishlist" className="flex items-center px-2 py-2 mb-2 text-stone-700 hover:bg-stone-100">
+                                                    <StyledFavoriteIcon className="mr-2" />
+                                                    Wishlist
+                                                </Link>
+                                                <div className="border-t border-stone-200 mb-2"></div>
+                                                <button onClick={handleLogout} className="flex items-center w-full px-2 py-2 text-stone-700 hover:bg-stone-100 text-left">
+                                                    <StyledLogoutIcon className="mr-2" />
+                                                    Log Out
+                                                </button>
+                                            </div>
+                                        )}
+                                    </div>
+                                    <li className='list-none'>
+                                        <ul className='flex justify-between list-none'>
+                                            <Link to='/wishlist'>
+                                                <StyledFavoriteIcon className='mr-6'/>
+                                            </Link>
+                                            <Link to='/cart'>
+                                                <StyledShoppingCartIcon />
+                                            </Link>
+                                        </ul>
+                                    </li>
+
                                 </>
                             ) : (
                                 <>
