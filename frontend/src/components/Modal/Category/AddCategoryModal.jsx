@@ -2,9 +2,9 @@ import UploadIcon from '@mui/icons-material/Upload';
 import { Box, Modal, Typography } from '@mui/material';
 import React, { useContext, useState } from 'react';
 import { toast } from 'react-toastify';
+import { BrownButton, BrownOutlinedTextField, OutlinedBrownButton, VisuallyHiddenInput } from '../../../assets/CustomComponents';
 import useAxios from '../../../axiosInstance';
 import { AuthContext } from '../../../context/AuthContext';
-import { BrownButton, BrownOutlinedTextField, OutlinedBrownButton, VisuallyHiddenInput } from '../../Dashboard/CustomComponents';
 
 const AddCategoryModal = ({ open, onClose, onAddSuccess }) => {
     const [name, setName] = useState('');

@@ -1,8 +1,8 @@
 import { Checkbox, Paper, Table, TableBody, TableCell, TableContainer, TableHead, TableRow, Typography } from '@mui/material';
 import React, { useContext, useEffect, useState } from 'react';
 import ReactPaginate from 'react-paginate';
+import { ActionButton, BoldTableCell, BrownCreateOutlinedIcon, OutlinedBrownButton } from '../../assets/CustomComponents';
 import useAxios from '../../axiosInstance';
-import { ActionButton, BoldTableCell, BrownCreateOutlinedIcon, OutlinedBrownButton } from '../../components/Dashboard/CustomComponents';
 import AddSlideshowModal from '../../components/Modal/Slideshow/AddSlideshowModal';
 import DeleteSlideshowModal from '../../components/Modal/Slideshow/DeleteSlideshowModal';
 import EditSlideshowModal from '../../components/Modal/Slideshow/EditSlideshowModal';
@@ -124,7 +124,7 @@ const SlideshowPage = () => {
                                 ) : (
                                     <TableRow>
                                         <TableCell colSpan={5} align="center">
-                                            No images found.
+                                            No image found
                                         </TableCell>
                                     </TableRow>
                                 )}

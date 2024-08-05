@@ -48,6 +48,7 @@ const getSubcategory = async (req, res) => {
 const getSubcategoriesByCategory = async (req, res) => {
     try {
         const subcategories = await Subcategory.find({ category: req.params.categoryId });
+        if (!subcategories || subcategories.length == 0) return res.status(404).json({ message: 'Subcategory not found' });
         res.status(200).json(subcategories);
     } catch (error) {
         res.status(500).json({ message: 'Server error' });

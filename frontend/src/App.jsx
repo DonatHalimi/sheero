@@ -12,6 +12,7 @@ import Register from './pages/Auth/Register';
 import FAQs from './pages/FAQs.jsx';
 import Home from './pages/Home';
 import NotFound from './pages/NotFound.jsx';
+import ProductDetails from './pages/Product/ProductDetails.jsx';
 import ProductsByCategory from './pages/Product/ProductsByCategory.jsx';
 import ProductsBySubcategory from './pages/Product/ProductsBySubcategory.jsx';
 import ProductsBySubSubCategory from './pages/Product/ProductsBySubSubCategory.jsx';
@@ -32,6 +33,8 @@ const App = () => (
       <Route path="/products/category/:id/" element={<ProductsByCategory />} />
       <Route path="/products/subcategory/:id/" element={<ProductsBySubcategory />} />
       <Route path="/products/subSubcategory/:id/" element={<ProductsBySubSubCategory />} />
+
+      <Route path="/product-details/:id" element={<ProductDetails />} />
 
       <Route path="*" element={<NotFound />} />
       <Route path='/faqs' element={<FAQs />} />

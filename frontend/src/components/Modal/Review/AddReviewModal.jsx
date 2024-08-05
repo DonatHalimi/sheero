@@ -1,9 +1,9 @@
 import { Box, FormControl, InputLabel, MenuItem, Modal, Select, Typography } from '@mui/material';
 import React, { useContext, useEffect, useState } from 'react';
 import { toast } from 'react-toastify';
+import { BrownButton, BrownOutlinedTextField } from '../../../assets/CustomComponents';
 import useAxios from '../../../axiosInstance';
 import { AuthContext } from '../../../context/AuthContext';
-import { BrownButton, BrownOutlinedTextField } from '../../Dashboard/CustomComponents';
 
 const AddReviewModal = ({ open, onClose, onAddSuccess }) => {
     const [rating, setRating] = useState('');
@@ -66,11 +66,7 @@ const AddReviewModal = ({ open, onClose, onAddSuccess }) => {
             onClose();
         } catch (error) {
             console.error('Error adding review', error);
-            if (error.response && error.response.data.message) {
-                toast.error(error.response.data.message);
-            } else {
-                toast.error('Error adding review');
-            }
+            toast.error('Error adding review');
         }
     };
 

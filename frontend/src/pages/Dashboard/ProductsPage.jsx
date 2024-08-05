@@ -1,8 +1,8 @@
 import { Checkbox, Paper, Table, TableBody, TableCell, TableContainer, TableHead, TableRow, Typography } from '@mui/material';
 import React, { useContext, useEffect, useState } from 'react';
 import ReactPaginate from 'react-paginate';
+import { ActionButton, BoldTableCell, BrownCreateOutlinedIcon, OutlinedBrownButton } from '../../assets/CustomComponents';
 import useAxios from '../../axiosInstance';
-import { ActionButton, BoldTableCell, BrownCreateOutlinedIcon, OutlinedBrownButton } from '../../components/Dashboard/CustomComponents';
 import AddProductModal from '../../components/Modal/Product/AddProductModal';
 import DeleteProductModal from '../../components/Modal/Product/DeleteProductModal';
 import EditProductModal from '../../components/Modal/Product/EditProductModal';
@@ -184,8 +184,8 @@ const ProductsPage = () => {
                                     ))
                                 ) : (
                                     <TableRow>
-                                        <TableCell colSpan={15} align="center">
-                                            No products found.
+                                        <TableCell colSpan={17} align="center">
+                                            No product found
                                         </TableCell>
                                     </TableRow>
                                 )}

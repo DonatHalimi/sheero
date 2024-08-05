@@ -1,9 +1,9 @@
 import { Box, Modal, Typography } from '@mui/material';
 import React, { useContext, useState } from 'react';
 import { toast } from 'react-toastify';
+import { BrownButton, BrownOutlinedTextField } from '../../../assets/CustomComponents';
 import useAxios from '../../../axiosInstance';
 import { AuthContext } from '../../../context/AuthContext';
-import { BrownButton, BrownOutlinedTextField } from '../../Dashboard/CustomComponents';
 
 const AddCountryModal = ({ open, onClose, onAddSuccess }) => {
     const [name, setName] = useState('');

@@ -1,8 +1,8 @@
 import { Checkbox, Paper, Table, TableBody, TableCell, TableContainer, TableHead, TableRow, Typography } from '@mui/material';
 import React, { useContext, useEffect, useState } from 'react';
 import ReactPaginate from 'react-paginate';
+import { ActionButton, BoldTableCell, BrownCreateOutlinedIcon, OutlinedBrownButton } from '../../assets/CustomComponents';
 import useAxios from '../../axiosInstance';
-import { ActionButton, BoldTableCell, BrownCreateOutlinedIcon, OutlinedBrownButton } from '../../components/Dashboard/CustomComponents';
 import AddAddressModal from '../../components/Modal/Address/AddAddressModal';
 import DeleteAddressModal from '../../components/Modal/Address/DeleteAddressModal';
 import EditAddressModal from '../../components/Modal/Address/EditAddressModal';
@@ -126,7 +126,7 @@ const AddressesPage = () => {
                             ) : (
                                 <TableRow>
                                     <TableCell colSpan={8} align="center">
-                                        No addresses found.
+                                        No address found
                                     </TableCell>
                                 </TableRow>
                             )}

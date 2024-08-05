@@ -3,9 +3,9 @@ import VisibilityOffIcon from '@mui/icons-material/VisibilityOff';
 import { Box, IconButton, InputAdornment, InputLabel, MenuItem, Modal, Select, Typography } from '@mui/material';
 import React, { useContext, useState } from 'react';
 import { toast } from 'react-toastify';
+import { BrownButton, BrownOutlinedTextField, OutlinedBrownFormControl } from '../../../assets/CustomComponents';
 import useAxios from '../../../axiosInstance';
 import { AuthContext } from '../../../context/AuthContext';
-import { BrownButton, BrownOutlinedTextField, OutlinedBrownFormControl } from '../../Dashboard/CustomComponents';
 
 const AddUserModal = ({ open, onClose, onAddSuccess }) => {
     const [username, setUsername] = useState('');

@@ -18,7 +18,7 @@ import {
 } from '@mui/icons-material';
 import React, { useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { ActiveListItem, CollapsibleListItem } from './CustomComponents';
+import { ActiveListItem, CollapsibleListItem } from '../../assets/CustomComponents';
 
 /**
  * Renders the main list items for the CRUD dashboard.

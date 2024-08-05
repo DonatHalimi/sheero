@@ -1,8 +1,8 @@
 import { Checkbox, Paper, Table, TableBody, TableCell, TableContainer, TableHead, TableRow, Typography } from '@mui/material';
 import React, { useContext, useEffect, useState } from 'react';
 import ReactPaginate from 'react-paginate';
+import { ActionButton, BoldTableCell, BrownCreateOutlinedIcon, OutlinedBrownButton } from '../../assets/CustomComponents.jsx';
 import useAxios from '../../axiosInstance.js';
-import { ActionButton, BoldTableCell, BrownCreateOutlinedIcon, OutlinedBrownButton } from '../../components/Dashboard/CustomComponents.jsx';
 import AddCountryModal from '../../components/Modal/Country/AddCountryModal.jsx';
 import DeleteCountryModal from '../../components/Modal/Country/DeleteCountryModal.jsx';
 import EditCountryModal from '../../components/Modal/Country/EditCountryModal.jsx';
@@ -115,8 +115,8 @@ const CountriesPage = () => {
                                 ))
                             ) : (
                                 <TableRow>
-                                    <TableCell colSpan={2} align="center">
-                                        No countries found.
+                                    <TableCell colSpan={4} align="center">
+                                        No country found
                                     </TableCell>
                                 </TableRow>
                             )}

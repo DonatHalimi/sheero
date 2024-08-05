@@ -1,9 +1,9 @@
 import { Box, Button, Modal } from '@mui/material';
 import React, { useContext } from 'react';
 import { toast } from 'react-toastify';
+import { OutlinedBrownButton } from '../../../assets/CustomComponents';
 import useAxios from '../../../axiosInstance';
 import { AuthContext } from '../../../context/AuthContext';
-import { OutlinedBrownButton } from '../../Dashboard/CustomComponents';
 
 const DeleteUserModal = ({ open, onClose, users, onDeleteSuccess }) => {
     const { refreshToken } = useContext(AuthContext);

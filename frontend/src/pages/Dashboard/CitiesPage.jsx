@@ -1,8 +1,8 @@
 import { Checkbox, Paper, Table, TableBody, TableCell, TableContainer, TableHead, TableRow, Typography } from '@mui/material';
 import React, { useContext, useEffect, useState } from 'react';
 import ReactPaginate from 'react-paginate';
+import { ActionButton, BoldTableCell, BrownCreateOutlinedIcon, OutlinedBrownButton } from '../../assets/CustomComponents';
 import useAxios from '../../axiosInstance';
-import { ActionButton, BoldTableCell, BrownCreateOutlinedIcon, OutlinedBrownButton } from '../../components/Dashboard/CustomComponents';
 import AddCityModal from '../../components/Modal/City/AddCityModal';
 import DeleteCityModal from '../../components/Modal/City/DeleteCityModal';
 import EditCityModal from '../../components/Modal/City/EditCityModal';
@@ -119,8 +119,8 @@ const CitiesPage = () => {
                                 ))
                             ) : (
                                 <TableRow>
-                                    <TableCell colSpan={4} align="center">
-                                        No cities found.
+                                    <TableCell colSpan={6} align="center">
+                                        No city found
                                     </TableCell>
                                 </TableRow>
                             )}

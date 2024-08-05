@@ -1,7 +1,7 @@
-import { CreateOutlined, DeleteOutlined, ExpandLess, ExpandMore, ShoppingCart } from '@mui/icons-material';
-import { Button, Collapse, FormControl, List, ListItemButton, ListItemIcon, ListItemText, AppBar as MuiAppBar, Drawer as MuiDrawer, TableCell, TextField } from '@mui/material';
+import { CreateOutlined, DeleteOutlined, ExpandLess, ExpandMore, ShoppingCart, Star, StarBorder } from '@mui/icons-material';
+import { Box, Button, Collapse, FormControl, List, ListItemButton, ListItemIcon, ListItemText, AppBar as MuiAppBar, Drawer as MuiDrawer, Paper, Tab, TableCell, TextField } from '@mui/material';
 import { styled } from '@mui/material/styles';
-import React from 'react';
+import SvgIcon from '@mui/material/SvgIcon';
 
 export const BrownOutlinedTextField = styled(TextField)({
     '& .MuiOutlinedInput-root': {
@@ -188,3 +188,43 @@ export const BrownShoppingCartIcon = styled(ShoppingCart)(({ theme }) => ({
     marginRight: 20,
     transition: 'color 0.3s ease',
 }));
+
+export const CustomTab = styled(Tab)(({ theme }) => ({
+    flex: 1,
+    textTransform: 'none',
+    fontWeight: theme.typography.fontWeightRegular,
+    '&.Mui-selected': {
+        borderBottom: `2px solid ${theme.palette.primary.main}`,
+        fontWeight: 'bold',
+    },
+}));
+
+export const ReviewCard = styled(Paper)(({ theme }) => ({
+    padding: theme.spacing(2),
+    marginBottom: theme.spacing(2),
+    backgroundColor: theme.palette.background.paper,
+    boxShadow: theme.shadows[3],
+}));
+
+export const ReviewContent = styled(Box)(({ theme }) => ({
+    flex: 1,
+}));
+
+export const RatingStars = ({ rating }) => {
+    const stars = Array(5).fill(false).map((_, index) => index < rating);
+    return (
+        <Box display="flex">
+            {stars.map((filled, index) =>
+                filled ? <Star key={index} color="primary" /> : <StarBorder key={index} />
+            )}
+        </Box>
+    );
+};
+
+export function HomeIcon(props) {
+    return (
+        <SvgIcon {...props} style={{ fontSize: 20, marginBottom: 0.5 }}>
+            <path d="M10 20v-6h4v6h5v-8h3L12 3 2 12h3v8z" />
+        </SvgIcon>
+    );
+}

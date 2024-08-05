@@ -32,7 +32,7 @@ const CategoryNavbar = ({ children }) => {
 
     const fetchSubcategories = async (categoryId) => {
         try {
-            const response = await axiosInstance.get(`/subcategories/getByCategory/${categoryId}`);
+            const response = await axiosInstance.get(`/subcategories/get-by-category/${categoryId}`);
             setSubcategories((prev) => ({ ...prev, [categoryId]: response.data }));
 
             response.data.forEach(subcategory => {
@@ -45,7 +45,7 @@ const CategoryNavbar = ({ children }) => {
 
     const fetchSubsubcategories = async (subcategoryId) => {
         try {
-            const response = await axiosInstance.get(`/subsubcategories/getBySubcategory/${subcategoryId}`);
+            const response = await axiosInstance.get(`/subsubcategories/get-by-subCategory/${subcategoryId}`);
             setSubsubcategories((prev) => ({ ...prev, [subcategoryId]: response.data }));
         } catch (error) {
             console.error('Error fetching subsubcategories:', error);

@@ -69,6 +69,30 @@ const getReview = async (req, res) => {
     }
 };
 
+const getReviewsByProduct = async (req, res) => {
+    const productId = req.params.productId;
+
+    try {
+        const reviews = await Review.find({ product: productId })
+            .populate({
+                path: 'user',
+                select: '_id username'
+            })
+            .populate({
+                path: 'product',
+                select: 'name description price salePrice category subcategory image inventoryCount'
+            });
+
+        if (reviews.length === 0) {
+            return res.status(404).json({ message: 'No reviews found for this product' });
+        }
+
+        res.status(200).json(reviews);
+    } catch (error) {
+        res.status(500).json({ message: 'Server error', error: error.message });
+    }
+};
+
 const updateReview = async (req, res) => {
     const { rating, comment } = req.body;
     const userId = req.user.userId;
@@ -164,7 +188,6 @@ const deleteReviews = async (req, res) => {
     }
 };
 
-
 const getAllProducts = async (req, res) => {
     try {
         const products = await Product.find().select('name');
@@ -174,4 +197,4 @@ const getAllProducts = async (req, res) => {
     }
 };
 
-module.exports = { createReview, getReviews, getReview, updateReview, deleteReview, getAllProducts, deleteReviews };
+module.exports = { createReview, getReviews, getReview, getReviewsByProduct, updateReview, deleteReview, getAllProducts, deleteReviews };

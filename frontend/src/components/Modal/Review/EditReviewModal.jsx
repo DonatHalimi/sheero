@@ -1,9 +1,9 @@
 import { Box, InputLabel, MenuItem, Modal, Select, Typography } from '@mui/material';
 import React, { useContext, useEffect, useState } from 'react';
 import { toast } from 'react-toastify';
+import { BrownButton, BrownOutlinedTextField, OutlinedBrownFormControl } from '../../../assets/CustomComponents';
 import useAxios from '../../../axiosInstance';
 import { AuthContext } from '../../../context/AuthContext';
-import { BrownButton, BrownOutlinedTextField, OutlinedBrownFormControl } from '../../Dashboard/CustomComponents';
 
 const EditReviewModal = ({ open, onClose, review, onEditSuccess }) => {
     const [rating, setRating] = useState('');
@@ -21,7 +21,6 @@ const EditReviewModal = ({ open, onClose, review, onEditSuccess }) => {
                 setProducts(response.data);
             } catch (error) {
                 console.error('Error fetching products', error);
-                toast.error('Error fetching products');
             }
         };
 

@@ -1,8 +1,8 @@
 import { Checkbox, Paper, Table, TableBody, TableCell, TableContainer, TableHead, TableRow, Typography } from '@mui/material';
 import React, { useContext, useEffect, useState } from 'react';
 import ReactPaginate from 'react-paginate';
+import { ActionButton, BoldTableCell, BrownCreateOutlinedIcon, OutlinedBrownButton } from '../../assets/CustomComponents';
 import useAxios from '../../axiosInstance';
-import { ActionButton, BoldTableCell, BrownCreateOutlinedIcon, OutlinedBrownButton } from '../../components/Dashboard/CustomComponents';
 import AddUserModal from '../../components/Modal/User/AddUserModal';
 import DeleteUserModal from '../../components/Modal/User/DeleteUserModal';
 import EditUserModal from '../../components/Modal/User/EditUserModal';
@@ -122,8 +122,8 @@ const UsersPage = () => {
                                     ))
                                 ) : (
                                     <TableRow>
-                                        <TableCell colSpan={5} align="center">
-                                            No users found.
+                                        <TableCell colSpan={6} align="center">
+                                            No user found
                                         </TableCell>
                                     </TableRow>
                                 )}

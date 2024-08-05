@@ -1,8 +1,8 @@
 import { Checkbox, Paper, Table, TableBody, TableCell, TableContainer, TableHead, TableRow, Typography } from '@mui/material';
 import React, { useContext, useEffect, useState } from 'react';
 import ReactPaginate from 'react-paginate';
+import { ActionButton, BoldTableCell, BrownCreateOutlinedIcon, OutlinedBrownButton } from '../../assets/CustomComponents';
 import useAxios from '../../axiosInstance';
-import { ActionButton, BoldTableCell, BrownCreateOutlinedIcon, OutlinedBrownButton } from '../../components/Dashboard/CustomComponents';
 import AddReviewModal from '../../components/Modal/Review/AddReviewModal';
 import DeleteReviewModal from '../../components/Modal/Review/DeleteReviewModal';
 import EditReviewModal from '../../components/Modal/Review/EditReviewModal';
@@ -121,8 +121,8 @@ const ReviewsPage = () => {
                                 ))
                             ) : (
                                 <TableRow>
-                                    <TableCell colSpan={5} align="center">
-                                        No reviews found.
+                                    <TableCell colSpan={7} align="center">
+                                        No review found
                                     </TableCell>
                                 </TableRow>
                             )}

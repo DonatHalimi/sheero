@@ -10,10 +10,10 @@ import { ThemeProvider } from '@mui/material/styles';
 import Toolbar from '@mui/material/Toolbar';
 import React, { useContext } from 'react';
 import { Link, Outlet } from 'react-router-dom';
+import { AppBar, BrownButton, Drawer } from '../../assets/CustomComponents';
 import logo from '../../assets/logo.png';
 import { AuthContext } from '../../context/AuthContext';
 import theme from '../../theme';
-import { AppBar, BrownButton, Drawer } from '../Dashboard/CustomComponents';
 import { mainListItems, secondaryListItems } from './listItems';
 
 const DashboardLayout = () => {

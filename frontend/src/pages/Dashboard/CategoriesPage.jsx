@@ -1,8 +1,8 @@
 import { Checkbox, Paper, Table, TableBody, TableCell, TableContainer, TableHead, TableRow, Typography } from '@mui/material';
 import React, { useContext, useEffect, useState } from 'react';
 import ReactPaginate from 'react-paginate';
+import { ActionButton, BoldTableCell, BrownCreateOutlinedIcon, OutlinedBrownButton } from '../../assets/CustomComponents';
 import useAxios from '../../axiosInstance';
-import { ActionButton, BoldTableCell, BrownCreateOutlinedIcon, OutlinedBrownButton } from '../../components/Dashboard/CustomComponents';
 import AddCategoryModal from '../../components/Modal/Category/AddCategoryModal';
 import DeleteCategoryModal from '../../components/Modal/Category/DeleteCategoryModal';
 import EditCategoryModal from '../../components/Modal/Category/EditCategoryModal';
@@ -122,7 +122,7 @@ const CategoriesPage = () => {
                                 ) : (
                                     <TableRow>
                                         <TableCell colSpan={4} align="center">
-                                            No categories found.
+                                            No category found
                                         </TableCell>
                                     </TableRow>
                                 )}

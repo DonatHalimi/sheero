@@ -1,8 +1,8 @@
 import { Checkbox, Paper, Table, TableBody, TableCell, TableContainer, TableHead, TableRow, Typography } from '@mui/material';
 import React, { useContext, useEffect, useState } from 'react';
 import ReactPaginate from 'react-paginate';
+import { ActionButton, BoldTableCell, BrownCreateOutlinedIcon, OutlinedBrownButton } from '../../assets/CustomComponents';
 import useAxios from '../../axiosInstance';
-import { ActionButton, BoldTableCell, BrownCreateOutlinedIcon, OutlinedBrownButton } from '../../components/Dashboard/CustomComponents';
 import AddSupplierModal from '../../components/Modal/Supplier/AddSupplierModal';
 import DeleteSupplierModal from '../../components/Modal/Supplier/DeleteSupplierModal';
 import EditSupplierModal from '../../components/Modal/Supplier/EditSupplierModal';
@@ -122,7 +122,7 @@ const SupplierPage = () => {
                                 ) : (
                                     <TableRow>
                                         <TableCell colSpan={5} align="center">
-                                            No supplier found.
+                                            No supplier found
                                         </TableCell>
                                     </TableRow>
                                 )}
