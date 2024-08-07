@@ -1,37 +1,46 @@
 import axios from 'axios';
-import React, { createContext, useEffect, useState } from 'react';
+import React, { createContext, useState } from 'react';
 
 const AuthContext = createContext();
 
 const AuthProvider = ({ children }) => {
-    const [auth, setAuth] = useState({
+    const [auth, setAuthState] = useState({
         accessToken: localStorage.getItem('accessToken'),
-        refreshToken: localStorage.getItem('refreshToken'),
         role: localStorage.getItem('role'),
+        username: localStorage.getItem('username'),
+        email: localStorage.getItem('email'),
     });
+
+    const setAuth = (authData) => {
+        setAuthState(authData);
+        localStorage.setItem('accessToken', authData.accessToken || '');
+        localStorage.setItem('role', authData.role || '');
+        localStorage.setItem('username', authData.username || '');
+        localStorage.setItem('email', authData.email || '');
+    };
 
     const login = async (username, password) => {
         try {
-            const response = await axios.post('http://localhost:5000/api/auth/login', {
-                username,
-                email: username,
-                password
+            const response = await axios.post('http://localhost:5000/api/auth/login', { username, password });
+            setAuth({
+                accessToken: response.data.accessToken,
+                role: response.data.role,
+                username: response.data.username,
+                email: response.data.email
             });
-            setAuth({ ...response.data, role: response.data.role });
-            localStorage.setItem('accessToken', response.data.accessToken);
-            localStorage.setItem('refreshToken', response.data.refreshToken);
-            localStorage.setItem('role', response.data.role);
             return { success: true };
         } catch (error) {
-            return { success: false, message: error.response ? error.response.data.message : 'Login failed' };
+            console.error('Login failed:', error.response?.data?.message || 'Login failed');
+            return { success: false, message: error.response?.data?.message || 'Login failed' };
         }
     };
 
     const logout = () => {
-        setAuth({ accessToken: null, refreshToken: null, role: null });
+        setAuth({ accessToken: null, role: null, username: null, email: null });
         localStorage.removeItem('accessToken');
-        localStorage.removeItem('refreshToken');
         localStorage.removeItem('role');
+        localStorage.removeItem('username');
+        localStorage.removeItem('email');
     };
 
     const register = async (username, email, password) => {
@@ -39,44 +48,20 @@ const AuthProvider = ({ children }) => {
             await axios.post('http://localhost:5000/api/auth/register', { username, email, password });
             return { success: true };
         } catch (error) {
-            return { success: false, message: error.response ? error.response.data.message : 'Registration failed' };
+            console.error('Registration failed:', error.response?.data?.message || 'Registration failed');
+            return { success: false, message: error.response?.data?.message || 'Registration failed' };
         }
     };
 
-    const refreshToken = async () => {
-        if (!auth.refreshToken) {
-            console.error('No refresh token available');
-            return null;
-        }
-        try {
-            const response = await axios.post('http://localhost:5000/api/auth/token', { token: auth.refreshToken });
-            setAuth(prevAuth => ({ ...prevAuth, accessToken: response.data.accessToken }));
-            localStorage.setItem('accessToken', response.data.accessToken);
-            return response.data.accessToken;
-        } catch (error) {
-            console.error('Token refresh failed', error);
-            throw error;
-        }
+    const isAdmin = () => {
+        return auth.role === 'admin';
     };
-
-    useEffect(() => {
-        const interval = setInterval(() => {
-            if (auth.refreshToken) {
-                refreshToken();
-            }
-        }, 15 * 60 * 1000); // Refresh token every 15 minutes
-
-        return () => clearInterval(interval);
-    }, [auth.refreshToken]);
-
-    const isAdmin = () => auth.role === 'admin';
 
     return (
-        <AuthContext.Provider value={{ auth, login, logout, register, refreshToken, isAdmin }}>
+        <AuthContext.Provider value={{ auth, setAuth: setAuthState, login, logout, register, isAdmin }}>
             {children}
         </AuthContext.Provider>
     );
 };
 
 export { AuthContext, AuthProvider };
-

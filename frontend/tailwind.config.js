@@ -5,7 +5,17 @@ export default {
     "./src/**/*.{js,ts,jsx,tsx}",
   ],
   theme: {
-    extend: {},
+    extend: {
+      width: {
+        "430": "430px",
+      },
+      height: {
+        "370": "370px",
+      },
+      top: {
+        "99": "96px",
+      }
+    },
   },
   plugins: [
     require('@tailwindcss/aspect-ratio'),

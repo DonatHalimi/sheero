@@ -8,21 +8,51 @@ import IconButton from '@mui/material/IconButton';
 import List from '@mui/material/List';
 import { ThemeProvider } from '@mui/material/styles';
 import Toolbar from '@mui/material/Toolbar';
-import React, { useContext } from 'react';
+import React, { useContext, useEffect, useRef, useState } from 'react';
 import { Link, Outlet } from 'react-router-dom';
-import { AppBar, BrownButton, Drawer } from '../../assets/CustomComponents';
+import {
+    AppBar, BrownButton, Drawer, ProfileButton, StyledDashboardIcon,
+    StyledFavoriteIcon,
+    StyledInboxIcon,
+    StyledLogoutIcon,
+    StyledPersonIcon
+} from '../../assets/CustomComponents';
 import logo from '../../assets/logo.png';
 import { AuthContext } from '../../context/AuthContext';
 import theme from '../../theme';
 import { mainListItems, secondaryListItems } from './listItems';
 
 const DashboardLayout = () => {
-    const [open, setOpen] = React.useState(true);
-    const { auth, logout } = useContext(AuthContext);
+    const [open, setOpen] = useState(true);
+    const { auth, isAdmin, logout } = useContext(AuthContext);
+    const [isDropdownOpen, setIsDropdownOpen] = useState(false);
+    const dropdownRef = useRef(null);
 
     const toggleDrawer = () => {
         setOpen(!open);
     };
+
+    const handleDropdownToggle = () => {
+        setIsDropdownOpen(prev => !prev);
+    };
+
+    const handleLogout = () => {
+        logout();
+        setIsDropdownOpen(false);
+    };
+
+    const handleClickOutside = (event) => {
+        if (dropdownRef.current && !dropdownRef.current.contains(event.target)) {
+            setIsDropdownOpen(false);
+        }
+    };
+
+    useEffect(() => {
+        document.addEventListener('mousedown', handleClickOutside);
+        return () => {
+            document.removeEventListener('mousedown', handleClickOutside);
+        };
+    }, []);
 
     return (
         <ThemeProvider theme={theme}>
@@ -55,7 +85,46 @@ const DashboardLayout = () => {
                                 <div className="flex items-center space-x-4">
                                     {auth.accessToken ? (
                                         <>
-                                            <BrownButton variant="contained" color="primary" onClick={logout}>Log Out</BrownButton>
+                                            <div className="relative ml-4" ref={dropdownRef}>
+                                                <ProfileButton onClick={handleDropdownToggle} className="rounded-sm">
+                                                    <StyledPersonIcon />
+                                                    {auth.username && (
+                                                        <span className="ml-2 text-sm">
+                                                            {auth.username}
+                                                        </span>
+                                                    )}
+                                                </ProfileButton>
+                                                {isDropdownOpen && (
+                                                    <div className="absolute right-0 mt-2 w-48 bg-white border  shadow-lg rounded-lg p-2">
+                                                        {isAdmin() && (
+                                                            <>
+                                                                <Link to="/dashboard/users" className="flex items-center px-2 py-2 mb-2 text-stone-700 hover:bg-stone-100">
+                                                                    <StyledDashboardIcon className="mr-2" />
+                                                                    Dashboard
+                                                                </Link>
+                                                                <div className="border-t border-stone-200 mb-2"></div>
+                                                            </>
+                                                        )}
+                                                        <Link to="/profile" className="flex items-center px-2 py-2 text-stone-700 hover:bg-stone-100">
+                                                            <StyledPersonIcon className="mr-2" />
+                                                            Profile
+                                                        </Link>
+                                                        <Link to="/orders" className="flex items-center px-2 py-2 text-stone-700 hover:bg-stone-100">
+                                                            <StyledInboxIcon className="mr-2" />
+                                                            Orders
+                                                        </Link>
+                                                        <Link to="/wishlist" className="flex items-center px-2 py-2 mb-2 text-stone-700 hover:bg-stone-100">
+                                                            <StyledFavoriteIcon className="mr-2" />
+                                                            Wishlist
+                                                        </Link>
+                                                        <div className="border-t border-stone-200 mb-2"></div>
+                                                        <button onClick={handleLogout} className="flex items-center w-full px-2 py-2 text-stone-700 hover:bg-stone-100 text-left">
+                                                            <StyledLogoutIcon className="mr-2" />
+                                                            Log Out
+                                                        </button>
+                                                    </div>
+                                                )}
+                                            </div>
                                         </>
                                     ) : (
                                         <>

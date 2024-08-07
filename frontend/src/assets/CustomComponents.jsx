@@ -1,17 +1,37 @@
-import { CreateOutlined, DeleteOutlined, ExpandLess, ExpandMore, ShoppingCart, Star, StarBorder } from '@mui/icons-material';
 import {
-    Box, Button, Collapse, FormControl, List, ListItemButton, ListItemIcon, ListItemText, AppBar as MuiAppBar, Drawer as MuiDrawer, Paper, Tab, TableCell, TextField,
+    CreateOutlined,
+    DashboardOutlined,
+    DeleteOutlined,
+    ExpandLess,
+    ExpandMore,
+    FavoriteBorderOutlined,
+    InboxOutlined,
+    Logout,
+    PersonOutlined,
+    Settings,
+    ShoppingCart,
+    ShoppingCartOutlined,
+    Star,
+    StarBorder,
+} from '@mui/icons-material';
+import {
+    Box,
+    Button,
+    Collapse,
+    FormControl,
+    IconButton,
+    List,
+    ListItemButton,
+    ListItemIcon,
+    ListItemText,
+    AppBar as MuiAppBar, Drawer as MuiDrawer,
+    Paper,
+    Tab,
+    TableCell,
+    TextField
 } from '@mui/material';
 import { styled } from '@mui/material/styles';
 import SvgIcon from '@mui/material/SvgIcon';
-
-import Person from '@mui/icons-material/Person';
-import Dashboard from '@mui/icons-material/Dashboard';
-import Settings from '@mui/icons-material/Settings';
-import Logout from '@mui/icons-material/Logout';
-import Favorite from '@mui/icons-material/Favorite';
-import Inbox from '@mui/icons-material/Inbox';
-import ShoppingCartIcon from '@mui/icons-material/ShoppingCart';
 
 export const BrownOutlinedTextField = styled(TextField)({
     '& .MuiOutlinedInput-root': {
@@ -252,11 +272,30 @@ export function HomeIcon(props) {
     );
 }
 
-export const StyledPersonIcon = styled(Person)({
+export const RoundIconButton = styled(IconButton)(({ theme }) => ({
+    color: theme.palette.primary.contrastText,
+    width: '40px',
+    height: '40px',
+}));
+
+export const ProfileButton = styled(IconButton)(({ theme }) => ({
+    color: 'black',
+    width: '100px',
+    height: '40px',
+    display: 'flex',
+    alignItems: 'center',
+    justifyContent: 'flex-start',
+    borderRadius: '0.125rem',
+    '&:hover': {
+        backgroundColor: theme.palette.action.hover,
+    },
+}));
+
+export const StyledPersonIcon = styled(PersonOutlined)({
     color: '#666666',
 });
 
-export const StyledDashboardIcon = styled(Dashboard)({
+export const StyledDashboardIcon = styled(DashboardOutlined)({
     color: '#666666',
 });
 
@@ -268,14 +307,14 @@ export const StyledLogoutIcon = styled(Logout)({
     color: '#666666',
 });
 
-export const StyledFavoriteIcon = styled(Favorite)({
+export const StyledFavoriteIcon = styled(FavoriteBorderOutlined)({
     color: '#666666',
 });
 
-export const StyledInboxIcon = styled(Inbox)({
+export const StyledInboxIcon = styled(InboxOutlined)({
     color: '#666666',
 });
 
-export const StyledShoppingCartIcon = styled(ShoppingCart)({
+export const StyledShoppingCartIcon = styled(ShoppingCartOutlined)({
     color: '#666666',
 });

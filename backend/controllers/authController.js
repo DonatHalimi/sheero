@@ -37,7 +37,7 @@ const registerUser = async (req, res) => {
     } catch (error) {
         res.status(500).json({ message: 'Server error' });
     }
-}
+};
 
 const loginUser = async (req, res) => {
     const { username, email, password } = req.body;
@@ -59,28 +59,19 @@ const loginUser = async (req, res) => {
             return res.status(400).json({ message: 'Invalid credentials' });
         }
 
-        const accessToken = jwt.sign({ userId: user._id, role: user.role }, process.env.JWT_SECRET, { expiresIn: '15m' });
-        const refreshToken = jwt.sign({ userId: user._id, role: user.role }, process.env.JWT_REFRESH_SECRET, { expiresIn: '7d' });
+        const accessToken = jwt.sign({ userId: user._id, role: user.role }, process.env.JWT_SECRET, { expiresIn: '1h' });
 
-        res.json({ accessToken, refreshToken, role: user.role });
+        // Include username and email in the response
+        res.json({
+            accessToken,
+            role: user.role,
+            username: user.username,
+            email: user.email
+        });
     } catch (error) {
         res.status(500).json({ message: 'Server error' });
     }
 };
-
-const token = (req, res) => {
-    const { token } = req.body;
-
-    if (!token) return res.status(401).json({ message: 'No token provided' });
-
-    jwt.verify(token, process.env.JWT_REFRESH_SECRET, (err, user) => {
-        if (err) return res.status(403).json({ message: 'Invalid token' });
-
-        const accessToken = jwt.sign({ userId: user.userId, role: user.role }, process.env.JWT_SECRET, { expiresIn: '15m' });
-
-        res.json({ accessToken });
-    });
-}
 
 const getCurrentUser = async (req, res) => {
     try {
@@ -88,11 +79,43 @@ const getCurrentUser = async (req, res) => {
         if (!user) {
             return res.status(404).json({ message: 'User not found' });
         }
-        res.json(user);
+        res.json({
+            username: user.username,
+            email: user.email,
+            role: user.role
+        });
     } catch (error) {
         res.status(500).json({ message: 'Server error' });
     }
 };
 
-module.exports = { registerUser, loginUser, token, getCurrentUser };
+const updateUserProfile = async (req, res) => {
+    const { username, email, password, newPassword } = req.body;
 
+    try {
+        const user = await User.findById(req.user.userId);
+        if (!user) {
+            return res.status(404).json({ message: 'User not found' });
+        }
+
+        if ((username || email || newPassword) && !await bcrypt.compare(password, user.password)) {
+            return res.status(400).json({ message: 'Incorrect current password' });
+        }
+
+        if (username) user.username = username;
+        if (email) user.email = email;
+        if (newPassword) user.password = await bcrypt.hash(newPassword, 10);
+
+        await user.save();
+
+        res.json({
+            username: user.username,
+            email: user.email,
+            role: user.role
+        });
+    } catch (error) {
+        res.status(500).json({ message: 'Server error' });
+    }
+};
+
+module.exports = { registerUser, loginUser, getCurrentUser, updateUserProfile };

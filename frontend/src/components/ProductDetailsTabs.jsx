@@ -1,5 +1,5 @@
-import { Box, Tabs, Typography, Modal, Button, IconButton } from '@mui/material';
 import CloseIcon from '@mui/icons-material/Close';
+import { Box, IconButton, Modal, Tabs, Typography } from '@mui/material';
 import React, { useEffect, useState } from 'react';
 import { CustomTab, RatingStars, ReviewCard } from '../assets/CustomComponents';
 import useAxios from '../axiosInstance';
@@ -49,7 +49,7 @@ const ProductDetailsTabs = ({ product }) => {
   const { description, details } = product;
 
   return (
-    <Box sx={{ width: '100%', display: 'flex', flexDirection: 'column', alignItems: 'flex-start' }}>
+    <Box sx={{ width: '100%', display: 'flex', flexDirection: 'column', alignItems: 'flex-start', marginBottom: 15 }}>
       <div style={{ width: '100%', display: 'flex', justifyContent: 'center' }}>
         <Tabs
           value={value}

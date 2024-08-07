@@ -1,11 +1,20 @@
-import React, { useState, useContext, useRef, useEffect } from 'react';
+import React, { useContext, useEffect, useRef, useState } from 'react';
 import { Link } from 'react-router-dom';
-import { BrownButton, OutlinedBrownButton, StyledFavoriteIcon, StyledInboxIcon } from '../assets/CustomComponents';
+import {
+    BrownButton,
+    OutlinedBrownButton,
+    ProfileButton,
+    RoundIconButton,
+    StyledDashboardIcon,
+    StyledFavoriteIcon,
+    StyledInboxIcon,
+    StyledLogoutIcon,
+    StyledPersonIcon,
+    StyledShoppingCartIcon,
+} from '../assets/CustomComponents';
 import logo from '../assets/logo.png';
 import { AuthContext } from '../context/AuthContext';
 import CategoryNavbar from './CategoryNavbar';
-import { Button } from '@mui/material';
-import { StyledPersonIcon, StyledDashboardIcon, StyledLogoutIcon, StyledShoppingCartIcon } from '../assets/CustomComponents'
 
 const Navbar = () => {
     const { auth, isAdmin, logout } = useContext(AuthContext);
@@ -45,10 +54,15 @@ const Navbar = () => {
                         <div className="flex items-center space-x-4">
                             {auth.accessToken ? (
                                 <>
-                                    <div className="relative" ref={dropdownRef}>
-                                        <Button onClick={handleDropdownToggle} className="flex items-center">
+                                    <div className="relative ml-4" ref={dropdownRef}>
+                                        <ProfileButton onClick={handleDropdownToggle} className="rounded-sm">
                                             <StyledPersonIcon />
-                                        </Button>
+                                            {auth.username && (
+                                                <span className="ml-2 text-sm">
+                                                    {auth.username}
+                                                </span>
+                                            )}
+                                        </ProfileButton>
                                         {isDropdownOpen && (
                                             <div className="absolute right-0 mt-2 w-48 bg-white border  shadow-lg rounded-lg p-2">
                                                 {isAdmin() && (
@@ -80,17 +94,18 @@ const Navbar = () => {
                                             </div>
                                         )}
                                     </div>
-                                    <li className='list-none'>
-                                        <ul className='flex justify-between list-none'>
-                                            <Link to='/wishlist'>
-                                                <StyledFavoriteIcon className='mr-6'/>
-                                            </Link>
-                                            <Link to='/cart'>
+                                    <div className='flex space-x-2'>
+                                        <Link to='/wishlist'>
+                                            <RoundIconButton>
+                                                <StyledFavoriteIcon />
+                                            </RoundIconButton>
+                                        </Link>
+                                        <Link to='/cart'>
+                                            <RoundIconButton>
                                                 <StyledShoppingCartIcon />
-                                            </Link>
-                                        </ul>
-                                    </li>
-
+                                            </RoundIconButton>
+                                        </Link>
+                                    </div>
                                 </>
                             ) : (
                                 <>

@@ -1,5 +1,5 @@
 import FavoriteIcon from '@mui/icons-material/FavoriteBorderOutlined';
-import { Breadcrumbs, Link, Typography, Skeleton } from '@mui/material';
+import { Breadcrumbs, Link, Skeleton, Typography } from '@mui/material';
 import axios from 'axios';
 import React, { useEffect, useState } from 'react';
 import { Link as RouterLink, useParams } from 'react-router-dom';
