@@ -27,7 +27,7 @@ const UsersPage = () => {
 
     const fetchUsers = async () => {
         try {
-            const response = await axiosInstance.get(`/users/get?page=${currentPage}&limit=${itemsPerPage}`);
+            const response = await axiosInstance.get(`/users/get`);
             setUsers(response.data.users);
         } catch (error) {
             console.error('Error fetching users', error);

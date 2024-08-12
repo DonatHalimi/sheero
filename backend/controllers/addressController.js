@@ -3,6 +3,14 @@ const Address = require('../models/Address');
 const createAddress = async (req, res) => {
     const { name, street, city, country } = req.body;
     try {
+        // Check if the user already has an address
+        const existingAddress = await Address.findOne({ user: req.user.userId });
+
+        if (existingAddress) {
+            return res.status(400).json({ message: 'You already have an address. Please update it instead.' });
+        }
+
+        // Create a new address
         const address = new Address({
             user: req.user.userId,
             name,
@@ -10,6 +18,7 @@ const createAddress = async (req, res) => {
             city,
             country
         });
+
         await address.save();
         res.status(201).json(address);
     } catch (error) {
@@ -45,21 +54,37 @@ const getAddress = async (req, res) => {
     }
 };
 
+const getUserAddress = async (req, res) => {
+    try {
+        const address = await Address.findOne({ user: req.user.userId })
+            .populate('city', 'name zipCode')
+            .populate('country', 'name');
+
+        if (!address) {
+            return res.status(404).json({ message: 'No address found for the current user' });
+        }
+
+        res.status(200).json(address);
+    } catch (error) {
+        console.error('Error fetching user address:', error);
+        res.status(500).json({ message: 'Server error' });
+    }
+};
+
 const updateAddress = async (req, res) => {
+    const addressId = req.params.id;
     const updates = req.body;
 
     try {
-        const address = await Address.findById(req.params.id);
+        // Find the address by ID and ensure it belongs to the current user
+        const address = await Address.findOne({ _id: addressId, user: req.user.userId });
 
         if (!address) {
-            return res.status(404).json({ message: 'Address not found' });
+            return res.status(404).json({ message: 'Address not found or does not belong to the user' });
         }
 
-        if (address.user.toString() !== req.user.userId) {
-            return res.status(403).json({ message: 'Unauthorized' });
-        }
-
-        const updatedAddress = await Address.findByIdAndUpdate(req.params.id, updates, { new: true, runValidators: true });
+        // Update the existing address
+        const updatedAddress = await Address.findByIdAndUpdate(address._id, updates, { new: true, runValidators: true });
 
         res.status(200).json(updatedAddress);
     } catch (error) {
@@ -100,4 +125,4 @@ const deleteAddresses = async (req, res) => {
     }
 };
 
-module.exports = { createAddress, getAddresses, getAddress, updateAddress, deleteAddress, deleteAddresses };
+module.exports = { createAddress, getAddresses, getAddress, getUserAddress, updateAddress, deleteAddress, deleteAddresses };

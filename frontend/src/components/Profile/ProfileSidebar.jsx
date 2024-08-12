@@ -22,7 +22,7 @@ const ProfileSidebar = () => {
     };
 
     return (
-        <div className="relative top-[96px] left-0 w-430 h-370 bg-white p-5 shadow-lg rounded-sm">
+        <div className="relative top-[96px] left-0 w-430 h-full bg-white p-5 shadow-lg rounded-sm">
             <Typography variant="h6" gutterBottom>
                 Hello, {auth.username}
             </Typography>
@@ -33,7 +33,7 @@ const ProfileSidebar = () => {
                     handleClick={() => handleItemClick('profile')}
                     selected={activeItem === 'profile'}
                     icon={<StyledPersonIcon />}
-                    primary="Personal data"
+                    primary="Profile"
                 />
                 <ActiveListItem
                     handleClick={() => handleItemClick('addresses')}

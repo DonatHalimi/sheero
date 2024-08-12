@@ -1,7 +1,7 @@
 const mongoose = require('mongoose');
 
 const addressSchema = new mongoose.Schema({
-    user: { type: mongoose.Schema.Types.ObjectId, ref: 'User', required: true },
+    user: { type: mongoose.Schema.Types.ObjectId, ref: 'User', unique: true, required: true },
     name: { type: String, required: true },
     street: { type: String, required: true },
     city: { type: mongoose.Schema.Types.ObjectId, ref: 'City', required: true },

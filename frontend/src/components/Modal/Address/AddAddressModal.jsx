@@ -13,8 +13,7 @@ const AddAddressModal = ({ open, onClose, onAddSuccess }) => {
     const [cities, setCities] = useState([]);
     const [countries, setCountries] = useState([]);
 
-    const { refreshToken } = useContext(AuthContext);
-    const axiosInstance = useAxios(refreshToken);
+    const axiosInstance = useAxios();
 
     useEffect(() => {
         const fetchCountries = async () => {

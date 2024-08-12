@@ -13,8 +13,7 @@ const EditAddressModal = ({ open, onClose, address, onEditSuccess }) => {
     const [cities, setCities] = useState([]);
     const [countries, setCountries] = useState([]);
 
-    const { refreshToken } = useContext(AuthContext);
-    const axiosInstance = useAxios(refreshToken);
+    const axiosInstance = useAxios();
 
     useEffect(() => {
         if (address) {

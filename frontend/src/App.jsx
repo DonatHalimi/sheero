@@ -19,7 +19,7 @@ import ProductsByCategory from './pages/Product/ProductsByCategory.jsx';
 import ProductsBySubcategory from './pages/Product/ProductsBySubcategory.jsx';
 import ProductsBySubSubCategory from './pages/Product/ProductsBySubSubCategory.jsx';
 import Reviews from './components/Profile/Reviews.jsx';
-import Addresses from './components/Profile/Addresses.jsx';
+import Addresses from './components/Profile/AddressInformation.jsx';
 import Orders from './components/Profile/Orders.jsx';
 import Wishlist from './components/Profile/Wishlist.jsx';
 

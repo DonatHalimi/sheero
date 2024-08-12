@@ -6,8 +6,7 @@ import useAxios from '../../../axiosInstance';
 import { AuthContext } from '../../../context/AuthContext';
 
 const DeleteAddressModal = ({ open, onClose, addresses, onDeleteSuccess }) => {
-    const { refreshToken } = useContext(AuthContext);
-    const axiosInstance = useAxios(refreshToken);
+    const axiosInstance = useAxios();
 
     const handleDeleteAddresses = async () => {
         try {

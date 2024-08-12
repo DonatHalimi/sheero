@@ -48,6 +48,13 @@ const loginUser = async (req, res) => {
                 { username: username || email },
                 { email: email || username }
             ]
+        })
+        .populate({
+            path: 'address',
+            populate: { 
+                path: 'city country', 
+                model: ['City', 'Country'] // populate related city and country data
+            }
         });
 
         if (!user) {
@@ -61,14 +68,15 @@ const loginUser = async (req, res) => {
 
         const accessToken = jwt.sign({ userId: user._id, role: user.role }, process.env.JWT_SECRET, { expiresIn: '1h' });
 
-        // Include username and email in the response
         res.json({
             accessToken,
             role: user.role,
             username: user.username,
-            email: user.email
+            email: user.email,
+            address: user.address || {}, // Address is returned here
         });
     } catch (error) {
+        console.error('Server error during login:', error);
         res.status(500).json({ message: 'Server error' });
     }
 };
