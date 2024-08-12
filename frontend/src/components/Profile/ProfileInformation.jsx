@@ -5,11 +5,11 @@ import axios from 'axios';
 import React, { useContext, useState } from 'react';
 import { toast } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
+import { BrownOutlinedTextField } from '../../assets/CustomComponents';
 import { AuthContext } from '../../context/AuthContext';
 import Footer from '../Footer';
 import Navbar from '../Navbar';
 import ProfileSidebar from './ProfileSidebar';
-import { BrownOutlinedTextField } from '../../assets/CustomComponents';
 
 const ProfileInformation = () => {
     const { auth, setAuth } = useContext(AuthContext);
@@ -25,7 +25,7 @@ const ProfileInformation = () => {
 
     const handleClickShowPassword = () => setShowPassword(!showPassword);
     const handleClickShowNewPassword = () => setShowNewPassword(!showNewPassword);
-    const handleMouseDownPassword = (event) => event.preventDefault(); 
+    const handleMouseDownPassword = (event) => event.preventDefault();
 
     const handleChange = (e) => {
         setFormData({ ...formData, [e.target.name]: e.target.value });

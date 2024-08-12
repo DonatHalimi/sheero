@@ -1,15 +1,10 @@
-import VisibilityIcon from '@mui/icons-material/Visibility';
-import VisibilityOffIcon from '@mui/icons-material/VisibilityOff';
-import { Box, Button, IconButton, InputAdornment, TextField, Typography } from '@mui/material';
-import axios from 'axios';
-import React, { useContext, useState } from 'react';
-import { toast } from 'react-toastify';
+import { Box, Button, TextField, Typography } from '@mui/material';
+import React from 'react';
 import 'react-toastify/dist/ReactToastify.css';
-import { AuthContext } from '../../context/AuthContext';
+import { BrownOutlinedTextField } from '../../assets/CustomComponents';
 import Footer from '../Footer';
 import Navbar from '../Navbar';
 import ProfileSidebar from './ProfileSidebar';
-import { BrownOutlinedTextField } from '../../assets/CustomComponents';
 
 const Wishlist = () => {
     // TODO

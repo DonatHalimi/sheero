@@ -1,12 +1,12 @@
+import { Box, Button, FormControl, InputLabel, MenuItem, Select, TextField, Typography } from '@mui/material';
 import React, { useContext, useEffect, useState } from 'react';
-import { Box, Button, TextField, Typography, MenuItem, Select, InputLabel, FormControl } from '@mui/material';
 import { toast } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
-import { AuthContext } from '../../context/AuthContext';
-import Navbar from '../Navbar';
-import Footer from '../Footer';
-import ProfileSidebar from './ProfileSidebar';
 import useAxios from '../../axiosInstance';
+import { AuthContext } from '../../context/AuthContext';
+import Footer from '../Footer';
+import Navbar from '../Navbar';
+import ProfileSidebar from './ProfileSidebar';
 
 const AddressInformation = () => {
     const { auth, setAuth } = useContext(AuthContext);

@@ -7,30 +7,17 @@ import NoImage from '../assets/not-found.jpg';
 
 const ProductItem = ({ product, loading }) => {
     const navigate = useNavigate();
-    const name = product?.name || "";
-    const imageUrl = `http://localhost:5000/${product?.image}`;
-    const originalPrice = product?.price || 0;
-    const discountPercentage = product?.discount?.value || 0;
-    const discountedPrice = product?.salePrice || originalPrice;
+    const { _id, name, image, price, discount, salePrice } = product || {};
+    const imageUrl = `http://localhost:5000/${image}`;
+    const discountPercentage = discount?.value || 0;
+    const finalPrice = salePrice || price || 0;
 
-    const handleClick = () => {
-        if (product?._id) {
-            navigate(`/product/${product._id}`);
-        } else {
-            console.error("Product ID is undefined");
-        }
-    };
+    const handleClick = () => _id ? navigate(`/product/${_id}`) : console.error("Product ID is undefined");
 
-    const handleAddToCart = (e) => {
+    const handleAction = (action) => (e) => {
         e.stopPropagation();
-        console.log("Adding to cart:", product);
+        console.log(`Adding to ${action}:`, product);
     };
-
-    const handleAddToWishlist = (e) => {
-        e.stopPropagation();
-        console.log("Adding to wishlist:", product);
-    };
-
 
     return (
         <div className="bg-white rounded-lg shadow-md p-4 flex flex-col cursor-pointer" onClick={handleClick}>
@@ -38,17 +25,19 @@ const ProductItem = ({ product, loading }) => {
                 {loading ? (
                     <Skeleton variant="rectangular" width="100%" height={192} />
                 ) : (
-                    <img
-                        src={imageUrl}
-                        alt={name}
-                        className="w-full h-48 object-cover rounded"
-                        onError={(e) => { e.target.onerror = null; e.target.src = NoImage; }}
-                    />
-                )}
-                {!loading && discountPercentage > 0 && (
-                    <span className="absolute top-2 right-2 bg-red-400 text-white px-2 py-1 rounded text-xs">
-                        -{discountPercentage}%
-                    </span>
+                    <>
+                        <img
+                            src={imageUrl}
+                            alt={name}
+                            className="w-full h-48 object-cover rounded"
+                            onError={(e) => { e.target.onerror = null; e.target.src = NoImage; }}
+                        />
+                        {discountPercentage > 0 && (
+                            <span className="absolute top-2 right-2 bg-red-400 text-white px-2 py-1 rounded text-xs">
+                                -{discountPercentage}%
+                            </span>
+                        )}
+                    </>
                 )}
             </div>
             <h2 className="font-semibold mt-2 h-10 overflow-hidden">
@@ -56,11 +45,11 @@ const ProductItem = ({ product, loading }) => {
             </h2>
             <div className="flex flex-col mb-2">
                 <span className="font-bold text-lg">
-                    {loading ? <Skeleton variant="text" width="60%" /> : `${discountedPrice.toFixed(2)} €`}
+                    {loading ? <Skeleton variant="text" width="60%" /> : `${finalPrice.toFixed(2)} €`}
                 </span>
                 {!loading && discountPercentage > 0 && (
                     <span className="text-gray-500 line-through text-sm">
-                        {originalPrice.toFixed(2)} €
+                        {price.toFixed(2)} €
                     </span>
                 )}
             </div>
@@ -72,10 +61,10 @@ const ProductItem = ({ product, loading }) => {
                     </>
                 ) : (
                     <>
-                        <AddToCartButton onClick={handleAddToCart}>
+                        <AddToCartButton onClick={handleAction('cart')}>
                             <BrownShoppingCartIcon /> Add To Cart
                         </AddToCartButton>
-                        <WishlistButton onClick={handleAddToWishlist}>
+                        <WishlistButton onClick={handleAction('wishlist')}>
                             <FavoriteIcon />
                         </WishlistButton>
                     </>

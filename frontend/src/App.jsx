@@ -4,7 +4,11 @@ import { ToastContainer } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
 import pages from './assets/dashboardPages.js';
 import DashboardLayout from './components/Dashboard/DashboardLayout';
+import Addresses from './components/Profile/AddressInformation.jsx';
+import Orders from './components/Profile/Orders.jsx';
 import Profile from './components/Profile/ProfileInformation.jsx';
+import Reviews from './components/Profile/Reviews.jsx';
+import Wishlist from './components/Profile/Wishlist.jsx';
 import ProtectedRoute from './components/Route/ProtectedRoute';
 import PublicRoute from './components/Route/PublicRoute';
 import ToTop from './components/ToTop';
@@ -18,10 +22,6 @@ import ProductDetails from './pages/Product/ProductDetails.jsx';
 import ProductsByCategory from './pages/Product/ProductsByCategory.jsx';
 import ProductsBySubcategory from './pages/Product/ProductsBySubcategory.jsx';
 import ProductsBySubSubCategory from './pages/Product/ProductsBySubSubCategory.jsx';
-import Reviews from './components/Profile/Reviews.jsx';
-import Addresses from './components/Profile/AddressInformation.jsx';
-import Orders from './components/Profile/Orders.jsx';
-import Wishlist from './components/Profile/Wishlist.jsx';
 
 const App = () => (
   <Router>
@@ -44,7 +44,7 @@ const App = () => (
 
       <Route path="/profile" element={<ProtectedRoute><Profile /></ProtectedRoute>} />
       <Route path="/addresses" element={<ProtectedRoute><Addresses /></ProtectedRoute>} />
-      <Route path="/orders" element={<ProtectedRoute><Orders/></ProtectedRoute>} />
+      <Route path="/orders" element={<ProtectedRoute><Orders /></ProtectedRoute>} />
       <Route path="/wishlist" element={<ProtectedRoute><Wishlist /></ProtectedRoute>} />
       <Route path="/reviews" element={<ProtectedRoute><Reviews /></ProtectedRoute>} />
 

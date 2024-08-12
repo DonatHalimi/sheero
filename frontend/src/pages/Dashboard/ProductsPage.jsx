@@ -1,8 +1,8 @@
-import { Checkbox, Paper, Table, TableBody, TableCell, TableContainer, TableHead, TableRow, Typography } from '@mui/material';
+import { Typography } from '@mui/material';
 import React, { useContext, useEffect, useState } from 'react';
-import ReactPaginate from 'react-paginate';
-import { ActionButton, BoldTableCell, BrownCreateOutlinedIcon, OutlinedBrownButton } from '../../assets/CustomComponents';
+import { ActionButton, BrownCreateOutlinedIcon, OutlinedBrownButton } from '../../assets/CustomComponents';
 import useAxios from '../../axiosInstance';
+import DashboardTable from '../../components/Dashboard/DashboardTable';
 import AddProductModal from '../../components/Modal/Product/AddProductModal';
 import DeleteProductModal from '../../components/Modal/Product/DeleteProductModal';
 import EditProductModal from '../../components/Modal/Product/EditProductModal';
@@ -34,193 +34,97 @@ const ProductsPage = () => {
         }
     };
 
-
     const handleSelectProduct = (productId) => {
-        setSelectedProducts((prevSelected) => {
-            if (prevSelected.includes(productId)) {
-                return prevSelected.filter(id => id !== productId);
-            } else {
-                return [...prevSelected, productId];
-            }
-        });
+        setSelectedProducts((prevSelected) =>
+            prevSelected.includes(productId)
+                ? prevSelected.filter(id => id !== productId)
+                : [...prevSelected, productId]
+        );
     };
 
     const handleSelectAll = (e) => {
-        if (e.target.checked) {
-            setSelectedProducts(products.map(product => product._id));
-        } else {
-            setSelectedProducts([]);
-        }
-    };
-
-    const ITEMS_TO_SHOW = 3;
-
-    const truncateItems = (items, maxItems = ITEMS_TO_SHOW) => {
-        if (items.length <= maxItems) {
-            return items;
-        }
-        return [...items.slice(0, maxItems), '...'];
-    };
-    const pageCount = Math.ceil(products.length / itemsPerPage);
-    const isPreviousDisabled = currentPage === 0;
-    const isNextDisabled = currentPage >= pageCount - 1;
-    const paginationEnabled = pageCount && pageCount > 1;
-
-    const getCurrentPageItems = () => {
-        const startIndex = currentPage * itemsPerPage;
-        return products.slice(startIndex, startIndex + itemsPerPage);
+        setSelectedProducts(e.target.checked ? products.map(product => product._id) : []);
     };
 
     const handlePageClick = (event) => {
         setCurrentPage(event.selected);
     };
 
+    // Utility function to truncate items
+    const truncateItems = (items, maxItems = 3) => {
+        if (items.length <= maxItems) {
+            return items;
+        }
+        return [...items.slice(0, maxItems), '...'];
+    };
+
+    const columns = [
+        { key: 'checkbox', label: 'checkbox' },
+        { key: 'name', label: 'Name' },
+        { key: 'description', label: 'Description' },
+        { key: 'details', label: 'Details', render: (item) => truncateItems(item.details.map(detail => `${detail.attribute}: ${detail.value}`)).join(', ') },
+        { key: 'price', label: 'Price' },
+        { key: 'salePrice', label: 'Sale Price' },
+        { key: 'category.name', label: 'Category' },
+        { key: 'subcategory.name', label: 'Subcategory' },
+        { key: 'subSubcategory.name', label: 'SubSubcategory' },
+        { key: 'inventoryCount', label: 'Inventory Count' },
+        { key: 'dimensions', label: 'Dimensions', render: (item) => item.dimensions ? `${item.dimensions.length} x ${item.dimensions.width} x ${item.dimensions.height} ${item.dimensions.unit}` : 'N/A' },
+        { key: 'variants', label: 'Variants', render: (item) => truncateItems(item.variants.map(variant => `Color: ${variant.color}, Size: ${variant.size}`)).join(', ') },
+        { key: 'discount', label: 'Discount', render: (item) => item.discount ? `${item.discount.value}${item.discount.type === 'percentage' ? '%' : ''}` : 'N/A' },
+        { key: 'supplier.name', label: 'Supplier' },
+        { key: 'shipping', label: 'Shipping', render: (item) => item.shipping ? `${item.shipping.weight} kg, ${item.shipping.cost}€, ${item.shipping.packageSize}` : 'None' },
+        { key: 'image', label: 'Image', render: (item) => <img className='rounded-md' src={`http://localhost:5000/${item.image}`} alt="" width={80} /> },
+        { key: 'actions', label: 'Actions' }
+    ];
+
+    const renderActionButtons = (product) => (
+        <ActionButton onClick={() => { setSelectedProduct(product); setEditProductOpen(true); }}>
+            <BrownCreateOutlinedIcon />
+        </ActionButton>
+    );
+
+    const renderTableActions = () => (
+        <div className='flex items-center justify-between w-full mb-4'>
+            <Typography variant='h5'>Products</Typography>
+            <div>
+                <OutlinedBrownButton onClick={() => setAddProductOpen(true)} className='!mr-4'>
+                    Add Product
+                </OutlinedBrownButton>
+                {selectedProducts.length > 0 && (
+                    <OutlinedBrownButton
+                        onClick={() => setDeleteProductOpen(true)}
+                        disabled={selectedProducts.length === 0}
+                    >
+                        {selectedProducts.length > 1 ? 'Delete Selected Products' : 'Delete Product'}
+                    </OutlinedBrownButton>
+                )}
+            </div>
+        </div>
+    );
+
     return (
-        <>
-            <div className='container mx-auto max-w-full mt-20'>
-                <div className='w-full px-4'>
-                    <div className='flex items-center justify-between w-full mb-4'>
-                        <Typography variant='h5'>Products</Typography>
-                        <div>
-                            <OutlinedBrownButton onClick={() => setAddProductOpen(true)} className='!mr-4'>Add Product</OutlinedBrownButton>
-                            {selectedProducts.length > 0 && (
-                                <OutlinedBrownButton
-                                    onClick={() => setDeleteProductOpen(true)}
-                                    disabled={selectedProducts.length === 0}
-                                >
-                                    {selectedProducts.length > 1 ? 'Delete Selected Products' : 'Delete Product'}
-                                </OutlinedBrownButton>
-                            )}
-                        </div>
-                    </div>
-                    <TableContainer component={Paper} className='w-full mx-auto'>
-                        <Table>
-                            <TableHead>
-                                <TableRow>
-                                    <BoldTableCell>
-                                        <Checkbox
-                                            checked={selectedProducts.length === products.length}
-                                            onChange={handleSelectAll}
-                                        />
-                                    </BoldTableCell>
-                                    <BoldTableCell>Name</BoldTableCell>
-                                    <BoldTableCell>Description</BoldTableCell>
-                                    <BoldTableCell>Details</BoldTableCell>
-                                    <BoldTableCell>Price</BoldTableCell>
-                                    <BoldTableCell>Sale Price</BoldTableCell>
-                                    <BoldTableCell>Category</BoldTableCell>
-                                    <BoldTableCell>Subcategory</BoldTableCell>
-                                    <BoldTableCell>SubSubcategory</BoldTableCell>
-                                    <BoldTableCell>Inventory Count</BoldTableCell>
-                                    <BoldTableCell>Dimensions</BoldTableCell>
-                                    <BoldTableCell>Variants</BoldTableCell>
-                                    <BoldTableCell>Discount</BoldTableCell>
-                                    <BoldTableCell>Supplier</BoldTableCell>
-                                    <BoldTableCell>Shipping</BoldTableCell>
-                                    <BoldTableCell>Image</BoldTableCell>
-                                    <BoldTableCell>Actions</BoldTableCell>
-                                </TableRow>
-                            </TableHead>
+        <div className='container mx-auto max-w-full mt-20'>
+            <div className='w-full px-4'>
+                <DashboardTable
+                    columns={columns}
+                    data={products}
+                    selectedItems={selectedProducts}
+                    onSelectItem={handleSelectProduct}
+                    onSelectAll={handleSelectAll}
+                    itemsPerPage={itemsPerPage}
+                    currentPage={currentPage}
+                    onPageChange={handlePageClick}
+                    renderActionButtons={renderActionButtons}
+                    renderTableActions={renderTableActions}
+                    containerClassName="max-w-full"
+                />
 
-                            <TableBody>
-                                {getCurrentPageItems().length > 0 ? (
-                                    getCurrentPageItems().map((product) => (
-                                        <TableRow key={product._id}>
-                                            <TableCell>
-                                                <Checkbox
-                                                    checked={selectedProducts.includes(product._id)}
-                                                    onChange={() => handleSelectProduct(product._id)}
-                                                />
-                                            </TableCell>
-                                            <TableCell>{product?.name || 'N/A'}</TableCell>
-                                            <TableCell>{product?.description || 'N/A'}</TableCell>
-                                            <TableCell>
-                                                {product?.details && product.details.length > 0 ? (
-                                                    truncateItems(product.details.map((detail, index) => (
-                                                        <div key={index}>
-                                                            <Typography fontSize='small'>{`${detail.attribute}: ${detail.value}`}</Typography>
-                                                        </div>
-                                                    )), ITEMS_TO_SHOW).map((item, index) => (
-                                                        <div key={index}>{item}</div>
-                                                    ))
-                                                ) : 'N/A'}
-                                            </TableCell>
-                                            <TableCell>{product?.price || '0'}</TableCell>
-                                            <TableCell>{product?.salePrice || '0'}</TableCell>
-                                            <TableCell>{product?.category?.name || 'N/A'}</TableCell>
-                                            <TableCell>{product?.subcategory?.name || 'N/A'}</TableCell>
-                                            <TableCell>{product?.subSubcategory?.name || 'N/A'}</TableCell>
-                                            <TableCell>{product?.inventoryCount || 'N/A'}</TableCell>
-                                            <TableCell>
-                                                {product?.dimensions ? `${product.dimensions.length} x ${product.dimensions.width} x ${product.dimensions.height} ${product.dimensions.unit}` : 'N/A'}
-                                            </TableCell>
-                                            <TableCell>
-                                                {product?.variants && product.variants.length > 0 ? (
-                                                    truncateItems(product.variants.map((variant, index) => (
-                                                        <div key={index}>
-                                                            <Typography fontSize='small'>{`Color: ${variant.color}, Size: ${variant.size}`}</Typography>
-                                                        </div>
-                                                    )), ITEMS_TO_SHOW).map((item, index) => (
-                                                        <div key={index}>{item}</div>
-                                                    ))
-                                                ) : 'N/A'}
-                                            </TableCell>
-                                            <TableCell>
-                                                {product?.discount ?
-                                                    (product.discount.type === 'percentage'
-                                                        ? `${product.discount.value}%`
-                                                        : `${product.discount.value}`)
-                                                    : 'N/A'}
-                                            </TableCell>
-                                            <TableCell>{product?.supplier?.name || 'N/A'}</TableCell>
-                                            <TableCell>
-                                                {product?.shipping ? `${product.shipping.weight} kg, ${product.shipping.cost}€, ${product.shipping.packageSize}` : 'None'}
-                                            </TableCell>
-                                            <TableCell><img className='rounded-md' src={`http://localhost:5000/${product?.image || ''}`} alt="" width={80} /></TableCell>
-                                            <TableCell>
-                                                <ActionButton onClick={() => { setSelectedProduct(product); setEditProductOpen(true); }}><BrownCreateOutlinedIcon /></ActionButton>
-                                            </TableCell>
-                                        </TableRow>
-                                    ))
-                                ) : (
-                                    <TableRow>
-                                        <TableCell colSpan={17} align="center">
-                                            No product found
-                                        </TableCell>
-                                    </TableRow>
-                                )}
-                            </TableBody>
-                        </Table>
-                    </TableContainer>
-
-                    <AddProductModal open={addProductOpen} onClose={() => setAddProductOpen(false)} onAddSuccess={fetchProducts} />
-                    <EditProductModal open={editProductOpen} onClose={() => setEditProductOpen(false)} product={selectedProduct} onEditSuccess={fetchProducts} />
-                    <DeleteProductModal open={deleteProductOpen} onClose={() => setDeleteProductOpen(false)} products={selectedProducts.map(id => products.find(product => product._id === id))} onDeleteSuccess={fetchProducts} />
-
-                    {products.length > 0 && paginationEnabled && (
-                        <div className="w-full flex justify-start mt-6 mb-24">
-                            <ReactPaginate
-                                pageCount={pageCount}
-                                pageRangeDisplayed={2}
-                                marginPagesDisplayed={1}
-                                onPageChange={handlePageClick}
-                                containerClassName="inline-flex -space-x-px text-sm"
-                                activeClassName="text-white bg-stone-400"
-                                previousLinkClassName={`flex items-center justify-center px-1 h-10 text-gray-500 bg-white border border-e-0 border-gray-300 rounded-sm hover:bg-gray-100 hover:text-gray-700 ${isPreviousDisabled ? 'pointer-events-none text-gray-300' : ''}`}
-                                nextLinkClassName={`flex items-center justify-center px-1 h-10 text-gray-500 bg-white border border-gray-300 rounded-sm hover:bg-gray-100 hover:text-gray-700 ${isNextDisabled ? 'pointer-events-none text-gray-300' : ''}`}
-                                disabledClassName="text-gray-50 cursor-not-allowed"
-                                activeLinkClassName="text-stone-600 font-extrabold"
-                                previousLabel={<span className="flex items-center justify-center px-2 h-10 text-gray-500 hover:text-gray-700">Previous</span>}
-                                nextLabel={<span className="flex items-center justify-center px-2 h-10 text-gray-500 hover:text-gray-700">Next</span>}
-                                breakLabel={<span className="flex items-center justify-center px-4 h-10 text-gray-500 bg-white border border-gray-300">...</span>}
-                                pageClassName="flex items-center justify-center px-1 h-10 text-gray-500 border border-gray-300 cursor-pointer bg-white"
-                                pageLinkClassName="flex items-center justify-center px-3 h-10 text-gray-500 cursor-pointer"
-                            />
-                        </div>
-                    )}
-                </div>
-            </div >
-        </>
+                <AddProductModal open={addProductOpen} onClose={() => setAddProductOpen(false)} onAddSuccess={fetchProducts} />
+                <EditProductModal open={editProductOpen} onClose={() => setEditProductOpen(false)} product={selectedProduct} onEditSuccess={fetchProducts} />
+                <DeleteProductModal open={deleteProductOpen} onClose={() => setDeleteProductOpen(false)} products={selectedProducts.map(id => products.find(product => product._id === id))} onDeleteSuccess={fetchProducts} />
+            </div>
+        </div>
     );
 };
 

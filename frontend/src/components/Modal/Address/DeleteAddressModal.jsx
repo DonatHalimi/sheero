@@ -1,9 +1,8 @@
 import { Box, Button, Modal } from '@mui/material';
-import React, { useContext } from 'react';
+import React from 'react';
 import { toast } from 'react-toastify';
 import { OutlinedBrownButton } from '../../../assets/CustomComponents';
 import useAxios from '../../../axiosInstance';
-import { AuthContext } from '../../../context/AuthContext';
 
 const DeleteAddressModal = ({ open, onClose, addresses, onDeleteSuccess }) => {
     const axiosInstance = useAxios();

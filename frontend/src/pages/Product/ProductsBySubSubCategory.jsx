@@ -4,6 +4,7 @@ import ReactPaginate from 'react-paginate';
 import { useParams } from 'react-router-dom';
 import Footer from '../../components/Footer';
 import Navbar from '../../components/Navbar';
+import { ProductPagination } from '../../components/Dashboard/Pagination';
 import ProductItem from '../../components/ProductItem';
 import Slideshow from '../../components/Slideshow';
 
@@ -73,18 +74,19 @@ const ProductsBySubSubCategory = () => {
                             pageCount={pageCount}
                             pageRangeDisplayed={2}
                             marginPagesDisplayed={1}
-                            onPageChange={handlePageClick}
-                            containerClassName="inline-flex -space-x-px text-sm"
-                            activeClassName="text-stone-600 bg-stone-500"
-                            previousLinkClassName={`flex items-center justify-center px-1 h-10 text-gray-500 bg-white border border-e-0 border-gray-300 rounded-sm hover:bg-gray-100 hover:text-gray-700 ${isPreviousDisabled ? 'pointer-events-none text-gray-300' : ''}`}
-                            nextLinkClassName={`flex items-center justify-center px-1 h-10 text-gray-500 bg-white border border-gray-300 rounded-sm hover:bg-gray-100 hover:text-gray-700 ${isNextDisabled ? 'pointer-events-none text-gray-300' : ''}`}
-                            disabledClassName="text-gray-50 cursor-not-allowed"
-                            activeLinkClassName="text-stone-700 font-extrabold"
-                            previousLabel={<span className="flex items-center justify-center px-2 h-10 text-gray-500 hover:text-gray-700">Previous</span>}
-                            nextLabel={<span className="flex items-center justify-center px-2 h-10 text-gray-500 hover:text-gray-700">Next</span>}
-                            breakLabel={<span className="flex items-center justify-center px-4 h-10 text-gray-500 bg-white border border-gray-300">...</span>}
-                            pageClassName="flex items-center justify-center px-1 h-10 text-gray-500 border border-gray-300 cursor-pointer bg-white"
-                            pageLinkClassName="flex items-center justify-center px-3 h-10 text-gray-500 cursor-pointer"
+                            onPageChange={({ selected }) => setCurrentPage(selected)}
+                            containerClassName={ProductPagination.container}
+                            activeClassName={ProductPagination.active}
+                            pageClassName={ProductPagination.page}
+                            pageLinkClassName={ProductPagination.link}
+                            disabledClassName={ProductPagination.disabled}
+                            activeLinkClassName={ProductPagination.activeLink}
+                            previousLabel="Previous"
+                            nextLabel="Next"
+                            breakLabel="..."
+                            breakClassName={ProductPagination.break}
+                            previousClassName={`${ProductPagination.nav} ${currentPage === 0 ? ProductPagination.disabled : ''}`}
+                            nextClassName={`${ProductPagination.nav} ${currentPage >= pageCount - 1 ? ProductPagination.disabled : ''}`}
                         />
                     </div>
                 )}

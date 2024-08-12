@@ -39,7 +39,7 @@ const ProfileSidebar = () => {
                     handleClick={() => handleItemClick('addresses')}
                     selected={activeItem === 'addresses'}
                     icon={<HomeOutlined />}
-                    primary="Addresses"
+                    primary="Address"
                 />
                 <ActiveListItem
                     handleClick={() => handleItemClick('orders')}

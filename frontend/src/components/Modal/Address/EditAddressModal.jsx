@@ -1,9 +1,8 @@
 import { Box, InputLabel, MenuItem, Modal, Select, Typography } from '@mui/material';
-import React, { useContext, useEffect, useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import { toast } from 'react-toastify';
 import { BrownButton, BrownOutlinedTextField, OutlinedBrownFormControl } from '../../../assets/CustomComponents';
 import useAxios from '../../../axiosInstance';
-import { AuthContext } from '../../../context/AuthContext';
 
 const EditAddressModal = ({ open, onClose, address, onEditSuccess }) => {
     const [name, setName] = useState('');
