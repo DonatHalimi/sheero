@@ -35,10 +35,12 @@ const ProductsPage = () => {
     };
 
     const handleSelectProduct = (productId) => {
+        const id = Array.isArray(productId) ? productId[0] : productId;
+
         setSelectedProducts((prevSelected) =>
-            prevSelected.includes(productId)
-                ? prevSelected.filter(id => id !== productId)
-                : [...prevSelected, productId]
+            prevSelected.includes(id)
+                ? prevSelected.filter((selectedId) => selectedId !== id)
+                : [...prevSelected, id]
         );
     };
 
@@ -59,12 +61,11 @@ const ProductsPage = () => {
     };
 
     const columns = [
-        { key: 'checkbox', label: 'checkbox' },
         { key: 'name', label: 'Name' },
         { key: 'description', label: 'Description' },
         { key: 'details', label: 'Details', render: (item) => truncateItems(item.details.map(detail => `${detail.attribute}: ${detail.value}`)).join(', ') },
         { key: 'price', label: 'Price' },
-        { key: 'salePrice', label: 'Sale Price' },
+        { key: 'salePrice', label: 'Sale Price', render: (item) => item.salePrice ? item.salePrice : 'N/A' },
         { key: 'category.name', label: 'Category' },
         { key: 'subcategory.name', label: 'Subcategory' },
         { key: 'subSubcategory.name', label: 'SubSubcategory' },

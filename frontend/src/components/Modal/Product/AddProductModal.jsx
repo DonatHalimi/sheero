@@ -1,8 +1,8 @@
 import UploadIcon from '@mui/icons-material/Upload';
-import { Box, InputLabel, MenuItem, Modal, Select, Typography } from '@mui/material';
+import { Box, InputLabel, MenuItem, Modal, Typography, TextField, Autocomplete, Select } from '@mui/material';
 import React, { useContext, useEffect, useState } from 'react';
 import { toast } from 'react-toastify';
-import { BrownButton, BrownOutlinedTextField, OutlinedBrownButton, OutlinedBrownFormControl, VisuallyHiddenInput } from '../../../assets/CustomComponents';
+import { BrownButton, BrownOutlinedTextField, OutlinedBrownButton, OutlinedBrownFormControl, VisuallyHiddenInput, CustomPaper } from '../../../assets/CustomComponents';
 import useAxios from '../../../axiosInstance';
 import { AuthContext } from '../../../context/AuthContext';
 
@@ -11,9 +11,9 @@ const AddProductModal = ({ open, onClose, onAddSuccess }) => {
     const [description, setDescription] = useState('');
     const [price, setPrice] = useState('');
     const [salePrice, setSalePrice] = useState('');
-    const [category, setCategory] = useState('');
-    const [subcategory, setSubcategory] = useState('');
-    const [subSubcategory, setSubSubcategory] = useState('');
+    const [category, setCategory] = useState(null);
+    const [subcategory, setSubcategory] = useState(null);
+    const [subSubcategory, setSubSubcategory] = useState(null);
     const [inventoryCount, setInventoryCount] = useState('');
     const [image, setImage] = useState(null);
     const [imagePreview, setImagePreview] = useState(null);
@@ -27,7 +27,7 @@ const AddProductModal = ({ open, onClose, onAddSuccess }) => {
     const [variants, setVariants] = useState([{ color: '', size: '' }]);
     const [discountType, setDiscountType] = useState('percentage');
     const [discountValue, setDiscountValue] = useState(0);
-    const [supplier, setSupplier] = useState('');
+    const [supplier, setSupplier] = useState(null);
     const [suppliers, setSuppliers] = useState([]);
     const [weight, setWeight] = useState('');
     const [shippingCost, setShippingCost] = useState('');
@@ -40,37 +40,46 @@ const AddProductModal = ({ open, onClose, onAddSuccess }) => {
     useEffect(() => {
         const TIMEOUT = 15000;
 
-        async function fetchCategoriesAndSubcategories() {
+        const fetchCategoriesAndSubcategories = async () => {
             try {
-                const response = await axiosInstance.get('/categories/get', {
-                    timeout: TIMEOUT,
-                });
-                setCategories(response.data);
+                const [categoriesResponse, subcategoriesResponse, subSubcategoriesResponse] = await Promise.all([
+                    axiosInstance.get('/categories/get'),
+                    axiosInstance.get('/subcategories/get'),
+                    axiosInstance.get('/subsubcategories/get')
+                ]);
 
-                const subcategoriesResponse = await axiosInstance.get('/subcategories/get', {
-                    timeout: TIMEOUT,
-                });
-                setSubcategories(subcategoriesResponse.data);
+                const categoriesWithGroups = categoriesResponse.data.map(category => ({
+                    ...category,
+                    firstLetter: category.name[0].toUpperCase()
+                }));
+                const subcategoriesWithGroups = subcategoriesResponse.data.map(subcategory => ({
+                    ...subcategory,
+                    firstLetter: subcategory.name[0].toUpperCase()
+                }));
+                const subSubcategoriesWithGroups = subSubcategoriesResponse.data.map(subSubcategory => ({
+                    ...subSubcategory,
+                    firstLetter: subSubcategory.name[0].toUpperCase()
+                }));
 
-                const subSubcategoriesResponse = await axiosInstance.get('/subsubcategories/get', {
-                    timeout: TIMEOUT,
-                });
-                setSubSubcategories(subSubcategoriesResponse.data);
+                setCategories(categoriesWithGroups);
+                setSubcategories(subcategoriesWithGroups);
+                setSubSubcategories(subSubcategoriesWithGroups);
             } catch (error) {
-                if (error.code === 'ECONNABORTED') {
-                    console.error('Request timed out');
-                } else {
-                    console.error('Error fetching categories, subcategories, and subsubcategories:', error.message);
-                }
+                console.error('Error fetching categories, subcategories, and subsubcategories', error);
             }
-        }
+        };
 
         async function fetchSuppliers() {
             try {
                 const response = await axiosInstance.get('/suppliers/get', {
                     timeout: TIMEOUT,
                 });
-                setSuppliers(response.data);
+
+                const suppliersWithGroups = response.data.map(supplier => ({
+                    ...supplier,
+                    firstLetter: supplier.name[0].toUpperCase()
+                }));
+                setSuppliers(suppliersWithGroups);
             } catch (error) {
                 if (error.code === 'ECONNABORTED') {
                     console.error('Request timed out');
@@ -227,42 +236,44 @@ const AddProductModal = ({ open, onClose, onAddSuccess }) => {
                         className="!mb-4"
                     />
                     <Box className="flex gap-4 mb-4">
-                        <OutlinedBrownFormControl className="flex-1">
-                            <InputLabel>Category</InputLabel>
-                            <Select
-                                label="Category"
-                                value={category}
-                                onChange={(e) => setCategory(e.target.value)}
-                            >
-                                {categories.map((cat) => (
-                                    <MenuItem key={cat._id} value={cat._id}>{cat.name}</MenuItem>
-                                ))}
-                            </Select>
-                        </OutlinedBrownFormControl>
-                        <OutlinedBrownFormControl className="flex-1">
-                            <InputLabel>Subcategory</InputLabel>
-                            <Select
-                                label="Subcategory"
-                                value={subcategory}
-                                onChange={(e) => setSubcategory(e.target.value)}
-                            >
-                                {subcategories.map((sub) => (
-                                    <MenuItem key={sub._id} value={sub._id}>{sub.name}</MenuItem>
-                                ))}
-                            </Select>
-                        </OutlinedBrownFormControl>
-                        <OutlinedBrownFormControl className="flex-1">
-                            <InputLabel>SubSubcategory</InputLabel>
-                            <Select
-                                label="SubSubcategory"
-                                value={subSubcategory}
-                                onChange={(e) => setSubSubcategory(e.target.value)}
-                            >
-                                {subSubcategories.map((sub) => (
-                                    <MenuItem key={sub._id} value={sub._id}>{sub.name}</MenuItem>
-                                ))}
-                            </Select>
-                        </OutlinedBrownFormControl>
+                        <Autocomplete
+                            id="category-autocomplete"
+                            options={categories.sort((a, b) => -b.firstLetter.localeCompare(a.firstLetter))}
+                            groupBy={(option) => option.firstLetter}
+                            getOptionLabel={(option) => option.name}
+                            value={category}
+                            onChange={(event, newValue) => setCategory(newValue)}
+                            PaperComponent={CustomPaper}
+                            fullWidth
+                            renderInput={(params) => <TextField {...params} label="Category" variant="outlined" />}
+                            className='!mb-4'
+                        />
+
+                        <Autocomplete
+                            id="subcategory-autocomplete"
+                            options={subcategories.sort((a, b) => -b.firstLetter.localeCompare(a.firstLetter))}
+                            groupBy={(option) => option.firstLetter}
+                            getOptionLabel={(option) => option.name}
+                            value={subcategory}
+                            onChange={(event, newValue) => setSubcategory(newValue)}
+                            PaperComponent={CustomPaper}
+                            fullWidth
+                            renderInput={(params) => <TextField {...params} label="Subcategory" variant="outlined" />}
+                            className='!mb-4'
+                        />
+
+                        <Autocomplete
+                            id="subsubcategory-autocomplete"
+                            options={subSubcategories.sort((a, b) => -b.firstLetter.localeCompare(a.firstLetter))}
+                            groupBy={(option) => option.firstLetter}
+                            getOptionLabel={(option) => option.name}
+                            value={subSubcategory}
+                            onChange={(event, newValue) => setSubSubcategory(newValue)}
+                            PaperComponent={CustomPaper}
+                            fullWidth
+                            renderInput={(params) => <TextField {...params} label="Sub-Subcategory" variant="outlined" />}
+                            className='!mb-4'
+                        />
                     </Box>
                     <Typography variant='h6' className="!text-lg !font-bold !mb-2">Dimensions</Typography>
                     <Box className="flex gap-4 mb-4">
@@ -335,18 +346,18 @@ const AddProductModal = ({ open, onClose, onAddSuccess }) => {
                     ))}
                     <OutlinedBrownButton sx={{ width: '160px' }} onClick={addDetail} className="!mb-4">Add Detail</OutlinedBrownButton>
 
-                    <OutlinedBrownFormControl fullWidth className="!mb-4">
-                        <InputLabel>Supplier</InputLabel>
-                        <Select
-                            label="Supplier"
+                    <Autocomplete
+                            id="subsubcategory-autocomplete"
+                            options={suppliers.sort((a, b) => -b.firstLetter.localeCompare(a.firstLetter))}
+                            groupBy={(option) => option.firstLetter}
+                            getOptionLabel={(option) => option.name}
                             value={supplier}
-                            onChange={(e) => setSupplier(e.target.value)}
-                        >
-                            {suppliers.map((sup) => (
-                                <MenuItem key={sup._id} value={sup._id}>{sup.name}</MenuItem>
-                            ))}
-                        </Select>
-                    </OutlinedBrownFormControl>
+                            onChange={(event, newValue) => setSupplier(newValue)}
+                            PaperComponent={CustomPaper}
+                            fullWidth
+                            renderInput={(params) => <TextField {...params} label="Supplier" variant="outlined" />}
+                            className='!mb-4'
+                        />
 
                     <Typography variant='h6' className="!text-lg !font-bold !mb-2">Shipping</Typography>
                     <Box className="flex gap-4 mb-4">

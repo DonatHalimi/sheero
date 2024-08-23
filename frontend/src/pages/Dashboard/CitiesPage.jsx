@@ -35,10 +35,12 @@ const CitiesPage = () => {
     };
 
     const handleSelectCity = (cityId) => {
+        const id = Array.isArray(cityId) ? cityId[0] : cityId;
+
         setSelectedCities((prevSelected) =>
-            prevSelected.includes(cityId)
-                ? prevSelected.filter(id => id !== cityId)
-                : [...prevSelected, cityId]
+            prevSelected.includes(id)
+                ? prevSelected.filter((selectedId) => selectedId !== id)
+                : [...prevSelected, id]
         );
     };
 
@@ -51,7 +53,6 @@ const CitiesPage = () => {
     };
 
     const columns = [
-        { key: 'checkbox', label: 'checkbox' },
         { key: 'name', label: 'Name' },
         { key: 'country.name', label: 'Country' },
         { key: 'zipCode', label: 'Zip Code' },

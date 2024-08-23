@@ -35,13 +35,13 @@ const SupplierPage = () => {
     };
 
     const handleSelectSupplier = (supplierId) => {
-        setSelectedSuppliers((prevSelected) => {
-            if (prevSelected.includes(supplierId)) {
-                return prevSelected.filter(id => id !== supplierId);
-            } else {
-                return [...prevSelected, supplierId];
-            }
-        });
+        const id = Array.isArray(supplierId) ? supplierId[0] : supplierId;
+
+        setSelectedSuppliers((prevSelected) =>
+            prevSelected.includes(id)
+                ? prevSelected.filter((selectedId) => selectedId !== id)
+                : [...prevSelected, id]
+        );
     };
 
     const handleSelectAll = (e) => {
@@ -57,11 +57,10 @@ const SupplierPage = () => {
     };
 
     const columns = [
-        { key: 'checkbox', label: 'checkbox' },
-        { key: 'name', label: 'Name' },
-        { key: 'contactInfo.email', label: 'Email' },
-        { key: 'contactInfo.phoneNumber', label: 'Phone Number' },
-        { key: 'actions', label: 'Actions' }
+        { label: 'Name', key: 'name' },
+        { label: 'Email', key: 'contactInfo.email' },
+        { label: 'Phone Number', key: 'contactInfo.phoneNumber' },
+        { label: 'Actions', key: 'actions' }
     ];
 
     const renderActionButtons = (supplier) => (

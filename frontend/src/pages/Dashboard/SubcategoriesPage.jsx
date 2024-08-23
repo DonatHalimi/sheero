@@ -35,13 +35,13 @@ const SubcategoriesPage = () => {
     };
 
     const handleSelectSubcategory = (subcategoryId) => {
-        setSelectedSubcategories((prevSelected) => {
-            if (prevSelected.includes(subcategoryId)) {
-                return prevSelected.filter(id => id !== subcategoryId);
-            } else {
-                return [...prevSelected, subcategoryId];
-            }
-        });
+        const id = Array.isArray(subcategoryId) ? subcategoryId[0] : subcategoryId;
+
+        setSelectedSubcategories((prevSelected) =>
+            prevSelected.includes(id)
+                ? prevSelected.filter((selectedId) => selectedId !== id)
+                : [...prevSelected, id]
+        );
     };
 
     const handleSelectAll = (e) => {
@@ -57,7 +57,6 @@ const SubcategoriesPage = () => {
     };
 
     const columns = [
-        { label: 'checkbox', key: 'checkbox' },
         { label: 'Name', key: 'name' },
         { label: 'Image', key: 'image', render: (item) => <img className='rounded-md' src={`http://localhost:5000/${item.image}`} alt="" width={80} /> },
         { label: 'Category', key: 'category.name' },

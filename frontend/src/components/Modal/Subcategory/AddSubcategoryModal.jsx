@@ -1,8 +1,9 @@
 import UploadIcon from '@mui/icons-material/Upload';
-import { Box, InputLabel, MenuItem, Modal, Select, Typography } from '@mui/material';
+import { Box, Modal, TextField, Typography } from '@mui/material';
+import Autocomplete from '@mui/material/Autocomplete';
 import React, { useContext, useEffect, useState } from 'react';
 import { toast } from 'react-toastify';
-import { BrownButton, BrownOutlinedTextField, OutlinedBrownButton, OutlinedBrownFormControl, VisuallyHiddenInput } from '../../../assets/CustomComponents';
+import { BrownButton, BrownOutlinedTextField, CustomPaper, OutlinedBrownButton, VisuallyHiddenInput } from '../../../assets/CustomComponents';
 import useAxios from '../../../axiosInstance';
 import { AuthContext } from '../../../context/AuthContext';
 
@@ -10,7 +11,7 @@ const AddSubcategoryModal = ({ open, onClose, onAddSuccess }) => {
     const [name, setName] = useState('');
     const [image, setImage] = useState(null);
     const [imagePreview, setImagePreview] = useState(null);
-    const [category, setCategory] = useState('');
+    const [category, setCategory] = useState(null);
     const [categories, setCategories] = useState([]);
 
     const { refreshToken } = useContext(AuthContext);
@@ -20,7 +21,11 @@ const AddSubcategoryModal = ({ open, onClose, onAddSuccess }) => {
         const fetchCategories = async () => {
             try {
                 const response = await axiosInstance.get('/categories/get');
-                setCategories(response.data);
+                const categoriesWithGroups = response.data.map(category => ({
+                    ...category,
+                    firstLetter: category.name[0].toUpperCase()
+                }));
+                setCategories(categoriesWithGroups);
             } catch (error) {
                 console.error('Error fetching categories', error);
                 toast.error('Error fetching categories');
@@ -28,20 +33,20 @@ const AddSubcategoryModal = ({ open, onClose, onAddSuccess }) => {
         };
 
         fetchCategories();
-    }, []);
+    }, [axiosInstance]);
 
     const handleAddSubcategory = async () => {
         if (!name || !image || !category) {
             toast.error('Please fill in all the fields', {
                 closeOnClick: true
-            })
+            });
             return;
         }
 
         const formData = new FormData();
         formData.append('name', name);
         formData.append('image', image);
-        formData.append('category', category)
+        formData.append('category', category._id);
 
         try {
             await axiosInstance.post('/subcategories/create', formData, {
@@ -79,21 +84,20 @@ const AddSubcategoryModal = ({ open, onClose, onAddSuccess }) => {
                     value={name}
                     onChange={(e) => setName(e.target.value)}
                     fullWidth
-                    className='!mb-2'
+                    className='!mb-4'
                 />
-                <OutlinedBrownFormControl fullWidth margin="normal">
-                    <InputLabel>Category</InputLabel>
-                    <Select
-                        label='Category'
-                        value={category}
-                        onChange={(e) => setCategory(e.target.value)}
-                        className='!mb-4'
-                    >
-                        {categories.map((cat) => (
-                            <MenuItem key={cat._id} value={cat._id}>{cat.name}</MenuItem>
-                        ))}
-                    </Select>
-                </OutlinedBrownFormControl>
+                <Autocomplete
+                    id="category-autocomplete"
+                    options={categories.sort((a, b) => -b.firstLetter.localeCompare(a.firstLetter))}
+                    groupBy={(option) => option.firstLetter}
+                    getOptionLabel={(option) => option.name}
+                    value={category}
+                    onChange={(event, newValue) => setCategory(newValue)}
+                    PaperComponent={CustomPaper}
+                    fullWidth
+                    renderInput={(params) => <TextField {...params} label="Category" variant="outlined" />}
+                    className='!mb-4'
+                />
                 <OutlinedBrownButton
                     component="label"
                     role={undefined}

@@ -35,11 +35,13 @@ const UsersPage = () => {
     };
 
     const handleSelectUser = (userId) => {
+        const id = Array.isArray(userId) ? userId[0] : userId;
+
         setSelectedUsers((prevSelected) => {
-            if (prevSelected.includes(userId)) {
-                return prevSelected.filter(id => id !== userId);
+            if (prevSelected.includes(id)) {
+                return prevSelected.filter((selectedId) => selectedId !== id);
             } else {
-                return [...prevSelected, userId];
+                return [...prevSelected, id];
             }
         });
     };
@@ -57,7 +59,6 @@ const UsersPage = () => {
     };
 
     const columns = [
-        { key: 'checkbox', label: 'checkbox' },
         { key: 'username', label: 'Username' },
         { key: 'email', label: 'Email' },
         { key: 'password', label: 'Password' },
@@ -80,7 +81,25 @@ const UsersPage = () => {
                 </OutlinedBrownButton>
                 {selectedUsers.length > 0 && (
                     <OutlinedBrownButton
-                        onClick={() => setDeleteUserOpen(true)}
+                        onClick={() => {
+                            // Ensure selectedUsers is a flat array of IDs
+                            const validUserIds = selectedUsers.filter(id => id);
+                            console.log('Selected Users IDs:', validUserIds);
+
+                            // Find corresponding user objects
+                            const selectedUserObjects = validUserIds.map(id => {
+                                const user = users.find(user => user._id === id);
+                                if (!user) {
+                                    console.error('User not found for ID:', id);
+                                }
+                                return user;
+                            }).filter(user => user);
+
+                            console.log('All Users:', users);
+                            console.log('Users to be deleted:', selectedUserObjects);
+
+                            setDeleteUserOpen(true);
+                        }}
                         disabled={selectedUsers.length === 0}
                     >
                         {selectedUsers.length > 1 ? 'Delete Selected Users' : 'Delete User'}
@@ -109,7 +128,12 @@ const UsersPage = () => {
 
                 <AddUserModal open={addUserOpen} onClose={() => setAddUserOpen(false)} onAddSuccess={fetchUsers} />
                 <EditUserModal open={editUserOpen} onClose={() => setEditUserOpen(false)} user={selectedUser} onEditSuccess={fetchUsers} />
-                <DeleteUserModal open={deleteUserOpen} onClose={() => setDeleteUserOpen(false)} users={selectedUsers.map(id => users.find(user => user._id === id))} onDeleteSuccess={fetchUsers} />
+                <DeleteUserModal
+                    open={deleteUserOpen}
+                    onClose={() => setDeleteUserOpen(false)}
+                    users={selectedUsers.map(id => users.find(user => user._id === id)).filter(user => user)}
+                    onDeleteSuccess={fetchUsers}
+                />
             </div>
         </div>
     );

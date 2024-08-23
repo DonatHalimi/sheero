@@ -1,14 +1,14 @@
-import { Box, InputLabel, MenuItem, Modal, Select, Typography } from '@mui/material';
+import { Autocomplete, Box, Modal, TextField, Typography } from '@mui/material';
 import React, { useEffect, useState } from 'react';
 import { toast } from 'react-toastify';
-import { BrownButton, BrownOutlinedTextField, OutlinedBrownFormControl } from '../../../assets/CustomComponents';
+import { BrownButton, BrownOutlinedTextField, CustomPaper } from '../../../assets/CustomComponents';
 import useAxios from '../../../axiosInstance';
 
 const AddAddressModal = ({ open, onClose, onAddSuccess }) => {
     const [name, setName] = useState('');
     const [street, setStreet] = useState('');
-    const [city, setCity] = useState('');
-    const [country, setCountry] = useState('');
+    const [city, setCity] = useState(null);
+    const [country, setCountry] = useState(null);
     const [cities, setCities] = useState([]);
     const [countries, setCountries] = useState([]);
 
@@ -18,7 +18,11 @@ const AddAddressModal = ({ open, onClose, onAddSuccess }) => {
         const fetchCountries = async () => {
             try {
                 const response = await axiosInstance.get('/countries/get');
-                setCountries(response.data);
+                const countriesWithGroups = response.data.map(country => ({
+                    ...country,
+                    firstLetter: country.name[0].toUpperCase()
+                }));
+                setCountries(countriesWithGroups);
             } catch (error) {
                 console.error('Error fetching countries', error);
             }
@@ -27,28 +31,33 @@ const AddAddressModal = ({ open, onClose, onAddSuccess }) => {
         fetchCountries();
     }, [axiosInstance]);
 
-    const handleCountryChange = async (e) => {
-        const selectedCountry = e.target.value;
-        setCountry(selectedCountry);
-        setCity('');
-        try {
-            const response = await axiosInstance.get(`/cities/country/${selectedCountry}`);
-            setCities(response.data);
-        } catch (error) {
-            console.error('Error fetching cities for selected country', error);
+    const handleCountryChange = async (event, newValue) => {
+        setCountry(newValue);
+        setCity(null);
+        if (newValue) {
+            try {
+                const response = await axiosInstance.get(`/cities/country/${newValue._id}`);
+                const citiesWithGroups = response.data.map(city => ({
+                    ...city,
+                    firstLetter: city.name[0].toUpperCase()
+                }));
+                setCities(citiesWithGroups);
+            } catch (error) {
+                console.error('Error fetching cities for selected country', error);
+            }
+        } else {
+            setCities([]);
         }
     };
 
     const handleAddAddress = async () => {
         if (!name || !street || !city || !country) {
-            toast.error('Please fill in all the fields', {
-                closeOnClick: true
-            });
+            toast.error('Please fill in all the fields', { closeOnClick: true });
             return;
         }
 
         try {
-            await axiosInstance.post('/addresses/create', { name, street, city, country });
+            await axiosInstance.post('/addresses/create', { name, street, city: city._id, country: country._id });
             toast.success('Address added successfully');
             onAddSuccess();
             onClose();
@@ -82,35 +91,34 @@ const AddAddressModal = ({ open, onClose, onAddSuccess }) => {
                     label="Street"
                     value={street}
                     onChange={(e) => setStreet(e.target.value)}
-                    className="!mb-2"
+                    className="!mb-4"
                 />
 
-                <OutlinedBrownFormControl fullWidth margin="normal">
-                    <InputLabel>Country</InputLabel>
-                    <Select
-                        label='Country'
-                        value={country}
-                        onChange={handleCountryChange}
-                    >
-                        {countries.map((country) => (
-                            <MenuItem key={country._id} value={country._id}>{country.name}</MenuItem>
-                        ))}
-                    </Select>
-                </OutlinedBrownFormControl>
+                <Autocomplete
+                    id="country-autocomplete"
+                    options={countries.sort((a, b) => -b.firstLetter.localeCompare(a.firstLetter))}
+                    groupBy={(option) => option.firstLetter}
+                    getOptionLabel={(option) => option.name}
+                    value={country}
+                    onChange={handleCountryChange}
+                    PaperComponent={CustomPaper}
+                    fullWidth
+                    renderInput={(params) => <TextField {...params} label="Country" variant="outlined" />}
+                    className='!mb-4'
+                />
 
-                <OutlinedBrownFormControl fullWidth margin="normal">
-                    <InputLabel>City</InputLabel>
-                    <Select
-                        label='City'
-                        value={city}
-                        onChange={(e) => setCity(e.target.value)}
-                        className='mb-4'
-                    >
-                        {cities.map((city) => (
-                            <MenuItem key={city._id} value={city._id}>{city.name}</MenuItem>
-                        ))}
-                    </Select>
-                </OutlinedBrownFormControl>
+                <Autocomplete
+                    id="city-autocomplete"
+                    options={cities.sort((a, b) => -b.firstLetter.localeCompare(a.firstLetter))}
+                    groupBy={(option) => option.firstLetter}
+                    getOptionLabel={(option) => option.name}
+                    value={city}
+                    onChange={(event, newValue) => setCity(newValue)}
+                    PaperComponent={CustomPaper}
+                    fullWidth
+                    renderInput={(params) => <TextField {...params} label="City" variant="outlined" />}
+                    className='!mb-4'
+                />
 
                 <BrownButton
                     onClick={handleAddAddress}

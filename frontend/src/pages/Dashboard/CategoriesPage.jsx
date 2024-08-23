@@ -35,10 +35,12 @@ const CategoriesPage = () => {
     };
 
     const handleSelectCategory = (categoryId) => {
+        const id = Array.isArray(categoryId) ? categoryId[0] : categoryId;
+
         setSelectedCategories((prevSelected) =>
-            prevSelected.includes(categoryId)
-                ? prevSelected.filter(id => id !== categoryId)
-                : [...prevSelected, categoryId]
+            prevSelected.includes(id)
+                ? prevSelected.filter((selectedId) => selectedId !== id)
+                : [...prevSelected, id]
         );
     };
 
@@ -51,7 +53,6 @@ const CategoriesPage = () => {
     };
 
     const columns = [
-        { key: 'checkbox', label: 'checkbox' },
         { key: 'name', label: 'Name' },
         { key: 'image', label: 'Image', render: (item) => <img className='rounded-md' src={`http://localhost:5000/${item.image}`} alt={item.name} width={80} /> },
         { key: 'actions', label: 'Actions' }

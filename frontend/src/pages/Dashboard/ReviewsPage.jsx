@@ -35,10 +35,12 @@ const ReviewsPage = () => {
     };
 
     const handleSelectReview = (reviewId) => {
+        const id = Array.isArray(reviewId) ? reviewId[0] : reviewId;
+
         setSelectedReviews((prevSelected) =>
-            prevSelected.includes(reviewId)
-                ? prevSelected.filter(id => id !== reviewId)
-                : [...prevSelected, reviewId]
+            prevSelected.includes(id)
+                ? prevSelected.filter((selectedId) => selectedId !== id)
+                : [...prevSelected, id]
         );
     };
 
@@ -51,7 +53,6 @@ const ReviewsPage = () => {
     };
 
     const columns = [
-        { key: 'checkbox', label: 'checkbox' },
         { key: 'user.username', label: 'User' },
         { key: 'rating', label: 'Rating' },
         { key: 'comment', label: 'Comment' },

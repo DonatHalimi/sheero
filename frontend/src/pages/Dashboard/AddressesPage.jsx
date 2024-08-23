@@ -35,10 +35,12 @@ const AddressesPage = () => {
     };
 
     const handleSelectAddress = (addressId) => {
+        const id = Array.isArray(addressId) ? addressId[0] : addressId;
+
         setSelectedAddresses((prevSelected) =>
-            prevSelected.includes(addressId)
-                ? prevSelected.filter(id => id !== addressId)
-                : [...prevSelected, addressId]
+            prevSelected.includes(id)
+                ? prevSelected.filter((selectedId) => selectedId !== id)
+                : [...prevSelected, id]
         );
     };
 
@@ -47,7 +49,6 @@ const AddressesPage = () => {
     };
 
     const columns = [
-        { key: 'checkbox', label: 'checkbox' },
         { key: 'user.username', label: 'Username' },
         { key: 'name', label: 'Name' },
         { key: 'street', label: 'Street' },

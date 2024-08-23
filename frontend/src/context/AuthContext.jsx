@@ -19,8 +19,6 @@ const AuthProvider = ({ children }) => {
         localStorage.setItem('username', authData.username || '');
         localStorage.setItem('email', authData.email || '');
         localStorage.setItem('address', JSON.stringify(authData.address || null));
-
-        console.log('Auth state updated:', authData);
     };
 
     const login = async (username, password) => {

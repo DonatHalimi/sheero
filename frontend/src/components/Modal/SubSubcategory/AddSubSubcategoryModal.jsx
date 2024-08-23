@@ -1,13 +1,13 @@
-import { Box, InputLabel, MenuItem, Modal, Select, Typography } from '@mui/material';
+import { Autocomplete, Box, Modal, TextField, Typography } from '@mui/material';
 import React, { useContext, useEffect, useState } from 'react';
 import { toast } from 'react-toastify';
-import { BrownButton, BrownOutlinedTextField, OutlinedBrownFormControl } from '../../../assets/CustomComponents';
+import { BrownButton, BrownOutlinedTextField, CustomPaper } from '../../../assets/CustomComponents';
 import useAxios from '../../../axiosInstance';
 import { AuthContext } from '../../../context/AuthContext';
 
 const AddSubSubcategoryModal = ({ open, onClose, onAddSuccess }) => {
     const [name, setName] = useState('');
-    const [subcategory, setSubcategory] = useState('');
+    const [subcategory, setSubcategory] = useState(null); // Initialize with null
     const [subcategories, setSubcategories] = useState([]);
 
     const { refreshToken } = useContext(AuthContext);
@@ -17,7 +17,12 @@ const AddSubSubcategoryModal = ({ open, onClose, onAddSuccess }) => {
         const fetchSubcategories = async () => {
             try {
                 const response = await axiosInstance.get('/subcategories/get');
-                setSubcategories(response.data);
+                const subCategoriesWithGroups = response.data.map(subCategory => ({
+                    ...subCategory,
+                    firstLetter: subCategory.name[0].toUpperCase()
+                }));
+
+                setSubcategories(subCategoriesWithGroups);
             } catch (error) {
                 console.error('Error fetching subcategories', error);
                 toast.error('Error fetching subcategories');
@@ -25,7 +30,7 @@ const AddSubSubcategoryModal = ({ open, onClose, onAddSuccess }) => {
         };
 
         fetchSubcategories();
-    }, []);
+    }, [axiosInstance]);
 
     const handleAddSubSubcategory = async () => {
         if (!name || !subcategory) {
@@ -38,7 +43,7 @@ const AddSubSubcategoryModal = ({ open, onClose, onAddSuccess }) => {
         try {
             await axiosInstance.post('/subsubcategories/create', {
                 name,
-                subcategory
+                subcategory: subcategory._id // Assuming subcategory has an _id field
             });
             toast.success('SubSubcategory added successfully');
             onAddSuccess();
@@ -60,19 +65,18 @@ const AddSubSubcategoryModal = ({ open, onClose, onAddSuccess }) => {
                     fullWidth
                     margin="normal"
                 />
-                <OutlinedBrownFormControl fullWidth margin="normal">
-                    <InputLabel>Subcategory</InputLabel>
-                    <Select
-                        label='Subcategory'
-                        value={subcategory}
-                        onChange={(e) => setSubcategory(e.target.value)}
-                        className='!mb-6'
-                    >
-                        {subcategories.map((subcat) => (
-                            <MenuItem key={subcat._id} value={subcat._id}>{subcat.name}</MenuItem>
-                        ))}
-                    </Select>
-                </OutlinedBrownFormControl>
+                <Autocomplete
+                    id="subcategory-autocomplete"
+                    options={subcategories.sort((a, b) => -b.firstLetter.localeCompare(a.firstLetter))}
+                    groupBy={(option) => option.firstLetter}
+                    getOptionLabel={(option) => option.name}
+                    value={subcategory}
+                    onChange={(event, newValue) => setSubcategory(newValue)}
+                    PaperComponent={CustomPaper}
+                    fullWidth
+                    renderInput={(params) => <TextField {...params} label="Subcategory" variant="outlined" />}
+                    className='!mb-4'
+                />
                 <BrownButton
                     onClick={handleAddSubSubcategory}
                     variant="contained"

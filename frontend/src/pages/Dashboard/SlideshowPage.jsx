@@ -35,13 +35,13 @@ const SlideshowPage = () => {
     };
 
     const handleSelectImage = (imageId) => {
-        setSelectedImages((prevSelected) => {
-            if (prevSelected.includes(imageId)) {
-                return prevSelected.filter(id => id !== imageId);
-            } else {
-                return [...prevSelected, imageId];
-            }
-        });
+        const id = Array.isArray(imageId) ? imageId[0] : imageId;
+
+        setSelectedImages((prevSelected) =>
+            prevSelected.includes(id)
+                ? prevSelected.filter((selectedId) => selectedId !== id)
+                : [...prevSelected, id]
+        );
     };
 
     const handleSelectAll = (e) => {
@@ -53,7 +53,6 @@ const SlideshowPage = () => {
     };
 
     const columns = [
-        { key: 'checkbox', label: 'checkbox' },
         { key: 'title', label: 'Title' },
         { key: 'image', label: 'Image', render: (item) => <img className='rounded-md' src={`http://localhost:5000/${item.image}`} alt="" width={80} /> },
         { key: 'description', label: 'Description' },

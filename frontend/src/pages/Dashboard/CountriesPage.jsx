@@ -35,10 +35,12 @@ const CountriesPage = () => {
     };
 
     const handleSelectCountry = (countryId) => {
+        const id = Array.isArray(countryId) ? countryId[0] : countryId;
+
         setSelectedCountries((prevSelected) =>
-            prevSelected.includes(countryId)
-                ? prevSelected.filter(id => id !== countryId)
-                : [...prevSelected, countryId]
+            prevSelected.includes(id)
+                ? prevSelected.filter((selectedId) => selectedId !== id)
+                : [...prevSelected, id]
         );
     };
 
@@ -51,7 +53,6 @@ const CountriesPage = () => {
     };
 
     const columns = [
-        { key: 'checkbox', label: 'checkbox' },
         { key: 'name', label: 'Name' },
         { key: 'actions', label: 'Actions' }
     ];

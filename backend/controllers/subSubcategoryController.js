@@ -77,6 +77,7 @@ const deleteSubSubcategory = async (req, res) => {
 
 const deleteSubSubcategories = async (req, res) => {
     const { subSubcategoryIds } = req.body;
+
     try {
         const subSubcategories = await SubSubcategory.find({ _id: { $in: subSubcategoryIds } });
 
@@ -85,13 +86,13 @@ const deleteSubSubcategories = async (req, res) => {
         }
 
         for (const subSubcategory of subSubcategories) {
-            const products = await Product.find({ subsubcategory: req.params.id });
+            const products = await Product.find({ subSubcategory: subSubcategory._id });
             if (products.length > 0) {
                 return res.status(400).json({ message: `Cannot delete subSubcategory ${subSubcategory.name} with existing products` });
             }
 
             if (subSubcategory.image) {
-                fs.unlink(category.image, (err) => {
+                fs.unlink(subSubcategory.image, (err) => {
                     if (err) console.error('Error deleting image:', err);
                 });
             }

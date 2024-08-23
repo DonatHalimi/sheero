@@ -1,8 +1,7 @@
-import { Checkbox, Paper, Table, TableBody, TableCell, TableContainer, TableHead, TableRow } from '@mui/material';
+import { Paper } from '@mui/material';
+import { DataGrid } from '@mui/x-data-grid';
 import React from 'react';
-import ReactPaginate from 'react-paginate';
-import { BoldTableCell } from '../../assets/CustomComponents';
-import { DashboardPagination } from './Pagination';
+import { CustomNoRowsOverlay, CustomToolbar } from '../../assets/CustomComponents';
 
 const getNestedValue = (obj, path) => {
     return path.split('.').reduce((acc, part) => acc && acc[part], obj);
@@ -13,7 +12,7 @@ const DashboardTable = ({
     data,
     selectedItems,
     onSelectItem,
-    onSelectAll,
+    onRowRightClick,
     itemsPerPage,
     currentPage,
     onPageChange,
@@ -21,89 +20,70 @@ const DashboardTable = ({
     renderTableActions,
     containerClassName,
 }) => {
-    const pageCount = Math.ceil(data.length / itemsPerPage);
-    const isPreviousDisabled = currentPage === 0;
-    const isNextDisabled = currentPage >= pageCount - 1;
-    const paginationEnabled = data.length > 0 && pageCount > 1;
+    // Prepare columns for DataGrid with even width distribution
+    const gridColumns = columns.map((column) => ({
+        field: column.key,
+        headerName: column.label,
+        flex: 1,
+        minWidth: 150,
+        renderCell: (params) => {
+            if (column.key === 'actions') {
+                return renderActionButtons(params.row);
+            } else if (column.key === 'password' && containerClassName === 'user') {
+                return '●●●●●●●●●●';
+            } else {
+                return column.render
+                    ? column.render(params.row)
+                    : getNestedValue(params.row, column.key);
+            }
+        },
+    }));
 
-    const getCurrentPageItems = () => {
-        const startIndex = currentPage * itemsPerPage;
-        return data.slice(startIndex, startIndex + itemsPerPage);
-    };
+    // Prepare rows for DataGrid
+    const gridRows = data.map((item) => ({
+        id: item._id,
+        ...item,
+    }));
 
     return (
         <>
             {renderTableActions && renderTableActions()}
-            <TableContainer component={Paper} className={containerClassName || 'max-w-screen-2xl mx-auto'}>
-                <Table>
-                    <TableHead>
-                        <TableRow>
-                            {columns.map((column, index) => (
-                                <BoldTableCell key={index}>
-                                    {column.label === 'checkbox' ? (
-                                        <Checkbox
-                                            checked={selectedItems.length === data.length}
-                                            onChange={onSelectAll}
-                                        />
-                                    ) : column.label}
-                                </BoldTableCell>
-                            ))}
-                        </TableRow>
-                    </TableHead>
-                    <TableBody>
-                        {getCurrentPageItems().length > 0 ? (
-                            getCurrentPageItems().map((item) => (
-                                <TableRow key={item._id}>
-                                    {columns.map((column, index) => (
-                                        <TableCell key={index}>
-                                            {column.key === 'checkbox' ? (
-                                                <Checkbox
-                                                    checked={selectedItems.includes(item._id)}
-                                                    onChange={() => onSelectItem(item._id)}
-                                                />
-                                            ) : column.key === 'actions' ? (
-                                                renderActionButtons(item)
-                                            ) : column.key === 'password' && containerClassName === 'user' ? (
-                                                '●●●●●●●●●●'
-                                            ) : (
-                                                column.render ? column.render(item) : getNestedValue(item, column.key)
-                                            )}
-                                        </TableCell>
-                                    ))}
-                                </TableRow>
-                            ))
-                        ) : (
-                            <TableRow>
-                                <TableCell colSpan={columns.length} align="center">
-                                    No items found
-                                </TableCell>
-                            </TableRow>
-                        )}
-                    </TableBody>
-                </Table>
-            </TableContainer>
+            <Paper
+                className={containerClassName || 'max-w-screen-2xl mx-auto'}
+                style={{ height: 'auto', width: '100%' }}
+            >
+                <DataGrid
+                    rows={gridRows}
+                    columns={gridColumns}
+                    pageSize={itemsPerPage}
+                    page={currentPage}
+                    onPageChange={(params) => onPageChange(params.page)}
+                    pagination
+                    checkboxSelection
+                    onSelectionModelChange={(newSelection) => onSelectItem(newSelection.selectionModel)}
+                    onRowClick={(params) => onSelectItem([params.id])}
+                    onRowContextMenu={(event, params) => onRowRightClick(event, params.row)}
+                    autoHeight
+                    disableSelectionOnClick
+                    initialState={{
+                        density: 'comfortable',
+                    }}
+                    slots={{
+                        toolbar: CustomToolbar,
+                        noRowsOverlay: CustomNoRowsOverlay,
+                    }}
+                    sx={{
+                        '& .MuiDataGrid-cell:focus': {
+                            outline: 'none',
+                        },
+                        '& .MuiDataGrid-cell:focus-within': {
+                            outline: 'none',
+                        },
+                        '--DataGrid-overlayHeight': '300px',
 
-            {paginationEnabled && (
-                <div className="w-full flex justify-start mt-6 mb-24">
-                    <ReactPaginate
-                        pageCount={pageCount}
-                        pageRangeDisplayed={2}
-                        marginPagesDisplayed={1}
-                        onPageChange={onPageChange}
-                        containerClassName={DashboardPagination.container}
-                        activeClassName={DashboardPagination.active}
-                        previousLinkClassName={`${DashboardPagination.previous} ${isPreviousDisabled ? DashboardPagination.disabled : ''}`}
-                        nextLinkClassName={`${DashboardPagination.next} ${isNextDisabled ? DashboardPagination.disabled : ''}`}
-                        disabledClassName={DashboardPagination.disabled}
-                        activeLinkClassName={DashboardPagination.activeLink}
-                        previousLabel={<span className={DashboardPagination.previousLabel}>Previous</span>}
-                        nextLabel={<span className={DashboardPagination.nextLabel}>Next</span>}
-                        breakLabel={<span className={DashboardPagination.break}>...</span>}
-                        pageClassName={DashboardPagination.page}
-                        pageLinkClassName={DashboardPagination.link}
-                    />
-                </div>
-            )}
+                    }}
+                />
+            </Paper>
         </>
     );
 };

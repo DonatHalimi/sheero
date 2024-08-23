@@ -1,6 +1,6 @@
 import ChevronLeftIcon from '@mui/icons-material/ChevronLeft';
 import MenuIcon from '@mui/icons-material/Menu';
-import { Button } from '@mui/material';
+import { Button, Tooltip } from '@mui/material';
 import Box from '@mui/material/Box';
 import CssBaseline from '@mui/material/CssBaseline';
 import Divider from '@mui/material/Divider';
@@ -71,9 +71,13 @@ const DashboardLayout = () => {
                         </IconButton>
                         <div className="flex justify-between items-center top-0 left-0 right-0 z-50 mx-auto-xl px-16 mt-4 w-full">
                             <div className="flex items-center mb-5">
-                                <a href="/" className="flex items-center space-x-3 rtl:space-x-reverse">
-                                    <img src={logo} alt="Logo" className="w-60 h-11" />
-                                </a>
+                                <Tooltip title="Home" arrow>
+                                    <span>
+                                        <a href="/" className="flex items-center space-x-3 rtl:space-x-reverse">
+                                            <img src={logo} alt="Logo" className="w-60 h-11" />
+                                        </a>
+                                    </span>
+                                </Tooltip>
                             </div>
                             <div className="flex items-center space-x-6">
                                 <ul className="flex items-center space-x-6">
@@ -86,14 +90,19 @@ const DashboardLayout = () => {
                                     {auth.accessToken ? (
                                         <>
                                             <div className="relative ml-4" ref={dropdownRef}>
-                                                <ProfileButton onClick={handleDropdownToggle} className="rounded-sm">
-                                                    <StyledPersonIcon />
-                                                    {auth.username && (
-                                                        <span className="ml-2 text-sm">
-                                                            {auth.username}
-                                                        </span>
-                                                    )}
-                                                </ProfileButton>
+                                                <Tooltip title="Profile" arrow>
+                                                    <span>
+                                                        <ProfileButton onClick={handleDropdownToggle} className="rounded-sm">
+                                                            <StyledPersonIcon />
+                                                            {auth.username && (
+                                                                <span className="ml-2 text-sm">
+                                                                    {auth.username}
+                                                                </span>
+                                                            )}
+                                                        </ProfileButton>
+                                                    </span>
+                                                </Tooltip>
+
                                                 {isDropdownOpen && (
                                                     <div className="absolute right-0 mt-2 w-48 bg-white border  shadow-lg rounded-lg p-2">
                                                         {isAdmin() && (

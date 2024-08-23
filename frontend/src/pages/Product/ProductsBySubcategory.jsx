@@ -2,9 +2,9 @@ import axios from 'axios';
 import React, { useEffect, useState } from 'react';
 import ReactPaginate from 'react-paginate';
 import { useParams } from 'react-router-dom';
+import { ProductPagination } from '../../components/Dashboard/Pagination';
 import Footer from '../../components/Footer';
 import Navbar from '../../components/Navbar';
-import { ProductPagination } from '../../components/Dashboard/Pagination';
 import ProductItem from '../../components/ProductItem';
 import Slideshow from '../../components/Slideshow';
 

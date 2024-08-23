@@ -34,11 +34,13 @@ const SubSubcategoriesPage = () => {
         }
     };
 
-    const handleSelectSubSubcategory = (subSubcategoryId) => {
+    const handleSelectSubSubcategory = (subsubcategoryId) => {
+        const id = Array.isArray(subsubcategoryId) ? subsubcategoryId[0] : subsubcategoryId;
+
         setSelectedSubSubcategories((prevSelected) =>
-            prevSelected.includes(subSubcategoryId)
-                ? prevSelected.filter(id => id !== subSubcategoryId)
-                : [...prevSelected, subSubcategoryId]
+            prevSelected.includes(id)
+                ? prevSelected.filter((selectedId) => selectedId !== id)
+                : [...prevSelected, id]
         );
     };
 
@@ -51,10 +53,9 @@ const SubSubcategoriesPage = () => {
     };
 
     const columns = [
-        { key: 'checkbox', label: 'checkbox' },
-        { key: 'name', label: 'Name' },
-        { key: 'subcategory.name', label: 'Subcategory' },
-        { key: 'actions', label: 'Actions' }
+        { label: 'Name', key: 'name' },
+        { label: 'Subcategory', key: 'subcategory.name' },
+        { label: 'Actions', key: 'actions' }
     ];
 
     const renderActionButtons = (subSubcategory) => (
