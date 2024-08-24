@@ -1,6 +1,6 @@
 import { Typography } from '@mui/material';
 import React, { useContext, useEffect, useState } from 'react';
-import { ActionButton, BrownCreateOutlinedIcon, OutlinedBrownButton } from '../../assets/CustomComponents';
+import { ActionButton, BrownCreateOutlinedIcon, OutlinedBrownButton, RatingStars } from '../../assets/CustomComponents';
 import useAxios from '../../axiosInstance';
 import DashboardTable from '../../components/Dashboard/DashboardTable';
 import AddReviewModal from '../../components/Modal/Review/AddReviewModal';
@@ -52,19 +52,33 @@ const ReviewsPage = () => {
         setCurrentPage(event.selected);
     };
 
-    const columns = [
-        { key: 'user.username', label: 'User' },
-        { key: 'rating', label: 'Rating' },
-        { key: 'comment', label: 'Comment' },
-        { key: 'product.name', label: 'Product' },
-        { key: 'actions', label: 'Actions' }
-    ];
-
     const renderActionButtons = (review) => (
         <ActionButton onClick={() => { setSelectedReview(review); setEditReviewOpen(true); }}>
             <BrownCreateOutlinedIcon />
         </ActionButton>
     );
+
+    const columns = [
+        { key: 'user.username', label: 'User' },
+        {
+            key: 'rating',
+            label: 'Rating',
+            render: (review) => (
+                <div style={{ position: 'relative', top: '17px' }}>
+                    <RatingStars rating={review.rating} />
+                </div>
+            )
+        },
+        { key: 'comment', label: 'Comment' },
+        { key: 'product.name', label: 'Product' },
+        {
+            key: 'actions',
+            label: 'Actions',
+            render: renderActionButtons
+        }
+    ];
+
+
 
     const renderTableActions = () => (
         <div className='flex items-center justify-between w-full mb-4'>

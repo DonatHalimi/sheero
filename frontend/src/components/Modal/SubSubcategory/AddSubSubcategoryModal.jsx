@@ -43,7 +43,7 @@ const AddSubSubcategoryModal = ({ open, onClose, onAddSuccess }) => {
         try {
             await axiosInstance.post('/subsubcategories/create', {
                 name,
-                subcategory: subcategory._id // Assuming subcategory has an _id field
+                subcategory: subcategory._id
             });
             toast.success('SubSubcategory added successfully');
             onAddSuccess();
@@ -56,14 +56,14 @@ const AddSubSubcategoryModal = ({ open, onClose, onAddSuccess }) => {
 
     return (
         <Modal open={open} onClose={onClose} className="flex items-center justify-center">
-            <Box className="bg-white p-4 rounded-lg shadow-lg max-w-md">
-                <Typography variant='h5' className="!text-xl !font-bold !mb-2">Add SubSubcategory</Typography>
+            <Box className="bg-white p-4 rounded-lg shadow-lg max-w-md w-full">
+                <Typography variant='h5' className="!text-xl !font-bold !mb-6">Add SubSubcategory</Typography>
                 <BrownOutlinedTextField
                     label="Name"
                     value={name}
                     onChange={(e) => setName(e.target.value)}
                     fullWidth
-                    margin="normal"
+                    className='!mb-4'
                 />
                 <Autocomplete
                     id="subcategory-autocomplete"

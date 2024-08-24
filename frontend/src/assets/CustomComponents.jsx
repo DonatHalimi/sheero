@@ -381,3 +381,19 @@ export const StyledInboxIcon = styled(InboxOutlined)({
 export const StyledShoppingCartIcon = styled(ShoppingCartOutlined)({
     color: '#666666',
 });
+
+export const DashboardStyling = {
+    '& .MuiDataGrid-columnHeader:focus': {
+        outline: 'none',
+    },
+    '& .MuiDataGrid-columnHeader:focus-within': {
+        outline: 'none',
+    },
+    '& .MuiDataGrid-cell:focus': {
+        outline: 'none',
+    },
+    '& .MuiDataGrid-cell:focus-within': {
+        outline: 'none',
+    },
+    '--DataGrid-overlayHeight': '300px',
+};

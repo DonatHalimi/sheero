@@ -60,23 +60,24 @@ const DashboardLayout = () => {
                 <CssBaseline />
                 <AppBar position="absolute" open={open}>
                     <Toolbar sx={{ pr: '32px' }}>
-                        <IconButton
-                            edge="start"
-                            color="black"
-                            aria-label="open drawer"
-                            onClick={toggleDrawer}
-                            sx={{ marginRight: '36px', ...(open && { display: 'none' }) }}
-                        >
-                            <MenuIcon />
-                        </IconButton>
+
+                        <Tooltip title="Extend" arrow>
+                            <IconButton
+                                edge="start"
+                                color="black"
+                                aria-label="open drawer"
+                                onClick={toggleDrawer}
+                                sx={{ marginRight: '36px', ...(open && { display: 'none' }) }}
+                            >
+                                <MenuIcon />
+                            </IconButton>
+                        </Tooltip>
                         <div className="flex justify-between items-center top-0 left-0 right-0 z-50 mx-auto-xl px-16 mt-4 w-full">
                             <div className="flex items-center mb-5">
                                 <Tooltip title="Home" arrow>
-                                    <span>
-                                        <a href="/" className="flex items-center space-x-3 rtl:space-x-reverse">
-                                            <img src={logo} alt="Logo" className="w-60 h-11" />
-                                        </a>
-                                    </span>
+                                    <a href="/" className="flex items-center space-x-3 rtl:space-x-reverse">
+                                        <img src={logo} alt="Logo" className="w-60 h-11" />
+                                    </a>
                                 </Tooltip>
                             </div>
                             <div className="flex items-center space-x-6">
@@ -91,16 +92,14 @@ const DashboardLayout = () => {
                                         <>
                                             <div className="relative ml-4" ref={dropdownRef}>
                                                 <Tooltip title="Profile" arrow>
-                                                    <span>
-                                                        <ProfileButton onClick={handleDropdownToggle} className="rounded-sm">
-                                                            <StyledPersonIcon />
-                                                            {auth.username && (
-                                                                <span className="ml-2 text-sm">
-                                                                    {auth.username}
-                                                                </span>
-                                                            )}
-                                                        </ProfileButton>
-                                                    </span>
+                                                    <ProfileButton onClick={handleDropdownToggle} className="rounded-sm">
+                                                        <StyledPersonIcon />
+                                                        {auth.username && (
+                                                            <span className="ml-2 text-sm">
+                                                                {auth.username}
+                                                            </span>
+                                                        )}
+                                                    </ProfileButton>
                                                 </Tooltip>
 
                                                 {isDropdownOpen && (
@@ -171,9 +170,11 @@ const DashboardLayout = () => {
                             px: [1],
                         }}
                     >
-                        <IconButton onClick={toggleDrawer}>
-                            <ChevronLeftIcon />
-                        </IconButton>
+                        <Tooltip title="Collapse" arrow>
+                            <IconButton onClick={toggleDrawer}>
+                                <ChevronLeftIcon />
+                            </IconButton>
+                        </Tooltip>
                     </Toolbar>
                     <Divider />
                     <List component="nav">

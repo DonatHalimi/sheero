@@ -54,8 +54,10 @@ const App = () => (
     </Routes>
     <ToastContainer
       position="bottom-right"
+      autoClose={3500}
       closeOnClick
       hideProgressBar={true}
+      newestOnTop
       stacked
     />
     <ToTop />

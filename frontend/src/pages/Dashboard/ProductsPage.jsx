@@ -52,7 +52,6 @@ const ProductsPage = () => {
         setCurrentPage(event.selected);
     };
 
-    // Utility function to truncate items
     const truncateItems = (items, maxItems = 3) => {
         if (items.length <= maxItems) {
             return items;

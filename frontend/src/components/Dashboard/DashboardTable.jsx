@@ -1,7 +1,7 @@
 import { Paper } from '@mui/material';
 import { DataGrid } from '@mui/x-data-grid';
 import React from 'react';
-import { CustomNoRowsOverlay, CustomToolbar } from '../../assets/CustomComponents';
+import { CustomNoRowsOverlay, DashboardStyling, CustomToolbar } from '../../assets/CustomComponents';
 
 const getNestedValue = (obj, path) => {
     return path.split('.').reduce((acc, part) => acc && acc[part], obj);
@@ -20,7 +20,6 @@ const DashboardTable = ({
     renderTableActions,
     containerClassName,
 }) => {
-    // Prepare columns for DataGrid with even width distribution
     const gridColumns = columns.map((column) => ({
         field: column.key,
         headerName: column.label,
@@ -28,7 +27,11 @@ const DashboardTable = ({
         minWidth: 150,
         renderCell: (params) => {
             if (column.key === 'actions') {
-                return renderActionButtons(params.row);
+                return (
+                    <div onClick={(e) => e.stopPropagation()}>
+                        {renderActionButtons(params.row)}
+                    </div>
+                );
             } else if (column.key === 'password' && containerClassName === 'user') {
                 return '●●●●●●●●●●';
             } else {
@@ -39,11 +42,16 @@ const DashboardTable = ({
         },
     }));
 
-    // Prepare rows for DataGrid
     const gridRows = data.map((item) => ({
         id: item._id,
         ...item,
     }));
+
+    const handleRowClick = (params, event) => {
+        if (!event.target.closest('.MuiDataGrid-actionsCell')) {
+            onSelectItem([params.id]);
+        }
+    };
 
     return (
         <>
@@ -55,14 +63,15 @@ const DashboardTable = ({
                 <DataGrid
                     rows={gridRows}
                     columns={gridColumns}
+                    onSelectionModelChange={(newSelection) => onSelectItem(newSelection)}
+                    onRowClick={handleRowClick}
+                    onRowContextMenu={(event, params) => onRowRightClick(event, params.row)}
                     pageSize={itemsPerPage}
                     page={currentPage}
                     onPageChange={(params) => onPageChange(params.page)}
                     pagination
                     checkboxSelection
-                    onSelectionModelChange={(newSelection) => onSelectItem(newSelection.selectionModel)}
-                    onRowClick={(params) => onSelectItem([params.id])}
-                    onRowContextMenu={(event, params) => onRowRightClick(event, params.row)}
+                    disableColumnResize
                     autoHeight
                     disableSelectionOnClick
                     initialState={{
@@ -72,16 +81,7 @@ const DashboardTable = ({
                         toolbar: CustomToolbar,
                         noRowsOverlay: CustomNoRowsOverlay,
                     }}
-                    sx={{
-                        '& .MuiDataGrid-cell:focus': {
-                            outline: 'none',
-                        },
-                        '& .MuiDataGrid-cell:focus-within': {
-                            outline: 'none',
-                        },
-                        '--DataGrid-overlayHeight': '300px',
-
-                    }}
+                    sx={DashboardStyling}
                 />
             </Paper>
         </>

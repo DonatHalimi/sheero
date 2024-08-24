@@ -81,25 +81,7 @@ const UsersPage = () => {
                 </OutlinedBrownButton>
                 {selectedUsers.length > 0 && (
                     <OutlinedBrownButton
-                        onClick={() => {
-                            // Ensure selectedUsers is a flat array of IDs
-                            const validUserIds = selectedUsers.filter(id => id);
-                            console.log('Selected Users IDs:', validUserIds);
-
-                            // Find corresponding user objects
-                            const selectedUserObjects = validUserIds.map(id => {
-                                const user = users.find(user => user._id === id);
-                                if (!user) {
-                                    console.error('User not found for ID:', id);
-                                }
-                                return user;
-                            }).filter(user => user);
-
-                            console.log('All Users:', users);
-                            console.log('Users to be deleted:', selectedUserObjects);
-
-                            setDeleteUserOpen(true);
-                        }}
+                        onClick={() => setDeleteUserOpen(true)}
                         disabled={selectedUsers.length === 0}
                     >
                         {selectedUsers.length > 1 ? 'Delete Selected Users' : 'Delete User'}

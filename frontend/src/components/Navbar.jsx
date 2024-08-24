@@ -80,11 +80,9 @@ const Navbar = () => {
             <nav className="fixed top-0 left-0 right-0 z-[900] bg-white p-4">
                 <div className="flex justify-between items-center mx-auto max-w-screen-xl">
                     <Tooltip title="Home" arrow>
-                        <span>
-                            <Link to="/" className="flex items-center">
-                                <img src={logo} alt="Logo" className="w-60 h-11" />
-                            </Link>
-                        </span>
+                        <Link to="/" className="flex items-center">
+                            <img src={logo} alt="Logo" className="w-60 h-11" />
+                        </Link>
                     </Tooltip>
                     <div className="flex items-center space-x-4">
                         <div className="flex items-center space-x-4">
@@ -92,14 +90,12 @@ const Navbar = () => {
                                 <>
                                     <div className="relative">
                                         <Tooltip title="Profile" arrow>
-                                            <span>
-                                                <ProfileButton onClick={handleDropdownToggle} className="flex items-center space-x-2 rounded-sm">
-                                                    <StyledPersonIcon />
-                                                    {auth.username && <span className="ml-2 text-sm">{auth.username}</span>}
-                                                </ProfileButton>
+                                            <ProfileButton onClick={handleDropdownToggle} className="flex items-center space-x-2 rounded-sm">
+                                                <StyledPersonIcon />
+                                                {auth.username && <span className="ml-2 text-sm">{auth.username}</span>}
+                                            </ProfileButton>
 
-                                                {isDropdownOpen && <NavbarDropdown />}
-                                            </span>
+                                            {isDropdownOpen && <NavbarDropdown />}
                                         </Tooltip>
                                     </div>
                                     <div className='flex space-x-2'>
