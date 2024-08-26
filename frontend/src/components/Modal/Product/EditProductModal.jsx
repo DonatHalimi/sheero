@@ -39,38 +39,39 @@ const EditProductModal = ({ open, onClose, product, onEditSuccess }) => {
 
     useEffect(() => {
         if (product) {
-            setName(product.name);
-            setDescription(product.description);
-            setPrice(product.price);
+            setName(product.name || '');
+            setDescription(product.description || '');
+            setPrice(product.price || '');
             setSalePrice(product.salePrice || '');
-            setCategory(product.category._id);
-            setSubcategory(product.subcategory._id);
-            setSubSubcategory(product.subSubcategory._id);
-            setInventoryCount(product.inventoryCount);
-            setSupplier(product.supplier._id);
-            if (product.image) {
-                setImagePreview(`http://localhost:5000/${product.image}`);
-            } else {
-                setImagePreview('');
-            }
+            setCategory(product.category?._id || '');
+            setSubcategory(product.subcategory?._id || '');
+            setSubSubcategory(product.subSubcategory?._id || '');
+            setInventoryCount(product.inventoryCount || '');
+            setSupplier(product.supplier?._id || '');
+            setImagePreview(product.image ? `http://localhost:5000/${product.image}` : '');
+
             if (product.dimensions) {
-                setLength(product.dimensions.length);
-                setWidth(product.dimensions.width);
-                setHeight(product.dimensions.height);
+                setLength(product.dimensions.length || '');
+                setWidth(product.dimensions.width || '');
+                setHeight(product.dimensions.height || '');
                 setUnit(product.dimensions.unit || 'cm');
             }
+
             if (product.variants) {
                 setVariants(product.variants);
             }
+
             if (product.discount) {
-                setDiscountType(product.discount.type);
-                setDiscountValue(product.discount.value);
+                setDiscountType(product.discount.type || 'percentage');
+                setDiscountValue(product.discount.value || 0);
             }
+
             if (product.shipping) {
-                setWeight(product.shipping.weight);
-                setShippingCost(product.shipping.cost);
-                setPackageSize(product.shipping.packageSize);
+                setWeight(product.shipping.weight || '');
+                setShippingCost(product.shipping.cost || '');
+                setPackageSize(product.shipping.packageSize || 'medium');
             }
+
             if (product.details) {
                 setDetails(product.details);
             }
@@ -82,19 +83,13 @@ const EditProductModal = ({ open, onClose, product, onEditSuccess }) => {
 
         async function fetchCategoriesAndSubcategories() {
             try {
-                const response = await axiosInstance.get('/categories/get', {
-                    timeout: TIMEOUT,
-                });
+                const response = await axiosInstance.get('/categories/get', { timeout: TIMEOUT });
                 setCategories(response.data);
 
-                const subcategoriesResponse = await axiosInstance.get('/subcategories/get', {
-                    timeout: TIMEOUT,
-                });
+                const subcategoriesResponse = await axiosInstance.get('/subcategories/get', { timeout: TIMEOUT });
                 setSubcategories(subcategoriesResponse.data);
 
-                const subSubcategoriesResponse = await axiosInstance.get('/subsubcategories/get', {
-                    timeout: TIMEOUT,
-                });
+                const subSubcategoriesResponse = await axiosInstance.get('/subsubcategories/get', { timeout: TIMEOUT });
                 setSubSubcategories(subSubcategoriesResponse.data);
             } catch (error) {
                 if (error.code === 'ECONNABORTED') {
@@ -107,9 +102,7 @@ const EditProductModal = ({ open, onClose, product, onEditSuccess }) => {
 
         async function fetchSuppliers() {
             try {
-                const response = await axiosInstance.get('/suppliers/get', {
-                    timeout: TIMEOUT,
-                });
+                const response = await axiosInstance.get('/suppliers/get', { timeout: TIMEOUT });
                 setSuppliers(response.data);
             } catch (error) {
                 if (error.code === 'ECONNABORTED') {

@@ -83,15 +83,20 @@ const deleteUser = async (req, res) => {
 };
 
 const deleteUsers = async (req, res) => {
-    const { userIds } = req.body;
-    try {
-        const users = await User.find({ _id: { $in: userIds } });
+    const { ids } = req.body;
 
-        if (users.length !== userIds.length) {
+    if (!ids || !Array.isArray(ids) || ids.length === 0) {
+        return res.status(400).json({ message: 'Invalid or empty ids array' });
+    }
+
+    try {
+        const users = await User.find({ _id: { $in: ids } });
+
+        if (users.length !== ids.length) {
             return res.status(404).json({ message: 'One or more users not found' });
         }
 
-        await User.deleteMany({ _id: { $in: userIds } });
+        await User.deleteMany({ _id: { $in: ids } });
 
         res.status(200).json({ message: 'Users deleted successfully' });
     } catch (error) {

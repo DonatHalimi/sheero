@@ -3,8 +3,8 @@ import React, { useContext, useEffect, useState } from 'react';
 import { ActionButton, BrownCreateOutlinedIcon, OutlinedBrownButton } from '../../assets/CustomComponents';
 import useAxios from '../../axiosInstance';
 import DashboardTable from '../../components/Dashboard/DashboardTable';
+import DeleteModal from '../../components/Modal/DeleteModal';
 import AddSupplierModal from '../../components/Modal/Supplier/AddSupplierModal';
-import DeleteSupplierModal from '../../components/Modal/Supplier/DeleteSupplierModal';
 import EditSupplierModal from '../../components/Modal/Supplier/EditSupplierModal';
 import { AuthContext } from '../../context/AuthContext';
 
@@ -106,7 +106,15 @@ const SupplierPage = () => {
 
                 <AddSupplierModal open={addSupplierOpen} onClose={() => setAddSupplierOpen(false)} onAddSuccess={fetchSuppliers} />
                 <EditSupplierModal open={editSupplierOpen} onClose={() => setEditSupplierOpen(false)} supplier={selectedSupplier} onEditSuccess={fetchSuppliers} />
-                <DeleteSupplierModal open={deleteSupplierOpen} onClose={() => setDeleteSupplierOpen(false)} suppliers={selectedSuppliers.map(id => suppliers.find(supplier => supplier._id === id))} onDeleteSuccess={fetchSuppliers} />
+                <DeleteModal
+                    open={deleteSupplierOpen}
+                    onClose={() => setDeleteSupplierOpen(false)}
+                    items={selectedSuppliers.map(id => suppliers.find(supplier => supplier._id === id)).filter(supplier => supplier)}
+                    onDeleteSuccess={fetchSuppliers}
+                    endpoint="/suppliers/delete-bulk"
+                    title="Delete Suppliers"
+                    message="Are you sure you want to delete the selected suppliers?"
+                />
             </div>
         </div>
     );

@@ -1,7 +1,7 @@
 import { Paper } from '@mui/material';
 import { DataGrid } from '@mui/x-data-grid';
 import React from 'react';
-import { CustomNoRowsOverlay, DashboardStyling, CustomToolbar } from '../../assets/CustomComponents';
+import { CustomNoRowsOverlay, CustomToolbar, DashboardStyling } from '../../assets/CustomComponents';
 
 const getNestedValue = (obj, path) => {
     return path.split('.').reduce((acc, part) => acc && acc[part], obj);
@@ -32,6 +32,12 @@ const DashboardTable = ({
                         {renderActionButtons(params.row)}
                     </div>
                 );
+            } else if (column.key === 'image') {
+                return (
+                    <div onClick={(e) => e.stopPropagation()}>
+                        {column.render(params.row)}
+                    </div>
+                );
             } else if (column.key === 'password' && containerClassName === 'user') {
                 return '●●●●●●●●●●';
             } else {
@@ -48,7 +54,7 @@ const DashboardTable = ({
     }));
 
     const handleRowClick = (params, event) => {
-        if (!event.target.closest('.MuiDataGrid-actionsCell')) {
+        if (!event.target.closest('.MuiDataGrid-actionsCell') && !event.target.closest('.MuiDataGrid-imageCell')) {
             onSelectItem([params.id]);
         }
     };

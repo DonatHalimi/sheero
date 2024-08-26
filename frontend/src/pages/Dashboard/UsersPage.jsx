@@ -3,8 +3,8 @@ import React, { useContext, useEffect, useState } from 'react';
 import { ActionButton, BrownCreateOutlinedIcon, OutlinedBrownButton } from '../../assets/CustomComponents';
 import useAxios from '../../axiosInstance';
 import DashboardTable from '../../components/Dashboard/DashboardTable';
+import DeleteModal from '../../components/Modal/DeleteModal';
 import AddUserModal from '../../components/Modal/User/AddUserModal';
-import DeleteUserModal from '../../components/Modal/User/DeleteUserModal';
 import EditUserModal from '../../components/Modal/User/EditUserModal';
 import { AuthContext } from '../../context/AuthContext';
 
@@ -110,11 +110,14 @@ const UsersPage = () => {
 
                 <AddUserModal open={addUserOpen} onClose={() => setAddUserOpen(false)} onAddSuccess={fetchUsers} />
                 <EditUserModal open={editUserOpen} onClose={() => setEditUserOpen(false)} user={selectedUser} onEditSuccess={fetchUsers} />
-                <DeleteUserModal
+                <DeleteModal
                     open={deleteUserOpen}
                     onClose={() => setDeleteUserOpen(false)}
-                    users={selectedUsers.map(id => users.find(user => user._id === id)).filter(user => user)}
+                    items={selectedUsers.map(id => users.find(user => user._id === id)).filter(user => user)}
                     onDeleteSuccess={fetchUsers}
+                    endpoint="/users/delete-bulk"
+                    title="Delete Users"
+                    message="Are you sure you want to delete the selected users?"
                 />
             </div>
         </div>

@@ -3,8 +3,8 @@ import React, { useContext, useEffect, useState } from 'react';
 import { ActionButton, BrownCreateOutlinedIcon, OutlinedBrownButton } from '../../assets/CustomComponents';
 import useAxios from '../../axiosInstance';
 import DashboardTable from '../../components/Dashboard/DashboardTable';
+import DeleteModal from '../../components/Modal/DeleteModal';
 import AddSubSubcategoryModal from '../../components/Modal/SubSubcategory/AddSubSubcategoryModal';
-import DeleteSubSubcategoryModal from '../../components/Modal/SubSubcategory/DeleteSubSubcategoryModal';
 import EditSubSubcategoryModal from '../../components/Modal/SubSubcategory/EditSubSubcategoryModal';
 import { AuthContext } from '../../context/AuthContext';
 
@@ -101,7 +101,15 @@ const SubSubcategoriesPage = () => {
 
                 <AddSubSubcategoryModal open={addSubSubcategoryOpen} onClose={() => setAddSubSubcategoryOpen(false)} onAddSuccess={fetchSubSubcategories} />
                 <EditSubSubcategoryModal open={editSubSubcategoryOpen} onClose={() => setEditSubSubcategoryOpen(false)} subSubcategory={selectedSubSubcategory} onEditSuccess={fetchSubSubcategories} />
-                <DeleteSubSubcategoryModal open={deleteSubSubcategoryOpen} onClose={() => setDeleteSubSubcategoryOpen(false)} subSubcategories={selectedSubSubcategories.map(id => subSubcategories.find(subSubcategory => subSubcategory._id === id))} onDeleteSuccess={fetchSubSubcategories} />
+                <DeleteModal
+                    open={deleteSubSubcategoryOpen}
+                    onClose={() => setDeleteSubSubcategoryOpen(false)}
+                    items={selectedSubSubcategories.map(id => subSubcategories.find(subsubcategory => subsubcategory._id === id)).filter(subsubcategory => subsubcategory)}
+                    onDeleteSuccess={fetchSubSubcategories}
+                    endpoint="/subsubcategories/delete-bulk"
+                    title="Delete SubSubcategories"
+                    message="Are you sure you want to delete the selected subsubcategories?"
+                />
             </div>
         </div>
     );

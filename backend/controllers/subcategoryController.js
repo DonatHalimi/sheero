@@ -124,11 +124,16 @@ const deleteSubcategory = async (req, res) => {
 };
 
 const deleteSubcategories = async (req, res) => {
-    const { subcategoryIds } = req.body;
-    try {
-        const subcategories = await Subcategory.find({ _id: { $in: subcategoryIds } });
+    const { ids } = req.body;
 
-        if (subcategories.length !== subcategoryIds.length) {
+    if (!ids || !Array.isArray(ids) || ids.length === 0) {
+        return res.status(400).json({ message: 'Invalid or empty ids array' });
+    }
+
+    try {
+        const subcategories = await Subcategory.find({ _id: { $in: ids } });
+
+        if (subcategories.length !== ids.length) {
             return res.status(404).json({ message: 'One or more subcategories not found' });
         }
 
@@ -150,11 +155,11 @@ const deleteSubcategories = async (req, res) => {
             }
         }
 
-        await Subcategory.deleteMany({ _id: { $in: subcategoryIds } });
+        await Subcategory.deleteMany({ _id: { $in: ids } });
 
         res.status(200).json({ message: 'Subcategories deleted successfully' });
     } catch (error) {
-        console.error('Error deleting subcategories:', error);
+        console.error('Server error:', error);
         res.status(500).json({ message: 'Server error', error: error.message });
     }
 };

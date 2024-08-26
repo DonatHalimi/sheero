@@ -3,8 +3,9 @@ import React, { useContext, useEffect, useState } from 'react';
 import { ActionButton, BrownCreateOutlinedIcon, OutlinedBrownButton } from '../../assets/CustomComponents';
 import useAxios from '../../axiosInstance';
 import DashboardTable from '../../components/Dashboard/DashboardTable';
+import DeleteModal from '../../components/Modal/DeleteModal';
+import ImagePreviewModal from '../../components/Modal/ImagePreviewModal';
 import AddProductModal from '../../components/Modal/Product/AddProductModal';
-import DeleteProductModal from '../../components/Modal/Product/DeleteProductModal';
 import EditProductModal from '../../components/Modal/Product/EditProductModal';
 import { AuthContext } from '../../context/AuthContext';
 
@@ -15,6 +16,7 @@ const ProductsPage = () => {
     const [addProductOpen, setAddProductOpen] = useState(false);
     const [editProductOpen, setEditProductOpen] = useState(false);
     const [deleteProductOpen, setDeleteProductOpen] = useState(false);
+    const [imagePreviewOpen, setImagePreviewOpen] = useState(false);
     const [currentPage, setCurrentPage] = useState(0);
     const itemsPerPage = 6;
 
@@ -59,6 +61,11 @@ const ProductsPage = () => {
         return [...items.slice(0, maxItems), '...'];
     };
 
+    const handleImageClick = (imageUrl) => {
+        setSelectedProduct(imageUrl);
+        setImagePreviewOpen(true);
+    };
+
     const columns = [
         { key: 'name', label: 'Name' },
         { key: 'description', label: 'Description' },
@@ -74,7 +81,19 @@ const ProductsPage = () => {
         { key: 'discount', label: 'Discount', render: (item) => item.discount ? `${item.discount.value}${item.discount.type === 'percentage' ? '%' : ''}` : 'N/A' },
         { key: 'supplier.name', label: 'Supplier' },
         { key: 'shipping', label: 'Shipping', render: (item) => item.shipping ? `${item.shipping.weight} kg, ${item.shipping.cost}€, ${item.shipping.packageSize}` : 'None' },
-        { key: 'image', label: 'Image', render: (item) => <img className='rounded-md' src={`http://localhost:5000/${item.image}`} alt="" width={80} /> },
+        {
+            key: 'image',
+            label: 'Image',
+            render: (item) => (
+                <img
+                    className='rounded-md cursor-pointer'
+                    src={`http://localhost:5000/${item.image}`}
+                    alt=""
+                    width={80}
+                    onClick={() => handleImageClick(`http://localhost:5000/${item.image}`)}
+                />
+            )
+        },
         { key: 'actions', label: 'Actions' }
     ];
 
@@ -122,7 +141,16 @@ const ProductsPage = () => {
 
                 <AddProductModal open={addProductOpen} onClose={() => setAddProductOpen(false)} onAddSuccess={fetchProducts} />
                 <EditProductModal open={editProductOpen} onClose={() => setEditProductOpen(false)} product={selectedProduct} onEditSuccess={fetchProducts} />
-                <DeleteProductModal open={deleteProductOpen} onClose={() => setDeleteProductOpen(false)} products={selectedProducts.map(id => products.find(product => product._id === id))} onDeleteSuccess={fetchProducts} />
+                <DeleteModal
+                    open={deleteProductOpen}
+                    onClose={() => setDeleteProductOpen(false)}
+                    items={selectedProducts.map(id => products.find(product => product._id === id)).filter(product => product)}
+                    onDeleteSuccess={fetchProducts}
+                    endpoint="/products/delete-bulk"
+                    title="Delete Products"
+                    message="Are you sure you want to delete the selected products?"
+                />
+                <ImagePreviewModal open={imagePreviewOpen} onClose={() => setImagePreviewOpen(false)} imageUrl={selectedProduct} />
             </div>
         </div>
     );

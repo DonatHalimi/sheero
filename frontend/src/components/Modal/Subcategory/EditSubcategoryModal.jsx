@@ -1,8 +1,8 @@
 import UploadIcon from '@mui/icons-material/Upload';
-import { Box, InputLabel, MenuItem, Modal, Select, Typography } from '@mui/material';
+import { InputLabel, MenuItem, Select } from '@mui/material';
 import React, { useContext, useEffect, useState } from 'react';
 import { toast } from 'react-toastify';
-import { BrownButton, BrownOutlinedTextField, OutlinedBrownButton, OutlinedBrownFormControl, VisuallyHiddenInput } from '../../../assets/CustomComponents';
+import { BrownButton, BrownOutlinedTextField, CustomBox, CustomModal, CustomTypography, OutlinedBrownButton, OutlinedBrownFormControl, VisuallyHiddenInput } from '../../../assets/CustomComponents';
 import useAxios from '../../../axiosInstance';
 import { AuthContext } from '../../../context/AuthContext';
 
@@ -18,15 +18,13 @@ const EditSubcategoryModal = ({ open, onClose, subcategory, onEditSuccess }) => 
 
     useEffect(() => {
         if (subcategory) {
-            setName(subcategory.name);
-            if (subcategory.image) {
-                setImagePreview(`http://localhost:5000/${subcategory.image}`);
-            } else {
-                setImagePreview('');
-            }
-            setCategory(subcategory.category._id);
+            setName(subcategory.name || '');
+            setCategory(subcategory.category?._id || '');
+            setImagePreview(subcategory.image ? `http://localhost:5000/${subcategory.image}` : '');
         }
+    }, [subcategory]);
 
+    useEffect(() => {
         const fetchCategories = async () => {
             try {
                 const response = await axiosInstance.get('/categories/get');
@@ -38,12 +36,12 @@ const EditSubcategoryModal = ({ open, onClose, subcategory, onEditSuccess }) => 
         };
 
         fetchCategories();
-    }, [subcategory]);
+    }, [axiosInstance]);
 
     const handleEditSubcategory = async () => {
         const formData = new FormData();
         formData.append('name', name);
-        formData.append('category', category)
+        formData.append('category', category);
         if (image) {
             formData.append('image', image);
         }
@@ -51,8 +49,8 @@ const EditSubcategoryModal = ({ open, onClose, subcategory, onEditSuccess }) => 
         try {
             await axiosInstance.put(`/subcategories/update/${subcategory._id}`, formData, {
                 headers: {
-                    'Content-Type': 'multipart/form-data'
-                }
+                    'Content-Type': 'multipart/form-data',
+                },
             });
             toast.success('Subcategory updated successfully');
             onEditSuccess();
@@ -76,34 +74,35 @@ const EditSubcategoryModal = ({ open, onClose, subcategory, onEditSuccess }) => 
     };
 
     return (
-        <Modal open={open} onClose={onClose} className='flex items-center justify-center'>
-            <Box className="bg-white p-4 rounded-lg shadow-lg max-w-md w-full">
-                <Typography variant='h5' className="!text-xl !font-bold !mb-6">Edit Subcategory</Typography>
+        <CustomModal open={open} onClose={onClose}>
+            <CustomBox>
+                <CustomTypography variant="h5">Edit Subcategory</CustomTypography>
+
                 <BrownOutlinedTextField
                     label="Name"
                     value={name}
                     onChange={(e) => setName(e.target.value)}
                     fullWidth
-                    className='!mb-4'
+                    className="!mb-4"
                 />
                 <OutlinedBrownFormControl fullWidth margin="normal">
                     <InputLabel>Category</InputLabel>
                     <Select
-                        label='Category'
+                        label="Category"
                         value={category}
                         onChange={(e) => setCategory(e.target.value)}
-                        className='!mb-4'
+                        className="!mb-4"
                     >
                         {categories.map((cat) => (
-                            <MenuItem key={cat._id} value={cat._id}>{cat.name}</MenuItem>
+                            <MenuItem key={cat._id} value={cat._id}>
+                                {cat.name}
+                            </MenuItem>
                         ))}
                     </Select>
                 </OutlinedBrownFormControl>
                 <OutlinedBrownButton
                     component="label"
-                    role={undefined}
                     variant="contained"
-                    tabIndex={-1}
                     startIcon={<UploadIcon />}
                     className="w-full !mb-6"
                 >
@@ -115,16 +114,11 @@ const EditSubcategoryModal = ({ open, onClose, subcategory, onEditSuccess }) => 
                         <img src={imagePreview} alt="Preview" className="max-w-full h-auto mx-auto rounded-md" />
                     </div>
                 )}
-                <BrownButton
-                    onClick={handleEditSubcategory}
-                    variant="contained"
-                    color="primary"
-                    className="w-full"
-                >
+                <BrownButton onClick={handleEditSubcategory} variant="contained" color="primary" className="w-full">
                     Save Changes
                 </BrownButton>
-            </Box>
-        </Modal>
+            </CustomBox>
+        </CustomModal>
     );
 };
 

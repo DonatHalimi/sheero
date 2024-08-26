@@ -78,15 +78,20 @@ const deleteSupplier = async (req, res) => {
 };
 
 const deleteSuppliers = async (req, res) => {
-    const { supplierIds } = req.body;
-    try {
-        const suppliers = await Supplier.find({ _id: { $in: supplierIds } });
+    const { ids } = req.body;
 
-        if (suppliers.length !== supplierIds.length) {
+    if (!ids || !Array.isArray(ids) || ids.length === 0) {
+        return res.status(400).json({ message: 'Invalid or empty ids array' });
+    }
+
+    try {
+        const suppliers = await Supplier.find({ _id: { $in: ids } });
+
+        if (suppliers.length !== ids.length) {
             return res.status(404).json({ message: 'One or more suppliers not found' });
         }
 
-        await Supplier.deleteMany({ _id: { $in: supplierIds } });
+        await Supplier.deleteMany({ _id: { $in: ids } });
 
         res.status(200).json({ message: 'Suppliers deleted successfully' });
     } catch (error) {

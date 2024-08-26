@@ -1,7 +1,7 @@
-import { Autocomplete, Box, Modal, TextField, Typography } from '@mui/material';
+import { Autocomplete, TextField } from '@mui/material';
 import React, { useEffect, useState } from 'react';
 import { toast } from 'react-toastify';
-import { BrownButton, BrownOutlinedTextField, CustomPaper } from '../../../assets/CustomComponents';
+import { BrownButton, BrownOutlinedTextField, CustomBox, CustomModal, CustomPaper, CustomTypography } from '../../../assets/CustomComponents';
 import useAxios from '../../../axiosInstance';
 
 const AddAddressModal = ({ open, onClose, onAddSuccess }) => {
@@ -72,9 +72,9 @@ const AddAddressModal = ({ open, onClose, onAddSuccess }) => {
     };
 
     return (
-        <Modal open={open} onClose={onClose} className="flex items-center justify-center">
-            <Box className="bg-white p-4 rounded-lg shadow-lg max-w-md">
-                <Typography variant='h5' className="!text-xl !font-bold !mb-4">Add Address</Typography>
+        <CustomModal open={open} onClose={onClose}>
+            <CustomBox>
+                <CustomTypography variant="h5">Add Address</CustomTypography>
 
                 <BrownOutlinedTextField
                     fullWidth
@@ -116,6 +116,7 @@ const AddAddressModal = ({ open, onClose, onAddSuccess }) => {
                     onChange={(event, newValue) => setCity(newValue)}
                     PaperComponent={CustomPaper}
                     fullWidth
+                    required
                     renderInput={(params) => <TextField {...params} label="City" variant="outlined" />}
                     className='!mb-4'
                 />
@@ -128,8 +129,8 @@ const AddAddressModal = ({ open, onClose, onAddSuccess }) => {
                 >
                     Add
                 </BrownButton>
-            </Box>
-        </Modal>
+            </CustomBox>
+        </CustomModal>
     );
 };
 

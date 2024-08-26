@@ -4,8 +4,8 @@ import { ActionButton, BrownCreateOutlinedIcon, OutlinedBrownButton } from '../.
 import useAxios from '../../axiosInstance';
 import DashboardTable from '../../components/Dashboard/DashboardTable';
 import AddCityModal from '../../components/Modal/City/AddCityModal';
-import DeleteCityModal from '../../components/Modal/City/DeleteCityModal';
 import EditCityModal from '../../components/Modal/City/EditCityModal';
+import DeleteModal from '../../components/Modal/DeleteModal';
 import { AuthContext } from '../../context/AuthContext';
 
 const CitiesPage = () => {
@@ -102,7 +102,15 @@ const CitiesPage = () => {
 
                 <AddCityModal open={addCityOpen} onClose={() => setAddCityOpen(false)} onAddSuccess={fetchCities} />
                 <EditCityModal open={editCityOpen} onClose={() => setEditCityOpen(false)} city={selectedCity} onEditSuccess={fetchCities} />
-                <DeleteCityModal open={deleteCityOpen} onClose={() => setDeleteCityOpen(false)} cities={selectedCities.map(id => cities.find(city => city._id === id))} onDeleteSuccess={fetchCities} />
+                <DeleteModal
+                    open={deleteCityOpen}
+                    onClose={() => setDeleteCityOpen(false)}
+                    items={selectedCities.map(id => cities.find(city => city._id === id)).filter(city => city)}
+                    onDeleteSuccess={fetchCities}
+                    endpoint="/cities/delete-bulk"
+                    title="Delete Cities"
+                    message="Are you sure you want to delete the selected cities?"
+                />
             </div>
         </div>
     );

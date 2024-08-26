@@ -133,7 +133,8 @@ const ProductDetailsTabs = ({ product }) => {
           boxShadow: 24,
           p: 2,
           display: 'flex',
-          flexDirection: 'column'
+          flexDirection: 'column',
+          outline: 'none'
         }}>
           <Box sx={{
             display: 'flex',

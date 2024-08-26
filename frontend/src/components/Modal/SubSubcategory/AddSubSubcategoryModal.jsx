@@ -1,13 +1,13 @@
-import { Autocomplete, Box, Modal, TextField, Typography } from '@mui/material';
+import { Autocomplete, TextField } from '@mui/material';
 import React, { useContext, useEffect, useState } from 'react';
 import { toast } from 'react-toastify';
-import { BrownButton, BrownOutlinedTextField, CustomPaper } from '../../../assets/CustomComponents';
+import { BrownButton, BrownOutlinedTextField, CustomBox, CustomModal, CustomPaper, CustomTypography } from '../../../assets/CustomComponents';
 import useAxios from '../../../axiosInstance';
 import { AuthContext } from '../../../context/AuthContext';
 
 const AddSubSubcategoryModal = ({ open, onClose, onAddSuccess }) => {
     const [name, setName] = useState('');
-    const [subcategory, setSubcategory] = useState(null); // Initialize with null
+    const [subcategory, setSubcategory] = useState(null);
     const [subcategories, setSubcategories] = useState([]);
 
     const { refreshToken } = useContext(AuthContext);
@@ -55,9 +55,10 @@ const AddSubSubcategoryModal = ({ open, onClose, onAddSuccess }) => {
     };
 
     return (
-        <Modal open={open} onClose={onClose} className="flex items-center justify-center">
-            <Box className="bg-white p-4 rounded-lg shadow-lg max-w-md w-full">
-                <Typography variant='h5' className="!text-xl !font-bold !mb-6">Add SubSubcategory</Typography>
+        <CustomModal open={open} onClose={onClose}>
+            <CustomBox>
+                <CustomTypography variant="h5">Add SubSubcategory</CustomTypography>
+
                 <BrownOutlinedTextField
                     label="Name"
                     value={name}
@@ -85,8 +86,8 @@ const AddSubSubcategoryModal = ({ open, onClose, onAddSuccess }) => {
                 >
                     Add
                 </BrownButton>
-            </Box>
-        </Modal>
+            </CustomBox>
+        </CustomModal>
     );
 };
 

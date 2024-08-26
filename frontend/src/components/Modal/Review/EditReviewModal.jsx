@@ -1,7 +1,7 @@
-import { Box, InputLabel, MenuItem, Modal, Select, Typography } from '@mui/material';
+import { InputLabel, MenuItem, Select } from '@mui/material';
 import React, { useContext, useEffect, useState } from 'react';
 import { toast } from 'react-toastify';
-import { BrownButton, BrownOutlinedTextField, OutlinedBrownFormControl } from '../../../assets/CustomComponents';
+import { BrownButton, BrownOutlinedTextField, CustomBox, CustomModal, CustomTypography, OutlinedBrownFormControl } from '../../../assets/CustomComponents';
 import useAxios from '../../../axiosInstance';
 import { AuthContext } from '../../../context/AuthContext';
 
@@ -63,48 +63,47 @@ const EditReviewModal = ({ open, onClose, review, onEditSuccess }) => {
     };
 
     return (
-        <Modal open={open} onClose={onClose}>
-            <div className="flex items-center justify-center h-screen">
-                <Box className="bg-white p-4 rounded-lg shadow-lg max-w-md w-full max-h-[80vh] overflow-y-auto">
-                    <Typography variant='h5' className="!text-xl !font-bold !mb-6">Edit Review</Typography>
-                    <OutlinedBrownFormControl fullWidth className="mb-4">
-                        <InputLabel>Product</InputLabel>
-                        <Select
-                            label="Product"
-                            value={product}
-                            onChange={(e) => setProduct(e.target.value)}
-                            className='!mb-4'
-                        >
-                            {products.map((product) => (
-                                <MenuItem key={product._id} value={product._id}>
-                                    {product.name}
-                                </MenuItem>
-                            ))}
-                        </Select>
-                    </OutlinedBrownFormControl>
-                    <BrownOutlinedTextField
-                        label="Rating"
-                        value={rating}
-                        onChange={(e) => setRating(e.target.value)}
-                        fullWidth
+        <CustomModal open={open} onClose={onClose}>
+            <CustomBox>
+                <CustomTypography variant="h5">Edit Review</CustomTypography>
+
+                <OutlinedBrownFormControl fullWidth className="mb-4">
+                    <InputLabel>Product</InputLabel>
+                    <Select
+                        label="Product"
+                        value={product}
+                        onChange={(e) => setProduct(e.target.value)}
                         className='!mb-4'
-                    />
-                    <BrownOutlinedTextField
-                        label="Comment"
-                        value={comment}
-                        onChange={(e) => setComment(e.target.value)}
-                        fullWidth
-                        className='!mb-4'
-                    />
-                    <BrownButton
-                        onClick={handleEditReview}
-                        fullWidth
                     >
-                        Save Changes
-                    </BrownButton>
-                </Box>
-            </div>
-        </Modal>
+                        {products.map((product) => (
+                            <MenuItem key={product._id} value={product._id}>
+                                {product.name}
+                            </MenuItem>
+                        ))}
+                    </Select>
+                </OutlinedBrownFormControl>
+                <BrownOutlinedTextField
+                    label="Rating"
+                    value={rating}
+                    onChange={(e) => setRating(e.target.value)}
+                    fullWidth
+                    className='!mb-4'
+                />
+                <BrownOutlinedTextField
+                    label="Comment"
+                    value={comment}
+                    onChange={(e) => setComment(e.target.value)}
+                    fullWidth
+                    className='!mb-4'
+                />
+                <BrownButton
+                    onClick={handleEditReview}
+                    fullWidth
+                >
+                    Save Changes
+                </BrownButton>
+            </CustomBox>
+        </CustomModal>
     );
 };
 

@@ -1,7 +1,7 @@
-import { Box, InputLabel, MenuItem, Modal, Select, Typography } from '@mui/material';
+import { InputLabel, MenuItem, Select } from '@mui/material';
 import React, { useContext, useEffect, useState } from 'react';
 import { toast } from 'react-toastify';
-import { BrownButton, BrownOutlinedTextField, OutlinedBrownFormControl } from '../../../assets/CustomComponents';
+import { BrownButton, BrownOutlinedTextField, CustomBox, CustomModal, CustomTypography, OutlinedBrownFormControl } from '../../../assets/CustomComponents';
 import useAxios from '../../../axiosInstance';
 import { AuthContext } from '../../../context/AuthContext';
 
@@ -53,9 +53,10 @@ const EditCityModal = ({ open, onClose, city, onEditSuccess }) => {
     };
 
     return (
-        <Modal open={open} onClose={onClose} className="flex items-center justify-center">
-            <Box className="bg-white p-4 rounded-lg shadow-lg w-full max-w-md">
-                <Typography variant='h5' className="!text-xl !font-bold !mb-6">Edit City</Typography>
+        <CustomModal open={open} onClose={onClose}>
+            <CustomBox>
+                <CustomTypography variant="h5">Edit Category</CustomTypography>
+
                 <BrownOutlinedTextField
                     fullWidth
                     required
@@ -94,8 +95,8 @@ const EditCityModal = ({ open, onClose, city, onEditSuccess }) => {
                 >
                     Save
                 </BrownButton>
-            </Box>
-        </Modal>
+            </CustomBox>
+        </CustomModal>
     );
 };
 

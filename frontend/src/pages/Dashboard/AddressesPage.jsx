@@ -4,8 +4,8 @@ import { ActionButton, BrownCreateOutlinedIcon, OutlinedBrownButton } from '../.
 import useAxios from '../../axiosInstance';
 import DashboardTable from '../../components/Dashboard/DashboardTable';
 import AddAddressModal from '../../components/Modal/Address/AddAddressModal';
-import DeleteAddressModal from '../../components/Modal/Address/DeleteAddressModal';
 import EditAddressModal from '../../components/Modal/Address/EditAddressModal';
+import DeleteModal from '../../components/Modal/DeleteModal';
 import { AuthContext } from '../../context/AuthContext';
 
 const AddressesPage = () => {
@@ -99,7 +99,15 @@ const AddressesPage = () => {
 
                 <AddAddressModal open={addAddressOpen} onClose={() => setAddAddressOpen(false)} onAddSuccess={fetchAddresses} />
                 <EditAddressModal open={editAddressOpen} onClose={() => setEditAddressOpen(false)} address={selectedAddress} onEditSuccess={fetchAddresses} />
-                <DeleteAddressModal open={deleteAddressOpen} onClose={() => setDeleteAddressOpen(false)} addresses={selectedAddresses.map(id => addresses.find(address => address._id === id))} onDeleteSuccess={fetchAddresses} />
+                <DeleteModal
+                    open={deleteAddressOpen}
+                    onClose={() => setDeleteAddressOpen(false)}
+                    items={selectedAddresses.map(id => addresses.find(address => address._id === id)).filter(address => address)}
+                    onDeleteSuccess={fetchAddresses}
+                    endpoint="/addresses/delete-bulk"
+                    title="Delete Addresses"
+                    message="Are you sure you want to delete the selected addresses?"
+                />
             </div>
         </div>
     );

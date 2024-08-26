@@ -4,8 +4,9 @@ import { ActionButton, BrownCreateOutlinedIcon, OutlinedBrownButton } from '../.
 import useAxios from '../../axiosInstance';
 import DashboardTable from '../../components/Dashboard/DashboardTable';
 import AddCategoryModal from '../../components/Modal/Category/AddCategoryModal';
-import DeleteCategoryModal from '../../components/Modal/Category/DeleteCategoryModal';
 import EditCategoryModal from '../../components/Modal/Category/EditCategoryModal';
+import DeleteModal from '../../components/Modal/DeleteModal';
+import ImagePreviewModal from '../../components/Modal/ImagePreviewModal';
 import { AuthContext } from '../../context/AuthContext';
 
 const CategoriesPage = () => {
@@ -15,6 +16,7 @@ const CategoriesPage = () => {
     const [addCategoryOpen, setAddCategoryOpen] = useState(false);
     const [editCategoryOpen, setEditCategoryOpen] = useState(false);
     const [deleteCategoryOpen, setDeleteCategoryOpen] = useState(false);
+    const [imagePreviewOpen, setImagePreviewOpen] = useState(false);
     const [currentPage, setCurrentPage] = useState(0);
     const itemsPerPage = 5;
 
@@ -52,9 +54,26 @@ const CategoriesPage = () => {
         setCurrentPage(event.selected);
     };
 
+    const handleImageClick = (imageUrl) => {
+        setSelectedCategory(imageUrl);
+        setImagePreviewOpen(true);
+    };
+
     const columns = [
         { key: 'name', label: 'Name' },
-        { key: 'image', label: 'Image', render: (item) => <img className='rounded-md' src={`http://localhost:5000/${item.image}`} alt={item.name} width={80} /> },
+        {
+            key: 'image',
+            label: 'Image',
+            render: (item) => (
+                <img
+                    className='rounded-md cursor-pointer'
+                    src={`http://localhost:5000/${item.image}`}
+                    alt=""
+                    width={80}
+                    onClick={() => handleImageClick(`http://localhost:5000/${item.image}`)}
+                />
+            )
+        },
         { key: 'actions', label: 'Actions' }
     ];
 
@@ -101,7 +120,16 @@ const CategoriesPage = () => {
 
                 <AddCategoryModal open={addCategoryOpen} onClose={() => setAddCategoryOpen(false)} onAddSuccess={fetchCategories} />
                 <EditCategoryModal open={editCategoryOpen} onClose={() => setEditCategoryOpen(false)} category={selectedCategory} onEditSuccess={fetchCategories} />
-                <DeleteCategoryModal open={deleteCategoryOpen} onClose={() => setDeleteCategoryOpen(false)} categories={selectedCategories.map(id => categories.find(category => category._id === id))} onDeleteSuccess={fetchCategories} />
+                <DeleteModal
+                    open={deleteCategoryOpen}
+                    onClose={() => setDeleteCategoryOpen(false)}
+                    items={selectedCategories.map(id => categories.find(category => category._id === id)).filter(category => category)}
+                    onDeleteSuccess={fetchCategories}
+                    endpoint="/categories/delete-bulk"
+                    title="Delete Categories"
+                    message="Are you sure you want to delete the selected categories?"
+                />
+                <ImagePreviewModal open={imagePreviewOpen} onClose={() => setImagePreviewOpen(false)} imageUrl={selectedCategory} />
             </div>
         </div>
     );

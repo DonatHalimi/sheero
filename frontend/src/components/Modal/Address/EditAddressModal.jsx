@@ -1,7 +1,7 @@
-import { Box, InputLabel, MenuItem, Modal, Select, Typography } from '@mui/material';
+import { InputLabel, MenuItem, Select } from '@mui/material';
 import React, { useEffect, useState } from 'react';
 import { toast } from 'react-toastify';
-import { BrownButton, BrownOutlinedTextField, OutlinedBrownFormControl } from '../../../assets/CustomComponents';
+import { BrownButton, BrownOutlinedTextField, CustomBox, CustomModal, CustomTypography, OutlinedBrownFormControl } from '../../../assets/CustomComponents';
 import useAxios from '../../../axiosInstance';
 
 const EditAddressModal = ({ open, onClose, address, onEditSuccess }) => {
@@ -59,9 +59,10 @@ const EditAddressModal = ({ open, onClose, address, onEditSuccess }) => {
     };
 
     return (
-        <Modal open={open} onClose={onClose} className='flex items-center justify-center'>
-            <Box className="bg-white p-4 rounded-lg shadow-lg max-w-md w-full">
-                <Typography variant='h5' className="!text-xl !font-bold !mb-4">Edit Address</Typography>
+        <CustomModal open={open} onClose={onClose}>
+            <CustomBox>
+                <CustomTypography variant="h5">Edit Address</CustomTypography>
+
                 <BrownOutlinedTextField
                     label="Name"
                     value={name}
@@ -114,8 +115,8 @@ const EditAddressModal = ({ open, onClose, address, onEditSuccess }) => {
                 >
                     Update
                 </BrownButton>
-            </Box>
-        </Modal>
+            </CustomBox>
+        </CustomModal>
     );
 };
 

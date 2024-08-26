@@ -85,11 +85,16 @@ const deleteImage = async (req, res) => {
 };
 
 const deleteImages = async (req, res) => {
-    const { imageIds } = req.body;
-    try {
-        const images = await SlideshowImage.find({ _id: { $in: imageIds } });
+    const { ids } = req.body;
 
-        if (images.length !== imageIds.length) {
+    if (!ids || !Array.isArray(ids) || ids.length === 0) {
+        return res.status(400).json({ message: 'Invalid or empty ids array' });
+    }
+
+    try {
+        const images = await SlideshowImage.find({ _id: { $in: ids } });
+
+        if (images.length !== ids.length) {
             return res.status(404).json({ message: 'One or more images not found' });
         }
 
@@ -101,7 +106,7 @@ const deleteImages = async (req, res) => {
             }
         }
 
-        await SlideshowImage.deleteMany({ _id: { $in: imageIds } });
+        await SlideshowImage.deleteMany({ _id: { $in: ids } });
 
         res.status(200).json({ message: 'Images deleted successfully' });
     } catch (error) {

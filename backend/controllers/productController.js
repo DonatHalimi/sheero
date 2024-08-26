@@ -142,11 +142,16 @@ const deleteProduct = async (req, res) => {
 };
 
 const deleteProducts = async (req, res) => {
-    const { productIds } = req.body;
-    try {
-        const products = await Product.find({ _id: { $in: productIds } });
+    const { ids } = req.body;
 
-        if (products.length !== productIds.length) {
+    if (!ids || !Array.isArray(ids) || ids.length === 0) {
+        return res.status(400).json({ message: 'Invalid or empty ids array' });
+    }
+
+    try {
+        const products = await Product.find({ _id: { $in: ids } });
+
+        if (products.length !== ids.length) {
             return res.status(404).json({ message: 'One or more products not found' });
         }
 
@@ -162,7 +167,7 @@ const deleteProducts = async (req, res) => {
             }
         }
 
-        await Product.deleteMany({ _id: { $in: productIds } });
+        await Product.deleteMany({ _id: { $in: ids } });
 
         res.status(200).json({ message: 'Products and associated reviews deleted successfully' });
     } catch (error) {

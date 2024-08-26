@@ -4,8 +4,8 @@ import { ActionButton, BrownCreateOutlinedIcon, OutlinedBrownButton } from '../.
 import useAxios from '../../axiosInstance.js';
 import DashboardTable from '../../components/Dashboard/DashboardTable';
 import AddCountryModal from '../../components/Modal/Country/AddCountryModal.jsx';
-import DeleteCountryModal from '../../components/Modal/Country/DeleteCountryModal.jsx';
 import EditCountryModal from '../../components/Modal/Country/EditCountryModal.jsx';
+import DeleteModal from '../../components/Modal/DeleteModal.jsx';
 import { AuthContext } from '../../context/AuthContext.jsx';
 
 const CountriesPage = () => {
@@ -100,7 +100,15 @@ const CountriesPage = () => {
 
                 <AddCountryModal open={addCountryOpen} onClose={() => setAddCountryOpen(false)} onAddSuccess={fetchCountries} />
                 <EditCountryModal open={editCountryOpen} onClose={() => setEditCountryOpen(false)} country={selectedCountry} onEditSuccess={fetchCountries} />
-                <DeleteCountryModal open={deleteCountryOpen} onClose={() => setDeleteCountryOpen(false)} countries={selectedCountries.map(id => countries.find(country => country._id === id))} onDeleteSuccess={fetchCountries} />
+                <DeleteModal
+                    open={deleteCountryOpen}
+                    onClose={() => setDeleteCountryOpen(false)}
+                    items={selectedCountries.map(id => countries.find(country => country._id === id)).filter(country => country)}
+                    onDeleteSuccess={fetchCountries}
+                    endpoint="/countries/delete-bulk"
+                    title="Delete Countries"
+                    message="Are you sure you want to delete the selected countries?"
+                />
             </div>
         </div>
     );

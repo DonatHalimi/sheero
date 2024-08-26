@@ -155,14 +155,19 @@ const deleteReview = async (req, res) => {
 };
 
 const deleteReviews = async (req, res) => {
-    const { reviewIds } = req.body;
+    const { ids } = req.body;
+
+    if (!ids || !Array.isArray(ids) || ids.length === 0) {
+        return res.status(400).json({ message: 'Invalid or empty ids array' });
+    }
+
     const userId = req.user.userId;
     const userRole = req.user.role;
 
     try {
-        const reviews = await Review.find({ _id: { $in: reviewIds } });
+        const reviews = await Review.find({ _id: { $in: ids } });
 
-        if (reviews.length !== reviewIds.length) {
+        if (reviews.length !== ids.length) {
             return res.status(404).json({ message: 'One or more reviews not found' });
         }
 
@@ -175,11 +180,11 @@ const deleteReviews = async (req, res) => {
 
         const productIds = reviews.map(review => review.product);
 
-        await Review.deleteMany({ _id: { $in: reviewIds } });
+        await Review.deleteMany({ _id: { $in: ids } });
 
         await Product.updateMany(
             { _id: { $in: productIds } },
-            { $pull: { reviews: { $in: reviewIds } } }
+            { $pull: { reviews: { $in: ids } } }
         );
 
         res.status(200).json({ message: 'Reviews and references in products deleted successfully' });

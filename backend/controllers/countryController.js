@@ -63,11 +63,16 @@ const deleteCountry = async (req, res) => {
 };
 
 const deleteCountries = async (req, res) => {
-    const { countryIds } = req.body;
-    try {
-        const countries = await Country.find({ _id: { $in: countryIds } });
+    const { ids } = req.body;
 
-        if (countries.length !== countryIds.length) {
+    if (!ids || !Array.isArray(ids) || ids.length === 0) {
+        return res.status(400).json({ message: 'Invalid or empty ids array' });
+    }
+    
+    try {
+        const countries = await Country.find({ _id: { $in: ids } });
+
+        if (countries.length !== ids.length) {
             return res.status(404).json({ message: 'One or more countries not found' });
         }
 
@@ -76,7 +81,7 @@ const deleteCountries = async (req, res) => {
             await City.deleteMany({ country: country._id });
         }
 
-        await Country.deleteMany({ _id: { $in: countryIds } });
+        await Country.deleteMany({ _id: { $in: ids } });
 
         res.status(200).json({ message: 'Countries and associated cities deleted successfully' });
     } catch (error) {

@@ -3,8 +3,8 @@ import React, { useContext, useEffect, useState } from 'react';
 import { ActionButton, BrownCreateOutlinedIcon, OutlinedBrownButton, RatingStars } from '../../assets/CustomComponents';
 import useAxios from '../../axiosInstance';
 import DashboardTable from '../../components/Dashboard/DashboardTable';
+import DeleteModal from '../../components/Modal/DeleteModal';
 import AddReviewModal from '../../components/Modal/Review/AddReviewModal';
-import DeleteReviewModal from '../../components/Modal/Review/DeleteReviewModal';
 import EditReviewModal from '../../components/Modal/Review/EditReviewModal';
 import { AuthContext } from '../../context/AuthContext';
 
@@ -117,7 +117,15 @@ const ReviewsPage = () => {
 
                 <AddReviewModal open={addReviewOpen} onClose={() => setAddReviewOpen(false)} onAddSuccess={fetchReviews} />
                 <EditReviewModal open={editReviewOpen} onClose={() => setEditReviewOpen(false)} review={selectedReview} onEditSuccess={fetchReviews} />
-                <DeleteReviewModal open={deleteReviewOpen} onClose={() => setDeleteReviewOpen(false)} reviews={selectedReviews.map(id => reviews.find(review => review._id === id))} onDeleteSuccess={fetchReviews} />
+                <DeleteModal
+                    open={deleteReviewOpen}
+                    onClose={() => setDeleteReviewOpen(false)}
+                    items={selectedReviews.map(id => reviews.find(review => review._id === id)).filter(review => review)}
+                    onDeleteSuccess={fetchReviews}
+                    endpoint="/reviews/delete-bulk"
+                    title="Delete Reviews"
+                    message="Are you sure you want to delete the selected reviews?"
+                />
             </div>
         </div>
     );

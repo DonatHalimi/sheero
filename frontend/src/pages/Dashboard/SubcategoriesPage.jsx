@@ -3,8 +3,9 @@ import React, { useContext, useEffect, useState } from 'react';
 import { ActionButton, BrownCreateOutlinedIcon, OutlinedBrownButton } from '../../assets/CustomComponents';
 import useAxios from '../../axiosInstance';
 import DashboardTable from '../../components/Dashboard/DashboardTable';
+import DeleteModal from '../../components/Modal/DeleteModal';
+import ImagePreviewModal from '../../components/Modal/ImagePreviewModal';
 import AddSubcategoryModal from '../../components/Modal/Subcategory/AddSubcategoryModal';
-import DeleteSubcategoryModal from '../../components/Modal/Subcategory/DeleteSubcategoryModal';
 import EditSubcategoryModal from '../../components/Modal/Subcategory/EditSubcategoryModal';
 import { AuthContext } from '../../context/AuthContext';
 
@@ -15,6 +16,7 @@ const SubcategoriesPage = () => {
     const [addSubcategoryOpen, setAddSubcategoryOpen] = useState(false);
     const [editSubcategoryOpen, setEditSubcategoryOpen] = useState(false);
     const [deleteSubcategoryOpen, setDeleteSubcategoryOpen] = useState(false);
+    const [imagePreviewOpen, setImagePreviewOpen] = useState(false);
     const [currentPage, setCurrentPage] = useState(0);
     const itemsPerPage = 5;
 
@@ -56,9 +58,26 @@ const SubcategoriesPage = () => {
         setCurrentPage(event.selected);
     };
 
+    const handleImageClick = (imageUrl) => {
+        setSelectedSubcategory(imageUrl);
+        setImagePreviewOpen(true);
+    };
+
     const columns = [
         { label: 'Name', key: 'name' },
-        { label: 'Image', key: 'image', render: (item) => <img className='rounded-md' src={`http://localhost:5000/${item.image}`} alt="" width={80} /> },
+        {
+            key: 'image',
+            label: 'Image',
+            render: (item) => (
+                <img
+                    className='rounded-md cursor-pointer'
+                    src={`http://localhost:5000/${item.image}`}
+                    alt=""
+                    width={80}
+                    onClick={() => handleImageClick(`http://localhost:5000/${item.image}`)}
+                />
+            )
+        },
         { label: 'Category', key: 'category.name' },
         { label: 'Actions', key: 'actions' }
     ];
@@ -89,7 +108,7 @@ const SubcategoriesPage = () => {
     );
 
     return (
-        <>
+        <div className='container mx-auto max-w-screen-2xl px-4 mt-20'>
             <div className='container mx-auto max-w-screen-2xl px-4 mt-20'>
                 <DashboardTable
                     columns={columns}
@@ -106,9 +125,18 @@ const SubcategoriesPage = () => {
                 />
                 <AddSubcategoryModal open={addSubcategoryOpen} onClose={() => setAddSubcategoryOpen(false)} onAddSuccess={fetchSubcategories} />
                 <EditSubcategoryModal open={editSubcategoryOpen} onClose={() => setEditSubcategoryOpen(false)} subcategory={selectedSubcategory} onEditSuccess={fetchSubcategories} />
-                <DeleteSubcategoryModal open={deleteSubcategoryOpen} onClose={() => setDeleteSubcategoryOpen(false)} subcategories={selectedSubcategories.map(id => subcategories.find(subcategory => subcategory._id === id))} onDeleteSuccess={fetchSubcategories} />
+                <DeleteModal
+                    open={deleteSubcategoryOpen}
+                    onClose={() => setDeleteSubcategoryOpen(false)}
+                    items={selectedSubcategories.map(id => subcategories.find(subcategory => subcategory._id === id)).filter(subcategory => subcategory)}
+                    onDeleteSuccess={fetchSubcategories}
+                    endpoint="/subcategories/delete-bulk"
+                    title="Delete Subcategories"
+                    message="Are you sure you want to delete the selected subcategories?"
+                />
+                <ImagePreviewModal open={imagePreviewOpen} onClose={() => setImagePreviewOpen(false)} imageUrl={selectedSubcategory} />
             </div>
-        </>
+        </div>
     );
 };
 

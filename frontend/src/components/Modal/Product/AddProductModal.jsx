@@ -1,8 +1,8 @@
 import UploadIcon from '@mui/icons-material/Upload';
-import { Box, InputLabel, MenuItem, Modal, Typography, TextField, Autocomplete, Select } from '@mui/material';
+import { Autocomplete, Box, InputLabel, MenuItem, Modal, Select, TextField, Typography } from '@mui/material';
 import React, { useContext, useEffect, useState } from 'react';
 import { toast } from 'react-toastify';
-import { BrownButton, BrownOutlinedTextField, OutlinedBrownButton, OutlinedBrownFormControl, VisuallyHiddenInput, CustomPaper } from '../../../assets/CustomComponents';
+import { BrownButton, BrownOutlinedTextField, CustomPaper, OutlinedBrownButton, OutlinedBrownFormControl, VisuallyHiddenInput } from '../../../assets/CustomComponents';
 import useAxios from '../../../axiosInstance';
 import { AuthContext } from '../../../context/AuthContext';
 
@@ -347,17 +347,17 @@ const AddProductModal = ({ open, onClose, onAddSuccess }) => {
                     <OutlinedBrownButton sx={{ width: '160px' }} onClick={addDetail} className="!mb-4">Add Detail</OutlinedBrownButton>
 
                     <Autocomplete
-                            id="subsubcategory-autocomplete"
-                            options={suppliers.sort((a, b) => -b.firstLetter.localeCompare(a.firstLetter))}
-                            groupBy={(option) => option.firstLetter}
-                            getOptionLabel={(option) => option.name}
-                            value={supplier}
-                            onChange={(event, newValue) => setSupplier(newValue)}
-                            PaperComponent={CustomPaper}
-                            fullWidth
-                            renderInput={(params) => <TextField {...params} label="Supplier" variant="outlined" />}
-                            className='!mb-4'
-                        />
+                        id="subsubcategory-autocomplete"
+                        options={suppliers.sort((a, b) => -b.firstLetter.localeCompare(a.firstLetter))}
+                        groupBy={(option) => option.firstLetter}
+                        getOptionLabel={(option) => option.name}
+                        value={supplier}
+                        onChange={(event, newValue) => setSupplier(newValue)}
+                        PaperComponent={CustomPaper}
+                        fullWidth
+                        renderInput={(params) => <TextField {...params} label="Supplier" variant="outlined" />}
+                        className='!mb-4'
+                    />
 
                     <Typography variant='h6' className="!text-lg !font-bold !mb-2">Shipping</Typography>
                     <Box className="flex gap-4 mb-4">

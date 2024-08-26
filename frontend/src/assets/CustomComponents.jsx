@@ -1,4 +1,5 @@
 import {
+    ArrowBack,
     CreateOutlined,
     DashboardOutlined,
     DeleteOutlined,
@@ -12,27 +13,33 @@ import {
     ShoppingCart,
     ShoppingCartOutlined,
     Star,
-    StarBorder,
+    StarBorder
 } from '@mui/icons-material';
 import {
     Box,
+    Breadcrumbs,
     Button,
     Collapse,
     FormControl,
     IconButton,
+    Link,
     List,
     ListItemButton,
     ListItemIcon,
     ListItemText,
+    Modal,
     AppBar as MuiAppBar, Drawer as MuiDrawer,
     Paper,
+    Skeleton,
     Tab,
     TableCell,
-    TextField
+    TextField,
+    Typography,
 } from '@mui/material';
 import { styled } from '@mui/material/styles';
 import SvgIcon from '@mui/material/SvgIcon';
 import { GridToolbar } from '@mui/x-data-grid';
+import { Link as RouterLink } from 'react-router-dom'; // Correct import for routing
 
 export const BrownOutlinedTextField = styled(TextField)({
     '& .MuiOutlinedInput-root': {
@@ -317,6 +324,30 @@ export const StyledGridOverlay = styled('div')(({ theme }) => ({
     },
 }));
 
+export const StyledBox = styled(Box)(({ theme }) => ({
+    position: 'fixed',
+    inset: 0,
+    zIndex: 50,
+    display: 'flex',
+    alignItems: 'center',
+    justifyContent: 'center',
+}));
+
+export const CloseButtonStyled = styled(IconButton)(({ theme }) => ({
+    position: 'absolute',
+    top: 16,
+    right: 16,
+    color: '#fff',
+    zIndex: 1400,
+}));
+
+export const StyledImage = styled('img')({
+    maxHeight: '80%',
+    maxWidth: '80%',
+    objectFit: 'contain',
+    borderRadius: '10px',
+});
+
 export function CustomNoRowsOverlay() {
     return (
         <StyledGridOverlay>
@@ -396,4 +427,179 @@ export const DashboardStyling = {
         outline: 'none',
     },
     '--DataGrid-overlayHeight': '300px',
+};
+
+export const CustomModal = ({ open, onClose, children, ...props }) => (
+    <Modal
+        open={open}
+        onClose={onClose}
+        className="flex items-center justify-center outline-none"
+        {...props}
+    >
+        <Box className="bg-white p-2 rounded-lg shadow-lg max-w-md w-full">
+            {children}
+        </Box>
+    </Modal>
+);
+
+export const CustomBox = (props) => (
+    <Box className="bg-white p-2 rounded-lg max-w-md w-full" {...props} />
+);
+
+export const CustomTypography = (props) => (
+    <Typography className="!text-xl !font-bold !mb-4" {...props} />
+);
+
+export const CustomDeleteModal = ({ open, onClose, onDelete, title, message }) => (
+    <Modal open={open} onClose={onClose} className="flex items-center justify-center outline-none">
+        <Box className="bg-white p-4 rounded-lg shadow-lg max-w-md w-full">
+            <Typography variant="h6" className="text-xl font-bold mb-2">
+                {title}
+            </Typography>
+            <Typography variant="body1" className="mb-4">
+                {message}
+            </Typography>
+            <div className="flex justify-end mt-4">
+                <OutlinedBrownButton onClick={onClose} variant="outlined" className='!mr-4'>
+                    Cancel
+                </OutlinedBrownButton>
+                <BrownButton onClick={onDelete} variant="contained" color="error">
+                    Delete
+                </BrownButton>
+            </div>
+        </Box>
+    </Modal>
+);
+
+export const BreadcrumbsComponent = ({ product }) => {
+    return (
+        <div className='container mx-auto px-4 max-w-5xl relative top-6 right-4'>
+            <Breadcrumbs aria-label="breadcrumb" sx={{ mb: 4, fontSize: '14px' }}>
+                <Link component={RouterLink} to="/" color="inherit" underline="none" className='hover:underline cursor-pointer'>
+                    <HomeIcon color="primary" />
+                </Link>
+                {product.category && (
+                    <Link component={RouterLink} to={`/products/category/${product.category._id}`} color="inherit" underline="none" className='hover:underline cursor-pointer'>
+                        {product.category.name}
+                    </Link>
+                )}
+                {product.subcategory && (
+                    <Link component={RouterLink} to={`/products/subcategory/${product.subcategory._id}`} color="inherit" underline="none" className='hover:underline cursor-pointer'>
+                        {product.subcategory.name}
+                    </Link>
+                )}
+                {product.subSubcategory && (
+                    <Link component={RouterLink} to={`/products/subSubcategory/${product.subSubcategory._id}`} color="inherit" underline="none" className='hover:underline cursor-pointer'>
+                        {product.subSubcategory.name}
+                    </Link>
+                )}
+                <Typography color="text.primary" style={{ fontSize: '14px' }}>{product.name}</Typography>
+            </Breadcrumbs>
+        </div>
+    );
+};
+
+
+export const ProductSkeleton = () => {
+    return (
+        <>
+            <div className='container mx-auto px-4 max-w-5xl relative top-6 right-4'>
+                <Breadcrumbs aria-label="breadcrumb" sx={{ mb: 4, fontSize: '14px' }}>
+                    <Link component={RouterLink} to="/" color="inherit" underline="none">
+                        <HomeIcon color="primary" />
+                    </Link>
+                    <Skeleton width={120} />
+                </Breadcrumbs>
+            </div>
+            <div className="container mx-auto px-4 py-4 mb-8 bg-white mt-8 rounded-md max-w-5xl">
+                <div className="flex flex-col md:flex-row gap-8">
+                    <div className="flex flex-col items-center md:w-1/2">
+                        <Skeleton variant="rectangular" width="100%" height={320} />
+                    </div>
+                    <div className="md:w-1/2">
+                        <Skeleton variant="text" width="80%" height={40} />
+                        <Skeleton variant="text" width="40%" height={30} style={{ marginTop: '16px' }} />
+                        <Skeleton variant="text" width="60%" height={30} />
+                        <Skeleton variant="text" width="20%" height={30} />
+                        <div className="mt-4 flex items-center space-x-4">
+                            <Skeleton variant="rectangular" width={140} height={40} />
+                            <Skeleton variant="rectangular" width={60} height={40} />
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </>
+    );
+};
+
+export const GoBackHome = () => {
+    return (
+        <Button
+            component={RouterLink}
+            to="/"
+            variant="contained"
+            color="primary"
+            sx={{
+                display: 'flex',
+                alignItems: 'center',
+                gap: 1,
+                textTransform: 'none',
+                padding: '8px 16px',
+                backgroundColor: '#686159',
+                '&:hover': {
+                    backgroundColor: '#5b504b',
+                },
+                borderRadius: '5px',
+                boxShadow: 'none',
+                width: '50%',
+                margin: '0 auto',
+            }}
+        >
+            <ArrowBack />
+            <Typography variant="button" sx={{ color: 'white' }}>
+                Go back home
+            </Typography>
+        </Button>
+    );
+};
+
+
+export const NotAllowedComponent = () => {
+    return (
+        <div className="min-h-screen bg-gray-100 flex flex-col justify-center items-center px-4 sm:px-6 lg:px-8">
+            <div className="max-w-md w-full space-y-8 text-center">
+                <div className="mb-8">
+                    <svg className="mx-auto h-32 w-auto text-stone-400" fill="none" viewBox="0 0 24 24" stroke="currentColor" aria-hidden="true">
+                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9.172 16.172a4 4 0 015.656 0M9 10h.01M15 10h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+                    </svg>
+                </div>
+                <h1 className="text-4xl font-extrabold text-gray-900 sm:text-5xl">403</h1>
+                <p className="mt-2 text-3xl font-bold text-gray-900 sm:text-4xl">Page not allowed</p>
+                <p className="mt-2 text-lg text-gray-600">Sorry, access to this page is not allowed.</p>
+                <div className="mt-8">
+                    <GoBackHome />
+                </div>
+            </div>
+        </div>
+    );
+};
+
+export const NotFoundComponent = () => {
+    return (
+        <div className="min-h-screen bg-gray-100 flex flex-col justify-center items-center px-4 sm:px-6 lg:px-8">
+            <div className="max-w-md w-full space-y-8 text-center">
+                <div className="mb-8">
+                    <svg className="mx-auto h-32 w-auto text-stone-400" fill="none" viewBox="0 0 24 24" stroke="currentColor" aria-hidden="true">
+                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9.172 16.172a4 4 0 015.656 0M9 10h.01M15 10h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+                    </svg>
+                </div>
+                <h1 className="text-4xl font-extrabold text-gray-900 sm:text-5xl">404</h1>
+                <p className="mt-2 text-3xl font-bold text-gray-900 sm:text-4xl">Page not found</p>
+                <p className="mt-2 text-lg text-gray-600">Sorry, we couldn't find the page you're looking for.</p>
+                <div className="mt-8">
+                    <GoBackHome />
+                </div>
+            </div>
+        </div>
+    );
 };

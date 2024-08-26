@@ -113,11 +113,16 @@ const deleteCategory = async (req, res) => {
 };
 
 const deleteCategories = async (req, res) => {
-    const { categoryIds } = req.body;
-    try {
-        const categories = await Category.find({ _id: { $in: categoryIds } });
+    const { ids } = req.body;
 
-        if (categories.length !== categoryIds.length) {
+    if (!ids || !Array.isArray(ids) || ids.length === 0) {
+        return res.status(400).json({ message: 'Invalid or empty ids array' });
+    }
+
+    try {
+        const categories = await Category.find({ _id: { $in: ids } });
+
+        if (categories.length !== ids.length) {
             return res.status(404).json({ message: 'One or more categories not found' });
         }
 
@@ -139,7 +144,7 @@ const deleteCategories = async (req, res) => {
             }
         }
 
-        await Category.deleteMany({ _id: { $in: categoryIds } });
+        await Category.deleteMany({ _id: { $in: ids } });
 
         res.status(200).json({ message: 'Categories deleted successfully' });
     } catch (error) {

@@ -55,7 +55,14 @@ const CategoryNavbar = ({ children }) => {
     const handleCategoryHover = (categoryId) => {
         setOpenCategory(categoryId);
         setDarkOverlay(true);
+        document.body.classList.add('no-scroll');
         if (!subcategories[categoryId]) fetchSubcategories(categoryId);
+    };
+
+    const handleCategoryLeave = () => {
+        setOpenCategory(null);
+        setDarkOverlay(false);
+        document.body.classList.remove('no-scroll');
     };
 
     const calculateDropdownStyle = () => {
@@ -69,6 +76,7 @@ const CategoryNavbar = ({ children }) => {
     const handleNavigation = (path, categoryId) => {
         setActiveCategory(categoryId);
         navigate(path);
+        document.body.classList.remove('no-scroll');
         setTimeout(() => document.getElementById('product-container')?.scrollIntoView({ behavior: 'smooth' }), 100);
     };
 
@@ -97,7 +105,7 @@ const CategoryNavbar = ({ children }) => {
                                     <li
                                         key={category._id}
                                         onMouseEnter={() => handleCategoryHover(category._id)}
-                                        onMouseLeave={() => { setOpenCategory(null); setDarkOverlay(false); }}
+                                        onMouseLeave={handleCategoryLeave}
                                         className="relative"
                                     >
                                         <button

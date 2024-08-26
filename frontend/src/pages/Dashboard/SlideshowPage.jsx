@@ -3,8 +3,9 @@ import React, { useContext, useEffect, useState } from 'react';
 import { ActionButton, BrownCreateOutlinedIcon, OutlinedBrownButton } from '../../assets/CustomComponents';
 import useAxios from '../../axiosInstance';
 import DashboardTable from '../../components/Dashboard/DashboardTable';
+import DeleteModal from '../../components/Modal/DeleteModal';
+import ImagePreviewModal from '../../components/Modal/ImagePreviewModal';
 import AddSlideshowModal from '../../components/Modal/Slideshow/AddSlideshowModal';
-import DeleteSlideshowModal from '../../components/Modal/Slideshow/DeleteSlideshowModal';
 import EditSlideshowModal from '../../components/Modal/Slideshow/EditSlideshowModal';
 import { AuthContext } from '../../context/AuthContext';
 
@@ -15,6 +16,7 @@ const SlideshowPage = () => {
     const [addImageOpen, setAddImageOpen] = useState(false);
     const [editImageOpen, setEditImageOpen] = useState(false);
     const [deleteImageOpen, setDeleteImageOpen] = useState(false);
+    const [imagePreviewOpen, setImagePreviewOpen] = useState(false);
     const [currentPage, setCurrentPage] = useState(0);
     const itemsPerPage = 5;
 
@@ -52,9 +54,26 @@ const SlideshowPage = () => {
         }
     };
 
+    const handleImageClick = (imageUrl) => {
+        setSelectedImage(imageUrl);
+        setImagePreviewOpen(true);
+    };
+
     const columns = [
         { key: 'title', label: 'Title' },
-        { key: 'image', label: 'Image', render: (item) => <img className='rounded-md' src={`http://localhost:5000/${item.image}`} alt="" width={80} /> },
+        {
+            key: 'image',
+            label: 'Image',
+            render: (item) => (
+                <img
+                    className='rounded-md cursor-pointer'
+                    src={`http://localhost:5000/${item.image}`}
+                    alt=""
+                    width={80}
+                    onClick={() => handleImageClick(`http://localhost:5000/${item.image}`)}
+                />
+            )
+        },
         { key: 'description', label: 'Description' },
         { key: 'actions', label: 'Actions' }
     ];
@@ -103,7 +122,16 @@ const SlideshowPage = () => {
 
                 <AddSlideshowModal open={addImageOpen} onClose={() => setAddImageOpen(false)} onAddSuccess={fetchImages} />
                 <EditSlideshowModal open={editImageOpen} onClose={() => setEditImageOpen(false)} image={selectedImage} onEditSuccess={fetchImages} />
-                <DeleteSlideshowModal open={deleteImageOpen} onClose={() => setDeleteImageOpen(false)} images={selectedImages.map(id => images.find(image => image._id === id))} onDeleteSuccess={fetchImages} />
+                <DeleteModal
+                    open={deleteImageOpen}
+                    onClose={() => setDeleteImageOpen(false)}
+                    items={selectedImages.map(id => images.find(image => image._id === id)).filter(image => image)}
+                    onDeleteSuccess={fetchImages}
+                    endpoint="/slideshow/delete-bulk"
+                    title="Delete Images"
+                    message="Are you sure you want to delete the selected images?"
+                />
+                <ImagePreviewModal open={imagePreviewOpen} onClose={() => setImagePreviewOpen(false)} imageUrl={selectedImage} />
             </div>
         </div>
     );

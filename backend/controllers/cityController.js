@@ -62,15 +62,20 @@ const deleteCity = async (req, res) => {
 };
 
 const deleteCities = async (req, res) => {
-    const { cityIds } = req.body;
-    try {
-        const cities = await City.find({ _id: { $in: cityIds } });
+    const { ids } = req.body;
 
-        if (cities.length !== cityIds.length) {
+    if (!ids || !Array.isArray(ids) || ids.length === 0) {
+        return res.status(400).json({ message: 'Invalid or empty ids array' });
+    }
+
+    try {
+        const cities = await City.find({ _id: { $in: ids } });
+
+        if (cities.length !== ids.length) {
             return res.status(404).json({ message: 'One or more cities not found' });
         }
 
-        await City.deleteMany({ _id: { $in: cityIds } });
+        await City.deleteMany({ _id: { $in: ids } });
 
         res.status(200).json({ message: 'Cities deleted successfully' });
     } catch (error) {

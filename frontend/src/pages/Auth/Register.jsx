@@ -15,7 +15,7 @@ const Register = () => {
     const [password, setPassword] = useState('');
     const [showPassword, setShowPassword] = useState(false);
     const handleClickShowPassword = () => setShowPassword(!showPassword);
-    const handleMouseDownPassword = () => setShowPassword(!showPassword);
+    const handleMouseDownPassword = (event) => event.preventDefault();
     const { register } = useContext(AuthContext);
     const navigate = useNavigate();
 
@@ -46,29 +46,28 @@ const Register = () => {
             return;
         }
 
-        const response = await register(username, email, password);
-        if (response.success) {
-            toast.success('User registered successfully');
-            navigate('/login');
-        } else {
-            if (response.message === 'User or Email already exists') {
-                toast.error('Username or Email already exists');
+        try {
+            const response = await register(username, email, password);
+            if (response.success) {
+                toast.success('User registered successfully');
+                navigate('/login');
             } else {
-                toast.error(response.message || 'Registration failed');
+                if (response.message === 'User or Email already exists') {
+                    toast.error('Username or Email already exists');
+                } else {
+                    toast.error(response.message || 'Registration failed');
+                }
             }
+        } catch (error) {
+            toast.error('An error occurred during registration');
+            console.error('Registration error:', error);
         }
     };
 
     return (
-        <Box className='bg-neutral-50' sx={{
-            minHeight: '100vh',
-            display: 'flex',
-            flexDirection: 'column',
-        }}>
+        <Box className='bg-neutral-50' sx={{ minHeight: '100vh', display: 'flex', flexDirection: 'column' }}>
             <Navbar />
-            <Container component="main" maxWidth="xs" sx={{
-                flex: 1, display: 'flex', marginTop: '150px', marginBottom: '200px'
-            }}>
+            <Container component="main" maxWidth="xs" sx={{ flex: 1, display: 'flex', marginTop: '150px', marginBottom: '200px' }}>
                 <Paper elevation={3} className='p-4 flex flex-col align-middle w-full' sx={{
                     p: 4,
                     display: 'flex',
@@ -83,74 +82,72 @@ const Register = () => {
                         Join Us
                     </Typography>
                     <Box component="form" onSubmit={handleSubmit} noValidate sx={{ width: '100%' }}>
-                        <Box component="form" onSubmit={handleSubmit} noValidate className="w-full">
-                            <BrownOutlinedTextField
-                                variant="outlined"
-                                margin="normal"
-                                required
-                                fullWidth
-                                id="username"
-                                label="Username"
-                                value={username}
-                                name="username"
-                                autoComplete="username"
-                                autoFocus
-                                onChange={(e) => setUsername(e.target.value)}
-                            />
-                            <BrownOutlinedTextField
-                                margin='normal'
-                                required
-                                fullWidth
-                                id='email'
-                                label="Email"
-                                value={email}
-                                name='email'
-                                autoComplete='email'
-                                onChange={(e) => setEmail(e.target.value)}
-                                type='email'
-                            />
-                            <BrownOutlinedTextField
-                                margin="normal"
-                                required
-                                fullWidth
-                                name="password"
-                                label="Password"
-                                type={showPassword ? "text" : "password"}
-                                id="password"
-                                autoComplete="new-password"
-                                value={password}
-                                onChange={(e) => setPassword(e.target.value)}
-                                InputProps={{
-                                    endAdornment: (
-                                        <InputAdornment position="end">
-                                            <IconButton
-                                                aria-label="toggle password visibility"
-                                                onClick={handleClickShowPassword}
-                                                onMouseDown={handleMouseDownPassword}
-                                            >
-                                                {showPassword ? <VisibilityIcon /> : <VisibilityOffIcon />}
-                                            </IconButton>
-                                        </InputAdornment>
-                                    ),
-                                }}
-                            />
-                            <BrownButton
-                                type="submit"
-                                fullWidth
-                                variant="contained"
-                                className="!mb-4 !mt-4"
-                            >
-                                Register
-                            </BrownButton>
-                            <Typography variant="body2" align="left" className='mt-2 text-stone-500'>
-                                Already have an account? <a href='/login' className='text-stone-500 cursor-pointer font-bold hover:underline'>Log In</a>
-                            </Typography>
-                        </Box>
+                        <BrownOutlinedTextField
+                            variant="outlined"
+                            margin="normal"
+                            required
+                            fullWidth
+                            id="username"
+                            label="Username"
+                            value={username}
+                            name="username"
+                            autoComplete="username"
+                            autoFocus
+                            onChange={(e) => setUsername(e.target.value)}
+                        />
+                        <BrownOutlinedTextField
+                            margin='normal'
+                            required
+                            fullWidth
+                            id='email'
+                            label="Email"
+                            value={email}
+                            name='email'
+                            autoComplete='email'
+                            onChange={(e) => setEmail(e.target.value)}
+                            type='email'
+                        />
+                        <BrownOutlinedTextField
+                            margin="normal"
+                            required
+                            fullWidth
+                            name="password"
+                            label="Password"
+                            type={showPassword ? "text" : "password"}
+                            id="password"
+                            autoComplete="new-password"
+                            value={password}
+                            onChange={(e) => setPassword(e.target.value)}
+                            InputProps={{
+                                endAdornment: (
+                                    <InputAdornment position="end">
+                                        <IconButton
+                                            aria-label="toggle password visibility"
+                                            onClick={handleClickShowPassword}
+                                            onMouseDown={handleMouseDownPassword}
+                                        >
+                                            {showPassword ? <VisibilityIcon /> : <VisibilityOffIcon />}
+                                        </IconButton>
+                                    </InputAdornment>
+                                ),
+                            }}
+                        />
+                        <BrownButton
+                            type="submit"
+                            fullWidth
+                            variant="contained"
+                            className="!mb-4 !mt-4"
+                        >
+                            Register
+                        </BrownButton>
+                        <Typography variant="body2" align="left" className='mt-2 text-stone-500'>
+                            Already have an account? <a href='/login' className='text-stone-500 cursor-pointer font-bold hover:underline'>Log In</a>
+                        </Typography>
                     </Box>
                 </Paper>
             </Container>
             <Footer />
-        </Box >
+        </Box>
     );
 };
 

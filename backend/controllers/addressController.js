@@ -109,15 +109,20 @@ const deleteAddress = async (req, res) => {
 };
 
 const deleteAddresses = async (req, res) => {
-    const { addressIds } = req.body;
-    try {
-        const addresses = await Address.find({ _id: { $in: addressIds } });
+    const { ids } = req.body;
 
-        if (addresses.length !== addressIds.length) {
+    if (!ids || !Array.isArray(ids) || ids.length === 0) {
+        return res.status(400).json({ message: 'Invalid or empty ids array' });
+    }
+
+    try {
+        const addresses = await Address.find({ _id: { $in: ids } });
+
+        if (addresses.length !== ids.length) {
             return res.status(404).json({ message: 'One or more addresses not found' });
         }
 
-        await Address.deleteMany({ _id: { $in: addressIds } });
+        await Address.deleteMany({ _id: { $in: ids } });
 
         res.status(200).json({ message: 'Addresses deleted successfully' });
     } catch (error) {

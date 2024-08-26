@@ -1,7 +1,6 @@
-import { Box, Modal, Typography } from '@mui/material';
 import React, { useContext, useState } from 'react';
 import { toast } from 'react-toastify';
-import { BrownButton, BrownOutlinedTextField } from '../../../assets/CustomComponents';
+import { BrownButton, BrownOutlinedTextField, CustomBox, CustomModal, CustomTypography } from '../../../assets/CustomComponents';
 import useAxios from '../../../axiosInstance';
 import { AuthContext } from '../../../context/AuthContext';
 
@@ -45,14 +44,16 @@ const AddSupplierModal = ({ open, onClose, onAddSuccess }) => {
     };
 
     return (
-        <Modal open={open} onClose={onClose} className="flex items-center justify-center">
-            <Box className="bg-white p-4 rounded-lg shadow-lg max-w-md">
-                <Typography variant='h5' className="!text-xl !font-bold !mb-4">Add Supplier</Typography>
+        <CustomModal open={open} onClose={onClose}>
+            <CustomBox>
+                <CustomTypography variant="h5">Add Supplier</CustomTypography>
+
                 <BrownOutlinedTextField
                     label="Name"
                     value={name}
                     onChange={(e) => setName(e.target.value)}
                     fullWidth
+                    required
                     className='!mb-4'
                 />
                 <BrownOutlinedTextField
@@ -63,6 +64,7 @@ const AddSupplierModal = ({ open, onClose, onAddSuccess }) => {
                         setIsValidEmail(validateEmail(e.target.value));
                     }}
                     fullWidth
+                    required
                     className='!mb-4'
                     type="email"
                     error={!isValidEmail}
@@ -73,6 +75,7 @@ const AddSupplierModal = ({ open, onClose, onAddSuccess }) => {
                     value={phoneNumber}
                     onChange={(e) => setPhoneNumber(e.target.value)}
                     fullWidth
+                    required
                     className='!mb-4'
                 />
                 <BrownButton
@@ -83,8 +86,8 @@ const AddSupplierModal = ({ open, onClose, onAddSuccess }) => {
                 >
                     Add
                 </BrownButton>
-            </Box>
-        </Modal>
+            </CustomBox>
+        </CustomModal>
     );
 };
 
