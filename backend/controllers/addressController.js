@@ -1,7 +1,7 @@
 const Address = require('../models/Address');
 
 const createAddress = async (req, res) => {
-    const { name, street, city, country } = req.body;
+    const { name, street, city, country, phoneNumber } = req.body;
     try {
         // Check if the user already has an address
         const existingAddress = await Address.findOne({ user: req.user.userId });
@@ -16,7 +16,8 @@ const createAddress = async (req, res) => {
             name,
             street,
             city,
-            country
+            country,
+            phoneNumber
         });
 
         await address.save();

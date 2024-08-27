@@ -52,6 +52,7 @@ const AddressesPage = () => {
         { key: 'user.username', label: 'Username' },
         { key: 'name', label: 'Name' },
         { key: 'street', label: 'Street' },
+        { key: 'phoneNumber', label: 'Phone Number' },
         { key: 'country.name', label: 'Country' },
         { key: 'city.name', label: 'City' },
         { key: 'city.zipCode', label: 'Zip Code' },

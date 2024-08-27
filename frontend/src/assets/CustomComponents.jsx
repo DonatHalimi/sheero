@@ -544,7 +544,7 @@ export const GoBackHome = () => {
                 alignItems: 'center',
                 gap: 1,
                 textTransform: 'none',
-                padding: '8px 16px',
+                padding: '10px 14px',
                 backgroundColor: '#686159',
                 '&:hover': {
                     backgroundColor: '#5b504b',

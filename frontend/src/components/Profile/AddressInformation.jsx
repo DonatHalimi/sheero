@@ -12,6 +12,7 @@ const AddressInformation = () => {
     const { auth, setAuth } = useContext(AuthContext);
     const [name, setName] = useState(auth.address?.name || '');
     const [street, setStreet] = useState(auth.address?.street || '');
+    const [phoneNumber, setPhoneNumber] = useState(auth.address?.phoneNumber || '');
     const [city, setCity] = useState(auth.address?.city?._id || auth.address?.city || '');
     const [country, setCountry] = useState(auth.address?.country?._id || auth.address?.country || '');
     const [existingAddress, setExistingAddress] = useState(auth.address || null);
@@ -70,7 +71,7 @@ const AddressInformation = () => {
 
     const handleSaveAddress = async (e) => {
         e.preventDefault();
-        if (!name || !street || !city || !country) {
+        if (!name || !street || !phoneNumber || !city || !country) {
             toast.error('Please fill in all the fields');
             return;
         }
@@ -78,6 +79,7 @@ const AddressInformation = () => {
         const updatedAddress = {
             name,
             street,
+            phoneNumber,
             city,
             country
         };
@@ -143,6 +145,17 @@ const AddressInformation = () => {
                                     onChange={(e) => setStreet(e.target.value)}
                                     InputLabelProps={{ className: 'text-gray-700' }}
                                     InputProps={{ className: 'text-gray-700' }}
+                                />
+                                <TextField
+                                    fullWidth
+                                    label="Phone Number"
+                                    variant="outlined"
+                                    name="phoneNumber"
+                                    value={phoneNumber}
+                                    onChange={(e) => setPhoneNumber(e.target.value)}
+                                    InputLabelProps={{ className: 'text-gray-700' }}
+                                    InputProps={{ className: 'text-gray-700' }}
+                                    placeholder="044/45/48 XXXXXX"
                                 />
                                 <FormControl fullWidth variant="outlined">
                                     <InputLabel>Country</InputLabel>

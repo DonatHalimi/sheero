@@ -71,11 +71,12 @@ const AddSupplierModal = ({ open, onClose, onAddSuccess }) => {
                     helperText={!isValidEmail ? "Please enter a valid email address" : ""}
                 />
                 <BrownOutlinedTextField
+                    fullWidth
+                    required
                     label="Phone Number"
                     value={phoneNumber}
                     onChange={(e) => setPhoneNumber(e.target.value)}
-                    fullWidth
-                    required
+                    placeholder="044/45/48 XXXXXX"
                     className='!mb-4'
                 />
                 <BrownButton

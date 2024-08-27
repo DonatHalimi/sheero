@@ -7,6 +7,7 @@ import useAxios from '../../../axiosInstance';
 const EditAddressModal = ({ open, onClose, address, onEditSuccess }) => {
     const [name, setName] = useState('');
     const [street, setStreet] = useState('');
+    const [phoneNumber, setPhoneNumber] = useState('');
     const [city, setCity] = useState('');
     const [country, setCountry] = useState('');
     const [cities, setCities] = useState([]);
@@ -18,6 +19,7 @@ const EditAddressModal = ({ open, onClose, address, onEditSuccess }) => {
         if (address) {
             setName(address.name);
             setStreet(address.street);
+            setPhoneNumber(address.phoneNumber);
             setCity(address.city._id);
             setCountry(address.country._id);
         }
@@ -40,6 +42,7 @@ const EditAddressModal = ({ open, onClose, address, onEditSuccess }) => {
         const updates = {};
         if (name !== address.name) updates.name = name;
         if (street !== address.street) updates.street = street;
+        if (phoneNumber !== address.phoneNumber) updates.phoneNumber = phoneNumber;
         if (city !== address.city._id) updates.city = city;
         if (country !== address.country._id) updates.country = country;
 
@@ -78,6 +81,16 @@ const EditAddressModal = ({ open, onClose, address, onEditSuccess }) => {
                     onChange={(e) => setStreet(e.target.value)}
                     fullWidth
                     margin="normal"
+                    className='mb-4'
+                />
+
+                <BrownOutlinedTextField
+                    label="Phone Number"
+                    value={phoneNumber}
+                    onChange={(e) => setPhoneNumber(e.target.value)}
+                    fullWidth
+                    margin="normal"
+                    placeholder="044/45/48 XXXXXX"
                     className='mb-4'
                 />
 

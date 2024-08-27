@@ -7,6 +7,7 @@ import useAxios from '../../../axiosInstance';
 const AddAddressModal = ({ open, onClose, onAddSuccess }) => {
     const [name, setName] = useState('');
     const [street, setStreet] = useState('');
+    const [phoneNumber, setPhoneNumber] = useState('');
     const [city, setCity] = useState(null);
     const [country, setCountry] = useState(null);
     const [cities, setCities] = useState([]);
@@ -51,13 +52,19 @@ const AddAddressModal = ({ open, onClose, onAddSuccess }) => {
     };
 
     const handleAddAddress = async () => {
-        if (!name || !street || !city || !country) {
+        if (!name || !street || !phoneNumber || !city || !country) {
             toast.error('Please fill in all the fields', { closeOnClick: true });
             return;
         }
 
         try {
-            await axiosInstance.post('/addresses/create', { name, street, city: city._id, country: country._id });
+            await axiosInstance.post('/addresses/create', {
+                name,
+                street,
+                phoneNumber,
+                city: city._id,
+                country: country._id
+            });
             toast.success('Address added successfully');
             onAddSuccess();
             onClose();
@@ -91,6 +98,16 @@ const AddAddressModal = ({ open, onClose, onAddSuccess }) => {
                     label="Street"
                     value={street}
                     onChange={(e) => setStreet(e.target.value)}
+                    className="!mb-4"
+                />
+
+                <BrownOutlinedTextField
+                    fullWidth
+                    required
+                    label="Phone Number"
+                    value={phoneNumber}
+                    onChange={(e) => setPhoneNumber(e.target.value)}
+                    placeholder="044/45/48 XXXXXX"
                     className="!mb-4"
                 />
 

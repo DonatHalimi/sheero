@@ -77,6 +77,7 @@ const EditSupplierModal = ({ open, onClose, supplier, onEditSuccess }) => {
                     value={phoneNumber}
                     onChange={(e) => setPhoneNumber(e.target.value)}
                     fullWidth
+                    placeholder="044/45/48 XXXXXX"
                     className='!mb-4'
                 />
                 <BrownButton
