@@ -15,6 +15,7 @@ import {
     Star,
     StarBorder
 } from '@mui/icons-material';
+import CloseIcon from '@mui/icons-material/Close';
 import {
     Box,
     Breadcrumbs,
@@ -29,17 +30,25 @@ import {
     ListItemText,
     Modal,
     AppBar as MuiAppBar, Drawer as MuiDrawer,
+    Pagination,
     Paper,
     Skeleton,
+    Stack,
     Tab,
     TableCell,
+    Tabs,
     TextField,
     Typography,
 } from '@mui/material';
 import { styled } from '@mui/material/styles';
 import SvgIcon from '@mui/material/SvgIcon';
 import { GridToolbar } from '@mui/x-data-grid';
-import { Link as RouterLink } from 'react-router-dom'; // Correct import for routing
+import React from 'react';
+import { Link as RouterLink } from 'react-router-dom';
+import Footer from '../components/Footer';
+import Navbar from '../components/Navbar';
+import Slideshow from '../components/Slideshow';
+import ProductList from '../pages/Product/ProductList';
 
 export const BrownOutlinedTextField = styled(TextField)({
     '& .MuiOutlinedInput-root': {
@@ -603,3 +612,192 @@ export const NotFoundComponent = () => {
         </div>
     );
 };
+
+export const HomePageContent = () => {
+    return (
+        <>
+            <div className='bg-white'>
+                <Navbar />
+            </div>
+
+            <main className="flex-grow bg-neutral-50">
+                <Slideshow />
+                <ProductList />
+            </main>
+            <Footer />
+        </>
+    );
+}
+
+export const TabPanel = ({ children, value, index }) => {
+    return (
+        <div role="tabpanel" hidden={value !== index}>
+            {value === index && <Box p={3}>{children}</Box>}
+        </div>
+    );
+};
+
+export const DetailsBox = styled(Box)(({ theme }) => ({
+    width: '100%',
+    display: 'flex',
+    flexDirection: 'column',
+    alignItems: 'flex-start',
+    marginBottom: '5rem',
+}));
+
+export const ReviewsList = ({ reviews, openModal }) => {
+    return (
+        <Box className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
+            {reviews.length > 0 ? (
+                reviews.map((review, index) => (
+                    <ReviewCard
+                        key={index}
+                        onClick={() => openModal(review)}
+                        style={{
+                            cursor: 'pointer',
+                            overflow: 'hidden',
+                        }}
+                    >
+                        <Box className="flex justify-between items-center mb-2 w-52">
+                            <p className='font-semibold text-lg'>{review.user.username}</p>
+                            <RatingStars rating={review.rating} />
+                        </Box>
+                        <p className="my-2" style={{
+                            maxWidth: '200px',
+                            overflow: 'hidden',
+                            textOverflow: 'ellipsis',
+                            whiteSpace: 'nowrap',
+                        }}>
+                            {review.comment}
+                        </p>
+                        <Typography variant="caption" color="text.secondary">
+                            {new Date(review.createdAt).toLocaleDateString()}
+                        </Typography>
+                    </ReviewCard>
+                ))
+            ) : (
+                <Typography>No reviews found.</Typography>
+            )}
+        </Box>
+    );
+};
+
+export const ReviewModal = ({ open, handleClose, selectedReview }) => {
+    return (
+        <Modal
+            open={open}
+            onClose={handleClose}
+            aria-labelledby="review-modal-title"
+            aria-describedby="review-modal-description"
+        >
+            <Box sx={{
+                position: 'absolute',
+                top: '50%',
+                left: '50%',
+                transform: 'translate(-50%, -50%)',
+                width: '70%',
+                maxWidth: '600px',
+                bgcolor: 'background.paper',
+                borderRadius: '8px',
+                boxShadow: 24,
+                p: 2,
+                display: 'flex',
+                flexDirection: 'column',
+                outline: 'none'
+            }}>
+                <Box sx={{
+                    display: 'flex',
+                    justifyContent: 'space-between',
+                    alignItems: 'flex-start',
+                    mb: 1
+                }}>
+                    <Box>
+                        {selectedReview && (
+                            <Typography variant="caption" color="text.secondary">
+                                {new Date(selectedReview.createdAt).toLocaleDateString()}
+                            </Typography>
+                        )}
+                        <Box display="flex" alignItems="center">
+                            <Typography id="review-modal-title" variant="h6" component="h2" mr={1}>
+                                {selectedReview?.user.username}
+                            </Typography>
+                            {selectedReview && <RatingStars rating={selectedReview.rating} />}
+                        </Box>
+                    </Box>
+                    <IconButton
+                        onClick={handleClose}
+                        aria-label="close"
+                        sx={{ ml: 'auto', mt: -1, mr: -1 }}
+                    >
+                        <CloseIcon />
+                    </IconButton>
+                </Box>
+                {selectedReview && (
+                    <Typography id="review-modal-description">
+                        {selectedReview.comment}
+                    </Typography>
+                )}
+            </Box>
+        </Modal>
+    );
+};
+
+export const ProductTabs = ({ value, handleChange }) => {
+    return (
+        <Tabs
+            value={value}
+            onChange={handleChange}
+            aria-label="product details tabs"
+            sx={{ width: '100%', display: 'flex', justifyContent: 'center' }}
+        >
+            <CustomTab label="Description" />
+            <CustomTab label="Details" />
+            <CustomTab label="Reviews" />
+        </Tabs>
+    );
+};
+
+export const CustomPagination = ({ count, page, onChange, size = 'large', sx = {} }) => {
+    const paginationEnabled = count > 1;
+
+    if (!paginationEnabled) return null;
+
+    return (
+        <Stack
+            spacing={2}
+            sx={{
+                marginTop: 4,
+                alignItems: 'center',
+                justifyContent: 'center',
+                ...sx,
+            }}
+        >
+            <Pagination
+                count={count}
+                page={page}
+                onChange={onChange}
+                shape="rounded"
+                variant="outlined"
+                size={size}
+                sx={{
+                    '& .MuiPaginationItem-page': {
+                        color: '#686159',
+                    },
+                    '& .MuiPaginationItem-page.Mui-selected': {
+                        backgroundColor: '#686159',
+                        color: 'white',
+                        '&:hover': {
+                            backgroundColor: '#686159',
+                            color: 'white',
+                        },
+                    },
+                    '& .MuiPaginationItem-page:not(.Mui-selected):hover': {
+                        backgroundColor: '#686159',
+                        color: 'white',
+                    },
+                    ...sx,
+                }}
+            />
+        </Stack>
+    );
+};  

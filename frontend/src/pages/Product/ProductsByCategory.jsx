@@ -1,8 +1,7 @@
 import axios from 'axios';
 import React, { useEffect, useState } from 'react';
-import ReactPaginate from 'react-paginate';
 import { useParams } from 'react-router-dom';
-import { ProductPagination } from '../../components/Dashboard/Pagination';
+import { CustomPagination } from '../../assets/CustomComponents';
 import Footer from '../../components/Footer';
 import Navbar from '../../components/Navbar';
 import ProductItem from '../../components/ProductItem';
@@ -12,14 +11,10 @@ const ProductsByCategory = () => {
     const { id } = useParams();
     const [products, setProducts] = useState([]);
     const [categoryName, setCategoryName] = useState('');
-    const [currentPage, setCurrentPage] = useState(0);
-    const itemsPerPage = 2;
+    const [currentPage, setCurrentPage] = useState(1);
+    const itemsPerPage = 10;
 
     useEffect(() => {
-        setProducts([]);
-        setCategoryName('');
-        setCurrentPage(0);
-
         const fetchProductsAndCategory = async () => {
             try {
                 const categoryResponse = await axios.get(`http://localhost:5000/api/categories/get/${id}`);
@@ -27,6 +22,7 @@ const ProductsByCategory = () => {
 
                 const productsResponse = await axios.get(`http://localhost:5000/api/products/get-by-category/${id}`);
                 setProducts(productsResponse.data.products);
+                setCurrentPage(1);
             } catch (error) {
                 console.error('Error fetching products or category:', error);
             }
@@ -36,17 +32,14 @@ const ProductsByCategory = () => {
     }, [id]);
 
     const pageCount = Math.ceil(products.length / itemsPerPage);
-    const isPreviousDisabled = currentPage === 0;
-    const isNextDisabled = currentPage >= pageCount - 1;
-    const paginationEnabled = pageCount && pageCount > 1;
 
     const getCurrentPageItems = () => {
-        const startIndex = currentPage * itemsPerPage;
+        const startIndex = (currentPage - 1) * itemsPerPage;
         return products.slice(startIndex, startIndex + itemsPerPage);
     };
 
-    const handlePageClick = (event) => {
-        setCurrentPage(event.selected);
+    const handlePageChange = (event, value) => {
+        setCurrentPage(value);
     };
 
     return (
@@ -69,28 +62,12 @@ const ProductsByCategory = () => {
                         ))}
                     </div>
                 )}
-                {products.length > 0 && paginationEnabled && (
-                    <div className="flex justify-center mt-8">
-                        <ReactPaginate
-                            pageCount={pageCount}
-                            pageRangeDisplayed={2}
-                            marginPagesDisplayed={1}
-                            onPageChange={({ selected }) => setCurrentPage(selected)}
-                            containerClassName={ProductPagination.container}
-                            activeClassName={ProductPagination.active}
-                            pageClassName={ProductPagination.page}
-                            pageLinkClassName={ProductPagination.link}
-                            disabledClassName={ProductPagination.disabled}
-                            activeLinkClassName={ProductPagination.activeLink}
-                            previousLabel="Previous"
-                            nextLabel="Next"
-                            breakLabel="..."
-                            breakClassName={ProductPagination.break}
-                            previousClassName={`${ProductPagination.nav} ${currentPage === 0 ? ProductPagination.disabled : ''}`}
-                            nextClassName={`${ProductPagination.nav} ${currentPage >= pageCount - 1 ? ProductPagination.disabled : ''}`}
-                        />
-                    </div>
-                )}
+
+                <CustomPagination
+                    count={pageCount}
+                    page={currentPage}
+                    onChange={handlePageChange}
+                />
             </div>
             <Footer />
         </>

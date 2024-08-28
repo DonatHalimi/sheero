@@ -1,12 +1,11 @@
 import axios from 'axios';
 import React, { useEffect, useState } from 'react';
-import ReactPaginate from 'react-paginate';
-import { ProductPagination } from '../../components/Dashboard/Pagination';
+import { CustomPagination } from '../../assets/CustomComponents';
 import ProductItem from '../../components/ProductItem';
 
 const ProductList = () => {
     const [products, setProducts] = useState([]);
-    const [currentPage, setCurrentPage] = useState(0);
+    const [currentPage, setCurrentPage] = useState(1);
     const itemsPerPage = 10;
 
     useEffect(() => {
@@ -16,11 +15,14 @@ const ProductList = () => {
     }, []);
 
     const pageCount = Math.ceil(products.length / itemsPerPage);
-    const ProductPaginationEnabled = pageCount > 1;
 
     const getCurrentPageItems = () => {
-        const startIndex = currentPage * itemsPerPage;
+        const startIndex = (currentPage - 1) * itemsPerPage;
         return products.slice(startIndex, startIndex + itemsPerPage);
+    };
+
+    const handlePageChange = (event, value) => {
+        setCurrentPage(value);
     };
 
     return (
@@ -36,28 +38,11 @@ const ProductList = () => {
                 ))}
             </div>
 
-            {products.length > 0 && ProductPaginationEnabled && (
-                <div className="flex justify-center mt-8">
-                    <ReactPaginate
-                        pageCount={pageCount}
-                        pageRangeDisplayed={2}
-                        marginPagesDisplayed={1}
-                        onPageChange={({ selected }) => setCurrentPage(selected)}
-                        containerClassName={ProductPagination.container}
-                        activeClassName={ProductPagination.active}
-                        pageClassName={ProductPagination.page}
-                        pageLinkClassName={ProductPagination.link}
-                        disabledClassName={ProductPagination.disabled}
-                        activeLinkClassName={ProductPagination.activeLink}
-                        previousLabel="Previous"
-                        nextLabel="Next"
-                        breakLabel="..."
-                        breakClassName={ProductPagination.break}
-                        previousClassName={`${ProductPagination.nav} ${currentPage === 0 ? ProductPagination.disabled : ''}`}
-                        nextClassName={`${ProductPagination.nav} ${currentPage >= pageCount - 1 ? ProductPagination.disabled : ''}`}
-                    />
-                </div>
-            )}
+            <CustomPagination
+                count={pageCount}
+                page={currentPage}
+                onChange={handlePageChange}
+            />
         </div>
     );
 };

@@ -1,16 +1,7 @@
-import CloseIcon from '@mui/icons-material/Close';
-import { Box, IconButton, Modal, Tabs, Typography } from '@mui/material';
+import { Typography } from '@mui/material';
 import React, { useEffect, useState } from 'react';
-import { CustomTab, RatingStars, ReviewCard } from '../assets/CustomComponents';
+import { DetailsBox, ProductTabs, ReviewModal, ReviewsList, TabPanel } from '../assets/CustomComponents';
 import useAxios from '../axiosInstance';
-
-const TabPanel = ({ children, value, index }) => {
-  return (
-    <div role="tabpanel" hidden={value !== index}>
-      {value === index && <Box p={3}>{children}</Box>}
-    </div>
-  );
-};
 
 const ProductDetailsTabs = ({ product }) => {
   const [value, setValue] = useState(0);
@@ -47,24 +38,16 @@ const ProductDetailsTabs = ({ product }) => {
   };
 
   const { description, details } = product;
+  const noDetails = 'The details are being processed, in the meantime you can view the technical specifications. Thank you for your patience.';
 
   return (
-    <Box sx={{ width: '100%', display: 'flex', flexDirection: 'column', alignItems: 'flex-start', marginBottom: 15 }}>
-      <div style={{ width: '100%', display: 'flex', justifyContent: 'center' }}>
-        <Tabs
-          value={value}
-          onChange={handleChange}
-          aria-label="product details tabs"
-          sx={{ width: '100%', display: 'flex', justifyContent: 'center' }}
-        >
-          <CustomTab label="Description" />
-          <CustomTab label="Details" />
-          <CustomTab label="Reviews" />
-        </Tabs>
-      </div>
+    <DetailsBox>
+      <ProductTabs value={value} handleChange={handleChange} />
+
       <TabPanel value={value} index={0}>
         <p>{description}</p>
       </TabPanel>
+
       <TabPanel value={value} index={1}>
         {details.length > 0 ? (
           <div className="space-y-2">
@@ -76,102 +59,21 @@ const ProductDetailsTabs = ({ product }) => {
             ))}
           </div>
         ) : (
-          <Typography>The details are being processed, in the meantime you can view the technical specifications, or contact us via email for further details. Thank you for your understanding.</Typography>
+          <Typography>{noDetails}</Typography>
         )}
       </TabPanel>
+
       <TabPanel value={value} index={2}>
-        <Box className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
-          {reviews.length > 0 ? (
-            reviews.map((review, index) => (
-              <ReviewCard
-                key={index}
-                onClick={() => handleOpenModal(review)}
-                style={{
-                  cursor: 'pointer',
-                  overflow: open ? 'visible' : 'hidden',
-                }}
-              >
-                <Box className="flex justify-between items-center mb-2">
-                  <p className='font-semibold text-lg'>{review.user.username}</p>
-                  <RatingStars rating={review.rating} />
-                </Box>
-                <p className="my-2" style={{
-                  maxWidth: '200px',
-                  overflow: 'hidden',
-                  textOverflow: 'ellipsis',
-                  whiteSpace: 'nowrap',
-                }}>
-                  {review.comment}
-                </p>
-                <Typography variant="caption" color="text.secondary">
-                  {new Date(review.createdAt).toLocaleDateString()}
-                </Typography>
-              </ReviewCard>
-            ))
-          ) : (
-            <Typography>No reviews found.</Typography>
-          )}
-        </Box>
+        <ReviewsList reviews={reviews} openModal={handleOpenModal} />
       </TabPanel>
 
-      {/* Modal for displaying the selected review */}
-      <Modal
+      <ReviewModal
         open={open}
-        onClose={handleCloseModal}
-        aria-labelledby="review-modal-title"
-        aria-describedby="review-modal-description"
-      >
-        <Box sx={{
-          position: 'absolute',
-          top: '50%',
-          left: '50%',
-          transform: 'translate(-50%, -50%)',
-          width: '70%',
-          maxWidth: '600px',
-          bgcolor: 'background.paper',
-          borderRadius: '8px',
-          boxShadow: 24,
-          p: 2,
-          display: 'flex',
-          flexDirection: 'column',
-          outline: 'none'
-        }}>
-          <Box sx={{
-            display: 'flex',
-            justifyContent: 'space-between',
-            alignItems: 'flex-start',
-            mb: 1
-          }}>
-            <Box>
-              {selectedReview && (
-                <Typography variant="caption" color="text.secondary">
-                  {new Date(selectedReview.createdAt).toLocaleDateString()}
-                </Typography>
-              )}
-              <Box display="flex" alignItems="center">
-                <Typography id="review-modal-title" variant="h6" component="h2" mr={1}>
-                  {selectedReview?.user.username}
-                </Typography>
-                {selectedReview && <RatingStars rating={selectedReview.rating} />}
-              </Box>
-            </Box>
-            <IconButton
-              onClick={handleCloseModal}
-              aria-label="close"
-              sx={{ ml: 'auto', mt: -1, mr: -1 }}
-            >
-              <CloseIcon />
-            </IconButton>
-          </Box>
-          {selectedReview && (
-            <Typography id="review-modal-description" >
-              {selectedReview.comment}
-            </Typography>
-          )}
-        </Box>
-      </Modal>
-    </Box>
+        handleClose={handleCloseModal}
+        selectedReview={selectedReview}
+      />
+    </DetailsBox>
   );
 };
 
-export default ProductDetailsTabs;
+export default ProductDetailsTabs

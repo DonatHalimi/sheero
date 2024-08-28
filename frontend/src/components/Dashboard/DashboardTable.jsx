@@ -7,6 +7,22 @@ const getNestedValue = (obj, path) => {
     return path.split('.').reduce((acc, part) => acc && acc[part], obj);
 };
 
+/**
+ * A reusable table component for displaying data in a dashboard.
+ *
+ * @param {Array} columns - An array of column objects with keys for label, key, and render.
+ * @param {Array} data - An array of data objects to be displayed in the table.
+ * @param {Array} selectedItems - An array of selected item IDs.
+ * @param {Function} onSelectItem - A callback function for when an item is selected.
+ * @param {Function} onRowRightClick - A callback function for when a row is right-clicked.
+ * @param {Number} itemsPerPage - The number of items to display per page.
+ * @param {Number} currentPage - The current page number.
+ * @param {Function} onPageChange - A callback function for when the page changes.
+ * @param {Function} renderActionButtons - A function that returns the action buttons for each row.
+ * @param {Function} renderTableActions - A function that returns the table actions.
+ * @param {String} containerClassName - A class name for the container element.
+ * @return {JSX.Element} The table component.
+ */
 const DashboardTable = ({
     columns,
     data,
