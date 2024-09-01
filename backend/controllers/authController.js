@@ -12,6 +12,14 @@ const validatePassword = (password) => {
     return passwordRegex.test(password);
 };
 
+const generateAccessToken = (user) => {
+    return jwt.sign({ userId: user._id, role: user.role }, process.env.JWT_SECRET, { expiresIn: '1h' });
+};
+
+const generateRefreshToken = (user) => {
+    return jwt.sign({ userId: user._id }, process.env.JWT_REFRESH_SECRET, { expiresIn: '7d' });
+};
+
 const registerUser = async (req, res) => {
     const { username, email, password, role } = req.body;
 
@@ -29,11 +37,13 @@ const registerUser = async (req, res) => {
         if (existingUser || existingEmail) return res.status(400).json({ message: 'User or Email already exists' });
 
         const hashedPassword = await bcrypt.hash(password, 10);
-
         const user = new User({ username, email, password: hashedPassword, role });
         await user.save();
 
-        res.status(201).json({ message: 'User registered successfully' });
+        const accessToken = generateAccessToken(user);
+        const refreshToken = generateRefreshToken(user);
+
+        res.status(201).json({ message: 'User registered successfully', accessToken, refreshToken });
     } catch (error) {
         res.status(500).json({ message: 'Server error' });
     }
@@ -48,12 +58,11 @@ const loginUser = async (req, res) => {
                 { username: username || email },
                 { email: email || username }
             ]
-        })
-        .populate({
+        }).populate({
             path: 'address',
             populate: { 
                 path: 'city country', 
-                model: ['City', 'Country'] // populate related city and country data
+                model: ['City', 'Country']
             }
         });
 
@@ -66,18 +75,37 @@ const loginUser = async (req, res) => {
             return res.status(400).json({ message: 'Invalid credentials' });
         }
 
-        const accessToken = jwt.sign({ userId: user._id, role: user.role }, process.env.JWT_SECRET, { expiresIn: '1h' });
+        const accessToken = generateAccessToken(user);
+        const refreshToken = generateRefreshToken(user);
 
         res.json({
             accessToken,
+            refreshToken,
             role: user.role,
             username: user.username,
             email: user.email,
-            address: user.address || {}, // Address is returned here
+            address: user.address || {},
         });
     } catch (error) {
         console.error('Server error during login:', error);
         res.status(500).json({ message: 'Server error' });
+    }
+};
+
+const refreshAccessToken = (req, res) => {
+    const { refreshToken } = req.body;
+
+    if (!refreshToken) {
+        return res.status(400).json({ message: 'Refresh Token is required' });
+    }
+
+    try {
+        const decoded = jwt.verify(refreshToken, process.env.JWT_REFRESH_SECRET);
+        const accessToken = generateAccessToken({ _id: decoded.userId, role: decoded.role });
+
+        res.json({ accessToken });
+    } catch (error) {
+        res.status(403).json({ message: 'Invalid Refresh Token' });
     }
 };
 
@@ -90,7 +118,8 @@ const getCurrentUser = async (req, res) => {
         res.json({
             username: user.username,
             email: user.email,
-            role: user.role
+            role: user.role,
+            address: user.address || {},
         });
     } catch (error) {
         res.status(500).json({ message: 'Server error' });
@@ -119,11 +148,16 @@ const updateUserProfile = async (req, res) => {
         res.json({
             username: user.username,
             email: user.email,
-            role: user.role
+            role: user.role,
+            address: user.address || {},
         });
     } catch (error) {
         res.status(500).json({ message: 'Server error' });
     }
 };
 
-module.exports = { registerUser, loginUser, getCurrentUser, updateUserProfile };
+const logoutUser = (req, res) => {
+    res.json({ message: 'Logout successful' });
+};
+
+module.exports = { registerUser, loginUser, getCurrentUser, updateUserProfile, refreshAccessToken, logoutUser };

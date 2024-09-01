@@ -14,7 +14,13 @@ const authenticateToken = (req, res, next) => {
     }
 
     jwt.verify(token, process.env.JWT_SECRET, (err, user) => {
-        if (err) return res.status(403).json({ message: 'Invalid token' });
+        if (err) {
+            if (err.name === 'TokenExpiredError') {
+                return res.status(401).json({ message: 'Access token expired' });
+            } else {
+                return res.status(403).json({ message: 'Invalid token' });
+            }
+        }
 
         req.user = user;
         next();
@@ -28,6 +34,28 @@ const authorizeRole = (role) => {
         }
         next();
     };
+};
+
+const refreshAccessToken = (req, res) => {
+    const { refreshToken } = req.body;
+
+    if (!refreshToken) {
+        return res.status(401).json({ message: 'Refresh token required' });
+    }
+
+    jwt.verify(refreshToken, process.env.JWT_REFRESH_SECRET, (err, user) => {
+        if (err) {
+            return res.status(403).json({ message: 'Invalid refresh token' });
+        }
+
+        const newAccessToken = jwt.sign(
+            { userId: user.userId, role: user.role },
+            process.env.JWT_SECRET,
+            { expiresIn: '1h' }
+        );
+
+        res.json({ accessToken: newAccessToken });
+    });
 };
 
 const protect = (req, res, next) => {
@@ -46,4 +74,4 @@ const requireAuthAndRole = (role) => {
     };
 };
 
-module.exports = { authenticateToken, authorizeRole, protect, requireAuthAndRole };
+module.exports = { authenticateToken, authorizeRole, protect, requireAuthAndRole, refreshAccessToken };
