@@ -1,50 +1,7 @@
-import ExpandMoreIcon from '@mui/icons-material/ExpandMore';
-import QuestionAnswerIconOutlined from '@mui/icons-material/QuestionAnswerOutlined';
-import { AnimatePresence, motion } from 'framer-motion';
-import React, { useState } from 'react';
-import Footer from '../components/Footer';
+import React from 'react';
 import Navbar from '../components/Navbar';
-
-const FAQItem = ({ question, answer }) => {
-    const [isOpen, setIsOpen] = useState(false);
-
-    return (
-        <div className="mb-4">
-            <motion.button
-                className="flex justify-between items-center w-full py-4 px-6 text-left bg-white rounded-md shadow-md hover:shadow-lg transition-shadow duration-200"
-                onClick={() => setIsOpen(!isOpen)}
-                whileHover={isOpen ? {} : { scale: 1.02 }}
-                whileTap={isOpen ? {} : { scale: 0.98 }}
-            >
-                <span className="flex items-center text-brown-800 font-semibold">
-                    <QuestionAnswerIconOutlined className="mr-2 text-brown-600" />
-                    {question}
-                </span>
-                <motion.span
-                    animate={{ rotate: isOpen ? 180 : 0 }}
-                    transition={{ duration: 0.3 }}
-                >
-                    <ExpandMoreIcon className="text-brown-600" />
-                </motion.span>
-            </motion.button>
-            <AnimatePresence>
-                {isOpen && (
-                    <motion.div
-                        initial={{ opacity: 0, height: 0 }}
-                        animate={{ opacity: 1, height: 'auto' }}
-                        exit={{ opacity: 0, height: 0 }}
-                        transition={{ duration: 0.3 }}
-                        className="bg-white rounded-b-md shadow-md mt-1 overflow-hidden"
-                    >
-                        <div className="p-6 text-brown-700">
-                            <p>{answer}</p>
-                        </div>
-                    </motion.div>
-                )}
-            </AnimatePresence>
-        </div>
-    );
-};
+import Footer from '../components/Footer';
+import {FAQSection} from '../assets/CustomComponents';
 
 const FAQs = () => {
     const faqData = [
@@ -73,14 +30,7 @@ const FAQs = () => {
     return (
         <>
             <Navbar />
-            <div className="max-w-3xl mx-auto py-12 px-4 sm:px-6 lg:px-8 bg-brown-50 mt-24">
-                <h1 className="text-3xl font-bold text-brown-900 mb-8 text-left">Frequently Asked Questions</h1>
-                <div>
-                    {faqData.map((faq, index) => (
-                        <FAQItem key={index} question={faq.question} answer={faq.answer} />
-                    ))}
-                </div>
-            </div>
+            <FAQSection faqData={faqData} />
             <div className='mt-40'></div>
             <Footer />
         </>

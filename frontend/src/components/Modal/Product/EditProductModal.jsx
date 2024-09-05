@@ -1,8 +1,9 @@
-import UploadIcon from '@mui/icons-material/Upload';
-import { Box, InputLabel, MenuItem, Modal, Select, Typography } from '@mui/material';
 import React, { useContext, useEffect, useState } from 'react';
+import { Box, Typography, Modal } from '@mui/material';
+import { Autocomplete, TextField, MenuItem } from '@mui/material';
+import UploadIcon from '@mui/icons-material/Upload';
 import { toast } from 'react-toastify';
-import { BrownButton, BrownOutlinedTextField, OutlinedBrownButton, OutlinedBrownFormControl, VisuallyHiddenInput } from '../../../assets/CustomComponents';
+import { BrownButton, BrownOutlinedTextField, OutlinedBrownButton, VisuallyHiddenInput, OutlinedBrownFormControl, CustomPaper } from '../../../assets/CustomComponents';
 import useAxios from '../../../axiosInstance';
 import { AuthContext } from '../../../context/AuthContext';
 
@@ -11,9 +12,9 @@ const EditProductModal = ({ open, onClose, product, onEditSuccess }) => {
     const [description, setDescription] = useState('');
     const [price, setPrice] = useState('');
     const [salePrice, setSalePrice] = useState('');
-    const [category, setCategory] = useState('');
-    const [subcategory, setSubcategory] = useState('');
-    const [subSubcategory, setSubSubcategory] = useState('');
+    const [category, setCategory] = useState(null);
+    const [subcategory, setSubcategory] = useState(null);
+    const [subSubcategory, setSubSubcategory] = useState(null);
     const [inventoryCount, setInventoryCount] = useState('');
     const [image, setImage] = useState(null);
     const [imagePreview, setImagePreview] = useState('');
@@ -27,7 +28,7 @@ const EditProductModal = ({ open, onClose, product, onEditSuccess }) => {
     const [variants, setVariants] = useState([{ color: '', size: '' }]);
     const [discountType, setDiscountType] = useState('percentage');
     const [discountValue, setDiscountValue] = useState(0);
-    const [supplier, setSupplier] = useState('');
+    const [supplier, setSupplier] = useState(null);
     const [suppliers, setSuppliers] = useState([]);
     const [weight, setWeight] = useState('');
     const [shippingCost, setShippingCost] = useState('');
@@ -43,11 +44,11 @@ const EditProductModal = ({ open, onClose, product, onEditSuccess }) => {
             setDescription(product.description || '');
             setPrice(product.price || '');
             setSalePrice(product.salePrice || '');
-            setCategory(product.category?._id || '');
-            setSubcategory(product.subcategory?._id || '');
-            setSubSubcategory(product.subSubcategory?._id || '');
+            setCategory(product.category || null);
+            setSubcategory(product.subcategory || null);
+            setSubSubcategory(product.subSubcategory || null);
             setInventoryCount(product.inventoryCount || '');
-            setSupplier(product.supplier?._id || '');
+            setSupplier(product.supplier || null);
             setImagePreview(product.image ? `http://localhost:5000/${product.image}` : '');
 
             if (product.dimensions) {
@@ -81,7 +82,7 @@ const EditProductModal = ({ open, onClose, product, onEditSuccess }) => {
     useEffect(() => {
         const TIMEOUT = 5000;
 
-        async function fetchCategoriesAndSubcategories() {
+        const fetchCategoriesAndSubcategories = async () => {
             try {
                 const response = await axiosInstance.get('/categories/get', { timeout: TIMEOUT });
                 setCategories(response.data);
@@ -98,9 +99,9 @@ const EditProductModal = ({ open, onClose, product, onEditSuccess }) => {
                     console.error('Error fetching categories, subcategories, and subsubcategories:', error.message);
                 }
             }
-        }
+        };
 
-        async function fetchSuppliers() {
+        const fetchSuppliers = async () => {
             try {
                 const response = await axiosInstance.get('/suppliers/get', { timeout: TIMEOUT });
                 setSuppliers(response.data);
@@ -111,7 +112,7 @@ const EditProductModal = ({ open, onClose, product, onEditSuccess }) => {
                     console.error('Error fetching suppliers:', error.message);
                 }
             }
-        }
+        };
 
         fetchCategoriesAndSubcategories();
         fetchSuppliers();
@@ -178,9 +179,9 @@ const EditProductModal = ({ open, onClose, product, onEditSuccess }) => {
         formData.append('description', description);
         formData.append('price', price);
         formData.append('salePrice', salePrice);
-        formData.append('category', category);
-        formData.append('subcategory', subcategory);
-        formData.append('subSubcategory', subSubcategory);
+        formData.append('category', category._id || category);
+        formData.append('subcategory', subcategory._id || subcategory);
+        formData.append('subSubcategory', subSubcategory._id || subSubcategory);
         formData.append('inventoryCount', inventoryCount);
         formData.append('dimensions[length]', length);
         formData.append('dimensions[width]', width);
@@ -188,7 +189,7 @@ const EditProductModal = ({ open, onClose, product, onEditSuccess }) => {
         formData.append('dimensions[unit]', unit);
         formData.append('discount[type]', discountType);
         formData.append('discount[value]', discountValue);
-        formData.append('supplier', supplier);
+        formData.append('supplier', supplier._id || supplier);
         formData.append('shipping[weight]', weight);
         formData.append('shipping[cost]', shippingCost);
         formData.append('shipping[dimensions][length]', length);
@@ -227,7 +228,7 @@ const EditProductModal = ({ open, onClose, product, onEditSuccess }) => {
         <Modal open={open} onClose={onClose}>
             <div className="flex items-center justify-center h-screen">
                 <Box className="edit-modal bg-white p-4 rounded-lg shadow-lg max-w-md w-full max-h-[80vh] overflow-y-auto">
-                    <Typography variant='h5' className="!text-xl !font-bold !mb-6">Edit Product</Typography>
+                    <Typography variant='h5' className="!text-xl !font-bold !mb-4">Edit Product</Typography>
                     <BrownOutlinedTextField
                         fullWidth
                         required
@@ -241,9 +242,9 @@ const EditProductModal = ({ open, onClose, product, onEditSuccess }) => {
                         required
                         label="Description"
                         value={description}
-                        onChange={(e) => setDescription(e.target.value)}
                         multiline
                         rows={4}
+                        onChange={(e) => setDescription(e.target.value)}
                         className="!mb-4"
                     />
                     <Box className="flex gap-4 mb-2">
@@ -274,46 +275,49 @@ const EditProductModal = ({ open, onClose, product, onEditSuccess }) => {
                         onChange={(e) => setInventoryCount(e.target.value)}
                         className="!mb-4"
                     />
-                    <Box className="flex gap-4 mb-4">
-                        <OutlinedBrownFormControl className="flex-1">
-                            <InputLabel>Category</InputLabel>
-                            <Select
-                                value={category}
-                                onChange={(e) => setCategory(e.target.value)}
-                                label='Category'
-                            >
-                                {categories.map((cat) => (
-                                    <MenuItem key={cat._id} value={cat._id}>{cat.name}</MenuItem>
-                                ))}
-                            </Select>
-                        </OutlinedBrownFormControl>
-                        <OutlinedBrownFormControl className="flex-1">
-                            <InputLabel>Subcategory</InputLabel>
-                            <Select
-                                value={subcategory}
-                                onChange={(e) => setSubcategory(e.target.value)}
-                                label='Subcategory'
-                            >
-                                {subcategories.map((subcat) => (
-                                    <MenuItem key={subcat._id} value={subcat._id}>{subcat.name}</MenuItem>
-                                ))}
-                            </Select>
-                        </OutlinedBrownFormControl>
-                        <OutlinedBrownFormControl className="flex-1">
-                            <InputLabel>SubSubcategory</InputLabel>
-                            <Select
-                                value={subSubcategory}
-                                onChange={(e) => setSubSubcategory(e.target.value)}
-                                label='SubSubcategory'
-                            >
-                                {subSubcategories.map((subsubcat) => (
-                                    <MenuItem key={subsubcat._id} value={subsubcat._id}>{subsubcat.name}</MenuItem>
-                                ))}
-                            </Select>
-                        </OutlinedBrownFormControl>
+                    <Typography variant='h6' className="!text-lg !font-bold !mb-4">Categories</Typography>
+                    <Box className="flex gap-4 mb-2">
+
+                        <Autocomplete
+                            id="category-autocomplete"
+                            options={categories.sort((a, b) => -b.name[0].localeCompare(a.name[0]))}
+                            groupBy={(option) => option.name[0].toUpperCase()}
+                            getOptionLabel={(option) => option.name}
+                            value={category}
+                            onChange={(event, newValue) => setCategory(newValue)}
+                            PaperComponent={CustomPaper}
+                            fullWidth
+                            renderInput={(params) => <TextField {...params} label="Category" variant="outlined" />}
+                        />
+
+                        <Autocomplete
+                            id="subcategory-autocomplete"
+                            options={subcategories.sort((a, b) => -b.name[0].localeCompare(a.name[0]))}
+                            groupBy={(option) => option.name[0].toUpperCase()}
+                            getOptionLabel={(option) => option.name}
+                            value={subcategory}
+                            onChange={(event, newValue) => setSubcategory(newValue)}
+                            PaperComponent={CustomPaper}
+                            fullWidth
+                            renderInput={(params) => <TextField {...params} label="Subcategory" variant="outlined" />}
+                            disabled={!category}
+                        />
+
+                        <Autocomplete
+                            id="subsubCategory-autocomplete"
+                            options={subSubcategories.sort((a, b) => -b.name[0].localeCompare(a.name[0]))}
+                            groupBy={(option) => option.name[0].toUpperCase()}
+                            getOptionLabel={(option) => option.name}
+                            value={subSubcategory}
+                            onChange={(event, newValue) => setSubSubcategory(newValue)}
+                            PaperComponent={CustomPaper}
+                            fullWidth
+                            renderInput={(params) => <TextField {...params} label="SubSubcategory" variant="outlined" />}
+                            disabled={!subcategory}
+                        />
                     </Box>
-                    <Typography variant='h6' className="!text-lg !font-bold !mb-2">Dimensions</Typography>
-                    <Box className="flex gap-4 mb-4">
+                    <Typography variant='h6' className="!text-lg !font-bold !mb-4">Dimensions</Typography>
+                    <Box className="flex gap-4">
                         <BrownOutlinedTextField
                             fullWidth
                             label="Length"
@@ -346,7 +350,7 @@ const EditProductModal = ({ open, onClose, product, onEditSuccess }) => {
                             className="!mb-4"
                         />
                     </Box>
-                    <Typography variant='h6' className="!text-lg !font-bold !mb-2">Variants</Typography>
+                    <Typography variant='h6' className="!text-lg !font-bold !mb-4">Variants</Typography>
                     {variants.map((variant, index) => (
                         <Box key={index} className="flex gap-4 mb-2">
                             <BrownOutlinedTextField
@@ -386,21 +390,21 @@ const EditProductModal = ({ open, onClose, product, onEditSuccess }) => {
                     ))}
                     <OutlinedBrownButton sx={{ width: '160px' }} onClick={addDetail} className="!mb-4">Add Detail</OutlinedBrownButton>
 
-                    <OutlinedBrownFormControl fullWidth className="!mb-4">
-                        <InputLabel>Supplier</InputLabel>
-                        <Select
-                            value={supplier}
-                            onChange={(e) => setSupplier(e.target.value)}
-                            label='Supplier'
-                        >
-                            {suppliers.map((sup) => (
-                                <MenuItem key={sup._id} value={sup._id}>{sup.name}</MenuItem>
-                            ))}
-                        </Select>
-                    </OutlinedBrownFormControl>
+                    <Typography variant='h6' className="!text-lg !font-bold !mb-4">Supplier</Typography>
+                    <Autocomplete
+                        id="supplier-autocomplete"
+                        options={suppliers.sort((a, b) => -b.name[0].localeCompare(a.name[0]))}
+                        groupBy={(option) => option.name[0].toUpperCase()}
+                        getOptionLabel={(option) => option.name}
+                        value={supplier}
+                        onChange={(event, newValue) => setSupplier(newValue)}
+                        PaperComponent={CustomPaper}
+                        fullWidth
+                        renderInput={(params) => <TextField {...params} label="Supplier" variant="outlined" />}
+                    />
 
-                    <Typography variant='h6' className="!text-lg !font-bold !mb-2">Shipping</Typography>
-                    <Box className="flex gap-4 mb-4">
+                    <Typography variant='h6' className="!text-lg !font-bold !mt-4 !mb-4">Shipping</Typography>
+                    <Box className="flex gap-4 mb-2">
                         <BrownOutlinedTextField
                             fullWidth
                             label="Weight"
@@ -419,16 +423,16 @@ const EditProductModal = ({ open, onClose, product, onEditSuccess }) => {
                         />
                     </Box>
                     <OutlinedBrownFormControl fullWidth className="!mb-4">
-                        <InputLabel>Package Size</InputLabel>
-                        <Select
+                        <TextField
+                            label="Package Size"
                             value={packageSize}
                             onChange={(e) => setPackageSize(e.target.value)}
-                            label='Package Size'
+                            select
                         >
                             <MenuItem value="small">Small</MenuItem>
                             <MenuItem value="medium">Medium</MenuItem>
                             <MenuItem value="large">Large</MenuItem>
-                        </Select>
+                        </TextField>
                     </OutlinedBrownFormControl>
 
                     <OutlinedBrownButton

@@ -1,4 +1,4 @@
-import { FormControl, InputLabel, MenuItem, Select } from '@mui/material';
+import { Rating, FormControl, InputLabel, Select, MenuItem } from '@mui/material';
 import React, { useContext, useEffect, useState } from 'react';
 import { toast } from 'react-toastify';
 import { BrownButton, BrownOutlinedTextField, CustomBox, CustomModal, CustomTypography } from '../../../assets/CustomComponents';
@@ -6,9 +6,9 @@ import useAxios from '../../../axiosInstance';
 import { AuthContext } from '../../../context/AuthContext';
 
 const AddReviewModal = ({ open, onClose, onAddSuccess }) => {
-    const [rating, setRating] = useState('');
+    const [rating, setRating] = useState(0);
     const [comment, setComment] = useState('');
-    const [productId, setProductId] = useState('');
+    const [productId, setProductId] = useState(null);
     const [products, setProducts] = useState([]);
     const [userReviews, setUserReviews] = useState([]);
 
@@ -39,8 +39,8 @@ const AddReviewModal = ({ open, onClose, onAddSuccess }) => {
     }, [axiosInstance]);
 
     const handleAddReview = async () => {
-        if (!rating || !comment || !productId) {
-            toast.error('Please fill in all the fields', {
+        if (rating < 1 || !productId) {
+            toast.error('Please fill in all the fields and select a rating between 1 and 5 stars', {
                 closeOnClick: true,
             });
             return;
@@ -78,6 +78,7 @@ const AddReviewModal = ({ open, onClose, onAddSuccess }) => {
                 <FormControl fullWidth className='!mb-4'>
                     <InputLabel id="product-label">Product</InputLabel>
                     <Select
+                        labelId="product-label"
                         label="Product"
                         value={productId}
                         onChange={(e) => setProductId(e.target.value)}
@@ -89,13 +90,18 @@ const AddReviewModal = ({ open, onClose, onAddSuccess }) => {
                         ))}
                     </Select>
                 </FormControl>
-                <BrownOutlinedTextField
-                    label="Rating"
+
+                <Rating
+                    name="product-rating"
                     value={rating}
-                    onChange={(e) => setRating(e.target.value)}
-                    fullWidth
-                    className='!mb-4'
+                    onChange={(event, newValue) => setRating(newValue)}
+                    precision={1}
+                    max={5}
+                    min={1}
+                    size="large"
+                    className='mb-4'
                 />
+
                 <BrownOutlinedTextField
                     label="Comment"
                     value={comment}

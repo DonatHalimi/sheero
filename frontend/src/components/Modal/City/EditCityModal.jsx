@@ -55,7 +55,7 @@ const EditCityModal = ({ open, onClose, city, onEditSuccess }) => {
     return (
         <CustomModal open={open} onClose={onClose}>
             <CustomBox>
-                <CustomTypography variant="h5">Edit Category</CustomTypography>
+                <CustomTypography variant="h5">Edit City</CustomTypography>
 
                 <BrownOutlinedTextField
                     fullWidth

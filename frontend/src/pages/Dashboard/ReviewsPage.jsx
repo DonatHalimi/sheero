@@ -64,21 +64,19 @@ const ReviewsPage = () => {
             key: 'rating',
             label: 'Rating',
             render: (review) => (
-                <div style={{ position: 'relative', top: '17px' }}>
+                <div style={{ position: 'relative', top: '20px' }}>
                     <RatingStars rating={review.rating} />
                 </div>
             )
         },
-        { key: 'comment', label: 'Comment' },
-        { key: 'product.name', label: 'Product' },
         {
-            key: 'actions',
-            label: 'Actions',
-            render: renderActionButtons
-        }
+            key: 'comment',
+            label: 'Comment',
+            render: (review) => review.comment ? review.comment : 'N/A'
+        },
+        { key: 'product.name', label: 'Product' },
+        { key: 'actions', label: 'Actions', render: renderActionButtons }
     ];
-
-
 
     const renderTableActions = () => (
         <div className='flex items-center justify-between w-full mb-4'>

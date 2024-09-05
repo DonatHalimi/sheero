@@ -90,13 +90,14 @@ const Navbar = () => {
                                 <>
                                     <div className="relative">
                                         <Tooltip title="Profile" arrow>
-                                            <ProfileButton onClick={handleDropdownToggle} className="flex items-center space-x-2 rounded-sm">
-                                                <StyledPersonIcon />
-                                                {auth.username && <span className="ml-2 text-sm">{auth.username}</span>}
-                                            </ProfileButton>
-
-                                            {isDropdownOpen && <NavbarDropdown />}
+                                            <div className="flex items-center">
+                                                <ProfileButton onClick={handleDropdownToggle} className="flex items-center space-x-2 rounded-sm">
+                                                    <StyledPersonIcon />
+                                                    {auth.username && <span className="ml-2 text-sm">{auth.username}</span>}
+                                                </ProfileButton>
+                                            </div>
                                         </Tooltip>
+                                        {isDropdownOpen && <NavbarDropdown />}
                                     </div>
                                     <div className='flex space-x-2'>
                                         <Link to='/wishlist'>

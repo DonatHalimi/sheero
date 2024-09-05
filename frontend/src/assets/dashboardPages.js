@@ -3,6 +3,7 @@ import CategoriesPage from '../pages/Dashboard/CategoriesPage';
 import CitiesPage from '../pages/Dashboard/CitiesPage';
 import CountriesPage from '../pages/Dashboard/CountriesPage';
 import DashboardContent from '../pages/Dashboard/DashboardContent';
+import FAQPage from '../pages/Dashboard/FAQPage';
 import ProductsPage from '../pages/Dashboard/ProductsPage';
 import ReviewsPage from '../pages/Dashboard/ReviewsPage';
 import SlideshowPage from '../pages/Dashboard/SlideshowPage';
@@ -23,7 +24,8 @@ const pages = {
     suppliers: SuppliersPage,
     subcategories: SubcategoriesPage,
     users: UsersPage,
-    subSubcategories: SubSubcategoriesPage
+    subSubcategories: SubSubcategoriesPage,
+    faqs: FAQPage
 };
 
 export default pages;

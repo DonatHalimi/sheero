@@ -69,7 +69,8 @@ const CategoriesPage = () => {
                     className='rounded-md cursor-pointer'
                     src={`http://localhost:5000/${item.image}`}
                     alt=""
-                    width={80}
+                    width={70}
+                    style={{ position: 'relative', top: '3px' }}
                     onClick={() => handleImageClick(`http://localhost:5000/${item.image}`)}
                 />
             )

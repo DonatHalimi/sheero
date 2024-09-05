@@ -1,4 +1,4 @@
-import { InputLabel, MenuItem, Select } from '@mui/material';
+import { InputLabel, MenuItem, Rating, Select } from '@mui/material';
 import React, { useContext, useEffect, useState } from 'react';
 import { toast } from 'react-toastify';
 import { BrownButton, BrownOutlinedTextField, CustomBox, CustomModal, CustomTypography, OutlinedBrownFormControl } from '../../../assets/CustomComponents';
@@ -6,7 +6,7 @@ import useAxios from '../../../axiosInstance';
 import { AuthContext } from '../../../context/AuthContext';
 
 const EditReviewModal = ({ open, onClose, review, onEditSuccess }) => {
-    const [rating, setRating] = useState('');
+    const [rating, setRating] = useState(null);
     const [comment, setComment] = useState('');
     const [product, setProduct] = useState('');
     const [products, setProducts] = useState([]);
@@ -29,14 +29,14 @@ const EditReviewModal = ({ open, onClose, review, onEditSuccess }) => {
 
     useEffect(() => {
         if (review) {
-            setRating(review.rating);
+            setRating(Number(review.rating));
             setComment(review.comment);
             setProduct(review.product._id);
         }
     }, [review]);
 
     const handleEditReview = async () => {
-        if (!rating || !comment || !product) {
+        if (rating === null || !comment || !product) {
             toast.error('Please fill in all the fields', {
                 closeOnClick: true,
             });
@@ -82,12 +82,16 @@ const EditReviewModal = ({ open, onClose, review, onEditSuccess }) => {
                         ))}
                     </Select>
                 </OutlinedBrownFormControl>
-                <BrownOutlinedTextField
-                    label="Rating"
+
+                <Rating
+                    name="product-rating"
                     value={rating}
-                    onChange={(e) => setRating(e.target.value)}
-                    fullWidth
-                    className='!mb-4'
+                    onChange={(event, newValue) => setRating(newValue)}
+                    precision={1}
+                    max={5}
+                    min={1}
+                    size="large"
+                    className='mb-4'
                 />
                 <BrownOutlinedTextField
                     label="Comment"

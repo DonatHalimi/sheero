@@ -193,7 +193,7 @@ const AddProductModal = ({ open, onClose, onAddSuccess }) => {
         <Modal open={open} onClose={onClose}>
             <div className="flex items-center justify-center h-screen">
                 <Box className="edit-modal bg-white p-4 rounded-lg shadow-lg max-w-md w-full max-h-[80vh] overflow-y-auto">
-                    <Typography variant='h5' className="!text-xl !font-bold !mb-6">Add Product</Typography>
+                    <Typography variant='h5' className="!text-xl !font-bold !mb-4">Add Product</Typography>
                     <BrownOutlinedTextField
                         fullWidth
                         required
@@ -207,6 +207,8 @@ const AddProductModal = ({ open, onClose, onAddSuccess }) => {
                         required
                         label="Description"
                         value={description}
+                        multiline
+                        rows={4}
                         onChange={(e) => setDescription(e.target.value)}
                         className="!mb-4"
                     />
@@ -235,7 +237,8 @@ const AddProductModal = ({ open, onClose, onAddSuccess }) => {
                         onChange={(e) => setInventoryCount(e.target.value)}
                         className="!mb-4"
                     />
-                    <Box className="flex gap-4 mb-4">
+                    <Typography variant='h6' className="!text-lg !font-bold !mb-2">Categories</Typography>
+                    <Box className="flex gap-4 mb-2">
                         <Autocomplete
                             id="category-autocomplete"
                             options={categories.sort((a, b) => -b.firstLetter.localeCompare(a.firstLetter))}
@@ -276,7 +279,7 @@ const AddProductModal = ({ open, onClose, onAddSuccess }) => {
                         />
                     </Box>
                     <Typography variant='h6' className="!text-lg !font-bold !mb-2">Dimensions</Typography>
-                    <Box className="flex gap-4 mb-4">
+                    <Box className="flex gap-4 mb-2">
                         <BrownOutlinedTextField
                             fullWidth
                             label="Length"

@@ -13,7 +13,8 @@ import {
     ShoppingCart,
     ShoppingCartOutlined,
     Star,
-    StarBorder
+    StarBorder,
+    QuestionAnswerOutlined
 } from '@mui/icons-material';
 import CloseIcon from '@mui/icons-material/Close';
 import {
@@ -43,12 +44,16 @@ import {
 import { styled } from '@mui/material/styles';
 import SvgIcon from '@mui/material/SvgIcon';
 import { GridToolbar } from '@mui/x-data-grid';
-import React from 'react';
+import React, { useEffect, useState } from 'react';
 import { Link as RouterLink } from 'react-router-dom';
 import Footer from '../components/Footer';
 import Navbar from '../components/Navbar';
 import Slideshow from '../components/Slideshow';
 import ProductList from '../pages/Product/ProductList';
+import ProductDetailsTabs from '../components/ProductDetailsTabs';
+import ImagePreviewModal from '../components/Modal/ImagePreviewModal';
+import { AnimatePresence, motion } from 'framer-motion';
+import useAxios from '../axiosInstance';
 
 export const BrownOutlinedTextField = styled(TextField)({
     '& .MuiOutlinedInput-root': {
@@ -800,4 +805,153 @@ export const CustomPagination = ({ count, page, onChange, size = 'large', sx = {
             />
         </Stack>
     );
-};  
+};
+
+export const ProductDetailCard = ({
+    imageUrl,
+    name,
+    discountPercentage,
+    originalPrice,
+    discountedPrice,
+    product,
+    imagePreviewOpen,
+    handleImageClick,
+    setImagePreviewOpen
+}) => {
+    return (
+        <>
+            <div className="container mx-auto px-4 py-4 mb-8 bg-white mt-8 rounded-md max-w-5xl">
+                <div className="flex flex-col md:flex-row gap-8">
+                    <div className="flex flex-col items-center md:w-1/2">
+                        <img
+                            src={imageUrl}
+                            alt={name}
+                            className="w-full h-80 object-cover rounded hover:cursor-pointer"
+                            onError={(e) => { e.target.onerror = null; e.target.src = NoImage; }}
+                            onClick={handleImageClick}
+                        />
+                    </div>
+                    <div className="md:w-1/2">
+                        <h1 className="text-2xl">{name}</h1>
+                        <div className="mt-4 flex flex-col">
+                            {discountPercentage > 0 ? (
+                                <>
+                                    <span className="text-gray-500 line-through text-sm">
+                                        {originalPrice.toFixed(2)} €
+                                    </span>
+                                    <span className="text-2xl font-bold text-stone-600">
+                                        {discountedPrice.toFixed(2)} €
+                                    </span>
+                                    <div className="flex items-center mt-1">
+                                        <span className="text-sm font-semibold text-stone-600">
+                                            You save {(originalPrice - discountedPrice).toFixed(2)}€
+                                        </span>
+                                        <span className="ml-2 text-sm font-semibold text-stone-600 bg-stone-100 rounded-md px-1">
+                                            -{discountPercentage}%
+                                        </span>
+                                    </div>
+                                </>
+                            ) : (
+                                <span className="text-2xl font-bold">
+                                    {originalPrice.toFixed(2)} €
+                                </span>
+                            )}
+                        </div>
+                        <div className="mt-4 flex items-center space-x-4">
+                            <AddToCartButton>
+                                <BrownShoppingCartIcon /> Add To Cart
+                            </AddToCartButton>
+                            <WishlistButton>
+                                <FavoriteBorderOutlined />
+                            </WishlistButton>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div className="container mx-auto px-4 bg-white mt-8 mb-8 rounded-md max-w-5xl">
+                <div className="mt-4">
+                    <ProductDetailsTabs product={product} />
+                </div>
+            </div>
+
+            <ImagePreviewModal
+                open={imagePreviewOpen}
+                onClose={() => setImagePreviewOpen(false)}
+                imageUrl={imageUrl}
+            />
+        </>
+    );
+};
+
+export const FAQItem = ({ question, answer }) => {
+    const [isOpen, setIsOpen] = useState(false);
+
+    return (
+        <div className="mb-4">
+            <motion.button
+                className="flex justify-between items-center w-full py-4 px-6 text-left bg-white rounded-md shadow-md hover:shadow-lg transition-shadow duration-200"
+                onClick={() => setIsOpen(!isOpen)}
+                whileHover={isOpen ? {} : { scale: 1.02 }}
+                whileTap={isOpen ? {} : { scale: 0.98 }}
+            >
+                <span className="flex items-center text-brown-800 font-semibold">
+                    <QuestionAnswerOutlined className="mr-2 text-brown-600" />
+                    {question}
+                </span>
+                <motion.span
+                    animate={{ rotate: isOpen ? 180 : 0 }}
+                    transition={{ duration: 0.3 }}
+                >
+                    <ExpandMore className="text-brown-600" />
+                </motion.span>
+            </motion.button>
+            <AnimatePresence>
+                {isOpen && (
+                    <motion.div
+                        initial={{ opacity: 0, height: 0 }}
+                        animate={{ opacity: 1, height: 'auto' }}
+                        exit={{ opacity: 0, height: 0 }}
+                        transition={{ duration: 0.3 }}
+                        className="bg-white rounded-b-md shadow-md mt-1 overflow-hidden"
+                    >
+                        <div className="p-6 text-brown-700">
+                            <p>{answer}</p>
+                        </div>
+                    </motion.div>
+                )}
+            </AnimatePresence>
+        </div>
+    );
+};
+
+export const FAQSection = () => {
+    const [faqData, setFaqData] = useState([]);
+    const axiosInstance = useAxios();
+
+    useEffect(() => {
+        const fetchFAQs = async () => {
+            try {
+                const response = await axiosInstance.get('/faq/get');
+                setFaqData(response.data);
+            } catch (error) {
+                console.error('Error fetching FAQs:', error);
+            }
+        };
+
+        fetchFAQs();
+    }, []);
+
+    return (
+        <div className="max-w-3xl mx-auto py-12 px-4 sm:px-6 lg:px-8 bg-brown-50 mt-24">
+            <h1 className="text-3xl font-bold text-brown-900 mb-8 text-left">Frequently Asked Questions</h1>
+            <div>
+                {faqData.map((faq, index) => (
+                    <FAQItem key={index} question={faq.question} answer={faq.answer} />
+                ))}
+            </div>
+        </div>
+    );
+};
+
+export default FAQSection;

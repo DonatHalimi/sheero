@@ -6,6 +6,7 @@ import {
   DashboardOutlined,
   ExploreOutlined,
   FlagOutlined,
+  HelpOutlineOutlined,
   InboxOutlined,
   Inventory2Outlined,
   InventoryOutlined,
@@ -109,6 +110,14 @@ export const mainListItems = ({ setCurrentView }) => {
             selected={activeItem === 'images'}
             icon={<CollectionsOutlined />}
             primary="Images"
+          />
+
+          <ActiveListItem
+            sx={{ pl: 4 }}
+            handleClick={() => handleItemClick('faqs')}
+            selected={activeItem === 'faqs'}
+            icon={<HelpOutlineOutlined />}
+            primary="FAQs"
           />
 
           <CollapsibleListItem
