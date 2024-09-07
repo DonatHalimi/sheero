@@ -179,7 +179,7 @@ const DashboardLayout = () => {
                     <Divider />
                     <List component="nav">
                         {mainListItems({ setCurrentView: () => { } })}
-                        <Divider sx={{ my: 1 }} />
+                        {/* <Divider sx={{ my: 1 }} /> */}
                         {secondaryListItems}
                     </List>
                 </Drawer>

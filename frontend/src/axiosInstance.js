@@ -49,7 +49,7 @@ const useAxios = () => {
 
                     // Update the Authorization header and retry the request
                     originalRequest.headers['Authorization'] = `Bearer ${data.accessToken}`;
-                    
+
                     // Retry the original request with the new access token
                     return axiosInstance(originalRequest);
                 } catch (refreshError) {

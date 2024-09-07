@@ -3,9 +3,9 @@ import React, { useContext, useEffect, useState } from 'react';
 import { ActionButton, BrownCreateOutlinedIcon, OutlinedBrownButton } from '../../assets/CustomComponents';
 import useAxios from '../../axiosInstance';
 import DashboardTable from '../../components/Dashboard/DashboardTable';
+import DeleteModal from '../../components/Modal/DeleteModal';
 import AddFAQModal from '../../components/Modal/FAQ/AddFAQModal';
 import EditFAQModal from '../../components/Modal/FAQ/EditFAQModal';
-import DeleteModal from '../../components/Modal/DeleteModal';
 import { AuthContext } from '../../context/AuthContext';
 
 const FAQPage = () => {

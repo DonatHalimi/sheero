@@ -1,5 +1,6 @@
 import {
     ArrowBack,
+    ChevronLeft,
     CreateOutlined,
     DashboardOutlined,
     DeleteOutlined,
@@ -9,12 +10,12 @@ import {
     InboxOutlined,
     Logout,
     PersonOutlined,
+    QuestionAnswerOutlined,
     Settings,
     ShoppingCart,
     ShoppingCartOutlined,
     Star,
-    StarBorder,
-    QuestionAnswerOutlined
+    StarBorder
 } from '@mui/icons-material';
 import CloseIcon from '@mui/icons-material/Close';
 import {
@@ -44,16 +45,16 @@ import {
 import { styled } from '@mui/material/styles';
 import SvgIcon from '@mui/material/SvgIcon';
 import { GridToolbar } from '@mui/x-data-grid';
+import { AnimatePresence, motion } from 'framer-motion';
 import React, { useEffect, useState } from 'react';
-import { Link as RouterLink } from 'react-router-dom';
+import { Link as RouterLink, useNavigate } from 'react-router-dom';
+import useAxios from '../axiosInstance';
 import Footer from '../components/Footer';
+import ImagePreviewModal from '../components/Modal/ImagePreviewModal';
 import Navbar from '../components/Navbar';
+import ProductDetailsTabs from '../components/ProductDetailsTabs';
 import Slideshow from '../components/Slideshow';
 import ProductList from '../pages/Product/ProductList';
-import ProductDetailsTabs from '../components/ProductDetailsTabs';
-import ImagePreviewModal from '../components/Modal/ImagePreviewModal';
-import { AnimatePresence, motion } from 'framer-motion';
-import useAxios from '../axiosInstance';
 
 export const BrownOutlinedTextField = styled(TextField)({
     '& .MuiOutlinedInput-root': {
@@ -925,9 +926,18 @@ export const FAQItem = ({ question, answer }) => {
     );
 };
 
+export const GoBackArrow = () => {
+    return (
+        <div className="flex justify-start">
+            <ChevronLeft className="text-stone-600" />
+        </div>
+    )
+}
+
 export const FAQSection = () => {
     const [faqData, setFaqData] = useState([]);
     const axiosInstance = useAxios();
+    const navigate = useNavigate();
 
     useEffect(() => {
         const fetchFAQs = async () => {
@@ -942,9 +952,22 @@ export const FAQSection = () => {
         fetchFAQs();
     }, []);
 
+    const goBack = () => {
+        navigate(-1);
+    }
+
     return (
-        <div className="max-w-3xl mx-auto py-12 px-4 sm:px-6 lg:px-8 bg-brown-50 mt-24">
-            <h1 className="text-3xl font-bold text-brown-900 mb-8 text-left">Frequently Asked Questions</h1>
+        <div className="max-w-3xl mx-auto py-12 px-4 sm:px-6 lg:px-8 bg-brown-50 mt-10">
+            <div className="flex justify-left mb-4 ">
+                <RoundIconButton
+                    className="text-black rounded-md px-4 py-2"
+                    onClick={goBack}
+                >
+                    <GoBackArrow />
+                </RoundIconButton>
+            </div>
+            <h1 className="text-3xl font-bold text-stone-600 mb-8 text-left">Frequently Asked Questions</h1>
+
             <div>
                 {faqData.map((faq, index) => (
                     <FAQItem key={index} question={faq.question} answer={faq.answer} />

@@ -1,7 +1,6 @@
-import { InputLabel, MenuItem, Select } from '@mui/material';
 import React, { useContext, useEffect, useState } from 'react';
 import { toast } from 'react-toastify';
-import { BrownButton, BrownOutlinedTextField, CustomBox, CustomModal, CustomTypography, OutlinedBrownFormControl } from '../../../assets/CustomComponents';
+import { BrownButton, BrownOutlinedTextField, CustomBox, CustomModal, CustomTypography } from '../../../assets/CustomComponents';
 import useAxios from '../../../axiosInstance';
 import { AuthContext } from '../../../context/AuthContext';
 

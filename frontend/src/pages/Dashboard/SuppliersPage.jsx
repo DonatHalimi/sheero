@@ -20,7 +20,7 @@ const SupplierPage = () => {
 
     const { refreshToken } = useContext(AuthContext);
     const axiosInstance = useAxios(refreshToken);
-    
+
     useEffect(() => {
         fetchSuppliers();
     }, [addSupplierOpen, editSupplierOpen, deleteSupplierOpen, axiosInstance]);

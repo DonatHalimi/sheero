@@ -1,9 +1,8 @@
-import React, { useContext, useEffect, useState } from 'react';
-import { Box, Typography, Modal } from '@mui/material';
-import { Autocomplete, TextField, MenuItem } from '@mui/material';
 import UploadIcon from '@mui/icons-material/Upload';
+import { Autocomplete, Box, MenuItem, Modal, TextField, Typography } from '@mui/material';
+import React, { useContext, useEffect, useState } from 'react';
 import { toast } from 'react-toastify';
-import { BrownButton, BrownOutlinedTextField, OutlinedBrownButton, VisuallyHiddenInput, OutlinedBrownFormControl, CustomPaper } from '../../../assets/CustomComponents';
+import { BrownButton, BrownOutlinedTextField, CustomPaper, OutlinedBrownButton, OutlinedBrownFormControl, VisuallyHiddenInput } from '../../../assets/CustomComponents';
 import useAxios from '../../../axiosInstance';
 import { AuthContext } from '../../../context/AuthContext';
 
