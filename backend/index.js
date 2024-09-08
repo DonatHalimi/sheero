@@ -16,6 +16,7 @@ const reviewRoutes = require('./routes/review');
 const slideshowRoutes = require('./routes/slideshow');
 const subSubcategoryRoutes = require('./routes/subSubcategory');
 const faqRoutes = require('./routes/faq');
+const cartRoutes = require('./routes/cart');
 
 dotenv.config();
 
@@ -49,6 +50,7 @@ app.use('/api/reviews', reviewRoutes);
 app.use('/api/slideshow', slideshowRoutes);
 app.use('/api/subsubcategories', subSubcategoryRoutes);
 app.use('/api/faq', faqRoutes);
+app.use('/api/cart', cartRoutes);
 
 const PORT = process.env.BACKEND_PORT || 5000;
 app.listen(PORT, () => console.log(`Server running on port ${PORT}`));

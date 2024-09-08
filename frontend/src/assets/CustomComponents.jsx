@@ -934,10 +934,28 @@ export const GoBackArrow = () => {
     )
 }
 
+export const GoBackButton = () => {
+    const navigate = useNavigate();
+
+    const goBack = () => {
+        navigate(-1);
+    }
+
+    return (
+        <div className="flex justify-left mb-4">
+            <RoundIconButton
+                className="text-black rounded-md px-4 py-2"
+                onClick={goBack}
+            >
+                <GoBackArrow />
+            </RoundIconButton>
+        </div>
+    )
+}
+
 export const FAQSection = () => {
     const [faqData, setFaqData] = useState([]);
     const axiosInstance = useAxios();
-    const navigate = useNavigate();
 
     useEffect(() => {
         const fetchFAQs = async () => {
@@ -952,20 +970,9 @@ export const FAQSection = () => {
         fetchFAQs();
     }, []);
 
-    const goBack = () => {
-        navigate(-1);
-    }
-
     return (
         <div className="max-w-3xl mx-auto py-12 px-4 sm:px-6 lg:px-8 bg-brown-50 mt-10">
-            <div className="flex justify-left mb-4 ">
-                <RoundIconButton
-                    className="text-black rounded-md px-4 py-2"
-                    onClick={goBack}
-                >
-                    <GoBackArrow />
-                </RoundIconButton>
-            </div>
+            <GoBackButton />
             <h1 className="text-3xl font-bold text-stone-600 mb-8 text-left">Frequently Asked Questions</h1>
 
             <div>

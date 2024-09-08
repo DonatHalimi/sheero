@@ -21,7 +21,7 @@ const Slideshow = () => {
     }, [images]);
 
     return (
-        <div className="w-full mx-auto mb-20">
+        <div className="w-full mx-auto mb-14">
             <Splide
                 ref={splideRef}
                 options={{

@@ -1,7 +1,7 @@
 import axios from 'axios';
 import React, { useEffect, useState } from 'react';
 import { useParams } from 'react-router-dom';
-import { CustomPagination } from '../../assets/CustomComponents';
+import { CustomPagination, GoBackButton } from '../../assets/CustomComponents';
 import Footer from '../../components/Footer';
 import Navbar from '../../components/Navbar';
 import ProductItem from '../../components/ProductItem';
@@ -47,6 +47,8 @@ const ProductsBySubcategory = () => {
             <Navbar />
             <Slideshow />
             <div className="container mx-auto px-4 py-8 mb-16 bg-gray-50">
+                <GoBackButton />
+
                 <div className="sticky top-0 z-10 pb-4 bg-gray-50">
                     {products.length > 0 ? (
                         <h1 className="text-2xl font-semibold" id='product-container'>Products in {subcategoryName}</h1>
