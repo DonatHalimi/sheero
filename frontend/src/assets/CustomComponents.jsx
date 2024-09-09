@@ -37,7 +37,12 @@ import {
     Skeleton,
     Stack,
     Tab,
+    Table,
+    TableBody,
     TableCell,
+    TableContainer,
+    TableHead,
+    TableRow,
     Tabs,
     TextField,
     Typography,
@@ -48,13 +53,12 @@ import { GridToolbar } from '@mui/x-data-grid';
 import { AnimatePresence, motion } from 'framer-motion';
 import React, { useEffect, useState } from 'react';
 import { Link as RouterLink, useNavigate } from 'react-router-dom';
+import emptyCartImage from '../assets/empty-cart.png';
 import useAxios from '../axiosInstance';
 import Footer from '../components/Footer';
 import ImagePreviewModal from '../components/Modal/ImagePreviewModal';
 import Navbar from '../components/Navbar';
 import ProductDetailsTabs from '../components/ProductDetailsTabs';
-import Slideshow from '../components/Slideshow';
-import ProductList from '../pages/Product/ProductList';
 
 export const BrownOutlinedTextField = styled(TextField)({
     '& .MuiOutlinedInput-root': {
@@ -619,22 +623,6 @@ export const NotFoundComponent = () => {
     );
 };
 
-export const HomePageContent = () => {
-    return (
-        <>
-            <div className='bg-white'>
-                <Navbar />
-            </div>
-
-            <main className="flex-grow bg-neutral-50">
-                <Slideshow />
-                <ProductList />
-            </main>
-            <Footer />
-        </>
-    );
-}
-
 export const TabPanel = ({ children, value, index }) => {
     return (
         <div role="tabpanel" hidden={value !== index}>
@@ -985,3 +973,101 @@ export const FAQSection = () => {
 };
 
 export default FAQSection;
+
+export const CheckoutButton = styled(Button)(({ theme }) => ({
+    backgroundColor: '#686159',
+    color: 'white',
+    fontSize: '1.02rem',
+    padding: '4px 20px',
+    '&:hover': {
+        backgroundColor: '#5b504b',
+    },
+}));
+
+export const IncreaseButton = styled(Button)(({ theme }) => ({
+    minWidth: '35px',
+    height: '30px',
+    backgroundColor: '#686159',
+    color: 'white',
+    '&:hover': {
+        backgroundColor: '#5b504b',
+    },
+}));
+
+export const DecreaseButton = styled(Button)(({ theme }) => ({
+    minWidth: '35px',
+    height: '30px',
+    backgroundColor: '#686159',
+    color: 'white',
+    '&:hover': {
+        backgroundColor: '#5b504b',
+    },
+}));
+
+export const LoadingCart = () => {
+    return (
+        <>
+            <Navbar />
+            <div className="container mx-auto px-4 py-2 mb-16 bg-gray-50 mt-10">
+                <h1 className="text-2xl font-semibold mb-4">Cart</h1>
+                <TableContainer component={Paper} className="bg-white">
+                    <Table>
+                        <TableHead>
+                            <TableRow>
+                                <TableCell><Skeleton variant="text" animation="wave" width={100} height={20} /></TableCell>
+                                <TableCell align="center"><Skeleton variant="text" animation="wave" width={80} height={20} /></TableCell>
+                                <TableCell align="center"><Skeleton variant="text" animation="wave" width={80} height={20} /></TableCell>
+                                <TableCell align="center"><Skeleton variant="text" animation="wave" width={80} height={20} /></TableCell>
+                                <TableCell align="center"><Skeleton variant="text" animation="wave" width={40} height={20} /></TableCell>
+                            </TableRow>
+                        </TableHead>
+                        <TableBody>
+                            {Array.from(new Array(5)).map((_, index) => (
+                                <TableRow key={index}>
+                                    <TableCell>
+                                        <div className="flex items-center">
+                                            <Skeleton variant="rectangular" width={80} height={80} className="mr-4" />
+                                            <Skeleton variant="text" animation="wave" width={120} height={20} />
+                                        </div>
+                                    </TableCell>
+                                    <TableCell align="center">
+                                        <Skeleton variant="text" animation="wave" width={60} height={20} />
+                                    </TableCell>
+                                    <TableCell align="center">
+                                        <Skeleton variant="text" animation="wave" width={60} height={20} />
+                                    </TableCell>
+                                    <TableCell align="center">
+                                        <Skeleton variant="text" animation="wave" width={60} height={20} />
+                                    </TableCell>
+                                    <TableCell align="center">
+                                        <Skeleton variant="text" animation="wave" width={30} height={20} />
+                                    </TableCell>
+                                </TableRow>
+                            ))}
+                        </TableBody>
+                    </Table>
+                </TableContainer>
+            </div>
+            <Footer />
+        </>
+    );
+}
+
+export const EmptyCart = () => {
+    const navigate = useNavigate();
+
+    return (
+        <>
+            <div className="flex flex-col items-center justify-center bg-white p-8 rounded-sm shadow-lg">
+                <img src={emptyCartImage} alt="Empty Cart" className="w-60 h-60 object-cover mb-4" />
+                <p className="text-sm font-semibold mb-2">Your cart is empty!</p>
+                <h2
+                    className='text-base font-semibold cursor-pointer hover:underline'
+                    onClick={() => navigate('/')}
+                >
+                    Go Back to Home
+                </h2>
+            </div>
+        </>
+    )
+}

@@ -98,7 +98,7 @@ const CategoryNavbar = ({ children }) => {
                             {loading ?
                                 Array(10).fill().map((_, index) => (
                                     <li key={index} className="relative">
-                                        <Skeleton variant="text" width={100} height={40} />
+                                        <Skeleton variant="text" animation="wave" width={100} height={40} />
                                     </li>
                                 )) :
                                 categories.map((category) => (

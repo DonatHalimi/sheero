@@ -1,12 +1,17 @@
 import FavoriteIcon from '@mui/icons-material/FavoriteBorderOutlined';
 import { Skeleton } from '@mui/material';
-import React from 'react';
+import axios from 'axios';
+import React, { useContext } from 'react';
 import { useNavigate } from 'react-router-dom';
+import { toast } from 'react-toastify';
 import { AddToCartButton, BrownShoppingCartIcon, WishlistButton } from '../assets/CustomComponents';
 import NoImage from '../assets/not-found.jpg';
+import { AuthContext } from '../context/AuthContext';
 
 const ProductItem = ({ product, loading }) => {
     const navigate = useNavigate();
+    const { auth } = useContext(AuthContext);
+
     const { _id, name, image, price, discount, salePrice } = product || {};
     const imageUrl = `http://localhost:5000/${image}`;
     const discountPercentage = discount?.value || 0;
@@ -14,16 +19,32 @@ const ProductItem = ({ product, loading }) => {
 
     const handleClick = () => _id ? navigate(`/product/${_id}`) : console.error("Product ID is undefined");
 
-    const handleAction = (action) => (e) => {
+    const handleAction = (action) => async (e) => {
         e.stopPropagation();
-        console.log(`Adding to ${action}:`, product);
+        try {
+            if (action === 'cart') {
+                await axios.post('http://localhost:5000/api/cart/add', {
+                    productId: _id,
+                    quantity: 1
+                }, {
+                    headers: { Authorization: `Bearer ${auth.accessToken}` }
+                });
+                toast.success('Product added to cart!', {
+                    onClick: () => { navigate('/cart'); }
+                });
+            }
+            // TODO: Handle wishlist action
+        } catch (error) {
+            console.error(`Failed to add product to ${action}:`, error.response?.data?.message || error.message);
+            toast.error(`Failed to add product to ${action}.`);
+        }
     };
 
     return (
         <div className="bg-white rounded-lg shadow-md p-4 flex flex-col cursor-pointer" onClick={handleClick}>
             <div className="relative mb-2">
                 {loading ? (
-                    <Skeleton variant="rectangular" width="100%" height={192} />
+                    <Skeleton variant="rectangular" animation="wave" width="100%" height={192} />
                 ) : (
                     <>
                         <img
@@ -41,11 +62,11 @@ const ProductItem = ({ product, loading }) => {
                 )}
             </div>
             <h2 className="font-semibold mt-2 h-10 overflow-hidden">
-                {loading ? <Skeleton variant="text" width="80%" /> : name}
+                {loading ? <Skeleton variant="text" animation="wave" width="80%" /> : name}
             </h2>
             <div className="flex flex-col mb-2">
                 <span className="font-bold text-lg">
-                    {loading ? <Skeleton variant="text" width="60%" /> : `${finalPrice.toFixed(2)} €`}
+                    {loading ? <Skeleton variant="text" animation="wave" width="60%" /> : `${finalPrice.toFixed(2)} €`}
                 </span>
                 {!loading && discountPercentage > 0 && (
                     <span className="text-gray-500 line-through text-sm">
@@ -56,8 +77,8 @@ const ProductItem = ({ product, loading }) => {
             <div className="flex justify-between items-center mt-auto">
                 {loading ? (
                     <>
-                        <Skeleton variant="rectangular" width={140} height={40} />
-                        <Skeleton variant="rectangular" width={60} height={40} />
+                        <Skeleton variant="rectangular" animation="wave" width={140} height={40} />
+                        <Skeleton variant="rectangular" animation="wave" width={60} height={40} />
                     </>
                 ) : (
                     <>

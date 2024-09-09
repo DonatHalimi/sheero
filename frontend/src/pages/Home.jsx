@@ -1,10 +1,18 @@
 import React from 'react';
-import { HomePageContent } from '../assets/CustomComponents';
+import Footer from '../components/Footer';
+import Navbar from '../components/Navbar';
+import Slideshow from '../components/Slideshow';
+import ProductList from './Product/ProductList';
 
 const Home = () => {
     return (
         <>
-            <HomePageContent />
+            <Navbar />
+
+            <Slideshow />
+            <ProductList />
+
+            <Footer />
         </>
     );
 };
