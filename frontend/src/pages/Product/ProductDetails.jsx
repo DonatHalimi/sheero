@@ -63,6 +63,7 @@ const ProductDetails = () => {
                 handleImageClick={handleImageClick}
                 setImagePreviewOpen={setImagePreviewOpen}
             />
+
             <Footer />
         </>
     );

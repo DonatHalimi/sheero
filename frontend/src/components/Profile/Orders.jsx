@@ -1,5 +1,5 @@
 import { Box, Button, TextField, Typography } from '@mui/material';
-import React from 'react';
+import React, { useEffect } from 'react';
 import 'react-toastify/dist/ReactToastify.css';
 import { BrownOutlinedTextField } from '../../assets/CustomComponents';
 import Footer from '../Footer';
@@ -8,6 +8,11 @@ import ProfileSidebar from './ProfileSidebar';
 
 const Orders = () => {
     // TODO
+
+    useEffect(() => {
+        window.scrollTo(0, 0);
+    }, []);
+
     return (
         <>
             <Navbar />

@@ -64,7 +64,7 @@ const App = () => (
       newestOnTop
       stacked
     />
-    
+
     <ToTop />
   </Router>
 );

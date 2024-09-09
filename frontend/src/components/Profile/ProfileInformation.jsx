@@ -2,7 +2,7 @@ import VisibilityIcon from '@mui/icons-material/Visibility';
 import VisibilityOffIcon from '@mui/icons-material/VisibilityOff';
 import { Box, Button, IconButton, InputAdornment, TextField, Typography } from '@mui/material';
 import axios from 'axios';
-import React, { useContext, useState } from 'react';
+import React, { useContext, useEffect, useState } from 'react';
 import { toast } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
 import { BrownOutlinedTextField } from '../../assets/CustomComponents';
@@ -30,6 +30,10 @@ const ProfileInformation = () => {
     const handleChange = (e) => {
         setFormData({ ...formData, [e.target.name]: e.target.value });
     };
+    
+    useEffect(() => {
+        window.scrollTo(0, 0);
+    },[]);
 
     const handleSubmit = async (e) => {
         e.preventDefault();
@@ -72,9 +76,6 @@ const ProfileInformation = () => {
             console.error('Profile update failed:', error);
 
             if (error.response) {
-                console.error('Response data:', error.response.data);
-                console.error('Response status:', error.response.status);
-                console.error('Response headers:', error.response.headers);
                 toast.error(error.response.data.message || 'Profile update failed');
             } else if (error.request) {
                 console.error('Request data:', error.request);

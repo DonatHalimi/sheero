@@ -17,10 +17,22 @@ const ProductItem = ({ product, loading }) => {
     const discountPercentage = discount?.value || 0;
     const finalPrice = salePrice || price || 0;
 
-    const handleClick = () => _id ? navigate(`/product/${_id}`) : console.error("Product ID is undefined");
+    const handleClick = () => {
+        if (_id) {
+            navigate(`/product/${_id}`);
+        } else {
+            console.error("Product ID is undefined");
+        }
+    };
 
     const handleAction = (action) => async (e) => {
-        e.stopPropagation();
+        e.stopPropagation();  // Prevent parent click event from triggering
+        if (!auth.accessToken) {
+            toast.error("You need to log in first.");
+            navigate('/login');
+            return;
+        }
+
         try {
             if (action === 'cart') {
                 await axios.post('http://localhost:5000/api/cart/add', {
@@ -29,11 +41,22 @@ const ProductItem = ({ product, loading }) => {
                 }, {
                     headers: { Authorization: `Bearer ${auth.accessToken}` }
                 });
+
+                // Dispatch event to update the cart item count
+                document.dispatchEvent(new Event('productAdded'));
+
                 toast.success('Product added to cart!', {
                     onClick: () => { navigate('/cart'); }
                 });
+            } else if (action === 'wishlist') {
+                // TODO: Handle wishlist action
+                await axios.post('http://localhost:5000/api/wishlist/add', {
+                    productId: _id
+                }, {
+                    headers: { Authorization: `Bearer ${auth.accessToken}` }
+                });
+                toast.success('Product added to wishlist!');
             }
-            // TODO: Handle wishlist action
         } catch (error) {
             console.error(`Failed to add product to ${action}:`, error.response?.data?.message || error.message);
             toast.error(`Failed to add product to ${action}.`);

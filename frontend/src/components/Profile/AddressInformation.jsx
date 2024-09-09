@@ -35,6 +35,8 @@ const AddressInformation = () => {
             }
         };
 
+        window.scrollTo(0, 0);
+
         fetchCountries();
     }, [axiosInstance]);
 

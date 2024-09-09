@@ -31,6 +31,8 @@ const Cart = () => {
             }
         };
 
+        window.scrollTo(0, 0);
+
         fetchCart();
     }, [auth.accessToken]);
 

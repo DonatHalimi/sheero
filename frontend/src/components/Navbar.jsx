@@ -1,8 +1,9 @@
-import { Tooltip } from '@mui/material';
+import { IconButton, Tooltip } from '@mui/material';
 import React, { useContext, useEffect, useRef, useState } from 'react';
-import { Link } from 'react-router-dom';
+import { Link, useNavigate } from 'react-router-dom';
 import {
     BrownButton,
+    BrownDeleteOutlinedIcon,
     OutlinedBrownButton,
     ProfileButton,
     RoundIconButton,
@@ -16,43 +17,107 @@ import {
 import logo from '../assets/logo.png';
 import { AuthContext } from '../context/AuthContext';
 import CategoryNavbar from './CategoryNavbar';
+import Badge from '@mui/material/Badge';
+import useAxios from '../axiosInstance';
+import { toast } from 'react-toastify';
 
 const Navbar = () => {
     const { auth, isAdmin, logout } = useContext(AuthContext);
-    const [isDropdownOpen, setIsDropdownOpen] = useState(false);
-    const dropdownRef = useRef(null);
+    const [isProfileDropdownOpen, setIsProfileDropdownOpen] = useState(false);
+    const [isCartDropdownOpen, setIsCartDropdownOpen] = useState(false);
+    const [cartItems, setCartItems] = useState([]);
+    const [cartTotal, setCartTotal] = useState(0);
 
-    const handleDropdownToggle = () => {
-        setIsDropdownOpen(prev => !prev);
+    const axiosInstance = useAxios();
+    const profileDropdownRef = useRef(null);
+    const cartDropdownRef = useRef(null);
+    const navigate = useNavigate();
+
+    useEffect(() => {
+        const fetchCartData = async () => {
+            if (auth.accessToken) {
+                try {
+                    const response = await axiosInstance.get('/cart');
+                    const cart = response.data;
+                    setCartItems(cart.items);
+                    const total = cart.items.reduce((acc, item) => acc + item.product.price * item.quantity, 0);
+                    setCartTotal(total);
+                } catch (error) {
+                    console.error('Error fetching cart data:', error);
+                }
+            }
+        };
+
+        fetchCartData();
+    }, [auth.accessToken, axiosInstance]);
+
+    const handleProfileDropdownToggle = () => {
+        setIsProfileDropdownOpen(prev => !prev);
+        setIsCartDropdownOpen(false);
+    };
+
+    const handleCartDropdownToggle = () => {
+        setIsCartDropdownOpen(prev => !prev);
+        setIsProfileDropdownOpen(false);
     };
 
     const handleLogout = () => {
         logout();
-        setIsDropdownOpen(false);
+        setIsProfileDropdownOpen(false);
     };
 
-    const handleClickOutside = (event) => {
-        if (dropdownRef.current && !dropdownRef.current.contains(event.target)) {
-            setIsDropdownOpen(false);
+    const handleClickOutsideProfile = (event) => {
+        if (profileDropdownRef.current && !profileDropdownRef.current.contains(event.target)) {
+            setIsProfileDropdownOpen(false);
+        }
+    };
+
+    const handleClickOutsideCart = (event) => {
+        if (cartDropdownRef.current && !cartDropdownRef.current.contains(event.target)) {
+            setIsCartDropdownOpen(false);
         }
     };
 
     useEffect(() => {
-        document.addEventListener('mousedown', handleClickOutside);
+        document.addEventListener('mousedown', handleClickOutsideProfile);
+        document.addEventListener('mousedown', handleClickOutsideCart);
+
         return () => {
-            document.removeEventListener('mousedown', handleClickOutside);
+            document.removeEventListener('mousedown', handleClickOutsideProfile);
+            document.removeEventListener('mousedown', handleClickOutsideCart);
         };
     }, []);
 
-    const NavbarDropdown = () => (
-        <div className="absolute right-0 mt-2 w-48 bg-white border shadow-lg rounded-lg p-2" ref={dropdownRef}>
+    const totalQuantity = cartItems.reduce((acc, item) => acc + item.quantity, 0);
+
+    const handleRemoveItem = async (productId) => {
+        try {
+            const response = await axiosInstance.delete('/cart/remove', {
+                headers: { Authorization: `Bearer ${auth.accessToken}` },
+                data: { productId }
+            });
+
+            toast.success(`Product removed from cart`)
+
+            // Update cart items and total
+            setCartItems(response.data.items);
+            const updatedTotal = response.data.items.reduce((acc, item) => acc + item.product.price * item.quantity, 0);
+            setCartTotal(updatedTotal);
+
+        } catch (error) {
+            console.error('Error removing item from cart:', error);
+        }
+    };
+
+    const ProfileDropdown = () => (
+        <div className="absolute right-0 mt-2 w-48 bg-white border shadow-lg rounded-lg p-2" ref={profileDropdownRef}>
             {isAdmin() && (
                 <>
                     <Link to="/dashboard/users" className="flex items-center px-2 py-2 mb-2 text-stone-700 hover:bg-stone-100">
                         <StyledDashboardIcon className="mr-2" />
                         Dashboard
                     </Link>
-                    <div className="border-t border-stone-200 mb-2"></div>
+                    <hr className='border-stone-200 mb-2' />
                 </>
             )}
             <Link to="/profile" className="flex items-center px-2 py-2 text-stone-700 hover:bg-stone-100">
@@ -67,11 +132,55 @@ const Navbar = () => {
                 <StyledFavoriteIcon className="mr-2" />
                 Wishlist
             </Link>
-            <div className="border-t border-stone-200 mb-2"></div>
+            <hr className='border-stone-200 mb-2' />
             <button onClick={handleLogout} className="flex items-center w-full px-2 py-2 text-stone-700 hover:bg-stone-100 text-left">
                 <StyledLogoutIcon className="mr-2" />
                 Log Out
             </button>
+        </div>
+    );
+
+    const CartDropdown = () => (
+        <div className="absolute right-0 mt-2 w-96 bg-white border shadow-lg rounded-lg p-4" ref={cartDropdownRef}>
+            {cartItems.length === 0 ? (
+                <div className="text-sm text-left">Your cart is empty</div>
+            ) : (
+                <>
+                    <ul className="mt-2 mb-4">
+                        {cartItems.map(item => (
+                            <li key={item.product._id} className="flex justify-between items-center mb-4">
+                                <img
+                                    src={`http://localhost:5000/${item.product.image}`}
+                                    alt={item.product.name}
+                                    className="w-12 h-12 object-cover rounded"
+                                />
+                                <div className="ml-2 flex-grow">
+                                    <span className="block font-semibold">{item.product.name}</span>
+                                    <span className="block text-sm text-gray-500">{item.quantity} x {item.product.price} €</span>
+                                </div>
+                                <button
+                                    onClick={() => handleRemoveItem(item.product._id)}
+                                >
+                                    <BrownDeleteOutlinedIcon />
+                                </button>
+                            </li>
+                        ))}
+                    </ul>
+                    <hr className='border-stone-200' />
+                    <div className="flex justify-between items-center mt-4 mb-4">
+                        <div className="flex justify-start items-center space-x-1">
+                            <span className="font-semibold">Total:</span>
+                            <span className="font-semibold">{cartTotal.toFixed(2)} €</span>
+                        </div>
+                    </div>
+                    <button
+                        className="w-full bg-stone-600 text-white py-2 rounded"
+                        onClick={() => navigate('/cart')}
+                    >
+                        Go to Cart
+                    </button>
+                </>
+            )}
         </div>
     );
 
@@ -91,21 +200,29 @@ const Navbar = () => {
                                     <div className="relative">
                                         <Tooltip title="Profile" arrow>
                                             <div className="flex items-center">
-                                                <ProfileButton onClick={handleDropdownToggle} className="flex items-center space-x-2 rounded-sm">
+                                                <ProfileButton onClick={handleProfileDropdownToggle} className="flex items-center space-x-2 rounded-sm">
                                                     <StyledPersonIcon />
                                                     {auth.username && <span className="ml-2 text-sm">{auth.username}</span>}
                                                 </ProfileButton>
                                             </div>
                                         </Tooltip>
-                                        {isDropdownOpen && <NavbarDropdown />}
+                                        {isProfileDropdownOpen && <ProfileDropdown />}
                                     </div>
                                     <div className='flex space-x-2'>
                                         <Link to='/wishlist'>
                                             <RoundIconButton><StyledFavoriteIcon /></RoundIconButton>
                                         </Link>
-                                        <Link to='/cart'>
-                                            <RoundIconButton><StyledShoppingCartIcon /></RoundIconButton>
-                                        </Link>
+                                        <div className="relative">
+                                            <RoundIconButton aria-label="cart" onClick={handleCartDropdownToggle}>
+                                                <Badge badgeContent={totalQuantity} anchorOrigin={{
+                                                    vertical: 'top',
+                                                    horizontal: 'right',
+                                                }} color="secondary">
+                                                    <StyledShoppingCartIcon />
+                                                </Badge>
+                                            </RoundIconButton>
+                                            {isCartDropdownOpen && <CartDropdown />}
+                                        </div>
                                     </div>
                                 </>
                             ) : (

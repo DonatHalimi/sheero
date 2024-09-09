@@ -50,15 +50,18 @@ import {
 import { styled } from '@mui/material/styles';
 import SvgIcon from '@mui/material/SvgIcon';
 import { GridToolbar } from '@mui/x-data-grid';
+import axios from 'axios';
 import { AnimatePresence, motion } from 'framer-motion';
-import React, { useEffect, useState } from 'react';
+import React, { useContext, useEffect, useState } from 'react';
 import { Link as RouterLink, useNavigate } from 'react-router-dom';
+import { toast } from 'react-toastify';
 import emptyCartImage from '../assets/empty-cart.png';
 import useAxios from '../axiosInstance';
 import Footer from '../components/Footer';
 import ImagePreviewModal from '../components/Modal/ImagePreviewModal';
 import Navbar from '../components/Navbar';
 import ProductDetailsTabs from '../components/ProductDetailsTabs';
+import { AuthContext } from '../context/AuthContext';
 
 export const BrownOutlinedTextField = styled(TextField)({
     '& .MuiOutlinedInput-root': {
@@ -112,6 +115,9 @@ export const BrownCreateOutlinedIcon = styled(CreateOutlined)({
 
 export const BrownDeleteOutlinedIcon = styled(DeleteOutlined)({
     color: '#493c30',
+    '&:hover': {
+        cursor: 'pointer',
+    }
 });
 
 export const VisuallyHiddenInput = styled('input')({
@@ -807,6 +813,30 @@ export const ProductDetailCard = ({
     handleImageClick,
     setImagePreviewOpen
 }) => {
+    const navigate = useNavigate();
+    const { auth } = useContext(AuthContext);
+
+    const handleAction = (action) => async (e) => {
+        e.stopPropagation();
+        try {
+            if (action === 'cart') {
+                await axios.post('http://localhost:5000/api/cart/add', {
+                    productId: product._id,
+                    quantity: 1
+                }, {
+                    headers: { Authorization: `Bearer ${auth.accessToken}` }
+                });
+                toast.success('Product added to cart!', {
+                    onClick: () => { navigate('/cart'); }
+                });
+            }
+            // TODO: Handle wishlist action
+        } catch (error) {
+            console.error(`Failed to add product to ${action}:`, error.response?.data?.message || error.message);
+            toast.error(`Failed to add product to ${action}.`);
+        }
+    };
+
     return (
         <>
             <div className="container mx-auto px-4 py-4 mb-8 bg-white mt-8 rounded-md max-w-5xl">
@@ -847,7 +877,7 @@ export const ProductDetailCard = ({
                             )}
                         </div>
                         <div className="mt-4 flex items-center space-x-4">
-                            <AddToCartButton>
+                            <AddToCartButton onClick={handleAction('cart')}>
                                 <BrownShoppingCartIcon /> Add To Cart
                             </AddToCartButton>
                             <WishlistButton>
