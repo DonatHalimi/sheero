@@ -52,7 +52,7 @@ app.use('/api/subcategories', subcategoryRoutes);
 app.use('/api/subsubcategories', subSubcategoryRoutes);
 app.use('/api/suppliers', supplierRoutes);
 app.use('/api/users', userRoutes);
-// app.use('/api/wishlist', wishlistRoutes);
+app.use('/api/wishlist', wishlistRoutes);
 
 const PORT = process.env.BACKEND_PORT || 5000;
 app.listen(PORT, () => console.log(`Server running on port ${PORT}`));

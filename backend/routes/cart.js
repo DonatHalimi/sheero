@@ -8,4 +8,5 @@ router.post('/add', protect, addToCart);
 router.put('/update-quantity', protect, updateCartItemQuantity);
 router.delete('/remove', protect, removeFromCart);
 router.delete('/clear', protect, clearCart);
+
 module.exports = router;

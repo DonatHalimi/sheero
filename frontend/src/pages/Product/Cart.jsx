@@ -1,5 +1,5 @@
 import DeleteOutlineIcon from '@mui/icons-material/DeleteOutline';
-import { Button, Paper, Table, TableBody, TableCell, TableContainer, TableHead, TableRow } from '@mui/material';
+import { Button, Paper, Table, TableBody, TableCell, TableContainer, TableHead, TableRow, Tooltip } from '@mui/material';
 import React, { useContext, useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { CheckoutButton, CustomDeleteModal, DecreaseButton, EmptyCart, IncreaseButton, LoadingCart, RoundIconButton } from '../../assets/CustomComponents';
@@ -126,7 +126,13 @@ const Cart = () => {
                                         <TableCell align="center">Price</TableCell>
                                         <TableCell align="center">Quantity</TableCell>
                                         <TableCell align="center">Total</TableCell>
-                                        <TableCell align="center"><DeleteOutlineIcon color="primary" onClick={() => setOpenModal(true)} className='cursor-pointer' /></TableCell>
+                                        <TableCell align="center">
+                                            <Tooltip title="Clear cart" arrow placement='top'>
+                                                <RoundIconButton onClick={() => setOpenModal(true)} className='cursor-pointer'>
+                                                    <DeleteOutlineIcon color="primary" />
+                                                </RoundIconButton>
+                                            </Tooltip>
+                                        </TableCell>
                                     </TableRow>
                                 </TableHead>
                                 <TableBody>

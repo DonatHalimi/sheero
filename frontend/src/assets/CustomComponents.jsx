@@ -22,6 +22,7 @@ import {
     Box,
     Breadcrumbs,
     Button,
+    CircularProgress,
     Collapse,
     FormControl,
     IconButton,
@@ -802,107 +803,6 @@ export const CustomPagination = ({ count, page, onChange, size = 'large', sx = {
     );
 };
 
-export const ProductDetailCard = ({
-    imageUrl,
-    name,
-    discountPercentage,
-    originalPrice,
-    discountedPrice,
-    product,
-    imagePreviewOpen,
-    handleImageClick,
-    setImagePreviewOpen
-}) => {
-    const navigate = useNavigate();
-    const { auth } = useContext(AuthContext);
-
-    const handleAction = (action) => async (e) => {
-        e.stopPropagation();
-        try {
-            if (action === 'cart') {
-                await axios.post('http://localhost:5000/api/cart/add', {
-                    productId: product._id,
-                    quantity: 1
-                }, {
-                    headers: { Authorization: `Bearer ${auth.accessToken}` }
-                });
-                toast.success('Product added to cart!', {
-                    onClick: () => { navigate('/cart'); }
-                });
-            }
-            // TODO: Handle wishlist action
-        } catch (error) {
-            console.error(`Failed to add product to ${action}:`, error.response?.data?.message || error.message);
-            toast.error(`Failed to add product to ${action}.`);
-        }
-    };
-
-    return (
-        <>
-            <div className="container mx-auto px-4 py-4 mb-8 bg-white mt-8 rounded-md max-w-5xl">
-                <div className="flex flex-col md:flex-row gap-8">
-                    <div className="flex flex-col items-center md:w-1/2">
-                        <img
-                            src={imageUrl}
-                            alt={name}
-                            className="w-full h-80 object-cover rounded hover:cursor-pointer"
-                            onError={(e) => { e.target.onerror = null; e.target.src = NoImage; }}
-                            onClick={handleImageClick}
-                        />
-                    </div>
-                    <div className="md:w-1/2">
-                        <h1 className="text-2xl">{name}</h1>
-                        <div className="mt-4 flex flex-col">
-                            {discountPercentage > 0 ? (
-                                <>
-                                    <span className="text-gray-500 line-through text-sm">
-                                        {originalPrice.toFixed(2)} €
-                                    </span>
-                                    <span className="text-2xl font-bold text-stone-600">
-                                        {discountedPrice.toFixed(2)} €
-                                    </span>
-                                    <div className="flex items-center mt-1">
-                                        <span className="text-sm font-semibold text-stone-600">
-                                            You save {(originalPrice - discountedPrice).toFixed(2)}€
-                                        </span>
-                                        <span className="ml-2 text-sm font-semibold text-stone-600 bg-stone-100 rounded-md px-1">
-                                            -{discountPercentage}%
-                                        </span>
-                                    </div>
-                                </>
-                            ) : (
-                                <span className="text-2xl font-bold">
-                                    {originalPrice.toFixed(2)} €
-                                </span>
-                            )}
-                        </div>
-                        <div className="mt-4 flex items-center space-x-4">
-                            <AddToCartButton onClick={handleAction('cart')}>
-                                <BrownShoppingCartIcon /> Add To Cart
-                            </AddToCartButton>
-                            <WishlistButton>
-                                <FavoriteBorderOutlined />
-                            </WishlistButton>
-                        </div>
-                    </div>
-                </div>
-            </div>
-
-            <div className="container mx-auto px-4 bg-white mt-8 mb-8 rounded-md max-w-5xl">
-                <div className="mt-4">
-                    <ProductDetailsTabs product={product} />
-                </div>
-            </div>
-
-            <ImagePreviewModal
-                open={imagePreviewOpen}
-                onClose={() => setImagePreviewOpen(false)}
-                imageUrl={imageUrl}
-            />
-        </>
-    );
-};
-
 export const FAQItem = ({ question, answer }) => {
     const [isOpen, setIsOpen] = useState(false);
 
@@ -1101,3 +1001,21 @@ export const EmptyCart = () => {
         </>
     )
 }
+
+export const ProductItemSkeleton = () => {
+    return (
+        <div className="bg-white rounded-lg shadow-md p-4 flex flex-col">
+            <div className="relative mb-2">
+                <Skeleton variant="rectangular" animation="wave" width="100%" height={192} />
+            </div>
+            <Skeleton variant="text" animation="wave" width="80%" height={24} className="mt-2" />
+            <div className="flex flex-col mb-2">
+                <Skeleton variant="text" animation="wave" width="60%" height={28} className="mt-1" />
+            </div>
+            <div className="flex justify-between items-center mt-auto">
+                <Skeleton variant="rectangular" animation="wave" width={140} height={40} />
+                <Skeleton variant="rectangular" animation="wave" width={60} height={40} />
+            </div>
+        </div>
+    );
+};

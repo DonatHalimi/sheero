@@ -13,42 +13,48 @@ const CategoryNavbar = ({ children }) => {
     const [menuOpen, setMenuOpen] = useState(false);
     const [darkOverlay, setDarkOverlay] = useState(false);
     const [activeCategory, setActiveCategory] = useState(null);
-    const [loading, setLoading] = useState(true);
+    const [loading, setLoading] = useState(!categories.length);
 
     const megaMenuRef = useRef(null);
     const categoryListRef = useRef(null);
     const navigate = useNavigate();
 
     useEffect(() => {
-        const fetchCategories = async () => {
-            try {
-                const { data } = await axiosInstance.get('/categories/get');
-                setCategories(data);
-                setLoading(false);
-            } catch (error) {
-                console.error('Error fetching categories:', error);
-                setLoading(false);
-            }
-        };
-        fetchCategories();
-    }, [axiosInstance]);
+        if (!categories.length) {
+            const fetchCategories = async () => {
+                try {
+                    const { data } = await axiosInstance.get('/categories/get');
+                    setCategories(data);
+                    setLoading(false);
+                } catch (error) {
+                    console.error('Error fetching categories:', error);
+                    setLoading(false);
+                }
+            };
+            fetchCategories();
+        }
+    }, [axiosInstance, categories.length]);
 
     const fetchSubcategories = async (categoryId) => {
-        try {
-            const { data } = await axiosInstance.get(`/subcategories/get-by-category/${categoryId}`);
-            setSubcategories(prev => ({ ...prev, [categoryId]: data }));
-            data.forEach(subcategory => fetchSubsubcategories(subcategory._id));
-        } catch (error) {
-            console.error('Error fetching subcategories:', error);
+        if (!subcategories[categoryId]) {
+            try {
+                const { data } = await axiosInstance.get(`/subcategories/get-by-category/${categoryId}`);
+                setSubcategories(prev => ({ ...prev, [categoryId]: data }));
+                data.forEach(subcategory => fetchSubsubcategories(subcategory._id));
+            } catch (error) {
+                console.error('Error fetching subcategories:', error);
+            }
         }
     };
 
     const fetchSubsubcategories = async (subcategoryId) => {
-        try {
-            const { data } = await axiosInstance.get(`/subsubcategories/get-by-subCategory/${subcategoryId}`);
-            setSubsubcategories(prev => ({ ...prev, [subcategoryId]: data }));
-        } catch (error) {
-            console.error('Error fetching subsubcategories:', error);
+        if (!subsubcategories[subcategoryId]) {
+            try {
+                const { data } = await axiosInstance.get(`/subsubcategories/get-by-subCategory/${subcategoryId}`);
+                setSubsubcategories(prev => ({ ...prev, [subcategoryId]: data }));
+            } catch (error) {
+                console.error('Error fetching subsubcategories:', error);
+            }
         }
     };
 
@@ -56,7 +62,7 @@ const CategoryNavbar = ({ children }) => {
         setOpenCategory(categoryId);
         setDarkOverlay(true);
         document.body.classList.add('no-scroll');
-        if (!subcategories[categoryId]) fetchSubcategories(categoryId);
+        fetchSubcategories(categoryId);
     };
 
     const handleCategoryLeave = () => {

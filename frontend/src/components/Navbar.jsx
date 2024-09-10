@@ -1,6 +1,8 @@
-import { IconButton, Tooltip } from '@mui/material';
 import React, { useContext, useEffect, useRef, useState } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
+import {  Tooltip, CircularProgress } from '@mui/material';
+import Badge from '@mui/material/Badge';
+import { toast } from 'react-toastify';
 import {
     BrownButton,
     BrownDeleteOutlinedIcon,
@@ -17,9 +19,7 @@ import {
 import logo from '../assets/logo.png';
 import { AuthContext } from '../context/AuthContext';
 import CategoryNavbar from './CategoryNavbar';
-import Badge from '@mui/material/Badge';
 import useAxios from '../axiosInstance';
-import { toast } from 'react-toastify';
 
 const Navbar = () => {
     const { auth, isAdmin, logout } = useContext(AuthContext);
@@ -27,6 +27,7 @@ const Navbar = () => {
     const [isCartDropdownOpen, setIsCartDropdownOpen] = useState(false);
     const [cartItems, setCartItems] = useState([]);
     const [cartTotal, setCartTotal] = useState(0);
+    const [isLoading, setIsLoading] = useState(false);
 
     const axiosInstance = useAxios();
     const profileDropdownRef = useRef(null);
@@ -40,7 +41,12 @@ const Navbar = () => {
                     const response = await axiosInstance.get('/cart');
                     const cart = response.data;
                     setCartItems(cart.items);
-                    const total = cart.items.reduce((acc, item) => acc + item.product.price * item.quantity, 0);
+                    
+                    // Calculate total, prioritizing salePrice if available
+                    const total = cart.items.reduce((acc, item) => {
+                        const price = item.product.salePrice > 0 ? item.product.salePrice : item.product.price;
+                        return acc + price * item.quantity;
+                    }, 0);
                     setCartTotal(total);
                 } catch (error) {
                     console.error('Error fetching cart data:', error);
@@ -91,22 +97,42 @@ const Navbar = () => {
     const totalQuantity = cartItems.reduce((acc, item) => acc + item.quantity, 0);
 
     const handleRemoveItem = async (productId) => {
+        setIsLoading(true);
         try {
             const response = await axiosInstance.delete('/cart/remove', {
                 headers: { Authorization: `Bearer ${auth.accessToken}` },
                 data: { productId }
             });
 
-            toast.success(`Product removed from cart`)
+            toast.success(`Product removed from cart`);
 
-            // Update cart items and total
             setCartItems(response.data.items);
-            const updatedTotal = response.data.items.reduce((acc, item) => acc + item.product.price * item.quantity, 0);
-            setCartTotal(updatedTotal);
 
+            const updatedTotal = response.data.items.reduce((acc, item) => {
+                const price = item.product.salePrice > 0 ? item.product.salePrice : item.product.price;
+                return acc + price * item.quantity;
+            }, 0);
+
+            setCartTotal(updatedTotal);
         } catch (error) {
             console.error('Error removing item from cart:', error);
+            toast.error('Failed to remove item from cart');
+        } finally {
+            setIsLoading(false);
         }
+    };
+
+    const handleGoToCart = async () => {
+        setIsLoading(true);
+        try {
+            await navigate('/cart');
+        } finally {
+            setIsLoading(false);
+        }
+    };
+
+    const handleProductClick = (productId) => {
+        navigate(`/product/${productId}`);
     };
 
     const ProfileDropdown = () => (
@@ -152,14 +178,23 @@ const Navbar = () => {
                                 <img
                                     src={`http://localhost:5000/${item.product.image}`}
                                     alt={item.product.name}
-                                    className="w-12 h-12 object-cover rounded"
+                                    className="w-12 h-12 object-cover rounded cursor-pointer"
+                                    onClick={() => handleProductClick(item.product._id)}
                                 />
                                 <div className="ml-2 flex-grow">
-                                    <span className="block font-semibold">{item.product.name}</span>
-                                    <span className="block text-sm text-gray-500">{item.quantity} x {item.product.price} €</span>
+                                    <span
+                                        className="block font-semibold cursor-pointer hover:underline"
+                                        onClick={() => handleProductClick(item.product._id)}
+                                    >
+                                        {item.product.name}
+                                    </span>
+                                    <span className="block text-sm text-gray-500">
+                                        {item.quantity} x {item.product.salePrice > 0 ? item.product.salePrice : item.product.price} €
+                                    </span>
                                 </div>
                                 <button
                                     onClick={() => handleRemoveItem(item.product._id)}
+                                    disabled={isLoading}
                                 >
                                     <BrownDeleteOutlinedIcon />
                                 </button>
@@ -175,7 +210,8 @@ const Navbar = () => {
                     </div>
                     <button
                         className="w-full bg-stone-600 text-white py-2 rounded"
-                        onClick={() => navigate('/cart')}
+                        onClick={handleGoToCart}
+                        disabled={isLoading}
                     >
                         Go to Cart
                     </button>
@@ -186,6 +222,12 @@ const Navbar = () => {
 
     return (
         <>
+            {isLoading && (
+                <div className="fixed inset-0 z-[1000] flex items-center justify-center bg-black bg-opacity-50">
+                    <CircularProgress size={60} style={{ color: '#373533' }} />
+                </div>
+            )}
+
             <nav className="fixed top-0 left-0 right-0 z-[900] bg-white p-4">
                 <div className="flex justify-between items-center mx-auto max-w-screen-xl">
                     <Tooltip title="Home" arrow>
@@ -217,7 +259,8 @@ const Navbar = () => {
                                                 <Badge badgeContent={totalQuantity} anchorOrigin={{
                                                     vertical: 'top',
                                                     horizontal: 'right',
-                                                }} color="secondary">
+                                                }} color="secondary"
+                                                    showZero>
                                                     <StyledShoppingCartIcon />
                                                 </Badge>
                                             </RoundIconButton>

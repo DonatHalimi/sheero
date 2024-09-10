@@ -12,13 +12,14 @@ const ProductList = () => {
 
     useEffect(() => {
         const fetchProducts = async () => {
+            setLoading(true);
             try {
                 const response = await axios.get('http://localhost:5000/api/products/get');
                 setProducts(response.data.products);
                 setTotalProducts(response.data.products.length);
-                setLoading(false);
             } catch (error) {
                 console.error('Error fetching products:', error);
+            } finally {
                 setLoading(false);
             }
         };
@@ -50,10 +51,10 @@ const ProductList = () => {
             )}
             <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 gap-4">
                 {loading ? (
-                    skeletonArray.slice(0, itemsPerPage)
+                    skeletonArray
                 ) : (
                     getCurrentPageItems().map(product => (
-                        <ProductItem key={product._id} product={product} loading={loading} />
+                        <ProductItem key={product._id} product={product} loading={false} />
                     ))
                 )}
             </div>
