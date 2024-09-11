@@ -4,8 +4,8 @@ import axios from 'axios';
 import React, { useContext, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { toast } from 'react-toastify';
-import { AddToCartButton, BrownShoppingCartIcon, WishlistButton, ProductItemSkeleton } from '../assets/CustomComponents';
-import NoImage from '../assets/product-not-found.jpg';
+import { AddToCartButton, BrownShoppingCartIcon, ProductItemSkeleton, WishlistButton } from '../assets/CustomComponents';
+import NoImage from '../assets/img/product-not-found.jpg';
 import { AuthContext } from '../context/AuthContext';
 
 const WishlistItem = ({ product, onRemove, loading }) => {

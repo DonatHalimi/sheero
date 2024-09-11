@@ -51,15 +51,15 @@ import { styled } from '@mui/material/styles';
 import SvgIcon from '@mui/material/SvgIcon';
 import { GridToolbar } from '@mui/x-data-grid';
 import { AnimatePresence, motion } from 'framer-motion';
-import React, {  useEffect, useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import { Link as RouterLink, useNavigate } from 'react-router-dom';
-import emptyCartImage from '../assets/empty-cart.png';
 import useAxios from '../axiosInstance';
 import Footer from '../components/Footer';
-import emptyWishlistImage from '../assets/empty-wishlist.png';
 import Navbar from '../components/Navbar';
-import notFound from './not-found.png'
-import notAllowed from './not-allowed.png'
+import emptyCartImage from './img/empty-cart.png';
+import emptyWishlistImage from './img/empty-wishlist.png';
+import notAllowed from './img/not-allowed.png';
+import notFound from './img/not-found.png';
 
 export const BrownOutlinedTextField = styled(TextField)({
     '& .MuiOutlinedInput-root': {
@@ -1000,7 +1000,7 @@ export const EmptyCart = () => {
 
     return (
         <>
-            <div className="flex flex-col items-center justify-center bg-white p-8 rounded-sm shadow-lg">
+            <div className="flex flex-col items-center justify-center bg-white p-8 rounded-sm shadow-sm">
                 <img src={emptyCartImage} alt="Empty Cart" className="w-60 h-60 object-cover mb-4" />
                 <p className="text-sm font-semibold mb-2">Your cart is empty!</p>
                 <h2
@@ -1019,7 +1019,7 @@ export const EmptyWishlist = () => {
 
     return (
         <>
-            <div className="flex flex-col items-center justify-center bg-white p-8 rounded-sm shadow-lg">
+            <div className="flex flex-col items-center justify-center bg-white p-8 rounded-sm shadow-sm">
                 <img src={emptyWishlistImage} alt="Empty Wishlist" className="w-60 h-60 object-cover mb-4" />
                 <p className="text-sm font-semibold mb-2">Your wishlist is empty!</p>
                 <h2

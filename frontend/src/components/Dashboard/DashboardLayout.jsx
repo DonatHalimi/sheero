@@ -17,7 +17,7 @@ import {
     StyledLogoutIcon,
     StyledPersonIcon
 } from '../../assets/CustomComponents';
-import logo from '../../assets/logo.png';
+import logo from '../../assets/img/logo.png';
 import { AuthContext } from '../../context/AuthContext';
 import theme from '../../theme';
 import { mainListItems, secondaryListItems } from './listItems';

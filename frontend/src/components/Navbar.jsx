@@ -16,7 +16,7 @@ import {
     StyledPersonIcon,
     StyledShoppingCartIcon,
 } from '../assets/CustomComponents';
-import logo from '../assets/logo.png';
+import logo from '../assets/img/logo.png';
 import { AuthContext } from '../context/AuthContext';
 import CategoryNavbar from './CategoryNavbar';
 import useAxios from '../axiosInstance';
@@ -42,7 +42,6 @@ const Navbar = () => {
                     const cart = response.data;
                     setCartItems(cart.items);
 
-                    // Calculate total, prioritizing salePrice if available
                     const total = cart.items.reduce((acc, item) => {
                         const price = item.product.salePrice > 0 ? item.product.salePrice : item.product.price;
                         return acc + price * item.quantity;
@@ -57,13 +56,15 @@ const Navbar = () => {
         fetchCartData();
     }, [auth.accessToken, axiosInstance]);
 
-    const handleProfileDropdownToggle = () => {
-        setIsProfileDropdownOpen(prev => !prev);
+    const handleProfileDropdownToggle = (event) => {
+        event.stopPropagation();
+        setIsProfileDropdownOpen((prev) => !prev);
         setIsCartDropdownOpen(false);
     };
 
-    const handleCartDropdownToggle = () => {
-        setIsCartDropdownOpen(prev => !prev);
+    const handleCartDropdownToggle = (event) => {
+        event.stopPropagation();
+        setIsCartDropdownOpen((prev) => !prev);
         setIsProfileDropdownOpen(false);
     };
 
@@ -72,25 +73,20 @@ const Navbar = () => {
         setIsProfileDropdownOpen(false);
     };
 
-    const handleClickOutsideProfile = (event) => {
-        if (profileDropdownRef.current && !profileDropdownRef.current.contains(event.target)) {
+    const handleClickOutside = (event) => {
+        if (
+            profileDropdownRef.current && !profileDropdownRef.current.contains(event.target) &&
+            cartDropdownRef.current && !cartDropdownRef.current.contains(event.target)
+        ) {
             setIsProfileDropdownOpen(false);
-        }
-    };
-
-    const handleClickOutsideCart = (event) => {
-        if (cartDropdownRef.current && !cartDropdownRef.current.contains(event.target)) {
             setIsCartDropdownOpen(false);
         }
     };
 
     useEffect(() => {
-        document.addEventListener('mousedown', handleClickOutsideProfile);
-        document.addEventListener('mousedown', handleClickOutsideCart);
-
+        document.addEventListener('mousedown', handleClickOutside);
         return () => {
-            document.removeEventListener('mousedown', handleClickOutsideProfile);
-            document.removeEventListener('mousedown', handleClickOutsideCart);
+            document.removeEventListener('mousedown', handleClickOutside);
         };
     }, []);
 

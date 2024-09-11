@@ -1,13 +1,13 @@
 import { Box, Typography } from '@mui/material';
-import React, { useContext, useEffect, useState } from 'react';
 import axios from 'axios';
+import React, { useContext, useEffect, useState } from 'react';
 import { toast } from 'react-toastify';
-import Footer from '../Footer';
-import Navbar from '../Navbar';
-import ProfileSidebar from './ProfileSidebar';
-import WishlistItem from '../WishlistItem';
 import { EmptyWishlist, ProductItemSkeleton } from '../../assets/CustomComponents';
 import { AuthContext } from '../../context/AuthContext';
+import Footer from '../Footer';
+import Navbar from '../Navbar';
+import WishlistItem from '../WishlistItem';
+import ProfileSidebar from './ProfileSidebar';
 
 const Wishlist = () => {
     const { auth } = useContext(AuthContext);
@@ -23,7 +23,6 @@ const Wishlist = () => {
                 setWishlistItems(response.data.items);
             } catch (error) {
                 console.error('Error fetching wishlist:', error);
-                toast.error('Failed to load wishlist');
             } finally {
                 setLoading(false);
             }
@@ -59,9 +58,11 @@ const Wishlist = () => {
                 <ProfileSidebar />
                 <main className="flex-grow p-4 relative left-24">
                     <div className="container max-w-5xl mx-auto mt-20 mb-20">
-                        <Typography variant="h5" className="!text-gray-800 !font-semilight relative bottom-2">
-                            Wishlist
-                        </Typography>
+                        <div className="bg-white px-4 py-4 rounded-sm shadow-sm mb-3">
+                            <Typography variant="h5" className="!text-gray-800 !font-semilight">
+                                Wishlist
+                            </Typography>
+                        </div>
                         {loading ? (
                             <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-3 gap-6">
                                 {Array.from({ length: 8 }).map((_, index) => (

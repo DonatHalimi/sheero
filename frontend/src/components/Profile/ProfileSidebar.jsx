@@ -22,7 +22,7 @@ const ProfileSidebar = () => {
     };
 
     return (
-        <div className="absolute top-[234px] left-[320px] w-72 bg-white p-5 shadow-lg rounded-sm">
+        <div className="absolute top-[234px] left-[320px] w-72 bg-white p-5 shadow-sm rounded-sm">
             <Typography variant="h5" gutterBottom className="!text-gray-800 !font-semilight">
                 Hello, {auth.username}
             </Typography>

@@ -122,8 +122,12 @@ const AddressInformation = () => {
                 <ProfileSidebar />
                 <main className="p-4 relative left-24 w-full">
                     <div className="container mx-auto mt-20 mb-20">
-                        <div className="bg-white shadow-lg rounded-sm p-8">
-                            <Typography variant="h5" className="!mb-6 !text-gray-800 !font-semilight">Address Information</Typography>
+                        <div className="bg-white px-4 py-4 rounded-sm shadow-sm mb-3">
+                            <Typography variant="h5" className="!text-gray-800 !font-semilight">
+                                Address
+                            </Typography>
+                        </div>
+                        <div className="bg-white shadow-sm rounded-sm p-8">
                             <form onSubmit={handleSaveAddress} className="space-y-6">
                                 <Box className="flex gap-4">
                                     <TextField

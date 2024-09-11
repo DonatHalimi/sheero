@@ -1,21 +1,21 @@
-import axios from 'axios';
-import React, { useEffect, useState, useContext } from 'react';
-import { useNavigate, useParams } from 'react-router-dom';
 import { CircularProgress } from '@mui/material';
+import axios from 'axios';
+import React, { useContext, useEffect, useState } from 'react';
+import { useNavigate, useParams } from 'react-router-dom';
 import { toast } from 'react-toastify';
-import { AuthContext } from '../../context/AuthContext';
 import {
-    BreadcrumbsComponent,
-    ProductSkeleton,
     AddToCartButton,
-    WishlistButton,
+    BreadcrumbsComponent,
     BrownShoppingCartIcon,
+    ProductSkeleton,
     StyledFavoriteIcon,
+    WishlistButton,
 } from '../../assets/CustomComponents';
 import Footer from '../../components/Footer';
+import ImagePreviewModal from '../../components/Modal/ImagePreviewModal';
 import Navbar from '../../components/Navbar';
 import ProductDetailsTabs from '../../components/ProductDetailsTabs';
-import ImagePreviewModal from '../../components/Modal/ImagePreviewModal';
+import { AuthContext } from '../../context/AuthContext';
 
 const ProductDetails = () => {
     const { id } = useParams();

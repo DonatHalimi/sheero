@@ -99,8 +99,12 @@ const ProfileInformation = () => {
                 <ProfileSidebar />
                 <main className="p-4 relative left-24 w-full">
                     <div className="container max-w-6xl mx-auto mt-20 mb-36">
-                        <div className="bg-white shadow-lg rounded-sm p-8">
-                            <Typography variant="h5" className="!mb-6 !text-gray-800 !font-semilight">Personal Information</Typography>
+                        <div className="bg-white px-4 py-4 rounded-sm shadow-sm mb-3">
+                            <Typography variant="h5" className="!text-gray-800 !font-semilight">
+                                Personal Information
+                            </Typography>
+                        </div>
+                        <div className="bg-white shadow-sm rounded-sm p-8">
                             <form onSubmit={handleSubmit} className="space-y-2">
                                 <Box className="flex gap-4">
                                     <TextField
