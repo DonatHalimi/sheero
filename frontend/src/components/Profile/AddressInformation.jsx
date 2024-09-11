@@ -35,8 +35,6 @@ const AddressInformation = () => {
             }
         };
 
-        window.scrollTo(0, 0);
-
         fetchCountries();
     }, [axiosInstance]);
 
@@ -120,77 +118,82 @@ const AddressInformation = () => {
     return (
         <>
             <Navbar />
-            <Box className="container mx-auto max-w-4xl flex">
+            <Box className="container mx-auto max-w-4xl flex mb-16">
                 <ProfileSidebar />
-                <main className="flex-grow ml-0 p-4">
-                    <div className="container max-w-4xl mx-auto mt-20 mb-20">
+                <main className="p-4 relative left-24 w-full">
+                    <div className="container mx-auto mt-20 mb-20">
                         <div className="bg-white shadow-lg rounded-sm p-8">
-                            <Typography variant="h5" className="!mb-6 !text-gray-800 !font-semibold">Address Information</Typography>
-
+                            <Typography variant="h5" className="!mb-6 !text-gray-800 !font-semilight">Address Information</Typography>
                             <form onSubmit={handleSaveAddress} className="space-y-6">
-                                <TextField
-                                    fullWidth
-                                    label="Name"
-                                    variant="outlined"
-                                    name="name"
-                                    value={name}
-                                    onChange={(e) => setName(e.target.value)}
-                                    InputLabelProps={{ className: 'text-gray-700' }}
-                                    InputProps={{ className: 'text-gray-700' }}
-                                />
-                                <TextField
-                                    fullWidth
-                                    label="Street"
-                                    variant="outlined"
-                                    name="street"
-                                    value={street}
-                                    onChange={(e) => setStreet(e.target.value)}
-                                    InputLabelProps={{ className: 'text-gray-700' }}
-                                    InputProps={{ className: 'text-gray-700' }}
-                                />
-                                <TextField
-                                    fullWidth
-                                    label="Phone Number"
-                                    variant="outlined"
-                                    name="phoneNumber"
-                                    value={phoneNumber}
-                                    onChange={(e) => setPhoneNumber(e.target.value)}
-                                    InputLabelProps={{ className: 'text-gray-700' }}
-                                    InputProps={{ className: 'text-gray-700' }}
-                                    placeholder="044/45/48 XXXXXX"
-                                />
-                                <FormControl fullWidth variant="outlined">
-                                    <InputLabel>Country</InputLabel>
-                                    <Select
-                                        name="country"
-                                        value={country || ''}
-                                        onChange={handleCountryChange}
-                                        label="Country"
-                                    >
-                                        {countries.map((country) => (
-                                            <MenuItem key={country._id} value={country._id}>
-                                                {country.name}
-                                            </MenuItem>
-                                        ))}
-                                    </Select>
-                                </FormControl>
+                                <Box className="flex gap-4">
+                                    <TextField
+                                        fullWidth
+                                        label="Name"
+                                        variant="outlined"
+                                        name="name"
+                                        value={name}
+                                        onChange={(e) => setName(e.target.value)}
+                                        InputLabelProps={{ className: 'text-gray-700' }}
+                                        InputProps={{ className: 'text-gray-700' }}
+                                    />
+                                    <TextField
+                                        fullWidth
+                                        label="Street"
+                                        variant="outlined"
+                                        name="street"
+                                        value={street}
+                                        onChange={(e) => setStreet(e.target.value)}
+                                        InputLabelProps={{ className: 'text-gray-700' }}
+                                        InputProps={{ className: 'text-gray-700' }}
+                                    />
+                                </Box>
 
-                                <FormControl fullWidth variant="outlined">
-                                    <InputLabel>City</InputLabel>
-                                    <Select
-                                        name="city"
-                                        value={city || ''}
-                                        onChange={handleCityChange}
-                                        label="City"
-                                        disabled={!country}
-                                    >
-                                        {cities.map((city) => (
-                                            <MenuItem key={city._id} value={city._id}>
-                                                {city.name}
-                                            </MenuItem>
-                                        ))}
-                                    </Select>
-                                </FormControl>
+                                <Box className="flex gap-4">
+
+                                    <TextField
+                                        fullWidth
+                                        label="Phone Number"
+                                        variant="outlined"
+                                        name="phoneNumber"
+                                        value={phoneNumber}
+                                        onChange={(e) => setPhoneNumber(e.target.value)}
+                                        InputLabelProps={{ className: 'text-gray-700' }}
+                                        InputProps={{ className: 'text-gray-700' }}
+                                        placeholder="044/45/48 XXXXXX"
+                                    />
+                                    <FormControl fullWidth variant="outlined">
+                                        <InputLabel>Country</InputLabel>
+                                        <Select
+                                            name="country"
+                                            value={country || ''}
+                                            onChange={handleCountryChange}
+                                            label="Country"
+                                        >
+                                            {countries.map((country) => (
+                                                <MenuItem key={country._id} value={country._id}>
+                                                    {country.name}
+                                                </MenuItem>
+                                            ))}
+                                        </Select>
+                                    </FormControl>
+
+                                    <FormControl fullWidth variant="outlined">
+                                        <InputLabel>City</InputLabel>
+                                        <Select
+                                            name="city"
+                                            value={city || ''}
+                                            onChange={handleCityChange}
+                                            label="City"
+                                            disabled={!country}
+                                        >
+                                            {cities.map((city) => (
+                                                <MenuItem key={city._id} value={city._id}>
+                                                    {city.name}
+                                                </MenuItem>
+                                            ))}
+                                        </Select>
+                                    </FormControl>
+                                </Box >
 
                                 <Button type="submit" variant="contained" color="primary" className="bg-orange-600 hover:bg-orange-700">
                                     Save

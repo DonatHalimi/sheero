@@ -30,10 +30,10 @@ const ProfileInformation = () => {
     const handleChange = (e) => {
         setFormData({ ...formData, [e.target.name]: e.target.value });
     };
-    
+
     useEffect(() => {
         window.scrollTo(0, 0);
-    },[]);
+    }, []);
 
     const handleSubmit = async (e) => {
         e.preventDefault();
@@ -87,93 +87,102 @@ const ProfileInformation = () => {
         }
     };
 
+    // Function to determine if the user is adding new information
+    const isAddingNewInformation = () => {
+        return formData.username !== auth.username || formData.email !== auth.email;
+    };
+
     return (
         <>
             <Navbar />
             <Box className="container mx-auto max-w-4xl flex">
                 <ProfileSidebar />
-                <main className="flex-grow ml-0 p-4">
-                    <div className="container max-w-4xl mx-auto mt-20 mb-20">
+                <main className="p-4 relative left-24 w-full">
+                    <div className="container max-w-6xl mx-auto mt-20 mb-36">
                         <div className="bg-white shadow-lg rounded-sm p-8">
-                            <Typography variant="h5" className="!mb-6 !text-gray-800 !font-semibold">Personal Information</Typography>
-                            <form onSubmit={handleSubmit} className="space-y-6">
-                                <TextField
-                                    fullWidth
-                                    label="Username"
-                                    variant="outlined"
-                                    name="username"
-                                    value={formData.username}
-                                    onChange={handleChange}
-                                    InputLabelProps={{ className: 'text-gray-700' }}
-                                    InputProps={{ className: 'text-gray-700' }}
-                                />
-                                <TextField
-                                    fullWidth
-                                    label="Email"
-                                    variant="outlined"
-                                    type="email"
-                                    name="email"
-                                    value={formData.email}
-                                    onChange={handleChange}
-                                    InputLabelProps={{ className: 'text-gray-700' }}
-                                    InputProps={{ className: 'text-gray-700' }}
-                                />
-                                <BrownOutlinedTextField
-                                    variant="outlined"
-                                    margin="normal"
-                                    required
-                                    fullWidth
-                                    name="password"
-                                    label="Current Password"
-                                    type={showPassword ? "text" : "password"}
-                                    id="password"
-                                    autoComplete="current-password"
-                                    value={formData.password}
-                                    onChange={handleChange}
-                                    InputProps={{
-                                        endAdornment: (
-                                            <InputAdornment position="end">
-                                                <IconButton
-                                                    aria-label="toggle current password visibility"
-                                                    onClick={handleClickShowPassword}
-                                                    onMouseDown={handleMouseDownPassword}
-                                                    edge="end"
-                                                >
-                                                    {showPassword ? <VisibilityIcon className='text-stone-500' /> : <VisibilityOffIcon className='text-stone-500' />}
-                                                </IconButton>
-                                            </InputAdornment>
-                                        )
-                                    }}
-                                    sx={{ mb: 3 }}
-                                />
-                                <BrownOutlinedTextField
-                                    variant="outlined"
-                                    margin="normal"
-                                    fullWidth
-                                    name="newPassword"
-                                    label="New Password"
-                                    type={showNewPassword ? "text" : "password"}
-                                    id="new-password"
-                                    value={formData.newPassword}
-                                    onChange={handleChange}
-                                    InputProps={{
-                                        endAdornment: (
-                                            <InputAdornment position="end">
-                                                <IconButton
-                                                    aria-label="toggle new password visibility"
-                                                    onClick={handleClickShowNewPassword}
-                                                    onMouseDown={handleMouseDownPassword}
-                                                    edge="end"
-                                                >
-                                                    {showNewPassword ? <VisibilityIcon className='text-stone-500' /> : <VisibilityOffIcon className='text-stone-500' />}
-                                                </IconButton>
-                                            </InputAdornment>
-                                        )
-                                    }}
-                                    sx={{ mb: 3 }}
-                                />
+                            <Typography variant="h5" className="!mb-6 !text-gray-800 !font-semilight">Personal Information</Typography>
+                            <form onSubmit={handleSubmit} className="space-y-2">
+                                <Box className="flex gap-4">
+                                    <TextField
+                                        fullWidth
+                                        label="Username"
+                                        variant="outlined"
+                                        name="username"
+                                        value={formData.username}
+                                        onChange={handleChange}
+                                        InputLabelProps={{ className: 'text-gray-700' }}
+                                        InputProps={{ className: 'text-gray-700' }}
+                                    />
+                                    <TextField
+                                        fullWidth
+                                        label="Email"
+                                        variant="outlined"
+                                        type="email"
+                                        name="email"
+                                        value={formData.email}
+                                        onChange={handleChange}
+                                        InputLabelProps={{ className: 'text-gray-700' }}
+                                        InputProps={{ className: 'text-gray-700' }}
+                                    />
+                                </Box>
+
+                                <Box className="flex gap-4">
+                                    <BrownOutlinedTextField
+                                        variant="outlined"
+                                        margin="normal"
+                                        required
+                                        fullWidth
+                                        name="password"
+                                        label="Current Password"
+                                        type={showPassword ? "text" : "password"}
+                                        id="password"
+                                        autoComplete="current-password"
+                                        value={formData.password}
+                                        onChange={handleChange}
+                                        InputProps={{
+                                            endAdornment: (
+                                                <InputAdornment position="end">
+                                                    <IconButton
+                                                        aria-label="toggle current password visibility"
+                                                        onClick={handleClickShowPassword}
+                                                        onMouseDown={handleMouseDownPassword}
+                                                        edge="end"
+                                                    >
+                                                        {showPassword ? <VisibilityIcon className='text-stone-500' /> : <VisibilityOffIcon className='text-stone-500' />}
+                                                    </IconButton>
+                                                </InputAdornment>
+                                            )
+                                        }}
+                                    />
+                                    <BrownOutlinedTextField
+                                        variant="outlined"
+                                        margin="normal"
+                                        fullWidth
+                                        name="newPassword"
+                                        label="New Password"
+                                        type={showNewPassword ? "text" : "password"}
+                                        id="new-password"
+                                        value={formData.newPassword}
+                                        onChange={handleChange}
+                                        InputProps={{
+                                            endAdornment: (
+                                                <InputAdornment position="end">
+                                                    <IconButton
+                                                        aria-label="toggle new password visibility"
+                                                        onClick={handleClickShowNewPassword}
+                                                        onMouseDown={handleMouseDownPassword}
+                                                        edge="end"
+                                                    >
+                                                        {showNewPassword ? <VisibilityIcon className='text-stone-500' /> : <VisibilityOffIcon className='text-stone-500' />}
+                                                    </IconButton>
+                                                </InputAdornment>
+                                            )
+                                        }}
+                                    />
+                                </Box>
+
                                 <Button type="submit" variant="contained" color="primary" className="bg-orange-600 hover:bg-orange-700">
-                                    Save
+                                    {isAddingNewInformation() ? 'Save' : 'Update'}
                                 </Button>
                             </form>
                         </div>

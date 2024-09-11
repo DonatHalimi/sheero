@@ -1,6 +1,6 @@
 import React, { useContext, useEffect, useRef, useState } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
-import {  Tooltip, CircularProgress } from '@mui/material';
+import { Tooltip, CircularProgress, Button } from '@mui/material';
 import Badge from '@mui/material/Badge';
 import { toast } from 'react-toastify';
 import {
@@ -41,7 +41,7 @@ const Navbar = () => {
                     const response = await axiosInstance.get('/cart');
                     const cart = response.data;
                     setCartItems(cart.items);
-                    
+
                     // Calculate total, prioritizing salePrice if available
                     const total = cart.items.reduce((acc, item) => {
                         const price = item.product.salePrice > 0 ? item.product.salePrice : item.product.price;
@@ -192,12 +192,13 @@ const Navbar = () => {
                                         {item.quantity} x {item.product.salePrice > 0 ? item.product.salePrice : item.product.price} €
                                     </span>
                                 </div>
-                                <button
+                                <RoundIconButton
+                                    style={{ backgroundColor: 'white' }}
                                     onClick={() => handleRemoveItem(item.product._id)}
                                     disabled={isLoading}
                                 >
                                     <BrownDeleteOutlinedIcon />
-                                </button>
+                                </RoundIconButton>
                             </li>
                         ))}
                     </ul>
@@ -208,13 +209,15 @@ const Navbar = () => {
                             <span className="font-semibold">{cartTotal.toFixed(2)} €</span>
                         </div>
                     </div>
-                    <button
-                        className="w-full bg-stone-600 text-white py-2 rounded"
+                    <Button
+                        style={{ backgroundColor: '#686159', color: 'white' }}
                         onClick={handleGoToCart}
+                        className='w-full rounded-md'
                         disabled={isLoading}
                     >
                         Go to Cart
-                    </button>
+                    </Button>
+
                 </>
             )}
         </div>

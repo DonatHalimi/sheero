@@ -18,10 +18,10 @@ const Reviews = () => {
             <Navbar />
             <Box className="container mx-auto max-w-4xl flex">
                 <ProfileSidebar />
-                <main className="flex-grow ml-0 p-4">
-                    <div className="container max-w-4xl mx-auto mt-20 mb-20">
+                <main className="p-4 relative left-24 w-full">
+                    <div className="container max-w-6xl mx-auto mt-20 mb-20">
                         <div className="bg-white shadow-lg rounded-sm p-8">
-                            <Typography variant="h5" className="!mb-6 !text-gray-800 !font-semibold">Reviews</Typography>
+                            <Typography variant="h5" className="!mb-6 !text-gray-800 !font-semilight">Reviews</Typography>
                             <form className="space-y-6">
                                 <TextField
                                     fullWidth

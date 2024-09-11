@@ -22,7 +22,6 @@ import {
     Box,
     Breadcrumbs,
     Button,
-    CircularProgress,
     Collapse,
     FormControl,
     IconButton,
@@ -51,18 +50,16 @@ import {
 import { styled } from '@mui/material/styles';
 import SvgIcon from '@mui/material/SvgIcon';
 import { GridToolbar } from '@mui/x-data-grid';
-import axios from 'axios';
 import { AnimatePresence, motion } from 'framer-motion';
-import React, { useContext, useEffect, useState } from 'react';
+import React, {  useEffect, useState } from 'react';
 import { Link as RouterLink, useNavigate } from 'react-router-dom';
-import { toast } from 'react-toastify';
 import emptyCartImage from '../assets/empty-cart.png';
 import useAxios from '../axiosInstance';
 import Footer from '../components/Footer';
-import ImagePreviewModal from '../components/Modal/ImagePreviewModal';
+import emptyWishlistImage from '../assets/empty-wishlist.png';
 import Navbar from '../components/Navbar';
-import ProductDetailsTabs from '../components/ProductDetailsTabs';
-import { AuthContext } from '../context/AuthContext';
+import notFound from './not-found.png'
+import notAllowed from './not-allowed.png'
 
 export const BrownOutlinedTextField = styled(TextField)({
     '& .MuiOutlinedInput-root': {
@@ -594,10 +591,8 @@ export const NotAllowedComponent = () => {
     return (
         <div className="min-h-screen bg-gray-100 flex flex-col justify-center items-center px-4 sm:px-6 lg:px-8">
             <div className="max-w-md w-full space-y-8 text-center">
-                <div className="mb-8">
-                    <svg className="mx-auto h-32 w-auto text-stone-400" fill="none" viewBox="0 0 24 24" stroke="currentColor" aria-hidden="true">
-                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9.172 16.172a4 4 0 015.656 0M9 10h.01M15 10h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
-                    </svg>
+                <div className="mb-8 flex justify-center">
+                    <img src={notAllowed} alt="Page Not Allowed" className='w-64 h-64' />
                 </div>
                 <h1 className="text-4xl font-extrabold text-gray-900 sm:text-5xl">403</h1>
                 <p className="mt-2 text-3xl font-bold text-gray-900 sm:text-4xl">Page not allowed</p>
@@ -614,10 +609,8 @@ export const NotFoundComponent = () => {
     return (
         <div className="min-h-screen bg-gray-100 flex flex-col justify-center items-center px-4 sm:px-6 lg:px-8">
             <div className="max-w-md w-full space-y-8 text-center">
-                <div className="mb-8">
-                    <svg className="mx-auto h-32 w-auto text-stone-400" fill="none" viewBox="0 0 24 24" stroke="currentColor" aria-hidden="true">
-                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9.172 16.172a4 4 0 015.656 0M9 10h.01M15 10h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
-                    </svg>
+                <div className="mb-8 flex justify-center">
+                    <img src={notFound} alt="Page Not Found" className='w-64 h-64' />
                 </div>
                 <h1 className="text-4xl font-extrabold text-gray-900 sm:text-5xl">404</h1>
                 <p className="mt-2 text-3xl font-bold text-gray-900 sm:text-4xl">Page not found</p>
@@ -629,6 +622,7 @@ export const NotFoundComponent = () => {
         </div>
     );
 };
+
 
 export const TabPanel = ({ children, value, index }) => {
     return (
@@ -983,6 +977,24 @@ export const LoadingCart = () => {
     );
 }
 
+export const ProductItemSkeleton = () => {
+    return (
+        <div className="bg-white rounded-lg shadow-md p-4 flex flex-col">
+            <div className="relative mb-2">
+                <Skeleton variant="rectangular" animation="wave" width="100%" height={192} />
+            </div>
+            <Skeleton variant="text" animation="wave" width="80%" height={24} className="mt-2" />
+            <div className="flex flex-col mb-2">
+                <Skeleton variant="text" animation="wave" width="60%" height={28} className="mt-1" />
+            </div>
+            <div className="flex justify-between items-center mt-auto">
+                <Skeleton variant="rectangular" animation="wave" width={140} height={40} />
+                <Skeleton variant="rectangular" animation="wave" width={60} height={40} />
+            </div>
+        </div>
+    );
+};
+
 export const EmptyCart = () => {
     const navigate = useNavigate();
 
@@ -1002,20 +1014,21 @@ export const EmptyCart = () => {
     )
 }
 
-export const ProductItemSkeleton = () => {
+export const EmptyWishlist = () => {
+    const navigate = useNavigate();
+
     return (
-        <div className="bg-white rounded-lg shadow-md p-4 flex flex-col">
-            <div className="relative mb-2">
-                <Skeleton variant="rectangular" animation="wave" width="100%" height={192} />
+        <>
+            <div className="flex flex-col items-center justify-center bg-white p-8 rounded-sm shadow-lg">
+                <img src={emptyWishlistImage} alt="Empty Wishlist" className="w-60 h-60 object-cover mb-4" />
+                <p className="text-sm font-semibold mb-2">Your wishlist is empty!</p>
+                <h2
+                    className='text-base font-semibold cursor-pointer hover:underline'
+                    onClick={() => navigate('/')}
+                >
+                    Go Back to Home
+                </h2>
             </div>
-            <Skeleton variant="text" animation="wave" width="80%" height={24} className="mt-2" />
-            <div className="flex flex-col mb-2">
-                <Skeleton variant="text" animation="wave" width="60%" height={28} className="mt-1" />
-            </div>
-            <div className="flex justify-between items-center mt-auto">
-                <Skeleton variant="rectangular" animation="wave" width={140} height={40} />
-                <Skeleton variant="rectangular" animation="wave" width={60} height={40} />
-            </div>
-        </div>
-    );
-};
+        </>
+    )
+}

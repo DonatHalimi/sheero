@@ -1,4 +1,4 @@
-import FavoriteIcon from '@mui/icons-material/FavoriteBorderOutlined';
+import DeleteIcon from '@mui/icons-material/DeleteOutline';
 import { CircularProgress } from '@mui/material';
 import axios from 'axios';
 import React, { useContext, useState } from 'react';
@@ -8,11 +8,10 @@ import { AddToCartButton, BrownShoppingCartIcon, WishlistButton, ProductItemSkel
 import NoImage from '../assets/product-not-found.jpg';
 import { AuthContext } from '../context/AuthContext';
 
-const ProductItem = ({ product, loading }) => {
+const WishlistItem = ({ product, onRemove, loading }) => {
     const navigate = useNavigate();
     const { auth } = useContext(AuthContext);
     const [isActionLoading, setIsActionLoading] = useState(false);
-    const [isWishlistLoading, setIsWishlistLoading] = useState(false);
 
     const { _id, name, image, price, discount, salePrice } = product || {};
     const imageUrl = `http://localhost:5000/${image}`;
@@ -27,51 +26,33 @@ const ProductItem = ({ product, loading }) => {
         }
     };
 
-    const handleAction = (action) => async (e) => {
-        e.stopPropagation();  // Prevent parent click event from triggering
+    const handleAddToCart = async (e) => {
+        e.stopPropagation();
         if (!auth.accessToken) {
             toast.error("You need to log in first.");
             navigate('/login');
             return;
         }
 
-        if (action === 'cart') {
-            setIsActionLoading(true);
-        } else if (action === 'wishlist') {
-            setIsWishlistLoading(true);
-        }
-
+        setIsActionLoading(true);
         try {
-            if (action === 'cart') {
-                await axios.post('http://localhost:5000/api/cart/add', {
-                    productId: _id,
-                    quantity: 1
-                }, {
-                    headers: { Authorization: `Bearer ${auth.accessToken}` }
-                });
+            await axios.post('http://localhost:5000/api/cart/add', {
+                productId: _id,
+                quantity: 1
+            }, {
+                headers: { Authorization: `Bearer ${auth.accessToken}` }
+            });
 
-                document.dispatchEvent(new Event('productAdded'));
+            document.dispatchEvent(new Event('productAdded'));
 
-                toast.success('Product added to cart!', {
-                    onClick: () => { navigate('/cart'); }
-                });
-            } else if (action === 'wishlist') {
-                await axios.post('http://localhost:5000/api/wishlist/add', {
-                    productId: _id
-                }, {
-                    headers: { Authorization: `Bearer ${auth.accessToken}` }
-                });
-                toast.success('Product added to wishlist!');
-            }
+            toast.success('Product added to cart!', {
+                onClick: () => { navigate('/cart'); }
+            });
         } catch (error) {
-            console.error(`Failed to add product to ${action}:`, error.response?.data?.message || error.message);
-            toast.error(`Failed to add product to ${action}.`);
+            console.error('Failed to add product to cart:', error.response?.data?.message || error.message);
+            toast.error('Failed to add product to cart.');
         } finally {
-            if (action === 'cart') {
-                setIsActionLoading(false);
-            } else if (action === 'wishlist') {
-                setIsWishlistLoading(false);
-            }
+            setIsActionLoading(false);
         }
     };
 
@@ -81,13 +62,13 @@ const ProductItem = ({ product, loading }) => {
 
     return (
         <>
-            {(isActionLoading || isWishlistLoading) && (
+            {isActionLoading && (
                 <div className="fixed inset-0 z-[1000] flex items-center justify-center bg-black bg-opacity-50">
                     <CircularProgress size={60} style={{ color: '#373533' }} />
                 </div>
             )}
             <div className="bg-white rounded-lg shadow-md p-4 flex flex-col cursor-pointer" onClick={handleClick}>
-                <div className="relative mb-2">
+                <div className="relative mb-2 max-w-4xl">
                     <img
                         src={imageUrl}
                         alt={name}
@@ -110,11 +91,11 @@ const ProductItem = ({ product, loading }) => {
                     )}
                 </div>
                 <div className="flex justify-between items-center mt-auto">
-                    <AddToCartButton onClick={handleAction('cart')} disabled={isActionLoading || isWishlistLoading}>
+                    <AddToCartButton onClick={handleAddToCart} disabled={isActionLoading}>
                         <BrownShoppingCartIcon /> Add To Cart
                     </AddToCartButton>
-                    <WishlistButton onClick={handleAction('wishlist')} disabled={isActionLoading || isWishlistLoading}>
-                        {isWishlistLoading ? <CircularProgress size={24} color="inherit" /> : <FavoriteIcon />}
+                    <WishlistButton onClick={(e) => { e.stopPropagation(); onRemove(_id); }} disabled={isActionLoading}>
+                        <DeleteIcon />
                     </WishlistButton>
                 </div>
             </div>
@@ -122,4 +103,4 @@ const ProductItem = ({ product, loading }) => {
     );
 };
 
-export default ProductItem;
+export default WishlistItem;

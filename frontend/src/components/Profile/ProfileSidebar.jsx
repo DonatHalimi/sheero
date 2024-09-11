@@ -22,8 +22,8 @@ const ProfileSidebar = () => {
     };
 
     return (
-        <div className="relative top-[96px] left-0 w-430 h-full bg-white p-5 shadow-lg rounded-sm">
-            <Typography variant="h6" gutterBottom>
+        <div className="absolute top-[234px] left-[320px] w-72 bg-white p-5 shadow-lg rounded-sm">
+            <Typography variant="h5" gutterBottom className="!text-gray-800 !font-semilight">
                 Hello, {auth.username}
             </Typography>
             <span className='text-md'>Thank you for being part of sheero</span>
