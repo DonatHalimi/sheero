@@ -1,8 +1,8 @@
+import React, { useContext, useState, useEffect } from 'react';
+import { useNavigate } from 'react-router-dom';
+import { Box, Container, IconButton, InputAdornment, Paper, Typography } from '@mui/material';
 import VisibilityIcon from '@mui/icons-material/Visibility';
 import VisibilityOffIcon from '@mui/icons-material/VisibilityOff';
-import { Box, Container, IconButton, InputAdornment, Paper, Typography } from '@mui/material';
-import React, { useContext, useState } from 'react';
-import { useNavigate } from 'react-router-dom';
 import { toast } from 'react-toastify';
 import { BrownButton, BrownOutlinedTextField } from '../../assets/CustomComponents';
 import Footer from '../../components/Footer';
@@ -17,6 +17,10 @@ const Register = () => {
     const { register } = useContext(AuthContext);
     const navigate = useNavigate();
 
+    useEffect(() => {
+        window.scrollTo(0, 0);
+    }, []);
+
     const handleClickShowPassword = () => setShowPassword(prev => !prev);
     const handleMouseDownPassword = event => event.preventDefault();
 
@@ -28,15 +32,12 @@ const Register = () => {
         if (!username || !email || !password) {
             return toast.error('Please fill in all fields');
         }
-
         if (!validateEmail(email)) {
             return toast.error('Invalid email format');
         }
-
         if (!validatePassword(password)) {
             return toast.error('Password must be at least 8 characters long, with one uppercase letter, one lowercase letter, one number, and one special character');
         }
-
         try {
             const response = await register(username, email, password);
             if (response.success) {

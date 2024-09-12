@@ -16,6 +16,7 @@ import {
     ShoppingCartOutlined,
     Star,
     StarBorder,
+    MoreVert
 } from '@mui/icons-material';
 import CloseIcon from '@mui/icons-material/Close';
 import {
@@ -30,6 +31,8 @@ import {
     ListItemButton,
     ListItemIcon,
     ListItemText,
+    Menu,
+    MenuItem,
     Modal,
     AppBar as MuiAppBar, Drawer as MuiDrawer,
     Pagination,
@@ -58,6 +61,7 @@ import Footer from '../components/Footer';
 import Navbar from '../components/Navbar';
 import emptyCartImage from './img/empty-cart.png';
 import emptyWishlistImage from './img/empty-wishlist.png';
+import emptyReviewsImage from './img/empty-reviews.png';
 import notAllowed from './img/not-allowed.png';
 import notFound from './img/not-found.png';
 
@@ -339,7 +343,7 @@ export const ReviewCard = styled(Paper)(({ theme }) => ({
     padding: theme.spacing(2),
     marginBottom: theme.spacing(2),
     backgroundColor: theme.palette.background.paper,
-    boxShadow: theme.shadows[3],
+    boxShadow: theme.shadows[2],
     overflow: 'hidden',
     textOverflow: 'ellipsis',
     whiteSpace: 'nowrap',
@@ -742,7 +746,7 @@ export const ReviewsList = ({ reviews, openModal }) => {
     );
 };
 
-export const ReviewModal = ({ open, handleClose, selectedReview }) => {
+export const ReviewModal = ({ open, handleClose, selectedReview, onImageClick }) => {
     return (
         <Modal
             open={open}
@@ -751,51 +755,73 @@ export const ReviewModal = ({ open, handleClose, selectedReview }) => {
             aria-describedby="review-modal-description"
         >
             <Box sx={{
-                position: 'absolute',
+                position: 'relative',
                 top: '50%',
                 left: '50%',
                 transform: 'translate(-50%, -50%)',
-                width: '70%',
-                maxWidth: '600px',
+                width: '80%',
+                maxWidth: '800px',
                 bgcolor: 'background.paper',
                 borderRadius: '8px',
                 boxShadow: 24,
-                p: 2,
                 display: 'flex',
                 flexDirection: 'column',
-                outline: 'none'
+                p: 2,
+                outline: 'none',
             }}>
-                <Box sx={{
-                    display: 'flex',
-                    justifyContent: 'space-between',
-                    alignItems: 'flex-start',
-                    mb: 1
-                }}>
-                    <Box>
-                        {selectedReview && (
-                            <Typography variant="caption" color="text.secondary">
-                                {new Date(selectedReview.createdAt).toLocaleDateString()}
-                            </Typography>
-                        )}
-                        <Box display="flex" alignItems="center">
-                            <Typography id="review-modal-title" variant="h6" component="h2" mr={1}>
-                                {selectedReview?.user.username}
-                            </Typography>
-                            {selectedReview && <RatingStars rating={selectedReview.rating} />}
+                {selectedReview && (
+                    <Box sx={{ display: 'flex', flex: 1 }}>
+                        <Box sx={{
+                            width: '40%',
+                            flexShrink: 0,
+                            mr: 2,
+                            display: 'flex',
+                            alignItems: 'center',
+                            justifyContent: 'center'
+                        }}>
+                            <img
+                                src={`http://localhost:5000/${selectedReview.product.image}`}
+                                alt={selectedReview.product.name}
+                                onClick={() => onImageClick(selectedReview.product._id)}
+                                className="w-full h-auto object-cover rounded-md cursor-pointer"
+                            />
+                        </Box>
+                        <Box sx={{
+                            flexGrow: 1,
+                            display: 'flex',
+                            flexDirection: 'column',
+                            justifyContent: 'space-between'
+                        }}>
+                            <Box sx={{ display: 'flex', alignItems: 'flex-start', mb: 2 }}>
+                                <Box sx={{ flexGrow: 1 }}>
+                                    <Typography id="review-modal-title" variant="h6" component="h2" mb={1}>
+                                        {selectedReview.user.username}
+                                        <Typography variant="caption" color="text.secondary" component="span" sx={{ ml: 1 }}>
+                                            {new Date(selectedReview.createdAt).toLocaleDateString()}
+                                        </Typography>
+                                    </Typography>
+                                    <Typography variant="h6" component="h2" display="flex" alignItems="center">
+                                        {selectedReview.product.name}
+                                        <Box sx={{ ml: 1 }}>
+                                            <RatingStars rating={selectedReview.rating} />
+                                        </Box>
+                                    </Typography>
+                                    <Typography variant="body2" mt={1}>
+                                        {selectedReview.comment}
+                                    </Typography>
+                                </Box>
+                            </Box>
+                            <Box sx={{ marginTop: 'auto' }}>
+                            </Box>
+                            <IconButton
+                                onClick={handleClose}
+                                aria-label="close"
+                                sx={{ position: 'absolute', top: 8, right: 8 }}
+                            >
+                                <CloseIcon />
+                            </IconButton>
                         </Box>
                     </Box>
-                    <IconButton
-                        onClick={handleClose}
-                        aria-label="close"
-                        sx={{ ml: 'auto', mt: -1, mr: -1 }}
-                    >
-                        <CloseIcon />
-                    </IconButton>
-                </Box>
-                {selectedReview && (
-                    <Typography id="review-modal-description">
-                        {selectedReview.comment}
-                    </Typography>
                 )}
             </Box>
         </Modal>
@@ -1060,6 +1086,26 @@ export const ProductItemSkeleton = () => {
     );
 };
 
+export const ReviewItemSkeleton = () => {
+    return (
+        <Paper className="p-4 mb-4 shadow-sm flex relative">
+            <Box className="flex-shrink-0 mr-4">
+                <Skeleton variant="rectangular" animation="wave" width={80} height={80} className="rounded-md" />
+            </Box>
+            <Box flexGrow={1}>
+                <Skeleton variant="text" animation="wave" width="60%" height={28} />
+                <Skeleton variant="text" animation="wave" width="80%" height={20} className="mt-1" />
+                <Skeleton variant="text" animation="wave" width="40%" height={20} className="mt-1" />
+            </Box>
+
+            <Box display="flex" justifyContent="center" alignItems="center">
+                <Skeleton variant="circular" animation="wave" width={40} height={40} />
+            </Box>
+        </Paper>
+    );
+};
+
+
 export const EmptyCart = () => {
     const navigate = useNavigate();
 
@@ -1097,3 +1143,92 @@ export const EmptyWishlist = () => {
         </>
     )
 }
+
+export const CustomReviewCard = ({ review, onImageClick, onMenuClick, onCardClick }) => (
+    <Paper className="p-4 mb-4 shadow-sm flex relative cursor-pointer" onClick={() => onCardClick(review)}>
+        <Box className="flex-shrink-0 mr-4 cursor-pointer">
+            <img
+                src={`http://localhost:5000/${review.product.image}`}
+                alt={review.product.name}
+                onClick={() => onImageClick(review.product._id)}
+                className="w-20 h-20 object-cover rounded-md cursor-pointer"
+            />
+        </Box>
+        <Box flexGrow={1} display="flex" justifyContent="space-between" alignItems="center">
+            <Box onClick={() => onImageClick(review.product._id)} className="cursor-pointer hover:underline">
+                <Typography variant="h6" className="font-light mb-2 flex items-center ml-2">
+                    {review.product.name.length > 100 ? `${review.product.name.slice(0, 100)}...` : review.product.name}
+                    <Box className='ml-2'>
+                        <RatingStars rating={review.rating} />
+                    </Box>
+                </Typography>
+
+                <Typography variant="body1" className="mt-1 text-gray-700">{review.comment}</Typography>
+
+                <Typography variant="caption" className="block mt-2 text-sm text-gray-500">
+                    {new Date(review.createdAt).toLocaleDateString()}
+                </Typography>
+            </Box>
+            <CenteredMoreVertIcon onClick={(event) => onMenuClick(event, review)} />
+        </Box>
+    </Paper>
+);
+
+export const EmptyReviews = () => {
+    const navigate = useNavigate();
+
+    return (
+        <div className="flex flex-col items-center justify-center bg-white p-8 rounded-sm shadow-sm">
+            <img src={emptyReviewsImage} alt="No Reviews" className="w-60 h-60 object-cover mb-4" />
+            <p className="text-sm font-semibold mb-2">No reviews available!</p>
+            <h2
+                className='text-base font-semibold cursor-pointer hover:underline'
+                onClick={() => navigate('/')}
+            >
+                Go Back to Home
+            </h2>
+        </div>
+    );
+};
+
+export const CenteredMoreVertIcon = ({ onClick, ...props }) => (
+    <Box display="flex" justifyContent="center" alignItems="center" {...props}>
+        <IconButton onClick={onClick}>
+            <MoreVert />
+        </IconButton>
+    </Box>
+);
+
+
+export const CustomMenu = ({
+    anchorEl,
+    open,
+    handleMenuClose,
+    handleEditClick,
+    handleDeleteClick,
+}) => {
+    return (
+        <Menu
+            anchorEl={anchorEl}
+            open={Boolean(anchorEl)}
+            onClose={handleMenuClose}
+            PaperProps={{
+                sx: {
+                    boxShadow: '0px 2px 4px rgba(0, 0, 0, 0.2)',
+                    transform: 'translate(-10px, 10px)',
+                },
+            }}
+            anchorOrigin={{
+                vertical: 'bottom',
+                horizontal: 'right',
+            }}
+            transformOrigin={{
+                vertical: 'top',
+                horizontal: 'right',
+            }}
+        >
+            <MenuItem onClick={handleEditClick}>Edit</MenuItem>
+            <MenuItem onClick={handleDeleteClick}>Delete</MenuItem>
+        </Menu>
+    );
+};

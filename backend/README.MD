@@ -1,2 +1,2 @@
 ## Backend
-The APIs are documented and accessible through Postman. For detailed information on endpoints, request/response formats, and usage examples, please refer to the official [API documentation](https://documenter.getpostman.com/view/31736145/2sA3kRL56j/?target=_blank) for sheero.
+The APIs are documented and accessible through Postman. For detailed information on endpoints, request/response formats, and usage examples, please refer to the official [API documentation](https://documenter.getpostman.com/view/31736145/2sA3kRL56j) for sheero.

@@ -10,6 +10,7 @@ const AuthProvider = ({ children }) => {
         role: localStorage.getItem('role'),
         username: localStorage.getItem('username'),
         email: localStorage.getItem('email'),
+        userId: localStorage.getItem('userId'),
         address: JSON.parse(localStorage.getItem('address') || 'null'),
     });
 
@@ -20,6 +21,7 @@ const AuthProvider = ({ children }) => {
         localStorage.setItem('role', authData.role || '');
         localStorage.setItem('username', authData.username || '');
         localStorage.setItem('email', authData.email || '');
+        localStorage.setItem('userId', authData.userId || ''); 
         localStorage.setItem('address', JSON.stringify(authData.address || null));
     };
 
@@ -69,6 +71,7 @@ const AuthProvider = ({ children }) => {
                 role: response.data.role,
                 username: response.data.username,
                 email: response.data.email,
+                userId: response.data.userId,
                 address: address,
             };
 
