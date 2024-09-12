@@ -48,7 +48,7 @@ const Navbar = () => {
                     }, 0);
                     setCartTotal(total);
                 } catch (error) {
-                    console.error('Error fetching cart data:', error);
+                    console('Error fetching cart data:', error);
                 }
             }
         };
@@ -56,39 +56,27 @@ const Navbar = () => {
         fetchCartData();
     }, [auth.accessToken, axiosInstance]);
 
-    const handleProfileDropdownToggle = (event) => {
-        event.stopPropagation();
+    const handleProfileDropdownToggle = () => {
         setIsProfileDropdownOpen((prev) => !prev);
         setIsCartDropdownOpen(false);
     };
 
-    const handleCartDropdownToggle = (event) => {
-        event.stopPropagation();
+    const handleCartDropdownToggle = () => {
         setIsCartDropdownOpen((prev) => !prev);
         setIsProfileDropdownOpen(false);
+    };
+
+    const handleBlur = (event) => {
+        if (!event.currentTarget.contains(event.relatedTarget)) {
+            setIsProfileDropdownOpen(false);
+            setIsCartDropdownOpen(false);
+        }
     };
 
     const handleLogout = () => {
         logout();
         setIsProfileDropdownOpen(false);
     };
-
-    const handleClickOutside = (event) => {
-        if (
-            profileDropdownRef.current && !profileDropdownRef.current.contains(event.target) &&
-            cartDropdownRef.current && !cartDropdownRef.current.contains(event.target)
-        ) {
-            setIsProfileDropdownOpen(false);
-            setIsCartDropdownOpen(false);
-        }
-    };
-
-    useEffect(() => {
-        document.addEventListener('mousedown', handleClickOutside);
-        return () => {
-            document.removeEventListener('mousedown', handleClickOutside);
-        };
-    }, []);
 
     const totalQuantity = cartItems.reduce((acc, item) => acc + item.quantity, 0);
 
@@ -132,7 +120,12 @@ const Navbar = () => {
     };
 
     const ProfileDropdown = () => (
-        <div className="absolute right-0 mt-2 w-48 bg-white border shadow-lg rounded-lg p-2" ref={profileDropdownRef}>
+        <div
+            className="absolute right-0 mt-2 w-48 bg-white border shadow-lg rounded-lg p-2"
+            ref={profileDropdownRef}
+            onBlur={handleBlur}
+            tabIndex="0"
+        >
             {isAdmin() && (
                 <>
                     <Link to="/dashboard/users" className="flex items-center px-2 py-2 mb-2 text-stone-700 hover:bg-stone-100">
@@ -163,9 +156,14 @@ const Navbar = () => {
     );
 
     const CartDropdown = () => (
-        <div className="absolute right-0 mt-2 w-96 bg-white border shadow-lg rounded-lg p-4" ref={cartDropdownRef}>
+        <div
+            className="absolute right-0 mt-2 w-96 bg-white border shadow-lg rounded-lg p-4"
+            ref={cartDropdownRef}
+            onBlur={handleBlur}
+            tabIndex="0"
+        >
             {cartItems.length === 0 ? (
-                <div className="text-sm text-left">Your cart is empty</div>
+                <div className="text-sm text-left">You have no products in your cart</div>
             ) : (
                 <>
                     <ul className="mt-2 mb-4">
@@ -241,7 +239,10 @@ const Navbar = () => {
                                     <div className="relative">
                                         <Tooltip title="Profile" arrow>
                                             <div className="flex items-center">
-                                                <ProfileButton onClick={handleProfileDropdownToggle} className="flex items-center space-x-2 rounded-sm">
+                                                <ProfileButton
+                                                    onMouseDown={handleProfileDropdownToggle}
+                                                    className="flex items-center space-x-2 rounded-sm"
+                                                >
                                                     <StyledPersonIcon />
                                                     {auth.username && <span className="ml-2 text-sm">{auth.username}</span>}
                                                 </ProfileButton>
@@ -254,7 +255,7 @@ const Navbar = () => {
                                             <RoundIconButton><StyledFavoriteIcon /></RoundIconButton>
                                         </Link>
                                         <div className="relative">
-                                            <RoundIconButton aria-label="cart" onClick={handleCartDropdownToggle}>
+                                            <RoundIconButton aria-label="cart" onMouseDown={handleCartDropdownToggle}>
                                                 <Badge badgeContent={totalQuantity} anchorOrigin={{
                                                     vertical: 'top',
                                                     horizontal: 'right',

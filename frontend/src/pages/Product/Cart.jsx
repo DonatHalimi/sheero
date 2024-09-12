@@ -1,4 +1,3 @@
-import DeleteOutlineIcon from '@mui/icons-material/DeleteOutline';
 import { Paper, Table, TableBody, TableCell, TableContainer, TableHead, TableRow, Tooltip } from '@mui/material';
 import React, { useContext, useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
@@ -7,6 +6,7 @@ import useAxios from '../../axiosInstance';
 import Footer from '../../components/Footer';
 import Navbar from '../../components/Navbar';
 import { AuthContext } from '../../context/AuthContext';
+import { DeleteOutline } from '@mui/icons-material';
 
 const Cart = () => {
     const [cart, setCart] = useState(null);
@@ -16,90 +16,70 @@ const Cart = () => {
     const { auth } = useContext(AuthContext);
     const navigate = useNavigate();
 
+    const apiUrl = 'http://localhost:5000/api/cart';
+
     useEffect(() => {
         const fetchCart = async () => {
             try {
-                const response = await axiosInstance.get('/cart', {
+                const { data } = await axiosInstance.get(`${apiUrl}`, {
                     headers: { Authorization: `Bearer ${auth.accessToken}` }
                 });
-                setCart(response.data);
+                setCart(data);
             } catch (error) {
-                console.error('Failed to fetch cart:', error.response?.data?.message || error.message);
+                console.error('Failed to fetch cart:', error?.response?.data?.message || error.message);
             } finally {
                 setLoading(false);
             }
         };
-
         window.scrollTo(0, 0);
-
         fetchCart();
     }, [auth.accessToken]);
 
     const updateQuantity = async (productId, quantityChange) => {
         try {
-            const response = await axiosInstance.put('/cart/update-quantity', {
-                productId,
-                quantityChange
-            }, {
-                headers: { Authorization: `Bearer ${auth.accessToken}` }
-            });
-            setCart(response.data);
+            const { data } = await axiosInstance.put(`${apiUrl}/update-quantity`,
+                { productId, quantityChange },
+                { headers: { Authorization: `Bearer ${auth.accessToken}` } }
+            );
+            setCart(data);
         } catch (error) {
-            console.error('Failed to update product quantity:', error.response?.data?.message || error.message);
+            console.error('Failed to update quantity:', error?.response?.data?.message || error.message);
         }
     };
 
     const handleRemove = async (productId) => {
         try {
-            const response = await axiosInstance.delete(`/cart/remove`, {
+            const { data } = await axiosInstance.delete(`${apiUrl}/remove`, {
                 headers: { Authorization: `Bearer ${auth.accessToken}` },
                 data: { productId }
             });
-            setCart(response.data);
+            setCart(data);
         } catch (error) {
-            console.error('Failed to remove product from cart:', error.response?.data?.message || error.message);
+            console.error('Failed to remove product from cart:', error?.response?.data?.message || error.message);
         }
     };
 
     const handleClearCart = async () => {
         try {
-            const response = await axiosInstance.delete(`/cart/clear`, {
+            const { data } = await axiosInstance.delete(`${apiUrl}/clear`, {
                 headers: { Authorization: `Bearer ${auth.accessToken}` }
             });
-            setCart(response.data);
+            setCart(data);
         } catch (error) {
-            console.error('Failed to clear cart:', error.response?.data?.message || error.message);
+            console.error('Failed to clear cart:', error?.response?.data?.message || error.message);
         }
         setOpenModal(false);
     };
 
-    const handleCheckout = () => {
-        navigate('/checkout');
-    };
+    const handleCheckout = () => navigate('/checkout');
+    const handleProductClick = (productId) => navigate(`/product/${productId}`);
 
-    const handleProductClick = (productId) => {
-        navigate(`/product/${productId}`);
-    };
+    if (loading) return <LoadingCart />;
 
-    if (loading) {
-        return <LoadingCart />;
-    }
+    if (!cart || !cart.items) return <EmptyCart />;
 
-    // Handle cases where cart might be null
-    if (!cart || !cart.items) {
-        return (
-            <>
-                <EmptyCart />
-            </>
-        );
-    }
-
-    const calculateTotalPrice = () => {
-        return cart.items.reduce((total, item) => {
-            const itemPrice = item.product.salePrice || item.product.price;
-            return total + (item.quantity * itemPrice);
-        }, 0);
-    };
+    const calculateTotalPrice = () =>
+        cart.items.reduce((total, item) => total + item.quantity * (item.product.salePrice || item.product.price), 0);
 
     return (
         <>
@@ -117,9 +97,9 @@ const Cart = () => {
                                         <TableCell align="center">Quantity</TableCell>
                                         <TableCell align="center">Total</TableCell>
                                         <TableCell align="center">
-                                            <Tooltip title="Clear cart" arrow placement='top'>
-                                                <RoundIconButton onClick={() => setOpenModal(true)} className='cursor-pointer'>
-                                                    <DeleteOutlineIcon color="primary" />
+                                            <Tooltip title="Clear cart" arrow placement="top">
+                                                <RoundIconButton onClick={() => setOpenModal(true)} className="cursor-pointer">
+                                                    <DeleteOutline color="primary" />
                                                 </RoundIconButton>
                                             </Tooltip>
                                         </TableCell>
@@ -152,7 +132,7 @@ const Cart = () => {
                                                         <span className="text-lg font-semibold">{item.product.salePrice.toFixed(2)} €</span>
                                                         <br />
                                                         <span className="text-sm font-semibold text-stone-600">
-                                                            You save {(item.product.price - item.product.salePrice).toFixed(2)}€
+                                                            You save {(item.product.price - item.product.salePrice).toFixed(2)} €
                                                         </span>
                                                     </>
                                                 ) : (
@@ -161,29 +141,19 @@ const Cart = () => {
                                             </TableCell>
                                             <TableCell align="center">
                                                 <div className="flex justify-center items-center">
-                                                    <DecreaseButton
-                                                        onClick={() => updateQuantity(item.product._id, -1)}
-                                                    >
-                                                        -
-                                                    </DecreaseButton>
+                                                    <DecreaseButton onClick={() => updateQuantity(item.product._id, -1)}>-</DecreaseButton>
                                                     <span className="px-4 py-1 border">{item.quantity}</span>
-                                                    <IncreaseButton
-                                                        onClick={() => updateQuantity(item.product._id, 1)}
-                                                    >
-                                                        +
-                                                    </IncreaseButton>
+                                                    <IncreaseButton onClick={() => updateQuantity(item.product._id, 1)}>+</IncreaseButton>
                                                 </div>
                                             </TableCell>
                                             <TableCell align="center">
-                                                <h2 className='text-base font-semibold'>
+                                                <h2 className="text-base font-semibold">
                                                     {(item.quantity * (item.product.salePrice || item.product.price)).toFixed(2)} €
                                                 </h2>
                                             </TableCell>
                                             <TableCell align="center">
-                                                <RoundIconButton
-                                                    onClick={() => handleRemove(item.product._id)}
-                                                >
-                                                    <DeleteOutlineIcon color="primary" />
+                                                <RoundIconButton onClick={() => handleRemove(item.product._id)}>
+                                                    <DeleteOutline color="primary" />
                                                 </RoundIconButton>
                                             </TableCell>
                                         </TableRow>
@@ -193,17 +163,12 @@ const Cart = () => {
                         </TableContainer>
                         <div className="mt-6 text-right">
                             <h2 className="text-lg font-semibold mb-2">Total: {calculateTotalPrice().toFixed(2)} €</h2>
-                            <CheckoutButton
-                                onClick={handleCheckout}
-                            >
-                                Checkout
-                            </CheckoutButton>
+                            <CheckoutButton onClick={handleCheckout}>Checkout</CheckoutButton>
                         </div>
                     </>
                 ) : (
                     <EmptyCart />
                 )}
-
                 <CustomDeleteModal
                     open={openModal}
                     onClose={() => setOpenModal(false)}
@@ -212,7 +177,6 @@ const Cart = () => {
                     message="Are you sure you want to clear the cart?"
                 />
             </div>
-
             <Footer />
         </>
     );

@@ -21,10 +21,12 @@ const ProfileSidebar = () => {
         navigate(`/${view}`);
     };
 
+    const greetingTime = new Date().getHours() < 12 ? "morning" : (new Date().getHours() < 18 ? "afternoon" : "evening");
+
     return (
-        <div className="absolute top-[234px] left-[320px] w-72 bg-white p-5 shadow-sm rounded-sm">
+        <div className="absolute top-[234px] left-[320px] w-80 bg-white p-5 shadow-sm rounded-sm">
             <Typography variant="h5" gutterBottom className="!text-gray-800 !font-semilight">
-                Hello, {auth.username}
+                Good {greetingTime}, {auth.username}.
             </Typography>
             <span className='text-md'>Thank you for being part of sheero</span>
             <div className="border-t border-stone-200 mt-4 mb-2"></div>

@@ -4,18 +4,18 @@ import React, { useContext, useEffect, useState } from 'react';
 import { useNavigate, useParams } from 'react-router-dom';
 import { toast } from 'react-toastify';
 import {
-    AddToCartButton,
     BreadcrumbsComponent,
-    BrownShoppingCartIcon,
+    CartWishlistButtons,
+    DetailsCartWishlistButtons,
     ProductSkeleton,
-    StyledFavoriteIcon,
-    WishlistButton,
 } from '../../assets/CustomComponents';
 import Footer from '../../components/Footer';
 import ImagePreviewModal from '../../components/Modal/ImagePreviewModal';
 import Navbar from '../../components/Navbar';
 import ProductDetailsTabs from '../../components/ProductDetailsTabs';
 import { AuthContext } from '../../context/AuthContext';
+
+const apiUrl = 'http://localhost:5000/api';
 
 const ProductDetails = () => {
     const { id } = useParams();
@@ -24,46 +24,49 @@ const ProductDetails = () => {
     const [product, setProduct] = useState(null);
     const [imagePreviewOpen, setImagePreviewOpen] = useState(false);
     const [loading, setLoading] = useState(true);
-    const [isLoading, setIsLoading] = useState(false);
+    const [isCartLoading, setIsCartLoading] = useState(false);
+    const [isWishlistLoading, setIsWishlistLoading] = useState(false);
 
     useEffect(() => {
         const fetchProduct = async () => {
             try {
-                const response = await axios.get(`http://localhost:5000/api/products/get/${id}`);
+                const response = await axios.get(`${apiUrl}/products/get/${id}`);
                 setProduct(response.data);
             } catch (error) {
                 console.error('Error fetching product:', error);
+                toast.error('Failed to load product details');
             } finally {
                 setLoading(false);
             }
         };
-
         fetchProduct();
     }, [id]);
 
     const handleAction = (action) => async (e) => {
         e.stopPropagation();
-        setIsLoading(true);
+        if (!auth.accessToken) {
+            toast.error('You need to log in first.');
+            navigate('/login');
+            return;
+        }
+
+        const endpoint = action === 'cart' ? 'cart/add' : 'wishlist/add';
+        const payload = { productId: product._id, ...(action === 'cart' && { quantity: 1 }) };
+        const setLoadingState = action === 'cart' ? setIsCartLoading : setIsWishlistLoading;
+
+        setLoadingState(true);
         try {
-            if (action === 'cart') {
-                await axios.post('http://localhost:5000/api/cart/add', {
-                    productId: product._id,
-                    quantity: 1
-                }, {
-                    headers: { Authorization: `Bearer ${auth.accessToken}` }
-                });
-                toast.success('Product added to cart!', {
-                    onClick: () => { navigate('/cart'); }
-                });
-            } else if (action === 'wishlist') {
-                // TODO: Logic for adding to wishlist
-                toast.success('Product added to wishlist!');
-            }
+            await axios.post(`${apiUrl}/${endpoint}`, payload, {
+                headers: { Authorization: `Bearer ${auth.accessToken}` }
+            });
+            toast.success(`Product added to ${action === 'cart' ? 'cart' : 'wishlist'}!`, {
+                onClick: () => navigate(`/${action}`),
+            });
+            document.dispatchEvent(new Event('productAdded'));
         } catch (error) {
-            console.error(`Failed to add product to ${action}:`, error.response?.data?.message || error.message);
-            toast.error(`Failed to add product to ${action}.`);
+            toast.error(error.response?.data?.message || `Failed to add product to ${action}.`);
         } finally {
-            setIsLoading(false);
+            setLoadingState(false);
         }
     };
 
@@ -77,10 +80,6 @@ const ProductDetails = () => {
         );
     }
 
-    const handleImageClick = () => {
-        setImagePreviewOpen(true);
-    };
-
     const { name, image, price, salePrice, discount } = product;
     const imageUrl = `http://localhost:5000/${image}`;
     const originalPrice = price || 0;
@@ -89,7 +88,7 @@ const ProductDetails = () => {
 
     return (
         <>
-            {isLoading && (
+            {(isCartLoading || isWishlistLoading) && (
                 <div className="fixed inset-0 z-[1000] flex items-center justify-center bg-black bg-opacity-50">
                     <CircularProgress size={60} style={{ color: '#373533' }} />
                 </div>
@@ -104,9 +103,9 @@ const ProductDetails = () => {
                         <img
                             src={imageUrl}
                             alt={name}
-                            className="w-full h-80 object-cover rounded hover:cursor-pointer"
+                            className="w-full h-80 object-cover rounded cursor-pointer"
                             onError={(e) => { e.target.onerror = null; e.target.src = NoImage; }}
-                            onClick={handleImageClick}
+                            onClick={() => setImagePreviewOpen(true)}
                         />
                     </div>
                     <div className="md:w-1/2">
@@ -122,7 +121,7 @@ const ProductDetails = () => {
                                     </span>
                                     <div className="flex items-center mt-1">
                                         <span className="text-sm font-semibold text-stone-600">
-                                            You save {(originalPrice - discountedPrice).toFixed(2)}€
+                                            You save {(originalPrice - discountedPrice).toFixed(2)} €
                                         </span>
                                         <span className="ml-2 text-sm font-semibold text-stone-600 bg-stone-100 rounded-md px-1">
                                             -{discountPercentage}%
@@ -135,22 +134,19 @@ const ProductDetails = () => {
                                 </span>
                             )}
                         </div>
-                        <div className="mt-4 flex items-center space-x-4">
-                            <AddToCartButton onClick={handleAction('cart')} disabled={isLoading}>
-                                <BrownShoppingCartIcon /> Add To Cart
-                            </AddToCartButton>
-                            <WishlistButton onClick={handleAction('wishlist')} disabled={isLoading}>
-                                <StyledFavoriteIcon />
-                            </WishlistButton>
+                        <div className="mt-4 flex items-center">
+                            <DetailsCartWishlistButtons
+                                handleAction={handleAction}
+                                isCartLoading={isCartLoading}
+                                isWishlistLoading={isWishlistLoading}
+                            />
                         </div>
                     </div>
                 </div>
             </div>
 
             <div className="container mx-auto px-4 bg-white mt-8 mb-8 rounded-md max-w-5xl">
-                <div className="mt-4">
-                    <ProductDetailsTabs product={product} />
-                </div>
+                <ProductDetailsTabs product={product} />
             </div>
 
             <ImagePreviewModal

@@ -15,7 +15,7 @@ import {
     ShoppingCart,
     ShoppingCartOutlined,
     Star,
-    StarBorder
+    StarBorder,
 } from '@mui/icons-material';
 import CloseIcon from '@mui/icons-material/Close';
 import {
@@ -238,8 +238,8 @@ export const WishlistButton = styled(Button)(({ theme }) => ({
     backgroundColor: '#f7f7f7',
     '&:hover': {
         borderColor: '#5b504b',
-        backgroundColor: '#686159',
-        color: 'white',
+        backgroundColor: '#e0e0e0',
+        color: '#686159',
     },
     flexShrink: 0,
 }));
@@ -249,6 +249,71 @@ export const BrownShoppingCartIcon = styled(ShoppingCart)(({ theme }) => ({
     marginRight: 20,
     transition: 'color 0.3s ease',
 }));
+
+export const CartButton = () => {
+    return (
+        <>
+            <BrownShoppingCartIcon />
+            Add To Cart
+        </>
+    )
+}
+
+export const CartWishlistButtons = ({ handleAction, isCartLoading, isWishlistLoading }) => {
+    return (
+        <>
+            <AddToCartButton onClick={handleAction('cart')} disabled={isCartLoading || isWishlistLoading}>
+                <CartButton />
+            </AddToCartButton>
+            <WishlistButton onClick={handleAction('wishlist')} disabled={isCartLoading || isWishlistLoading}>
+                <FavoriteBorderOutlined />
+            </WishlistButton>
+        </>
+    );
+};
+
+export const DetailsAddToCartButton = styled(Button)(({ theme }) => ({
+    backgroundColor: '#686159',
+    color: 'white',
+    '& .MuiSvgIcon-root': {
+        color: 'white',
+    },
+    '&:hover': {
+        backgroundColor: '#4c4844',
+        color: 'white',
+        '& .MuiSvgIcon-root': {
+            color: 'white',
+        },
+    },
+    flexGrow: 1,
+    marginRight: theme.spacing(2),
+}));
+
+export const DetailsWishlistButton = styled(Button)(({ theme }) => ({
+    color: '#493c30',
+    backgroundColor: '#f7f7f7',
+    width: '150px',
+    '&:hover': {
+        borderColor: '#5b504b',
+        backgroundColor: '#e0e0e0',
+        color: '#686159',
+    },
+    flexShrink: 0,
+}));
+
+
+export const DetailsCartWishlistButtons = ({ handleAction, isCartLoading, isWishlistLoading }) => {
+    return (
+        <>
+            <DetailsAddToCartButton onClick={handleAction('cart')} disabled={isCartLoading || isWishlistLoading}>
+                <CartButton />
+            </DetailsAddToCartButton>
+            <DetailsWishlistButton onClick={handleAction('wishlist')} disabled={isCartLoading || isWishlistLoading}>
+                <FavoriteBorderOutlined />
+            </DetailsWishlistButton>
+        </>
+    );
+};
 
 export const CustomTab = styled(Tab)(({ theme }) => ({
     flex: 1,

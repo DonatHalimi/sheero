@@ -120,7 +120,7 @@ const AddressInformation = () => {
             <Navbar />
             <Box className="container mx-auto max-w-4xl flex mb-16">
                 <ProfileSidebar />
-                <main className="p-4 relative left-24 w-full">
+                <main className="p-4 relative left-32 w-full">
                     <div className="container mx-auto mt-20 mb-20">
                         <div className="bg-white px-4 py-4 rounded-sm shadow-sm mb-3">
                             <Typography variant="h5" className="!text-gray-800 !font-semilight">

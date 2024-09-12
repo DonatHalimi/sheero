@@ -6,12 +6,19 @@ const Slideshow = () => {
     const [images, setImages] = useState([]);
     const splideRef = useRef(null);
 
+    const apiUrl = 'http://localhost:5000/api/slideshow';
+
     useEffect(() => {
-        axios.get('http://localhost:5000/api/slideshow/get')
-            .then(response => {
-                setImages(response.data);
-            })
-            .catch(error => console.error('Error fetching images:', error));
+        const fetchImages = async () => {
+            try {
+                const { data } = await axios.get(`${apiUrl}/get`);
+                setImages(data);
+            } catch (error) {
+                console.error('Error fetching images:', error);
+            }
+        };
+
+        fetchImages();
     }, []);
 
     useEffect(() => {
@@ -37,28 +44,20 @@ const Slideshow = () => {
                     breakpoints: {
                         1024: { perPage: 1 },
                         600: { perPage: 1 },
-                        480: { perPage: 1 }
-                    }
+                        480: { perPage: 1 },
+                    },
                 }}
-                onMounted={() => {
-                    if (splideRef.current) {
-                        splideRef.current.splide.refresh();
-                    }
-                }}
+                onMounted={() => splideRef.current?.splide.refresh()}
             >
                 {images.length > 0 &&
-                    images.map(image => (
+                    images.map((image) => (
                         <SplideSlide key={image._id}>
                             <div className="flex justify-center items-center">
                                 <img
                                     src={`http://localhost:5000/${image.image}`}
                                     alt={image.title}
                                     className="w-full max-w-[2000px] h-[800px] object-cover rounded-md"
-                                    onLoad={() => {
-                                        if (splideRef.current) {
-                                            splideRef.current.splide.refresh();
-                                        }
-                                    }}
+                                    onLoad={() => splideRef.current?.splide.refresh()}
                                 />
                             </div>
                         </SplideSlide>

@@ -13,8 +13,8 @@ const ProductDetailsTabs = ({ product }) => {
   useEffect(() => {
     const fetchReviews = async () => {
       try {
-        const response = await axiosInstance.get(`/reviews/products/${product._id}`);
-        setReviews(response.data);
+        const { data } = await axiosInstance.get(`/reviews/products/${product._id}`);
+        setReviews(data);
       } catch (error) {
         console.error('Error fetching reviews', error);
       }
@@ -23,9 +23,7 @@ const ProductDetailsTabs = ({ product }) => {
     fetchReviews();
   }, [product._id, axiosInstance]);
 
-  const handleChange = (event, newValue) => {
-    setValue(newValue);
-  };
+  const handleChange = (event, newValue) => setValue(newValue);
 
   const handleOpenModal = (review) => {
     setSelectedReview(review);
@@ -38,14 +36,14 @@ const ProductDetailsTabs = ({ product }) => {
   };
 
   const { description, details } = product;
-  const noDetails = 'The details are being processed, in the meantime you can view the technical specifications. Thank you for your patience.';
+  const noDetailsMessage = 'The details are being processed. In the meantime, you can view the technical specifications. Thank you for your patience.';
 
   return (
     <DetailsBox>
       <ProductTabs value={value} handleChange={handleChange} />
 
       <TabPanel value={value} index={0}>
-        <p>{description}</p>
+        <Typography>{description}</Typography>
       </TabPanel>
 
       <TabPanel value={value} index={1}>
@@ -59,7 +57,7 @@ const ProductDetailsTabs = ({ product }) => {
             ))}
           </div>
         ) : (
-          <Typography>{noDetails}</Typography>
+          <Typography>{noDetailsMessage}</Typography>
         )}
       </TabPanel>
 
@@ -67,13 +65,9 @@ const ProductDetailsTabs = ({ product }) => {
         <ReviewsList reviews={reviews} openModal={handleOpenModal} />
       </TabPanel>
 
-      <ReviewModal
-        open={open}
-        handleClose={handleCloseModal}
-        selectedReview={selectedReview}
-      />
+      <ReviewModal open={open} handleClose={handleCloseModal} selectedReview={selectedReview} />
     </DetailsBox>
   );
 };
 
-export default ProductDetailsTabs
+export default ProductDetailsTabs;

@@ -10,29 +10,27 @@ const ToTop = () => {
         };
 
         window.addEventListener('scroll', handleScroll);
-
-        return () => {
-            window.removeEventListener('scroll', handleScroll);
-        };
+        return () => window.removeEventListener('scroll', handleScroll);
     }, []);
 
     const scrollToTop = () => {
-        const c = document.documentElement.scrollTop || document.body.scrollTop;
-        if (c > 0) {
-            window.requestAnimationFrame(scrollToTop);
-            window.scrollTo(0, c - c / 11);
+        const scrollPosition = window.scrollY || document.body.scrollTop;
+        if (scrollPosition > 0) {
+            window.requestAnimationFrame(() => {
+                window.scrollTo(0, scrollPosition - scrollPosition / 50);
+                scrollToTop(); 
+            });
         }
     };
 
     return (
-        <div>
-            <button
-                onClick={scrollToTop}
-                className={`to-top-button ${isVisible ? 'visible' : 'hidden'}`}
-            >
-                <ArrowUpwardIcon className="to-top-arrow" />
-            </button>
-        </div>
+        <button
+            onClick={scrollToTop}
+            className={`to-top-button ${isVisible ? 'visible' : 'hidden'}`}
+            aria-label="Scroll to top"
+        >
+            <ArrowUpwardIcon className="to-top-arrow" />
+        </button>
     );
 };
 

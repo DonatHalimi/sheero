@@ -8,23 +8,19 @@ import { AddToCartButton, BrownShoppingCartIcon, ProductItemSkeleton, WishlistBu
 import NoImage from '../assets/img/product-not-found.jpg';
 import { AuthContext } from '../context/AuthContext';
 
+const apiUrl = 'http://localhost:5000';
+
 const WishlistItem = ({ product, onRemove, loading }) => {
     const navigate = useNavigate();
     const { auth } = useContext(AuthContext);
     const [isActionLoading, setIsActionLoading] = useState(false);
 
     const { _id, name, image, price, discount, salePrice } = product || {};
-    const imageUrl = `http://localhost:5000/${image}`;
+    const imageUrl = `${apiUrl}/${image}`;
     const discountPercentage = discount?.value || 0;
     const finalPrice = salePrice > 0 ? salePrice : price;
 
-    const handleClick = () => {
-        if (_id) {
-            navigate(`/product/${_id}`);
-        } else {
-            console.error("Product ID is undefined");
-        }
-    };
+    const handleClick = () => _id && navigate(`/product/${_id}`);
 
     const handleAddToCart = async (e) => {
         e.stopPropagation();
@@ -36,18 +32,12 @@ const WishlistItem = ({ product, onRemove, loading }) => {
 
         setIsActionLoading(true);
         try {
-            await axios.post('http://localhost:5000/api/cart/add', {
-                productId: _id,
-                quantity: 1
-            }, {
+            await axios.post(`${apiUrl}/api/cart/add`, { productId: _id, quantity: 1 }, {
                 headers: { Authorization: `Bearer ${auth.accessToken}` }
             });
 
             document.dispatchEvent(new Event('productAdded'));
-
-            toast.success('Product added to cart!', {
-                onClick: () => { navigate('/cart'); }
-            });
+            toast.success('Product added to cart!', { onClick: () => navigate('/cart') });
         } catch (error) {
             console.error('Failed to add product to cart:', error.response?.data?.message || error.message);
             toast.error('Failed to add product to cart.');
@@ -56,9 +46,7 @@ const WishlistItem = ({ product, onRemove, loading }) => {
         }
     };
 
-    if (loading) {
-        return <ProductItemSkeleton />;
-    }
+    if (loading) return <ProductItemSkeleton />;
 
     return (
         <>
@@ -73,7 +61,7 @@ const WishlistItem = ({ product, onRemove, loading }) => {
                         src={imageUrl}
                         alt={name}
                         className="w-full h-48 object-cover rounded"
-                        onError={(e) => { e.target.onerror = null; e.target.src = NoImage; }}
+                        onError={(e) => e.target.src = NoImage}
                     />
                     {discountPercentage > 0 && (
                         <span className="absolute top-2 right-2 bg-red-400 text-white px-2 py-1 rounded text-xs">

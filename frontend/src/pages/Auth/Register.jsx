@@ -14,49 +14,36 @@ const Register = () => {
     const [email, setEmail] = useState('');
     const [password, setPassword] = useState('');
     const [showPassword, setShowPassword] = useState(false);
-    const handleClickShowPassword = () => setShowPassword(!showPassword);
-    const handleMouseDownPassword = (event) => event.preventDefault();
     const { register } = useContext(AuthContext);
     const navigate = useNavigate();
 
-    const validatePassword = (password) => {
-        const passwordRegex = /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[@$!%*?&])[A-Za-z\d@$!%*?&]{8,}$/;
-        return passwordRegex.test(password);
-    };
+    const handleClickShowPassword = () => setShowPassword(prev => !prev);
+    const handleMouseDownPassword = event => event.preventDefault();
 
-    const validateEmail = (email) => {
-        const re = /^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$/;
-        return re.test(String(email).toLowerCase());
-    };
+    const validatePassword = password => /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[@$!%*?&])[A-Za-z\d@$!%*?&]{8,}$/.test(password);
+    const validateEmail = email => /^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$/.test(email.toLowerCase());
 
     const handleSubmit = async (e) => {
         e.preventDefault();
         if (!username || !email || !password) {
-            toast.error('Please fill in all fields');
-            return;
+            return toast.error('Please fill in all fields');
         }
 
         if (!validateEmail(email)) {
-            toast.error('Email format is not correct');
-            return;
+            return toast.error('Invalid email format');
         }
 
         if (!validatePassword(password)) {
-            toast.error('Password must contain at least 8 characters, one uppercase letter, one lowercase letter, one number and one special character');
-            return;
+            return toast.error('Password must be at least 8 characters long, with one uppercase letter, one lowercase letter, one number, and one special character');
         }
 
         try {
             const response = await register(username, email, password);
             if (response.success) {
-                toast.success('User registered successfully');
+                toast.success('Registration successful');
                 navigate('/login');
             } else {
-                if (response.message === 'User or Email already exists') {
-                    toast.error('Username or Email already exists');
-                } else {
-                    toast.error(response.message || 'Registration failed');
-                }
+                toast.error(response.message || 'Registration failed');
             }
         } catch (error) {
             toast.error('An error occurred during registration');
@@ -67,18 +54,18 @@ const Register = () => {
     return (
         <Box className='bg-neutral-50' sx={{ minHeight: '100vh', display: 'flex', flexDirection: 'column' }}>
             <Navbar />
-            <Container component="main" maxWidth="xs" sx={{ flex: 1, display: 'flex', marginTop: '150px', marginBottom: '200px' }}>
-                <Paper elevation={3} className='p-4 flex flex-col align-middle w-full' sx={{
+            <Container component="main" maxWidth="xs" sx={{ flex: 1, display: 'flex', mt: 10, mb: 10 }}>
+                <Paper elevation={3} sx={{
                     p: 4,
                     display: 'flex',
                     flexDirection: 'column',
                     alignItems: 'left',
                     width: '100%',
-                    borderRadius: '12px',
+                    borderRadius: 2,
                     background: 'linear-gradient(145deg, #ffffff, #f0f0f0)',
                     boxShadow: '20px 20px 60px #d9d9d9, -20px -20px 60px #ffffff',
                 }}>
-                    <Typography component="h1" variant="h4" align='left' className='!mb-4 !text-stone-500 !font-bold'>
+                    <Typography component="h1" variant="h4" align='left' sx={{ mb: 2, color: 'text.secondary', fontWeight: 'bold' }}>
                         Join Us
                     </Typography>
                     <Box component="form" onSubmit={handleSubmit} noValidate sx={{ width: '100%' }}>
@@ -90,7 +77,6 @@ const Register = () => {
                             id="username"
                             label="Username"
                             value={username}
-                            name="username"
                             autoComplete="username"
                             autoFocus
                             onChange={(e) => setUsername(e.target.value)}
@@ -102,7 +88,6 @@ const Register = () => {
                             id='email'
                             label="Email"
                             value={email}
-                            name='email'
                             autoComplete='email'
                             onChange={(e) => setEmail(e.target.value)}
                             type='email'
@@ -111,10 +96,9 @@ const Register = () => {
                             margin="normal"
                             required
                             fullWidth
-                            name="password"
+                            id="password"
                             label="Password"
                             type={showPassword ? "text" : "password"}
-                            id="password"
                             autoComplete="new-password"
                             value={password}
                             onChange={(e) => setPassword(e.target.value)}
@@ -131,17 +115,18 @@ const Register = () => {
                                     </InputAdornment>
                                 ),
                             }}
+                            sx={{ mb: 3 }}
                         />
                         <BrownButton
                             type="submit"
                             fullWidth
                             variant="contained"
-                            className="!mb-4 !mt-4"
+                            sx={{ mb: 2 }}
                         >
                             Register
                         </BrownButton>
-                        <Typography variant="body2" align="left" className='mt-2 text-stone-500'>
-                            Already have an account? <a href='/login' className='text-stone-500 cursor-pointer font-bold hover:underline'>Log In</a>
+                        <Typography variant="body2" align="left" sx={{ color: 'text.secondary' }}>
+                            Already have an account? <a href='/login' className='font-bold cursor-pointer hover:underline'>Log In</a>
                         </Typography>
                     </Box>
                 </Paper>
