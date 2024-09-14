@@ -18,7 +18,7 @@ const ToTop = () => {
         if (scrollPosition > 0) {
             window.requestAnimationFrame(() => {
                 window.scrollTo(0, scrollPosition - scrollPosition / 50);
-                scrollToTop(); 
+                scrollToTop();
             });
         }
     };

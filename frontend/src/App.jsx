@@ -1,29 +1,30 @@
 import {
-  React,
-  Route,
-  Router,
-  Routes,
-  ToastContainer,
-  DashboardLayout,
   Addresses,
-  Orders,
-  Profile,
-  Reviews,
-  Wishlist,
-  ProtectedRoute,
-  PublicRoute,
-  ToTop,
-  Login,
-  Register,
+  Cart,
+  DashboardLayout,
   FAQs,
   Home,
+  Login,
   NotAllowed,
   NotFound,
-  Cart,
+  Orders,
   ProductDetails,
   ProductsByCategory,
   ProductsBySubcategory,
   ProductsBySubSubCategory,
+  Profile,
+  ProtectedRoute,
+  PublicRoute,
+  React,
+  Register,
+  Reviews,
+  Route,
+  Router,
+  Routes,
+  ToastContainer,
+  ToTop,
+  Wishlist,
+  SharedWishlist
 } from './assets/imports';
 
 import pages from './assets/dashboardPages';
@@ -54,6 +55,9 @@ const App = () => (
       <Route path="/orders" element={<ProtectedRoute><Orders /></ProtectedRoute>} />
       <Route path="/wishlist" element={<ProtectedRoute><Wishlist /></ProtectedRoute>} />
       <Route path="/reviews" element={<ProtectedRoute><Reviews /></ProtectedRoute>} />
+
+      {/* Public route to view shared wishlist */}
+      <Route path="/wishlist/:userId" element={<SharedWishlist />} />
 
       {/* Fallback Route */}
       <Route path="*" element={<NotFound />} />

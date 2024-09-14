@@ -1,7 +1,7 @@
+import { Button, CircularProgress, Tooltip } from '@mui/material';
+import Badge from '@mui/material/Badge';
 import React, { useContext, useEffect, useRef, useState } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
-import { Tooltip, CircularProgress, Button } from '@mui/material';
-import Badge from '@mui/material/Badge';
 import { toast } from 'react-toastify';
 import {
     BrownButton,
@@ -17,9 +17,9 @@ import {
     StyledShoppingCartIcon,
 } from '../assets/CustomComponents';
 import logo from '../assets/img/logo.png';
+import useAxios from '../axiosInstance';
 import { AuthContext } from '../context/AuthContext';
 import CategoryNavbar from './CategoryNavbar';
-import useAxios from '../axiosInstance';
 
 const Navbar = () => {
     const { auth, isAdmin, logout } = useContext(AuthContext);
@@ -229,7 +229,7 @@ const Navbar = () => {
                 <div className="flex justify-between items-center mx-auto max-w-screen-xl">
                     <Tooltip title="Home" arrow>
                         <Link to="/" className="flex items-center">
-                            <img src={logo} alt="Logo" className="w-60 h-11" />
+                            <img src={logo} alt="Logo" className="h-11" />
                         </Link>
                     </Tooltip>
                     <div className="flex items-center space-x-4">

@@ -1,15 +1,15 @@
-import React, { useEffect, useContext } from 'react';
 import { Box, Typography } from '@mui/material';
+import React, { useContext, useEffect } from 'react';
 import 'react-toastify/dist/ReactToastify.css';
+import { AuthContext } from '../../context/AuthContext';
 import Footer from '../Footer';
 import Navbar from '../Navbar';
+import ReviewItem from '../Product/ReviewItem';
 import ProfileSidebar from './ProfileSidebar';
-import { AuthContext } from '../../context/AuthContext'; 
-import ReviewItem from '../ReviewItem';
 
 const Reviews = () => {
-    const { auth } = useContext(AuthContext); 
-    const userId = auth?.userId; 
+    const { auth } = useContext(AuthContext);
+    const userId = auth?.userId;
 
     useEffect(() => {
         window.scrollTo(0, 0);

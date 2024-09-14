@@ -22,6 +22,7 @@ export { default as Home } from '../pages/Home';
 export { default as NotAllowed } from '../pages/NotAllowed';
 export { default as NotFound } from '../pages/NotFound.jsx';
 export { default as Cart } from '../pages/Product/Cart.jsx';
+export { default as SharedWishlist } from '../components/Product/SharedWishlist.jsx';
 export { default as ProductDetails } from '../pages/Product/ProductDetails.jsx';
 export { default as ProductsByCategory } from '../pages/Product/ProductsByCategory.jsx';
 export { default as ProductsBySubcategory } from '../pages/Product/ProductsBySubcategory.jsx';

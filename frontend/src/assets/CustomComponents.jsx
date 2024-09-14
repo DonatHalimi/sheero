@@ -9,14 +9,14 @@ import {
     FavoriteBorderOutlined,
     InboxOutlined,
     Logout,
+    MoreVert,
     PersonOutlined,
     QuestionAnswerOutlined,
     Settings,
     ShoppingCart,
     ShoppingCartOutlined,
     Star,
-    StarBorder,
-    MoreVert
+    StarBorder
 } from '@mui/icons-material';
 import CloseIcon from '@mui/icons-material/Close';
 import {
@@ -60,8 +60,9 @@ import useAxios from '../axiosInstance';
 import Footer from '../components/Footer';
 import Navbar from '../components/Navbar';
 import emptyCartImage from './img/empty-cart.png';
-import emptyWishlistImage from './img/empty-wishlist.png';
 import emptyReviewsImage from './img/empty-reviews.png';
+import noProducts from './img/no-products.png';
+import emptyWishlistImage from './img/empty-wishlist.png';
 import notAllowed from './img/not-allowed.png';
 import notFound from './img/not-found.png';
 
@@ -1143,6 +1144,46 @@ export const EmptyWishlist = () => {
         </>
     )
 }
+
+export const EmptySharedWishlist = ( { username } ) => {
+    const navigate = useNavigate();
+
+    return (
+        <>
+            <div className="flex flex-col items-center justify-center bg-white p-8 rounded-sm shadow-sm">
+                <img src={emptyWishlistImage} alt="Empty Wishlist" className="w-60 h-60 object-cover mb-4" />
+                <p className="text-sm font-semibold mb-2">No items in {username}'s wishlist.</p>
+                <h2
+                    className='text-base font-semibold cursor-pointer hover:underline'
+                    onClick={() => navigate('/')}
+                >
+                    Go Back to Home
+                </h2>
+            </div>
+        </>
+    )
+}
+
+
+export const NoProductsFound = ({ categoryName }) => {
+    const navigate = useNavigate();
+
+    return (
+        <>
+            <div className="flex flex-col items-center justify-center bg-white p-8 rounded-sm shadow-sm mt-4 mx-14 md:mx-16 lg:mx-72">
+                <img src={noProducts} alt="No Products" className="w-32 h-32 object-cover mb-4" />
+                <h1 className="text-md font-semibold mb-2">No products found for {categoryName}!</h1>
+                <h2
+                    className='text-base font-semibold cursor-pointer hover:underline'
+                    onClick={() => navigate('/')}
+                >
+                    Go Back to Home
+                </h2>
+            </div>
+        </>
+    );
+};
+
 
 export const CustomReviewCard = ({ review, onImageClick, onMenuClick, onCardClick }) => (
     <Paper className="p-4 mb-4 shadow-sm flex relative cursor-pointer" onClick={() => onCardClick(review)}>

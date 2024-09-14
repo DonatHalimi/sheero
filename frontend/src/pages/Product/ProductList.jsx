@@ -1,7 +1,7 @@
 import axios from 'axios';
 import React, { useEffect, useState } from 'react';
 import { CustomPagination } from '../../assets/CustomComponents';
-import ProductItem from '../../components/ProductItem';
+import ProductItem from '../../components/Product/ProductItem';
 
 const apiUrl = 'http://localhost:5000/api/products';
 const itemsPerPage = 10;

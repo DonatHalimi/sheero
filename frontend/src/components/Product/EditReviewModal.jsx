@@ -1,8 +1,8 @@
-import { Rating, Box, Typography } from '@mui/material';
-import React, { useState, useEffect } from 'react';
+import { Rating, Typography } from '@mui/material';
+import React, { useEffect, useState } from 'react';
 import { toast } from 'react-toastify';
-import { BrownButton, BrownOutlinedTextField, CustomBox, CustomModal, CustomTypography } from '../assets/CustomComponents';
-import useAxios from '../axiosInstance';
+import { BrownButton, BrownOutlinedTextField, CustomBox, CustomModal, CustomTypography } from '../../assets/CustomComponents';
+import useAxios from '../../axiosInstance';
 
 const EditReviewModal = ({ open, onClose, review, onEditSuccess }) => {
     const [rating, setRating] = useState(null);
@@ -46,9 +46,9 @@ const EditReviewModal = ({ open, onClose, review, onEditSuccess }) => {
         <CustomModal
             open={open}
             onClose={onClose}
-            BackdropProps={{
-                style: { backgroundColor: 'rgba(0, 0, 0, 0.27)' },
-            }}
+            // BackdropProps={{
+            //     style: { backgroundColor: 'rgba(0, 0, 0, 0.27)' },
+            // }}
         >
             <CustomBox>
                 <CustomTypography variant="h5">Edit Review</CustomTypography>

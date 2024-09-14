@@ -1,86 +1,67 @@
-import FavoriteIcon from '@mui/icons-material/FavoriteBorderOutlined';
+import DeleteIcon from '@mui/icons-material/DeleteOutline';
 import { CircularProgress } from '@mui/material';
 import axios from 'axios';
 import React, { useContext, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { toast } from 'react-toastify';
-import { AddToCartButton, BrownShoppingCartIcon, CartWishlistButtons, ProductItemSkeleton, WishlistButton } from '../assets/CustomComponents';
-import NoImage from '../assets/img/product-not-found.jpg';
-import { AuthContext } from '../context/AuthContext';
+import { AddToCartButton, BrownShoppingCartIcon, ProductItemSkeleton, WishlistButton } from '../../assets/CustomComponents';
+import NoImage from '../../assets/img/product-not-found.jpg';
+import { AuthContext } from '../../context/AuthContext';
 
-const ProductItem = ({ product, loading }) => {
+const apiUrl = 'http://localhost:5000';
+
+const WishlistItem = ({ product, onRemove, loading }) => {
     const navigate = useNavigate();
     const { auth } = useContext(AuthContext);
-    const [isCartLoading, setIsCartLoading] = useState(false);
-    const [isWishlistLoading, setIsWishlistLoading] = useState(false);
+    const [isActionLoading, setIsActionLoading] = useState(false);
 
     const { _id, name, image, price, discount, salePrice } = product || {};
-    const imageUrl = `http://localhost:5000/${image}`;
+    const imageUrl = `${apiUrl}/${image}`;
     const discountPercentage = discount?.value || 0;
     const finalPrice = salePrice > 0 ? salePrice : price;
 
-    const handleClick = () => {
-        if (_id) {
-            navigate(`/product/${_id}`);
-        } else {
-            console.error("Product ID is undefined");
-        }
-    };
+    const handleClick = () => _id && navigate(`/product/${_id}`);
 
-    const handleAction = (action) => async (e) => {
+    const handleAddToCart = async (e) => {
         e.stopPropagation();
         if (!auth.accessToken) {
-            toast.error('You need to log in first.');
+            toast.error("You need to log in first.");
             navigate('/login');
             return;
         }
 
-        if (action === 'cart') setIsCartLoading(true);
-        if (action === 'wishlist') setIsWishlistLoading(true);
-
+        setIsActionLoading(true);
         try {
-            const endpoint = action === 'cart' ? 'cart/add' : 'wishlist/add';
-            await axios.post(`http://localhost:5000/api/${endpoint}`, {
-                productId: product._id,
-                ...(action === 'cart' && { quantity: 1 }),
-            }, {
+            await axios.post(`${apiUrl}/api/cart/add`, { productId: _id, quantity: 1 }, {
                 headers: { Authorization: `Bearer ${auth.accessToken}` }
             });
 
-            toast.success(`Product added to ${action === 'cart' ? 'cart' : 'wishlist'}!`, {
-                onClick: () => navigate(`/${action}`),
-            });
-
             document.dispatchEvent(new Event('productAdded'));
+            toast.success('Product added to cart!', { onClick: () => navigate('/cart') });
         } catch (error) {
-            const errorMsg = error.response?.data?.message || `Failed to add product to ${action}.`;
-            toast.info(errorMsg, {
-                onClick: () => navigate(`/${action}`),
-            });
+            console.error('Failed to add product to cart:', error.response?.data?.message || error.message);
+            toast.error('Failed to add product to cart.');
         } finally {
-            if (action === 'cart') setIsCartLoading(false);
-            if (action === 'wishlist') setIsWishlistLoading(false);
+            setIsActionLoading(false);
         }
     };
 
-    if (loading) {
-        return <ProductItemSkeleton />;
-    }
+    if (loading) return <ProductItemSkeleton />;
 
     return (
         <>
-            {(isCartLoading || isWishlistLoading) && (
+            {isActionLoading && (
                 <div className="fixed inset-0 z-[1000] flex items-center justify-center bg-black bg-opacity-50">
                     <CircularProgress size={60} style={{ color: '#373533' }} />
                 </div>
             )}
             <div className="bg-white rounded-lg shadow-md p-4 flex flex-col cursor-pointer" onClick={handleClick}>
-                <div className="relative mb-2">
+                <div className="relative mb-2 max-w-4xl">
                     <img
                         src={imageUrl}
                         alt={name}
                         className="w-full h-48 object-cover rounded"
-                        onError={(e) => { e.target.onerror = null; e.target.src = NoImage; }}
+                        onError={(e) => e.target.src = NoImage}
                     />
                     {discountPercentage > 0 && (
                         <span className="absolute top-2 right-2 bg-red-400 text-white px-2 py-1 rounded text-xs">
@@ -98,15 +79,16 @@ const ProductItem = ({ product, loading }) => {
                     )}
                 </div>
                 <div className="flex justify-between items-center mt-auto">
-                    <CartWishlistButtons
-                        handleAction={handleAction}
-                        isCartLoading={isCartLoading}
-                        isWishlistLoading={isWishlistLoading}
-                    />
+                    <AddToCartButton onClick={handleAddToCart} disabled={isActionLoading}>
+                        <BrownShoppingCartIcon /> Add To Cart
+                    </AddToCartButton>
+                    <WishlistButton onClick={(e) => { e.stopPropagation(); onRemove(_id); }} disabled={isActionLoading}>
+                        <DeleteIcon />
+                    </WishlistButton>
                 </div>
             </div>
         </>
     );
 };
 
-export default ProductItem;
+export default WishlistItem;

@@ -1,4 +1,5 @@
-import { Box, Typography, Tooltip } from '@mui/material';
+import { DeleteOutline, Share } from '@mui/icons-material';
+import { Box, Tooltip, Typography, Button } from '@mui/material';
 import axios from 'axios';
 import React, { useContext, useEffect, useState } from 'react';
 import { toast } from 'react-toastify';
@@ -11,9 +12,8 @@ import {
 import { AuthContext } from '../../context/AuthContext';
 import Footer from '../Footer';
 import Navbar from '../Navbar';
-import WishlistItem from '../WishlistItem';
+import WishlistItem from '../Product/WishlistItem';
 import ProfileSidebar from './ProfileSidebar';
-import { DeleteOutline } from '@mui/icons-material';
 
 const apiUrl = 'http://localhost:5000/api/wishlist';
 
@@ -73,6 +73,25 @@ const Wishlist = () => {
         }
     };
 
+    const handleShareWishlist = () => {
+        const userId = auth.userId;
+        const shareUrl = `${window.location.origin}/wishlist/${userId}`;
+
+        navigator.clipboard.writeText(shareUrl)
+            .then(() => {
+                toast.success(
+                    <div>Wishlist link copied to clipboard! Click here to open it!</div>,
+                    {
+                        onClick: () => window.open(shareUrl, '_blank'),
+                        className: 'cursor-pointer'
+                    }
+                );
+            })
+            .catch(() => {
+                toast.error('Failed to copy wishlist link.');
+            });
+    };
+
     return (
         <>
             <Navbar />
@@ -82,17 +101,29 @@ const Wishlist = () => {
                     <div className="container max-w-5xl mx-auto mt-20 mb-20">
                         <div className="bg-white px-4 py-4 rounded-sm shadow-sm mb-3 flex justify-between items-center">
                             <Typography variant="h5" className="text-gray-800 font-semilight">Wishlist</Typography>
-                            {wishlistItems.length > 0 && (
-                                <Tooltip title="Clear wishlist" arrow placement="top">
-                                    <RoundIconButton
-                                        onClick={() => setIsModalOpen(true)}
-                                        disabled={loading}
-                                        className="cursor-pointer"
-                                    >
-                                        <DeleteOutline color="primary" />
-                                    </RoundIconButton>
-                                </Tooltip>
-                            )}
+                            <div className="flex space-x-2">
+                                {wishlistItems.length > 0 && (
+                                    <>
+                                        <Button
+                                            startIcon={<Share />}
+                                            onClick={handleShareWishlist}
+                                            disabled={loading}
+                                        >
+                                            Share Wishlist
+                                        </Button>
+
+                                        <Tooltip title="Clear wishlist" arrow placement="top">
+                                            <RoundIconButton
+                                                onClick={() => setIsModalOpen(true)}
+                                                disabled={loading}
+                                                className="cursor-pointer"
+                                            >
+                                                <DeleteOutline color="primary" />
+                                            </RoundIconButton>
+                                        </Tooltip>
+                                    </>
+                                )}
+                            </div>
                         </div>
                         {loading ? (
                             <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-3 gap-6">

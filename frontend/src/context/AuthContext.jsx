@@ -21,7 +21,7 @@ const AuthProvider = ({ children }) => {
         localStorage.setItem('role', authData.role || '');
         localStorage.setItem('username', authData.username || '');
         localStorage.setItem('email', authData.email || '');
-        localStorage.setItem('userId', authData.userId || ''); 
+        localStorage.setItem('userId', authData.userId || '');
         localStorage.setItem('address', JSON.stringify(authData.address || null));
     };
 
@@ -124,3 +124,4 @@ const AuthProvider = ({ children }) => {
 };
 
 export { AuthContext, AuthProvider };
+

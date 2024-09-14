@@ -5,14 +5,13 @@ import { useNavigate, useParams } from 'react-router-dom';
 import { toast } from 'react-toastify';
 import {
     BreadcrumbsComponent,
-    CartWishlistButtons,
     DetailsCartWishlistButtons,
-    ProductSkeleton,
+    ProductSkeleton
 } from '../../assets/CustomComponents';
 import Footer from '../../components/Footer';
 import ImagePreviewModal from '../../components/Modal/ImagePreviewModal';
 import Navbar from '../../components/Navbar';
-import ProductDetailsTabs from '../../components/ProductDetailsTabs';
+import ProductDetailsTabs from '../../components/Product/ProductDetailsTabs';
 import { AuthContext } from '../../context/AuthContext';
 
 const apiUrl = 'http://localhost:5000/api';

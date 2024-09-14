@@ -1,8 +1,8 @@
-import React, { useContext, useState, useEffect } from 'react';
-import { useNavigate } from 'react-router-dom';
-import { Box, Container, IconButton, InputAdornment, Paper, Typography } from '@mui/material';
 import VisibilityIcon from '@mui/icons-material/Visibility';
 import VisibilityOffIcon from '@mui/icons-material/VisibilityOff';
+import { Box, Container, IconButton, InputAdornment, Paper, Typography } from '@mui/material';
+import React, { useContext, useEffect, useState } from 'react';
+import { useNavigate } from 'react-router-dom';
 import { toast } from 'react-toastify';
 import { BrownButton, BrownOutlinedTextField } from '../../assets/CustomComponents';
 import Footer from '../../components/Footer';

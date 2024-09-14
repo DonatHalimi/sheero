@@ -76,7 +76,7 @@ const DashboardLayout = () => {
                             <div className="flex items-center mb-5">
                                 <Tooltip title="Home" arrow>
                                     <a href="/" className="flex items-center space-x-3 rtl:space-x-reverse">
-                                        <img src={logo} alt="Logo" className="w-60 h-11" />
+                                        <img src={logo} alt="Logo" className="h-11" />
                                     </a>
                                 </Tooltip>
                             </div>

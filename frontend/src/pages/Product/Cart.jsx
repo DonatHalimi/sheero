@@ -1,3 +1,4 @@
+import { DeleteOutline } from '@mui/icons-material';
 import { Paper, Table, TableBody, TableCell, TableContainer, TableHead, TableRow, Tooltip } from '@mui/material';
 import React, { useContext, useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
@@ -6,7 +7,6 @@ import useAxios from '../../axiosInstance';
 import Footer from '../../components/Footer';
 import Navbar from '../../components/Navbar';
 import { AuthContext } from '../../context/AuthContext';
-import { DeleteOutline } from '@mui/icons-material';
 
 const Cart = () => {
     const [cart, setCart] = useState(null);
