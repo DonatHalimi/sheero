@@ -20,6 +20,7 @@ import logo from '../assets/img/logo.png';
 import useAxios from '../axiosInstance';
 import { AuthContext } from '../context/AuthContext';
 import CategoryNavbar from './CategoryNavbar';
+import SearchBar from './SearchBar';
 
 const Navbar = () => {
     const { auth, isAdmin, logout } = useContext(AuthContext);
@@ -48,7 +49,7 @@ const Navbar = () => {
                     }, 0);
                     setCartTotal(total);
                 } catch (error) {
-                    console('Error fetching cart data:', error);
+                    console.log('Error fetching cart data:', error);
                 }
             }
         };
@@ -232,6 +233,9 @@ const Navbar = () => {
                             <img src={logo} alt="Logo" className="h-11" />
                         </Link>
                     </Tooltip>
+                    <div className="flex items-center space-x-4 flex-grow mx-4">
+                        <SearchBar /> {/* Search bar input */}
+                    </div>
                     <div className="flex items-center space-x-4">
                         <div className="flex items-center space-x-4">
                             {auth.accessToken ? (

@@ -175,4 +175,46 @@ const deleteProducts = async (req, res) => {
     }
 };
 
-module.exports = { createProduct, getProducts, getProduct, updateProduct, getProductsByCategory, getProductsBySubCategory, getProductsBySubSubCategory, deleteProduct, deleteProducts };
+const searchProducts = async (req, res) => {
+    const { query } = req.query;
+
+    try {
+        const results = await Product.aggregate([
+            {
+                $search: {
+                    index: 'default',
+                    text: {
+                        query: query,
+                        path: ['name', 'description'],
+                        fuzzy: {
+                            maxEdits: 2,
+                            prefixLength: 0,
+                            maxExpansions: 50,
+                        }
+                    }
+                }
+            },
+            {
+                $limit: 10,
+            },
+            {
+                $project: {
+                    name: 1,
+                    image: 1,
+                    category: 1,
+                    subCategory: 1,
+                    subSubcategory: 1,
+                    price: 1,
+                    salePrice: 1,
+                },
+            },
+        ]);
+
+        res.status(200).json({ results });
+    } catch (error) {
+        console.error('Atlas Search error:', error);
+        res.status(500).json({ message: 'Server error', error: error.message });
+    }
+};
+
+module.exports = { createProduct, getProducts, getProduct, updateProduct, getProductsByCategory, getProductsBySubCategory, getProductsBySubSubCategory, deleteProduct, deleteProducts, searchProducts };

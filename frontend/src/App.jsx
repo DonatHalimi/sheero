@@ -24,7 +24,8 @@ import {
   SharedWishlist,
   ToastContainer,
   ToTop,
-  Wishlist
+  Wishlist,
+  SearchResults
 } from './assets/imports';
 
 import pages from './assets/dashboardPages';
@@ -55,6 +56,7 @@ const App = () => (
       <Route path="/orders" element={<ProtectedRoute><Orders /></ProtectedRoute>} />
       <Route path="/wishlist" element={<ProtectedRoute><Wishlist /></ProtectedRoute>} />
       <Route path="/reviews" element={<ProtectedRoute><Reviews /></ProtectedRoute>} />
+      <Route path="/search-results" element={<SearchResults />} />
 
       {/* Public route to view shared wishlist */}
       <Route path="/wishlist/:userId" element={<SharedWishlist />} />

@@ -27,3 +27,4 @@ export { default as Reviews } from '../pages/Profile/Reviews.jsx';
 export { default as SharedWishlist } from '../components/Product/SharedWishlist.jsx';
 export { default as ToTop } from '../components/ToTop';
 export { default as Wishlist } from '../pages/Profile/Wishlist.jsx';
+export { default as SearchResults } from '../components/SearchResults.jsx';

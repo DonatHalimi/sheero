@@ -16,6 +16,7 @@ import {
     ShoppingCart,
     ShoppingCartOutlined,
     Star,
+    Search,
     StarBorder
 } from '@mui/icons-material';
 import CloseIcon from '@mui/icons-material/Close';
@@ -26,8 +27,10 @@ import {
     Collapse,
     FormControl,
     IconButton,
+    InputAdornment,
     Link,
     List,
+    ListItem,
     ListItemButton,
     ListItemIcon,
     ListItemText,
@@ -1228,5 +1231,99 @@ export const CustomMenu = ({
             <MenuItem onClick={handleEditClick}>Edit</MenuItem>
             <MenuItem onClick={handleDeleteClick}>Delete</MenuItem>
         </Menu>
+    );
+};
+
+export const SearchBarInput = ({ searchTerm, handleInputChange, handleSubmit }) => {
+    return (
+        <TextField
+            value={searchTerm}
+            onChange={handleInputChange}
+            placeholder='Search products...'
+            variant="outlined"
+            autoComplete="off"
+            sx={{
+                width: '400px',
+                borderColor: '#837E7B',
+                '& .MuiInputBase-root': {
+                    height: '40px',
+                    display: 'flex',
+                    alignItems: 'center'
+                },
+                '& .MuiInputBase-input': {
+                    padding: '0 14px',
+                    height: '40px',
+                    lineHeight: '40px',
+                },
+            }}
+            InputProps={{
+                endAdornment: (
+                    <InputAdornment position="end">
+                        <IconButton
+                            onClick={handleSubmit}
+                            edge="end"
+                            aria-label="search"
+                        >
+                            <Search />
+                        </IconButton>
+                    </InputAdornment>
+                ),
+            }}
+        />
+    );
+};
+
+export const SearchDropdown = ({ results, onClickSuggestion, searchBarWidth }) => {
+    return (
+        <List
+            sx={{
+                position: 'absolute',
+                width: searchBarWidth,
+                bgcolor: 'background.paper',
+                boxShadow: 1,
+                borderRadius: 1,
+                maxHeight: '200px',
+                overflowY: 'auto',
+                zIndex: 99,
+                top: '41px',
+            }}
+        >
+            {results.map((result) => (
+                <ListItem
+                    key={result._id}
+                    button
+                    onClick={() => onClickSuggestion(result._id)}
+                >
+                    <img
+                        src={`http://localhost:5000/${result.image}`}
+                        alt={result.name}
+                        style={{
+                            width: '40px',
+                            height: '40px',
+                            marginLeft: '-10px',
+                            marginRight: '10px',
+                            objectFit: 'cover',
+                        }}
+                    />
+                    <ListItemText
+                        primary={result.name}
+                        secondary={
+                            <Typography component="span" variant="body2" color="text.secondary">
+                                {result.salePrice ? (
+                                    <>
+                                        <span style={{ textDecoration: 'line-through', marginRight: '8px' }}>
+                                            €{result.price}
+                                        </span>
+                                        <span className='font-bold'>€{result.salePrice}</span>
+                                    </>
+                                ) : (
+                                    `€${result.price}`
+                                )}
+                            </Typography>
+                        }
+                    />
+                </ListItem>
+            ))}
+        </List>
     );
 };
