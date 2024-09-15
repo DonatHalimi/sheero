@@ -6,7 +6,7 @@ import { toast } from 'react-toastify';
 import {
     BreadcrumbsComponent,
     DetailsCartWishlistButtons,
-    ProductSkeleton
+    ProductDetailsSkeleton
 } from '../../assets/CustomComponents';
 import Footer from '../../components/Footer';
 import ImagePreviewModal from '../../components/Modal/ImagePreviewModal';
@@ -73,7 +73,7 @@ const ProductDetails = () => {
         return (
             <>
                 <Navbar />
-                <ProductSkeleton />
+                <ProductDetailsSkeleton />
                 <Footer />
             </>
         );

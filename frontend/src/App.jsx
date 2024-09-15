@@ -21,10 +21,10 @@ import {
   Route,
   Router,
   Routes,
+  SharedWishlist,
   ToastContainer,
   ToTop,
-  Wishlist,
-  SharedWishlist
+  Wishlist
 } from './assets/imports';
 
 import pages from './assets/dashboardPages';

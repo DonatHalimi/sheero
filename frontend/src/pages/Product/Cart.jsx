@@ -2,7 +2,8 @@ import { DeleteOutline } from '@mui/icons-material';
 import { Paper, Table, TableBody, TableCell, TableContainer, TableHead, TableRow, Tooltip } from '@mui/material';
 import React, { useContext, useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { CheckoutButton, CustomDeleteModal, DecreaseButton, EmptyCart, IncreaseButton, LoadingCart, RoundIconButton } from '../../assets/CustomComponents';
+import { CheckoutButton, CustomDeleteModal, DecreaseButton, EmptyState, IncreaseButton, LoadingCart, RoundIconButton } from '../../assets/CustomComponents';
+import emptyCartImage from '../../assets/img/empty-cart.png';
 import useAxios from '../../axiosInstance';
 import Footer from '../../components/Footer';
 import Navbar from '../../components/Navbar';
@@ -167,7 +168,10 @@ const Cart = () => {
                         </div>
                     </>
                 ) : (
-                    <EmptyCart />
+                    <EmptyState
+                        imageSrc={emptyCartImage}
+                        message="Your cart is empty!"
+                    />
                 )}
                 <CustomDeleteModal
                     open={openModal}

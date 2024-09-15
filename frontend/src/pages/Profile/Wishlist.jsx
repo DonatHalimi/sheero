@@ -1,27 +1,32 @@
 import { DeleteOutline, Share } from '@mui/icons-material';
-import { Box, Tooltip, Typography, Button } from '@mui/material';
+import { Box, Button, Tooltip, Typography } from '@mui/material';
 import axios from 'axios';
 import React, { useContext, useEffect, useState } from 'react';
 import { toast } from 'react-toastify';
 import {
     CustomDeleteModal,
-    EmptyWishlist,
+    CustomPagination,
+    EmptyState,
     ProductItemSkeleton,
     RoundIconButton
 } from '../../assets/CustomComponents';
+import emptyWishlistImage from '../../assets/img/empty-wishlist.png';
+import Footer from '../../components/Footer';
+import Navbar from '../../components/Navbar';
+import WishlistItem from '../../components/Product/WishlistItem';
 import { AuthContext } from '../../context/AuthContext';
-import Footer from '../Footer';
-import Navbar from '../Navbar';
-import WishlistItem from '../Product/WishlistItem';
 import ProfileSidebar from './ProfileSidebar';
 
 const apiUrl = 'http://localhost:5000/api/wishlist';
+const itemsPerPage = 10;
 
 const Wishlist = () => {
     const { auth } = useContext(AuthContext);
     const [wishlistItems, setWishlistItems] = useState([]);
     const [loading, setLoading] = useState(true);
     const [isModalOpen, setIsModalOpen] = useState(false);
+    const [currentPage, setCurrentPage] = useState(1);
+    const [totalItems, setTotalItems] = useState(0);
 
     useEffect(() => {
         if (auth.accessToken) {
@@ -31,6 +36,7 @@ const Wishlist = () => {
                         headers: { Authorization: `Bearer ${auth.accessToken}` },
                     });
                     setWishlistItems(data.items);
+                    setTotalItems(data.items.length);
                 } catch (error) {
                     console.error('Error fetching wishlist:', error);
                     toast.error('Failed to load wishlist.');
@@ -92,6 +98,17 @@ const Wishlist = () => {
             });
     };
 
+    const pageCount = Math.ceil(totalItems / itemsPerPage);
+
+    const getCurrentPageItems = () => {
+        const startIndex = (currentPage - 1) * itemsPerPage;
+        return wishlistItems.slice(startIndex, startIndex + itemsPerPage);
+    };
+
+    const handlePageChange = (event, value) => {
+        setCurrentPage(value);
+    };
+
     return (
         <>
             <Navbar />
@@ -127,22 +144,32 @@ const Wishlist = () => {
                         </div>
                         {loading ? (
                             <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-3 gap-6">
-                                {Array.from({ length: 4 }).map((_, index) => (
+                                {Array.from({ length: itemsPerPage }).map((_, index) => (
                                     <ProductItemSkeleton key={index} />
                                 ))}
                             </div>
                         ) : !wishlistItems.length ? (
-                            <EmptyWishlist />
+                            <EmptyState
+                                imageSrc={emptyWishlistImage}
+                                message="Your wishlist is empty!"
+                            />
                         ) : (
-                            <div className="grid grid-cols-3 gap-4 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-3">
-                                {wishlistItems.map(({ product }) => (
-                                    <WishlistItem
-                                        key={product._id}
-                                        product={product}
-                                        onRemove={() => handleRemoveFromWishlist(product._id)}
-                                    />
-                                ))}
-                            </div>
+                            <>
+                                <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-3 gap-4">
+                                    {getCurrentPageItems().map(({ product }) => (
+                                        <WishlistItem
+                                            key={product._id}
+                                            product={product}
+                                            onRemove={() => handleRemoveFromWishlist(product._id)}
+                                        />
+                                    ))}
+                                </div>
+                                <CustomPagination
+                                    count={pageCount}
+                                    page={currentPage}
+                                    onChange={handlePageChange}
+                                />
+                            </>
                         )}
                     </div>
                 </main>

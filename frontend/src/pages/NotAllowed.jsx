@@ -1,10 +1,11 @@
 import React from 'react';
-import { NotAllowedComponent } from '../assets/CustomComponents';
+import { ErrorPageComponent } from '../assets/CustomComponents';
+import notAllowed from '../assets/img/not-found.png';
 
 const NotAllowed = () => {
     return (
         <>
-            <NotAllowedComponent />
+            <ErrorPageComponent errorType={403} imageSrc={notAllowed} />
         </>
     );
 };

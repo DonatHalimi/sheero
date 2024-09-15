@@ -62,7 +62,7 @@ const Footer = () => {
                 </div>
 
                 <div className="mt-8 pt-8 border-t border-stone-700 text-center">
-                    <p className="text-gray-200">&copy; 2023 sheero. All rights reserved.</p>
+                    <p className="text-gray-200">&copy; 2023 sheero. All rights reserved. - <a href='https://github.com/DonatHalimi' target='_blank' className='underline'>Donat</a></p>
                 </div>
             </div>
         </footer>

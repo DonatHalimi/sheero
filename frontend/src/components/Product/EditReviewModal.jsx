@@ -43,15 +43,9 @@ const EditReviewModal = ({ open, onClose, review, onEditSuccess }) => {
     };
 
     return (
-        <CustomModal
-            open={open}
-            onClose={onClose}
-            // BackdropProps={{
-            //     style: { backgroundColor: 'rgba(0, 0, 0, 0.27)' },
-            // }}
-        >
+        <CustomModal open={open} onClose={onClose}>
             <CustomBox>
-                <CustomTypography variant="h5">Edit Review</CustomTypography>
+                <CustomTypography variant="h5" className="!text-gray-800 !font-semilight">Edit Review</CustomTypography>
 
                 <Typography variant="h6" sx={{ mt: 2, mb: 2 }}>
                     {review?.product?.name}

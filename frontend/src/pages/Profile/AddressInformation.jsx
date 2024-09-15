@@ -4,8 +4,8 @@ import { toast } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
 import useAxios from '../../axiosInstance';
 import { AuthContext } from '../../context/AuthContext';
-import Footer from '../Footer';
-import Navbar from '../Navbar';
+import Footer from '../../components/Footer';
+import Navbar from '../../components/Navbar';
 import ProfileSidebar from './ProfileSidebar';
 
 const AddressInformation = () => {

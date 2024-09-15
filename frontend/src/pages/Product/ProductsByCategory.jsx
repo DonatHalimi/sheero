@@ -1,10 +1,11 @@
 import axios from 'axios';
 import React, { useEffect, useState } from 'react';
 import { useParams } from 'react-router-dom';
-import { CustomPagination, GoBackButton, NoProductsFound } from '../../assets/CustomComponents';
+import { CustomPagination, GoBackButton, EmptyState } from '../../assets/CustomComponents';
 import Footer from '../../components/Footer';
 import Navbar from '../../components/Navbar';
 import ProductItem from '../../components/Product/ProductItem';
+import noProducts from '../../assets/img/no-products.png';
 
 const ProductsByCategory = () => {
     const { id } = useParams();
@@ -55,7 +56,13 @@ const ProductsByCategory = () => {
                         <h1 className="text-2xl font-semibold" id='product-container'>Products in {categoryName}</h1>
                     ) : (
                         <>
-                            <NoProductsFound categoryName={categoryName} />
+<EmptyState 
+    imageSrc={noProducts}
+    message="No products found for"
+    dynamicValue={categoryName}
+    containerClass="p-8 mt-4 mx-14 md:mx-16 lg:mx-72"  // Custom container class
+    imageClass="w-32 h-32"  // Smaller image
+/>
                         </>
                     )}
                 </div>

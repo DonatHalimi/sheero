@@ -1,11 +1,12 @@
+import { Typography } from '@mui/material';
+import axios from 'axios';
 import React, { useEffect, useState } from 'react';
 import { useParams } from 'react-router-dom';
-import axios from 'axios';
 import { toast } from 'react-toastify';
-import { CustomPagination, EmptySharedWishlist, ProductItemSkeleton } from '../../assets/CustomComponents';
-import Navbar from '../Navbar';
-import { Typography } from '@mui/material';
+import { CustomPagination, EmptyState, ProductItemSkeleton } from '../../assets/CustomComponents';
+import emptyWishlistImage from '../../assets/img/empty-wishlist.png';
 import Footer from '../Footer';
+import Navbar from '../Navbar';
 import ProductItem from './ProductItem';
 
 const apiUrl = 'http://localhost:5000/api/wishlist';
@@ -77,7 +78,11 @@ const SharedWishlist = () => {
                         />
                     </>
                 ) : (
-                    <EmptySharedWishlist username={username} />
+                    <EmptyState
+                        imageSrc={emptyWishlistImage}
+                        message="No items in"
+                        dynamicValue={`${username}'s wishlist.`}
+                    />
                 )}
             </div>
             <Footer />

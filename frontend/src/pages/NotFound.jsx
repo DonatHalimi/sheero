@@ -1,10 +1,11 @@
 import React from 'react';
-import { NotFoundComponent } from '../assets/CustomComponents';
+import { ErrorPageComponent } from '../assets/CustomComponents';
+import notFound from '../assets/img/not-found.png';
 
 const NotFound = () => {
     return (
         <>
-            <NotFoundComponent />
+            <ErrorPageComponent errorType={404} imageSrc={notFound} />
         </>
     );
 };

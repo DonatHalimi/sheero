@@ -6,9 +6,9 @@ import React, { useContext, useEffect, useState } from 'react';
 import { toast } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
 import { BrownOutlinedTextField } from '../../assets/CustomComponents';
+import Footer from '../../components/Footer';
+import Navbar from '../../components/Navbar';
 import { AuthContext } from '../../context/AuthContext';
-import Footer from '../Footer';
-import Navbar from '../Navbar';
 import ProfileSidebar from './ProfileSidebar';
 
 const ProfileInformation = () => {

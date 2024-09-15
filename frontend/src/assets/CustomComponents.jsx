@@ -54,17 +54,12 @@ import { styled } from '@mui/material/styles';
 import SvgIcon from '@mui/material/SvgIcon';
 import { GridToolbar } from '@mui/x-data-grid';
 import { AnimatePresence, motion } from 'framer-motion';
+import PropTypes from 'prop-types';
 import React, { useEffect, useState } from 'react';
 import { Link as RouterLink, useNavigate } from 'react-router-dom';
 import useAxios from '../axiosInstance';
 import Footer from '../components/Footer';
 import Navbar from '../components/Navbar';
-import emptyCartImage from './img/empty-cart.png';
-import emptyReviewsImage from './img/empty-reviews.png';
-import noProducts from './img/no-products.png';
-import emptyWishlistImage from './img/empty-wishlist.png';
-import notAllowed from './img/not-allowed.png';
-import notFound from './img/not-found.png';
 
 export const BrownOutlinedTextField = styled(TextField)({
     '& .MuiOutlinedInput-root': {
@@ -593,7 +588,7 @@ export const BreadcrumbsComponent = ({ product }) => {
 };
 
 
-export const ProductSkeleton = () => {
+export const ProductDetailsSkeleton = () => {
     return (
         <>
             <div className='container mx-auto px-4 max-w-5xl relative top-6 right-4'>
@@ -621,9 +616,31 @@ export const ProductSkeleton = () => {
                     </div>
                 </div>
             </div>
+
+            <div className="container mx-auto px-4 py-4 mb-8 bg-white mt-8 rounded-md max-w-5xl">
+
+                <div className="mt-8">
+                    <Tabs
+                        value={0}
+                        aria-label="product details tabs"
+                        sx={{ width: '100%', display: 'flex', justifyContent: 'space-between', mb: 2 }}
+                    >
+                        <Skeleton variant="rectangular" width="100%" height={40} style={{ margin: '0 4px', flexGrow: 1 }} />
+                        <Skeleton variant="rectangular" width="100%" height={40} style={{ margin: '0 4px', flexGrow: 1 }} />
+                        <Skeleton variant="rectangular" width="100%" height={40} style={{ margin: '0 4px', flexGrow: 1 }} />
+                    </Tabs>
+
+                    <Box p={3}>
+                        <Skeleton variant="text" width="80%" height={30} />
+                        <Skeleton variant="text" width="60%" height={30} style={{ marginTop: '16px' }} />
+                        <Skeleton variant="text" width="40%" height={30} style={{ marginTop: '16px' }} />
+                    </Box>
+                </div>
+            </div>
         </>
     );
 };
+
 
 export const GoBackHome = () => {
     return (
@@ -656,17 +673,31 @@ export const GoBackHome = () => {
     );
 };
 
+export const ErrorPageComponent = ({ errorType, imageSrc }) => {
+    const errorMessages = {
+        403: {
+            title: "403",
+            subtitle: "Page not allowed",
+            description: "Sorry, access to this page is not allowed."
+        },
+        404: {
+            title: "404",
+            subtitle: "Page not found",
+            description: "Sorry, we couldn't find the page you're looking for."
+        }
+    };
 
-export const NotAllowedComponent = () => {
+    const { title, subtitle, description } = errorMessages[errorType] || errorMessages[404];
+
     return (
         <div className="min-h-screen bg-gray-100 flex flex-col justify-center items-center px-4 sm:px-6 lg:px-8">
             <div className="max-w-md w-full space-y-8 text-center">
                 <div className="mb-8 flex justify-center">
-                    <img src={notAllowed} alt="Page Not Allowed" className='w-64 h-64' />
+                    <img src={imageSrc} alt={subtitle} className='w-64 h-64' />
                 </div>
-                <h1 className="text-4xl font-extrabold text-gray-900 sm:text-5xl">403</h1>
-                <p className="mt-2 text-3xl font-bold text-gray-900 sm:text-4xl">Page not allowed</p>
-                <p className="mt-2 text-lg text-gray-600">Sorry, access to this page is not allowed.</p>
+                <h1 className="text-4xl font-extrabold text-gray-900 sm:text-5xl">{title}</h1>
+                <p className="mt-2 text-3xl font-bold text-gray-900 sm:text-4xl">{subtitle}</p>
+                <p className="mt-2 text-lg text-gray-600">{description}</p>
                 <div className="mt-8">
                     <GoBackHome />
                 </div>
@@ -674,25 +705,6 @@ export const NotAllowedComponent = () => {
         </div>
     );
 };
-
-export const NotFoundComponent = () => {
-    return (
-        <div className="min-h-screen bg-gray-100 flex flex-col justify-center items-center px-4 sm:px-6 lg:px-8">
-            <div className="max-w-md w-full space-y-8 text-center">
-                <div className="mb-8 flex justify-center">
-                    <img src={notFound} alt="Page Not Found" className='w-64 h-64' />
-                </div>
-                <h1 className="text-4xl font-extrabold text-gray-900 sm:text-5xl">404</h1>
-                <p className="mt-2 text-3xl font-bold text-gray-900 sm:text-4xl">Page not found</p>
-                <p className="mt-2 text-lg text-gray-600">Sorry, we couldn't find the page you're looking for.</p>
-                <div className="mt-8">
-                    <GoBackHome />
-                </div>
-            </div>
-        </div>
-    );
-};
-
 
 export const TabPanel = ({ children, value, index }) => {
     return (
@@ -1087,106 +1099,68 @@ export const ProductItemSkeleton = () => {
     );
 };
 
-export const ReviewItemSkeleton = () => {
-    return (
-        <Paper className="p-4 mb-4 shadow-sm flex relative">
-            <Box className="flex-shrink-0 mr-4">
-                <Skeleton variant="rectangular" animation="wave" width={80} height={80} className="rounded-md" />
-            </Box>
-            <Box flexGrow={1}>
-                <Skeleton variant="text" animation="wave" width="60%" height={28} />
+export const ReviewItemSkeleton = () => (
+    <div className="p-4 mb-4 shadow-sm flex relative cursor-pointer bg-white rounded-md">
+        <div className="flex-shrink-0 mr-4 cursor-pointer">
+            <Skeleton variant="rectangular" animation="wave" width={80} height={80} className="rounded-md" />
+        </div>
+        <div className="flex-grow flex justify-between items-center">
+            <div className="cursor-pointer">
+                <Skeleton variant="text" animation="wave" width={200} height={28} className="mb-2" />
+                <div className="flex items-center ml-2">
+                    <Skeleton variant="text" animation="wave" width={150} height={24} />
+                    <Skeleton variant="text" animation="wave" width={100} height={24} className="ml-2" />
+                </div>
                 <Skeleton variant="text" animation="wave" width="80%" height={20} className="mt-1" />
-                <Skeleton variant="text" animation="wave" width="40%" height={20} className="mt-1" />
-            </Box>
+            </div>
+            <Skeleton variant="circular" animation="wave" width={24} height={24} />
+        </div>
+    </div>
+);
 
-            <Box display="flex" justifyContent="center" alignItems="center">
-                <Skeleton variant="circular" animation="wave" width={40} height={40} />
-            </Box>
-        </Paper>
+export const EmptyState = ({
+    imageSrc,
+    message,
+    subMessage = '',
+    dynamicValue = '',
+    buttonText = 'Go Back to Home',
+    containerClass = 'p-8',
+    imageClass = 'w-60 h-60'
+}) => {
+    const navigate = useNavigate();
+
+    return (
+        <div className={`flex flex-col items-center justify-center bg-white rounded-sm shadow-sm ${containerClass}`}>
+            <img src={imageSrc} alt={message} className={`${imageClass} object-cover mb-4`} />
+            <p className="text-sm font-semibold mb-2">
+                {message} {dynamicValue && <span>{dynamicValue}</span>}
+            </p>
+            {subMessage && <h1 className="text-sm font-semibold mb-2">{subMessage}</h1>}
+            <h2
+                className="text-base font-semibold cursor-pointer hover:underline"
+                onClick={() => navigate('/')}
+            >
+                {buttonText}
+            </h2>
+        </div>
     );
 };
 
-
-export const EmptyCart = () => {
-    const navigate = useNavigate();
-
-    return (
-        <>
-            <div className="flex flex-col items-center justify-center bg-white p-8 rounded-sm shadow-sm">
-                <img src={emptyCartImage} alt="Empty Cart" className="w-60 h-60 object-cover mb-4" />
-                <p className="text-sm font-semibold mb-2">Your cart is empty!</p>
-                <h2
-                    className='text-base font-semibold cursor-pointer hover:underline'
-                    onClick={() => navigate('/')}
-                >
-                    Go Back to Home
-                </h2>
-            </div>
-        </>
-    )
-}
-
-export const EmptyWishlist = () => {
-    const navigate = useNavigate();
-
-    return (
-        <>
-            <div className="flex flex-col items-center justify-center bg-white p-8 rounded-sm shadow-sm">
-                <img src={emptyWishlistImage} alt="Empty Wishlist" className="w-60 h-60 object-cover mb-4" />
-                <p className="text-sm font-semibold mb-2">Your wishlist is empty!</p>
-                <h2
-                    className='text-base font-semibold cursor-pointer hover:underline'
-                    onClick={() => navigate('/')}
-                >
-                    Go Back to Home
-                </h2>
-            </div>
-        </>
-    )
-}
-
-export const EmptySharedWishlist = ( { username } ) => {
-    const navigate = useNavigate();
-
-    return (
-        <>
-            <div className="flex flex-col items-center justify-center bg-white p-8 rounded-sm shadow-sm">
-                <img src={emptyWishlistImage} alt="Empty Wishlist" className="w-60 h-60 object-cover mb-4" />
-                <p className="text-sm font-semibold mb-2">No items in {username}'s wishlist.</p>
-                <h2
-                    className='text-base font-semibold cursor-pointer hover:underline'
-                    onClick={() => navigate('/')}
-                >
-                    Go Back to Home
-                </h2>
-            </div>
-        </>
-    )
-}
-
-
-export const NoProductsFound = ({ categoryName }) => {
-    const navigate = useNavigate();
-
-    return (
-        <>
-            <div className="flex flex-col items-center justify-center bg-white p-8 rounded-sm shadow-sm mt-4 mx-14 md:mx-16 lg:mx-72">
-                <img src={noProducts} alt="No Products" className="w-32 h-32 object-cover mb-4" />
-                <h1 className="text-md font-semibold mb-2">No products found for {categoryName}!</h1>
-                <h2
-                    className='text-base font-semibold cursor-pointer hover:underline'
-                    onClick={() => navigate('/')}
-                >
-                    Go Back to Home
-                </h2>
-            </div>
-        </>
-    );
+EmptyState.propTypes = {
+    imageSrc: PropTypes.string.isRequired,
+    message: PropTypes.string.isRequired,
+    subMessage: PropTypes.string,
+    dynamicValue: PropTypes.string,
+    buttonText: PropTypes.string,
+    containerClass: PropTypes.string,
+    imageClass: PropTypes.string,
 };
-
 
 export const CustomReviewCard = ({ review, onImageClick, onMenuClick, onCardClick }) => (
-    <Paper className="p-4 mb-4 shadow-sm flex relative cursor-pointer" onClick={() => onCardClick(review)}>
+    <div
+        className="p-4 mb-4 shadow-sm flex relative cursor-pointer bg-white rounded-md"
+        onClick={() => onCardClick(review)}
+    >
         <Box className="flex-shrink-0 mr-4 cursor-pointer">
             <img
                 src={`http://localhost:5000/${review.product.image}`}
@@ -1212,25 +1186,8 @@ export const CustomReviewCard = ({ review, onImageClick, onMenuClick, onCardClic
             </Box>
             <CenteredMoreVertIcon onClick={(event) => onMenuClick(event, review)} />
         </Box>
-    </Paper>
+    </div>
 );
-
-export const EmptyReviews = () => {
-    const navigate = useNavigate();
-
-    return (
-        <div className="flex flex-col items-center justify-center bg-white p-8 rounded-sm shadow-sm">
-            <img src={emptyReviewsImage} alt="No Reviews" className="w-60 h-60 object-cover mb-4" />
-            <p className="text-sm font-semibold mb-2">No reviews available!</p>
-            <h2
-                className='text-base font-semibold cursor-pointer hover:underline'
-                onClick={() => navigate('/')}
-            >
-                Go Back to Home
-            </h2>
-        </div>
-    );
-};
 
 export const CenteredMoreVertIcon = ({ onClick, ...props }) => (
     <Box display="flex" justifyContent="center" alignItems="center" {...props}>
