@@ -2,7 +2,7 @@ import { Close as CloseIcon, Menu as MenuIcon } from '@mui/icons-material';
 import { Skeleton } from '@mui/material';
 import React, { useEffect, useRef, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
-import useAxios from '../axiosInstance';
+import useAxios from '../../axiosInstance';
 
 const CategoryNavbar = ({ children }) => {
     const axiosInstance = useAxios();

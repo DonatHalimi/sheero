@@ -1,7 +1,7 @@
 import React from 'react';
 import { FAQSection } from '../assets/CustomComponents';
 import Footer from '../components/Footer';
-import Navbar from '../components/Navbar';
+import Navbar from '../components/Navbar/Navbar';
 
 const FAQs = () => {
     return (

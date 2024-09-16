@@ -1,11 +1,12 @@
-import { Box, Button, FormControl, InputLabel, MenuItem, Select, TextField, Typography } from '@mui/material';
+import { Box, Button, FormControl, InputLabel, MenuItem, Select, TextField } from '@mui/material';
 import React, { useContext, useEffect, useState } from 'react';
 import { toast } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
+import { SectionHeader } from '../../assets/CustomComponents';
 import useAxios from '../../axiosInstance';
-import { AuthContext } from '../../context/AuthContext';
 import Footer from '../../components/Footer';
-import Navbar from '../../components/Navbar';
+import Navbar from '../../components/Navbar/Navbar';
+import { AuthContext } from '../../context/AuthContext';
 import ProfileSidebar from './ProfileSidebar';
 
 const AddressInformation = () => {
@@ -122,11 +123,8 @@ const AddressInformation = () => {
                 <ProfileSidebar />
                 <main className="p-4 relative left-32 w-full">
                     <div className="container mx-auto mt-20 mb-20">
-                        <div className="bg-white px-4 py-4 rounded-sm shadow-sm mb-3">
-                            <Typography variant="h5" className="!text-gray-800 !font-semilight">
-                                Address
-                            </Typography>
-                        </div>
+                        <SectionHeader title='Address' />
+
                         <div className="bg-white shadow-sm rounded-sm p-8">
                             <form onSubmit={handleSaveAddress} className="space-y-6">
                                 <Box className="flex gap-4">

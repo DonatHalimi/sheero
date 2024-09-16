@@ -10,7 +10,7 @@ import {
 } from '../../assets/CustomComponents';
 import Footer from '../../components/Footer';
 import ImagePreviewModal from '../../components/Modal/ImagePreviewModal';
-import Navbar from '../../components/Navbar';
+import Navbar from '../../components/Navbar/Navbar';
 import ProductDetailsTabs from '../../components/Product/ProductDetailsTabs';
 import { AuthContext } from '../../context/AuthContext';
 
@@ -41,6 +41,10 @@ const ProductDetails = () => {
         fetchProduct();
     }, [id]);
 
+    useEffect(() => {
+        window.scrollTo(0, 0);
+    }, [])
+
     const handleAction = (action) => async (e) => {
         e.stopPropagation();
         if (!auth.accessToken) {
@@ -61,7 +65,11 @@ const ProductDetails = () => {
             toast.success(`Product added to ${action === 'cart' ? 'cart' : 'wishlist'}!`, {
                 onClick: () => navigate(`/${action}`),
             });
-            document.dispatchEvent(new Event('productAdded'));
+
+            if (action === 'cart') {
+                document.dispatchEvent(new CustomEvent('productAddedToCart', { detail: product._id }));
+            }
+
         } catch (error) {
             toast.error(error.response?.data?.message || `Failed to add product to ${action}.`);
         } finally {

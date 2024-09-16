@@ -1,5 +1,4 @@
-import { DeleteOutline, Share } from '@mui/icons-material';
-import { Box, Button, Tooltip, Typography } from '@mui/material';
+import { Box } from '@mui/material';
 import axios from 'axios';
 import React, { useContext, useEffect, useState } from 'react';
 import { toast } from 'react-toastify';
@@ -8,11 +7,11 @@ import {
     CustomPagination,
     EmptyState,
     ProductItemSkeleton,
-    RoundIconButton
+    WishlistHeader
 } from '../../assets/CustomComponents';
 import emptyWishlistImage from '../../assets/img/empty-wishlist.png';
 import Footer from '../../components/Footer';
-import Navbar from '../../components/Navbar';
+import Navbar from '../../components/Navbar/Navbar';
 import WishlistItem from '../../components/Product/WishlistItem';
 import { AuthContext } from '../../context/AuthContext';
 import ProfileSidebar from './ProfileSidebar';
@@ -116,32 +115,14 @@ const Wishlist = () => {
                 <ProfileSidebar />
                 <main className="flex-grow p-4 relative left-32">
                     <div className="container max-w-5xl mx-auto mt-20 mb-20">
-                        <div className="bg-white px-4 py-4 rounded-sm shadow-sm mb-3 flex justify-between items-center">
-                            <Typography variant="h5" className="text-gray-800 font-semilight">Wishlist</Typography>
-                            <div className="flex space-x-2">
-                                {wishlistItems.length > 0 && (
-                                    <>
-                                        <Button
-                                            startIcon={<Share />}
-                                            onClick={handleShareWishlist}
-                                            disabled={loading}
-                                        >
-                                            Share Wishlist
-                                        </Button>
+                        <WishlistHeader
+                            wishlistItems={wishlistItems}
+                            handleClearWishlist={handleClearWishlist}
+                            handleShareWishlist={handleShareWishlist}
+                            setIsModalOpen={setIsModalOpen}
+                            loading={loading}
+                        />
 
-                                        <Tooltip title="Clear wishlist" arrow placement="top">
-                                            <RoundIconButton
-                                                onClick={() => setIsModalOpen(true)}
-                                                disabled={loading}
-                                                className="cursor-pointer"
-                                            >
-                                                <DeleteOutline color="primary" />
-                                            </RoundIconButton>
-                                        </Tooltip>
-                                    </>
-                                )}
-                            </div>
-                        </div>
                         {loading ? (
                             <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-3 gap-6">
                                 {Array.from({ length: itemsPerPage }).map((_, index) => (
@@ -175,6 +156,7 @@ const Wishlist = () => {
                 </main>
             </Box>
             <Footer />
+
             <CustomDeleteModal
                 open={isModalOpen}
                 onClose={() => setIsModalOpen(false)}

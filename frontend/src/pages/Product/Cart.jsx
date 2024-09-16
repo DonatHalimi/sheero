@@ -6,7 +6,7 @@ import { CheckoutButton, CustomDeleteModal, DecreaseButton, EmptyState, Increase
 import emptyCartImage from '../../assets/img/empty-cart.png';
 import useAxios from '../../axiosInstance';
 import Footer from '../../components/Footer';
-import Navbar from '../../components/Navbar';
+import Navbar from '../../components/Navbar/Navbar';
 import { AuthContext } from '../../context/AuthContext';
 
 const Cart = () => {

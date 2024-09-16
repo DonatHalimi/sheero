@@ -6,7 +6,7 @@ import { toast } from 'react-toastify';
 import { CustomPagination, EmptyState, ProductItemSkeleton } from '../../assets/CustomComponents';
 import emptyWishlistImage from '../../assets/img/empty-wishlist.png';
 import Footer from '../Footer';
-import Navbar from '../Navbar';
+import Navbar from '../Navbar/Navbar';
 import ProductItem from './ProductItem';
 
 const apiUrl = 'http://localhost:5000/api/wishlist';
@@ -60,7 +60,7 @@ const SharedWishlist = () => {
                 </div>
                 {loading ? (
                     <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 gap-4">
-                        {[...Array(5)].map((_, index) => (
+                        {[...Array(3)].map((_, index) => (
                             <ProductItemSkeleton key={index} />
                         ))}
                     </div>

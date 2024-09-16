@@ -1,12 +1,12 @@
-import React, { useState, useEffect } from 'react';
-import { useLocation } from 'react-router-dom';
-import useAxios from '../axiosInstance';
 import { Typography } from '@mui/material';
-import ProductItem from './Product/ProductItem';
-import Navbar from './Navbar';
-import Footer from './Footer';
-import { CustomPagination, EmptyState } from '../assets/CustomComponents';
-import noResultsImage from '../assets/img/no-results.png';
+import React, { useEffect, useState } from 'react';
+import { useLocation } from 'react-router-dom';
+import { CustomPagination, EmptyState } from '../../assets/CustomComponents';
+import noResultsImage from '../../assets/img/no-results.png';
+import useAxios from '../../axiosInstance';
+import Footer from '../../components/Footer';
+import Navbar from '../../components/Navbar/Navbar';
+import ProductItem from '../../components/Product/ProductItem';
 
 const itemsPerPage = 10;
 
@@ -71,7 +71,7 @@ const SearchResults = () => {
                 {totalProducts > 0 ? (
                     <>
                         <div className="sticky top-0 z-10 pb-4 bg-gray-50">
-                            <Typography variant="h5" gutterBottom>
+                            <Typography variant="h5" className='mb-1'>
                                 Search Results for "{query}"
                             </Typography>
                         </div>

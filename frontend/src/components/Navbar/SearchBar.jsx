@@ -1,15 +1,29 @@
-import React, { useState } from 'react';
+import React, { useEffect, useRef, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
-import useAxios from '../axiosInstance';
-import { SearchBarInput, SearchDropdown } from '../assets/CustomComponents';
+import { SearchBarInput, SearchDropdown } from '../../assets/CustomComponents';
+import useAxios from '../../axiosInstance';
 
 const SearchBar = () => {
     const [searchTerm, setSearchTerm] = useState('');
     const [suggestions, setSuggestions] = useState([]);
     const navigate = useNavigate();
     const axiosInstance = useAxios();
-
     const [debounceTimeout, setDebounceTimeout] = useState(null);
+    const searchContainerRef = useRef(null);
+
+    useEffect(() => {
+        const handleClickOutside = (event) => {
+            if (searchContainerRef.current && !searchContainerRef.current.contains(event.target)) {
+                setSuggestions([]);
+            }
+        };
+
+        document.addEventListener('mousedown', handleClickOutside);
+
+        return () => {
+            document.removeEventListener('mousedown', handleClickOutside);
+        };
+    }, []);
 
     const handleInputChange = (event) => {
         const query = event.target.value;
@@ -36,6 +50,7 @@ const SearchBar = () => {
     };
 
     const handleSuggestionClick = (productId) => {
+        setSuggestions([]);
         navigate(`/product/${productId}`);
     };
 
@@ -43,11 +58,12 @@ const SearchBar = () => {
         event.preventDefault();
         if (searchTerm.trim() !== '') {
             navigate(`/search-results?query=${searchTerm}`);
+            setSuggestions([]);
         }
     };
 
     return (
-        <div className='relative w-full flex justify-center'>
+        <div ref={searchContainerRef} className="relative w-full flex justify-center">
             <form onSubmit={handleSubmit}>
                 <SearchBarInput
                     searchTerm={searchTerm}

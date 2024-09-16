@@ -1,13 +1,13 @@
 import VisibilityIcon from '@mui/icons-material/Visibility';
 import VisibilityOffIcon from '@mui/icons-material/VisibilityOff';
-import { Box, Button, IconButton, InputAdornment, TextField, Typography } from '@mui/material';
+import { Box, Button, IconButton, InputAdornment, TextField } from '@mui/material';
 import axios from 'axios';
 import React, { useContext, useEffect, useState } from 'react';
 import { toast } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
-import { BrownOutlinedTextField } from '../../assets/CustomComponents';
+import { BrownOutlinedTextField, SectionHeader } from '../../assets/CustomComponents';
 import Footer from '../../components/Footer';
-import Navbar from '../../components/Navbar';
+import Navbar from '../../components/Navbar/Navbar';
 import { AuthContext } from '../../context/AuthContext';
 import ProfileSidebar from './ProfileSidebar';
 
@@ -99,11 +99,8 @@ const ProfileInformation = () => {
                 <ProfileSidebar />
                 <main className="p-4 relative left-32 w-full">
                     <div className="container max-w-6xl mx-auto mt-20 mb-36">
-                        <div className="bg-white px-4 py-4 rounded-sm shadow-sm mb-3">
-                            <Typography variant="h5" className="!text-gray-800 !font-semilight">
-                                Personal Information
-                            </Typography>
-                        </div>
+                        <SectionHeader title='Personal Information' />
+
                         <div className="bg-white shadow-sm rounded-sm p-8">
                             <form onSubmit={handleSubmit} className="space-y-2">
                                 <Box className="flex gap-4">

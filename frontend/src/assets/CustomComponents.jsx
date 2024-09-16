@@ -3,6 +3,7 @@ import {
     ChevronLeft,
     CreateOutlined,
     DashboardOutlined,
+    DeleteOutline,
     DeleteOutlined,
     ExpandLess,
     ExpandMore,
@@ -12,18 +13,21 @@ import {
     MoreVert,
     PersonOutlined,
     QuestionAnswerOutlined,
+    Search,
     Settings,
+    Share,
     ShoppingCart,
     ShoppingCartOutlined,
     Star,
-    Search,
     StarBorder
 } from '@mui/icons-material';
 import CloseIcon from '@mui/icons-material/Close';
 import {
+    Badge,
     Box,
     Breadcrumbs,
     Button,
+    CircularProgress,
     Collapse,
     FormControl,
     IconButton,
@@ -51,6 +55,7 @@ import {
     TableRow,
     Tabs,
     TextField,
+    Tooltip,
     Typography,
 } from '@mui/material';
 import { styled } from '@mui/material/styles';
@@ -62,7 +67,8 @@ import React, { useEffect, useState } from 'react';
 import { Link as RouterLink, useNavigate } from 'react-router-dom';
 import useAxios from '../axiosInstance';
 import Footer from '../components/Footer';
-import Navbar from '../components/Navbar';
+import Navbar from '../components/Navbar/Navbar';
+import logo from './img/logo.png';
 
 export const BrownOutlinedTextField = styled(TextField)({
     '& .MuiOutlinedInput-root': {
@@ -751,7 +757,7 @@ export const ReviewsList = ({ reviews, openModal }) => {
                             {review.comment}
                         </p>
                         <Typography variant="caption" color="text.secondary">
-                            {new Date(review.createdAt).toLocaleDateString()}
+                            {new Date(review.updatedAt || review.createdAt).toLocaleDateString()}
                         </Typography>
                     </ReviewCard>
                 ))
@@ -813,7 +819,7 @@ export const ReviewModal = ({ open, handleClose, selectedReview, onImageClick })
                                     <Typography id="review-modal-title" variant="h6" component="h2" mb={1}>
                                         {selectedReview.user.username}
                                         <Typography variant="caption" color="text.secondary" component="span" sx={{ ml: 1 }}>
-                                            {new Date(selectedReview.createdAt).toLocaleDateString()}
+                                            {new Date(selectedReview.updatedAt || selectedReview.createdAt).toLocaleDateString()}
                                         </Typography>
                                     </Typography>
                                     <Typography variant="h6" component="h2" display="flex" alignItems="center">
@@ -1053,7 +1059,7 @@ export const LoadingCart = () => {
                             </TableRow>
                         </TableHead>
                         <TableBody>
-                            {Array.from(new Array(5)).map((_, index) => (
+                            {Array.from(new Array(3)).map((_, index) => (
                                 <TableRow key={index}>
                                     <TableCell>
                                         <div className="flex items-center">
@@ -1184,7 +1190,7 @@ export const CustomReviewCard = ({ review, onImageClick, onMenuClick, onCardClic
                 <Typography variant="body1" className="mt-1 text-gray-700">{review.comment}</Typography>
 
                 <Typography variant="caption" className="block mt-2 text-sm text-gray-500">
-                    {new Date(review.createdAt).toLocaleDateString()}
+                    {new Date(review.updatedAt || review.createdAt).toLocaleDateString()}
                 </Typography>
             </Box>
             <CenteredMoreVertIcon onClick={(event) => onMenuClick(event, review)} />
@@ -1273,6 +1279,58 @@ export const SearchBarInput = ({ searchTerm, handleInputChange, handleSubmit }) 
     );
 };
 
+export const ShareWishlist = ({ handleShareWishlist, loading }) => {
+    return (
+        <Button
+            startIcon={<Share />}
+            onClick={handleShareWishlist}
+            disabled={loading}
+        >
+            Share Wishlist
+        </Button>
+    )
+}
+
+export const ClearWishlist = ({ setIsModalOpen, loading }) => {
+    return (
+        <Tooltip title="Clear wishlist" arrow placement="top">
+            <RoundIconButton
+                onClick={() => setIsModalOpen(true)}
+                disabled={loading}
+                className="cursor-pointer"
+            >
+                <DeleteOutline color="primary" />
+            </RoundIconButton>
+        </Tooltip>
+    )
+}
+
+export const SectionHeader = ({ title }) => {
+    return (
+        <div className="bg-white px-4 py-4 rounded-sm shadow-sm mb-3">
+            <Typography variant="h5" className="!text-gray-800 !font-semilight">
+                {title}
+            </Typography>
+        </div>
+    );
+};
+
+export const WishlistHeader = ({ wishlistItems, handleClearWishlist, setIsModalOpen, loading, handleShareWishlist }) => {
+    return (
+        <div className="bg-white px-4 py-4 rounded-sm shadow-sm mb-3 flex justify-between items-center">
+            <Typography variant="h5" className="text-gray-800 font-semilight">Wishlist</Typography>
+            <div className="flex space-x-2">
+                {wishlistItems.length > 0 && (
+                    <>
+                        <ShareWishlist handleShareWishlist={handleShareWishlist} loading={loading} />
+                        <ClearWishlist setIsModalOpen={setIsModalOpen} loading={loading} />
+                    </>
+                )}
+            </div>
+        </div>
+    );
+};
+
 export const SearchDropdown = ({ results, onClickSuggestion, searchBarWidth }) => {
     return (
         <List
@@ -1325,5 +1383,198 @@ export const SearchDropdown = ({ results, onClickSuggestion, searchBarWidth }) =
                 </ListItem>
             ))}
         </List>
+    );
+};
+
+export const ProfileDropdown = ({ isAdmin, handleLogout }) => {
+    const navigate = useNavigate();
+
+    const handleNavigate = (path) => {
+        navigate(path);
+    };
+
+    return (
+        <div
+            className="absolute right-0 mt-1 w-48 bg-white border shadow-lg rounded-lg p-2"
+            tabIndex="0"
+        >
+            {isAdmin && (
+                <>
+                    <button
+                        onClick={() => handleNavigate('/dashboard/users')}
+                        className="flex items-center px-2 py-2 mb-2 text-stone-700 hover:bg-stone-100 no-underline w-full text-left"
+                    >
+                        <StyledDashboardIcon className="mr-2" />
+                        Dashboard
+                    </button>
+                    <hr className='border-stone-200 mb-2' />
+                </>
+            )}
+            <button
+                onClick={() => handleNavigate('/profile')}
+                className="flex items-center px-2 py-2 text-stone-700 hover:bg-stone-100 no-underline w-full text-left"
+            >
+                <StyledPersonIcon className="mr-2" />
+                Profile
+            </button>
+            <button
+                onClick={() => handleNavigate('/orders')}
+                className="flex items-center px-2 py-2 text-stone-700 hover:bg-stone-100 no-underline w-full text-left"
+            >
+                <StyledInboxIcon className="mr-2" />
+                Orders
+            </button>
+            <button
+                onClick={() => handleNavigate('/wishlist')}
+                className="flex items-center px-2 py-2 mb-2 text-stone-700 hover:bg-stone-100 no-underline w-full text-left"
+            >
+                <StyledFavoriteIcon className="mr-2" />
+                Wishlist
+            </button>
+            <hr className='border-stone-200 mb-2' />
+            <button
+                onClick={handleLogout}
+                className="flex items-center w-full px-2 py-2 text-stone-700 hover:bg-stone-100 text-left"
+            >
+                <StyledLogoutIcon className="mr-2" />
+                Log Out
+            </button>
+        </div>
+    );
+};
+
+export const CartDropdown = ({ cartItems, cartTotal, handleRemoveItem, handleGoToCart, isLoading, handleProductClick }) => (
+    <div
+        className="absolute right-0 mt-1 w-96 bg-white border shadow-lg rounded-lg p-4"
+        tabIndex="0"
+    >
+        {cartItems.length === 0 ? (
+            <div className="text-sm text-left">You have no products in your cart</div>
+        ) : (
+            <>
+                <ul className="mt-2 mb-4">
+                    {cartItems.map(item => (
+                        <li
+                            key={item.product._id}
+                            className={'flex justify-between items-center mb-4'}
+                        >
+                            <img
+                                src={`http://localhost:5000/${item.product.image}`}
+                                alt={item.product.name}
+                                className="w-12 h-12 object-cover rounded cursor-pointer"
+                                onClick={() => handleProductClick(item.product._id)}
+                            />
+                            <div className="ml-2 flex-grow">
+                                <span
+                                    className="block font-semibold cursor-pointer hover:underline"
+                                    onClick={() => handleProductClick(item.product._id)}
+                                >
+                                    {item.product.name}
+                                </span>
+                                <span className="block text-sm text-gray-500">
+                                    {item.quantity} x {item.product.salePrice > 0 ? item.product.salePrice : item.product.price} €
+                                </span>
+                            </div>
+                            <RoundIconButton
+                                style={{ backgroundColor: 'white' }}
+                                onClick={() => handleRemoveItem(item.product._id)}
+                                disabled={isLoading}
+                            >
+                                <BrownDeleteOutlinedIcon />
+                            </RoundIconButton>
+                        </li>
+                    ))}
+                </ul>
+                <hr className='border-stone-200' />
+                <div className="flex justify-between items-center mt-4 mb-4">
+                    <div className="flex justify-start items-center space-x-1">
+                        <span className="font-semibold">Total:</span>
+                        <span className="font-semibold">{cartTotal.toFixed(2)} €</span>
+                    </div>
+                </div>
+                <Button
+                    style={{ backgroundColor: '#686159', color: 'white' }}
+                    onClick={handleGoToCart}
+                    className='w-full rounded-md'
+                    disabled={isLoading}
+                >
+                    Go to Cart
+                </Button>
+            </>
+        )}
+    </div>
+);
+
+export const LoadingOverlay = () => (
+    <div className="fixed inset-0 z-[1000] flex items-center justify-center bg-black bg-opacity-50">
+        <CircularProgress size={60} style={{ color: '#373533' }} />
+    </div>
+);
+
+export const NavbarLogo = () => {
+    const navigate = useNavigate();
+
+    const handleGoHome = () => {
+        navigate('/');
+    }
+
+    return (
+        <Tooltip title="Home" arrow>
+            <button
+                onClick={handleGoHome}
+                className="flex items-center cursor-pointer">
+                <img src={logo} alt="Logo" className="h-11" />
+            </button>
+        </Tooltip>
+    );
+}
+
+export const ProfileIcon = ({ auth, handleProfileDropdownToggle }) => {
+    return (
+        <Tooltip title="Profile" arrow>
+            <div className="flex items-center">
+                <ProfileButton
+                    onMouseDown={handleProfileDropdownToggle}
+                    className="flex items-center space-x-2 rounded-sm"
+                >
+                    <StyledPersonIcon />
+                    {auth?.username && (
+                        <span className="ml-2 text-sm">{auth.username}</span>
+                    )}
+                </ProfileButton>
+            </div>
+        </Tooltip>
+    );
+};
+
+export const WishlistIcon = () => {
+    const navigate = useNavigate();
+
+    const handleWishlistClick = () => {
+        navigate('/wishlist');
+    };
+
+    return (
+        <RoundIconButton onClick={handleWishlistClick}>
+            <StyledFavoriteIcon />
+        </RoundIconButton>
+    );
+};
+
+export const CartIcon = ({ totalQuantity, handleCartDropdownToggle }) => {
+    return (
+        <RoundIconButton aria-label="cart" onMouseDown={handleCartDropdownToggle}>
+            <Badge
+                badgeContent={totalQuantity}
+                anchorOrigin={{
+                    vertical: 'top',
+                    horizontal: 'right',
+                }}
+                color="secondary"
+                showZero
+            >
+                <StyledShoppingCartIcon />
+            </Badge>
+        </RoundIconButton>
     );
 };

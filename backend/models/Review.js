@@ -5,7 +5,13 @@ const reviewSchema = new mongoose.Schema({
     user: { type: mongoose.Schema.Types.ObjectId, ref: 'User', required: true },
     rating: { type: Number, required: true, min: 1, max: 5 },
     comment: { type: String, default: null },
-    createdAt: { type: Date, default: Date.now }
+    createdAt: { type: Date, default: Date.now },
+    updatedAt: { type: Date }
+});
+
+reviewSchema.pre('save', function (next) {
+    this.updatedAt = Date.now();
+    next();
 });
 
 module.exports = mongoose.model('Review', reviewSchema);

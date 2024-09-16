@@ -13,11 +13,11 @@ const ProductItem = ({ product, loading }) => {
     const [isCartLoading, setIsCartLoading] = useState(false);
     const [isWishlistLoading, setIsWishlistLoading] = useState(false);
 
-    const { _id, name, image, price, discount, salePrice } = product || {};
+    const { _id, name, image, price, salePrice } = product || {};
     const imageUrl = `http://localhost:5000/${image}`;
-    
+
     const discountPercentage = salePrice && price > 0 ? Math.round(((price - salePrice) / price) * 100) : 0;
-    
+
     const finalPrice = salePrice > 0 ? salePrice : price;
 
     const handleClick = () => {
@@ -52,12 +52,13 @@ const ProductItem = ({ product, loading }) => {
                 onClick: () => navigate(`/${action}`),
             });
 
-            document.dispatchEvent(new Event('productAdded'));
+            if (action === 'cart') {
+                document.dispatchEvent(new CustomEvent('productAddedToCart', { detail: product._id }));
+            }
+
         } catch (error) {
             const errorMsg = error.response?.data?.message || `Failed to add product to ${action}.`;
-            toast.info(errorMsg, {
-                onClick: () => navigate(`/${action}`),
-            });
+            toast.info(errorMsg, { onClick: () => navigate(`/${action}`), });
         } finally {
             if (action === 'cart') setIsCartLoading(false);
             if (action === 'wishlist') setIsWishlistLoading(false);
@@ -93,11 +94,9 @@ const ProductItem = ({ product, loading }) => {
                 <div className="flex flex-col mb-2">
                     <span className="font-bold text-lg">{finalPrice.toFixed(2)} €</span>
                     {discountPercentage > 0 && (
-                        <>
-                            <span className="text-gray-500 line-through text-sm">
-                                {price.toFixed(2)} €
-                            </span>
-                        </>
+                        <span className="text-gray-500 line-through text-sm">
+                            {price.toFixed(2)} €
+                        </span>
                     )}
                 </div>
                 <div className="flex justify-between items-center mt-auto">

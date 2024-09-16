@@ -36,11 +36,13 @@ const WishlistItem = ({ product, onRemove, loading }) => {
                 headers: { Authorization: `Bearer ${auth.accessToken}` }
             });
 
-            document.dispatchEvent(new Event('productAdded'));
             toast.success('Product added to cart!', { onClick: () => navigate('/cart') });
+
+            document.dispatchEvent(new CustomEvent('productAddedToCart', { detail: _id }));
+
         } catch (error) {
-            console.error('Failed to add product to cart:', error.response?.data?.message || error.message);
-            toast.error('Failed to add product to cart.');
+            const errorMsg = error.response?.data?.message || `Failed to add product to ${action}.`;
+            toast.info(errorMsg, { onClick: () => navigate('/cart'), });
         } finally {
             setIsActionLoading(false);
         }

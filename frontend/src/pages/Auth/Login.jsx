@@ -6,7 +6,7 @@ import { useNavigate } from 'react-router-dom';
 import { toast } from 'react-toastify';
 import { BrownButton, BrownOutlinedTextField } from '../../assets/CustomComponents';
 import Footer from '../../components/Footer';
-import Navbar from '../../components/Navbar';
+import Navbar from '../../components/Navbar/Navbar';
 import { AuthContext } from '../../context/AuthContext';
 
 const Login = () => {

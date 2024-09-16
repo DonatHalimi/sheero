@@ -3,10 +3,10 @@ import axios from 'axios';
 import React, { useContext, useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import 'react-toastify/dist/ReactToastify.css';
-import { CustomDeleteModal, CustomMenu, ReviewModal } from '../../assets/CustomComponents';
+import { CustomDeleteModal, CustomMenu, ReviewModal, SectionHeader } from '../../assets/CustomComponents';
 import noReviewsImage from '../../assets/img/empty-reviews.png';
 import Footer from '../../components/Footer';
-import Navbar from '../../components/Navbar';
+import Navbar from '../../components/Navbar/Navbar';
 import EditReviewModal from '../../components/Product/EditReviewModal';
 import ReviewItem from '../../components/Product/ReviewItem';
 import { AuthContext } from '../../context/AuthContext';
@@ -104,11 +104,8 @@ const Reviews = () => {
                 <ProfileSidebar />
                 <main className="p-4 relative left-32 w-full">
                     <div className="container mx-auto max-w-6xl mt-20 mb-20">
-                        <div className="bg-white px-4 py-4 rounded-sm shadow-sm mb-3">
-                            <Typography variant="h5" className="!text-gray-800 !font-semilight">
-                                Reviews
-                            </Typography>
-                        </div>
+                        <SectionHeader title='Reviews' />
+
                         <div className="rounded-sm mb-2">
                             {userId && auth.accessToken ? (
                                 <ReviewItem
