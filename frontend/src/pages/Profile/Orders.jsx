@@ -1,19 +1,16 @@
 import { Box, Typography } from '@mui/material';
 import React, { useEffect } from 'react';
 import 'react-toastify/dist/ReactToastify.css';
-import { EmptyState } from '../../assets/CustomComponents';
+import { EmptyState, Header } from '../../assets/CustomComponents';
 import emptyOrdersImage from '../../assets/img/empty-orders.png';
 import Footer from '../../components/Footer';
 import Navbar from '../../components/Navbar/Navbar';
 import ProfileSidebar from './ProfileSidebar';
-import { SectionHeader } from '../../assets/CustomComponents';
 
 const Orders = () => {
     // TODO
 
-    useEffect(() => {
-        window.scrollTo(0, 0);
-    }, []);
+    useEffect(() => window.scrollTo(0, 0), []);
 
     return (
         <>
@@ -22,7 +19,7 @@ const Orders = () => {
                 <ProfileSidebar />
                 <main className="p-4 relative left-32 w-full">
                     <div className="container max-w-6xl mx-auto mt-20 mb-20">
-                        <SectionHeader title='Orders' />
+                        <Header title='Orders' />
 
                         {/* <div className="bg-white shadow-sm rounded-sm p-8"> */}
                         <EmptyState

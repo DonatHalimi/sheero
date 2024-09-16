@@ -1,9 +1,8 @@
-import { Typography } from '@mui/material';
 import axios from 'axios';
 import React, { useEffect, useState } from 'react';
 import { useParams } from 'react-router-dom';
 import { toast } from 'react-toastify';
-import { CustomPagination, EmptyState, ProductItemSkeleton } from '../../assets/CustomComponents';
+import { CustomPagination, EmptyState, Header, ProductItemSkeleton } from '../../assets/CustomComponents';
 import emptyWishlistImage from '../../assets/img/empty-wishlist.png';
 import Footer from '../Footer';
 import Navbar from '../Navbar/Navbar';
@@ -53,11 +52,8 @@ const SharedWishlist = () => {
         <>
             <Navbar />
             <div className="container mx-auto px-4 py-8 mb-16 bg-gray-50">
-                <div className="bg-white px-4 py-4 rounded-sm shadow-sm mb-3">
-                    <Typography variant="h5" className="!text-gray-800 !font-semilight">
-                        {username}'s Wishlist
-                    </Typography>
-                </div>
+                <Header username={username} />
+
                 {loading ? (
                     <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 gap-4">
                         {[...Array(3)].map((_, index) => (

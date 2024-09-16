@@ -5,7 +5,7 @@ import axios from 'axios';
 import React, { useContext, useEffect, useState } from 'react';
 import { toast } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
-import { BrownOutlinedTextField, SectionHeader } from '../../assets/CustomComponents';
+import { BrownOutlinedTextField, Header } from '../../assets/CustomComponents';
 import Footer from '../../components/Footer';
 import Navbar from '../../components/Navbar/Navbar';
 import { AuthContext } from '../../context/AuthContext';
@@ -31,9 +31,7 @@ const ProfileInformation = () => {
         setFormData({ ...formData, [e.target.name]: e.target.value });
     };
 
-    useEffect(() => {
-        window.scrollTo(0, 0);
-    }, []);
+    useEffect(() => window.scrollTo(0, 0), []);
 
     const handleSubmit = async (e) => {
         e.preventDefault();
@@ -99,7 +97,7 @@ const ProfileInformation = () => {
                 <ProfileSidebar />
                 <main className="p-4 relative left-32 w-full">
                     <div className="container max-w-6xl mx-auto mt-20 mb-36">
-                        <SectionHeader title='Personal Information' />
+                        <Header title='Personal Information' />
 
                         <div className="bg-white shadow-sm rounded-sm p-8">
                             <form onSubmit={handleSubmit} className="space-y-2">

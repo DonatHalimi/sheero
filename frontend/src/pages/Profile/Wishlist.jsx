@@ -6,8 +6,8 @@ import {
     CustomDeleteModal,
     CustomPagination,
     EmptyState,
+    Header,
     ProductItemSkeleton,
-    WishlistHeader
 } from '../../assets/CustomComponents';
 import emptyWishlistImage from '../../assets/img/empty-wishlist.png';
 import Footer from '../../components/Footer';
@@ -115,11 +115,11 @@ const Wishlist = () => {
                 <ProfileSidebar />
                 <main className="flex-grow p-4 relative left-32">
                     <div className="container max-w-5xl mx-auto mt-20 mb-20">
-                        <WishlistHeader
+                        <Header
+                            title="Wishlist"
                             wishlistItems={wishlistItems}
-                            handleClearWishlist={handleClearWishlist}
-                            handleShareWishlist={handleShareWishlist}
                             setIsModalOpen={setIsModalOpen}
+                            handleShareWishlist={handleShareWishlist}
                             loading={loading}
                         />
 

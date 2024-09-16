@@ -32,10 +32,9 @@ const Footer = () => {
                     <div>
                         <h3 className="text-lg font-semibold mb-4">Quick Links</h3>
                         <ul className="space-y-2">
-                            <li><a href="#" className="text-gray-200 hover:text-white hover:underline">Home</a></li>
-                            <li><a href="#" className="text-gray-200 hover:text-white hover:underline">Shop</a></li>
-                            <li><a href="#" className="text-gray-200 hover:text-white hover:underline">About Us</a></li>
-                            <li><a href="#" className="text-gray-200 hover:text-white hover:underline">Contact</a></li>
+                            <li><a href="/" className="text-gray-200 hover:text-white hover:underline">Home</a></li>
+                            <li><a href="/about" className="text-gray-200 hover:text-white hover:underline">About Us</a></li>
+                            <li><a href="/contact" className="text-gray-200 hover:text-white hover:underline">Contact</a></li>
                             <li><a href="/faqs" className="text-gray-200 hover:text-white hover:underline">FAQs</a></li>
                         </ul>
                     </div>
@@ -43,11 +42,10 @@ const Footer = () => {
                     <div>
                         <h3 className="text-lg font-semibold mb-4">Customer Service</h3>
                         <ul className="space-y-2">
-                            <li><a href="#" className="text-gray-200 hover:text-white">My Account</a></li>
-                            <li><a href="#" className="text-gray-200 hover:text-white">Order Tracking</a></li>
-                            <li><a href="#" className="text-gray-200 hover:text-white">Wishlist</a></li>
-                            <li><a href="#" className="text-gray-200 hover:text-white">Returns</a></li>
-                            <li><a href="#" className="text-gray-200 hover:text-white">Shipping Info</a></li>
+                            <li><a href="/profile" className="text-gray-200 hover:text-white hover:underline">My Account</a></li>
+                            <li><a href="/orders" className="text-gray-200 hover:text-white hover:underline">Order Tracking</a></li>
+                            <li><a href="/address" className="text-gray-200 hover:text-white hover:underline">Address</a></li>
+                            <li><a href="/wishlist" className="text-gray-200 hover:text-white hover:underline">Wishlist</a></li>
                         </ul>
                     </div>
 

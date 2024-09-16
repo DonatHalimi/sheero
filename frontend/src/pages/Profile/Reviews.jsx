@@ -3,7 +3,7 @@ import axios from 'axios';
 import React, { useContext, useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import 'react-toastify/dist/ReactToastify.css';
-import { CustomDeleteModal, CustomMenu, ReviewModal, SectionHeader } from '../../assets/CustomComponents';
+import { CustomDeleteModal, CustomMenu, Header, ReviewModal } from '../../assets/CustomComponents';
 import noReviewsImage from '../../assets/img/empty-reviews.png';
 import Footer from '../../components/Footer';
 import Navbar from '../../components/Navbar/Navbar';
@@ -47,6 +47,8 @@ const Reviews = () => {
             setLoading(false);
         }
     };
+
+    useEffect(() => window.scrollTo(0, 0), []);
 
     const handleMenuClick = (event, review) => {
         event.stopPropagation();
@@ -104,7 +106,7 @@ const Reviews = () => {
                 <ProfileSidebar />
                 <main className="p-4 relative left-32 w-full">
                     <div className="container mx-auto max-w-6xl mt-20 mb-20">
-                        <SectionHeader title='Reviews' />
+                        <Header title='Reviews' />
 
                         <div className="rounded-sm mb-2">
                             {userId && auth.accessToken ? (

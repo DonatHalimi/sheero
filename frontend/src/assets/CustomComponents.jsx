@@ -2,6 +2,7 @@ import {
     ArrowBack,
     ChevronLeft,
     CreateOutlined,
+    Close,
     DashboardOutlined,
     DeleteOutline,
     DeleteOutlined,
@@ -11,6 +12,7 @@ import {
     InboxOutlined,
     Logout,
     MoreVert,
+    Menu as MenuIcon,
     PersonOutlined,
     QuestionAnswerOutlined,
     Search,
@@ -21,7 +23,6 @@ import {
     Star,
     StarBorder
 } from '@mui/icons-material';
-import CloseIcon from '@mui/icons-material/Close';
 import {
     Badge,
     Box,
@@ -55,6 +56,7 @@ import {
     TableRow,
     Tabs,
     TextField,
+    Toolbar,
     Tooltip,
     Typography,
 } from '@mui/material';
@@ -63,7 +65,7 @@ import SvgIcon from '@mui/material/SvgIcon';
 import { GridToolbar } from '@mui/x-data-grid';
 import { AnimatePresence, motion } from 'framer-motion';
 import PropTypes from 'prop-types';
-import React, { useEffect, useState } from 'react';
+import React, { useEffect, useRef, useState } from 'react';
 import { Link as RouterLink, useNavigate } from 'react-router-dom';
 import useAxios from '../axiosInstance';
 import Footer from '../components/Footer';
@@ -840,7 +842,7 @@ export const ReviewModal = ({ open, handleClose, selectedReview, onImageClick })
                                 aria-label="close"
                                 sx={{ position: 'absolute', top: 8, right: 8 }}
                             >
-                                <CloseIcon />
+                                <Close />
                             </IconButton>
                         </Box>
                     </Box>
@@ -1250,7 +1252,7 @@ export const SearchBarInput = ({ searchTerm, handleInputChange, handleSubmit }) 
             autoComplete="off"
             sx={{
                 width: '400px',
-                borderColor: '#837E7B',
+                borderColor: '#9e9793',
                 '& .MuiInputBase-root': {
                     height: '40px',
                     display: 'flex',
@@ -1270,7 +1272,7 @@ export const SearchBarInput = ({ searchTerm, handleInputChange, handleSubmit }) 
                             edge="end"
                             aria-label="search"
                         >
-                            <Search />
+                            <Search color='primary' />
                         </IconButton>
                     </InputAdornment>
                 ),
@@ -1305,28 +1307,31 @@ export const ClearWishlist = ({ setIsModalOpen, loading }) => {
     )
 }
 
-export const SectionHeader = ({ title }) => {
-    return (
-        <div className="bg-white px-4 py-4 rounded-sm shadow-sm mb-3">
-            <Typography variant="h5" className="!text-gray-800 !font-semilight">
-                {title}
-            </Typography>
-        </div>
-    );
-};
+export const Header = ({
+    title,
+    wishlistItems,
+    setIsModalOpen,
+    handleShareWishlist,
+    loading,
+    username
+}) => {
+    const isSharedWishlist = username !== undefined;
 
-export const WishlistHeader = ({ wishlistItems, handleClearWishlist, setIsModalOpen, loading, handleShareWishlist }) => {
     return (
         <div className="bg-white px-4 py-4 rounded-sm shadow-sm mb-3 flex justify-between items-center">
-            <Typography variant="h5" className="text-gray-800 font-semilight">Wishlist</Typography>
-            <div className="flex space-x-2">
-                {wishlistItems.length > 0 && (
-                    <>
-                        <ShareWishlist handleShareWishlist={handleShareWishlist} loading={loading} />
-                        <ClearWishlist setIsModalOpen={setIsModalOpen} loading={loading} />
-                    </>
-                )}
-            </div>
+            <Typography variant="h5" className="text-gray-800 font-semilight">
+                {isSharedWishlist ? `${username}'s Wishlist` : title}
+            </Typography>
+            {wishlistItems !== undefined && !isSharedWishlist ? (
+                <div className="flex space-x-2">
+                    {wishlistItems.length > 0 && (
+                        <>
+                            <ShareWishlist handleShareWishlist={handleShareWishlist} loading={loading} />
+                            <ClearWishlist setIsModalOpen={setIsModalOpen} loading={loading} />
+                        </>
+                    )}
+                </div>
+            ) : null}
         </div>
     );
 };
@@ -1443,7 +1448,14 @@ export const ProfileDropdown = ({ isAdmin, handleLogout }) => {
     );
 };
 
-export const CartDropdown = ({ cartItems, cartTotal, handleRemoveItem, handleGoToCart, isLoading, handleProductClick }) => (
+export const CartDropdown = ({
+    cartItems,
+    cartTotal,
+    handleRemoveItem,
+    handleGoToCart,
+    isLoading,
+    handleProductClick
+}) => (
     <div
         className="absolute right-0 mt-1 w-96 bg-white border shadow-lg rounded-lg p-4"
         tabIndex="0"
@@ -1455,7 +1467,7 @@ export const CartDropdown = ({ cartItems, cartTotal, handleRemoveItem, handleGoT
                 <ul className="mt-2 mb-4">
                     {cartItems.map(item => (
                         <li
-                            key={item.product._id}
+                            key={`${item.product._id}-${item.quantity}`}
                             className={'flex justify-between items-center mb-4'}
                         >
                             <img
@@ -1578,3 +1590,197 @@ export const CartIcon = ({ totalQuantity, handleCartDropdownToggle }) => {
         </RoundIconButton>
     );
 };
+
+
+export const CollapseIcon = ({ toggleDrawer }) => {
+    return (
+        <Tooltip title="Collapse" arrow>
+            <IconButton onClick={toggleDrawer}>
+                <ChevronLeft />
+            </IconButton>
+        </Tooltip>
+    );
+}
+
+export const ExtendIcon = ({ toggleDrawer, open }) => {
+    return (
+        <Tooltip title="Extend" arrow>
+            <IconButton
+                edge="start"
+                color="primary"
+                aria-label="open drawer"
+                onClick={toggleDrawer}
+                className='mr-36'
+                sx={{ ...(open && { display: 'none' }) }}
+            >
+                <MenuIcon />
+            </IconButton>
+        </Tooltip>
+    )
+}
+
+export const DashboardCollapse = ({ toggleDrawer }) => {
+    return (
+        <Toolbar
+            sx={{
+                display: 'flex',
+                alignItems: 'center',
+                justifyContent: 'flex-end',
+                px: [1],
+            }}
+        >
+            <CollapseIcon toggleDrawer={toggleDrawer} />
+        </Toolbar>
+    )
+}
+
+export const DropdownMenu = ({ auth, isAdmin, onLogout }) => {
+    const [isDropdownOpen, setIsDropdownOpen] = useState(false);
+    const dropdownRef = useRef(null);
+
+    const handleDropdownToggle = () => {
+        setIsDropdownOpen(prev => !prev);
+    };
+
+    const handleClickOutside = (event) => {
+        if (dropdownRef.current && !dropdownRef.current.contains(event.target)) {
+            setIsDropdownOpen(false);
+        }
+    };
+
+    useEffect(() => {
+        document.addEventListener('mousedown', handleClickOutside);
+        return () => {
+            document.removeEventListener('mousedown', handleClickOutside);
+        };
+    }, []);
+
+    return (
+        <div className="relative ml-4" ref={dropdownRef}>
+            <Tooltip title="Profile" arrow>
+                <div onClick={handleDropdownToggle} className="flex items-center cursor-pointer">
+                    <StyledPersonIcon />
+                    {auth.username && (
+                        <span className="ml-2 text-sm">{auth.username}</span>
+                    )}
+                </div>
+            </Tooltip>
+
+            {isDropdownOpen && (
+                <div className="absolute right-0 mt-1 w-48 bg-white border shadow-lg rounded-lg p-2">
+                    {isAdmin() && (
+                        <>
+                            <Link to="/dashboard/users" className="flex items-center px-2 py-2 mb-2 text-stone-700 hover:bg-stone-100">
+                                <StyledDashboardIcon className="mr-2" />
+                                Dashboard
+                            </Link>
+                            <div className="border-t border-stone-200 mb-2"></div>
+                        </>
+                    )}
+                    <Link to="/profile" className="flex items-center px-2 py-2 text-stone-700 hover:bg-stone-100">
+                        <StyledPersonIcon className="mr-2" />
+                        Profile
+                    </Link>
+                    <Link to="/orders" className="flex items-center px-2 py-2 text-stone-700 hover:bg-stone-100">
+                        <StyledInboxIcon className="mr-2" />
+                        Orders
+                    </Link>
+                    <Link to="/wishlist" className="flex items-center px-2 py-2 mb-2 text-stone-700 hover:bg-stone-100">
+                        <StyledFavoriteIcon className="mr-2" />
+                        Wishlist
+                    </Link>
+                    <div className="border-t border-stone-200 mb-2"></div>
+                    <button onClick={onLogout} className="flex items-center w-full px-2 py-2 text-stone-700 hover:bg-stone-100 text-left">
+                        <StyledLogoutIcon className="mr-2" />
+                        Log Out
+                    </button>
+                </div>
+            )}
+        </div>
+    );
+};
+
+export const AuthActions = ({ auth, isDropdownOpen, handleProfileDropdownToggle, handleLogout, isAdmin }) => {
+    return (
+        <div className="flex items-center space-x-6">
+            <div className="flex items-center space-x-4">
+                {auth.accessToken ? (
+                    <div className="relative ml-4">
+                        <ProfileIcon
+                            auth={auth}
+                            handleProfileDropdownToggle={handleProfileDropdownToggle}
+                        />
+                        {isDropdownOpen && (
+                            <ProfileDropdown
+                                isAdmin={isAdmin}
+                                handleLogout={handleLogout}
+                            />
+                        )}
+                    </div>
+                ) : (
+                    <>
+                        <Link to='/login'>
+                            <BrownButton variant="contained" color="primary">Login</BrownButton>
+                        </Link>
+                        <Link to='/register'>
+                            <OutlinedBrownButton>Register</OutlinedBrownButton>
+                        </Link>
+                    </>
+                )}
+            </div>
+        </div>
+    );
+};
+
+export const DashboardAppBar = ({ open, children }) => {
+    return (
+        <AppBar
+            position="absolute"
+            open={open}
+            sx={{
+                boxShadow: '1px 0px 3px rgba(0, 0, 0, 0.1)',
+                display: 'flex',
+            }}
+        >
+            {children}
+        </AppBar>
+    );
+};
+
+export const DashboardToolbar = ({ children }) => {
+    return (
+        <Toolbar
+            sx={{
+                display: 'flex',
+                justifyContent: 'space-between',
+                alignItems: 'center',
+            }}
+        >
+            {children}
+        </Toolbar>
+    )
+}
+
+export const DashboardHeader = ({ open, toggleDrawer, auth, isDropdownOpen, handleProfileDropdownToggle, handleLogout, isAdmin }) => {
+    return (
+        <DashboardAppBar open={open}>
+            <DashboardToolbar>
+                <ExtendIcon toggleDrawer={toggleDrawer} open={open} />
+
+                <div className="flex justify-between items-center top-0 left-0 right-0 z-50 mx-auto-xl px-20 mt-4 w-full">
+                    <div className="flex items-center mb-5">
+                        <NavbarLogo />
+                    </div>
+
+                    <AuthActions
+                        auth={auth}
+                        isDropdownOpen={isDropdownOpen}
+                        handleProfileDropdownToggle={handleProfileDropdownToggle}
+                        handleLogout={handleLogout}
+                        isAdmin={isAdmin}
+                    />
+                </div>
+            </DashboardToolbar>
+        </DashboardAppBar>
+    )
+}

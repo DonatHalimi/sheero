@@ -2,7 +2,7 @@ import { Box, Button, FormControl, InputLabel, MenuItem, Select, TextField } fro
 import React, { useContext, useEffect, useState } from 'react';
 import { toast } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
-import { SectionHeader } from '../../assets/CustomComponents';
+import { Header } from '../../assets/CustomComponents';
 import useAxios from '../../axiosInstance';
 import Footer from '../../components/Footer';
 import Navbar from '../../components/Navbar/Navbar';
@@ -57,6 +57,8 @@ const AddressInformation = () => {
             fetchCities();
         }
     }, [country, cities.length, axiosInstance]);
+
+    useEffect(() => window.scrollTo(0, 0), []);
 
     const handleCountryChange = (e) => {
         const selectedCountryId = e.target.value;
@@ -123,7 +125,7 @@ const AddressInformation = () => {
                 <ProfileSidebar />
                 <main className="p-4 relative left-32 w-full">
                     <div className="container mx-auto mt-20 mb-20">
-                        <SectionHeader title='Address' />
+                        <Header title='Address' />
 
                         <div className="bg-white shadow-sm rounded-sm p-8">
                             <form onSubmit={handleSaveAddress} className="space-y-6">

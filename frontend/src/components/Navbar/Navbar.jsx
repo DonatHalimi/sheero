@@ -83,9 +83,8 @@ const Navbar = () => {
 
 
     useEffect(() => {
-        const handleProductAdded = (event) => {
+        const handleProductAdded = () => {
             setIsCartDropdownOpen(true);
-            setHighlightedProductId(event.detail);
         };
         document.addEventListener('productAddedToCart', handleProductAdded);
         return () => {
