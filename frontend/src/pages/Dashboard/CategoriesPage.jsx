@@ -1,6 +1,5 @@
-import { Typography } from '@mui/material';
 import React, { useContext, useEffect, useState } from 'react';
-import { ActionButton, BrownCreateOutlinedIcon, OutlinedBrownButton } from '../../assets/CustomComponents';
+import { DashboardHeader } from '../../assets/CustomComponents';
 import useAxios from '../../axiosInstance';
 import DashboardTable from '../../components/Dashboard/DashboardTable';
 import AddCategoryModal from '../../components/Modal/Category/AddCategoryModal';
@@ -59,6 +58,11 @@ const CategoriesPage = () => {
         setImagePreviewOpen(true);
     };
 
+    const handleEdit = (category) => {
+        setSelectedCategory(category);
+        setEditCategoryOpen(true);
+    };
+
     const columns = [
         { key: 'name', label: 'Name' },
         {
@@ -78,34 +82,17 @@ const CategoriesPage = () => {
         { key: 'actions', label: 'Actions' }
     ];
 
-    const renderActionButtons = (category) => (
-        <ActionButton onClick={() => { setSelectedCategory(category); setEditCategoryOpen(true); }}>
-            <BrownCreateOutlinedIcon />
-        </ActionButton>
-    );
-
-    const renderTableActions = () => (
-        <div className='flex items-center justify-between w-full mb-4'>
-            <Typography variant='h5'>Categories</Typography>
-            <div>
-                <OutlinedBrownButton onClick={() => setAddCategoryOpen(true)} className='!mr-4'>
-                    Add Category
-                </OutlinedBrownButton>
-                {selectedCategories.length > 0 && (
-                    <OutlinedBrownButton
-                        onClick={() => setDeleteCategoryOpen(true)}
-                        disabled={selectedCategories.length === 0}
-                    >
-                        {selectedCategories.length > 1 ? 'Delete Selected Categories' : 'Delete Category'}
-                    </OutlinedBrownButton>
-                )}
-            </div>
-        </div>
-    );
-
     return (
         <div className='container mx-auto max-w-screen-2xl px-4 mt-20'>
             <div className='flex flex-col items-center justify-center'>
+                <DashboardHeader
+                    title="Categories"
+                    selectedItems={selectedCategories}
+                    setAddItemOpen={setAddCategoryOpen}
+                    setDeleteItemOpen={setDeleteCategoryOpen}
+                    itemName="Category"
+                />
+
                 <DashboardTable
                     columns={columns}
                     data={categories}
@@ -115,8 +102,7 @@ const CategoriesPage = () => {
                     itemsPerPage={itemsPerPage}
                     currentPage={currentPage}
                     onPageChange={handlePageClick}
-                    renderActionButtons={renderActionButtons}
-                    renderTableActions={renderTableActions}
+                    onEdit={handleEdit}
                 />
 
                 <AddCategoryModal open={addCategoryOpen} onClose={() => setAddCategoryOpen(false)} onAddSuccess={fetchCategories} />

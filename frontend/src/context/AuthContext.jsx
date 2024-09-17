@@ -44,7 +44,7 @@ const AuthProvider = ({ children }) => {
                 'Failed to refresh access token:',
                 error.response?.data?.message || 'Failed to refresh access token'
             );
-            logout();
+            logout();  // Log the user out if refresh fails
         }
     };
 
@@ -91,6 +91,7 @@ const AuthProvider = ({ children }) => {
         localStorage.removeItem('role');
         localStorage.removeItem('username');
         localStorage.removeItem('email');
+        localStorage.removeItem('userId');
         localStorage.removeItem('address');
     };
 
@@ -111,7 +112,7 @@ const AuthProvider = ({ children }) => {
     useEffect(() => {
         const interval = setInterval(() => {
             refreshAccessToken();
-        }, 15 * 60 * 1000);
+        }, 15 * 60 * 1000); // Refresh token every 15 minutes
 
         return () => clearInterval(interval);
     }, []);
@@ -124,4 +125,3 @@ const AuthProvider = ({ children }) => {
 };
 
 export { AuthContext, AuthProvider };
-

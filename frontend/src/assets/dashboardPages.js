@@ -1,6 +1,7 @@
 import AddressesPage from '../pages/Dashboard/AddressesPage';
 import CategoriesPage from '../pages/Dashboard/CategoriesPage';
 import CitiesPage from '../pages/Dashboard/CitiesPage';
+import ContactPage from '../pages/Dashboard/ContactPage';
 import CountriesPage from '../pages/Dashboard/CountriesPage';
 import DashboardContent from '../pages/Dashboard/DashboardContent';
 import FAQPage from '../pages/Dashboard/FAQPage';
@@ -16,6 +17,7 @@ const pages = {
     addresses: AddressesPage,
     categories: CategoriesPage,
     cities: CitiesPage,
+    contacts: ContactPage,
     countries: CountriesPage,
     images: SlideshowPage,
     main: DashboardContent,

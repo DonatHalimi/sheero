@@ -1,6 +1,5 @@
-import { Typography } from '@mui/material';
 import React, { useContext, useEffect, useState } from 'react';
-import { ActionButton, BrownCreateOutlinedIcon, OutlinedBrownButton, RatingStars } from '../../assets/CustomComponents';
+import { DashboardHeader, RatingStars } from '../../assets/CustomComponents';
 import useAxios from '../../axiosInstance';
 import DashboardTable from '../../components/Dashboard/DashboardTable';
 import DeleteModal from '../../components/Modal/DeleteModal';
@@ -52,11 +51,10 @@ const ReviewsPage = () => {
         setCurrentPage(event.selected);
     };
 
-    const renderActionButtons = (review) => (
-        <ActionButton onClick={() => { setSelectedReview(review); setEditReviewOpen(true); }}>
-            <BrownCreateOutlinedIcon />
-        </ActionButton>
-    );
+    const handleEdit = (review) => {
+        setSelectedReview(review);
+        setEditReviewOpen(true);
+    };
 
     const columns = [
         { key: 'user.username', label: 'User' },
@@ -75,31 +73,21 @@ const ReviewsPage = () => {
             render: (review) => review.comment ? review.comment : 'N/A'
         },
         { key: 'product.name', label: 'Product' },
-        { key: 'actions', label: 'Actions', render: renderActionButtons }
+        { key: 'actions', label: 'Actions' }
     ];
 
-    const renderTableActions = () => (
-        <div className='flex items-center justify-between w-full mb-4'>
-            <Typography variant='h5'>Reviews</Typography>
-            <div>
-                <OutlinedBrownButton onClick={() => setAddReviewOpen(true)} className='!mr-4'>
-                    Add Review
-                </OutlinedBrownButton>
-                {selectedReviews.length > 0 && (
-                    <OutlinedBrownButton
-                        onClick={() => setDeleteReviewOpen(true)}
-                        disabled={selectedReviews.length === 0}
-                    >
-                        {selectedReviews.length > 1 ? 'Delete Selected Reviews' : 'Delete Review'}
-                    </OutlinedBrownButton>
-                )}
-            </div>
-        </div>
-    );
 
     return (
         <div className='container mx-auto max-w-screen-2xl px-4 mt-20'>
             <div className='flex flex-col items-center justify-center'>
+                <DashboardHeader
+                    title="Reviews"
+                    selectedItems={selectedReviews}
+                    setAddItemOpen={setAddReviewOpen}
+                    setDeleteItemOpen={setDeleteReviewOpen}
+                    itemName="Review"
+                />
+
                 <DashboardTable
                     columns={columns}
                     data={reviews}
@@ -109,8 +97,7 @@ const ReviewsPage = () => {
                     itemsPerPage={itemsPerPage}
                     currentPage={currentPage}
                     onPageChange={handlePageClick}
-                    renderActionButtons={renderActionButtons}
-                    renderTableActions={renderTableActions}
+                    onEdit={handleEdit}
                 />
 
                 <AddReviewModal open={addReviewOpen} onClose={() => setAddReviewOpen(false)} onAddSuccess={fetchReviews} />

@@ -1,6 +1,5 @@
-import { Typography } from '@mui/material';
 import React, { useContext, useEffect, useState } from 'react';
-import { ActionButton, BrownCreateOutlinedIcon, OutlinedBrownButton } from '../../assets/CustomComponents';
+import { DashboardHeader } from '../../assets/CustomComponents';
 import useAxios from '../../axiosInstance';
 import DashboardTable from '../../components/Dashboard/DashboardTable';
 import AddCityModal from '../../components/Modal/City/AddCityModal';
@@ -52,6 +51,11 @@ const CitiesPage = () => {
         setCurrentPage(event.selected);
     };
 
+    const handleEdit = (city) => {
+        setSelectedCity(city);
+        setEditCityOpen(true);
+    };
+
     const columns = [
         { key: 'name', label: 'Name' },
         { key: 'country.name', label: 'Country' },
@@ -59,34 +63,17 @@ const CitiesPage = () => {
         { key: 'actions', label: 'Actions' }
     ];
 
-    const renderActionButtons = (city) => (
-        <ActionButton onClick={() => { setSelectedCity(city); setEditCityOpen(true); }}>
-            <BrownCreateOutlinedIcon />
-        </ActionButton>
-    );
-
-    const renderTableActions = () => (
-        <div className='flex items-center justify-between w-full mb-4'>
-            <Typography variant='h5'>Cities</Typography>
-            <div>
-                <OutlinedBrownButton onClick={() => setAddCityOpen(true)} className='!mr-4'>
-                    Add City
-                </OutlinedBrownButton>
-                {selectedCities.length > 0 && (
-                    <OutlinedBrownButton
-                        onClick={() => setDeleteCityOpen(true)}
-                        disabled={selectedCities.length === 0}
-                    >
-                        {selectedCities.length > 1 ? 'Delete Selected Cities' : 'Delete City'}
-                    </OutlinedBrownButton>
-                )}
-            </div>
-        </div>
-    );
-
     return (
         <div className='container mx-auto max-w-screen-2xl px-4 mt-20'>
             <div className='flex flex-col items-center justify-center'>
+                <DashboardHeader
+                    title="Cities"
+                    selectedItems={selectedCities}
+                    setAddItemOpen={setAddCityOpen}
+                    setDeleteItemOpen={setDeleteCityOpen}
+                    itemName="City"
+                />
+
                 <DashboardTable
                     columns={columns}
                     data={cities}
@@ -96,8 +83,7 @@ const CitiesPage = () => {
                     itemsPerPage={itemsPerPage}
                     currentPage={currentPage}
                     onPageChange={handlePageClick}
-                    renderActionButtons={renderActionButtons}
-                    renderTableActions={renderTableActions}
+                    onEdit={handleEdit}
                 />
 
                 <AddCityModal open={addCityOpen} onClose={() => setAddCityOpen(false)} onAddSuccess={fetchCities} />

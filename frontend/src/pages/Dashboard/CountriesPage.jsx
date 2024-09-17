@@ -1,6 +1,5 @@
-import { Typography } from '@mui/material';
 import React, { useContext, useEffect, useState } from 'react';
-import { ActionButton, BrownCreateOutlinedIcon, OutlinedBrownButton } from '../../assets/CustomComponents.jsx';
+import { DashboardHeader } from '../../assets/CustomComponents.jsx';
 import useAxios from '../../axiosInstance.js';
 import DashboardTable from '../../components/Dashboard/DashboardTable';
 import AddCountryModal from '../../components/Modal/Country/AddCountryModal.jsx';
@@ -52,39 +51,27 @@ const CountriesPage = () => {
         setCurrentPage(event.selected);
     };
 
+    const handleEdit = (country) => {
+        setSelectedCountry(country);
+        setEditCountryOpen(true);
+    };
+
     const columns = [
         { key: 'name', label: 'Name' },
         { key: 'actions', label: 'Actions' }
     ];
 
-    const renderActionButtons = (country) => (
-        <ActionButton onClick={() => { setSelectedCountry(country); setEditCountryOpen(true); }}>
-            <BrownCreateOutlinedIcon />
-        </ActionButton>
-    );
-
-    const renderTableActions = () => (
-        <div className='flex items-center justify-between w-full mb-4'>
-            <Typography variant='h5'>Countries</Typography>
-            <div>
-                <OutlinedBrownButton onClick={() => setAddCountryOpen(true)} className='!mr-4'>
-                    Add Country
-                </OutlinedBrownButton>
-                {selectedCountries.length > 0 && (
-                    <OutlinedBrownButton
-                        onClick={() => setDeleteCountryOpen(true)}
-                        disabled={selectedCountries.length === 0}
-                    >
-                        {selectedCountries.length > 1 ? 'Delete Selected Countries' : 'Delete Country'}
-                    </OutlinedBrownButton>
-                )}
-            </div>
-        </div>
-    );
-
     return (
         <div className='container mx-auto max-w-screen-2xl px-4 mt-20'>
             <div className='flex flex-col items-center justify-center'>
+                <DashboardHeader
+                    title="Countries"
+                    selectedItems={selectedCountries}
+                    setAddItemOpen={setAddCountryOpen}
+                    setDeleteItemOpen={setDeleteCountryOpen}
+                    itemName="Country"
+                />
+
                 <DashboardTable
                     columns={columns}
                     data={countries}
@@ -94,8 +81,7 @@ const CountriesPage = () => {
                     itemsPerPage={itemsPerPage}
                     currentPage={currentPage}
                     onPageChange={handlePageClick}
-                    renderActionButtons={renderActionButtons}
-                    renderTableActions={renderTableActions}
+                    onEdit={handleEdit}
                 />
 
                 <AddCountryModal open={addCountryOpen} onClose={() => setAddCountryOpen(false)} onAddSuccess={fetchCountries} />

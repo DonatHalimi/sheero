@@ -1,7 +1,7 @@
 import { Paper } from '@mui/material';
 import { DataGrid } from '@mui/x-data-grid';
 import React from 'react';
-import { CustomNoRowsOverlay, CustomToolbar, DashboardStyling } from '../../assets/CustomComponents';
+import { ActionButton, BrownCreateOutlinedIcon, CustomNoRowsOverlay, CustomToolbar, DashboardStyling } from '../../assets/CustomComponents';
 
 const getNestedValue = (obj, path) => {
     return path.split('.').reduce((acc, part) => acc && acc[part], obj);
@@ -10,7 +10,7 @@ const getNestedValue = (obj, path) => {
 /**
  * A reusable table component for displaying data in a dashboard.
  *
- * @param {Array} columns - An array of column objects with keys for label, key, and render.
+ * @param {Array} columns - An array of column objects with keys for label and key.
  * @param {Array} data - An array of data objects to be displayed in the table.
  * @param {Array} selectedItems - An array of selected item IDs.
  * @param {Function} onSelectItem - A callback function for when an item is selected.
@@ -18,8 +18,8 @@ const getNestedValue = (obj, path) => {
  * @param {Number} itemsPerPage - The number of items to display per page.
  * @param {Number} currentPage - The current page number.
  * @param {Function} onPageChange - A callback function for when the page changes.
- * @param {Function} renderActionButtons - A function that returns the action buttons for each row.
  * @param {Function} renderTableActions - A function that returns the table actions.
+ * @param {Function} onEdit - A callback function for the edit action.
  * @param {String} containerClassName - A class name for the container element.
  * @return {JSX.Element} The table component.
  */
@@ -32,8 +32,8 @@ const DashboardTable = ({
     itemsPerPage,
     currentPage,
     onPageChange,
-    renderActionButtons,
     renderTableActions,
+    onEdit,
     containerClassName,
 }) => {
     const gridColumns = columns.map((column) => ({
@@ -45,7 +45,9 @@ const DashboardTable = ({
             if (column.key === 'actions') {
                 return (
                     <div onClick={(e) => e.stopPropagation()}>
-                        {renderActionButtons(params.row)}
+                        <ActionButton onClick={() => onEdit(params.row)}>
+                            <BrownCreateOutlinedIcon />
+                        </ActionButton>
                     </div>
                 );
             } else if (column.key === 'image') {
@@ -80,7 +82,7 @@ const DashboardTable = ({
             {renderTableActions && renderTableActions()}
             <Paper
                 className={containerClassName || 'max-w-screen-2xl mx-auto'}
-                style={{ height: 'auto', width: '100%' }}
+                style={{ height: 'auto', width: '100%', boxShadow: '0 1px 2px 0 rgb(0 0 0 / 0.05)' }}
             >
                 <DataGrid
                     rows={gridRows}

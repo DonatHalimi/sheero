@@ -1,6 +1,5 @@
-import { Typography } from '@mui/material';
 import React, { useContext, useEffect, useState } from 'react';
-import { ActionButton, BrownCreateOutlinedIcon, OutlinedBrownButton } from '../../assets/CustomComponents';
+import { DashboardHeader } from '../../assets/CustomComponents';
 import useAxios from '../../axiosInstance';
 import DashboardTable from '../../components/Dashboard/DashboardTable';
 import DeleteModal from '../../components/Modal/DeleteModal';
@@ -52,40 +51,28 @@ const SubSubcategoriesPage = () => {
         setCurrentPage(event.selected);
     };
 
+    const handleEdit = (subSubcategory) => {
+        setSelectedSubSubcategory(subSubcategory);
+        setEditSubSubcategoryOpen(true);
+    };
+
     const columns = [
         { label: 'Name', key: 'name' },
         { label: 'Subcategory', key: 'subcategory.name' },
         { label: 'Actions', key: 'actions' }
     ];
 
-    const renderActionButtons = (subSubcategory) => (
-        <ActionButton onClick={() => { setSelectedSubSubcategory(subSubcategory); setEditSubSubcategoryOpen(true); }}>
-            <BrownCreateOutlinedIcon />
-        </ActionButton>
-    );
-
-    const renderTableActions = () => (
-        <div className='flex items-center justify-between w-full mb-4'>
-            <Typography variant='h5'>SubSubcategories</Typography>
-            <div>
-                <OutlinedBrownButton onClick={() => setAddSubSubcategoryOpen(true)} className='!mr-4'>
-                    Add SubSubcategory
-                </OutlinedBrownButton>
-                {selectedSubSubcategories.length > 0 && (
-                    <OutlinedBrownButton
-                        onClick={() => setDeleteSubSubcategoryOpen(true)}
-                        disabled={selectedSubSubcategories.length === 0}
-                    >
-                        {selectedSubSubcategories.length > 1 ? 'Delete Selected SubSubcategories' : 'Delete SubSubcategory'}
-                    </OutlinedBrownButton>
-                )}
-            </div>
-        </div>
-    );
-
     return (
         <div className='container mx-auto max-w-screen-2xl px-4 mt-20'>
             <div className='flex flex-col items-center justify-center'>
+                <DashboardHeader
+                    title="SubSubcategories"
+                    selectedItems={selectedSubSubcategories}
+                    setAddItemOpen={setAddSubSubcategoryOpen}
+                    setDeleteItemOpen={setDeleteSubSubcategoryOpen}
+                    itemName="SubSubcategory"
+                />
+
                 <DashboardTable
                     columns={columns}
                     data={subSubcategories}
@@ -95,8 +82,7 @@ const SubSubcategoriesPage = () => {
                     itemsPerPage={itemsPerPage}
                     currentPage={currentPage}
                     onPageChange={handlePageClick}
-                    renderActionButtons={renderActionButtons}
-                    renderTableActions={renderTableActions}
+                    onEdit={handleEdit}
                 />
 
                 <AddSubSubcategoryModal open={addSubSubcategoryOpen} onClose={() => setAddSubSubcategoryOpen(false)} onAddSuccess={fetchSubSubcategories} />

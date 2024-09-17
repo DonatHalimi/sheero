@@ -1,6 +1,5 @@
-import { Typography } from '@mui/material';
 import React, { useContext, useEffect, useState } from 'react';
-import { ActionButton, BrownCreateOutlinedIcon, OutlinedBrownButton } from '../../assets/CustomComponents';
+import { DashboardHeader } from '../../assets/CustomComponents';
 import useAxios from '../../axiosInstance';
 import DashboardTable from '../../components/Dashboard/DashboardTable';
 import DeleteModal from '../../components/Modal/DeleteModal';
@@ -58,6 +57,11 @@ const UsersPage = () => {
         setCurrentPage(event.selected);
     };
 
+    const handleEdit = (user) => {
+        setSelectedUser(user);
+        setEditUserOpen(true);
+    };
+
     const columns = [
         { key: 'username', label: 'Username' },
         { key: 'email', label: 'Email' },
@@ -66,34 +70,17 @@ const UsersPage = () => {
         { key: 'actions', label: 'Actions' }
     ];
 
-    const renderActionButtons = (user) => (
-        <ActionButton onClick={() => { setSelectedUser(user); setEditUserOpen(true); }}>
-            <BrownCreateOutlinedIcon />
-        </ActionButton>
-    );
-
-    const renderTableActions = () => (
-        <div className='flex items-center justify-between w-full mb-4'>
-            <Typography variant='h5'>Users</Typography>
-            <div>
-                <OutlinedBrownButton onClick={() => setAddUserOpen(true)} className='!mr-4'>
-                    Add User
-                </OutlinedBrownButton>
-                {selectedUsers.length > 0 && (
-                    <OutlinedBrownButton
-                        onClick={() => setDeleteUserOpen(true)}
-                        disabled={selectedUsers.length === 0}
-                    >
-                        {selectedUsers.length > 1 ? 'Delete Selected Users' : 'Delete User'}
-                    </OutlinedBrownButton>
-                )}
-            </div>
-        </div>
-    );
-
     return (
         <div className='container mx-auto max-w-screen-2xl px-4 mt-20'>
             <div className='flex flex-col items-center justify-center'>
+                <DashboardHeader
+                    title="Users"
+                    selectedItems={selectedUsers}
+                    setAddItemOpen={setAddUserOpen}
+                    setDeleteItemOpen={setDeleteUserOpen}
+                    itemName="User"
+                />
+
                 <DashboardTable
                     columns={columns}
                     data={users}
@@ -103,8 +90,7 @@ const UsersPage = () => {
                     itemsPerPage={itemsPerPage}
                     currentPage={currentPage}
                     onPageChange={handlePageClick}
-                    renderActionButtons={renderActionButtons}
-                    renderTableActions={renderTableActions}
+                    onEdit={handleEdit}
                     containerClassName='user'
                 />
 

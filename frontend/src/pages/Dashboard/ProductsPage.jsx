@@ -1,6 +1,5 @@
-import { Typography } from '@mui/material';
 import React, { useContext, useEffect, useState } from 'react';
-import { ActionButton, BrownCreateOutlinedIcon, OutlinedBrownButton } from '../../assets/CustomComponents';
+import { DashboardHeader } from '../../assets/CustomComponents';
 import useAxios from '../../axiosInstance';
 import DashboardTable from '../../components/Dashboard/DashboardTable';
 import DeleteModal from '../../components/Modal/DeleteModal';
@@ -66,19 +65,24 @@ const ProductsPage = () => {
         setImagePreviewOpen(true);
     };
 
+    const handleEdit = (product) => {
+        setSelectedProduct(product);
+        setEditProductOpen(true);
+    };
+
     const columns = [
         { key: 'name', label: 'Name' },
         { key: 'description', label: 'Description' },
         { key: 'details', label: 'Details', render: (item) => truncateItems(item.details.map(detail => `${detail.attribute}: ${detail.value}`)).join(', ') },
         { key: 'price', label: 'Price' },
         { key: 'salePrice', label: 'Sale Price', render: (item) => item.salePrice ? item.salePrice : 'N/A' },
+        { key: 'discount', label: 'Discount', render: (item) => item.discount ? `${item.discount.value}${item.discount.type === 'percentage' ? '%' : ''}` : 'N/A' },
         { key: 'category.name', label: 'Category' },
         { key: 'subcategory.name', label: 'Subcategory' },
         { key: 'subSubcategory.name', label: 'SubSubcategory' },
         { key: 'inventoryCount', label: 'Inventory Count' },
         { key: 'dimensions', label: 'Dimensions', render: (item) => item.dimensions ? `${item.dimensions.length} x ${item.dimensions.width} x ${item.dimensions.height} ${item.dimensions.unit}` : 'N/A' },
         { key: 'variants', label: 'Variants', render: (item) => truncateItems(item.variants.map(variant => `Color: ${variant.color}, Size: ${variant.size}`)).join(', ') },
-        { key: 'discount', label: 'Discount', render: (item) => item.discount ? `${item.discount.value}${item.discount.type === 'percentage' ? '%' : ''}` : 'N/A' },
         { key: 'supplier.name', label: 'Supplier' },
         { key: 'shipping', label: 'Shipping', render: (item) => item.shipping ? `${item.shipping.weight} kg, ${item.shipping.cost}€, ${item.shipping.packageSize}` : 'None' },
         {
@@ -98,34 +102,17 @@ const ProductsPage = () => {
         { key: 'actions', label: 'Actions' }
     ];
 
-    const renderActionButtons = (product) => (
-        <ActionButton onClick={() => { setSelectedProduct(product); setEditProductOpen(true); }}>
-            <BrownCreateOutlinedIcon />
-        </ActionButton>
-    );
-
-    const renderTableActions = () => (
-        <div className='flex items-center justify-between w-full mb-4'>
-            <Typography variant='h5'>Products</Typography>
-            <div>
-                <OutlinedBrownButton onClick={() => setAddProductOpen(true)} className='!mr-4'>
-                    Add Product
-                </OutlinedBrownButton>
-                {selectedProducts.length > 0 && (
-                    <OutlinedBrownButton
-                        onClick={() => setDeleteProductOpen(true)}
-                        disabled={selectedProducts.length === 0}
-                    >
-                        {selectedProducts.length > 1 ? 'Delete Selected Products' : 'Delete Product'}
-                    </OutlinedBrownButton>
-                )}
-            </div>
-        </div>
-    );
-
     return (
         <div className='container mx-auto max-w-full mt-20'>
             <div className='w-full px-4'>
+                <DashboardHeader
+                    title="Products"
+                    selectedItems={selectedProducts}
+                    setAddItemOpen={setAddProductOpen}
+                    setDeleteItemOpen={setDeleteProductOpen}
+                    itemName="Product"
+                />
+
                 <DashboardTable
                     columns={columns}
                     data={products}
@@ -135,8 +122,7 @@ const ProductsPage = () => {
                     itemsPerPage={itemsPerPage}
                     currentPage={currentPage}
                     onPageChange={handlePageClick}
-                    renderActionButtons={renderActionButtons}
-                    renderTableActions={renderTableActions}
+                    onEdit={handleEdit}
                     containerClassName="max-w-full"
                 />
 

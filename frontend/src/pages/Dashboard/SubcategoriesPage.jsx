@@ -1,6 +1,5 @@
-import { Typography } from '@mui/material';
 import React, { useContext, useEffect, useState } from 'react';
-import { ActionButton, BrownCreateOutlinedIcon, OutlinedBrownButton } from '../../assets/CustomComponents';
+import { DashboardHeader } from '../../assets/CustomComponents';
 import useAxios from '../../axiosInstance';
 import DashboardTable from '../../components/Dashboard/DashboardTable';
 import DeleteModal from '../../components/Modal/DeleteModal';
@@ -63,6 +62,11 @@ const SubcategoriesPage = () => {
         setImagePreviewOpen(true);
     };
 
+    const handleEdit = (subcategory) => {
+        setSelectedSubcategory(subcategory);
+        setEditSubcategoryOpen(true);
+    };
+
     const columns = [
         { label: 'Name', key: 'name' },
         {
@@ -83,34 +87,17 @@ const SubcategoriesPage = () => {
         { label: 'Actions', key: 'actions' }
     ];
 
-    const renderActionButtons = (item) => (
-        <ActionButton onClick={() => { setSelectedSubcategory(item); setEditSubcategoryOpen(true); }}>
-            <BrownCreateOutlinedIcon />
-        </ActionButton>
-    );
-
-    const renderTableActions = () => (
-        <div className='flex items-center justify-between w-full mb-4'>
-            <Typography variant='h5'>Subcategories</Typography>
-            <div>
-                <OutlinedBrownButton onClick={() => setAddSubcategoryOpen(true)} className='!mr-4'>
-                    Add Subcategory
-                </OutlinedBrownButton>
-                {selectedSubcategories.length > 0 && (
-                    <OutlinedBrownButton
-                        onClick={() => setDeleteSubcategoryOpen(true)}
-                        disabled={selectedSubcategories.length === 0}
-                    >
-                        {selectedSubcategories.length > 1 ? 'Delete Selected Subcategories' : 'Delete Subcategory'}
-                    </OutlinedBrownButton>
-                )}
-            </div>
-        </div>
-    );
-
     return (
         <div className='container mx-auto max-w-screen-2xl px-4 mt-20'>
             <div className='container mx-auto max-w-screen-2xl px-4 mt-20'>
+                <DashboardHeader
+                    title="Subcategories"
+                    selectedItems={selectedSubcategories}
+                    setAddItemOpen={setAddSubcategoryOpen}
+                    setDeleteItemOpen={setDeleteSubcategoryOpen}
+                    itemName="Subcategory"
+                />
+
                 <DashboardTable
                     columns={columns}
                     data={subcategories}
@@ -120,8 +107,7 @@ const SubcategoriesPage = () => {
                     itemsPerPage={itemsPerPage}
                     currentPage={currentPage}
                     onPageChange={handlePageClick}
-                    renderActionButtons={renderActionButtons}
-                    renderTableActions={renderTableActions}
+                    onEdit={handleEdit}
                     containerClassName="max-w-screen-2xl mx-auto"
                 />
                 <AddSubcategoryModal open={addSubcategoryOpen} onClose={() => setAddSubcategoryOpen(false)} onAddSuccess={fetchSubcategories} />

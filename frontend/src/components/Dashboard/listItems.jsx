@@ -120,6 +120,14 @@ export const mainListItems = ({ setCurrentView }) => {
             primary="FAQs"
           />
 
+          <ActiveListItem
+            sx={{ pl: 4 }}
+            handleClick={() => handleItemClick('contacts')}
+            selected={activeItem === 'contacts'}
+            icon={<HelpOutlineOutlined />}
+            primary="Contacts"
+          />
+
           <CollapsibleListItem
             open={categoriesOpen}
             handleClick={() => setCategoriesOpen(!categoriesOpen)}

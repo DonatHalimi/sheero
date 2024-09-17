@@ -27,7 +27,7 @@ const EditFAQModal = ({ open, onClose, faq, onEditSuccess }) => {
         }
 
         try {
-            await axiosInstance.put(`/faq/update/${faq._id}`, { question, answer });
+            await axiosInstance.put(`/faqs/update/${faq._id}`, { question, answer });
             toast.success('FAQ updated successfully');
             onEditSuccess();
             onClose();

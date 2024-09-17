@@ -33,17 +33,15 @@ const Login = () => {
         response.success ? navigate('/') : toast.error(response.message);
     };
 
-
-
     return (
-        <Box sx={{ minHeight: '100vh', display: 'flex', flexDirection: 'column', bgcolor: 'neutral.50' }}>
+        <Box className='flex flex-col bg-neutral-50 min-h-[100vh]'>
             <Navbar />
-            <Container component="main" maxWidth="xs" sx={{ flex: 1, display: 'flex', flexDirection: 'column', alignItems: 'left', mt: 10, mb: 10 }}>
-                <Paper elevation={3} sx={{ p: 4, display: 'flex', flexDirection: 'column', alignItems: 'left', borderRadius: 2, boxShadow: '20px 20px 60px #d9d9d9, -20px -20px 60px #ffffff', background: 'linear-gradient(145deg, #ffffff, #f0f0f0)' }}>
-                    <Typography component="h1" variant="h4" align='left' sx={{ mb: 2, color: 'text.secondary', fontWeight: 'bold' }}>
+            <Container component="main" maxWidth="xs" className='flex flex-1 flex-col align-left mt-20 mb-20'>
+                <div className='bg-white flex flex-col align-left rounded-md shadow-md p-6'>
+                    <Typography variant="h4" align='left' className='mb-2 font-extrabold text-stone-600'>
                         Welcome Back
                     </Typography>
-                    <Box component="form" onSubmit={handleSubmit} noValidate sx={{ width: '100%' }}>
+                    <Box component="form" onSubmit={handleSubmit} noValidate className='w-full'>
                         <BrownOutlinedTextField
                             variant="outlined"
                             margin="normal"
@@ -90,10 +88,10 @@ const Login = () => {
                             Log In
                         </BrownButton>
                         <Typography variant="body2" align="left" sx={{ color: 'text.secondary' }}>
-                            Don't have an account? <a href='/register' className='font-bold cursor-pointer hover:underline'>Sign Up</a>
+                            Don't have an account?{' '} <span onClick={() => navigate('/register')} role="button" className='font-bold cursor-pointer hover:underline'> Sign Up</span>
                         </Typography>
                     </Box>
-                </Paper>
+                </div>
             </Container>
             <Footer />
         </Box>

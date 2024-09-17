@@ -1,6 +1,5 @@
-import { Typography } from '@mui/material';
 import React, { useContext, useEffect, useState } from 'react';
-import { ActionButton, BrownCreateOutlinedIcon, OutlinedBrownButton } from '../../assets/CustomComponents';
+import { DashboardHeader } from '../../assets/CustomComponents';
 import useAxios from '../../axiosInstance';
 import DashboardTable from '../../components/Dashboard/DashboardTable';
 import DeleteModal from '../../components/Modal/DeleteModal';
@@ -27,7 +26,7 @@ const FAQPage = () => {
 
     const fetchFAQs = async () => {
         try {
-            const response = await axiosInstance.get('/faq/get');
+            const response = await axiosInstance.get('/faqs/get');
             setFaqs(response.data);
         } catch (error) {
             console.error('Error fetching FAQ items', error);
@@ -52,40 +51,28 @@ const FAQPage = () => {
         setCurrentPage(event.selected);
     };
 
+    const handleEdit = (faq) => {
+        setSelectedFaq(faq);
+        setEditFaqOpen(true);
+    };
+
     const columns = [
         { key: 'question', label: 'Question' },
         { key: 'answer', label: 'Answer' },
         { key: 'actions', label: 'Actions' }
     ];
 
-    const renderActionButtons = (faq) => (
-        <ActionButton onClick={() => { setSelectedFaq(faq); setEditFaqOpen(true); }}>
-            <BrownCreateOutlinedIcon />
-        </ActionButton>
-    );
-
-    const renderTableActions = () => (
-        <div className='flex items-center justify-between w-full mb-4'>
-            <Typography variant='h5'>FAQs</Typography>
-            <div>
-                <OutlinedBrownButton onClick={() => setAddFaqOpen(true)} className='!mr-4'>
-                    Add FAQ
-                </OutlinedBrownButton>
-                {selectedFaqs.length > 0 && (
-                    <OutlinedBrownButton
-                        onClick={() => setDeleteFaqOpen(true)}
-                        disabled={selectedFaqs.length === 0}
-                    >
-                        {selectedFaqs.length > 1 ? 'Delete Selected FAQ items' : 'Delete FAQ item'}
-                    </OutlinedBrownButton>
-                )}
-            </div>
-        </div>
-    );
-
     return (
         <div className='container mx-auto max-w-screen-2xl px-4 mt-20'>
             <div className='flex flex-col items-center justify-center'>
+                <DashboardHeader
+                    title="FAQs"
+                    selectedItems={selectedFaqs}
+                    setAddItemOpen={setAddFaqOpen}
+                    setDeleteItemOpen={setDeleteFaqOpen}
+                    itemName="FAQ"
+                />
+
                 <DashboardTable
                     columns={columns}
                     data={faqs}
@@ -95,8 +82,7 @@ const FAQPage = () => {
                     itemsPerPage={itemsPerPage}
                     currentPage={currentPage}
                     onPageChange={handlePageClick}
-                    renderActionButtons={renderActionButtons}
-                    renderTableActions={renderTableActions}
+                    onEdit={handleEdit}
                 />
 
                 <AddFAQModal open={addFaqOpen} onClose={() => setAddFaqOpen(false)} onAddSuccess={fetchFAQs} />
@@ -106,7 +92,7 @@ const FAQPage = () => {
                     onClose={() => setDeleteFaqOpen(false)}
                     items={selectedFaqs.map(id => faqs.find(faq => faq._id === id)).filter(faq => faq)}
                     onDeleteSuccess={fetchFAQs}
-                    endpoint="/faq/delete-bulk"
+                    endpoint="/faqs/delete-bulk"
                     title="Delete FAQs"
                     message="Are you sure you want to delete the FAQ items?"
                 />

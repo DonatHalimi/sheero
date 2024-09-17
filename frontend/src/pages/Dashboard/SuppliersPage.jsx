@@ -1,6 +1,5 @@
-import { Typography } from '@mui/material';
 import React, { useContext, useEffect, useState } from 'react';
-import { ActionButton, BrownCreateOutlinedIcon, OutlinedBrownButton } from '../../assets/CustomComponents';
+import { DashboardHeader } from '../../assets/CustomComponents';
 import useAxios from '../../axiosInstance';
 import DashboardTable from '../../components/Dashboard/DashboardTable';
 import DeleteModal from '../../components/Modal/DeleteModal';
@@ -56,6 +55,11 @@ const SupplierPage = () => {
         setCurrentPage(event.selected);
     };
 
+    const handleEdit = (supplier) => {
+        setSelectedSupplier(supplier);
+        setEditSupplierOpen(true);
+    };
+
     const columns = [
         { label: 'Name', key: 'name' },
         { label: 'Email', key: 'contactInfo.email' },
@@ -63,34 +67,17 @@ const SupplierPage = () => {
         { label: 'Actions', key: 'actions' }
     ];
 
-    const renderActionButtons = (supplier) => (
-        <ActionButton onClick={() => { setSelectedSupplier(supplier); setEditSupplierOpen(true); }}>
-            <BrownCreateOutlinedIcon />
-        </ActionButton>
-    );
-
-    const renderTableActions = () => (
-        <div className='flex items-center justify-between w-full mb-4'>
-            <Typography variant='h5'>Suppliers</Typography>
-            <div>
-                <OutlinedBrownButton onClick={() => setAddSupplierOpen(true)} className='!mr-4'>
-                    Add Supplier
-                </OutlinedBrownButton>
-                {selectedSuppliers.length > 0 && (
-                    <OutlinedBrownButton
-                        onClick={() => setDeleteSupplierOpen(true)}
-                        disabled={selectedSuppliers.length === 0}
-                    >
-                        {selectedSuppliers.length > 1 ? 'Delete Selected Suppliers' : 'Delete Supplier'}
-                    </OutlinedBrownButton>
-                )}
-            </div>
-        </div>
-    );
-
     return (
         <div className='container mx-auto max-w-screen-2xl px-4 mt-20'>
             <div className='flex flex-col items-center justify-center'>
+                <DashboardHeader
+                    title="Suppliers"
+                    selectedItems={selectedSuppliers}
+                    setAddItemOpen={setAddSupplierOpen}
+                    setDeleteItemOpen={setDeleteSupplierOpen}
+                    itemName="Supplier"
+                />
+
                 <DashboardTable
                     columns={columns}
                     data={suppliers}
@@ -100,8 +87,7 @@ const SupplierPage = () => {
                     itemsPerPage={itemsPerPage}
                     currentPage={currentPage}
                     onPageChange={handlePageClick}
-                    renderActionButtons={renderActionButtons}
-                    renderTableActions={renderTableActions}
+                    onEdit={handleEdit}
                 />
 
                 <AddSupplierModal open={addSupplierOpen} onClose={() => setAddSupplierOpen(false)} onAddSuccess={fetchSuppliers} />

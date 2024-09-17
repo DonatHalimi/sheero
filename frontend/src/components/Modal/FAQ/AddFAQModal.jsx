@@ -20,7 +20,7 @@ const AddFAQModal = ({ open, onClose, onAddSuccess }) => {
         }
 
         try {
-            await axiosInstance.post('/faq/create', { question, answer });
+            await axiosInstance.post('/faqs/create', { question, answer });
             toast.success('FAQ item added successfully');
             onAddSuccess();
             onClose();

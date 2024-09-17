@@ -1,14 +1,12 @@
-import { Button, Tooltip } from '@mui/material';
 import Box from '@mui/material/Box';
-import CssBaseline from '@mui/material/CssBaseline';
 import Divider from '@mui/material/Divider';
 import List from '@mui/material/List';
 import { ThemeProvider } from '@mui/material/styles';
 import Toolbar from '@mui/material/Toolbar';
-import React, { useContext, useEffect, useState } from 'react';
+import React, { useContext, useState } from 'react';
 import { Outlet } from 'react-router-dom';
 import {
-    AppBar, AuthActions, DashboardAppBar, DashboardCollapse, DashboardHeader, DashboardToolbar, Drawer, ExtendIcon, NavbarLogo,
+    DashboardCollapse, DashboardNavbar, Drawer,
 } from '../../assets/CustomComponents';
 import { AuthContext } from '../../context/AuthContext';
 import theme from '../../theme';
@@ -39,25 +37,12 @@ const DashboardLayout = () => {
         setIsDropdownOpen(false);
     };
 
-    const handleClickOutside = (event) => {
-        if (dropdownRef.current && !dropdownRef.current.contains(event.target)) {
-            setIsDropdownOpen(false);
-        }
-    };
-
-    useEffect(() => {
-        document.addEventListener('mousedown', handleClickOutside);
-        return () => {
-            document.removeEventListener('mousedown', handleClickOutside);
-        };
-    }, []);
-
     return (
         <ThemeProvider theme={theme}>
             <Box className="flex bg-white">
                 {/* <CssBaseline /> */}
 
-                <DashboardHeader
+                <DashboardNavbar
                     open={open}
                     toggleDrawer={toggleDrawer}
                     auth={auth}

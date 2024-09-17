@@ -1,4 +1,5 @@
 import {
+  ContactUs,
   Addresses,
   Cart,
   DashboardLayout,
@@ -46,6 +47,7 @@ const App = () => (
       <Route path="/product/:id" element={<ProductDetails />} />
       <Route path="/search-results" element={<SearchResults />} />
       <Route path="/wishlist/:userId" element={<SharedWishlist />} />
+      <Route path="/contact-us" element={<ContactUs />} />
 
       {/* Protected Routes */}
       <Route path="/dashboard" element={<ProtectedRoute adminOnly><DashboardLayout /></ProtectedRoute>}>

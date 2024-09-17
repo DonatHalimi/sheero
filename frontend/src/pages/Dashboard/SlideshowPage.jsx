@@ -1,6 +1,5 @@
-import { Typography } from '@mui/material';
 import React, { useContext, useEffect, useState } from 'react';
-import { ActionButton, BrownCreateOutlinedIcon, OutlinedBrownButton } from '../../assets/CustomComponents';
+import { DashboardHeader } from '../../assets/CustomComponents';
 import useAxios from '../../axiosInstance';
 import DashboardTable from '../../components/Dashboard/DashboardTable';
 import DeleteModal from '../../components/Modal/DeleteModal';
@@ -59,6 +58,11 @@ const SlideshowPage = () => {
         setImagePreviewOpen(true);
     };
 
+    const handleEdit = (image) => {
+        setSelectedImage(image);
+        setEditImageOpen(true);
+    };
+
     const columns = [
         { key: 'title', label: 'Title' },
         {
@@ -79,34 +83,17 @@ const SlideshowPage = () => {
         { key: 'actions', label: 'Actions' }
     ];
 
-    const renderActionButtons = (image) => (
-        <ActionButton onClick={() => { setSelectedImage(image); setEditImageOpen(true); }}>
-            <BrownCreateOutlinedIcon />
-        </ActionButton>
-    );
-
-    const renderTableActions = () => (
-        <div className='flex items-center justify-between w-full mb-4'>
-            <Typography variant='h5'>Slideshow Images</Typography>
-            <div>
-                <OutlinedBrownButton onClick={() => setAddImageOpen(true)} className='!mr-4'>
-                    Add Image
-                </OutlinedBrownButton>
-                {selectedImages.length > 0 && (
-                    <OutlinedBrownButton
-                        onClick={() => setDeleteImageOpen(true)}
-                        disabled={selectedImages.length === 0}
-                    >
-                        {selectedImages.length > 1 ? 'Delete Selected Images' : 'Delete Image'}
-                    </OutlinedBrownButton>
-                )}
-            </div>
-        </div>
-    );
-
     return (
         <div className='container mx-auto max-w-screen-2xl px-4 mt-20'>
             <div className='flex flex-col items-center justify-center'>
+                <DashboardHeader
+                    title="Slideshow Images"
+                    selectedItems={selectedImages}
+                    setAddItemOpen={setAddImageOpen}
+                    setDeleteItemOpen={setDeleteImageOpen}
+                    itemName="Image"
+                />
+
                 <DashboardTable
                     columns={columns}
                     data={images}
@@ -116,8 +103,7 @@ const SlideshowPage = () => {
                     itemsPerPage={itemsPerPage}
                     currentPage={currentPage}
                     onPageChange={(event) => setCurrentPage(event.selected)}
-                    renderActionButtons={renderActionButtons}
-                    renderTableActions={renderTableActions}
+                    onEdit={handleEdit}
                     containerClassName='max-w-screen-2xl mx-auto'
                 />
 

@@ -1335,6 +1335,41 @@ export const Header = ({
         </div>
     );
 };
+export const pluralize = (word, count) => {
+    if (count === 1) return word;
+    return word.endsWith('y') ? `${word.slice(0, -1)}ies` : `${word}s`;
+};
+
+export const DashboardHeader = ({
+    title,
+    selectedItems,
+    setAddItemOpen,
+    setDeleteItemOpen,
+    itemName
+}) => {
+    const isMultipleSelected = selectedItems.length > 1;
+    const itemNamePlural = pluralize(itemName, selectedItems.length);
+
+    return (
+        <div className='bg-white p-4 flex items-center justify-between w-full mb-4'>
+            <Typography variant='h5'>{title}</Typography>
+            <div>
+                <OutlinedBrownButton onClick={() => setAddItemOpen(true)} className='!mr-4'>
+                    Add {itemName}
+                </OutlinedBrownButton>
+                {selectedItems.length > 0 && (
+                    <OutlinedBrownButton
+                        onClick={() => setDeleteItemOpen(true)}
+                        disabled={selectedItems.length === 0}
+                    >
+                        {isMultipleSelected ? `Delete ${itemNamePlural}` : `Delete ${itemName}`}
+                    </OutlinedBrownButton>
+                )}
+            </div>
+        </div>
+    );
+};
+
 
 export const SearchDropdown = ({ results, onClickSuggestion, searchBarWidth }) => {
     return (
@@ -1700,7 +1735,95 @@ export const DropdownMenu = ({ auth, isAdmin, onLogout }) => {
     );
 };
 
-export const AuthActions = ({ auth, isDropdownOpen, handleProfileDropdownToggle, handleLogout, isAdmin }) => {
+export const UserMenu = ({
+    auth,
+    isAdmin,
+    handleProfileDropdownToggle,
+    isProfileDropdownOpen,
+    handleLogout,
+    totalQuantity,
+    handleCartDropdownToggle,
+    isCartDropdownOpen,
+    cartItems,
+    cartTotal,
+    handleRemoveItem,
+    handleGoToCart,
+    isLoading,
+    handleProductClick,
+}) => {
+
+    const navigate = useNavigate();
+
+    return (
+        <div className="flex items-center space-x-4">
+            {auth.accessToken ? (
+                <>
+                    {/* Profile button */}
+                    <div className="relative">
+                        <ProfileIcon
+                            auth={auth}
+                            handleProfileDropdownToggle={handleProfileDropdownToggle}
+                        />
+                        {isProfileDropdownOpen && (
+                            <ProfileDropdown
+                                isAdmin={isAdmin}
+                                handleLogout={handleLogout}
+                            />
+                        )}
+                    </div>
+
+                    {/* Wishlist & Cart buttons */}
+                    <div className="flex space-x-2">
+                        <WishlistIcon />
+
+                        <div className="relative">
+                            <CartIcon
+                                totalQuantity={totalQuantity}
+                                handleCartDropdownToggle={handleCartDropdownToggle}
+                            />
+
+                            {isCartDropdownOpen && (
+                                <CartDropdown
+                                    cartItems={cartItems}
+                                    cartTotal={cartTotal}
+                                    handleRemoveItem={handleRemoveItem}
+                                    handleGoToCart={handleGoToCart}
+                                    isLoading={isLoading}
+                                    handleProductClick={handleProductClick}
+                                />
+                            )}
+                        </div>
+                    </div>
+                </>
+            ) : (
+                // If not authenticated, show login and register buttons
+                <>
+                    <BrownButton
+                        variant="contained"
+                        color="primary"
+                        onClick={() => navigate('/login')}
+                    >
+                        Login
+                    </BrownButton>
+                    <OutlinedBrownButton onClick={() => navigate('/register')}>
+                        Register
+                    </OutlinedBrownButton>
+                </>
+            )}
+        </div>
+    );
+};
+
+export const AuthActions = ({
+    auth,
+    isDropdownOpen,
+    handleProfileDropdownToggle,
+    handleLogout,
+    isAdmin
+}) => {
+
+    const navigate = useNavigate();
+
     return (
         <div className="flex items-center space-x-6">
             <div className="flex items-center space-x-4">
@@ -1719,12 +1842,16 @@ export const AuthActions = ({ auth, isDropdownOpen, handleProfileDropdownToggle,
                     </div>
                 ) : (
                     <>
-                        <Link to='/login'>
-                            <BrownButton variant="contained" color="primary">Login</BrownButton>
-                        </Link>
-                        <Link to='/register'>
-                            <OutlinedBrownButton>Register</OutlinedBrownButton>
-                        </Link>
+                        <BrownButton
+                            variant="contained"
+                            color="primary"
+                            onClick={() => navigate('/login')}
+                        >
+                            Login
+                        </BrownButton>
+                        <OutlinedBrownButton onClick={() => navigate('/register')}>
+                            Register
+                        </OutlinedBrownButton>
                     </>
                 )}
             </div>
@@ -1761,7 +1888,7 @@ export const DashboardToolbar = ({ children }) => {
     )
 }
 
-export const DashboardHeader = ({ open, toggleDrawer, auth, isDropdownOpen, handleProfileDropdownToggle, handleLogout, isAdmin }) => {
+export const DashboardNavbar = ({ open, toggleDrawer, auth, isDropdownOpen, handleProfileDropdownToggle, handleLogout, isAdmin }) => {
     return (
         <DashboardAppBar open={open}>
             <DashboardToolbar>

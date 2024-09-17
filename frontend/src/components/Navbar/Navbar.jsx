@@ -10,6 +10,7 @@ import {
     OutlinedBrownButton,
     ProfileDropdown,
     ProfileIcon,
+    UserMenu,
     WishlistIcon,
 } from '../../assets/CustomComponents';
 import useAxios from '../../axiosInstance';
@@ -22,7 +23,6 @@ const Navbar = () => {
     const [cartItems, setCartItems] = useState([]);
     const [cartTotal, setCartTotal] = useState(0);
     const [isLoading, setIsLoading] = useState(false);
-
     const [isProfileDropdownOpen, setIsProfileDropdownOpen] = useState(false);
     const [isCartDropdownOpen, setIsCartDropdownOpen] = useState(false);
 
@@ -59,15 +59,13 @@ const Navbar = () => {
                 data: { productId }
             });
 
-            toast.success(`Product removed from cart`);
-
+            toast.success('Product removed from cart');
             setCartItems(response.data.items);
 
             const updatedTotal = response.data.items.reduce((acc, item) => {
                 const price = item.product.salePrice > 0 ? item.product.salePrice : item.product.price;
                 return acc + price * item.quantity;
             }, 0);
-
             setCartTotal(updatedTotal);
 
             if (response.data.items.length === 0) {
@@ -80,7 +78,6 @@ const Navbar = () => {
             setIsLoading(false);
         }
     };
-
 
     useEffect(() => {
         const handleProductAdded = () => {
@@ -134,59 +131,26 @@ const Navbar = () => {
                         <SearchBar />
                     </div>
 
-                    <div className="flex items-center space-x-4">
-                        <div className="flex items-center space-x-4">
-                            {auth.accessToken ? (
-                                <>
-                                    {/* Profile button */}
-                                    <div className="relative">
-                                        <ProfileIcon
-                                            auth={auth}
-                                            handleProfileDropdownToggle={handleProfileDropdownToggle}
-                                        />
-                                        {isProfileDropdownOpen && <ProfileDropdown isAdmin={isAdmin} handleLogout={handleLogout} />}
-                                    </div>
-
-                                    {/* Wishlist & Cart buttons */}
-                                    <div className='flex space-x-2'>
-                                        <WishlistIcon />
-
-                                        <div className="relative">
-                                            <CartIcon
-                                                totalQuantity={totalQuantity}
-                                                handleCartDropdownToggle={handleCartDropdownToggle}
-                                            />
-
-                                            {isCartDropdownOpen && (
-                                                <CartDropdown
-                                                    cartItems={cartItems}
-                                                    cartTotal={cartTotal}
-                                                    handleRemoveItem={handleRemoveItem}
-                                                    handleGoToCart={handleGoToCart}
-                                                    isLoading={isLoading}
-                                                    handleProductClick={handleProductClick}
-                                                />
-                                            )}
-                                        </div>
-                                    </div>
-                                </>
-                            ) : (
-                                // If not authenticated, login and register buttons
-                                <>
-                                    <Link to='/login'>
-                                        <BrownButton variant="contained" color="primary">Login</BrownButton>
-                                    </Link>
-                                    <Link to='/register'>
-                                        <OutlinedBrownButton>Register</OutlinedBrownButton>
-                                    </Link>
-                                </>
-                            )}
-                        </div>
-                    </div>
+                    <UserMenu
+                        auth={auth}
+                        isAdmin={isAdmin}
+                        handleProfileDropdownToggle={handleProfileDropdownToggle}
+                        isProfileDropdownOpen={isProfileDropdownOpen}
+                        handleLogout={handleLogout}
+                        totalQuantity={totalQuantity}
+                        handleCartDropdownToggle={handleCartDropdownToggle}
+                        isCartDropdownOpen={isCartDropdownOpen}
+                        cartItems={cartItems}
+                        cartTotal={cartTotal}
+                        handleRemoveItem={handleRemoveItem}
+                        handleGoToCart={handleGoToCart}
+                        isLoading={isLoading}
+                        handleProductClick={handleProductClick}
+                    />
                 </div>
             </nav>
 
-            <div className='pt-20 bg-white'>
+            <div className="pt-20 bg-white">
                 <CategoryNavbar />
             </div>
         </>
