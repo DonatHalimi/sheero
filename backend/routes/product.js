@@ -1,5 +1,6 @@
 const express = require('express');
-const { createProduct, getProducts, getProduct, getProductsByCategory, getProductsBySubCategory, getProductsBySubSubCategory, updateProduct, deleteProduct, deleteProducts, searchProducts } = require('../controllers/productController');
+const { createProduct, getProducts, getProduct, getProductsByCategory, getProductsBySubCategory, getProductsBySubSubCategory, updateProduct, deleteProduct, deleteProducts, searchProducts,
+    createProductBasic, uploadProductImage, addProductVariantsAndDetails } = require('../controllers/productController');
 const upload = require('../middleware/upload');
 const { requireAuthAndRole } = require('../middleware/auth');
 
@@ -15,5 +16,8 @@ router.get('/search', searchProducts);
 router.put('/update/:id', requireAuthAndRole('admin'), upload.single('image'), updateProduct);
 router.delete('/delete/:id', requireAuthAndRole('admin'), deleteProduct);
 router.delete('/delete-bulk', requireAuthAndRole('admin'), deleteProducts);
+router.post('/create-basic', requireAuthAndRole('admin'), createProductBasic);
+router.post('/upload-image', requireAuthAndRole('admin'), upload.single('image'), uploadProductImage);
+router.post('/add-variants', requireAuthAndRole('admin'), addProductVariantsAndDetails);
 
 module.exports = router;

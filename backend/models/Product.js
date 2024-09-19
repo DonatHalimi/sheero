@@ -1,14 +1,14 @@
 const mongoose = require('mongoose');
 
 const productSchema = new mongoose.Schema({
-    name: { type: String, required: true },
-    description: { type: String, required: true },
-    price: { type: Number, required: true },
+    name: { type: String, default: null },
+    description: { type: String, default: null },
+    price: { type: Number, default: null },
     salePrice: { type: Number, default: null },
-    category: { type: mongoose.Schema.Types.ObjectId, ref: 'Category', required: true },
-    subcategory: { type: mongoose.Schema.Types.ObjectId, ref: 'Subcategory', required: true },
-    subSubcategory: { type: mongoose.Schema.Types.ObjectId, ref: 'SubSubcategory', required: true },
-    image: { type: String, required: true },
+    category: { type: mongoose.Schema.Types.ObjectId, ref: 'Category', default: null },
+    subcategory: { type: mongoose.Schema.Types.ObjectId, ref: 'Subcategory', default: null },
+    subSubcategory: { type: mongoose.Schema.Types.ObjectId, ref: 'SubSubcategory', default: null },
+    image: { type: String, default: null },
     inventoryCount: { type: Number, default: 0 },
     dimensions: {
         length: { type: Number, default: null },
@@ -17,8 +17,8 @@ const productSchema = new mongoose.Schema({
         unit: { type: String, default: 'cm' }
     },
     variants: [{
-        color: String,
-        size: String,
+        color: { type: String, default: null },
+        size: { type: String, default: null },
     }],
     discount: {
         type: {
@@ -28,7 +28,7 @@ const productSchema = new mongoose.Schema({
         },
         value: { type: Number, default: 0 }
     },
-    supplier: { type: mongoose.Schema.Types.ObjectId, ref: 'Supplier', required: true },
+    supplier: { type: mongoose.Schema.Types.ObjectId, ref: 'Supplier', default: null },
     shipping: {
         weight: { type: Number, default: null },
         dimensions: {

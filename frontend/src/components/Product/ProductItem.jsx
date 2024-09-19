@@ -51,7 +51,7 @@ const ProductItem = ({ product, loading }) => {
             const errorMsg = error.response?.data?.message || `Failed to add product to ${action}.`;
             toast.info(errorMsg, { onClick: () => navigate(`/${action}`) });
         } finally {
-            setIsLoading((prev) => ({ ...prev, [action]: false }));
+            setLoadingState(false);
         }
     };
 

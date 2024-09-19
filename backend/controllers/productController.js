@@ -217,4 +217,72 @@ const searchProducts = async (req, res) => {
     }
 };
 
-module.exports = { createProduct, getProducts, getProduct, updateProduct, getProductsByCategory, getProductsBySubCategory, getProductsBySubSubCategory, deleteProduct, deleteProducts, searchProducts };
+// Three new functions to evade network timeouts
+const createProductBasic = async (req, res) => {
+    const { name, description, price, salePrice, category, subcategory, subSubcategory, inventoryCount, supplier, image } = req.body;
+
+    try {
+        const product = new Product({
+            name,
+            description,
+            price,
+            salePrice,
+            category,
+            subcategory,
+            subSubcategory,
+            inventoryCount,
+            dimensions: {},
+            variants: [],
+            discount: {},
+            supplier: supplier || null,
+            shipping: {},
+            image: '',
+            details: []
+        });
+        await product.save();
+        res.status(201).json({ productId: product._id, message: 'Basic product created' });
+    } catch (error) {
+        res.status(500).json({ message: 'Server error', error: error.message });
+    }
+};
+
+const uploadProductImage = async (req, res) => {
+    const { productId } = req.body;
+    const image = req.file ? req.file.path : '';
+
+    try {
+        const product = await Product.findById(productId);
+        if (!product) return res.status(404).json({ message: 'Product not found' });
+
+        product.image = image;
+        await product.save();
+
+        res.status(200).json({ message: 'Image uploaded successfully', image });
+    } catch (error) {
+        res.status(500).json({ message: 'Server error', error: error.message });
+    }
+};
+
+const addProductVariantsAndDetails = async (req, res) => {
+    const { productId, variants, dimensions, discount, supplier, shipping, details } = req.body;
+
+    try {
+        const product = await Product.findById(productId);
+        if (!product) return res.status(404).json({ message: 'Product not found' });
+
+        product.variants = variants !== undefined ? variants : product.variants;
+        product.dimensions = dimensions !== undefined ? dimensions : product.dimensions;
+        product.discount = discount !== undefined ? discount : product.discount;
+        product.supplier = supplier !== undefined ? supplier : product.supplier;
+        product.shipping = shipping !== undefined ? shipping : product.shipping;
+        product.details = details !== undefined ? details : product.details;
+
+        await product.save();
+
+        res.status(200).json({ message: 'Variants, dimensions, and details added successfully', product });
+    } catch (error) {
+        res.status(500).json({ message: 'Server error', error: error.message });
+    }
+};
+
+module.exports = { createProduct, getProducts, getProduct, updateProduct, getProductsByCategory, getProductsBySubCategory, getProductsBySubSubCategory, deleteProduct, deleteProducts, searchProducts, createProductBasic, uploadProductImage, addProductVariantsAndDetails };

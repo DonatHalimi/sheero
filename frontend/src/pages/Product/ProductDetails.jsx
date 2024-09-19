@@ -47,14 +47,13 @@ const ProductDetails = () => {
         window.scrollTo(0, 0);
     }, []);
 
-    // Function to open the review modal
     const openReviewModal = () => {
         if (!auth.accessToken) {
             toast.error('You need to log in first.');
             navigate('/login');
             return;
         }
-        setIsReviewModalOpen(true); // Open the modal
+        setIsReviewModalOpen(true);
     };
 
     const handleReviewSuccess = () => {
@@ -85,9 +84,9 @@ const ProductDetails = () => {
             if (action === 'cart') {
                 document.dispatchEvent(new CustomEvent('productAddedToCart', { detail: product._id }));
             }
-
         } catch (error) {
-            toast.error(error.response?.data?.message || `Failed to add product to ${action}.`);
+            const errorMsg = error.response?.data?.message || `Failed to add product to ${action}.`;
+            toast.info(errorMsg, { onClick: () => navigate(`/${action}`) });
         } finally {
             setLoadingState(false);
         }
