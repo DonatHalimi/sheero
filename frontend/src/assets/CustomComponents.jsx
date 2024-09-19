@@ -1,8 +1,8 @@
 import {
     ArrowBack,
     ChevronLeft,
-    CreateOutlined,
     Close,
+    CreateOutlined,
     DashboardOutlined,
     DeleteOutline,
     DeleteOutlined,
@@ -11,8 +11,8 @@ import {
     FavoriteBorderOutlined,
     InboxOutlined,
     Logout,
-    MoreVert,
     Menu as MenuIcon,
+    MoreVert,
     PersonOutlined,
     QuestionAnswerOutlined,
     Search,
@@ -532,17 +532,17 @@ export const CustomModal = ({ open, onClose, children, ...props }) => (
     <Modal
         open={open}
         onClose={onClose}
-        className="flex items-center justify-center outline-none"
+        className="flex items-center justify-center"
         {...props}
     >
-        <Box className="bg-white p-2 rounded-lg shadow-lg max-w-md w-full">
+        <Box className="bg-white p-2 rounded-lg shadow-lg max-w-md w-full focus:outline-none">
             {children}
         </Box>
     </Modal>
 );
 
 export const CustomBox = (props) => (
-    <Box className="bg-white p-2 rounded-lg max-w-md w-full" {...props} />
+    <Box className="bg-white p-2 rounded-lg max-w-md w-full focus:outline-none" {...props} />
 );
 
 export const CustomTypography = (props) => (
@@ -735,7 +735,7 @@ export const DetailsBox = styled(Box)(({ theme }) => ({
 
 export const ReviewsList = ({ reviews, openModal }) => {
     return (
-        <Box className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
+        <Box className="grid grid-cols-1 sm:grid-cols-1 lg:grid-cols-4">
             {reviews.length > 0 ? (
                 reviews.map((review, index) => (
                     <ReviewCard
@@ -746,11 +746,19 @@ export const ReviewsList = ({ reviews, openModal }) => {
                             overflow: 'hidden',
                         }}
                     >
-                        <Box className="flex justify-between items-center mb-2 w-52">
-                            <p className='font-semibold text-lg'>{review.user.username}</p>
+                        <Box className="flex justify-between items-center w-52">
+                            <p className='font-semibold text-lg mr-4'>{review.user.username}</p>
                             <RatingStars rating={review.rating} />
                         </Box>
-                        <p className="my-2" style={{
+                        <p className="font-semibold" style={{
+                            maxWidth: '200px',
+                            overflow: 'hidden',
+                            textOverflow: 'ellipsis',
+                            whiteSpace: 'nowrap'
+                        }}>
+                            {review.title}
+                        </p>
+                        <p style={{
                             maxWidth: '200px',
                             overflow: 'hidden',
                             textOverflow: 'ellipsis',
@@ -766,7 +774,7 @@ export const ReviewsList = ({ reviews, openModal }) => {
             ) : (
                 <Typography>No reviews found.</Typography>
             )}
-        </Box>
+        </Box >
     );
 };
 
@@ -830,13 +838,33 @@ export const ReviewModal = ({ open, handleClose, selectedReview, onImageClick })
                                             <RatingStars rating={selectedReview.rating} />
                                         </Box>
                                     </Typography>
-                                    <Typography variant="body2" mt={1}>
-                                        {selectedReview.comment}
-                                    </Typography>
+                                    <p className="font-semibold mt-1 whitespace-nowrap">
+                                        {selectedReview.title}
+                                    </p>
+                                    <textarea
+                                        value={selectedReview.comment}
+                                        readOnly
+                                        className="custom-textarea"
+                                        style={{
+                                            width: '90%',
+                                            height: 'auto',
+                                            minHeight: '100px',
+                                            maxHeight: '200px',
+                                            overflowY: 'auto',
+                                            border: 'none',
+                                            background: 'transparent',
+                                            resize: 'none',
+                                            fontSize: '16px',
+                                            boxSizing: 'border-box',
+                                            borderRadius: '4px',
+                                            marginTop: '6px',
+                                            outline: 'none',
+                                        }}
+                                        onFocus={(e) => e.target.style.border = 'none'}
+                                    />
                                 </Box>
                             </Box>
-                            <Box sx={{ marginTop: 'auto' }}>
-                            </Box>
+                            <Box sx={{ marginTop: 'auto' }} />
                             <IconButton
                                 onClick={handleClose}
                                 aria-label="close"
@@ -851,7 +879,6 @@ export const ReviewModal = ({ open, handleClose, selectedReview, onImageClick })
         </Modal>
     );
 };
-
 export const ProductTabs = ({ value, handleChange }) => {
     return (
         <Tabs
@@ -987,7 +1014,7 @@ export const FAQSection = () => {
     useEffect(() => {
         const fetchFAQs = async () => {
             try {
-                const response = await axiosInstance.get('/faq/get');
+                const response = await axiosInstance.get('/faqs/get');
                 setFaqData(response.data);
             } catch (error) {
                 console.error('Error fetching FAQs:', error);
@@ -1048,7 +1075,7 @@ export const LoadingCart = () => {
         <>
             <Navbar />
             <div className="container mx-auto px-4 py-2 mb-16 bg-gray-50 mt-10">
-                <h1 className="text-2xl font-semibold mb-4">Cart</h1>
+                <h1 className="text-2xl font-semilight mb-4">Cart</h1>
                 <TableContainer component={Paper} className="bg-white">
                     <Table>
                         <TableHead>
@@ -1167,38 +1194,57 @@ EmptyState.propTypes = {
     imageClass: PropTypes.string,
 };
 
-export const CustomReviewCard = ({ review, onImageClick, onMenuClick, onCardClick }) => (
-    <div
-        className="p-4 mb-4 shadow-sm flex relative cursor-pointer bg-white rounded-md"
-        onClick={() => onCardClick(review)}
-    >
-        <Box className="flex-shrink-0 mr-4 cursor-pointer">
-            <img
-                src={`http://localhost:5000/${review.product.image}`}
-                alt={review.product.name}
-                onClick={() => onImageClick(review.product._id)}
-                className="w-20 h-20 object-cover rounded-md cursor-pointer"
-            />
-        </Box>
-        <Box flexGrow={1} display="flex" justifyContent="space-between" alignItems="center">
-            <Box onClick={() => onImageClick(review.product._id)} className="cursor-pointer hover:underline">
-                <Typography variant="h6" className="font-light mb-2 flex items-center ml-2">
-                    {review.product.name.length > 100 ? `${review.product.name.slice(0, 100)}...` : review.product.name}
-                    <Box className='ml-2'>
-                        <RatingStars rating={review.rating} />
-                    </Box>
-                </Typography>
+export const truncateText = (text, maxLength) => {
+    return text.length > maxLength ? `${text.slice(0, maxLength)}...` : text;
+};
 
-                <Typography variant="body1" className="mt-1 text-gray-700">{review.comment}</Typography>
+export const CustomReviewCard = ({ review, onImageClick, onMenuClick, onCardClick }) => {
+    const handleProductClick = (event, productId) => {
+        event.stopPropagation();
+        onImageClick(productId);
+    };
 
-                <Typography variant="caption" className="block mt-2 text-sm text-gray-500">
-                    {new Date(review.updatedAt || review.createdAt).toLocaleDateString()}
-                </Typography>
+    return (
+        <div
+            className="p-4 mb-4 shadow-sm flex relative cursor-pointer bg-white rounded-md"
+            onClick={() => onCardClick(review)}
+            style={{ height: 'auto', minHeight: '120px' }}
+        >
+            <Box className="flex-shrink-0 mr-4">
+                <img
+                    src={`http://localhost:5000/${review.product.image}`}
+                    alt={review.product.name}
+                    onClick={(event) => handleProductClick(event, review.product._id)}
+                    className="w-20 h-20 object-cover rounded-md cursor-pointer hover:underline"
+                />
             </Box>
-            <CenteredMoreVertIcon onClick={(event) => onMenuClick(event, review)} />
-        </Box>
-    </div>
-);
+            <Box flexGrow={1} display="flex" flexDirection="column" justifyContent="space-between" alignItems="flex-start">
+                <Box>
+                    <Typography
+                        onClick={(event) => handleProductClick(event, review.product._id)}
+                        variant="h6"
+                        className="font-light mb-2 flex items-center ml-2 hover:underline"
+                    >
+                        {truncateText(review.product.name, 100)}
+                        <Box className='ml-2'>
+                            <RatingStars rating={review.rating} />
+                        </Box>
+                    </Typography>
+                    <p className="text-base font-semibold">
+                        {truncateText(review.title, 100)}
+                    </p>
+                    <Typography variant="body1" className="mt-1 text-gray-700">
+                        {truncateText(review.comment, 100)}
+                    </Typography>
+                    <Typography variant="caption" className="block mt-2 text-sm text-gray-500">
+                        {new Date(review.updatedAt || review.createdAt).toLocaleDateString()}
+                    </Typography>
+                </Box>
+                <CenteredMoreVertIcon onClick={(event) => onMenuClick(event, review)} className="absolute top-2 right-2" />
+            </Box>
+        </div>
+    );
+};
 
 export const CenteredMoreVertIcon = ({ onClick, ...props }) => (
     <Box display="flex" justifyContent="center" alignItems="center" {...props}>
@@ -1318,7 +1364,7 @@ export const Header = ({
     const isSharedWishlist = username !== undefined;
 
     return (
-        <div className="bg-white px-4 py-4 rounded-sm shadow-sm mb-3 flex justify-between items-center">
+        <div className="bg-white p-4 rounded-sm shadow-sm mb-3 flex justify-between items-center">
             <Typography variant="h5" className="text-gray-800 font-semilight">
                 {isSharedWishlist ? `${username}'s Wishlist` : title}
             </Typography>

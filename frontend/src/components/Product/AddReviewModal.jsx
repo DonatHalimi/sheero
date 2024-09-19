@@ -1,65 +1,61 @@
 import { Rating, TextField } from '@mui/material';
-import React, { useEffect, useState } from 'react';
+import React, { useContext, useState } from 'react';
 import { toast } from 'react-toastify';
 import { BrownButton, BrownOutlinedTextField, CustomBox, CustomModal, CustomTypography } from '../../assets/CustomComponents';
 import useAxios from '../../axiosInstance';
+import { AuthContext } from '../../context/AuthContext';
 
-const EditReviewModal = ({ open, onClose, review, onEditSuccess }) => {
+const AddReviewModal = ({ open, onClose, product, onReviewSuccess }) => {
+    const { auth } = useContext(AuthContext);
     const [title, setTitle] = useState('');
     const [rating, setRating] = useState(null);
     const [comment, setComment] = useState('');
     const axiosInstance = useAxios();
 
-    useEffect(() => {
-        if (review) {
-            setTitle(review.title);
-            setRating(Number(review.rating));
-            setComment(review.comment);
+    const handleAddReview = async () => {
+        if (!auth.accessToken) {
+            toast.info('You need to be logged in to add a review');
+            return;
         }
-    }, [review]);
 
-    const handleEditReview = async () => {
+        if (title.length > 60) {
+            toast.error('Title cannot exceed 60 characters');
+            return;
+        }
+
         if (!title || rating === null || !comment) {
-            toast.error('Please fill in all the fields', {
-                closeOnClick: true,
-            });
+            toast.error('Please fill in all the fields');
             return;
         }
 
         try {
-            await axiosInstance.put(`/reviews/update/${review._id}`, {
+            await axiosInstance.post(`/reviews/product/${product._id}`, {
                 title,
                 rating,
                 comment,
             });
-            toast.success('Review edited successfully');
-            onEditSuccess();
-            onClose();
+            toast.success('Review added successfully');
+            onReviewSuccess();
         } catch (error) {
-            console.error('Error editing review', error);
-            if (error.response && error.response.data.message) {
-                toast.error(error.response.data.message);
-            } else {
-                toast.error('Error editing review');
-            }
+            toast.error(error.response?.data?.message || 'Error adding review');
         }
     };
 
     return (
         <CustomModal open={open} onClose={onClose}>
             <CustomBox>
-                <CustomTypography variant="h5" className="!text-gray-800 !font-semilight">Edit Review</CustomTypography>
+                <CustomTypography variant="h5" className="!text-gray-800 !font-semilight">
+                    Add Review
+                </CustomTypography>
 
                 <TextField
                     label="Product"
-                    value={review?.product?.name || ''}
-                    InputProps={{
-                        readOnly: true,
-                    }}
+                    value={product?.name || ''}
+                    InputProps={{ readOnly: true }}
                     fullWidth
                     margin="normal"
                     variant="outlined"
-                    disabled={!!review?.product?.name}
+                    disabled={!!product?.name}
                     className="!mb-4"
                 />
 
@@ -93,12 +89,12 @@ const EditReviewModal = ({ open, onClose, review, onEditSuccess }) => {
                     className="!mb-4"
                 />
 
-                <BrownButton onClick={handleEditReview} fullWidth>
-                    Save Changes
+                <BrownButton onClick={handleAddReview} fullWidth>
+                    Submit Review
                 </BrownButton>
             </CustomBox>
         </CustomModal>
     );
 };
 
-export default EditReviewModal;
+export default AddReviewModal;

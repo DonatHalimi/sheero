@@ -6,7 +6,6 @@ export { Route, BrowserRouter as Router, Routes } from 'react-router-dom';
 export { ToastContainer } from 'react-toastify';
 
 // Pages and components
-export { default as ContactUs } from '../pages/ContactUs.jsx';
 export { default as DashboardLayout } from '../components/Dashboard/DashboardLayout.jsx';
 export { default as SharedWishlist } from '../components/Product/SharedWishlist.jsx';
 export { default as ProtectedRoute } from '../components/Route/ProtectedRoute';
@@ -14,6 +13,7 @@ export { default as PublicRoute } from '../components/Route/PublicRoute';
 export { default as ToTop } from '../components/ToTop';
 export { default as Login } from '../pages/Auth/Login';
 export { default as Register } from '../pages/Auth/Register';
+export { default as ContactUs } from '../pages/ContactUs.jsx';
 export { default as FAQs } from '../pages/FAQs.jsx';
 export { default as Home } from '../pages/Home';
 export { default as NotAllowed } from '../pages/NotAllowed';

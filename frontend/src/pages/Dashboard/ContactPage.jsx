@@ -1,6 +1,5 @@
 import React, { useContext, useEffect, useState } from 'react';
-import { Typography } from '@mui/material';
-import { ActionButton, BrownCreateOutlinedIcon, DashboardHeader, OutlinedBrownButton } from '../../assets/CustomComponents';
+import { DashboardHeader } from '../../assets/CustomComponents';
 import useAxios from '../../axiosInstance';
 import DashboardTable from '../../components/Dashboard/DashboardTable';
 import AddContactModal from '../../components/Modal/Contact/AddContactModal';

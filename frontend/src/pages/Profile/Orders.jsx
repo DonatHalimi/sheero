@@ -1,4 +1,4 @@
-import { Box, Typography } from '@mui/material';
+import { Box } from '@mui/material';
 import React, { useEffect } from 'react';
 import 'react-toastify/dist/ReactToastify.css';
 import { EmptyState, Header } from '../../assets/CustomComponents';

@@ -2,7 +2,7 @@ const Review = require('../models/Review');
 const Product = require('../models/Product');
 
 const createReview = async (req, res) => {
-    const { rating, comment } = req.body;
+    const { title, rating, comment } = req.body;
     const productId = req.params.productId;
     const userId = req.user.userId;
 
@@ -20,6 +20,7 @@ const createReview = async (req, res) => {
         const review = new Review({
             product: productId,
             user: userId,
+            title,
             rating,
             comment
         });
@@ -118,7 +119,7 @@ const getReviewsByUser = async (req, res) => {
 };
 
 const updateReview = async (req, res) => {
-    const { rating, comment } = req.body;
+    const { title, rating, comment } = req.body;
     const userId = req.user.userId;
     const userRole = req.user.role;
 
@@ -133,6 +134,7 @@ const updateReview = async (req, res) => {
         }
 
         // Update fields only if they are provided in the request body
+        if (title !== undefined) review.title = title;
         if (rating !== undefined) review.rating = rating;
         if (comment !== undefined) review.comment = comment;
         review.updatedAt = Date.now();

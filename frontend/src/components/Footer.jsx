@@ -1,66 +1,98 @@
-import { Facebook, GitHub, Instagram, LinkedIn } from '@mui/icons-material';
+import { ContactMail, Email, Facebook, GitHub, Instagram, LinkedIn, Phone } from '@mui/icons-material';
 import React from 'react';
+import { Link } from 'react-router-dom';
 
 const Footer = () => {
+    const socialLinks = [
+        { href: 'https://facebook.com', icon: <Facebook />, label: 'Facebook' },
+        { href: 'https://instagram.com', icon: <Instagram />, label: 'Instagram' },
+        { href: 'https://www.linkedin.com/in/donat-halimi-0719b0193/', icon: <LinkedIn />, label: 'LinkedIn' },
+        { href: 'https://github.com/DonatHalimi/sheero', icon: <GitHub />, label: 'GitHub' },
+    ];
+
+    const quickLinks = [
+        { to: '/', label: 'Home' },
+        { to: '/about-us', label: 'About Us' },
+        { to: '/contact-us', label: 'Contact' },
+        { to: '/faqs', label: 'FAQs' },
+    ];
+
+    const customerServiceLinks = [
+        { to: '/profile', label: 'My Account' },
+        { to: '/orders', label: 'Order Tracking' },
+        { to: '/address', label: 'Address' },
+        { to: '/wishlist', label: 'Wishlist' },
+    ];
+
+    const contactInfo = [
+        { href: 'mailto:support@sheero.com', icon: <Email />, label: 'Email' },
+        { href: 'tel:+1234567890', icon: <Phone />, label: 'Phone' },
+        { to: '/contact-us', icon: <ContactMail />, label: 'Contact' },
+    ];
+
     return (
         <footer className="bg-stone-600 text-white">
             <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
                 <div className="grid grid-cols-1 md:grid-cols-4 gap-8">
+                    {/* Company Info */}
                     <div>
-                        <h3 className="text-lg font-semibold mb-4">sheero</h3>
+                        <h3 className="text-lg font-semibold mb-4 select-none"><Link to="/">sheero</Link></h3>
                         <p className="text-gray-200 mb-2">
                             Your trusted online shopping destination for quality products and exceptional service.
-                            <br />
+                            <div className='mb-2' />
                             <span className='mt-4'>Stay connected with us</span>
                         </p>
                         <div className="flex space-x-4">
-                            <a href='https://facebook.com' target='_blank' className="text-gray-200 hover:text-white" aria-label="Facebook">
-                                <Facebook />
-                            </a>
-                            <a href='https://instagram.com' target='_blank' className="text-gray-200 hover:text-white" aria-label="Instagram">
-                                <Instagram />
-                            </a>
-                            <a href='https://www.linkedin.com/in/donat-halimi-0719b0193/' target='_blank' className="text-gray-200 hover:text-white" aria-label="LinkedIn">
-                                <LinkedIn />
-                            </a>
-                            <a href='https://github.com/DonatHalimi/sheero' target='_blank' className="cursor-pointer text-gray-200 hover:text-white" aria-label='GitHub'>
-                                <GitHub />
-                            </a>
+                            {socialLinks.map(({ href, icon, label }) => (
+                                <a key={label} href={href} target='_blank' className="text-gray-200 hover:text-white" aria-label={label}>
+                                    {icon}
+                                </a>
+                            ))}
                         </div>
                     </div>
 
+                    {/* Quick Links */}
                     <div>
-                        <h3 className="text-lg font-semibold mb-4">Quick Links</h3>
+                        <h3 className="text-lg font-semibold mb-4 select-none">Quick Links</h3>
                         <ul className="space-y-2">
-                            <li><a href="/" className="text-gray-200 hover:text-white hover:underline">Home</a></li>
-                            <li><a href="/about" target='_blank' className="text-gray-200 hover:text-white hover:underline">About Us</a></li>
-                            <li><a href="/contact-us" target='_blank' className="text-gray-200 hover:text-white hover:underline">Contact</a></li>
-                            <li><a href="/faqs" target='_blank' className="text-gray-200 hover:text-white hover:underline">FAQs</a></li>
+                            {quickLinks.map(({ to, label }) => (
+                                <li key={label}>
+                                    <Link to={to} className="text-gray-200 hover:text-white hover:underline">{label}</Link>
+                                </li>
+                            ))}
                         </ul>
                     </div>
 
+                    {/* Customer Service */}
                     <div>
-                        <h3 className="text-lg font-semibold mb-4">Customer Service</h3>
+                        <h3 className="text-lg font-semibold mb-4 select-none">Customer Service</h3>
                         <ul className="space-y-2">
-                            <li><a href="/profile" className="text-gray-200 hover:text-white hover:underline">My Account</a></li>
-                            <li><a href="/orders" className="text-gray-200 hover:text-white hover:underline">Order Tracking</a></li>
-                            <li><a href="/address" className="text-gray-200 hover:text-white hover:underline">Address</a></li>
-                            <li><a href="/wishlist" className="text-gray-200 hover:text-white hover:underline">Wishlist</a></li>
+                            {customerServiceLinks.map(({ to, label }) => (
+                                <li key={label}>
+                                    <Link to={to} className="text-gray-200 hover:text-white hover:underline">{label}</Link>
+                                </li>
+                            ))}
                         </ul>
                     </div>
 
+                    {/* Contact Us */}
                     <div>
-                        <h3 className="text-lg font-semibold mb-4">Newsletter</h3>
-                        <p className="text-gray-200 mb-4">Subscribe to our newsletter for the latest updates and offers.</p>
-                        <form className="flex">
-                            <input type="email" placeholder="Your email" className="bg-stone-700 text-white px-4 py-2 rounded-l-md focus:outline-none focus:ring-2 focus:ring-stone-500 flex-grow" required />
-                            <button type="submit" className="bg-stone-800 text-white px-4 py-2 rounded-r-md hover:bg-stone-900 focus:outline-none focus:ring-2 focus:ring-stone-500">Subscribe</button>
-                        </form>
+                        <h3 className="text-lg font-semibold mb-4 select-none">Contact Us</h3>
+                        <p className="text-gray-200 mb-4">Have questions or need support? Reach out to us through the following channels:</p>
+                        <div className='mb-2' />
+                        <div className="flex space-x-4 items-center">
+                            {contactInfo.map(({ href, to, icon, label }) => (
+                                <a key={label} href={href} to={to} className="text-gray-200 hover:text-white flex items-center" aria-label={label}>
+                                    {icon}
+                                    <span className="ml-1">{label}</span>
+                                </a>
+                            ))}
+                        </div>
                     </div>
                 </div>
 
-                <div className="mt-8 pt-8 border-t border-stone-700 text-center">
-                    <p className="text-gray-200">&copy; 2023 sheero. All rights reserved. - <a href='https://github.com/DonatHalimi' target='_blank' className='underline'>Donat</a></p>
+                <div className="mt-8 pt-8 border-t border-stone-700 text-center select-none">
+                    <p className="text-gray-200">&copy; 2023 sheero. All Rights Reserved. - <a href='https://github.com/DonatHalimi' target='_blank' className='underline'>Donat</a></p>
                 </div>
             </div>
         </footer>

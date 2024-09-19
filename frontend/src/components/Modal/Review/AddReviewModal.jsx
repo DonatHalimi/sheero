@@ -1,4 +1,4 @@
-import { FormControl, InputLabel, MenuItem, Rating, Select } from '@mui/material';
+import { FormControl, InputLabel, MenuItem, Rating, Select, TextField } from '@mui/material';
 import React, { useContext, useEffect, useState } from 'react';
 import { toast } from 'react-toastify';
 import { BrownButton, BrownOutlinedTextField, CustomBox, CustomModal, CustomTypography } from '../../../assets/CustomComponents';
@@ -6,6 +6,7 @@ import useAxios from '../../../axiosInstance';
 import { AuthContext } from '../../../context/AuthContext';
 
 const AddReviewModal = ({ open, onClose, onAddSuccess }) => {
+    const [title, setTitle] = useState('');
     const [rating, setRating] = useState(0);
     const [comment, setComment] = useState('');
     const [productId, setProductId] = useState(null);
@@ -39,7 +40,7 @@ const AddReviewModal = ({ open, onClose, onAddSuccess }) => {
     }, [axiosInstance]);
 
     const handleAddReview = async () => {
-        if (rating < 1 || !productId) {
+        if (!title || rating < 1 || rating > 5 || !productId) {
             toast.error('Please fill in all the fields and select a rating between 1 and 5 stars', {
                 closeOnClick: true,
             });
@@ -58,6 +59,7 @@ const AddReviewModal = ({ open, onClose, onAddSuccess }) => {
 
         try {
             await axiosInstance.post(`/reviews/product/${productId}`, {
+                title,
                 rating,
                 comment,
             });
@@ -91,6 +93,14 @@ const AddReviewModal = ({ open, onClose, onAddSuccess }) => {
                     </Select>
                 </FormControl>
 
+                <TextField
+                    label="Title"
+                    value={title}
+                    onChange={(e) => setTitle(e.target.value)}
+                    fullWidth
+                    className='!mb-4'
+                />
+
                 <Rating
                     name="product-rating"
                     value={rating}
@@ -99,6 +109,7 @@ const AddReviewModal = ({ open, onClose, onAddSuccess }) => {
                     max={5}
                     min={1}
                     size="large"
+                    sx={{ color: '#6D4C41', '& .MuiRating-iconFilled': { color: '#5A504B' }, '& .MuiRating-iconEmpty': { color: '#D7CCC8' } }}
                     className='mb-4'
                 />
 
@@ -106,9 +117,12 @@ const AddReviewModal = ({ open, onClose, onAddSuccess }) => {
                     label="Comment"
                     value={comment}
                     onChange={(e) => setComment(e.target.value)}
+                    multiline
+                    rows={4}
                     fullWidth
                     className='!mb-4'
                 />
+
                 <BrownButton
                     onClick={handleAddReview}
                     variant="contained"

@@ -1,6 +1,6 @@
 import VisibilityIcon from '@mui/icons-material/Visibility';
 import VisibilityOffIcon from '@mui/icons-material/VisibilityOff';
-import { Box, Container, IconButton, InputAdornment, Paper, Typography } from '@mui/material';
+import { Box, Container, IconButton, InputAdornment, Typography } from '@mui/material';
 import React, { useContext, useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { toast } from 'react-toastify';

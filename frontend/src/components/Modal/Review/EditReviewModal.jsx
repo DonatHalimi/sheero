@@ -1,4 +1,4 @@
-import { InputLabel, MenuItem, Rating, Select } from '@mui/material';
+import { InputLabel, MenuItem, Rating, Select, TextField } from '@mui/material';
 import React, { useContext, useEffect, useState } from 'react';
 import { toast } from 'react-toastify';
 import { BrownButton, BrownOutlinedTextField, CustomBox, CustomModal, CustomTypography, OutlinedBrownFormControl } from '../../../assets/CustomComponents';
@@ -6,6 +6,7 @@ import useAxios from '../../../axiosInstance';
 import { AuthContext } from '../../../context/AuthContext';
 
 const EditReviewModal = ({ open, onClose, review, onEditSuccess }) => {
+    const [title, setTitle] = useState('');
     const [rating, setRating] = useState(null);
     const [comment, setComment] = useState('');
     const [product, setProduct] = useState('');
@@ -29,6 +30,7 @@ const EditReviewModal = ({ open, onClose, review, onEditSuccess }) => {
 
     useEffect(() => {
         if (review) {
+            setTitle(review.title);
             setRating(Number(review.rating));
             setComment(review.comment);
             setProduct(review.product._id);
@@ -36,7 +38,7 @@ const EditReviewModal = ({ open, onClose, review, onEditSuccess }) => {
     }, [review]);
 
     const handleEditReview = async () => {
-        if (rating === null || !comment || !product) {
+        if (!title || rating === null || !comment || !product) {
             toast.error('Please fill in all the fields', {
                 closeOnClick: true,
             });
@@ -45,6 +47,7 @@ const EditReviewModal = ({ open, onClose, review, onEditSuccess }) => {
 
         try {
             await axiosInstance.put(`/reviews/update/${review._id}`, {
+                title,
                 rating,
                 comment,
                 productId: product
@@ -83,6 +86,14 @@ const EditReviewModal = ({ open, onClose, review, onEditSuccess }) => {
                     </Select>
                 </OutlinedBrownFormControl>
 
+                <TextField
+                    label="Title"
+                    value={title}
+                    onChange={(e) => setTitle(e.target.value)}
+                    fullWidth
+                    className='!mb-4'
+                />
+
                 <Rating
                     name="product-rating"
                     value={rating}
@@ -91,15 +102,20 @@ const EditReviewModal = ({ open, onClose, review, onEditSuccess }) => {
                     max={5}
                     min={1}
                     size="large"
+                    sx={{ color: '#6D4C41', '& .MuiRating-iconFilled': { color: '#5A504B' }, '& .MuiRating-iconEmpty': { color: '#D7CCC8' } }}
                     className='mb-4'
                 />
+
                 <BrownOutlinedTextField
                     label="Comment"
                     value={comment}
                     onChange={(e) => setComment(e.target.value)}
+                    multiline
+                    rows={4}
                     fullWidth
                     className='!mb-4'
                 />
+
                 <BrownButton
                     onClick={handleEditReview}
                     fullWidth

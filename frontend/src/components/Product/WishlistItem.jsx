@@ -20,7 +20,9 @@ const WishlistItem = ({ product, onRemove, loading }) => {
     const discountPercentage = discount?.value || 0;
     const finalPrice = salePrice > 0 ? salePrice : price;
 
-    const handleClick = () => _id && navigate(`/product/${_id}`);
+    const handleClick = () => {
+        if (_id) navigate(`/product/${_id}`);
+    };
 
     const handleAddToCart = async (e) => {
         e.stopPropagation();
@@ -32,17 +34,17 @@ const WishlistItem = ({ product, onRemove, loading }) => {
 
         setIsActionLoading(true);
         try {
-            await axios.post(`${apiUrl}/api/cart/add`, { productId: _id, quantity: 1 }, {
-                headers: { Authorization: `Bearer ${auth.accessToken}` }
-            });
+            await axios.post(`${apiUrl}/api/cart/add`,
+                { productId: _id, quantity: 1 },
+                { headers: { Authorization: `Bearer ${auth.accessToken}` } }
+            );
 
             toast.success('Product added to cart!', { onClick: () => navigate('/cart') });
 
             document.dispatchEvent(new CustomEvent('productAddedToCart', { detail: _id }));
-
         } catch (error) {
-            const errorMsg = error.response?.data?.message || `Failed to add product to ${action}.`;
-            toast.info(errorMsg, { onClick: () => navigate('/cart'), });
+            const errorMsg = error.response?.data?.message || 'Failed to add product to cart.';
+            toast.error(errorMsg, { onClick: () => navigate('/cart') });
         } finally {
             setIsActionLoading(false);
         }

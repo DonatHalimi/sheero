@@ -1,17 +1,10 @@
 import React, { useContext, useEffect, useState } from 'react';
-import { Link, useNavigate } from 'react-router-dom';
+import { useNavigate } from 'react-router-dom';
 import { toast } from 'react-toastify';
 import {
-    BrownButton,
-    CartDropdown,
-    CartIcon,
     LoadingOverlay,
     NavbarLogo,
-    OutlinedBrownButton,
-    ProfileDropdown,
-    ProfileIcon,
     UserMenu,
-    WishlistIcon,
 } from '../../assets/CustomComponents';
 import useAxios from '../../axiosInstance';
 import { AuthContext } from '../../context/AuthContext';
@@ -31,20 +24,18 @@ const Navbar = () => {
 
     useEffect(() => {
         const fetchCartData = async () => {
-            if (auth.accessToken) {
-                try {
-                    const response = await axiosInstance.get('/cart');
-                    const cart = response.data;
-                    setCartItems(cart.items);
+            if (!auth.accessToken) return;
+            try {
+                const { data: cart } = await axiosInstance.get('/cart');
+                setCartItems(cart.items);
 
-                    const total = cart.items.reduce((acc, item) => {
-                        const price = item.product.salePrice > 0 ? item.product.salePrice : item.product.price;
-                        return acc + price * item.quantity;
-                    }, 0);
-                    setCartTotal(total);
-                } catch (error) {
-                    console.log('Error fetching cart data:', error);
-                }
+                const total = cart.items.reduce((acc, item) => {
+                    const price = item.product.salePrice || item.product.price;
+                    return acc + price * item.quantity;
+                }, 0);
+                setCartTotal(total);
+            } catch (error) {
+                console.log('Error fetching cart data:', error);
             }
         };
 
@@ -54,21 +45,20 @@ const Navbar = () => {
     const handleRemoveItem = async (productId) => {
         setIsLoading(true);
         try {
-            const response = await axiosInstance.delete('/cart/remove', {
+            const { data } = await axiosInstance.delete('/cart/remove', {
                 headers: { Authorization: `Bearer ${auth.accessToken}` },
                 data: { productId }
             });
-
             toast.success('Product removed from cart');
-            setCartItems(response.data.items);
+            setCartItems(data.items);
 
-            const updatedTotal = response.data.items.reduce((acc, item) => {
-                const price = item.product.salePrice > 0 ? item.product.salePrice : item.product.price;
+            const updatedTotal = data.items.reduce((acc, item) => {
+                const price = item.product.salePrice || item.product.price;
                 return acc + price * item.quantity;
             }, 0);
             setCartTotal(updatedTotal);
 
-            if (response.data.items.length === 0) {
+            if (data.items.length === 0) {
                 setIsCartDropdownOpen(false);
             }
         } catch (error) {
@@ -80,31 +70,25 @@ const Navbar = () => {
     };
 
     useEffect(() => {
-        const handleProductAdded = () => {
-            setIsCartDropdownOpen(true);
-        };
+        const handleProductAdded = () => setIsCartDropdownOpen(true);
         document.addEventListener('productAddedToCart', handleProductAdded);
-        return () => {
-            document.removeEventListener('productAddedToCart', handleProductAdded);
-        };
+        return () => document.removeEventListener('productAddedToCart', handleProductAdded);
     }, []);
 
-    const handleProfileDropdownToggle = () => {
-        setIsProfileDropdownOpen((prev) => !prev);
-        setIsCartDropdownOpen(false);
-    };
-
-    const handleCartDropdownToggle = () => {
-        setIsCartDropdownOpen((prev) => !prev);
-        setIsProfileDropdownOpen(false);
+    const toggleDropdown = (type) => {
+        if (type === 'profile') {
+            setIsProfileDropdownOpen(prev => !prev);
+            setIsCartDropdownOpen(false);
+        } else if (type === 'cart') {
+            setIsCartDropdownOpen(prev => !prev);
+            setIsProfileDropdownOpen(false);
+        }
     };
 
     const handleLogout = () => {
         logout();
         setIsProfileDropdownOpen(false);
     };
-
-    const totalQuantity = cartItems.reduce((acc, item) => acc + item.quantity, 0);
 
     const handleGoToCart = async () => {
         setIsLoading(true);
@@ -115,9 +99,9 @@ const Navbar = () => {
         }
     };
 
-    const handleProductClick = (productId) => {
-        navigate(`/product/${productId}`);
-    };
+    const handleProductClick = (productId) => navigate(`/product/${productId}`);
+
+    const totalQuantity = cartItems.reduce((acc, item) => acc + item.quantity, 0);
 
     return (
         <>
@@ -134,11 +118,11 @@ const Navbar = () => {
                     <UserMenu
                         auth={auth}
                         isAdmin={isAdmin}
-                        handleProfileDropdownToggle={handleProfileDropdownToggle}
+                        handleProfileDropdownToggle={() => toggleDropdown('profile')}
                         isProfileDropdownOpen={isProfileDropdownOpen}
                         handleLogout={handleLogout}
                         totalQuantity={totalQuantity}
-                        handleCartDropdownToggle={handleCartDropdownToggle}
+                        handleCartDropdownToggle={() => toggleDropdown('cart')}
                         isCartDropdownOpen={isCartDropdownOpen}
                         cartItems={cartItems}
                         cartTotal={cartTotal}

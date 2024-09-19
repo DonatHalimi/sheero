@@ -1,7 +1,7 @@
 import {
-  ContactUs,
   Addresses,
   Cart,
+  ContactUs,
   DashboardLayout,
   FAQs,
   Home,
@@ -45,7 +45,7 @@ const App = () => (
       <Route path="/products/subcategory/:id/" element={<ProductsBySubcategory />} />
       <Route path="/products/subSubcategory/:id/" element={<ProductsBySubSubCategory />} />
       <Route path="/product/:id" element={<ProductDetails />} />
-      <Route path="/search-results" element={<SearchResults />} />
+      <Route path="/search" element={<SearchResults />} />
       <Route path="/wishlist/:userId" element={<SharedWishlist />} />
       <Route path="/contact-us" element={<ContactUs />} />
 

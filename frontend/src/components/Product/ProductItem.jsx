@@ -10,22 +10,15 @@ import { AuthContext } from '../../context/AuthContext';
 const ProductItem = ({ product, loading }) => {
     const navigate = useNavigate();
     const { auth } = useContext(AuthContext);
-    const [isCartLoading, setIsCartLoading] = useState(false);
-    const [isWishlistLoading, setIsWishlistLoading] = useState(false);
+    const [isLoading, setIsLoading] = useState({ cart: false, wishlist: false });
 
     const { _id, name, image, price, salePrice } = product || {};
     const imageUrl = `http://localhost:5000/${image}`;
-
     const discountPercentage = salePrice && price > 0 ? Math.round(((price - salePrice) / price) * 100) : 0;
-
     const finalPrice = salePrice > 0 ? salePrice : price;
 
     const handleClick = () => {
-        if (_id) {
-            navigate(`/product/${_id}`);
-        } else {
-            console.error("Product ID is undefined");
-        }
+        if (_id) navigate(`/product/${_id}`);
     };
 
     const handleAction = (action) => async (e) => {
@@ -36,13 +29,12 @@ const ProductItem = ({ product, loading }) => {
             return;
         }
 
-        if (action === 'cart') setIsCartLoading(true);
-        if (action === 'wishlist') setIsWishlistLoading(true);
+        setIsLoading((prev) => ({ ...prev, [action]: true }));
 
         try {
             const endpoint = action === 'cart' ? 'cart/add' : 'wishlist/add';
             await axios.post(`http://localhost:5000/api/${endpoint}`, {
-                productId: product._id,
+                productId: _id,
                 ...(action === 'cart' && { quantity: 1 }),
             }, {
                 headers: { Authorization: `Bearer ${auth.accessToken}` }
@@ -53,15 +45,13 @@ const ProductItem = ({ product, loading }) => {
             });
 
             if (action === 'cart') {
-                document.dispatchEvent(new CustomEvent('productAddedToCart', { detail: product._id }));
+                document.dispatchEvent(new CustomEvent('productAddedToCart', { detail: _id }));
             }
-
         } catch (error) {
             const errorMsg = error.response?.data?.message || `Failed to add product to ${action}.`;
-            toast.info(errorMsg, { onClick: () => navigate(`/${action}`), });
+            toast.info(errorMsg, { onClick: () => navigate(`/${action}`) });
         } finally {
-            if (action === 'cart') setIsCartLoading(false);
-            if (action === 'wishlist') setIsWishlistLoading(false);
+            setIsLoading((prev) => ({ ...prev, [action]: false }));
         }
     };
 
@@ -71,7 +61,7 @@ const ProductItem = ({ product, loading }) => {
 
     return (
         <>
-            {(isCartLoading || isWishlistLoading) && (
+            {Object.values(isLoading).some(Boolean) && (
                 <div className="fixed inset-0 z-[1000] flex items-center justify-center bg-black bg-opacity-50">
                     <CircularProgress size={60} style={{ color: '#373533' }} />
                 </div>
@@ -94,16 +84,14 @@ const ProductItem = ({ product, loading }) => {
                 <div className="flex flex-col mb-2">
                     <span className="font-bold text-lg">{finalPrice.toFixed(2)} €</span>
                     {discountPercentage > 0 && (
-                        <span className="text-gray-500 line-through text-sm">
-                            {price.toFixed(2)} €
-                        </span>
+                        <span className="text-gray-500 line-through text-sm">{price.toFixed(2)} €</span>
                     )}
                 </div>
                 <div className="flex justify-between items-center mt-auto">
                     <CartWishlistButtons
                         handleAction={handleAction}
-                        isCartLoading={isCartLoading}
-                        isWishlistLoading={isWishlistLoading}
+                        isCartLoading={isLoading.cart}
+                        isWishlistLoading={isLoading.wishlist}
                     />
                 </div>
             </div>

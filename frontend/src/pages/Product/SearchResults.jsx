@@ -64,6 +64,12 @@ const SearchResults = () => {
         );
     }
 
+    const renderTotalProducts = () => (
+        <Typography variant="h5" className="mb-1">
+            {totalProducts} {totalProducts === 1 ? 'product' : 'products'} found for "{query}"
+        </Typography>
+    );
+
     return (
         <>
             <Navbar />
@@ -71,9 +77,7 @@ const SearchResults = () => {
                 {totalProducts > 0 ? (
                     <>
                         <div className="sticky top-0 z-10 pb-4 bg-gray-50">
-                            <Typography variant="h5" className='mb-1'>
-                                Search Results for "{query}"
-                            </Typography>
+                            {renderTotalProducts()}
                         </div>
                         <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 gap-4">
                             {renderProductItems()}

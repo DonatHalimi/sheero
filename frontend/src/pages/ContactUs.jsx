@@ -1,11 +1,13 @@
-import React, { useState } from 'react';
-import { TextField, Button, Container, Typography, Box } from '@mui/material';
+import { Box, Button, Container, TextField } from '@mui/material';
 import axios from 'axios';
+import React, { useContext, useEffect, useState } from 'react';
 import { toast } from 'react-toastify';
-import Navbar from '../components/Navbar/Navbar';
 import Footer from '../components/Footer';
+import Navbar from '../components/Navbar/Navbar';
+import { AuthContext } from '../context/AuthContext';
 
 const ContactUs = () => {
+    const { auth } = useContext(AuthContext);
     const [formData, setFormData] = useState({
         name: '',
         email: '',
@@ -15,13 +17,21 @@ const ContactUs = () => {
 
     const [loading, setLoading] = useState(false);
 
-    // Handle form field changes
+    useEffect(() => {
+        if (auth.email) {
+            setFormData((prev) => ({ ...prev, email: auth.email }));
+        }
+    }, [auth.email]);
+
+    useEffect(() => {
+        window.scrollTo(0, 0);
+    }, [])
+
     const handleChange = (e) => {
         const { name, value } = e.target;
         setFormData({ ...formData, [name]: value });
     };
 
-    // Handle form submission
     const handleSubmit = async (e) => {
         e.preventDefault();
         setLoading(true);
@@ -31,10 +41,9 @@ const ContactUs = () => {
             const response = await axios.post('http://localhost:5000/api/contact/create', formData);
             setLoading(false);
             toast.success('Message sent successfully!', { autoClose: 2000 });
-            // Reset form data after successful submission
             setFormData({
                 name: '',
-                email: '',
+                email: auth.email || '', // Reset email to the logged-in user's email
                 subject: '',
                 message: ''
             });
@@ -48,11 +57,11 @@ const ContactUs = () => {
         <>
             <Navbar />
 
-            <Container 
-                maxWidth="xs"  // Reduced the width to make the form narrower
+            <Container
+                maxWidth="xs"
                 className="my-10 p-5 bg-white shadow-md rounded-lg"
             >
-                <p  className="text-3xl mb-4 text-left">  {/* Align text to the left */}
+                <p className="text-3xl mb-4 text-left">
                     Contact Us
                 </p>
                 <form onSubmit={handleSubmit} className="flex flex-col gap-4">
@@ -70,12 +79,13 @@ const ContactUs = () => {
                         label="Email"
                         name="email"
                         type="email"
-                        value={formData.email}
+                        value={formData.email} // Email is pre-filled from the auth context
                         onChange={handleChange}
                         fullWidth
                         required
                         variant="outlined"
                         className="mb-3"
+                        disabled={!!auth.email} // Disable if the user is logged in
                     />
                     <TextField
                         label="Subject"
@@ -99,7 +109,7 @@ const ContactUs = () => {
                         variant="outlined"
                         className="mb-3"
                     />
-                    <Box textAlign="left">  {/* Align the button to the left */}
+                    <Box textAlign="left">
                         <Button
                             type="submit"
                             variant="contained"

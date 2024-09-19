@@ -1,6 +1,6 @@
 import { Box } from '@mui/material';
 import React from 'react';
-import { CustomReviewCard, ReviewItemSkeleton } from '../../assets/CustomComponents';
+import { CustomReviewCard, EmptyState, ReviewItemSkeleton } from '../../assets/CustomComponents';
 
 const ReviewItem = ({ reviews, loading, onImageClick, onMenuClick, onPaperClick, noReviewsImage }) => {
     if (loading) {

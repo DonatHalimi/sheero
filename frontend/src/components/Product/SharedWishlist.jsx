@@ -21,6 +21,7 @@ const SharedWishlist = () => {
 
     useEffect(() => {
         const fetchWishlist = async () => {
+            setLoading(true);
             try {
                 const { data } = await axios.get(`${apiUrl}/${userId}`);
                 setWishlistItems(data.items);
@@ -76,8 +77,7 @@ const SharedWishlist = () => {
                 ) : (
                     <EmptyState
                         imageSrc={emptyWishlistImage}
-                        message="No items in"
-                        dynamicValue={`${username}'s wishlist.`}
+                        message={`No item in ${username}'s wishlist.`}
                     />
                 )}
             </div>

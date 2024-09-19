@@ -42,13 +42,13 @@ const ProductList = () => {
 
     const renderProductItems = () => (
         loading
-            ? Array.from({ length: totalProducts }, (_, index) => <ProductItem key={index} loading={true} />)
+            ? Array.from({ length: itemsPerPage }, (_, index) => <ProductItem key={index} loading={true} />)
             : getCurrentPageItems().map(product => <ProductItem key={product._id} product={product} loading={false} />)
     );
 
     return (
         <div className="container mx-auto px-4 py-8 mb-16 bg-gray-50">
-            {totalProducts > 0 && (
+            {totalProducts > 0 && !loading && (
                 <div className="sticky top-0 z-10 pb-4 bg-gray-50">
                     <h1 className="text-2xl font-semibold">Products</h1>
                 </div>
@@ -56,7 +56,7 @@ const ProductList = () => {
             <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 gap-4">
                 {renderProductItems()}
             </div>
-            {totalProducts > 0 && (
+            {!loading && totalProducts > 0 && (
                 <CustomPagination
                     count={pageCount}
                     page={currentPage}

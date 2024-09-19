@@ -11,6 +11,7 @@ import {
 import Footer from '../../components/Footer';
 import ImagePreviewModal from '../../components/Modal/ImagePreviewModal';
 import Navbar from '../../components/Navbar/Navbar';
+import AddReviewModal from '../../components/Product/AddReviewModal';
 import ProductDetailsTabs from '../../components/Product/ProductDetailsTabs';
 import { AuthContext } from '../../context/AuthContext';
 
@@ -25,6 +26,7 @@ const ProductDetails = () => {
     const [loading, setLoading] = useState(true);
     const [isCartLoading, setIsCartLoading] = useState(false);
     const [isWishlistLoading, setIsWishlistLoading] = useState(false);
+    const [isReviewModalOpen, setIsReviewModalOpen] = useState(false);
 
     useEffect(() => {
         const fetchProduct = async () => {
@@ -43,7 +45,21 @@ const ProductDetails = () => {
 
     useEffect(() => {
         window.scrollTo(0, 0);
-    }, [])
+    }, []);
+
+    // Function to open the review modal
+    const openReviewModal = () => {
+        if (!auth.accessToken) {
+            toast.error('You need to log in first.');
+            navigate('/login');
+            return;
+        }
+        setIsReviewModalOpen(true); // Open the modal
+    };
+
+    const handleReviewSuccess = () => {
+        setIsReviewModalOpen(false);
+    };
 
     const handleAction = (action) => async (e) => {
         e.stopPropagation();
@@ -111,12 +127,19 @@ const ProductDetails = () => {
                             src={imageUrl}
                             alt={name}
                             className="w-full h-80 object-cover rounded cursor-pointer"
-                            onError={(e) => { e.target.onerror = null; e.target.src = NoImage; }}
                             onClick={() => setImagePreviewOpen(true)}
                         />
                     </div>
                     <div className="md:w-1/2">
                         <h1 className="text-2xl">{name}</h1>
+
+                        <p
+                            onClick={openReviewModal}
+                            className="mb-1 underline cursor-pointer text-sm w-9 font-sm"
+                        >
+                            Review
+                        </p>
+
                         <div className="mt-4 flex flex-col">
                             {discountPercentage > 0 ? (
                                 <>
@@ -141,6 +164,7 @@ const ProductDetails = () => {
                                 </span>
                             )}
                         </div>
+
                         <div className="mt-4 flex items-center">
                             <DetailsCartWishlistButtons
                                 handleAction={handleAction}
@@ -160,6 +184,14 @@ const ProductDetails = () => {
                 open={imagePreviewOpen}
                 onClose={() => setImagePreviewOpen(false)}
                 imageUrl={imageUrl}
+            />
+
+            {/* AddReviewModal */}
+            <AddReviewModal
+                open={isReviewModalOpen}
+                onClose={() => setIsReviewModalOpen(false)}
+                product={product}
+                onReviewSuccess={handleReviewSuccess}
             />
 
             <Footer />

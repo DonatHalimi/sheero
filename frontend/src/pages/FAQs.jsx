@@ -8,7 +8,7 @@ const FAQs = () => {
         <>
             <Navbar />
             <FAQSection />
-            <div className='mt-40'></div>
+            <div className='mt-20'></div>
             <Footer />
         </>
     );
