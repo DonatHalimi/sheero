@@ -1604,7 +1604,7 @@ export const LoadingOverlay = () => (
     </div>
 );
 
-export const NavbarLogo = () => {
+export const NavbarLogo = ({ dashboardStyling }) => {
     const navigate = useNavigate();
 
     const handleGoHome = () => {
@@ -1615,8 +1615,9 @@ export const NavbarLogo = () => {
         <Tooltip title="Home" arrow>
             <button
                 onClick={handleGoHome}
-                className="flex items-center cursor-pointer">
-                <img src={logo} alt="Logo" className="h-11" />
+                className={`flex items-center cursor-pointer ${dashboardStyling || ''}`}
+            >
+                <img src={logo} alt="Logo" className="h-9" />
             </button>
         </Tooltip>
     );
@@ -1781,85 +1782,6 @@ export const DropdownMenu = ({ auth, isAdmin, onLogout }) => {
     );
 };
 
-export const UserMenu = ({
-    auth,
-    isAdmin,
-    handleProfileDropdownToggle,
-    isProfileDropdownOpen,
-    handleLogout,
-    totalQuantity,
-    handleCartDropdownToggle,
-    isCartDropdownOpen,
-    cartItems,
-    cartTotal,
-    handleRemoveItem,
-    handleGoToCart,
-    isLoading,
-    handleProductClick,
-}) => {
-
-    const navigate = useNavigate();
-
-    return (
-        <div className="flex items-center space-x-4">
-            {auth.accessToken ? (
-                <>
-                    {/* Profile button */}
-                    <div className="relative">
-                        <ProfileIcon
-                            auth={auth}
-                            handleProfileDropdownToggle={handleProfileDropdownToggle}
-                        />
-                        {isProfileDropdownOpen && (
-                            <ProfileDropdown
-                                isAdmin={isAdmin}
-                                handleLogout={handleLogout}
-                            />
-                        )}
-                    </div>
-
-                    {/* Wishlist & Cart buttons */}
-                    <div className="flex space-x-2">
-                        <WishlistIcon />
-
-                        <div className="relative">
-                            <CartIcon
-                                totalQuantity={totalQuantity}
-                                handleCartDropdownToggle={handleCartDropdownToggle}
-                            />
-
-                            {isCartDropdownOpen && (
-                                <CartDropdown
-                                    cartItems={cartItems}
-                                    cartTotal={cartTotal}
-                                    handleRemoveItem={handleRemoveItem}
-                                    handleGoToCart={handleGoToCart}
-                                    isLoading={isLoading}
-                                    handleProductClick={handleProductClick}
-                                />
-                            )}
-                        </div>
-                    </div>
-                </>
-            ) : (
-                // If not authenticated, show login and register buttons
-                <>
-                    <BrownButton
-                        variant="contained"
-                        color="primary"
-                        onClick={() => navigate('/login')}
-                    >
-                        Login
-                    </BrownButton>
-                    <OutlinedBrownButton onClick={() => navigate('/register')}>
-                        Register
-                    </OutlinedBrownButton>
-                </>
-            )}
-        </div>
-    );
-};
-
 export const AuthActions = ({
     auth,
     isDropdownOpen,
@@ -1940,9 +1862,9 @@ export const DashboardNavbar = ({ open, toggleDrawer, auth, isDropdownOpen, hand
             <DashboardToolbar>
                 <ExtendIcon toggleDrawer={toggleDrawer} open={open} />
 
-                <div className="flex justify-between items-center top-0 left-0 right-0 z-50 mx-auto-xl px-20 mt-4 w-full">
+                <div className="flex justify-between items-center top-0 left-0 right-0 z-50 mx-auto-xl px-20 w-full">
                     <div className="flex items-center mb-5">
-                        <NavbarLogo />
+                        <NavbarLogo dashboardStyling={'relative top-2'} />
                     </div>
 
                     <AuthActions

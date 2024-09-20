@@ -1,4 +1,8 @@
 const jwt = require('jsonwebtoken');
+const Review = require('../models/Review');
+const Address = require('../models/Address');
+const Cart = require('../models/Cart');
+const Wishlist = require('../models/Wishlist');
 
 const authenticateToken = (req, res, next) => {
     const authHeader = req.header('Authorization');
@@ -73,5 +77,103 @@ const requireAuthAndRole = (role) => {
         });
     };
 };
+
+// TRY LATER: TO MAKE SURE USER EDITS THEIR OWN REVIEW/ADDRESS/CART/WISHLIST
+
+// const checkReviewOwnership = async (req, res, next) => {
+//     try {
+//         const reviewId = req.params.id;
+//         const userId = req.user.userId;
+//         const userRole = req.user.role;
+
+//         const review = await Review.findById(reviewId);
+
+//         if (!review) {
+//             return res.status(404).json({ message: 'Review not found' });
+//         }
+
+//         if (review.user.toString() !== userId && userRole !== 'admin') {
+//             return res.status(403).json({ message: 'You are not authorized to modify this review' });
+//         }
+
+//         // If the user is the owner or an admin, allow the operation
+//         next();
+//     } catch (error) {
+//         console.error('Error checking review ownership:', error);
+//         res.status(500).json({ message: 'Server error', error: error.message });
+//     }
+// };
+
+// const checkAddressOwnership = async (req, res, next) => {
+//     try {
+//         const addressId = req.params.id;
+//         const userId = req.user.userId;
+//         const userRole = req.user.role;
+
+//         const address = await Address.findById(addressId);
+
+//         if (!address) {
+//             return res.status(404).json({ message: 'Address not found' });
+//         }
+
+//         if (address.user.toString() !== userId && userRole !== 'admin') {
+//             return res.status(403).json({ message: 'You are not authorized to modify this address' });
+//         }
+
+//         // If the user is the owner or an admin, allow the operation
+//         next();
+//     } catch (error) {
+//         console.error('Error checking address ownership:', error);
+//         res.status(500).json({ message: 'Server error', error: error.message });
+//     }
+// };
+
+// const checkCartOwnership = async (req, res, next) => {
+//     try {
+//         const cartId = req.params.id;
+//         const userId = req.user.userId;
+//         const userRole = req.user.role;
+
+//         const cart = await Cart.findById(cartId);
+
+//         if (!cart) {
+//             return res.status(404).json({ message: 'Cart not found' });
+//         }
+
+//         if (cart.user.toString() !== userId && userRole !== 'admin') {
+//             return res.status(403).json({ message: 'You are not authorized to modify this cart' });
+//         }
+
+//         // If the user is the owner or an admin, allow the operation
+//         next();
+//     } catch (error) {
+//         console.error('Error checking cart ownership:', error);
+//         res.status(500).json({ message: 'Server error', error: error.message });
+//     }
+// };
+
+// const checkWishlistOwnership = async (req, res, next) => {
+//     try {
+//         const wishlistId = req.params.id;
+//         const userId = req.user.userId;
+//         const userRole = req.user.role;
+
+//         const wishlist = await Wishlist.findById(wishlistId);
+
+//         if (!wishlist) {
+//             return res.status(404).json({ message: 'Wishlist not found' });
+//         }
+
+//         if (wishlist.user.toString() !== userId && userRole !== 'admin') {
+//             return res.status(403).json({ message: 'You are not authorized to modify this wishlist' });
+//         }
+
+//         // If the user is the owner or an admin, allow the operation
+//         next();
+//     } catch (error) {
+//         console.error('Error checking wishlist ownership:', error);
+//         res.status(500).json({ message: 'Server error', error: error.message });
+//     }
+// };
 
 module.exports = { authenticateToken, authorizeRole, protect, requireAuthAndRole, refreshAccessToken };

@@ -39,7 +39,7 @@ const DashboardLayout = () => {
 
     return (
         <ThemeProvider theme={theme}>
-            <Box className="flex bg-white">
+            <Box sx={{ display: 'flex', bgcolor: '#F5F5F5' }}>
                 {/* <CssBaseline /> */}
 
                 <DashboardNavbar
@@ -51,7 +51,7 @@ const DashboardLayout = () => {
                     handleLogout={handleLogout}
                     isAdmin={isAdmin}
                 />
-                <Drawer variant="permanent" open={open} className='mt-4'>
+                <Drawer variant="permanent" open={open}>
                     <DashboardCollapse toggleDrawer={toggleDrawer} />
 
                     <Divider />
@@ -70,7 +70,7 @@ const DashboardLayout = () => {
                                 ? theme.palette.grey[100]
                                 : theme.palette.grey[900],
                         flexGrow: 1,
-                        height: '100vh',
+                        height: '105vh',
                         overflow: 'auto',
                     }}
                 >

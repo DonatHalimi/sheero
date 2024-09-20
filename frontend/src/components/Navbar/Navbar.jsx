@@ -2,9 +2,15 @@ import React, { useContext, useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { toast } from 'react-toastify';
 import {
+    BrownButton,
+    CartDropdown,
+    CartIcon,
     LoadingOverlay,
     NavbarLogo,
-    UserMenu,
+    OutlinedBrownButton,
+    ProfileDropdown,
+    ProfileIcon,
+    WishlistIcon,
 } from '../../assets/CustomComponents';
 import useAxios from '../../axiosInstance';
 import { AuthContext } from '../../context/AuthContext';
@@ -47,7 +53,7 @@ const Navbar = () => {
         try {
             const { data } = await axiosInstance.delete('/cart/remove', {
                 headers: { Authorization: `Bearer ${auth.accessToken}` },
-                data: { productId }
+                data: { productId },
             });
             toast.success('Product removed from cart');
             setCartItems(data.items);
@@ -113,24 +119,61 @@ const Navbar = () => {
 
                     <div className="flex items-center space-x-4 flex-grow mx-4">
                         <SearchBar />
-                    </div>
 
-                    <UserMenu
-                        auth={auth}
-                        isAdmin={isAdmin}
-                        handleProfileDropdownToggle={() => toggleDropdown('profile')}
-                        isProfileDropdownOpen={isProfileDropdownOpen}
-                        handleLogout={handleLogout}
-                        totalQuantity={totalQuantity}
-                        handleCartDropdownToggle={() => toggleDropdown('cart')}
-                        isCartDropdownOpen={isCartDropdownOpen}
-                        cartItems={cartItems}
-                        cartTotal={cartTotal}
-                        handleRemoveItem={handleRemoveItem}
-                        handleGoToCart={handleGoToCart}
-                        isLoading={isLoading}
-                        handleProductClick={handleProductClick}
-                    />
+                        {auth.accessToken ? (
+                            <>
+                                {/* Profile button */}
+                                <div className="relative">
+                                    <ProfileIcon
+                                        auth={auth}
+                                        handleProfileDropdownToggle={() => toggleDropdown('profile')}
+                                    />
+                                    {isProfileDropdownOpen && (
+                                        <ProfileDropdown
+                                            isAdmin={isAdmin()}
+                                            handleLogout={handleLogout}
+                                        />
+                                    )}
+                                </div>
+
+                                {/* Wishlist & Cart buttons */}
+                                <div className="flex space-x-2">
+                                    <WishlistIcon />
+
+                                    <div className="relative">
+                                        <CartIcon
+                                            totalQuantity={totalQuantity}
+                                            handleCartDropdownToggle={() => toggleDropdown('cart')}
+                                        />
+                                        {isCartDropdownOpen && (
+                                            <CartDropdown
+                                                cartItems={cartItems}
+                                                cartTotal={cartTotal}
+                                                handleRemoveItem={handleRemoveItem}
+                                                handleGoToCart={handleGoToCart}
+                                                isLoading={isLoading}
+                                                handleProductClick={handleProductClick}
+                                            />
+                                        )}
+                                    </div>
+                                </div>
+                            </>
+                        ) : (
+                            // If not authenticated, show login and register buttons
+                            <>
+                                <BrownButton
+                                    variant="contained"
+                                    color="primary"
+                                    onClick={() => navigate('/login')}
+                                >
+                                    Login
+                                </BrownButton>
+                                <OutlinedBrownButton onClick={() => navigate('/register')}>
+                                    Register
+                                </OutlinedBrownButton>
+                            </>
+                        )}
+                    </div>
                 </div>
             </nav>
 

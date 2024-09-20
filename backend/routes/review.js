@@ -5,8 +5,8 @@ const { protect, requireAuthAndRole } = require('../middleware/auth');
 const router = express.Router();
 
 router.post('/product/:productId', protect, createReview);
-router.get('/get', getReviews);
-router.get('/get/:id', getReview);
+router.get('/get', requireAuthAndRole('admin'), getReviews);
+router.get('/get/:id', requireAuthAndRole('admin'), getReview);
 router.get('/products/:productId', getReviewsByProduct);
 router.get('/user/:userId', protect, getReviewsByUser);
 router.put('/update/:id', protect, updateReview);

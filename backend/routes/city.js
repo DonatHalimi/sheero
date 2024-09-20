@@ -4,8 +4,8 @@ const { protect, requireAuthAndRole } = require('../middleware/auth.js');
 const router = express.Router();
 
 router.post('/create', requireAuthAndRole('admin'), createCity);
-router.get('/get', getCities);
-router.get('/get/:id', getCity);
+router.get('/get', protect, getCities);
+router.get('/get/:id', protect, getCity);
 router.put('/update/:id', requireAuthAndRole('admin'), updateCity);
 router.delete('/delete/:id', requireAuthAndRole('admin'), deleteCity);
 router.get('/country/:countryId', protect, getCitiesByCountry);

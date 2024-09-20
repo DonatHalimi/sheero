@@ -30,23 +30,27 @@ const AuthProvider = ({ children }) => {
             const response = await axios.post('http://localhost:5000/api/auth/refresh-token', {
                 refreshToken: auth.refreshToken,
             });
-
+    
             const newAccessToken = response.data.accessToken;
-
+            const newRole = response.data.role;
+    
             setAuth({
                 ...auth,
                 accessToken: newAccessToken,
+                role: newRole,
             });
-
+    
+            localStorage.setItem('role', newRole);
+    
             return newAccessToken;
         } catch (error) {
             console.error(
                 'Failed to refresh access token:',
                 error.response?.data?.message || 'Failed to refresh access token'
             );
-            logout();  // Log the user out if refresh fails
+            logout();
         }
-    };
+    };    
 
     const login = async (username, password) => {
         try {
@@ -112,7 +116,7 @@ const AuthProvider = ({ children }) => {
     useEffect(() => {
         const interval = setInterval(() => {
             refreshAccessToken();
-        }, 15 * 60 * 1000); // Refresh token every 15 minutes
+        }, 15 * 60 * 1000);
 
         return () => clearInterval(interval);
     }, []);

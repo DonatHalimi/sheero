@@ -93,7 +93,7 @@ const loginUser = async (req, res) => {
     }
 };
 
-const refreshAccessToken = (req, res) => {
+const refreshAccessToken = async (req, res) => {
     const { refreshToken } = req.body;
 
     if (!refreshToken) {
@@ -102,9 +102,16 @@ const refreshAccessToken = (req, res) => {
 
     try {
         const decoded = jwt.verify(refreshToken, process.env.JWT_REFRESH_SECRET);
-        const accessToken = generateAccessToken({ _id: decoded.userId, role: decoded.role });
+        
+        // Fetch the user to get the current role
+        const user = await User.findById(decoded.userId);
+        if (!user) {
+            return res.status(404).json({ message: 'User not found' });
+        }
 
-        res.json({ accessToken });
+        const accessToken = generateAccessToken({ _id: user._id, role: user.role });
+
+        res.json({ accessToken, role: user.role });
     } catch (error) {
         res.status(403).json({ message: 'Invalid Refresh Token' });
     }

@@ -217,7 +217,7 @@ const searchProducts = async (req, res) => {
     }
 };
 
-// Three new functions to evade network timeouts
+// Three new functions to evade network timeouts for 'AddProductModal'
 const createProductBasic = async (req, res) => {
     const { name, description, price, salePrice, category, subcategory, subSubcategory, inventoryCount, supplier, image } = req.body;
 
@@ -285,4 +285,7 @@ const addProductVariantsAndDetails = async (req, res) => {
     }
 };
 
-module.exports = { createProduct, getProducts, getProduct, updateProduct, getProductsByCategory, getProductsBySubCategory, getProductsBySubSubCategory, deleteProduct, deleteProducts, searchProducts, createProductBasic, uploadProductImage, addProductVariantsAndDetails };
+module.exports = {
+    createProduct, getProducts, getProduct, updateProduct, getProductsByCategory, getProductsBySubCategory, getProductsBySubSubCategory,
+    deleteProduct, deleteProducts, searchProducts, createProductBasic, uploadProductImage, addProductVariantsAndDetails
+};
