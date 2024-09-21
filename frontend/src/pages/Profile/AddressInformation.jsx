@@ -2,25 +2,55 @@ import { Box, Button, FormControl, InputLabel, MenuItem, Select, TextField } fro
 import React, { useContext, useEffect, useState } from 'react';
 import { toast } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
-import { Header } from '../../assets/CustomComponents';
-import useAxios from '../../axiosInstance';
+import { AddressInformationSkeleton, Header } from '../../assets/CustomComponents';
 import Footer from '../../components/Footer';
 import Navbar from '../../components/Navbar/Navbar';
 import { AuthContext } from '../../context/AuthContext';
 import ProfileSidebar from './ProfileSidebar';
+import useAxios from '../../axiosInstance';
+
+const apiUrl = 'http://localhost:5000/api/addresses';
 
 const AddressInformation = () => {
     const { auth, setAuth } = useContext(AuthContext);
-    const [name, setName] = useState(auth.address?.name || '');
-    const [street, setStreet] = useState(auth.address?.street || '');
-    const [phoneNumber, setPhoneNumber] = useState(auth.address?.phoneNumber || '');
-    const [city, setCity] = useState(auth.address?.city?._id || auth.address?.city || '');
-    const [country, setCountry] = useState(auth.address?.country?._id || auth.address?.country || '');
-    const [existingAddress, setExistingAddress] = useState(auth.address || null);
+    const userId = auth?.userId;
+    const axiosInstance = useAxios();
+
+    const [name, setName] = useState('');
+    const [street, setStreet] = useState('');
+    const [phoneNumber, setPhoneNumber] = useState('');
+    const [city, setCity] = useState('');
+    const [country, setCountry] = useState('');
+    const [existingAddress, setExistingAddress] = useState(null);
     const [cities, setCities] = useState([]);
     const [countries, setCountries] = useState([]);
+    const [loading, setLoading] = useState(true); // Added loading state
 
-    const axiosInstance = useAxios();
+    useEffect(() => {
+        if (userId && auth.accessToken) {
+            fetchAddress();
+        }
+    }, [userId, auth.accessToken]);
+
+    const fetchAddress = async () => {
+        try {
+            setLoading(true); // Start loading
+            const response = await axiosInstance.get(`${apiUrl}/user/${userId}`);
+            const address = response.data;
+            if (address) {
+                setName(address.name || '');
+                setStreet(address.street || '');
+                setPhoneNumber(address.phoneNumber || '');
+                setCity(address.city?._id || '');
+                setCountry(address.country?._id || '');
+                setExistingAddress(address);
+            }
+        } catch (error) {
+            console.error('Error fetching address:', error.message);
+        } finally {
+            setLoading(false); // Stop loading
+        }
+    };
 
     useEffect(() => {
         const fetchCountries = async () => {
@@ -28,8 +58,6 @@ const AddressInformation = () => {
                 const response = await axiosInstance.get('/countries/get');
                 if (response.data && Array.isArray(response.data)) {
                     setCountries(response.data);
-                } else {
-                    console.error('Unexpected data structure for countries:', response.data);
                 }
             } catch (error) {
                 console.error('Error fetching countries:', error);
@@ -46,8 +74,6 @@ const AddressInformation = () => {
                     const response = await axiosInstance.get(`/cities/country/${country}`);
                     if (response.data && Array.isArray(response.data)) {
                         setCities(response.data);
-                    } else {
-                        console.error('Unexpected data structure for cities:', response.data);
                     }
                 } catch (error) {
                     console.error('Error fetching cities:', error);
@@ -57,8 +83,6 @@ const AddressInformation = () => {
             fetchCities();
         }
     }, [country, cities.length, axiosInstance]);
-
-    useEffect(() => window.scrollTo(0, 0), []);
 
     const handleCountryChange = (e) => {
         const selectedCountryId = e.target.value;
@@ -84,37 +108,26 @@ const AddressInformation = () => {
             street,
             phoneNumber,
             city,
-            country
+            country,
         };
 
         try {
             let response;
-            if (existingAddress && existingAddress._id) {
-                response = await axiosInstance.put(`/addresses/update/${existingAddress._id}`, updatedAddress);
+            if (existingAddress) {
+                response = await axiosInstance.put(`${apiUrl}/update/${existingAddress._id}`, updatedAddress);
             } else {
-                response = await axiosInstance.post('/addresses/create', updatedAddress);
+                response = await axiosInstance.post(`${apiUrl}/create`, updatedAddress);
             }
 
             if (response.status === 200 || response.status === 201) {
                 toast.success(existingAddress ? 'Address updated successfully' : 'Address added successfully');
                 setExistingAddress(response.data);
-
-                const newAuth = {
-                    ...auth,
-                    address: response.data
-                };
-                setAuth(newAuth);
-                localStorage.setItem('address', JSON.stringify(response.data));
             } else {
                 toast.error('Unexpected response from server');
             }
         } catch (error) {
-            console.error('Error saving address:', error);
-            if (error.response) {
-                toast.error(error.response.data.message || 'Error saving address');
-            } else {
-                toast.error('Error saving address');
-            }
+            console.error('Error saving address:', error.message);
+            toast.error('Error saving address');
         }
     };
 
@@ -125,9 +138,11 @@ const AddressInformation = () => {
                 <ProfileSidebar />
                 <main className="p-4 relative left-32 w-full">
                     <div className="container mx-auto mt-20 mb-20">
-                        <Header title='Address' />
-
+                        <Header title="Address" />
                         <div className="bg-white shadow-sm rounded-sm p-8">
+                            {loading ? (
+                                <AddressInformationSkeleton />
+                            ) : (
                             <form onSubmit={handleSaveAddress} className="space-y-6">
                                 <Box className="flex gap-4">
                                     <TextField
@@ -153,7 +168,6 @@ const AddressInformation = () => {
                                 </Box>
 
                                 <Box className="flex gap-4">
-
                                     <TextField
                                         fullWidth
                                         label="Phone Number"
@@ -197,12 +211,13 @@ const AddressInformation = () => {
                                             ))}
                                         </Select>
                                     </FormControl>
-                                </Box >
+                                </Box>
 
                                 <Button type="submit" variant="contained" color="primary" className="bg-orange-600 hover:bg-orange-700">
                                     Save
                                 </Button>
                             </form>
+                            )}
                         </div>
                     </div>
                 </main>

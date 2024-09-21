@@ -58,12 +58,6 @@ const loginUser = async (req, res) => {
                 { username: username || email },
                 { email: email || username }
             ]
-        }).populate({
-            path: 'address',
-            populate: { 
-                path: 'city country', 
-                model: ['City', 'Country']
-            }
         });
 
         if (!user) {
@@ -85,7 +79,6 @@ const loginUser = async (req, res) => {
             role: user.role,
             username: user.username,
             email: user.email,
-            address: user.address || {},
         });
     } catch (error) {
         console.error('Server error during login:', error);

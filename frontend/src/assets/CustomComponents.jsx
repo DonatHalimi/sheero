@@ -1156,6 +1156,53 @@ export const ReviewItemSkeleton = () => (
     </div>
 );
 
+export const ProfileInformationSkeleton = () => {
+    return (
+        <div className="space-y-2">
+            <Box className="flex gap-4">
+                <Skeleton variant="text" animation="wave" width="100%" height={56} />
+                <Skeleton variant="text" animation="wave" width="100%" height={56} />
+            </Box>
+
+            <Box className="flex gap-4">
+                <Skeleton variant="rectangular" animation="wave" width="100%" height={56} />
+                <Skeleton variant="rectangular" animation="wave" width="100%" height={56} />
+            </Box>
+
+            <Skeleton variant="rectangular" animation="wave" width={120} height={48} />
+        </div>
+    );
+};
+
+export const AddressInformationSkeleton = () => {
+    return (
+        <div className="space-y-6">
+            <div className="flex gap-4">
+                <div className="flex-1">
+                    <Skeleton variant="text" animation="wave" width="100%" height={56} />
+                </div>
+                <div className="flex-1">
+                    <Skeleton variant="text" animation="wave" width="100%" height={56} />
+                </div>
+            </div>
+
+            <div className="flex gap-4">
+                <div className="flex-1">
+                    <Skeleton variant="text" animation="wave" width="100%" height={56} />
+                </div>
+                <div className="flex-1">
+                    <Skeleton variant="rectangular" animation="wave" width="100%" height={56} />
+                </div>
+                <div className="flex-1">
+                    <Skeleton variant="rectangular" animation="wave" width="100%" height={56} />
+                </div>
+            </div>
+
+            <Skeleton variant="rectangular" animation="wave" width={120} height={48} />
+        </div>
+    );
+};
+
 export const EmptyState = ({
     imageSrc,
     message,
@@ -1397,7 +1444,7 @@ export const DashboardHeader = ({
     const itemNamePlural = pluralize(itemName, selectedItems.length);
 
     return (
-        <div className='bg-white p-4 flex items-center justify-between w-full mb-4'>
+        <div className='bg-white p-4 flex items-center justify-between w-full mb-4 rounded-md'>
             <Typography variant='h5'>{title}</Typography>
             <div>
                 <OutlinedBrownButton onClick={() => setAddItemOpen(true)} className='!mr-4'>
@@ -1879,3 +1926,4 @@ export const DashboardNavbar = ({ open, toggleDrawer, auth, isDropdownOpen, hand
         </DashboardAppBar>
     )
 }
+

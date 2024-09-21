@@ -11,7 +11,6 @@ const AuthProvider = ({ children }) => {
         username: localStorage.getItem('username'),
         email: localStorage.getItem('email'),
         userId: localStorage.getItem('userId'),
-        address: JSON.parse(localStorage.getItem('address') || 'null'),
     });
 
     const setAuth = (authData) => {
@@ -22,7 +21,6 @@ const AuthProvider = ({ children }) => {
         localStorage.setItem('username', authData.username || '');
         localStorage.setItem('email', authData.email || '');
         localStorage.setItem('userId', authData.userId || '');
-        localStorage.setItem('address', JSON.stringify(authData.address || null));
     };
 
     const refreshAccessToken = async () => {
@@ -44,30 +42,14 @@ const AuthProvider = ({ children }) => {
     
             return newAccessToken;
         } catch (error) {
-            console.error(
-                'Failed to refresh access token:',
-                error.response?.data?.message || 'Failed to refresh access token'
-            );
+            console.error('Failed to refresh access token:', error.response?.data?.message || 'Failed to refresh access token');
             logout();
         }
-    };    
+    };
 
     const login = async (username, password) => {
         try {
             const response = await axios.post('http://localhost:5000/api/auth/login', { username, password });
-
-            let address = null;
-            try {
-                const addressResponse = await axios.get('http://localhost:5000/api/addresses/user', {
-                    headers: { Authorization: `Bearer ${response.data.accessToken}` },
-                });
-                address = addressResponse.data || null;
-            } catch (addressError) {
-                console.warn(
-                    'No address found for user:',
-                    addressError.response?.data?.message || 'No address found'
-                );
-            }
 
             const authData = {
                 accessToken: response.data.accessToken,
@@ -76,7 +58,6 @@ const AuthProvider = ({ children }) => {
                 username: response.data.username,
                 email: response.data.email,
                 userId: response.data.userId,
-                address: address,
             };
 
             setAuth(authData);
@@ -89,14 +70,13 @@ const AuthProvider = ({ children }) => {
     };
 
     const logout = () => {
-        setAuth({ accessToken: null, refreshToken: null, role: null, username: null, email: null, address: null });
+        setAuth({ accessToken: null, refreshToken: null, role: null, username: null, email: null });
         localStorage.removeItem('accessToken');
         localStorage.removeItem('refreshToken');
         localStorage.removeItem('role');
         localStorage.removeItem('username');
         localStorage.removeItem('email');
         localStorage.removeItem('userId');
-        localStorage.removeItem('address');
     };
 
     const register = async (username, email, password) => {

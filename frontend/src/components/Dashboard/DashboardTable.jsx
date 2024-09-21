@@ -105,7 +105,9 @@ const DashboardTable = ({
                         toolbar: CustomToolbar,
                         noRowsOverlay: CustomNoRowsOverlay,
                     }}
-                    sx={DashboardStyling}
+                    sx={{
+                        ...DashboardStyling,
+                    }}
                 />
             </Paper>
         </>

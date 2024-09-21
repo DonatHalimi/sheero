@@ -55,9 +55,11 @@ const getAddress = async (req, res) => {
     }
 };
 
-const getUserAddress = async (req, res) => {
+const getAddressByUser = async (req, res) => {
+    const userId = req.params.userId;
+
     try {
-        const address = await Address.findOne({ user: req.user.userId })
+        const address = await Address.findOne({ user: userId })
             .populate('city', 'name zipCode')
             .populate('country', 'name');
 
@@ -67,8 +69,7 @@ const getUserAddress = async (req, res) => {
 
         res.status(200).json(address);
     } catch (error) {
-        console.error('Error fetching user address:', error);
-        res.status(500).json({ message: 'Server error' });
+        res.status(500).json({ message: 'Server error', error: error.message });
     }
 };
 
@@ -131,4 +132,4 @@ const deleteAddresses = async (req, res) => {
     }
 };
 
-module.exports = { createAddress, getAddresses, getAddress, getUserAddress, updateAddress, deleteAddress, deleteAddresses };
+module.exports = { createAddress, getAddresses, getAddress, getAddressByUser, updateAddress, deleteAddress, deleteAddresses };
