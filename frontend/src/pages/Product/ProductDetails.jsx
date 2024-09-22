@@ -27,6 +27,7 @@ const ProductDetails = () => {
     const [isCartLoading, setIsCartLoading] = useState(false);
     const [isWishlistLoading, setIsWishlistLoading] = useState(false);
     const [isReviewModalOpen, setIsReviewModalOpen] = useState(false);
+    const [quantity, setQuantity] = useState(1);
 
     useEffect(() => {
         const fetchProduct = async () => {
@@ -60,6 +61,20 @@ const ProductDetails = () => {
         setIsReviewModalOpen(false);
     };
 
+    const handleQuantityChange = (change) => {
+        setQuantity(prevQuantity => {
+            const newQuantity = prevQuantity + change;
+            if (newQuantity < 1) {
+                return 1;
+            }
+            if (newQuantity > product.inventoryCount) {
+                toast.warning(`Only ${product.inventoryCount} items available in stock.`);
+                return product.inventoryCount;
+            }
+            return newQuantity;
+        });
+    };
+
     const handleAction = (action) => async (e) => {
         e.stopPropagation();
         if (!auth.accessToken) {
@@ -69,7 +84,7 @@ const ProductDetails = () => {
         }
 
         const endpoint = action === 'cart' ? 'cart/add' : 'wishlist/add';
-        const payload = { productId: product._id, ...(action === 'cart' && { quantity: 1 }) };
+        const payload = { productId: product._id, ...(action === 'cart' && { quantity }) };
         const setLoadingState = action === 'cart' ? setIsCartLoading : setIsWishlistLoading;
 
         setLoadingState(true);
@@ -83,6 +98,11 @@ const ProductDetails = () => {
 
             if (action === 'cart') {
                 document.dispatchEvent(new CustomEvent('productAddedToCart', { detail: product._id }));
+            }
+
+            if (action === 'cart' && quantity > product.inventoryCount) {
+                toast.error(`Cannot add more than ${product.inventoryCount} items to cart.`);
+                return;
             }
         } catch (error) {
             const errorMsg = error.response?.data?.message || `Failed to add product to ${action}.`;
@@ -102,11 +122,15 @@ const ProductDetails = () => {
         );
     }
 
-    const { name, image, price, salePrice, discount } = product;
+    const { name, image, price, salePrice, discount, inventoryCount } = product;
     const imageUrl = `http://localhost:5000/${image}`;
     const originalPrice = price || 0;
     const discountPercentage = discount?.value || 0;
     const discountedPrice = salePrice || originalPrice;
+
+    const inventoryText = inventoryCount > 10
+        ? "More than 10 articles"
+        : `${inventoryCount} article${inventoryCount !== 1 ? 's' : ''} left`;
 
     return (
         <>
@@ -119,18 +143,19 @@ const ProductDetails = () => {
             <Navbar />
             <BreadcrumbsComponent product={product} />
 
+
             <div className="container mx-auto px-4 py-4 mb-8 bg-white mt-8 rounded-md max-w-5xl">
                 <div className="flex flex-col md:flex-row gap-8">
                     <div className="flex flex-col items-center md:w-1/2">
                         <img
                             src={imageUrl}
                             alt={name}
-                            className="w-full h-80 object-cover rounded cursor-pointer"
+                            className="w-full h-80 object-contain rounded cursor-pointer"
                             onClick={() => setImagePreviewOpen(true)}
                         />
                     </div>
                     <div className="md:w-1/2">
-                        <h1 className="text-2xl">{name}</h1>
+                        <h1 className="text-2xl break-words">{name}</h1>
 
                         <p
                             onClick={openReviewModal}
@@ -165,6 +190,26 @@ const ProductDetails = () => {
                         </div>
 
                         <div className="mt-4 flex items-center">
+                            <div className="flex items-center mr-4">
+                                <button
+                                    onClick={() => handleQuantityChange(-1)}
+                                    disabled={quantity <= 1}
+                                    className="px-3 py-1 border rounded-l"
+                                >
+                                    -
+                                </button>
+                                <span className="px-4 py-1 border-t border-b">{quantity}</span>
+                                <button
+                                    onClick={() => handleQuantityChange(1)}
+                                    disabled={quantity >= product.inventoryCount}
+                                    className={`px-3 py-1 border rounded-r ${quantity >= product.inventoryCount ? 'opacity-50' : ''}`}
+                                >
+                                    +
+                                </button>
+                            </div>
+                            <span className="text-sm font-semibold text-stone-600 bg-stone-100 rounded-md px-2">{inventoryText}</span>
+                        </div>
+                        <div className="mt-4 flex items-center">
                             <DetailsCartWishlistButtons
                                 handleAction={handleAction}
                                 isCartLoading={isCartLoading}
@@ -173,6 +218,7 @@ const ProductDetails = () => {
                         </div>
                     </div>
                 </div>
+
             </div>
 
             <div className="container mx-auto px-4 bg-white mt-8 mb-8 rounded-md max-w-5xl">

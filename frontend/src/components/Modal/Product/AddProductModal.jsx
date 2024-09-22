@@ -5,6 +5,7 @@ import { toast } from 'react-toastify';
 import { BrownButton, BrownOutlinedTextField, CustomPaper, OutlinedBrownButton, OutlinedBrownFormControl, VisuallyHiddenInput } from '../../../assets/CustomComponents';
 import useAxios from '../../../axiosInstance';
 import { AuthContext } from '../../../context/AuthContext';
+import { useNavigate } from 'react-router-dom';
 
 const AddProductModal = ({ open, onClose, onAddSuccess }) => {
     const [step, setStep] = useState(1);
@@ -35,6 +36,8 @@ const AddProductModal = ({ open, onClose, onAddSuccess }) => {
     const [shippingCost, setShippingCost] = useState('');
     const [packageSize, setPackageSize] = useState('medium');
     const [details, setDetails] = useState([{ attribute: '', value: '' }]);
+
+    const navigate = useNavigate();
 
     const { refreshToken } = useContext(AuthContext);
     const axiosInstance = useAxios(refreshToken);
@@ -148,8 +151,11 @@ const AddProductModal = ({ open, onClose, onAddSuccess }) => {
                 shipping: { weight, cost: shippingCost, packageSize },
                 details
             });
-            toast.success('Product details added successfully');
+            toast.success('Product details added successfully', {
+                onClick: () => navigate(`/product/${productId}`)
+            });
             onAddSuccess();
+            setStep(1);
             onClose();
         } catch (error) {
             console.error('Error adding product details:', error);
@@ -354,9 +360,7 @@ const AddProductModal = ({ open, onClose, onAddSuccess }) => {
             case 3:
                 return (
                     <>
-                        <div className="flex justify-between mb-4">
-                            <Typography variant='h6' className="!text-lg !font-bold !mb-2">Dimensions</Typography>
-                        </div>
+                        <Typography variant='h6' className="!text-lg !font-bold !mb-2">Dimensions</Typography>
                         <Box className="flex gap-4 mb-2">
                             <BrownOutlinedTextField
                                 fullWidth
@@ -406,36 +410,6 @@ const AddProductModal = ({ open, onClose, onAddSuccess }) => {
                             </Box>
                         ))}
                         <OutlinedBrownButton onClick={addVariant} className="mb-4">Add Variant</OutlinedBrownButton>
-                        <Typography variant='h6' className="!text-lg !font-bold !mb-2">Shipping</Typography>
-                        <Box className="flex gap-4 mb-2">
-                            <BrownOutlinedTextField
-                                fullWidth
-                                label="Weight"
-                                value={weight}
-                                onChange={(e) => setWeight(e.target.value)}
-                                className="!mb-4"
-                            />
-                            <BrownOutlinedTextField
-                                fullWidth
-                                label="Shipping Cost"
-                                value={shippingCost}
-                                onChange={(e) => setShippingCost(e.target.value)}
-                                className="!mb-4"
-                            />
-                            <OutlinedBrownFormControl fullWidth className="!mb-4">
-                                <InputLabel id="package-size-label">Package Size</InputLabel>
-                                <Select
-                                    labelId="package-size-label"
-                                    value={packageSize}
-                                    onChange={(e) => setPackageSize(e.target.value)}
-                                    label="Package Size"
-                                >
-                                    <MenuItem value="small">Small</MenuItem>
-                                    <MenuItem value="medium">Medium</MenuItem>
-                                    <MenuItem value="large">Large</MenuItem>
-                                </Select>
-                            </OutlinedBrownFormControl>
-                        </Box>
                         <Typography variant='h6' className="!text-lg !font-bold !mb-2">Additional Details</Typography>
                         {details.map((detail, index) => (
                             <Box key={index} className="flex gap-4 mb-2">
@@ -455,6 +429,36 @@ const AddProductModal = ({ open, onClose, onAddSuccess }) => {
                             </Box>
                         ))}
                         <OutlinedBrownButton onClick={addDetail} className="!mb-4">Add Detail</OutlinedBrownButton>
+                        <Typography variant='h6' className="!text-lg !font-bold !mb-2">Shipping</Typography>
+                        <Box className="flex gap-4 mb-2">
+                            <BrownOutlinedTextField
+                                fullWidth
+                                label="Weight"
+                                value={weight}
+                                onChange={(e) => setWeight(e.target.value)}
+                                className="!mb-4"
+                            />
+                            <BrownOutlinedTextField
+                                fullWidth
+                                label="Shipping Cost"
+                                value={shippingCost}
+                                onChange={(e) => setShippingCost(e.target.value)}
+                                className="!mb-4"
+                            />
+                        </Box>
+                        <OutlinedBrownFormControl fullWidth className="!mb-4">
+                            <InputLabel id="package-size-label">Package Size</InputLabel>
+                            <Select
+                                labelId="package-size-label"
+                                value={packageSize}
+                                onChange={(e) => setPackageSize(e.target.value)}
+                                label="Package Size"
+                            >
+                                <MenuItem value="small">Small</MenuItem>
+                                <MenuItem value="medium">Medium</MenuItem>
+                                <MenuItem value="large">Large</MenuItem>
+                            </Select>
+                        </OutlinedBrownFormControl>
                         <BrownButton
                             onClick={handleVariantsAndDetailsAddition}
                             variant="contained"

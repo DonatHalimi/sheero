@@ -71,16 +71,18 @@ const ProductItem = ({ product, loading }) => {
                     <img
                         src={imageUrl}
                         alt={name}
-                        className="w-full h-48 object-cover rounded"
+                        className="w-full h-48 object-contain rounded"
                         onError={(e) => { e.target.onerror = null; e.target.src = NoImage; }}
                     />
                     {discountPercentage > 0 && (
-                        <span className="absolute top-2 right-2 bg-red-400 text-white px-2 py-1 rounded text-xs">
+                        <span className="absolute top-0 right-0 bg-stone-500 text-white px-2 py-1 rounded text-xs">
                             -{discountPercentage}%
                         </span>
                     )}
                 </div>
-                <h2 className="font-semibold mt-2 h-10 overflow-hidden">{name}</h2>
+                <h2 className="font-semibold h-8 overflow-hidden whitespace-nowrap text-ellipsis w-full">
+                    {name}
+                </h2>
                 <div className="flex flex-col mb-2">
                     <span className="font-bold text-lg">{finalPrice.toFixed(2)} €</span>
                     {discountPercentage > 0 && (

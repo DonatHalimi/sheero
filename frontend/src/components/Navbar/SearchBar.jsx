@@ -65,6 +65,7 @@ const SearchBar = () => {
                 <SearchBarInput
                     searchTerm={searchTerm}
                     handleInputChange={handleInputChange}
+                    handleSubmit={handleSubmit}
                 />
             </form>
             {suggestions.length > 0 && (

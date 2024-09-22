@@ -824,27 +824,31 @@ export const ReviewModal = ({ open, handleClose, selectedReview, onImageClick })
                             flexDirection: 'column',
                             justifyContent: 'space-between'
                         }}>
-                            <Box sx={{ display: 'flex', alignItems: 'flex-start', mb: 2 }}>
+                            <Box sx={{ display: 'flex', alignItems: 'flex-end', mb: 2 }}>
                                 <Box sx={{ flexGrow: 1 }}>
-                                    <Typography id="review-modal-title" variant="h6" component="h2" mb={1}>
-                                        {selectedReview.user.username}
-                                        <Typography variant="caption" color="text.secondary" component="span" sx={{ ml: 1 }}>
-                                            {new Date(selectedReview.updatedAt || selectedReview.createdAt).toLocaleDateString()}
-                                        </Typography>
-                                    </Typography>
-                                    <Typography variant="h6" component="h2" display="flex" alignItems="center">
-                                        {selectedReview.product.name}
-                                        <Box sx={{ ml: 1 }}>
+                                    <Box>
+                                        <Typography id="review-modal-title" variant="h6" component="h2" mb={1} className="break-words">
+                                            {selectedReview.user.username}
+                                            <Typography variant="caption" color="text.secondary" component="span" sx={{ ml: 1 }}>
+                                                {new Date(selectedReview.updatedAt || selectedReview.createdAt).toLocaleDateString()}
+                                            </Typography>
                                             <RatingStars rating={selectedReview.rating} />
-                                        </Box>
+                                        </Typography>
+                                    </Box>
+                                    <Typography variant="h6" component="h2" display="flex" alignItems="center" className="break-words">
+                                        <span style={{ maxWidth: 'calc(100% - 120px)' }}>
+                                            {selectedReview.product.name}
+                                        </span>
                                     </Typography>
-                                    <p className="font-semibold mt-1 whitespace-nowrap">
+
+
+                                    <p className="font-semibold mt-1 break-words">
                                         {selectedReview.title}
                                     </p>
                                     <textarea
                                         value={selectedReview.comment}
                                         readOnly
-                                        className="custom-textarea"
+                                        className="custom-textarea break-words"
                                         style={{
                                             width: '90%',
                                             height: 'auto',
@@ -879,6 +883,8 @@ export const ReviewModal = ({ open, handleClose, selectedReview, onImageClick })
         </Modal>
     );
 };
+
+
 export const ProductTabs = ({ value, handleChange }) => {
     return (
         <Tabs
@@ -1050,74 +1056,86 @@ export const CheckoutButton = styled(Button)(({ theme }) => ({
     },
 }));
 
-export const IncreaseButton = styled(Button)(({ theme }) => ({
-    minWidth: '35px',
-    height: '30px',
-    backgroundColor: '#686159',
-    color: 'white',
-    '&:hover': {
-        backgroundColor: '#5b504b',
-    },
-}));
-
-export const DecreaseButton = styled(Button)(({ theme }) => ({
-    minWidth: '35px',
-    height: '30px',
-    backgroundColor: '#686159',
-    color: 'white',
-    '&:hover': {
-        backgroundColor: '#5b504b',
-    },
-}));
-
 export const LoadingCart = () => {
     return (
         <>
             <Navbar />
-            <div className="container mx-auto px-4 py-2 mb-16 bg-gray-50 mt-10">
-                <h1 className="text-2xl font-semilight mb-4">Cart</h1>
-                <TableContainer component={Paper} className="bg-white">
-                    <Table>
-                        <TableHead>
-                            <TableRow>
-                                <TableCell><Skeleton variant="text" animation="wave" width={100} height={20} /></TableCell>
-                                <TableCell align="center"><Skeleton variant="text" animation="wave" width={80} height={20} /></TableCell>
-                                <TableCell align="center"><Skeleton variant="text" animation="wave" width={80} height={20} /></TableCell>
-                                <TableCell align="center"><Skeleton variant="text" animation="wave" width={80} height={20} /></TableCell>
-                                <TableCell align="center"><Skeleton variant="text" animation="wave" width={40} height={20} /></TableCell>
-                            </TableRow>
-                        </TableHead>
-                        <TableBody>
-                            {Array.from(new Array(3)).map((_, index) => (
-                                <TableRow key={index}>
-                                    <TableCell>
-                                        <div className="flex items-center">
-                                            <Skeleton variant="rectangular" width={80} height={80} className="mr-4" />
-                                            <Skeleton variant="text" animation="wave" width={120} height={20} />
-                                        </div>
-                                    </TableCell>
-                                    <TableCell align="center">
-                                        <Skeleton variant="text" animation="wave" width={60} height={20} />
-                                    </TableCell>
-                                    <TableCell align="center">
-                                        <Skeleton variant="text" animation="wave" width={60} height={20} />
-                                    </TableCell>
-                                    <TableCell align="center">
-                                        <Skeleton variant="text" animation="wave" width={60} height={20} />
-                                    </TableCell>
-                                    <TableCell align="center">
-                                        <Skeleton variant="text" animation="wave" width={30} height={20} />
-                                    </TableCell>
+            <div className="container mx-auto px-24 py-2 mb-16 bg-gray-50 mt-10 flex">
+                <div className="flex-1">
+                    <h1 className="text-2xl font-semilight mb-4">Cart</h1>
+                    <TableContainer component={Paper} className="bg-white">
+                        <Table>
+                            <TableHead>
+                                <TableRow>
+                                    <TableCell><Skeleton variant="text" animation="wave" width={100} height={20} /></TableCell>
+                                    <TableCell align="center"><Skeleton variant="text" animation="wave" width={80} height={20} /></TableCell>
+                                    <TableCell align="center"><Skeleton variant="text" animation="wave" width={80} height={20} /></TableCell>
+                                    <TableCell align="center"><Skeleton variant="text" animation="wave" width={80} height={20} /></TableCell>
+                                    <TableCell align="center"><Skeleton variant="text" animation="wave" width={40} height={20} /></TableCell>
                                 </TableRow>
-                            ))}
-                        </TableBody>
-                    </Table>
-                </TableContainer>
+                            </TableHead>
+                            <TableBody>
+                                {Array.from(new Array(3)).map((_, index) => (
+                                    <TableRow key={index}>
+                                        <TableCell>
+                                            <div className="flex items-center">
+                                                <Skeleton variant="rectangular" width={80} height={80} className="mr-4" />
+                                                <Skeleton variant="text" animation="wave" width={120} height={20} />
+                                            </div>
+                                        </TableCell>
+                                        <TableCell align="center">
+                                            <Skeleton variant="text" animation="wave" width={60} height={20} />
+                                        </TableCell>
+                                        <TableCell align="center">
+                                            <Skeleton variant="text" animation="wave" width={60} height={20} />
+                                        </TableCell>
+                                        <TableCell align="center">
+                                            <Skeleton variant="text" animation="wave" width={60} height={20} />
+                                        </TableCell>
+                                        <TableCell align="center">
+                                            <Skeleton variant="text" animation="wave" width={30} height={20} />
+                                        </TableCell>
+                                    </TableRow>
+                                ))}
+                            </TableBody>
+                        </Table>
+                    </TableContainer>
+                </div>
+                {/* Summary Section Loading Animation */}
+                <div className="ml-6 w-80 mt-12">
+                    <Paper className="p-4">
+                        <h2 className="text-xl font-semibold mb-2"><Skeleton variant="text" animation="wave" width={100} height={24} /></h2>
+                        <Table>
+                            <TableBody>
+                                <TableRow>
+                                    <TableCell><Skeleton variant="text" animation="wave" width={80} height={20} /></TableCell>
+                                    <TableCell align="right"><Skeleton variant="text" animation="wave" width={60} height={20} /></TableCell>
+                                </TableRow>
+                                <TableRow>
+                                    <TableCell><Skeleton variant="text" animation="wave" width={80} height={20} /></TableCell>
+                                    <TableCell align="right"><Skeleton variant="text" animation="wave" width={60} height={20} /></TableCell>
+                                </TableRow>
+                                <TableRow>
+                                    <TableCell><Skeleton variant="text" animation="wave" width={80} height={20} /></TableCell>
+                                    <TableCell align="right"><Skeleton variant="text" animation="wave" width={60} height={20} /></TableCell>
+                                </TableRow>
+                                <TableRow>
+                                    <TableCell><Skeleton variant="text" animation="wave" width={80} height={20} /></TableCell>
+                                    <TableCell align="right"><Skeleton variant="text" animation="wave" width={60} height={20} /></TableCell>
+                                </TableRow>
+                            </TableBody>
+                        </Table>
+                        <div className="mt-4 w-full">
+                            <Skeleton variant="rectangular" width={280} height={40} />
+                        </div>
+                    </Paper>
+                </div>
             </div>
             <Footer />
         </>
     );
-}
+};
+
 
 export const ProductItemSkeleton = () => {
     return (
@@ -1270,19 +1288,22 @@ export const CustomReviewCard = ({ review, onImageClick, onMenuClick, onCardClic
                     <Typography
                         onClick={(event) => handleProductClick(event, review.product._id)}
                         variant="h6"
-                        className="font-light mb-2 flex items-center ml-2 hover:underline"
+                        className="font-light mb-2 flex items-center ml-2 hover:underline break-words"
                     >
-                        {truncateText(review.product.name, 100)}
+                        {truncateText(review.product.name, 20)}
                         <Box className='ml-2'>
                             <RatingStars rating={review.rating} />
                         </Box>
                     </Typography>
-                    <p className="text-base font-semibold">
+                    <p className="text-base font-semibold break-words">
                         {truncateText(review.title, 100)}
                     </p>
-                    <Typography variant="body1" className="mt-1 text-gray-700">
-                        {truncateText(review.comment, 100)}
-                    </Typography>
+                    <div className="mt-1 text-gray-700 break-words">
+                        <Typography variant="body1" className="break-words">
+                            {truncateText(review.comment, 70)}
+                        </Typography>
+                    </div>
+
                     <Typography variant="caption" className="block mt-2 text-sm text-gray-500">
                         {new Date(review.updatedAt || review.createdAt).toLocaleDateString()}
                     </Typography>
@@ -1606,7 +1627,7 @@ export const CartDropdown = ({
                             />
                             <div className="ml-2 flex-grow">
                                 <span
-                                    className="block font-semibold cursor-pointer hover:underline"
+                                    className="block font-semibold cursor-pointer hover:underline truncate max-w-[calc(22ch)]"
                                     onClick={() => handleProductClick(item.product._id)}
                                 >
                                     {item.product.name}
@@ -1659,14 +1680,16 @@ export const NavbarLogo = ({ dashboardStyling }) => {
     }
 
     return (
-        <Tooltip title="Home" arrow>
-            <button
-                onClick={handleGoHome}
-                className={`flex items-center cursor-pointer ${dashboardStyling || ''}`}
-            >
-                <img src={logo} alt="Logo" className="h-9" />
-            </button>
-        </Tooltip>
+        <div onClick={handleGoHome}>
+            <Tooltip title="Home" arrow>
+                <button
+                    onClick={handleGoHome}
+                    className={`flex items-center cursor-pointer ${dashboardStyling || ''}`}
+                >
+                    <img src={logo} alt="Logo" className="h-9" />
+                </button>
+            </Tooltip>
+        </div>
     );
 }
 
