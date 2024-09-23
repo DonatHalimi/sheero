@@ -40,7 +40,6 @@ const DashboardLayout = () => {
     return (
         <ThemeProvider theme={theme}>
             <Box sx={{ display: 'flex', bgcolor: '#F5F5F5' }}>
-                {/* <CssBaseline /> */}
 
                 <DashboardNavbar
                     open={open}

@@ -57,7 +57,9 @@ const ReviewsPage = () => {
     };
 
     const columns = [
-        { key: 'user.username', label: 'User' },
+        { key: 'user.firstName', label: 'First Name' },
+        { key: 'user.lastName', label: 'Last Name' },
+        { key: 'user.email', label: 'Email' },
         { key: 'title', label: 'Title' },
         {
             key: 'rating',

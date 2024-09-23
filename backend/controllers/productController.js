@@ -124,10 +124,8 @@ const deleteProduct = async (req, res) => {
         const product = await Product.findById(req.params.id);
         if (!product) return res.status(404).json({ message: 'Product not found' });
 
-        // Remove associated reviews
         await Review.deleteMany({ product: product._id });
 
-        // Remove the product image
         if (product.image) {
             fs.unlink(product.image, (err) => {
                 if (err) console.error('Error deleting image:', err);
@@ -156,10 +154,8 @@ const deleteProducts = async (req, res) => {
         }
 
         for (const product of products) {
-            // Remove associated reviews
             await Review.deleteMany({ product: product._id });
 
-            // Remove the product image
             if (product.image) {
                 fs.unlink(product.image, (err) => {
                     if (err) console.error('Error deleting image:', err);

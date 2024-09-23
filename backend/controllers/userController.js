@@ -3,18 +3,16 @@ const User = require('../models/User');
 
 const createUser = async (req, res) => {
     try {
-        const { username, email, password, role } = req.body;
+        const { firstName, lastName, email, password, role } = req.body;
 
-        const existingUser = await User.findOne({ username });
         const existingEmail = await User.findOne({ email });
-        if (existingUser || existingEmail) return res.status(400).json({ message: 'Username or Email already exists' });
+        if (existingEmail) return res.status(400).json({ message: 'Email already exists' });
 
-        // Hash the password
         const hashedPassword = await bcrypt.hash(password, 10);
 
-        // Create a new user with the hashed password
         const newUser = new User({
-            username,
+            firstName,
+            lastName,
             email,
             password: hashedPassword,
             role
@@ -53,7 +51,6 @@ const getUser = async (req, res) => {
 
 const updateUser = async (req, res) => {
     try {
-        // If password is being updated, hash it before saving
         if (req.body.password) {
             req.body.password = await bcrypt.hash(req.body.password, 10);
         }

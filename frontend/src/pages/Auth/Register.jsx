@@ -10,7 +10,8 @@ import Navbar from '../../components/Navbar/Navbar';
 import { AuthContext } from '../../context/AuthContext';
 
 const Register = () => {
-    const [username, setUsername] = useState('');
+    const [firstName, setFirstName] = useState('');
+    const [lastName, setLastName] = useState('');
     const [email, setEmail] = useState('');
     const [password, setPassword] = useState('');
     const [showPassword, setShowPassword] = useState(false);
@@ -29,7 +30,7 @@ const Register = () => {
 
     const handleSubmit = async (e) => {
         e.preventDefault();
-        if (!username || !email || !password) {
+        if (!firstName || !lastName || !email || !password) {
             return toast.error('Please fill in all fields');
         }
         if (!validateEmail(email)) {
@@ -39,7 +40,7 @@ const Register = () => {
             return toast.error('Password must be at least 8 characters long, with one uppercase letter, one lowercase letter, one number, and one special character');
         }
         try {
-            const response = await register(username, email, password);
+            const response = await register(firstName, lastName, email, password);
             if (response.success) {
                 toast.success('Registration successful');
                 navigate('/login');
@@ -66,12 +67,24 @@ const Register = () => {
                             margin="normal"
                             required
                             fullWidth
-                            id="username"
-                            label="Username"
-                            value={username}
-                            autoComplete="username"
+                            id="firstName"
+                            label="First Name"
+                            value={firstName}
+                            autoComplete="firstName"
                             autoFocus
-                            onChange={(e) => setUsername(e.target.value)}
+                            onChange={(e) => setFirstName(e.target.value)}
+                        />
+                        <BrownOutlinedTextField
+                            variant="outlined"
+                            margin="normal"
+                            required
+                            fullWidth
+                            id="lastName"
+                            label="Last Name"
+                            value={lastName}
+                            autoComplete="lastName"
+                            autoFocus
+                            onChange={(e) => setLastName(e.target.value)}
                         />
                         <BrownOutlinedTextField
                             margin='normal'

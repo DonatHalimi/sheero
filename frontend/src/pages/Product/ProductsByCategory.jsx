@@ -6,16 +6,19 @@ import noProducts from '../../assets/img/no-products.png';
 import Footer from '../../components/Footer';
 import Navbar from '../../components/Navbar/Navbar';
 import ProductItem from '../../components/Product/ProductItem';
+import { Skeleton } from '@mui/material';
 
 const ProductsByCategory = () => {
     const { id } = useParams();
     const [products, setProducts] = useState([]);
     const [categoryName, setCategoryName] = useState('');
     const [currentPage, setCurrentPage] = useState(1);
+    const [loading, setLoading] = useState(true);
     const itemsPerPage = 10;
 
     useEffect(() => {
         const fetchProductsAndCategory = async () => {
+            setLoading(true);
             try {
                 const categoryResponse = await axios.get(`http://localhost:5000/api/categories/get/${id}`);
                 setCategoryName(categoryResponse.data.name);
@@ -25,6 +28,8 @@ const ProductsByCategory = () => {
                 setCurrentPage(1);
             } catch (error) {
                 console.error('Error fetching products or category:', error);
+            } finally {
+                setLoading(false);
             }
         };
 
@@ -42,6 +47,17 @@ const ProductsByCategory = () => {
         setCurrentPage(value);
     };
 
+    const renderProductItems = () => {
+        if (loading) {
+            return Array.from({ length: itemsPerPage }, (_, index) => (
+                <ProductItem key={index} loading={true} />
+            ));
+        }
+        return getCurrentPageItems().map(product => (
+            <ProductItem key={product._id} product={product} loading={false} />
+        ));
+    };
+
     return (
         <>
             <Navbar />
@@ -52,33 +68,34 @@ const ProductsByCategory = () => {
                 )}
 
                 <div className="sticky top-0 z-10 pb-4 bg-gray-50">
-                    {products.length > 0 ? (
-                        <h1 className="text-2xl font-semibold" id='product-container'>Products in {categoryName}</h1>
+                    {loading ? (
+                        <Skeleton variant="text" animation="wave" width={250} height={20} />
+                    ) : products.length > 0 ? (
+                        <h1 className="text-2xl font-semibold" id='product-container'>
+                            Products in {categoryName}
+                        </h1>
                     ) : (
-                        <>
-                            <EmptyState
-                                imageSrc={noProducts}
-                                message="No products found for"
-                                dynamicValue={categoryName}
-                                containerClass="p-8 mt-4 mx-14 md:mx-16 lg:mx-72"  // Custom container class
-                                imageClass="w-32 h-32"  // Smaller image
-                            />
-                        </>
+                        <EmptyState
+                            imageSrc={noProducts}
+                            message="No products found for"
+                            dynamicValue={categoryName}
+                            containerClass="p-8 mt-4 mx-14 md:mx-16 lg:mx-72"
+                            imageClass="w-32 h-32"
+                        />
                     )}
                 </div>
-                {products.length > 0 && (
-                    <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 gap-4">
-                        {getCurrentPageItems().map(product => (
-                            <ProductItem key={product._id} product={product} />
-                        ))}
-                    </div>
-                )}
 
-                <CustomPagination
-                    count={pageCount}
-                    page={currentPage}
-                    onChange={handlePageChange}
-                />
+                <div className="grid grid-cols-1 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 gap-4">
+                    {renderProductItems()}
+                </div>
+
+                {!loading && products.length > 0 && (
+                    <CustomPagination
+                        count={pageCount}
+                        page={currentPage}
+                        onChange={handlePageChange}
+                    />
+                )}
             </div>
             <Footer />
         </>

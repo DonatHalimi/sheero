@@ -53,7 +53,9 @@ const AddressesPage = () => {
     };
 
     const columns = [
-        { key: 'user.username', label: 'Username' },
+        { key: 'user.firstName', label: 'First Name' },
+        { key: 'user.lastName', label: 'Last Name' },
+        { key: 'user.email', label: 'Email' },
         { key: 'name', label: 'Name' },
         { key: 'street', label: 'Street' },
         { key: 'phoneNumber', label: 'Phone Number' },

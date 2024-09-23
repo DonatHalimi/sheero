@@ -3,14 +3,12 @@ const Address = require('../models/Address');
 const createAddress = async (req, res) => {
     const { name, street, city, country, phoneNumber } = req.body;
     try {
-        // Check if the user already has an address
         const existingAddress = await Address.findOne({ user: req.user.userId });
 
         if (existingAddress) {
             return res.status(400).json({ message: 'You already have an address. Please update it instead.' });
         }
 
-        // Create a new address
         const address = new Address({
             user: req.user.userId,
             name,
@@ -31,7 +29,7 @@ const createAddress = async (req, res) => {
 const getAddresses = async (req, res) => {
     try {
         const addresses = await Address.find()
-            .populate('user', 'username')
+            .populate('user', 'firstName lastName email')
             .populate('city', 'name zipCode')
             .populate('country', 'name');
         res.status(200).json(addresses);
@@ -44,7 +42,7 @@ const getAddresses = async (req, res) => {
 const getAddress = async (req, res) => {
     try {
         const address = await Address.findById(req.params.id)
-            .populate('user', 'username')
+            .populate('user', 'email')
             .populate('city', 'name zipCode')
             .populate('country', 'name');
 
@@ -78,14 +76,12 @@ const updateAddress = async (req, res) => {
     const updates = req.body;
 
     try {
-        // Find the address by ID and ensure it belongs to the current user
         const address = await Address.findOne({ _id: addressId, user: req.user.userId });
 
         if (!address) {
             return res.status(404).json({ message: 'Address not found or does not belong to the user' });
         }
 
-        // Update the existing address
         const updatedAddress = await Address.findByIdAndUpdate(address._id, updates, { new: true, runValidators: true });
 
         res.status(200).json(updatedAddress);

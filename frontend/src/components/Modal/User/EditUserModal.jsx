@@ -8,7 +8,8 @@ import useAxios from '../../../axiosInstance';
 import { AuthContext } from '../../../context/AuthContext';
 
 const EditUserModal = ({ open, onClose, user, onEditSuccess }) => {
-    const [username, setUsername] = useState('');
+    const [firstName, setFirstName] = useState('');
+    const [lastName, setLastName] = useState('');
     const [email, setEmail] = useState('');
     const [isValidEmail, setIsValidEmail] = useState(true);
     const [password, setPassword] = useState('');
@@ -20,7 +21,8 @@ const EditUserModal = ({ open, onClose, user, onEditSuccess }) => {
 
     useEffect(() => {
         if (user) {
-            setUsername(user.username);
+            setFirstName(user.firstName);
+            setLastName(user.lastName);
             setEmail(user.email);
             setRole(user.role);
             setIsValidEmail(true);
@@ -42,7 +44,8 @@ const EditUserModal = ({ open, onClose, user, onEditSuccess }) => {
         }
         try {
             const updatedData = {
-                username,
+                firstName,
+                lastName,
                 email,
                 role
             };
@@ -65,11 +68,18 @@ const EditUserModal = ({ open, onClose, user, onEditSuccess }) => {
                 <CustomTypography variant="h5">Edit User</CustomTypography>
 
                 <BrownOutlinedTextField
-                    label="Username"
-                    value={username}
-                    onChange={(e) => setUsername(e.target.value)}
+                    label="First Name"
+                    value={firstName}
+                    onChange={(e) => setFirstName(e.target.value)}
                     fullWidth
-                    className='!mb-4'
+                    className="!mb-4"
+                />
+                <BrownOutlinedTextField
+                    label="Last Name"
+                    value={lastName}
+                    onChange={(e) => setLastName(e.target.value)}
+                    fullWidth
+                    className="!mb-4"
                 />
                 <BrownOutlinedTextField
                     label="Email"

@@ -20,6 +20,8 @@ const UsersPage = () => {
     const { refreshToken } = useContext(AuthContext);
     const axiosInstance = useAxios(refreshToken);
 
+    useEffect(() => { window.scrollTo(0, 0); }, []);
+
     useEffect(() => {
         fetchUsers();
     }, [addUserOpen, editUserOpen, deleteUserOpen, currentPage, axiosInstance]);
@@ -63,7 +65,8 @@ const UsersPage = () => {
     };
 
     const columns = [
-        { key: 'username', label: 'Username' },
+        { key: 'firstName', label: 'First Name' },
+        { key: 'lastName', label: 'Last Name' },
         { key: 'email', label: 'Email' },
         { key: 'password', label: 'Password' },
         { key: 'role', label: 'Role' },

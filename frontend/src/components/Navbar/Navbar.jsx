@@ -1,15 +1,17 @@
+import { Login } from '@mui/icons-material';
 import React, { useContext, useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { toast } from 'react-toastify';
 import {
-    BrownButton,
     CartDropdown,
     CartIcon,
     LoadingOverlay,
     NavbarLogo,
-    OutlinedBrownButton,
     ProfileDropdown,
     ProfileIcon,
+
+
+    RoundIconButton,
     WishlistIcon,
 } from '../../assets/CustomComponents';
 import useAxios from '../../axiosInstance';
@@ -159,18 +161,14 @@ const Navbar = () => {
                                 </div>
                             </>
                         ) : (
-                            // If not authenticated, show login and register buttons
+                            // If not authenticated, show login button
                             <>
-                                <BrownButton
-                                    variant="contained"
-                                    color="primary"
+                                <RoundIconButton
                                     onClick={() => navigate('/login')}
+                                    sx={{ color: '#686159' }}
                                 >
-                                    Login
-                                </BrownButton>
-                                <OutlinedBrownButton onClick={() => navigate('/register')}>
-                                    Register
-                                </OutlinedBrownButton>
+                                    <Login />
+                                </RoundIconButton>
                             </>
                         )}
                     </div>

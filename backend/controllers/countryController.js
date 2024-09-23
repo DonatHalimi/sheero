@@ -77,7 +77,6 @@ const deleteCountries = async (req, res) => {
         }
 
         for (const country of countries) {
-            // Remove associated cities
             await City.deleteMany({ country: country._id });
         }
 

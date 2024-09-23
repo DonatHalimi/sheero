@@ -62,7 +62,6 @@ const deleteSubSubcategory = async (req, res) => {
         const subSubcategory = await SubSubcategory.findById(req.params.id);
         if (!subSubcategory) return res.status(404).json({ message: 'SubSubcategory not found' });
 
-        // Check if there are products associated with this sub-subcategory
         const products = await Product.find({ subSubcategory: req.params.id });
         if (products.length > 0) {
             return res.status(400).json({ message: 'Cannot delete sub-subcategory with existing products' });

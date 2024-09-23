@@ -1,7 +1,9 @@
 import {
   AllInboxOutlined,
   ApartmentOutlined,
+  CategoryOutlined,
   CollectionsOutlined,
+  ContactsOutlined,
   DashboardCustomizeOutlined,
   DashboardOutlined,
   ExploreOutlined,
@@ -124,7 +126,7 @@ export const mainListItems = ({ setCurrentView }) => {
             sx={{ pl: 4 }}
             handleClick={() => handleItemClick('contacts')}
             selected={activeItem === 'contacts'}
-            icon={<HelpOutlineOutlined />}
+            icon={<ContactsOutlined />}
             primary="Contacts"
           />
 
@@ -146,7 +148,7 @@ export const mainListItems = ({ setCurrentView }) => {
               sx={{ pl: 6 }}
               handleClick={() => handleItemClick('subcategories')}
               selected={activeItem === 'subcategories'}
-              icon={<WidgetsOutlined />}
+              icon={<CategoryOutlined />}
               primary="Subcategories"
             />
 

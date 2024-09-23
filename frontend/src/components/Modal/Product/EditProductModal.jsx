@@ -8,7 +8,7 @@ import { AuthContext } from '../../../context/AuthContext';
 import { ArrowBack } from '@mui/icons-material';
 
 const EditProductModal = ({ open, onClose, product, onEditSuccess }) => {
-    const [step, setStep] = useState(1); // Step state to control the stages
+    const [step, setStep] = useState(1);
     const [name, setName] = useState('');
     const [description, setDescription] = useState('');
     const [price, setPrice] = useState('');
@@ -44,7 +44,8 @@ const EditProductModal = ({ open, onClose, product, onEditSuccess }) => {
             setName(product.name || '');
             setDescription(product.description || '');
             setPrice(product.price || '');
-            setSalePrice(product.salePrice || '');
+            setSalePrice(product.salePrice ? parseInt(product.salePrice, 10) : '');
+            updateDiscountValue(product.price, product.salePrice);
             setCategory(product.category || null);
             setSubcategory(product.subcategory || null);
             setSubSubcategory(product.subSubcategory || null);
@@ -66,6 +67,8 @@ const EditProductModal = ({ open, onClose, product, onEditSuccess }) => {
             if (product.discount) {
                 setDiscountType(product.discount.type || 'percentage');
                 setDiscountValue(product.discount.value || 0);
+            } else {
+                updateDiscountValue();
             }
 
             if (product.shipping) {
@@ -128,7 +131,6 @@ const EditProductModal = ({ open, onClose, product, onEditSuccess }) => {
     };
 
     const handleEditProduct = async () => {
-        // Handle updating of the entire product across multiple steps
         const formData = new FormData();
         formData.append('name', name);
         formData.append('description', description);
@@ -208,6 +210,23 @@ const EditProductModal = ({ open, onClose, product, onEditSuccess }) => {
         setDetails(details.filter((_, i) => i !== index));
     };
 
+    const updateDiscountValue = (currentPrice, currentSalePrice) => {
+        const priceValue = parseFloat(currentPrice);
+        const salePriceValue = parseFloat(currentSalePrice);
+
+        if (priceValue && salePriceValue && salePriceValue < priceValue) {
+            const discountValue = ((priceValue - salePriceValue) / priceValue) * 100;
+            setDiscountValue(Math.floor(discountValue));
+        } else {
+            setDiscountValue(0);
+        }
+    };
+
+    const handleSalePriceChange = (e) => {
+        const newSalePrice = e.target.value === '' ? '' : parseInt(e.target.value, 10);
+        setSalePrice(newSalePrice);
+        updateDiscountValue(price, newSalePrice);
+    };
 
     const handleBackToStep1 = () => {
         setStep(1);
@@ -253,7 +272,7 @@ const EditProductModal = ({ open, onClose, product, onEditSuccess }) => {
                                 label="Sale Price"
                                 type="number"
                                 value={salePrice}
-                                onChange={(e) => setSalePrice(e.target.value)}
+                                onChange={handleSalePriceChange}
                                 className="!mb-4"
                             />
                         </Box>

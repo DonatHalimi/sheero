@@ -10,6 +10,7 @@ import {
     ExpandMore,
     FavoriteBorderOutlined,
     InboxOutlined,
+    Login,
     Logout,
     Menu as MenuIcon,
     MoreVert,
@@ -233,11 +234,13 @@ export const ActiveListItem = ({ icon, primary, handleClick, selected, sx }) => 
 export const AddToCartButton = styled(Button)(({ theme }) => ({
     backgroundColor: '#f7f7f7',
     color: '#57534E',
+    transition: 'background-color 0.3s ease-in-out, color 0.3s ease-in-out',
     '&:hover': {
         backgroundColor: '#686159',
         color: 'white',
         '& .MuiSvgIcon-root': {
             color: 'white',
+            transition: 'color 0.3s ease-in-out',
         },
     },
     flexGrow: 1,
@@ -247,10 +250,12 @@ export const AddToCartButton = styled(Button)(({ theme }) => ({
 export const WishlistButton = styled(Button)(({ theme }) => ({
     color: '#493c30',
     backgroundColor: '#f7f7f7',
+    transition: 'background-color 0.3s ease-in-out, color 0.3s ease-in-out',
     '&:hover': {
         borderColor: '#5b504b',
         backgroundColor: '#e0e0e0',
         color: '#686159',
+        transition: 'color 0.3s ease-in-out',
     },
     flexShrink: 0,
 }));
@@ -286,8 +291,10 @@ export const CartWishlistButtons = ({ handleAction, isCartLoading, isWishlistLoa
 export const DetailsAddToCartButton = styled(Button)(({ theme }) => ({
     backgroundColor: '#686159',
     color: 'white',
+    transition: 'background-color 0.3s ease-in-out, color 0.3s ease-in-out',
     '& .MuiSvgIcon-root': {
         color: 'white',
+        transition: 'color 0.3s ease-in-out',
     },
     '&:hover': {
         backgroundColor: '#4c4844',
@@ -304,10 +311,12 @@ export const DetailsWishlistButton = styled(Button)(({ theme }) => ({
     color: '#493c30',
     backgroundColor: '#f7f7f7',
     width: '150px',
+    transition: 'background-color 0.3s ease-in-out, color 0.3s ease-in-out',
     '&:hover': {
         borderColor: '#5b504b',
         backgroundColor: '#e0e0e0',
         color: '#686159',
+        transition: 'color 0.3s ease-in-out',
     },
     flexShrink: 0,
 }));
@@ -512,7 +521,11 @@ export const StyledShoppingCartIcon = styled(ShoppingCartOutlined)({
     color: '#666666',
 });
 
-export const DashboardStyling = {
+export const DashboardTableStyling = {
+    border: 'none',
+    '& .MuiDataGrid-main': {
+        border: 'none',
+    },
     '& .MuiDataGrid-columnHeader:focus': {
         outline: 'none',
     },
@@ -747,7 +760,9 @@ export const ReviewsList = ({ reviews, openModal }) => {
                         }}
                     >
                         <Box className="flex justify-between items-center w-52">
-                            <p className='font-semibold text-lg mr-4'>{review.user.username}</p>
+                            <p className='font-semibold text-lg mr-4'>
+                                {`${review.user.firstName}`}
+                            </p>
                             <RatingStars rating={review.rating} />
                         </Box>
                         <p className="font-semibold" style={{
@@ -801,7 +816,7 @@ export const ReviewModal = ({ open, handleClose, selectedReview, onImageClick })
                 p: 2,
                 outline: 'none',
             }}>
-                {selectedReview && (
+                {selectedReview && selectedReview.user && (
                     <Box sx={{ display: 'flex', flex: 1 }}>
                         <Box sx={{
                             width: '40%',
@@ -828,7 +843,7 @@ export const ReviewModal = ({ open, handleClose, selectedReview, onImageClick })
                                 <Box sx={{ flexGrow: 1 }}>
                                     <Box>
                                         <Typography id="review-modal-title" variant="h6" component="h2" mb={1} className="break-words">
-                                            {selectedReview.user.username}
+                                            {selectedReview.user.firstName} {selectedReview.user.lastName}
                                             <Typography variant="caption" color="text.secondary" component="span" sx={{ ml: 1 }}>
                                                 {new Date(selectedReview.updatedAt || selectedReview.createdAt).toLocaleDateString()}
                                             </Typography>
@@ -841,7 +856,6 @@ export const ReviewModal = ({ open, handleClose, selectedReview, onImageClick })
                                         </span>
                                     </Typography>
 
-
                                     <p className="font-semibold mt-1 break-words">
                                         {selectedReview.title}
                                     </p>
@@ -852,7 +866,7 @@ export const ReviewModal = ({ open, handleClose, selectedReview, onImageClick })
                                         style={{
                                             width: '90%',
                                             height: 'auto',
-                                            minHeight: '100px',
+                                            minHeight: '150px',
                                             maxHeight: '200px',
                                             overflowY: 'auto',
                                             border: 'none',
@@ -883,7 +897,6 @@ export const ReviewModal = ({ open, handleClose, selectedReview, onImageClick })
         </Modal>
     );
 };
-
 
 export const ProductTabs = ({ value, handleChange }) => {
     return (
@@ -1427,14 +1440,14 @@ export const Header = ({
     setIsModalOpen,
     handleShareWishlist,
     loading,
-    username
+    firstName
 }) => {
-    const isSharedWishlist = username !== undefined;
+    const isSharedWishlist = firstName !== undefined;
 
     return (
         <div className="bg-white p-4 rounded-sm shadow-sm mb-3 flex justify-between items-center">
             <Typography variant="h5" className="text-gray-800 font-semilight">
-                {isSharedWishlist ? `${username}'s Wishlist` : title}
+                {isSharedWishlist ? `${firstName}'s Wishlist` : title}
             </Typography>
             {wishlistItems !== undefined && !isSharedWishlist ? (
                 <div className="flex space-x-2">
@@ -1702,8 +1715,8 @@ export const ProfileIcon = ({ auth, handleProfileDropdownToggle }) => {
                     className="flex items-center space-x-2 rounded-sm"
                 >
                     <StyledPersonIcon />
-                    {auth?.username && (
-                        <span className="ml-2 text-sm">{auth.username}</span>
+                    {auth?.firstName && (
+                        <span className="ml-2 text-sm">{auth.firstName}</span>
                     )}
                 </ProfileButton>
             </div>
@@ -1812,8 +1825,8 @@ export const DropdownMenu = ({ auth, isAdmin, onLogout }) => {
             <Tooltip title="Profile" arrow>
                 <div onClick={handleDropdownToggle} className="flex items-center cursor-pointer">
                     <StyledPersonIcon />
-                    {auth.username && (
-                        <span className="ml-2 text-sm">{auth.username}</span>
+                    {auth.firstName && (
+                        <span className="ml-2 text-sm">{auth.firstName}</span>
                     )}
                 </div>
             </Tooltip>
@@ -1880,16 +1893,12 @@ export const AuthActions = ({
                     </div>
                 ) : (
                     <>
-                        <BrownButton
-                            variant="contained"
-                            color="primary"
+                        <RoundIconButton
                             onClick={() => navigate('/login')}
+                            sx={{ color: '#686159' }}
                         >
-                            Login
-                        </BrownButton>
-                        <OutlinedBrownButton onClick={() => navigate('/register')}>
-                            Register
-                        </OutlinedBrownButton>
+                            <Login />
+                        </RoundIconButton>
                     </>
                 )}
             </div>

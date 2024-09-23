@@ -159,12 +159,12 @@ const ProductDetails = () => {
 
                         <p
                             onClick={openReviewModal}
-                            className="mb-1 underline cursor-pointer text-sm w-9 font-sm"
+                            className="underline cursor-pointer text-sm w-9 font-sm"
                         >
                             Review
                         </p>
 
-                        <div className="mt-4 flex flex-col">
+                        <div className="mt-2 flex flex-col">
                             {discountPercentage > 0 ? (
                                 <>
                                     <span className="text-gray-500 line-through text-sm">

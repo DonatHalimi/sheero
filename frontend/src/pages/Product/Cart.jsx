@@ -1,13 +1,13 @@
 import { DeleteOutline } from '@mui/icons-material';
 import { Paper, Table, TableBody, TableCell, TableContainer, TableHead, TableRow, Tooltip } from '@mui/material';
 import React, { useContext, useEffect, useState } from 'react';
+import { useNavigate } from 'react-router-dom';
 import { CheckoutButton, CustomDeleteModal, EmptyState, LoadingCart, RoundIconButton, truncateText } from '../../assets/CustomComponents';
 import emptyCartImage from '../../assets/img/empty-cart.png';
 import useAxios from '../../axiosInstance';
 import Footer from '../../components/Footer';
 import Navbar from '../../components/Navbar/Navbar';
 import { AuthContext } from '../../context/AuthContext';
-import { useNavigate } from 'react-router-dom';
 
 const Cart = () => {
     const [cart, setCart] = useState(null);

@@ -24,7 +24,7 @@ const AddressInformation = () => {
     const [existingAddress, setExistingAddress] = useState(null);
     const [cities, setCities] = useState([]);
     const [countries, setCountries] = useState([]);
-    const [loading, setLoading] = useState(true); // Added loading state
+    const [loading, setLoading] = useState(true);
 
     useEffect(() => {
         if (userId && auth.accessToken) {
@@ -34,7 +34,7 @@ const AddressInformation = () => {
 
     const fetchAddress = async () => {
         try {
-            setLoading(true); // Start loading
+            setLoading(true);
             const response = await axiosInstance.get(`${apiUrl}/user/${userId}`);
             const address = response.data;
             if (address) {
@@ -48,7 +48,7 @@ const AddressInformation = () => {
         } catch (error) {
             console.error('Error fetching address:', error.message);
         } finally {
-            setLoading(false); // Stop loading
+            setLoading(false);
         }
     };
 

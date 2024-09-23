@@ -3,7 +3,7 @@ import axios from 'axios';
 import React, { useContext, useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import 'react-toastify/dist/ReactToastify.css';
-import { CustomDeleteModal, CustomMenu, Header, ReviewModal } from '../../assets/CustomComponents';
+import { CustomDeleteModal, CustomMenu, Header, ReviewModal, CustomPagination } from '../../assets/CustomComponents';
 import noReviewsImage from '../../assets/img/empty-reviews.png';
 import Footer from '../../components/Footer';
 import Navbar from '../../components/Navbar/Navbar';
@@ -13,6 +13,7 @@ import { AuthContext } from '../../context/AuthContext';
 import ProfileSidebar from './ProfileSidebar';
 
 const apiUrl = 'http://localhost:5000/api/reviews';
+const itemsPerPage = 4;
 
 const Reviews = () => {
     const { auth } = useContext(AuthContext);
@@ -26,6 +27,8 @@ const Reviews = () => {
     const [openEditModal, setOpenEditModal] = useState(false);
     const [openDeleteModal, setOpenDeleteModal] = useState(false);
     const [openReviewModal, setOpenReviewModal] = useState(false);
+    const [currentPage, setCurrentPage] = useState(1);
+    const [totalReviews, setTotalReviews] = useState(0);
 
     useEffect(() => {
         window.scrollTo(0, 0);
@@ -41,11 +44,24 @@ const Reviews = () => {
                 headers: { Authorization: `Bearer ${auth.accessToken}` },
             });
             setReviews(response.data);
+            setTotalReviews(response.data.length);
         } catch (err) {
             console.error('Failed to fetch reviews:', err.message);
         } finally {
             setLoading(false);
         }
+    };
+
+    const pageCount = Math.ceil(totalReviews / itemsPerPage);
+
+    const getCurrentPageItems = () => {
+        const startIndex = (currentPage - 1) * itemsPerPage;
+        return reviews.slice(startIndex, startIndex + itemsPerPage);
+    };
+
+    const handlePageChange = (event, value) => {
+        setCurrentPage(value);
+        window.scrollTo(0, 0);
     };
 
     useEffect(() => window.scrollTo(0, 0), []);
@@ -110,21 +126,38 @@ const Reviews = () => {
 
                         <div className="rounded-sm mb-2">
                             {userId && auth.accessToken ? (
-                                <ReviewItem
-                                    reviews={reviews}
-                                    loading={loading}
-                                    onImageClick={handleImageClick}
-                                    onMenuClick={handleMenuClick}
-                                    onPaperClick={handlePaperClick}
-                                    noReviewsImage={noReviewsImage}
-                                />
+                                <>
+                                    <ReviewItem
+                                        reviews={getCurrentPageItems()}
+                                        loading={loading}
+                                        onImageClick={handleImageClick}
+                                        onMenuClick={handleMenuClick}
+                                        onPaperClick={handlePaperClick}
+                                        noReviewsImage={noReviewsImage}
+                                    />
+                                    <Box sx={{ display: 'flex', justifyContent: 'flex-start', mb: 4 }}>
+                                        <CustomPagination
+                                            count={pageCount}
+                                            page={currentPage}
+                                            onChange={handlePageChange}
+                                            size="large"
+                                            sx={{
+                                                position: 'relative',
+                                                bottom: '18px',
+                                                '& .MuiPagination-ul': {
+                                                    justifyContent: 'flex-start',
+                                                },
+                                            }}
+                                        />
+                                    </Box>
+                                </>
                             ) : (
                                 <Typography variant="body1">Please log in to view your reviews.</Typography>
                             )}
                         </div>
                     </div>
                 </main>
-            </Box>
+            </Box >
             <Footer />
 
             <CustomMenu
@@ -135,31 +168,33 @@ const Reviews = () => {
                 handleDeleteClick={handleDeleteClick}
             />
 
-            {selectedReview && (
-                <>
-                    <EditReviewModal
-                        open={openEditModal}
-                        onClose={() => setOpenEditModal(false)}
-                        review={selectedReview}
-                        onEditSuccess={handleEditSuccess}
-                    />
+            {
+                selectedReview && (
+                    <>
+                        <EditReviewModal
+                            open={openEditModal}
+                            onClose={() => setOpenEditModal(false)}
+                            review={selectedReview}
+                            onEditSuccess={handleEditSuccess}
+                        />
 
-                    <CustomDeleteModal
-                        open={openDeleteModal}
-                        onClose={() => setOpenDeleteModal(false)}
-                        onDelete={handleDeleteConfirm}
-                        title="Delete Review"
-                        message="Are you sure you want to delete this review?"
-                    />
+                        <CustomDeleteModal
+                            open={openDeleteModal}
+                            onClose={() => setOpenDeleteModal(false)}
+                            onDelete={handleDeleteConfirm}
+                            title="Delete Review"
+                            message="Are you sure you want to delete this review?"
+                        />
 
-                    <ReviewModal
-                        open={openReviewModal}
-                        handleClose={() => setOpenReviewModal(false)}
-                        selectedReview={selectedReview}
-                        onImageClick={handleImageClick}
-                    />
-                </>
-            )}
+                        <ReviewModal
+                            open={openReviewModal}
+                            handleClose={() => setOpenReviewModal(false)}
+                            selectedReview={selectedReview}
+                            onImageClick={handleImageClick}
+                        />
+                    </>
+                )
+            }
         </>
     );
 };

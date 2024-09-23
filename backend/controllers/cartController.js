@@ -66,15 +66,12 @@ const updateCartItemQuantity = async (req, res) => {
             return res.status(404).json({ message: 'Product not found in cart' });
         }
 
-        // Update the quantity
         cart.items[cartItemIndex].quantity += quantityChange;
 
-        // If the quantity is 0 or less, remove the item from the cart
         if (cart.items[cartItemIndex].quantity <= 0) {
-            cart.items.splice(cartItemIndex, 1); // Remove the item from the cart
+            cart.items.splice(cartItemIndex, 1);
         }
 
-        // Recalculate the total price
         await cart.calculateTotalPrice();
         await cart.save();
 

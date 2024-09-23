@@ -43,7 +43,7 @@ const ContactUs = () => {
             toast.success('Message sent successfully!', { autoClose: 2000 });
             setFormData({
                 name: '',
-                email: auth.email || '', // Reset email to the logged-in user's email
+                email: auth.email || '',
                 subject: '',
                 message: ''
             });
@@ -79,13 +79,13 @@ const ContactUs = () => {
                         label="Email"
                         name="email"
                         type="email"
-                        value={formData.email} // Email is pre-filled from the auth context
+                        value={formData.email}
                         onChange={handleChange}
                         fullWidth
                         required
                         variant="outlined"
                         className="mb-3"
-                        disabled={!!auth.email} // Disable if the user is logged in
+                        disabled={!!auth.email}
                     />
                     <TextField
                         label="Subject"

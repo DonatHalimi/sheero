@@ -40,7 +40,7 @@ const getReviews = async (req, res) => {
         const reviews = await Review.find()
             .populate({
                 path: 'user',
-                select: '_id username'
+                select: '_id firstName lastName email'
             })
             .populate({
                 path: 'product',
@@ -57,7 +57,7 @@ const getReview = async (req, res) => {
         const review = await Review.findById(req.params.id)
             .populate({
                 path: 'user',
-                select: '_id username'
+                select: '_id firstName lastName email'
             })
             .populate({
                 path: 'product',
@@ -77,7 +77,7 @@ const getReviewsByProduct = async (req, res) => {
         const reviews = await Review.find({ product: productId })
             .populate({
                 path: 'user',
-                select: '_id username'
+                select: '_id firstName lastName email'
             })
             .populate({
                 path: 'product',
@@ -101,7 +101,7 @@ const getReviewsByUser = async (req, res) => {
         const reviews = await Review.find({ user: userId })
             .populate({
                 path: 'user',
-                select: '_id username'
+                select: '_id firstName lastName email'
             })
             .populate({
                 path: 'product',
@@ -133,7 +133,6 @@ const updateReview = async (req, res) => {
             return res.status(403).json({ message: 'You are not authorized to update this review' });
         }
 
-        // Update fields only if they are provided in the request body
         if (title !== undefined) review.title = title;
         if (rating !== undefined) review.rating = rating;
         if (comment !== undefined) review.comment = comment;
@@ -144,7 +143,7 @@ const updateReview = async (req, res) => {
         const updatedReview = await Review.findById(req.params.id)
             .populate({
                 path: 'user',
-                select: '_id username'
+                select: '_id email'
             })
             .populate({
                 path: 'product',
@@ -197,7 +196,6 @@ const deleteReviews = async (req, res) => {
             return res.status(404).json({ message: 'One or more reviews not found' });
         }
 
-        // Check if the user is authorized to delete all the reviews
         for (const review of reviews) {
             if (review.user.toString() !== userId && userRole !== 'admin') {
                 return res.status(403).json({ message: 'You are not authorized to delete one or more of these reviews' });

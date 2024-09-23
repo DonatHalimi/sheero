@@ -14,12 +14,13 @@ import ProfileSidebar from './ProfileSidebar';
 const ProfileInformation = () => {
     const { auth, setAuth } = useContext(AuthContext);
     const [formData, setFormData] = useState({
-        username: auth.username || '',
+        firstName: auth.firstName || '',
+        lastName: auth.lastName || '',
         email: auth.email || '',
         password: '',
         newPassword: '',
     });
-    const [loading, setLoading] = useState(false); 
+    const [loading, setLoading] = useState(false);
     const [showPassword, setShowPassword] = useState(false);
     const [showNewPassword, setShowNewPassword] = useState(false);
 
@@ -38,7 +39,8 @@ const ProfileInformation = () => {
         setLoading(true);
         try {
             const updatedData = {};
-            if (formData.username !== auth.username) updatedData.username = formData.username;
+            if (formData.firstName !== auth.firstName) updatedData.firstName = formData.firstName;
+            if (formData.lastName !== auth.lastName) updatedData.lastName = formData.lastName;
             if (formData.email !== auth.email) updatedData.email = formData.email;
             if (formData.newPassword) updatedData.newPassword = formData.newPassword;
 
@@ -58,14 +60,18 @@ const ProfileInformation = () => {
 
             const newAuth = {
                 ...auth,
-                username: response.data.username,
+                firstName: response.data.firstName,
+                lastName: response.data.lastName,
                 email: response.data.email,
                 accessToken: response.data.accessToken || auth.accessToken
             };
             setAuth(newAuth);
 
-            if (updatedData.username !== undefined) {
-                localStorage.setItem('username', updatedData.username);
+            if (updatedData.firstName !== undefined) {
+                localStorage.setItem('firstName', updatedData.firstName);
+            }
+            if (updatedData.lastName !== undefined) {
+                localStorage.setItem('lastName', updatedData.lastName);
             }
             if (updatedData.email !== undefined) {
                 localStorage.setItem('email', updatedData.email);
@@ -90,7 +96,7 @@ const ProfileInformation = () => {
 
     // Function to determine if the user is adding new information
     const isAddingNewInformation = () => {
-        return formData.username !== auth.username || formData.email !== auth.email;
+        return formData.firstName !== auth.firstName || formData.lastName !== auth.lastName || formData.email !== auth.email;
     };
 
     return (
@@ -101,7 +107,7 @@ const ProfileInformation = () => {
                 <main className="p-4 relative left-32 w-full">
                     <div className="container max-w-6xl mx-auto mt-20 mb-36">
                         <Header title='Personal Information' />
-                        
+
                         <div className="bg-white shadow-sm rounded-sm p-8">
                             {loading ? (
                                 <ProfileInformationSkeleton />
@@ -110,10 +116,20 @@ const ProfileInformation = () => {
                                     <Box className="flex gap-4">
                                         <TextField
                                             fullWidth
-                                            label="Username"
+                                            label="First Name"
                                             variant="outlined"
-                                            name="username"
-                                            value={formData.username}
+                                            name="firstName"
+                                            value={formData.firstName}
+                                            onChange={handleChange}
+                                            InputLabelProps={{ className: 'text-gray-700' }}
+                                            InputProps={{ className: 'text-gray-700' }}
+                                        />
+                                        <TextField
+                                            fullWidth
+                                            label="Last Name"
+                                            variant="outlined"
+                                            name="lastName"
+                                            value={formData.lastName}
                                             onChange={handleChange}
                                             InputLabelProps={{ className: 'text-gray-700' }}
                                             InputProps={{ className: 'text-gray-700' }}

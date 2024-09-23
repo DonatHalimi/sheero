@@ -21,7 +21,11 @@ const generateRefreshToken = (user) => {
 };
 
 const registerUser = async (req, res) => {
-    const { username, email, password, role } = req.body;
+    const { firstName, lastName, email, password, role } = req.body;
+
+    if (!firstName || !lastName || !email || !password) {
+        return res.status(400).json({ message: 'All fields are required' });
+    }
 
     if (!validatePassword(password)) {
         return res.status(400).json({ message: 'Password must contain at least 8 characters, one uppercase letter, one lowercase letter, one number and one special character' });
@@ -32,12 +36,15 @@ const registerUser = async (req, res) => {
     }
 
     try {
-        const existingUser = await User.findOne({ username });
+        if (!process.env.JWT_SECRET || !process.env.JWT_REFRESH_SECRET) {
+            throw new Error('JWT secret keys are not set');
+        }
+
         const existingEmail = await User.findOne({ email });
-        if (existingUser || existingEmail) return res.status(400).json({ message: 'User or Email already exists' });
+        if (existingEmail) return res.status(400).json({ message: 'Email already exists' });
 
         const hashedPassword = await bcrypt.hash(password, 10);
-        const user = new User({ username, email, password: hashedPassword, role });
+        const user = new User({ firstName, lastName, email, password: hashedPassword, role });
         await user.save();
 
         const accessToken = generateAccessToken(user);
@@ -45,20 +52,16 @@ const registerUser = async (req, res) => {
 
         res.status(201).json({ message: 'User registered successfully', accessToken, refreshToken });
     } catch (error) {
-        res.status(500).json({ message: 'Server error' });
+        console.error('Server error during registration:', error);
+        res.status(500).json({ message: 'Server error', error: error.message });
     }
 };
 
 const loginUser = async (req, res) => {
-    const { username, email, password } = req.body;
+    const { email, password } = req.body;
 
     try {
-        const user = await User.findOne({
-            $or: [
-                { username: username || email },
-                { email: email || username }
-            ]
-        });
+        const user = await User.findOne({ email });
 
         if (!user) {
             return res.status(400).json({ message: 'Invalid credentials' });
@@ -77,7 +80,8 @@ const loginUser = async (req, res) => {
             refreshToken,
             userId: user._id,
             role: user.role,
-            username: user.username,
+            firstName: user.firstName,
+            lastName: user.lastName,
             email: user.email,
         });
     } catch (error) {
@@ -95,8 +99,7 @@ const refreshAccessToken = async (req, res) => {
 
     try {
         const decoded = jwt.verify(refreshToken, process.env.JWT_REFRESH_SECRET);
-        
-        // Fetch the user to get the current role
+
         const user = await User.findById(decoded.userId);
         if (!user) {
             return res.status(404).json({ message: 'User not found' });
@@ -117,7 +120,8 @@ const getCurrentUser = async (req, res) => {
             return res.status(404).json({ message: 'User not found' });
         }
         res.json({
-            username: user.username,
+            firstName: user.firstName,
+            lastName: user.lastName,
             email: user.email,
             role: user.role,
             address: user.address || {},
@@ -128,7 +132,7 @@ const getCurrentUser = async (req, res) => {
 };
 
 const updateUserProfile = async (req, res) => {
-    const { username, email, password, newPassword } = req.body;
+    const { firstName, lastName, email, password, newPassword } = req.body;
 
     try {
         const user = await User.findById(req.user.userId);
@@ -136,21 +140,22 @@ const updateUserProfile = async (req, res) => {
             return res.status(404).json({ message: 'User not found' });
         }
 
-        if ((username || email || newPassword) && !await bcrypt.compare(password, user.password)) {
+        if ((email || newPassword) && !await bcrypt.compare(password, user.password)) {
             return res.status(400).json({ message: 'Incorrect current password' });
         }
 
-        if (username) user.username = username;
+        if (firstName) user.firstName = firstName;
+        if (lastName) user.lastName = lastName;
         if (email) user.email = email;
         if (newPassword) user.password = await bcrypt.hash(newPassword, 10);
 
         await user.save();
 
         res.json({
-            username: user.username,
+            firstName: user.firstName,
+            lastName: user.lastName,
             email: user.email,
             role: user.role,
-            address: user.address || {},
         });
     } catch (error) {
         res.status(500).json({ message: 'Server error' });

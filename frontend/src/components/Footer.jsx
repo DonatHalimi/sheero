@@ -1,3 +1,4 @@
+
 import { ContactMail, Email, Facebook, GitHub, Instagram, LinkedIn, Phone } from '@mui/icons-material';
 import React from 'react';
 import { Link } from 'react-router-dom';
@@ -39,9 +40,9 @@ const Footer = () => {
                         <h3 className="text-lg font-semibold mb-4 select-none"><Link to="/">sheero</Link></h3>
                         <p className="text-gray-200 mb-2">
                             Your trusted online shopping destination for quality products and exceptional service.
-                            <div className='mb-2' />
-                            <span className='mt-4'>Stay connected with us</span>
                         </p>
+                        <div className='mb-2' />
+                        <span className='text-gray-200 mb-2 mt-4'>Stay connected with us</span>
                         <div className="flex space-x-4">
                             {socialLinks.map(({ href, icon, label }) => (
                                 <a key={label} href={href} target='_blank' className="text-gray-200 hover:text-white" aria-label={label}>

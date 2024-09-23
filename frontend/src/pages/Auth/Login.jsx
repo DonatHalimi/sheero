@@ -10,7 +10,7 @@ import Navbar from '../../components/Navbar/Navbar';
 import { AuthContext } from '../../context/AuthContext';
 
 const Login = () => {
-    const [usernameOrEmail, setUsernameOrEmail] = useState('');
+    const [email, setEmail] = useState('');
     const [password, setPassword] = useState('');
     const [showPassword, setShowPassword] = useState(false);
     const { login } = useContext(AuthContext);
@@ -25,11 +25,11 @@ const Login = () => {
 
     const handleSubmit = async (e) => {
         e.preventDefault();
-        if (!usernameOrEmail || !password) {
+        if (!email || !password) {
             toast.error('Please fill in all fields');
             return;
         }
-        const response = await login(usernameOrEmail, password);
+        const response = await login(email, password);
         response.success ? navigate('/') : toast.error(response.message);
     };
 
@@ -47,10 +47,10 @@ const Login = () => {
                             margin="normal"
                             required
                             fullWidth
-                            id="usernameOrEmail"
-                            label="Username or Email"
-                            value={usernameOrEmail}
-                            onChange={(e) => setUsernameOrEmail(e.target.value)}
+                            id="email"
+                            label="Email"
+                            value={email}
+                            onChange={(e) => setEmail(e.target.value)}
                             sx={{ mb: 2 }}
                         />
                         <BrownOutlinedTextField

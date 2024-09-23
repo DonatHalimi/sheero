@@ -8,7 +8,8 @@ import useAxios from '../../../axiosInstance';
 import { AuthContext } from '../../../context/AuthContext';
 
 const AddUserModal = ({ open, onClose, onAddSuccess }) => {
-    const [username, setUsername] = useState('');
+    const [firstName, setFirstName] = useState('');
+    const [lastName, setLastName] = useState('');
     const [email, setEmail] = useState('');
     const [password, setPassword] = useState('');
     const [showPassword, setShowPassword] = useState(false);
@@ -31,7 +32,7 @@ const AddUserModal = ({ open, onClose, onAddSuccess }) => {
     };
 
     const handleAddUser = async () => {
-        if (!username || !email || !password || !role) {
+        if (!firstName || !lastName || !email || !password || !role) {
             toast.error('Please fill in all the fields');
             return;
         }
@@ -48,7 +49,8 @@ const AddUserModal = ({ open, onClose, onAddSuccess }) => {
 
         try {
             await axiosInstance.post('/users/create', {
-                username,
+                firstName,
+                lastName,
                 email,
                 password,
                 role
@@ -68,9 +70,16 @@ const AddUserModal = ({ open, onClose, onAddSuccess }) => {
                 <CustomTypography variant="h5">Add User</CustomTypography>
 
                 <BrownOutlinedTextField
-                    label="Username"
-                    value={username}
-                    onChange={(e) => setUsername(e.target.value)}
+                    label="First Name"
+                    value={firstName}
+                    onChange={(e) => setFirstName(e.target.value)}
+                    fullWidth
+                    className="!mb-4"
+                />
+                <BrownOutlinedTextField
+                    label="Last Name"
+                    value={lastName}
+                    onChange={(e) => setLastName(e.target.value)}
                     fullWidth
                     className="!mb-4"
                 />

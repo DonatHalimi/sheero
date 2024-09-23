@@ -17,7 +17,7 @@ import { AuthContext } from '../../context/AuthContext';
 import ProfileSidebar from './ProfileSidebar';
 
 const apiUrl = 'http://localhost:5000/api/wishlist';
-const itemsPerPage = 10;
+const itemsPerPage = 6;
 
 const Wishlist = () => {
     const { auth } = useContext(AuthContext);
@@ -28,6 +28,8 @@ const Wishlist = () => {
     const [totalItems, setTotalItems] = useState(0);
 
     useEffect(() => {
+        window.scrollTo(0, 0);
+        
         if (auth.accessToken) {
             const fetchWishlist = async () => {
                 try {
@@ -38,7 +40,6 @@ const Wishlist = () => {
                     setTotalItems(data.items.length);
                 } catch (error) {
                     console.error('Error fetching wishlist:', error);
-                    toast.error('Failed to load wishlist.');
                 } finally {
                     setLoading(false);
                 }
@@ -46,8 +47,6 @@ const Wishlist = () => {
             fetchWishlist();
         }
     }, [auth.accessToken]);
-
-    useEffect(() => window.scrollTo(0, 0), []);
 
     const handleRemoveFromWishlist = async (productId) => {
         try {
@@ -106,6 +105,7 @@ const Wishlist = () => {
 
     const handlePageChange = (event, value) => {
         setCurrentPage(value);
+        window.scrollTo(0, 0);
     };
 
     return (
@@ -145,11 +145,20 @@ const Wishlist = () => {
                                         />
                                     ))}
                                 </div>
-                                <CustomPagination
-                                    count={pageCount}
-                                    page={currentPage}
-                                    onChange={handlePageChange}
-                                />
+                                <Box sx={{ display: 'flex', justifyContent: 'flex-start', mb: 4 }}>
+                                    <CustomPagination
+                                        count={pageCount}
+                                        page={currentPage}
+                                        onChange={handlePageChange}
+                                        sx={{
+                                            position: 'relative',
+                                            bottom: '10px',
+                                            '& .MuiPagination-ul': {
+                                                justifyContent: 'flex-start',
+                                            },
+                                        }}
+                                    />
+                                </Box>
                             </>
                         )}
                     </div>
