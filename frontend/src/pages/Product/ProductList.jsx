@@ -61,6 +61,10 @@ const ProductList = () => {
                     count={pageCount}
                     page={currentPage}
                     onChange={handlePageChange}
+                    sx={{
+                        position: 'relative',
+                        bottom: '8px',
+                    }}
                 />
             )}
         </div>

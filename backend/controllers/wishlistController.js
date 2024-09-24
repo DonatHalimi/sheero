@@ -29,7 +29,7 @@ const getWishlistByUserId = async (req, res) => {
             return res.status(404).json({ message: 'Wishlist not found' });
         }
 
-        res.json({ firstName: user.firstName, items: wishlist.items });
+        res.json({ firstName: user.firstName, lastName: user.lastName, items: wishlist.items });
     } catch (err) {
         res.status(500).json({ message: 'Server Error', error: err.message });
     }

@@ -181,7 +181,7 @@ const searchProducts = async (req, res) => {
                     index: 'default',
                     text: {
                         query: query,
-                        path: ['name', 'description'],
+                        path: ['name', 'description', 'category'],
                         fuzzy: {
                             maxEdits: 2,
                             prefixLength: 0,

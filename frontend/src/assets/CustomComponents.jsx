@@ -1440,14 +1440,14 @@ export const Header = ({
     setIsModalOpen,
     handleShareWishlist,
     loading,
-    firstName
+    fullName = '',
 }) => {
-    const isSharedWishlist = firstName !== undefined;
+    const isSharedWishlist = fullName.trim() !== '';
 
     return (
         <div className="bg-white p-4 rounded-sm shadow-sm mb-3 flex justify-between items-center">
             <Typography variant="h5" className="text-gray-800 font-semilight">
-                {isSharedWishlist ? `${firstName}'s Wishlist` : title}
+                {isSharedWishlist ? `${fullName}'s Wishlist` : title}
             </Typography>
             {wishlistItems !== undefined && !isSharedWishlist ? (
                 <div className="flex space-x-2">
@@ -1462,6 +1462,7 @@ export const Header = ({
         </div>
     );
 };
+
 export const pluralize = (word, count) => {
     if (count === 1) return word;
     return word.endsWith('y') ? `${word.slice(0, -1)}ies` : `${word}s`;
@@ -1959,3 +1960,47 @@ export const DashboardNavbar = ({ open, toggleDrawer, auth, isDropdownOpen, hand
     )
 }
 
+export const knownEmailProviders = [
+    'gmail.com',
+    'yahoo.com',
+    'hotmail.com',
+    'outlook.com',
+    'icloud.com',
+    'mail.com',
+    'aol.com',
+    'zoho.com',
+    'protonmail.com',
+    'yandex.com',
+    'fastmail.com',
+    'gmx.com',
+    'tutanota.com',
+    'hushmail.com',
+    'live.com',
+    'me.com',
+    'msn.com',
+    'webmail.com',
+    'front.com',
+    'rediffmail.com',
+    'cogeco.ca',
+    'comcast.net',
+    'verizon.net',
+    'btinternet.com',
+    'bellsouth.net',
+    'sbcglobal.net',
+    'blueyonder.co.uk',
+    'charter.net',
+    'earthlink.net',
+    'optimum.net',
+    'xfinity.com',
+    'freenet.de',
+    'mail.ru',
+    'sina.com',
+    'qq.com',
+    '163.com',
+    '126.com',
+    'aliyun.com',
+    '126.com',
+    'example',
+    'test',
+    'custommail'
+];

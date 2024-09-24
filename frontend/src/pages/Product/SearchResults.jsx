@@ -1,7 +1,7 @@
 import { Typography } from '@mui/material';
 import React, { useEffect, useState } from 'react';
 import { useLocation } from 'react-router-dom';
-import { CustomPagination, EmptyState } from '../../assets/CustomComponents';
+import { CustomPagination, EmptyState, GoBackButton } from '../../assets/CustomComponents';
 import noResultsImage from '../../assets/img/no-results.png';
 import useAxios from '../../axiosInstance';
 import Footer from '../../components/Footer';
@@ -74,6 +74,10 @@ const SearchResults = () => {
         <>
             <Navbar />
             <div className="container mx-auto px-4 py-8 mb-16 bg-gray-50">
+                {products.length > 0 && (
+                    <GoBackButton />
+                )}
+
                 {totalProducts > 0 ? (
                     <>
                         <div className="sticky top-0 z-10 pb-4 bg-gray-50">
@@ -86,6 +90,10 @@ const SearchResults = () => {
                             count={pageCount}
                             page={currentPage}
                             onChange={handlePageChange}
+                            sx={{
+                                position: 'relative',
+                                bottom: '8px',
+                            }}
                         />
                     </>
                 ) : (

@@ -14,8 +14,7 @@ const itemsPerPage = 10;
 const SharedWishlist = () => {
     const { auth } = useContext(AuthContext);
     const [wishlistItems, setWishlistItems] = useState([]);
-    const [firstName, setFirstName] = useState('');
-    const [lastName, setLastName] = useState('');
+    const [fullName, setFullName] = useState('');
     const [currentPage, setCurrentPage] = useState(1);
     const [totalItems, setTotalItems] = useState(0);
     const [loading, setLoading] = useState(true);
@@ -27,7 +26,7 @@ const SharedWishlist = () => {
             try {
                 const { data } = await axiosInstance.get(`${apiUrl}/${auth.userId}`);
                 setWishlistItems(data.items);
-                setFirstName(data.firstName);
+                setFullName(`${data.firstName} ${data.lastName}`);
                 setTotalItems(data.items.length);
             } catch (error) {
                 console.error('Error fetching shared wishlist:', error);
@@ -53,7 +52,8 @@ const SharedWishlist = () => {
         <>
             <Navbar />
             <div className="container mx-auto px-4 py-8 mb-16 bg-gray-50">
-                <Header firstName={firstName} />
+                <Header fullName={fullName} />
+
                 {loading ? (
                     <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 gap-4">
                         {[...Array(3)].map((_, index) => <ProductItemSkeleton key={index} />)}
@@ -68,7 +68,7 @@ const SharedWishlist = () => {
                         <CustomPagination count={pageCount} page={currentPage} onChange={handlePageChange} />
                     </>
                 ) : (
-                    <EmptyState imageSrc={emptyWishlistImage} message={`No item in ${firstName}'s wishlist.`} />
+                    <EmptyState imageSrc={emptyWishlistImage} message={`No item in ${fullName}'s wishlist.`} />
                 )}
             </div>
             <Footer />

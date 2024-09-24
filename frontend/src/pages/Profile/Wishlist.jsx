@@ -29,7 +29,7 @@ const Wishlist = () => {
 
     useEffect(() => {
         window.scrollTo(0, 0);
-        
+
         if (auth.accessToken) {
             const fetchWishlist = async () => {
                 try {
@@ -152,7 +152,7 @@ const Wishlist = () => {
                                         onChange={handlePageChange}
                                         sx={{
                                             position: 'relative',
-                                            bottom: '10px',
+                                            bottom: '8px',
                                             '& .MuiPagination-ul': {
                                                 justifyContent: 'flex-start',
                                             },

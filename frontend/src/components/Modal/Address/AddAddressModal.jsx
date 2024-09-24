@@ -13,6 +13,10 @@ const AddAddressModal = ({ open, onClose, onAddSuccess }) => {
     const [cities, setCities] = useState([]);
     const [countries, setCountries] = useState([]);
 
+    const [nameValid, setNameValid] = useState(true);
+    const [streetValid, setStreetValid] = useState(true);
+    const [phoneNumberValid, setPhoneNumberValid] = useState(true);
+
     const axiosInstance = useAxios();
 
     useEffect(() => {
@@ -51,9 +55,25 @@ const AddAddressModal = ({ open, onClose, onAddSuccess }) => {
         }
     };
 
+    const validateName = (name) => {
+        return name.trim().length > 0; // Adjust as necessary
+    };
+
+    const validateStreet = (street) => {
+        return street.trim().length > 0; // Adjust as necessary
+    };
+
+    const validatePhoneNumber = (phoneNumber) => {
+        return /^\d{3}\/\d{2}\/\d{2} \d{6}$/.test(phoneNumber); // Adjust regex as necessary
+    };
+
     const handleAddAddress = async () => {
-        if (!name || !street || !phoneNumber || !city || !country) {
-            toast.error('Please fill in all the fields', { closeOnClick: true });
+        setNameValid(validateName(name));
+        setStreetValid(validateStreet(street));
+        setPhoneNumberValid(validatePhoneNumber(phoneNumber));
+
+        if (!nameValid || !streetValid || !phoneNumberValid || !city || !country) {
+            toast.error('Please fill in all fields correctly', { closeOnClick: true });
             return;
         }
 
@@ -88,28 +108,40 @@ const AddAddressModal = ({ open, onClose, onAddSuccess }) => {
                     required
                     label="Name"
                     value={name}
-                    onChange={(e) => setName(e.target.value)}
+                    onChange={(e) => {
+                        setName(e.target.value);
+                        setNameValid(validateName(e.target.value));
+                    }}
                     className="!mb-4"
                 />
+                {!nameValid && <div className="text-red-500 text-sm mb-2">Name is required.</div>}
 
                 <BrownOutlinedTextField
                     fullWidth
                     required
                     label="Street"
                     value={street}
-                    onChange={(e) => setStreet(e.target.value)}
+                    onChange={(e) => {
+                        setStreet(e.target.value);
+                        setStreetValid(validateStreet(e.target.value));
+                    }}
                     className="!mb-4"
                 />
+                {!streetValid && <div className="text-red-500 text-sm mb-2">Street is required.</div>}
 
                 <BrownOutlinedTextField
                     fullWidth
                     required
                     label="Phone Number"
                     value={phoneNumber}
-                    onChange={(e) => setPhoneNumber(e.target.value)}
+                    onChange={(e) => {
+                        setPhoneNumber(e.target.value);
+                        setPhoneNumberValid(validatePhoneNumber(e.target.value));
+                    }}
                     placeholder="044/45/48 XXXXXX"
                     className="!mb-4"
                 />
+                {!phoneNumberValid && <div className="text-red-500 text-sm mb-2">Phone number format is invalid. (Format: XXX/XX/XX XXXXXX)</div>}
 
                 <Autocomplete
                     id="country-autocomplete"

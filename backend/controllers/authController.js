@@ -2,6 +2,11 @@ const bcrypt = require('bcryptjs');
 const jwt = require('jsonwebtoken');
 const User = require('../models/User');
 
+const validateName = (name) => {
+    const nameRegex = /^[A-Z][a-z]{1,9}$/;
+    return nameRegex.test(name);
+};
+
 const validateEmail = (email) => {
     const emailRegex = /^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$/;
     return emailRegex.test(String(email).toLowerCase());
@@ -27,8 +32,16 @@ const registerUser = async (req, res) => {
         return res.status(400).json({ message: 'All fields are required' });
     }
 
+    if (!validateName(firstName)) {
+        return res.status(400).json({ message: 'First Name must start with a capital letter and contain 2-10 alphabetic characters' });
+    }
+
+    if(!validateName(lastName)){
+        return res.status(400).json({ message: 'Last Name must start with a capital letter and contain 2-10 alphabetic characters' });
+    }
+
     if (!validatePassword(password)) {
-        return res.status(400).json({ message: 'Password must contain at least 8 characters, one uppercase letter, one lowercase letter, one number and one special character' });
+        return res.status(400).json({ message: 'Password must contain at least 8 characters, one uppercase letter, one lowercase letter, one number, and one special character' });
     }
 
     if (!validateEmail(email)) {
@@ -142,6 +155,14 @@ const updateUserProfile = async (req, res) => {
 
         if ((email || newPassword) && !await bcrypt.compare(password, user.password)) {
             return res.status(400).json({ message: 'Incorrect current password' });
+        }
+
+        if (firstName && !validateName(firstName)) {
+            return res.status(400).json({ message: 'First name must start with a capital letter and contain 2-10 alphabetic characters' });
+        }
+
+        if (lastName && !validateName(lastName)) {
+            return res.status(400).json({ message: 'Last name must start with a capital letter and contain 2-10 alphabetic characters' });
         }
 
         if (firstName) user.firstName = firstName;

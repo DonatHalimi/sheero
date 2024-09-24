@@ -26,6 +26,13 @@ const AddressInformation = () => {
     const [countries, setCountries] = useState([]);
     const [loading, setLoading] = useState(true);
 
+    // New state for field validation
+    const [nameValid, setNameValid] = useState(true);
+    const [streetValid, setStreetValid] = useState(true);
+    const [phoneNumberValid, setPhoneNumberValid] = useState(true);
+
+    const [focusedField, setFocusedField] = useState(null);
+
     useEffect(() => {
         if (userId && auth.accessToken) {
             fetchAddress();
@@ -96,10 +103,43 @@ const AddressInformation = () => {
         setCity(selectedCityId);
     };
 
+    const validateName = (name) => {
+        return /^[A-Z][a-zA-Z]{1,9}$/.test(name);
+    };
+
+    const validateStreet = (street) => {
+        return /^[A-Z][a-zA-Z0-9]*([ ]+[A-Z][a-zA-Z0-9]*)*$/.test(street);
+    };
+
+    const validatePhoneNumber = (phoneNumber) => {
+        return /^0(44|45|48)\d{6}$/.test(phoneNumber);
+    };
+
+    const handleNameChange = (e) => {
+        const value = e.target.value;
+        setName(value);
+        setNameValid(validateName(value));
+    };
+
+    const handleStreetChange = (e) => {
+        const value = e.target.value;
+        setStreet(value);
+        setStreetValid(validateStreet(value));
+    };
+
+    const handlePhoneNumberChange = (e) => {
+        const value = e.target.value;
+        setPhoneNumber(value);
+        setPhoneNumberValid(validatePhoneNumber(value));
+    };
+
     const handleSaveAddress = async (e) => {
         e.preventDefault();
-        if (!name || !street || !phoneNumber || !city || !country) {
-            toast.error('Please fill in all the fields');
+        if (!validateName(name) || !validateStreet(street) || !validatePhoneNumber(phoneNumber) || !city || !country) {
+            toast.error('Please fill in all the fields correctly');
+            setNameValid(validateName(name));
+            setStreetValid(validateStreet(street));
+            setPhoneNumberValid(validatePhoneNumber(phoneNumber));
             return;
         }
 
@@ -143,80 +183,116 @@ const AddressInformation = () => {
                             {loading ? (
                                 <AddressInformationSkeleton />
                             ) : (
-                            <form onSubmit={handleSaveAddress} className="space-y-6">
-                                <Box className="flex gap-4">
-                                    <TextField
-                                        fullWidth
-                                        label="Name"
-                                        variant="outlined"
-                                        name="name"
-                                        value={name}
-                                        onChange={(e) => setName(e.target.value)}
-                                        InputLabelProps={{ className: 'text-gray-700' }}
-                                        InputProps={{ className: 'text-gray-700' }}
-                                    />
-                                    <TextField
-                                        fullWidth
-                                        label="Street"
-                                        variant="outlined"
-                                        name="street"
-                                        value={street}
-                                        onChange={(e) => setStreet(e.target.value)}
-                                        InputLabelProps={{ className: 'text-gray-700' }}
-                                        InputProps={{ className: 'text-gray-700' }}
-                                    />
-                                </Box>
+                                <form onSubmit={handleSaveAddress} className="space-y-6">
+                                    <Box className="flex gap-4">
+                                        <div className="relative w-full">
+                                            <TextField
+                                                fullWidth
+                                                label="Name"
+                                                variant="outlined"
+                                                name="name"
+                                                value={name}
+                                                onChange={handleNameChange}
+                                                onFocus={() => setFocusedField('name')}
+                                                onBlur={() => setFocusedField(null)}
+                                                error={!nameValid}
+                                                InputLabelProps={{ className: 'text-gray-700' }}
+                                                InputProps={{ className: 'text-gray-700' }}
+                                            />
+                                            {focusedField === 'name' && !nameValid && (
+                                                <div className="absolute left-0 bottom-[-58px] bg-white text-red-500 text-sm p-2 rounded-lg shadow-md w-full z-10">
+                                                    <span className="block text-xs font-semibold mb-1">Invalid Name</span>
+                                                    Must start with a capital letter, 2-10 characters.
+                                                    <div className="absolute top-[-5px] left-[20px] w-0 h-0 border-l-[5px] border-r-[5px] border-b-[5px] border-transparent border-b-white"></div>
+                                                </div>
+                                            )}
+                                        </div>
+                                        <div className="relative w-full">
+                                            <TextField
+                                                fullWidth
+                                                label="Street"
+                                                variant="outlined"
+                                                name="street"
+                                                value={street}
+                                                onChange={handleStreetChange}
+                                                onFocus={() => setFocusedField('street')}
+                                                onBlur={() => setFocusedField(null)}
+                                                error={!streetValid}
+                                                InputLabelProps={{ className: 'text-gray-700' }}
+                                                InputProps={{ className: 'text-gray-700' }}
+                                            />
+                                            {focusedField === 'street' && !streetValid && (
+                                                <div className="absolute left-0 bottom-[-58px] bg-white text-red-500 text-sm p-2 rounded-lg shadow-md w-full z-10">
+                                                    <span className="block text-xs font-semibold mb-1">Invalid Street</span>
+                                                    Must start with a capital letter.
+                                                    <div className="absolute top-[-5px] left-[20px] w-0 h-0 border-l-[5px] border-r-[5px] border-b-[5px] border-transparent border-b-white"></div>
+                                                </div>
+                                            )}
+                                        </div>
+                                    </Box>
 
-                                <Box className="flex gap-4">
-                                    <TextField
-                                        fullWidth
-                                        label="Phone Number"
-                                        variant="outlined"
-                                        name="phoneNumber"
-                                        value={phoneNumber}
-                                        onChange={(e) => setPhoneNumber(e.target.value)}
-                                        InputLabelProps={{ className: 'text-gray-700' }}
-                                        InputProps={{ className: 'text-gray-700' }}
-                                        placeholder="044/45/48 XXXXXX"
-                                    />
-                                    <FormControl fullWidth variant="outlined">
-                                        <InputLabel>Country</InputLabel>
-                                        <Select
-                                            name="country"
-                                            value={country || ''}
-                                            onChange={handleCountryChange}
-                                            label="Country"
-                                        >
-                                            {countries.map((country) => (
-                                                <MenuItem key={country._id} value={country._id}>
-                                                    {country.name}
-                                                </MenuItem>
-                                            ))}
-                                        </Select>
-                                    </FormControl>
+                                    <Box className="flex gap-4">
+                                        <div className="relative w-full">
+                                            <TextField
+                                                fullWidth
+                                                label="Phone Number"
+                                                variant="outlined"
+                                                name="phoneNumber"
+                                                value={phoneNumber}
+                                                onChange={handlePhoneNumberChange}
+                                                onFocus={() => setFocusedField('phoneNumber')}
+                                                onBlur={() => setFocusedField(null)}
+                                                error={!phoneNumberValid}
+                                                InputLabelProps={{ className: 'text-gray-700' }}
+                                                InputProps={{ className: 'text-gray-700' }}
+                                                placeholder="044/45/48 XXXXXX"
+                                            />
+                                            {focusedField === 'phoneNumber' && !phoneNumberValid && (
+                                                <div className="absolute left-0 bottom-[-78px] bg-white text-red-500 text-sm p-2 rounded-lg shadow-md w-full z-10">
+                                                    <span className="block text-xs font-semibold mb-1">Invalid Phone Number</span>
+                                                    Must be in the format: 044/45/48 followed by 6 digits.
+                                                    <div className="absolute top-[-5px] left-[20px] w-0 h-0 border-l-[5px] border-r-[5px] border-b-[5px] border-transparent border-b-white"></div>
+                                                </div>
+                                            )}
+                                        </div>
+                                        <FormControl fullWidth variant="outlined">
+                                            <InputLabel>Country</InputLabel>
+                                            <Select
+                                                name="country"
+                                                value={country || ''}
+                                                onChange={handleCountryChange}
+                                                label="Country"
+                                            >
+                                                {countries.map((country) => (
+                                                    <MenuItem key={country._id} value={country._id}>
+                                                        {country.name}
+                                                    </MenuItem>
+                                                ))}
+                                            </Select>
+                                        </FormControl>
 
-                                    <FormControl fullWidth variant="outlined">
-                                        <InputLabel>City</InputLabel>
-                                        <Select
-                                            name="city"
-                                            value={city || ''}
-                                            onChange={handleCityChange}
-                                            label="City"
-                                            disabled={!country}
-                                        >
-                                            {cities.map((city) => (
-                                                <MenuItem key={city._id} value={city._id}>
-                                                    {city.name}
-                                                </MenuItem>
-                                            ))}
-                                        </Select>
-                                    </FormControl>
-                                </Box>
+                                        <FormControl fullWidth variant="outlined">
+                                            <InputLabel>City</InputLabel>
+                                            <Select
+                                                name="city"
+                                                value={city || ''}
+                                                onChange={handleCityChange}
+                                                label="City"
+                                                disabled={!country}
+                                            >
+                                                {cities.map((city) => (
+                                                    <MenuItem key={city._id} value={city._id}>
+                                                        {city.name}
+                                                    </MenuItem>
+                                                ))}
+                                            </Select>
+                                        </FormControl>
+                                    </Box>
 
-                                <Button type="submit" variant="contained" color="primary" className="bg-orange-600 hover:bg-orange-700">
-                                    Save
-                                </Button>
-                            </form>
+                                    <Button type="submit" variant="contained" color="primary" className="bg-orange-600 hover:bg-orange-700">
+                                        Save
+                                    </Button>
+                                </form>
                             )}
                         </div>
                     </div>

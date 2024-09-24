@@ -1,7 +1,7 @@
 import { Box, Button, Container, TextField } from '@mui/material';
-import axios from 'axios';
-import React, { useContext, useEffect, useState } from 'react';
+import React, { useContext, useEffect, useRef, useState } from 'react';
 import { toast } from 'react-toastify';
+import useAxios from '../axiosInstance';
 import Footer from '../components/Footer';
 import Navbar from '../components/Navbar/Navbar';
 import { AuthContext } from '../context/AuthContext';
@@ -16,16 +16,21 @@ const ContactUs = () => {
     });
 
     const [loading, setLoading] = useState(false);
+    const subjectRef = useRef(null);
+    const axiosInstance = useAxios();
 
     useEffect(() => {
-        if (auth.email) {
-            setFormData((prev) => ({ ...prev, email: auth.email }));
-        }
-    }, [auth.email]);
+        setFormData((prev) => ({
+            ...prev,
+            name: auth.firstName || '',
+            email: auth.email || ''
+        }));
+    }, [auth.firstName, auth.email]);
 
     useEffect(() => {
         window.scrollTo(0, 0);
-    }, [])
+        subjectRef.current?.focus();
+    }, []);
 
     const handleChange = (e) => {
         const { name, value } = e.target;
@@ -38,11 +43,11 @@ const ContactUs = () => {
         toast.info('Sending message...', { autoClose: 1000 });
 
         try {
-            const response = await axios.post('http://localhost:5000/api/contact/create', formData);
+            await axiosInstance.post('/contact/create', formData);
             setLoading(false);
             toast.success('Message sent successfully!', { autoClose: 2000 });
             setFormData({
-                name: '',
+                name: auth.firstName || '',
                 email: auth.email || '',
                 subject: '',
                 message: ''
@@ -85,11 +90,11 @@ const ContactUs = () => {
                         required
                         variant="outlined"
                         className="mb-3"
-                        disabled={!!auth.email}
                     />
                     <TextField
                         label="Subject"
                         name="subject"
+                        inputRef={subjectRef} // Attach the ref to the subject field
                         value={formData.subject}
                         onChange={handleChange}
                         fullWidth

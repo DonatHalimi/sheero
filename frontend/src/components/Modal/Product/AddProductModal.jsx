@@ -1,11 +1,11 @@
 import UploadIcon from '@mui/icons-material/Upload';
 import { Autocomplete, Box, InputLabel, MenuItem, Modal, Select, TextField, Typography } from '@mui/material';
 import React, { useContext, useEffect, useState } from 'react';
+import { useNavigate } from 'react-router-dom';
 import { toast } from 'react-toastify';
 import { BrownButton, BrownOutlinedTextField, CustomPaper, OutlinedBrownButton, OutlinedBrownFormControl, VisuallyHiddenInput } from '../../../assets/CustomComponents';
 import useAxios from '../../../axiosInstance';
 import { AuthContext } from '../../../context/AuthContext';
-import { useNavigate } from 'react-router-dom';
 
 const AddProductModal = ({ open, onClose, onAddSuccess }) => {
     const [step, setStep] = useState(1);

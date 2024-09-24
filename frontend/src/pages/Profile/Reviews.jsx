@@ -3,7 +3,7 @@ import axios from 'axios';
 import React, { useContext, useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import 'react-toastify/dist/ReactToastify.css';
-import { CustomDeleteModal, CustomMenu, Header, ReviewModal, CustomPagination } from '../../assets/CustomComponents';
+import { CustomDeleteModal, CustomMenu, CustomPagination, Header, ReviewModal } from '../../assets/CustomComponents';
 import noReviewsImage from '../../assets/img/empty-reviews.png';
 import Footer from '../../components/Footer';
 import Navbar from '../../components/Navbar/Navbar';
@@ -143,7 +143,7 @@ const Reviews = () => {
                                             size="large"
                                             sx={{
                                                 position: 'relative',
-                                                bottom: '18px',
+                                                bottom: '16px',
                                                 '& .MuiPagination-ul': {
                                                     justifyContent: 'flex-start',
                                                 },

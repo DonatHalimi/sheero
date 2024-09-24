@@ -1,3 +1,4 @@
+import { Skeleton } from '@mui/material';
 import axios from 'axios';
 import React, { useEffect, useState } from 'react';
 import { useParams } from 'react-router-dom';
@@ -6,7 +7,6 @@ import noProducts from '../../assets/img/no-products.png';
 import Footer from '../../components/Footer';
 import Navbar from '../../components/Navbar/Navbar';
 import ProductItem from '../../components/Product/ProductItem';
-import { Skeleton } from '@mui/material';
 
 const ProductsByCategory = () => {
     const { id } = useParams();
@@ -94,6 +94,10 @@ const ProductsByCategory = () => {
                         count={pageCount}
                         page={currentPage}
                         onChange={handlePageChange}
+                        sx={{
+                            position: 'relative',
+                            bottom: '8px',
+                        }}
                     />
                 )}
             </div>

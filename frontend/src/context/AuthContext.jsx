@@ -32,7 +32,7 @@ const AuthProvider = ({ children }) => {
                 throw new Error('No refresh token available');
             }
 
-            const response = await axios.post('http://localhost:5000/api/auth/refresh-token', 
+            const response = await axios.post('http://localhost:5000/api/auth/refresh-token',
                 { refreshToken },
                 {
                     headers: { 'Content-Type': 'application/json' },

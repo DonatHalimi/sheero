@@ -4,7 +4,7 @@ import { Box, Container, IconButton, InputAdornment, Typography } from '@mui/mat
 import React, { useContext, useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { toast } from 'react-toastify';
-import { BrownButton, BrownOutlinedTextField } from '../../assets/CustomComponents';
+import { BrownButton, BrownOutlinedTextField, knownEmailProviders } from '../../assets/CustomComponents';
 import Footer from '../../components/Footer';
 import Navbar from '../../components/Navbar/Navbar';
 import { AuthContext } from '../../context/AuthContext';
@@ -15,18 +15,51 @@ const Login = () => {
     const [showPassword, setShowPassword] = useState(false);
     const { login } = useContext(AuthContext);
     const navigate = useNavigate();
+    const [emailValid, setEmailValid] = useState(true);
+    const [passwordValid, setPasswordValid] = useState(true);
+    const [focusedField, setFocusedField] = useState(null);
 
     useEffect(() => {
         window.scrollTo(0, 0);
-    }, [])
+    }, []);
 
     const handleClickShowPassword = () => setShowPassword(!showPassword);
     const handleMouseDownPassword = (event) => event.preventDefault();
+
+    const validateEmail = (email) => {
+        const providerPattern = knownEmailProviders.join('|');
+        const regex = new RegExp(`^[a-zA-Z0-9._%+-]+@(${providerPattern})$`, 'i');
+        return regex.test(email);
+    };
+
+    const validatePassword = (password) => {
+        return /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[@$!%*?&])[A-Za-z\d@$!%*?&]{8,}$/.test(password);
+    };
+
+    const handleEmailChange = (e) => {
+        const value = e.target.value;
+        setEmail(value);
+        setEmailValid(validateEmail(value));
+    };
+
+    const handlePasswordChange = (e) => {
+        const value = e.target.value;
+        setPassword(value);
+        setPasswordValid(validatePassword(value));
+    };
 
     const handleSubmit = async (e) => {
         e.preventDefault();
         if (!email || !password) {
             toast.error('Please fill in all fields');
+            return;
+        }
+        if (!emailValid) {
+            toast.error('Invalid email format');
+            return;
+        }
+        if (!passwordValid) {
+            toast.error('Password does not meet requirements');
             return;
         }
         const response = await login(email, password);
@@ -42,43 +75,66 @@ const Login = () => {
                         Welcome Back
                     </Typography>
                     <Box component="form" onSubmit={handleSubmit} noValidate className='w-full'>
-                        <BrownOutlinedTextField
-                            variant="outlined"
-                            margin="normal"
-                            required
-                            fullWidth
-                            id="email"
-                            label="Email"
-                            value={email}
-                            onChange={(e) => setEmail(e.target.value)}
-                            sx={{ mb: 2 }}
-                        />
-                        <BrownOutlinedTextField
-                            variant="outlined"
-                            margin="normal"
-                            required
-                            fullWidth
-                            name="password"
-                            label="Password"
-                            type={showPassword ? 'text' : 'password'}
-                            id="password"
-                            value={password}
-                            onChange={(e) => setPassword(e.target.value)}
-                            InputProps={{
-                                endAdornment: (
-                                    <InputAdornment position="end">
-                                        <IconButton
-                                            aria-label="toggle password visibility"
-                                            onClick={handleClickShowPassword}
-                                            onMouseDown={handleMouseDownPassword}
-                                        >
-                                            {showPassword ? <VisibilityIcon /> : <VisibilityOffIcon />}
-                                        </IconButton>
-                                    </InputAdornment>
-                                ),
-                            }}
-                            sx={{ mb: 3 }}
-                        />
+                        <div className="relative">
+                            <BrownOutlinedTextField
+                                variant="outlined"
+                                margin="normal"
+                                required
+                                fullWidth
+                                id="email"
+                                label="Email"
+                                value={email}
+                                onChange={handleEmailChange}
+                                onFocus={() => setFocusedField('email')}
+                                onBlur={() => setFocusedField(null)}
+                            />
+                            {focusedField === 'email' && !emailValid && (
+                                <div className="absolute left-0 bottom-[-50px] bg-white text-red-500 text-sm p-2 rounded-lg shadow-md w-full z-10">
+                                    <span className="block text-xs font-semibold mb-1">Invalid Email</span>
+                                    Please provide a valid email address.
+                                    <div className="absolute top-[-5px] left-[20px] w-0 h-0 border-l-[5px] border-r-[5px] border-b-[5px] border-transparent border-b-white"></div>
+                                </div>
+                            )}
+                        </div>
+
+                        <div className="relative">
+                            <BrownOutlinedTextField
+                                variant="outlined"
+                                margin="normal"
+                                required
+                                fullWidth
+                                name="password"
+                                label="Password"
+                                type={showPassword ? 'text' : 'password'}
+                                id="password"
+                                value={password}
+                                onChange={handlePasswordChange}
+                                onFocus={() => setFocusedField('password')}
+                                onBlur={() => setFocusedField(null)}
+                                InputProps={{
+                                    endAdornment: (
+                                        <InputAdornment position="end">
+                                            <IconButton
+                                                aria-label="toggle password visibility"
+                                                onClick={handleClickShowPassword}
+                                                onMouseDown={handleMouseDownPassword}
+                                            >
+                                                {showPassword ? <VisibilityIcon /> : <VisibilityOffIcon />}
+                                            </IconButton>
+                                        </InputAdornment>
+                                    ),
+                                }}
+                                sx={{ mb: 3 }}
+                            />
+                            {focusedField === 'password' && !passwordValid && (
+                                <div className="absolute left-0 bottom-[-54px] bg-white text-red-500 text-sm p-2 rounded-lg shadow-md w-full z-10">
+                                    <span className="block text-xs font-semibold mb-1">Invalid Password</span>
+                                    Must be 8 characters long with uppercase, lowercase, number, and special character.
+                                    <div className="absolute top-[-5px] left-[20px] w-0 h-0 border-l-[5px] border-r-[5px] border-b-[5px] border-transparent border-b-white"></div>
+                                </div>
+                            )}
+                        </div>
+
                         <BrownButton
                             type="submit"
                             fullWidth
