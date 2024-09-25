@@ -12,13 +12,13 @@ const ProfileSidebar = () => {
     const [activeItem, setActiveItem] = useState('');
 
     useEffect(() => {
-        const path = location.pathname.split('/')[1];
-        setActiveItem(path || 'profile');
+        const path = location.pathname.split('/')[2];
+        setActiveItem(path || 'me');
     }, [location]);
 
     const handleItemClick = (view) => {
         setActiveItem(view);
-        navigate(`/${view}`);
+        navigate(`/profile/${view}`);
     };
 
     const greetingTime = new Date().getHours() < 12 ? "morning" : (new Date().getHours() < 18 ? "afternoon" : "evening");
@@ -32,8 +32,8 @@ const ProfileSidebar = () => {
             <div className="border-t border-stone-200 mt-4 mb-2"></div>
             <List component="nav">
                 <ActiveListItem
-                    handleClick={() => handleItemClick('profile')}
-                    selected={activeItem === 'profile'}
+                    handleClick={() => handleItemClick('me')}
+                    selected={activeItem === 'me'}
                     icon={<StyledPersonIcon />}
                     primary="Profile"
                 />

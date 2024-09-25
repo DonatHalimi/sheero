@@ -56,11 +56,11 @@ const App = () => (
         ))}
       </Route>
       <Route path="/cart" element={<ProtectedRoute><Cart /></ProtectedRoute>} />
-      <Route path="/profile" element={<ProtectedRoute><Profile /></ProtectedRoute>} />
-      <Route path="/address" element={<ProtectedRoute><Addresses /></ProtectedRoute>} />
-      <Route path="/orders" element={<ProtectedRoute><Orders /></ProtectedRoute>} />
-      <Route path="/wishlist" element={<ProtectedRoute><Wishlist /></ProtectedRoute>} />
-      <Route path="/reviews" element={<ProtectedRoute><Reviews /></ProtectedRoute>} />
+      <Route path="/profile/me" element={<ProtectedRoute><Profile /></ProtectedRoute>} />
+      <Route path="/profile/address" element={<ProtectedRoute><Addresses /></ProtectedRoute>} />
+      <Route path="/profile/orders" element={<ProtectedRoute><Orders /></ProtectedRoute>} />
+      <Route path="/profile/wishlist" element={<ProtectedRoute><Wishlist /></ProtectedRoute>} />
+      <Route path="/profile/reviews" element={<ProtectedRoute><Reviews /></ProtectedRoute>} />
 
       {/* Fallback Route */}
       <Route path="*" element={<NotFound />} />

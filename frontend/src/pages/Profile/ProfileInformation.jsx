@@ -155,8 +155,8 @@ const ProfileInformation = () => {
                                 <ProfileInformationSkeleton />
                             ) : (
                                 <form onSubmit={handleSubmit} className="space-y-2">
-                                    <Box className="flex gap-4">
-                                        <div className="relative">
+                                    <Box className="flex gap-3 w-full">
+                                        <div className="relative flex-grow">
                                             <TextField
                                                 fullWidth
                                                 label="First Name"
@@ -178,7 +178,7 @@ const ProfileInformation = () => {
                                             )}
                                         </div>
 
-                                        <div className="relative">
+                                        <div className="relative flex-grow">
                                             <TextField
                                                 fullWidth
                                                 label="Last Name"
@@ -199,7 +199,8 @@ const ProfileInformation = () => {
                                                 </div>
                                             )}
                                         </div>
-                                        <div className="relative">
+
+                                        <div className="relative flex-grow">
                                             <TextField
                                                 fullWidth
                                                 label="Email"
@@ -214,7 +215,7 @@ const ProfileInformation = () => {
                                                 InputProps={{ className: 'text-gray-700' }}
                                             />
                                             {focusedField === 'email' && !emailValid && (
-                                                <div className="absolute left-0 bottom-[-78px] bg-white text-red-500 text-sm p-2 rounded-lg shadow-md w-full z-10">
+                                                <div className="absolute left-0 bottom-[-58px] bg-white text-red-500 text-sm p-2 rounded-lg shadow-md w-full z-10">
                                                     <span className="block text-xs font-semibold mb-1">Invalid Email</span>
                                                     Please provide a valid email address.
                                                     <div className="absolute top-[-5px] left-[20px] w-0 h-0 border-l-[5px] border-r-[5px] border-b-[5px] border-transparent border-b-white"></div>
@@ -223,8 +224,9 @@ const ProfileInformation = () => {
                                         </div>
                                     </Box>
 
-                                    <Box className="flex gap-4">
-                                        <div className="relative">
+
+                                    <Box className="flex flex-row gap-3 w-full">
+                                        <div className="relative flex-grow">
                                             <BrownOutlinedTextField
                                                 variant="outlined"
                                                 margin="normal"
@@ -251,7 +253,7 @@ const ProfileInformation = () => {
                                                                 {showPassword ? <VisibilityIcon className='text-stone-500' /> : <VisibilityOffIcon className='text-stone-500' />}
                                                             </IconButton>
                                                         </InputAdornment>
-                                                    )
+                                                    ),
                                                 }}
                                             />
                                             {focusedField === 'password' && !passwordValid && (
@@ -262,7 +264,7 @@ const ProfileInformation = () => {
                                                 </div>
                                             )}
                                         </div>
-                                        <div className="relative">
+                                        <div className="relative flex-grow">
                                             <BrownOutlinedTextField
                                                 variant="outlined"
                                                 margin="normal"
@@ -287,7 +289,7 @@ const ProfileInformation = () => {
                                                                 {showNewPassword ? <VisibilityIcon className='text-stone-500' /> : <VisibilityOffIcon className='text-stone-500' />}
                                                             </IconButton>
                                                         </InputAdornment>
-                                                    )
+                                                    ),
                                                 }}
                                             />
                                             {focusedField === 'newPassword' && !newPasswordValid && (

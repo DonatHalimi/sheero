@@ -21,7 +21,7 @@ const Footer = () => {
     const customerServiceLinks = [
         { to: '/profile', label: 'My Account' },
         { to: '/orders', label: 'Order Tracking' },
-        { to: '/address', label: 'Address' },
+        { to: '/profile/address', label: 'Address' },
         { to: '/wishlist', label: 'Wishlist' },
     ];
 

@@ -1161,28 +1161,36 @@ export const ProductItemSkeleton = () => {
                 <Skeleton variant="text" animation="wave" width="60%" height={28} className="mt-1" />
             </div>
             <div className="flex justify-between items-center mt-auto">
-                <Skeleton variant="rectangular" animation="wave" width={140} height={40} />
-                <Skeleton variant="rectangular" animation="wave" width={60} height={40} />
+                <Skeleton variant="rectangular" animation="wave" width={170} height={40} className='rounded' />
+                <Skeleton variant="rectangular" animation="wave" width={60} height={40} className='rounded' />
             </div>
         </div>
     );
 };
 
 export const ReviewItemSkeleton = () => (
-    <div className="p-4 mb-4 shadow-sm flex relative cursor-pointer bg-white rounded-md">
-        <div className="flex-shrink-0 mr-4 cursor-pointer">
-            <Skeleton variant="rectangular" animation="wave" width={80} height={80} className="rounded-md" />
-        </div>
-        <div className="flex-grow flex justify-between items-center">
-            <div className="cursor-pointer">
-                <Skeleton variant="text" animation="wave" width={200} height={28} className="mb-2" />
-                <div className="flex items-center ml-2">
-                    <Skeleton variant="text" animation="wave" width={150} height={24} />
-                    <Skeleton variant="text" animation="wave" width={100} height={24} className="ml-2" />
-                </div>
-                <Skeleton variant="text" animation="wave" width="80%" height={20} className="mt-1" />
-            </div>
+    <div className="relative p-4 mb-4 bg-white rounded-md shadow-sm">
+        <div className="absolute top-4 right-4">
             <Skeleton variant="circular" animation="wave" width={24} height={24} />
+        </div>
+
+        <div className="flex flex-grow">
+            <div className="flex-shrink-0 mr-4">
+                <Skeleton variant="rectangular" animation="wave" width={80} height={80} className="rounded-md" />
+            </div>
+
+            <div className="flex-grow">
+                <div className="flex items-center mb-2">
+                    <Skeleton variant="text" animation="wave" width={200} height={28} className="mr-2" />
+                    <Skeleton variant="text" animation="wave" width={100} height={28} />
+                </div>
+
+                <div className="mb-1">
+                    <Skeleton variant="text" animation="wave" width={180} height={24} />
+                </div>
+                <Skeleton variant="text" animation="wave" width={150} height={20} className="mt-1" />
+                <Skeleton variant="text" animation="wave" width={50} height={20} className="mt-1" />
+            </div>
         </div>
     </div>
 );
@@ -1207,29 +1215,27 @@ export const ProfileInformationSkeleton = () => {
 
 export const AddressInformationSkeleton = () => {
     return (
-        <div className="space-y-6">
-            <div className="flex gap-4">
+        <div className='space-y-0'>
+            <div className="flex gap-3">
                 <div className="flex-1">
-                    <Skeleton variant="text" animation="wave" width="100%" height={56} />
+                    <Skeleton variant="text" animation="wave" width="100%" height={80} />
                 </div>
                 <div className="flex-1">
-                    <Skeleton variant="text" animation="wave" width="100%" height={56} />
-                </div>
-            </div>
-
-            <div className="flex gap-4">
-                <div className="flex-1">
-                    <Skeleton variant="text" animation="wave" width="100%" height={56} />
+                    <Skeleton variant="text" animation="wave" width="100%" height={80} />
                 </div>
                 <div className="flex-1">
-                    <Skeleton variant="rectangular" animation="wave" width="100%" height={56} />
-                </div>
-                <div className="flex-1">
-                    <Skeleton variant="rectangular" animation="wave" width="100%" height={56} />
+                    <Skeleton variant="text" animation="wave" width="100%" height={80} />
                 </div>
             </div>
-
-            <Skeleton variant="rectangular" animation="wave" width={120} height={48} />
+            <div className="flex gap-3">
+                <div className="flex-1">
+                    <Skeleton variant="text" animation="wave" width="100%" height={80} className='rounded' />
+                </div>
+                <div className="flex-1">
+                    <Skeleton variant="text" animation="wave" width="100%" height={80} className='rounded' />
+                </div>
+            </div>
+            <Skeleton variant="text" animation="wave" width={100} height={50} className='rounded' />
         </div>
     );
 };
@@ -1579,21 +1585,21 @@ export const ProfileDropdown = ({ isAdmin, handleLogout }) => {
                 </>
             )}
             <button
-                onClick={() => handleNavigate('/profile')}
+                onClick={() => handleNavigate('/profile/me')}
                 className="flex items-center px-2 py-2 text-stone-700 hover:bg-stone-100 no-underline w-full text-left"
             >
                 <StyledPersonIcon className="mr-2" />
                 Profile
             </button>
             <button
-                onClick={() => handleNavigate('/orders')}
+                onClick={() => handleNavigate('/profile/orders')}
                 className="flex items-center px-2 py-2 text-stone-700 hover:bg-stone-100 no-underline w-full text-left"
             >
                 <StyledInboxIcon className="mr-2" />
                 Orders
             </button>
             <button
-                onClick={() => handleNavigate('/wishlist')}
+                onClick={() => handleNavigate('/profile/wishlist')}
                 className="flex items-center px-2 py-2 mb-2 text-stone-700 hover:bg-stone-100 no-underline w-full text-left"
             >
                 <StyledFavoriteIcon className="mr-2" />
@@ -1729,7 +1735,7 @@ export const WishlistIcon = () => {
     const navigate = useNavigate();
 
     const handleWishlistClick = () => {
-        navigate('/wishlist');
+        navigate('/profile/wishlist');
     };
 
     return (

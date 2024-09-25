@@ -26,7 +26,6 @@ const AddressInformation = () => {
     const [countries, setCountries] = useState([]);
     const [loading, setLoading] = useState(true);
 
-    // New state for field validation
     const [nameValid, setNameValid] = useState(true);
     const [streetValid, setStreetValid] = useState(true);
     const [phoneNumberValid, setPhoneNumberValid] = useState(true);
@@ -38,6 +37,8 @@ const AddressInformation = () => {
             fetchAddress();
         }
     }, [userId, auth.accessToken]);
+
+    useEffect(() => window.scrollTo(0, 0), []);
 
     const fetchAddress = async () => {
         try {
@@ -184,7 +185,7 @@ const AddressInformation = () => {
                                 <AddressInformationSkeleton />
                             ) : (
                                 <form onSubmit={handleSaveAddress} className="space-y-6">
-                                    <Box className="flex gap-4">
+                                    <Box className="flex gap-3">
                                         <div className="relative w-full">
                                             <TextField
                                                 fullWidth
@@ -200,7 +201,7 @@ const AddressInformation = () => {
                                                 InputProps={{ className: 'text-gray-700' }}
                                             />
                                             {focusedField === 'name' && !nameValid && (
-                                                <div className="absolute left-0 bottom-[-58px] bg-white text-red-500 text-sm p-2 rounded-lg shadow-md w-full z-10">
+                                                <div className="absolute left-0 bottom-[-78px] bg-white text-red-500 text-sm p-2 rounded-lg shadow-md w-full z-10">
                                                     <span className="block text-xs font-semibold mb-1">Invalid Name</span>
                                                     Must start with a capital letter, 2-10 characters.
                                                     <div className="absolute top-[-5px] left-[20px] w-0 h-0 border-l-[5px] border-r-[5px] border-b-[5px] border-transparent border-b-white"></div>
@@ -229,9 +230,7 @@ const AddressInformation = () => {
                                                 </div>
                                             )}
                                         </div>
-                                    </Box>
 
-                                    <Box className="flex gap-4">
                                         <div className="relative w-full">
                                             <TextField
                                                 fullWidth
@@ -255,6 +254,9 @@ const AddressInformation = () => {
                                                 </div>
                                             )}
                                         </div>
+                                    </Box>
+
+                                    <Box className="flex gap-3">
                                         <FormControl fullWidth variant="outlined">
                                             <InputLabel>Country</InputLabel>
                                             <Select

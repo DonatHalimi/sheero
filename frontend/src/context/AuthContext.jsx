@@ -1,33 +1,57 @@
 import axios from 'axios';
 import React, { createContext, useEffect, useState } from 'react';
+import CryptoJS from 'crypto-js';
 
 const AuthContext = createContext();
 
+const SECRET_KEY = import.meta.env.VITE_CRYPTOJS_SECRET_KEY;
+
+const encryptData = (data) => {
+    return CryptoJS.AES.encrypt(JSON.stringify(data), SECRET_KEY).toString();
+};
+
+const decryptData = (cipherText) => {
+    const bytes = CryptoJS.AES.decrypt(cipherText, SECRET_KEY);
+    const decryptedData = bytes.toString(CryptoJS.enc.Utf8);
+    return JSON.parse(decryptedData);
+};
+
 const AuthProvider = ({ children }) => {
+    const getLocalStorageItem = (key) => {
+        const encryptedValue = localStorage.getItem(key);
+        if (!encryptedValue) return null;
+        try {
+            return decryptData(encryptedValue);
+        } catch (error) {
+            console.error('Decryption failed:', error);
+            return null;
+        }
+    };
+
     const [auth, setAuthState] = useState({
-        accessToken: localStorage.getItem('accessToken'),
-        refreshToken: localStorage.getItem('refreshToken'),
-        role: localStorage.getItem('role'),
-        firstName: localStorage.getItem('firstName'),
-        lastName: localStorage.getItem('lastName'),
-        email: localStorage.getItem('email'),
-        userId: localStorage.getItem('userId'),
+        accessToken: getLocalStorageItem('accessToken'),
+        refreshToken: getLocalStorageItem('refreshToken'),
+        role: getLocalStorageItem('role'),
+        firstName: getLocalStorageItem('firstName'),
+        lastName: getLocalStorageItem('lastName'),
+        email: getLocalStorageItem('email'),
+        userId: getLocalStorageItem('userId'),
     });
 
     const setAuth = (authData) => {
         setAuthState(authData);
-        localStorage.setItem('accessToken', authData.accessToken || '');
-        localStorage.setItem('refreshToken', authData.refreshToken || '');
-        localStorage.setItem('role', authData.role || '');
-        localStorage.setItem('firstName', authData.firstName || '');
-        localStorage.setItem('lastName', authData.lastName || '');
-        localStorage.setItem('email', authData.email || '');
-        localStorage.setItem('userId', authData.userId || '');
+        localStorage.setItem('accessToken', encryptData(authData.accessToken || ''));
+        localStorage.setItem('refreshToken', encryptData(authData.refreshToken || ''));
+        localStorage.setItem('role', encryptData(authData.role || ''));
+        localStorage.setItem('firstName', encryptData(authData.firstName || ''));
+        localStorage.setItem('lastName', encryptData(authData.lastName || ''));
+        localStorage.setItem('email', encryptData(authData.email || ''));
+        localStorage.setItem('userId', encryptData(authData.userId || ''));
     };
 
     const refreshAccessToken = async () => {
         try {
-            const refreshToken = localStorage.getItem('refreshToken');
+            const refreshToken = getLocalStorageItem('refreshToken');
             if (!refreshToken) {
                 throw new Error('No refresh token available');
             }
@@ -118,7 +142,6 @@ const AuthProvider = ({ children }) => {
         return () => clearInterval(interval);
     }, []);
 
-
     return (
         <AuthContext.Provider value={{ auth, setAuth, login, logout, register, isAdmin, refreshAccessToken }}>
             {children}
@@ -126,4 +149,4 @@ const AuthProvider = ({ children }) => {
     );
 };
 
-export { AuthContext, AuthProvider };
+export { AuthContext, AuthProvider, encryptData, decryptData };
