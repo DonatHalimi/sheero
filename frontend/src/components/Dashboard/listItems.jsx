@@ -21,7 +21,7 @@ import {
 } from '@mui/icons-material';
 import React, { useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { ActiveListItem, CollapsibleListItem } from '../../assets/CustomComponents';
+import { ActiveListItem, CollapsibleListItem, StyledInboxIcon } from '../../assets/CustomComponents';
 
 /**
  * Renders the main list items for the CRUD dashboard.
@@ -89,6 +89,14 @@ export const mainListItems = ({ setCurrentView }) => {
             selected={activeItem === 'reviews'}
             icon={<StarHalf />}
             primary="Reviews"
+          />
+
+          <ActiveListItem
+            sx={{ pl: 4 }}
+            handleClick={() => handleItemClick('orders')}
+            selected={activeItem === 'orders'}
+            icon={<StyledInboxIcon />}
+            primary="Orders"
           />
         </CollapsibleListItem>
 

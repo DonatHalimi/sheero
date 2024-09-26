@@ -2,6 +2,7 @@ import { DeleteOutline } from '@mui/icons-material';
 import { Paper, Table, TableBody, TableCell, TableContainer, TableHead, TableRow, Tooltip } from '@mui/material';
 import React, { useContext, useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
+import { toast } from 'react-toastify'; // Import Toast components
 import { CheckoutButton, CustomDeleteModal, EmptyState, LoadingCart, RoundIconButton, truncateText } from '../../assets/CustomComponents';
 import emptyCartImage from '../../assets/img/empty-cart.png';
 import useAxios from '../../axiosInstance';
@@ -16,6 +17,7 @@ const Cart = () => {
     const axiosInstance = useAxios();
     const { auth } = useContext(AuthContext);
     const navigate = useNavigate();
+    const [address, setAddress] = useState(null);
 
     const apiUrl = 'http://localhost:5000/api/cart';
 
@@ -72,18 +74,60 @@ const Cart = () => {
         setOpenModal(false);
     };
 
-    const handleCheckout = () => navigate('/checkout');
+    useEffect(() => {
+        if (auth.userId) {
+            fetchAddress();
+        }
+    }, [auth.userId]);
+
+    const fetchAddress = async () => {
+        try {
+            const response = await axiosInstance.get(`/addresses/user/${auth.userId}`);
+            setAddress(response.data);
+        } catch (error) {
+            console.error('Error fetching address:', error.message);
+        }
+    };
+
+    const handleCheckout = async () => {
+        if (!address) {
+            toast.warn("No address found. Click here to add one!", {
+                onClick: () => navigate('/profile/address'),
+            });
+            return;
+        }
+
+        try {
+            const { data } = await axiosInstance.post('/orders/create-checkout-session', {
+                productIds: cart.items.map(item => item.product._id),
+                addressId: address._id,
+                userId: auth.userId,
+                email: auth.email
+            });
+
+            // Clear the cart after creating the checkout session
+            await axiosInstance.delete(`${apiUrl}/clear`, {
+                headers: { Authorization: `Bearer ${auth.accessToken}` }
+            });
+
+            // Redirect to the Stripe checkout page
+            window.location.href = data.url;
+        } catch (error) {
+            console.error('Error during Stripe checkout:', error.message);
+            toast.error("Failed to initiate checkout. Please try again.");
+        }
+    };
+
+
     const handleProductClick = (productId) => navigate(`/product/${productId}`);
 
     if (loading) return <LoadingCart />;
 
     if (!cart || !cart.items) return <EmptyState imageSrc={emptyCartImage} message="Your cart is empty!" />;
 
-
     const calculateShippingCost = () => {
         return cart.items.reduce((total, item) => total + (item.product.shipping?.cost || 0), 0);
     };
-
 
     const calculateTotalPrice = () =>
         cart.items.reduce((total, item) => total + item.quantity * (item.product.salePrice || item.product.price), 0);
@@ -210,7 +254,7 @@ const Cart = () => {
                                     </TableRow>
                                     <TableRow>
                                         <TableCell>Shipping</TableCell>
-                                        <TableCell align="right">{shippingCost.toFixed(2)} €</TableCell>
+                                        <TableCell align="right">2.00 €</TableCell>
                                     </TableRow>
                                     {cart.items.some(item => item.product.salePrice) && (
                                         <TableRow>
@@ -227,7 +271,9 @@ const Cart = () => {
                                     )}
                                     <TableRow>
                                         <TableCell>Total</TableCell>
-                                        <TableCell align="right" className="font-bold">{total.toFixed(2)} €</TableCell>
+                                        <TableCell align="right" className="font-bold">
+                                            {(subtotal + 2).toFixed(2)} € {/* Added shipping cost to subtotal for total */}
+                                        </TableCell>
                                     </TableRow>
                                 </TableBody>
                             </Table>
@@ -237,6 +283,7 @@ const Cart = () => {
                         </Paper>
                     </div>
                 )}
+
             </div>
             <Footer />
         </>

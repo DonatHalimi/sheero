@@ -25,6 +25,7 @@ export { default as ProductsBySubcategory } from '../pages/Product/ProductsBySub
 export { default as ProductsBySubSubCategory } from '../pages/Product/ProductsBySubSubCategory.jsx';
 export { default as SearchResults } from '../pages/Product/SearchResults.jsx';
 export { default as Addresses } from '../pages/Profile/AddressInformation.jsx';
+export { default as OrderDetails } from '../pages/Profile/OrderDetails.jsx';
 export { default as Orders } from '../pages/Profile/Orders.jsx';
 export { default as Profile } from '../pages/Profile/ProfileInformation.jsx';
 export { default as Reviews } from '../pages/Profile/Reviews.jsx';

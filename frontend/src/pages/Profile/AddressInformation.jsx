@@ -1,13 +1,12 @@
 import { Box, Button, FormControl, InputLabel, MenuItem, Select, TextField } from '@mui/material';
 import React, { useContext, useEffect, useState } from 'react';
 import { toast } from 'react-toastify';
-import 'react-toastify/dist/ReactToastify.css';
 import { AddressInformationSkeleton, Header } from '../../assets/CustomComponents';
+import useAxios from '../../axiosInstance';
 import Footer from '../../components/Footer';
 import Navbar from '../../components/Navbar/Navbar';
 import { AuthContext } from '../../context/AuthContext';
 import ProfileSidebar from './ProfileSidebar';
-import useAxios from '../../axiosInstance';
 
 const apiUrl = 'http://localhost:5000/api/addresses';
 

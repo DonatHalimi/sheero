@@ -59,7 +59,7 @@ import {
     TextField,
     Toolbar,
     Tooltip,
-    Typography,
+    Typography
 } from '@mui/material';
 import { styled } from '@mui/material/styles';
 import SvgIcon from '@mui/material/SvgIcon';
@@ -1195,6 +1195,138 @@ export const ReviewItemSkeleton = () => (
     </div>
 );
 
+export const OrderItemSkeleton = () => {
+    return (
+        <>
+            <Box className="grid grid-cols-1 gap-4">
+                {Array.from({ length: 3 }).map((_, index) => (
+                    <Box key={index} className="bg-white shadow-md rounded-lg p-6 relative">
+                        <Box className="flex justify-between items-center mb-4">
+                            <Skeleton variant="text" animation="wave" width="40%" />
+                            <Box>
+                                <Skeleton variant="text" animation="wave" width={100} />
+                            </Box>
+                        </Box>
+                        <div className="flex space-x-3 mt-4 mb-2">
+                            <Skeleton variant="rectangular" animation="wave" height={50} width={50} className='rounded' />
+                            <Skeleton variant="rectangular" animation="wave" height={50} width={50} className='rounded' />
+                            <Skeleton variant="rectangular" animation="wave" height={50} width={50} className='rounded' />
+                        </div>
+                    </Box>
+                ))}
+            </Box>
+        </>
+    );
+};
+
+export const OrderDetailsSkeleton = () => {
+    return (
+        <Box>
+            {/* Progress Card Skeleton */}
+            <Box className="bg-white shadow-md rounded-lg p-6 mb-4">
+                <div className='flex flex-col items-center'>
+                    <Skeleton variant="text" width="60%" height={30} />
+                    <Skeleton variant="text" width="40%" height={20} />
+                </div>
+                <div className='flex flex-col items-center'>
+                    <Skeleton variant="text" width="50%" height={40} />
+                </div>
+                <Box className="flex justify-center gap-20">
+                    <Skeleton variant="text" width="10%" height={20} />
+                    <Skeleton variant="text" width="10%" height={20} />
+                    <Skeleton variant="text" width="10%" height={20} />
+                </Box>
+            </Box>
+
+            {/* Products Table Skeleton */}
+            <Box className="bg-white shadow-md rounded-lg p-6 mb-4">
+                <TableContainer>
+                    <Table>
+                        <TableHead>
+                            <TableRow>
+                                <TableCell>
+                                    <Skeleton variant="text" width="40%" height={30} />
+                                </TableCell>
+                                <TableCell>
+                                    <Skeleton variant="text" width="100%" height={30} />
+                                </TableCell>
+                            </TableRow>
+                        </TableHead>
+                        <TableBody>
+                            {Array.from({ length: 2 }).map((_, index) => (
+                                <TableRow key={index}>
+                                    <TableCell component="th" scope="row" className="font-bold">
+                                        <Box display="flex" alignItems="center">
+                                            <Skeleton variant="rectangular" width={80} height={80} />
+                                            <Box ml={2}>
+                                                <Skeleton variant="text" width={150} height={20} />
+                                            </Box>
+                                        </Box>
+                                    </TableCell>
+                                    <TableCell align="right">
+                                        <Skeleton variant="text" width="50%" height={30} />
+                                    </TableCell>
+                                </TableRow>
+                            ))}
+                        </TableBody>
+                    </Table>
+                </TableContainer>
+            </Box>
+
+            {/* Total Amount Card Skeleton */}
+            <Box className="bg-white shadow-md rounded-lg p-6 mb-4">
+                <TableContainer>
+                    <Table>
+                        <TableBody>
+                            <TableRow>
+                                <TableCell component="th" scope="row" className="font-bold">
+                                    <Skeleton variant="text" width="100%" height={30} />
+                                </TableCell>
+                                <TableCell align="right">
+                                    <Skeleton variant="text" width="50%" height={30} />
+                                </TableCell>
+                            </TableRow>
+                            <TableRow>
+                                <TableCell component="th" scope="row" className="font-bold">
+                                    <Skeleton variant="text" width="100%" height={30} />
+                                </TableCell>
+                                <TableCell align="right">
+                                    <Skeleton variant="text" width="50%" height={30} />
+                                </TableCell>
+                            </TableRow>
+                            <TableRow>
+                                <TableCell component="th" scope="row" className="font-bold">
+                                    <Skeleton variant="text" width="100%" height={30} />
+                                </TableCell>
+                                <TableCell align="right">
+                                    <Skeleton variant="text" width="50%" height={30} />
+                                </TableCell>
+                            </TableRow>
+                        </TableBody>
+                    </Table>
+                </TableContainer>
+            </Box>
+
+            {/* Address and Payment Method Table Skeleton */}
+            <Box className="bg-white shadow-md rounded-lg p-6 mb-4">
+                <TableContainer>
+                    <Table>
+                        <TableBody>
+                            {Array.from({ length: 6 }).map((_, index) => (
+                                <TableRow key={index}>
+                                    <TableCell component="th" scope="row" className="font-bold">
+                                        <Skeleton variant="text" width="100%" height={30} />
+                                    </TableCell>
+                                </TableRow>
+                            ))}
+                        </TableBody>
+                    </Table>
+                </TableContainer>
+            </Box>
+        </Box>
+    );
+};
+
 export const ProfileInformationSkeleton = () => {
     return (
         <div className="space-y-2">
@@ -1290,7 +1422,7 @@ export const CustomReviewCard = ({ review, onImageClick, onMenuClick, onCardClic
 
     return (
         <div
-            className="p-4 mb-4 shadow-sm flex relative cursor-pointer bg-white rounded-md"
+            className="p-4 mb-4 shadow-md flex relative cursor-pointer bg-white rounded-md"
             onClick={() => onCardClick(review)}
             style={{ height: 'auto', minHeight: '120px' }}
         >

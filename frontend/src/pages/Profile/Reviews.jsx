@@ -2,7 +2,6 @@ import { Box, Typography } from '@mui/material';
 import axios from 'axios';
 import React, { useContext, useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
-import 'react-toastify/dist/ReactToastify.css';
 import { CustomDeleteModal, CustomMenu, CustomPagination, Header, ReviewModal } from '../../assets/CustomComponents';
 import noReviewsImage from '../../assets/img/empty-reviews.png';
 import Footer from '../../components/Footer';
@@ -158,6 +157,8 @@ const Reviews = () => {
                     </div>
                 </main>
             </Box >
+
+            <div className='mb-32' />
             <Footer />
 
             <CustomMenu

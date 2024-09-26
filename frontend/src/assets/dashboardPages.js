@@ -5,6 +5,7 @@ import ContactPage from '../pages/Dashboard/ContactPage';
 import CountriesPage from '../pages/Dashboard/CountriesPage';
 import DashboardContent from '../pages/Dashboard/DashboardContent';
 import FAQPage from '../pages/Dashboard/FAQPage';
+import OrdersPage from '../pages/Dashboard/OrdersPage';
 import ProductsPage from '../pages/Dashboard/ProductsPage';
 import ReviewsPage from '../pages/Dashboard/ReviewsPage';
 import SlideshowPage from '../pages/Dashboard/SlideshowPage';
@@ -19,15 +20,16 @@ const pages = {
     cities: CitiesPage,
     contacts: ContactPage,
     countries: CountriesPage,
+    faqs: FAQPage,
     images: SlideshowPage,
     main: DashboardContent,
+    orders: OrdersPage,
     products: ProductsPage,
     reviews: ReviewsPage,
-    suppliers: SuppliersPage,
     subcategories: SubcategoriesPage,
-    users: UsersPage,
     subSubcategories: SubSubcategoriesPage,
-    faqs: FAQPage
+    suppliers: SuppliersPage,
+    users: UsersPage,
 };
 
 export default pages;

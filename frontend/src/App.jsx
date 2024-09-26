@@ -8,6 +8,7 @@ import {
   Login,
   NotAllowed,
   NotFound,
+  OrderDetails,
   Orders,
   ProductDetails,
   ProductsByCategory,
@@ -59,6 +60,7 @@ const App = () => (
       <Route path="/profile/me" element={<ProtectedRoute><Profile /></ProtectedRoute>} />
       <Route path="/profile/address" element={<ProtectedRoute><Addresses /></ProtectedRoute>} />
       <Route path="/profile/orders" element={<ProtectedRoute><Orders /></ProtectedRoute>} />
+      <Route path="/profile/orders/:orderId" element={<ProtectedRoute><OrderDetails /></ProtectedRoute>} />
       <Route path="/profile/wishlist" element={<ProtectedRoute><Wishlist /></ProtectedRoute>} />
       <Route path="/profile/reviews" element={<ProtectedRoute><Reviews /></ProtectedRoute>} />
 

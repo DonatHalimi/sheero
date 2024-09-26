@@ -41,7 +41,7 @@ const ProductItem = ({ product, loading }) => {
             });
 
             toast.success(`Product added to ${action === 'cart' ? 'cart' : 'wishlist'}!`, {
-                onClick: () => navigate(`/${action}`),
+                onClick: () => navigate(`/${action === 'wishlist' ? 'profile/wishlist' : 'cart'}`),
             });
 
             if (action === 'cart') {
