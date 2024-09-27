@@ -62,10 +62,17 @@ const SharedWishlist = () => {
                     <>
                         <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 gap-4">
                             {getCurrentPageItems().map((item) => (
-                                <ProductItem key={item.product._id} product={item.product} />
+                                <ProductItem
+                                    key={item.product._id}
+                                    product={item.product}
+                                />
                             ))}
                         </div>
-                        <CustomPagination count={pageCount} page={currentPage} onChange={handlePageChange} />
+                        <CustomPagination
+                            count={pageCount}
+                            page={currentPage}
+                            onChange={handlePageChange}
+                        />
                     </>
                 ) : (
                     <EmptyState imageSrc={emptyWishlistImage} message={`No item in ${fullName}'s wishlist.`} />

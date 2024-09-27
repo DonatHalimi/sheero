@@ -36,9 +36,9 @@ const OrderDetails = () => {
     const getStatusProgress = (status) => {
         switch (status) {
             case 'pending':
-                return 11;
+                return 16;
             case 'shipped':
-                return 50;
+                return 57;
             case 'delivered':
                 return 100;
             default:

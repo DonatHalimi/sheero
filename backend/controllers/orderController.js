@@ -70,29 +70,6 @@ const checkoutSession = async (req, res) => {
             quantity: 1,
         });
 
-        // Create Stripe Checkout Session
-        const session = await stripe.checkout.sessions.create({
-            payment_method_types: ['card'],
-            line_items: lineItems,
-            mode: 'payment',
-            success_url: `http://localhost:3000/verify?success=true&orderId={CHECKOUT_SESSION_ID}`,
-            cancel_url: `http://localhost:3000/cancel`,
-            customer_email: email,
-            metadata: {
-                userId: userId,
-                addressId: addressId,
-                totalAmount: totalWithShipping.toFixed(2),
-                addressDetails: JSON.stringify({
-                    name: address.name,
-                    street: address.street,
-                    phoneNumber: address.phoneNumber,
-                    city: address.city.name,
-                    country: address.country.name
-                }),
-                fullAddress: `${address.street}, ${address.city.name}, ${address.country.name}`
-            }
-        });
-
         // Create the order in the database
         const order = new Order({
             user: userId,
@@ -105,10 +82,37 @@ const checkoutSession = async (req, res) => {
             totalAmount: totalWithShipping,
             paymentStatus: 'pending',
             paymentMethod: 'stripe',
-            paymentIntentId: session.id,
+            paymentIntentId: 'pending',
         });
 
         await order.save();
+
+        // Create Stripe Checkout Session
+        const session = await stripe.checkout.sessions.create({
+            payment_method_types: ['card'],
+            line_items: lineItems,
+            mode: 'payment',
+            success_url: `http://localhost:3000/verify?success=true&session_id={CHECKOUT_SESSION_ID}&order_id=${order._id}`,
+            cancel_url: `http://localhost:3000/verify?success=false&session_id={CHECKOUT_SESSION_ID}&order_id=${order._id}`,
+            customer_email: email,
+            metadata: {
+                userId: userId,
+                addressId: addressId,
+                totalAmount: totalWithShipping.toFixed(2),
+                addressDetails: JSON.stringify({
+                    name: address.name,
+                    street: address.street,
+                    phoneNumber: address.phoneNumber,
+                    city: address.city.name,
+                    country: address.country.name
+                }),
+                fullAddress: `${address.street}, ${address.city.name}, ${address.country.name}`,
+                orderId: order._id.toString()
+            }
+        });
+
+        // Update the order with the Stripe session ID
+        await Order.findByIdAndUpdate(order._id, { paymentIntentId: session.id });
 
         res.json({ url: session.url });
     } catch (error) {
@@ -118,21 +122,19 @@ const checkoutSession = async (req, res) => {
 };
 
 const verifyOrder = async (req, res) => {
-    const { orderId, success } = req.query;
+    const { order_id, success } = req.body;
 
     try {
-        if (success === "true") {
-            // Payment was successful, update the order to reflect this
-            await Order.findByIdAndUpdate(orderId, { paymentStatus: "paid" });
-            res.json({ success: true, message: 'Payment successful' });
+        if (success === true) {
+            await Order.findByIdAndUpdate(order_id, { paymentStatus: 'completed' });
+            res.json({ success: true, message: 'Payment completed successfully.' });
         } else {
-            // Payment failed
-            await Order.findByIdAndUpdate(orderId, { paymentStatus: "failed" });
-            res.json({ success: false, message: 'Payment failed' });
+            await Order.findByIdAndDelete(order_id); // Delete the order if payment fails
+            res.json({ success: false, message: 'Payment failed. Order has been deleted.' });
         }
     } catch (error) {
-        console.log(error);
-        res.json({ success: false, message: 'Error verifying order' });
+        console.error(error);
+        res.status(500).json({ success: false, message: 'An error occurred during verification.' });
     }
 };
 
@@ -198,29 +200,6 @@ const getOrderById = async (req, res) => {
     } catch (error) {
         console.error('Error fetching order:', error);
         res.status(500).json({ success: false, message: 'Error fetching order.' });
-    }
-};
-
-const updateOrderStatus = async (req, res) => {
-    try {
-        const { orderId, status } = req.body;
-
-        // Check if orderId and status are provided
-        if (!orderId || !status) {
-            return res.status(400).json({ success: false, message: 'orderId and status are required.' });
-        }
-
-        const order = await Order.findByIdAndUpdate(orderId, { paymentStatus: status }, { new: true });
-
-        // Check if order exists
-        if (!order) {
-            return res.status(404).json({ success: false, message: 'Order not found.' });
-        }
-
-        res.json({ success: true, message: 'Status updated successfully.', order });
-    } catch (error) {
-        console.error('Error updating order status:', error);
-        res.status(500).json({ success: false, message: 'Error updating order status.' });
     }
 };
 
@@ -312,4 +291,4 @@ const deleteOrders = async (req, res) => {
 //     req.rawBody = buf.toString();
 // }}), handleStripeWebhook);
 
-module.exports = { checkoutSession, verifyOrder, getAllOrders, getUserOrders, getOrderById, updateOrderStatus, updateDeliveryStatus, deleteOrders };
+module.exports = { checkoutSession, verifyOrder, getAllOrders, getUserOrders, getOrderById, updateDeliveryStatus, deleteOrders };

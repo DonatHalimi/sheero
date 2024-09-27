@@ -8,6 +8,7 @@ import Footer from '../../components/Footer';
 import Navbar from '../../components/Navbar/Navbar';
 import { AuthContext } from '../../context/AuthContext';
 import ProfileSidebar from './ProfileSidebar';
+import OrderItem from '../../components/Product/OrderItem';
 
 const itemsPerPage = 5;
 
@@ -70,20 +71,16 @@ const Orders = () => {
         ));
     };
 
-    const getStatusColor = (status) => {
-        switch (status) {
-            case 'pending':
-                return 'text-yellow-500 bg-stone-50 rounded-md px-1';
-            case 'shipped':
-                return 'text-blue-400 bg-stone-50 rounded-md px-1';
-            case 'delivered':
-                return 'text-green-500 bg-stone-50 rounded-md px-1';
-            case 'cancelled':
-                return 'text-red-500 bg-stone-50 rounded-md px-1';
-            default:
-                return 'text-gray-500 bg-stone-50 rounded-md px-1';
-        }
+    const statusClasses = {
+        pending: 'text-yellow-500',
+        shipped: 'text-blue-400',
+        delivered: 'text-green-500',
+        cancelled: 'text-red-500',
+        default: 'text-gray-500'
     };
+
+    const getStatusColor = (status) =>
+        `${statusClasses[status] || statusClasses.default} bg-stone-50 rounded-md px-1`;
 
     return (
         <>
@@ -107,26 +104,12 @@ const Orders = () => {
                             <>
                                 <div className="grid grid-cols-1 gap-4">
                                     {getCurrentPageItems().map(order => (
-                                        <div key={order._id} className="bg-white shadow-md rounded-lg p-6">
-                                            <Link to={`/profile/orders/${order._id}`}>
-                                                <div className="flex justify-between text-sm capitalize mb-4">
-                                                    <div className="flex items-center">
-                                                        <p>#{order._id}</p>
-                                                        <span className="mx-1">&#x2022;</span>
-                                                        <p>{new Date(order.createdAt).toLocaleDateString()}</p>
-                                                        <span className="mx-1">&#x2022;</span>
-                                                        <p className={getStatusColor(order.status)}>{order.status}</p>
-                                                    </div>
-                                                    <p className="font-semibold">€{order.totalAmount.toFixed(2)}</p>
-                                                </div>
-
-                                                <div className="mt-4">
-                                                    <div className="flex space-x-2">
-                                                        {renderProductImages(order.products)}
-                                                    </div>
-                                                </div>
-                                            </Link>
-                                        </div>
+                                        <OrderItem
+                                            key={order._id}
+                                            order={order}
+                                            renderProductImages={renderProductImages}
+                                            getStatusColor={getStatusColor}
+                                        />
                                     ))}
                                 </div>
                                 <Box sx={{ display: 'flex', justifyContent: 'flex-start', mb: 4 }}>

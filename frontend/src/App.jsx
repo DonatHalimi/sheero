@@ -27,6 +27,7 @@ import {
   SharedWishlist,
   ToastContainer,
   ToTop,
+  Verify,
   Wishlist
 } from './assets/imports';
 
@@ -63,6 +64,7 @@ const App = () => (
       <Route path="/profile/orders/:orderId" element={<ProtectedRoute><OrderDetails /></ProtectedRoute>} />
       <Route path="/profile/wishlist" element={<ProtectedRoute><Wishlist /></ProtectedRoute>} />
       <Route path="/profile/reviews" element={<ProtectedRoute><Reviews /></ProtectedRoute>} />
+      <Route path="/verify" element={<ProtectedRoute><Verify /></ProtectedRoute>} />
 
       {/* Fallback Route */}
       <Route path="*" element={<NotFound />} />

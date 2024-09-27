@@ -29,4 +29,5 @@ export { default as OrderDetails } from '../pages/Profile/OrderDetails.jsx';
 export { default as Orders } from '../pages/Profile/Orders.jsx';
 export { default as Profile } from '../pages/Profile/ProfileInformation.jsx';
 export { default as Reviews } from '../pages/Profile/Reviews.jsx';
+export { default as Verify } from '../components/Payment/Verify.jsx';
 export { default as Wishlist } from '../pages/Profile/Wishlist.jsx';
