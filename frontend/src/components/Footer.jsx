@@ -1,4 +1,3 @@
-
 import { ContactMail, Email, Facebook, GitHub, Instagram, LinkedIn, Phone } from '@mui/icons-material';
 import React from 'react';
 import { Link } from 'react-router-dom';
@@ -19,16 +18,16 @@ const Footer = () => {
     ];
 
     const customerServiceLinks = [
-        { to: '/profile', label: 'My Account' },
-        { to: '/orders', label: 'Order Tracking' },
+        { to: '/profile/me', label: 'My Account' },
+        { to: '/profile/orders', label: 'Order Tracking' },
         { to: '/profile/address', label: 'Address' },
-        { to: '/wishlist', label: 'Wishlist' },
+        { to: '/profile/wishlist', label: 'Wishlist' },
     ];
 
     const contactInfo = [
-        { href: 'mailto:support@sheero.com', icon: <Email />, label: 'Email' },
-        { href: 'tel:+1234567890', icon: <Phone />, label: 'Phone' },
-        { to: '/contact-us', icon: <ContactMail />, label: 'Contact' },
+        { linkType: 'external', href: 'mailto:support@sheero.com', icon: <Email />, label: 'Email' },
+        { linkType: 'external', href: 'tel:+1234567890', icon: <Phone />, label: 'Phone' },
+        { linkType: 'internal', to: '/contact-us', icon: <ContactMail />, label: 'Contact' },
     ];
 
     return (
@@ -82,11 +81,18 @@ const Footer = () => {
                         <p className="text-gray-200 mb-4">Have questions or need support? Reach out to us through the following channels:</p>
                         <div className='mb-2' />
                         <div className="flex space-x-4 items-center">
-                            {contactInfo.map(({ href, to, icon, label }) => (
-                                <a key={label} href={href} to={to} className="text-gray-200 hover:text-white flex items-center" aria-label={label}>
-                                    {icon}
-                                    <span className="ml-1">{label}</span>
-                                </a>
+                            {contactInfo.map(({ linkType, href, to, icon, label }) => (
+                                linkType === 'external' ? (
+                                    <a key={label} href={href} className="text-gray-200 hover:text-white flex items-center" aria-label={label}>
+                                        {icon}
+                                        <span className="ml-1">{label}</span>
+                                    </a>
+                                ) : (
+                                    <Link key={label} to={to} className="text-gray-200 hover:text-white flex items-center" aria-label={label}>
+                                        {icon}
+                                        <span className="ml-1">{label}</span>
+                                    </Link>
+                                )
                             ))}
                         </div>
                     </div>

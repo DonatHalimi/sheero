@@ -8,6 +8,7 @@ const AddAddressModal = ({ open, onClose, onAddSuccess }) => {
     const [name, setName] = useState('');
     const [street, setStreet] = useState('');
     const [phoneNumber, setPhoneNumber] = useState('');
+    const [comment, setComment] = useState('');
     const [city, setCity] = useState(null);
     const [country, setCountry] = useState(null);
     const [cities, setCities] = useState([]);
@@ -56,15 +57,15 @@ const AddAddressModal = ({ open, onClose, onAddSuccess }) => {
     };
 
     const validateName = (name) => {
-        return name.trim().length > 0; // Adjust as necessary
+        return name.trim().length > 0;
     };
 
     const validateStreet = (street) => {
-        return street.trim().length > 0; // Adjust as necessary
+        return street.trim().length > 0;
     };
 
     const validatePhoneNumber = (phoneNumber) => {
-        return /^\d{3}\/\d{2}\/\d{2} \d{6}$/.test(phoneNumber); // Adjust regex as necessary
+        return /^\d{3}\/\d{2}\/\d{2} \d{6}$/.test(phoneNumber);
     };
 
     const handleAddAddress = async () => {
@@ -72,7 +73,7 @@ const AddAddressModal = ({ open, onClose, onAddSuccess }) => {
         setStreetValid(validateStreet(street));
         setPhoneNumberValid(validatePhoneNumber(phoneNumber));
 
-        if (!nameValid || !streetValid || !phoneNumberValid || !city || !country) {
+        if (!nameValid || !streetValid || !phoneNumberValid || !comment || !city || !country) {
             toast.error('Please fill in all fields correctly', { closeOnClick: true });
             return;
         }
@@ -82,6 +83,7 @@ const AddAddressModal = ({ open, onClose, onAddSuccess }) => {
                 name,
                 street,
                 phoneNumber,
+                comment,
                 city: city._id,
                 country: country._id
             });
@@ -142,6 +144,17 @@ const AddAddressModal = ({ open, onClose, onAddSuccess }) => {
                     className="!mb-4"
                 />
                 {!phoneNumberValid && <div className="text-red-500 text-sm mb-2">Phone number format is invalid. (Format: XXX/XX/XX XXXXXX)</div>}
+
+                <BrownOutlinedTextField
+                    fullWidth
+                    required
+                    label="Comment"
+                    value={comment}
+                    onChange={(e) => {
+                        setComment(e.target.value);
+                    }}
+                    className="!mb-4"
+                />
 
                 <Autocomplete
                     id="country-autocomplete"

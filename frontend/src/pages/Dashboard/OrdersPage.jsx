@@ -56,7 +56,7 @@ const OrdersPage = () => {
 
     const columns = [
         { key: '_id', label: 'Order ID' },
-        { key: 'user.firstName', label: 'User' },
+        { key: 'user.email', label: 'User' },
         {
             key: 'products',
             label: 'Products',
@@ -110,7 +110,7 @@ const OrdersPage = () => {
                     onDeleteSuccess={fetchOrders}
                     endpoint="/orders/delete-bulk"
                     title="Delete Orders"
-                    message="Are you sure you want to delete the selected order(s)?"
+                    message="Are you sure you want to delete the selected orders?"
                 />
             </div>
         </div>

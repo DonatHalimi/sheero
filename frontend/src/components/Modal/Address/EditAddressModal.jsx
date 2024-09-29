@@ -8,6 +8,7 @@ const EditAddressModal = ({ open, onClose, address, onEditSuccess }) => {
     const [name, setName] = useState('');
     const [street, setStreet] = useState('');
     const [phoneNumber, setPhoneNumber] = useState('');
+    const [comment, setComment] = useState('');
     const [city, setCity] = useState('');
     const [country, setCountry] = useState('');
     const [cities, setCities] = useState([]);
@@ -20,6 +21,7 @@ const EditAddressModal = ({ open, onClose, address, onEditSuccess }) => {
             setName(address.name);
             setStreet(address.street);
             setPhoneNumber(address.phoneNumber);
+            setComment(address.comment);
             setCity(address.city._id);
             setCountry(address.country._id);
         }
@@ -39,12 +41,15 @@ const EditAddressModal = ({ open, onClose, address, onEditSuccess }) => {
     }, [address]);
 
     const handleEditAddress = async () => {
-        const updates = {};
-        if (name !== address.name) updates.name = name;
-        if (street !== address.street) updates.street = street;
-        if (phoneNumber !== address.phoneNumber) updates.phoneNumber = phoneNumber;
-        if (city !== address.city._id) updates.city = city;
-        if (country !== address.country._id) updates.country = country;
+        // Prepare the updated address data
+        const updates = {
+            name,
+            street,
+            phoneNumber,
+            comment,
+            city,
+            country
+        };
 
         try {
             const response = await axiosInstance.put(`/addresses/update/${address._id}`, updates);
@@ -91,6 +96,15 @@ const EditAddressModal = ({ open, onClose, address, onEditSuccess }) => {
                     fullWidth
                     margin="normal"
                     placeholder="044/45/48 XXXXXX"
+                    className='mb-4'
+                />
+
+                <BrownOutlinedTextField
+                    label="Comment"
+                    value={comment}
+                    onChange={(e) => setComment(e.target.value)}
+                    fullWidth
+                    margin="normal"
                     className='mb-4'
                 />
 

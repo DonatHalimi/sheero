@@ -22,7 +22,7 @@ import {
     ShoppingCart,
     ShoppingCartOutlined,
     Star,
-    StarBorder
+    StarBorder,
 } from '@mui/icons-material';
 import {
     Badge,
@@ -46,6 +46,7 @@ import {
     AppBar as MuiAppBar, Drawer as MuiDrawer,
     Pagination,
     Paper,
+    Select,
     Skeleton,
     Stack,
     Tab,
@@ -1579,24 +1580,79 @@ export const Header = ({
     handleShareWishlist,
     loading,
     fullName = '',
+    searchTerm,
+    setSearchTerm,
+    showSearch = false,
+    statusFilter,
+    setStatusFilter,
+    orderId
 }) => {
     const isSharedWishlist = fullName.trim() !== '';
 
     return (
         <div className="bg-white p-4 rounded-sm shadow-sm mb-3 flex justify-between items-center">
             <Typography variant="h5" className="text-gray-800 font-semilight">
-                {isSharedWishlist ? `${fullName}'s Wishlist` : title}
+                {isSharedWishlist ? `${fullName}'s Wishlist` : `${title} ${orderId ? `#${orderId}` : ''}`}
             </Typography>
-            {wishlistItems !== undefined && !isSharedWishlist ? (
-                <div className="flex space-x-2">
-                    {wishlistItems.length > 0 && (
-                        <>
-                            <ShareWishlist handleShareWishlist={handleShareWishlist} loading={loading} />
-                            <ClearWishlist setIsModalOpen={setIsModalOpen} loading={loading} />
-                        </>
-                    )}
-                </div>
-            ) : null}
+            <div className="flex items-center space-x-4">
+                {showSearch && (
+                    <>
+                        <TextField
+                            value={searchTerm}
+                            onChange={(e) => setSearchTerm(e.target.value)}
+                            placeholder="Search orders..."
+                            variant="outlined"
+                            size="small"
+                            InputProps={{
+                                endAdornment: <Search className="text-gray-400 ml-1" />,
+                                sx: {
+                                    '& .MuiOutlinedInput-root': {
+                                        '& fieldset': {
+                                            borderColor: 'rgba(0, 0, 0, 0.23)',
+                                        },
+                                        '&:focus fieldset': {
+                                            borderColor: 'rgba(0, 0, 0, 0.23)',
+                                        },
+                                        '&.Mui-focused fieldset': {
+                                            borderColor: 'rgba(0, 0, 0, 0.23)',
+                                        },
+                                    },
+                                },
+                            }}
+                        />
+                        <Select
+                            value={statusFilter}
+                            onChange={(e) => setStatusFilter(e.target.value)}
+                            variant="outlined"
+                            size="small"
+                            sx={{
+                                width: 120,
+                                '& .MuiOutlinedInput-notchedOutline': {
+                                    borderColor: 'rgba(0, 0, 0, 0.23)',
+                                },
+                                '&:focus .MuiOutlinedInput-notchedOutline': {
+                                    borderColor: 'rgba(0, 0, 0, 0.23)',
+                                },
+                                '&.Mui-focused .MuiOutlinedInput-notchedOutline': {
+                                    borderColor: 'rgba(0, 0, 0, 0.23)',
+                                },
+                            }}
+                        >
+                            <MenuItem value="All">All</MenuItem>
+                            <MenuItem value="pending">Pending</MenuItem>
+                            <MenuItem value="shipped">Shipped</MenuItem>
+                            <MenuItem value="delivered">Delivered</MenuItem>
+                            <MenuItem value="canceled">Canceled</MenuItem>
+                        </Select>
+                    </>
+                )}
+                {wishlistItems !== undefined && !isSharedWishlist && wishlistItems.length > 0 && (
+                    <>
+                        <ShareWishlist handleShareWishlist={handleShareWishlist} loading={loading} />
+                        <ClearWishlist setIsModalOpen={setIsModalOpen} loading={loading} />
+                    </>
+                )}
+            </div>
         </div>
     );
 };

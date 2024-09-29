@@ -1,5 +1,5 @@
-import { Box } from '@mui/material';
 import React, { useContext, useEffect, useState } from 'react';
+import { Box, MenuItem, Select, Typography } from '@mui/material';
 import { Link } from 'react-router-dom';
 import { CustomPagination, EmptyState, Header, OrderItemSkeleton } from '../../assets/CustomComponents';
 import emptyOrdersImage from '../../assets/img/empty-orders.png';
@@ -18,6 +18,8 @@ const Orders = () => {
     const [loading, setLoading] = useState(true);
     const [error, setError] = useState(null);
     const [currentPage, setCurrentPage] = useState(1);
+    const [searchTerm, setSearchTerm] = useState('');
+    const [statusFilter, setStatusFilter] = useState('All');
     const axiosInstance = useAxios();
 
     useEffect(() => {
@@ -42,12 +44,32 @@ const Orders = () => {
         }
     };
 
-    const totalOrders = orders.length;
+    const filteredOrders = orders.filter(order => {
+        const matchesSearchTerm = [
+            order._id,
+            order.paymentStatus,
+            order.paymentMethod,
+            order.totalAmount.toString(),
+            order.paymentIntentId,
+            order.status,
+            ...order.products.flatMap(product => [
+                product.product.name,
+                product.quantity.toString(),
+                product.price.toString()
+            ])
+        ].some(field => field.toLowerCase().includes(searchTerm.toLowerCase()));
+
+        const matchesStatusFilter = statusFilter === 'All' || order.status === statusFilter;
+
+        return matchesSearchTerm && matchesStatusFilter;
+    });
+
+    const totalOrders = filteredOrders.length;
     const pageCount = Math.ceil(totalOrders / itemsPerPage);
 
     const getCurrentPageItems = () => {
         const startIndex = (currentPage - 1) * itemsPerPage;
-        return orders.slice(startIndex, startIndex + itemsPerPage);
+        return filteredOrders.slice(startIndex, startIndex + itemsPerPage);
     };
 
     const handlePageChange = (event, value) => {
@@ -62,7 +84,6 @@ const Orders = () => {
                 to={`/product/${product.product._id}`}
             >
                 <img
-                    key={product.product._id}
                     src={`http://localhost:5000/${product.product.image}`}
                     alt={product.product.name}
                     className="w-20 h-20 object-cover rounded cursor-pointer"
@@ -75,7 +96,7 @@ const Orders = () => {
         pending: 'text-yellow-500',
         shipped: 'text-blue-400',
         delivered: 'text-green-500',
-        cancelled: 'text-red-500',
+        canceled: 'text-red-500',
         default: 'text-gray-500'
     };
 
@@ -89,16 +110,23 @@ const Orders = () => {
                 <ProfileSidebar />
                 <main className="p-4 relative left-32 w-full">
                     <div className="container max-w-6xl mx-auto mt-20 mb-20">
-                        <Header title='Orders' />
+                        <Header
+                            title='Orders'
+                            searchTerm={searchTerm}
+                            setSearchTerm={setSearchTerm}
+                            showSearch={true}
+                            statusFilter={statusFilter}
+                            setStatusFilter={setStatusFilter}
+                        />
 
                         {loading ? (
                             <OrderItemSkeleton />
                         ) : error ? (
                             <div>{error}</div>
-                        ) : orders.length === 0 ? (
+                        ) : filteredOrders.length === 0 ? (
                             <EmptyState
                                 imageSrc={emptyOrdersImage}
-                                message="No orders found!"
+                                message={searchTerm ? "No orders found matching your search" : "No orders found!"}
                             />
                         ) : (
                             <>
@@ -120,7 +148,7 @@ const Orders = () => {
                                         size="large"
                                         sx={{
                                             position: 'relative',
-                                            bottom: '10px',
+                                            bottom: '8px',
                                             '& .MuiPagination-ul': {
                                                 justifyContent: 'flex-start',
                                             },

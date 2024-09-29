@@ -16,6 +16,7 @@ const addressSchema = new mongoose.Schema({
     },
     city: { type: mongoose.Schema.Types.ObjectId, ref: 'City', required: true },
     country: { type: mongoose.Schema.Types.ObjectId, ref: 'Country', required: true },
+    comment: { type: String, required: false },
     createdAt: { type: Date, default: Date.now },
     updatedAt: { type: Date, default: Date.now }
 });

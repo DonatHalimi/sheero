@@ -1,7 +1,7 @@
 const Address = require('../models/Address');
 
 const createAddress = async (req, res) => {
-    const { name, street, city, country, phoneNumber } = req.body;
+    const { name, street, city, country, phoneNumber, comment } = req.body;
     try {
         const existingAddress = await Address.findOne({ user: req.user.userId });
 
@@ -15,7 +15,8 @@ const createAddress = async (req, res) => {
             street,
             city,
             country,
-            phoneNumber
+            phoneNumber,
+            comment
         });
 
         await address.save();
@@ -73,7 +74,7 @@ const getAddressByUser = async (req, res) => {
 
 const updateAddress = async (req, res) => {
     const addressId = req.params.id;
-    const updates = req.body;
+    const { name, street, city, country, phoneNumber, comment } = req.body;
 
     try {
         const address = await Address.findOne({ _id: addressId, user: req.user.userId });
@@ -82,7 +83,11 @@ const updateAddress = async (req, res) => {
             return res.status(404).json({ message: 'Address not found or does not belong to the user' });
         }
 
-        const updatedAddress = await Address.findByIdAndUpdate(address._id, updates, { new: true, runValidators: true });
+        const updatedAddress = await Address.findByIdAndUpdate(
+            address._id,
+            { name, street, city, country, phoneNumber, comment }, 
+            { new: true, runValidators: true }
+        );
 
         res.status(200).json(updatedAddress);
     } catch (error) {

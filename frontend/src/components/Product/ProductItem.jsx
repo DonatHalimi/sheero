@@ -49,7 +49,7 @@ const ProductItem = ({ product, loading }) => {
             }
         } catch (error) {
             const errorMsg = error.response?.data?.message || `Failed to add product to ${action}.`;
-            toast.info(errorMsg, { onClick: () => navigate(`/${action}`) });
+            toast.info(errorMsg, { onClick: () => navigate(`/${action === 'wishlist' ? 'profile/wishlist' : 'cart'}`) });
         } finally {
             setIsLoading(false);
         }

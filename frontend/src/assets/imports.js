@@ -6,6 +6,7 @@ export { Route, BrowserRouter as Router, Routes } from 'react-router-dom';
 export { ToastContainer } from 'react-toastify';
 
 // Pages and components
+export { default as AboutUs } from '../pages/AboutUs.jsx';
 export { default as DashboardLayout } from '../components/Dashboard/DashboardLayout.jsx';
 export { default as SharedWishlist } from '../components/Product/SharedWishlist.jsx';
 export { default as ProtectedRoute } from '../components/Route/ProtectedRoute';

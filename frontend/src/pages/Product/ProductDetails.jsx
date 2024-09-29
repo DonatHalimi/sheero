@@ -92,8 +92,9 @@ const ProductDetails = () => {
             await axios.post(`${apiUrl}/${endpoint}`, payload, {
                 headers: { Authorization: `Bearer ${auth.accessToken}` }
             });
+
             toast.success(`Product added to ${action === 'cart' ? 'cart' : 'wishlist'}!`, {
-                onClick: () => navigate(`/${action}`),
+                onClick: () => navigate(`/${action === 'wishlist' ? 'profile/wishlist' : 'cart'}`),
             });
 
             if (action === 'cart') {
@@ -106,7 +107,7 @@ const ProductDetails = () => {
             }
         } catch (error) {
             const errorMsg = error.response?.data?.message || `Failed to add product to ${action}.`;
-            toast.info(errorMsg, { onClick: () => navigate(`/${action}`) });
+            toast.info(errorMsg, { onClick: () => navigate(`/${action === 'wishlist' ? 'profile/wishlist' : 'cart'}`) });
         } finally {
             setLoadingState(false);
         }

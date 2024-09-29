@@ -5,8 +5,8 @@ import { AddressInformationSkeleton, Header } from '../../assets/CustomComponent
 import useAxios from '../../axiosInstance';
 import Footer from '../../components/Footer';
 import Navbar from '../../components/Navbar/Navbar';
-import { AuthContext } from '../../context/AuthContext';
 import ProfileSidebar from './ProfileSidebar';
+import { AuthContext } from '../../context/AuthContext';
 
 const apiUrl = 'http://localhost:5000/api/addresses';
 
@@ -20,6 +20,7 @@ const AddressInformation = () => {
     const [phoneNumber, setPhoneNumber] = useState('');
     const [city, setCity] = useState('');
     const [country, setCountry] = useState('');
+    const [comment, setComment] = useState('');
     const [existingAddress, setExistingAddress] = useState(null);
     const [cities, setCities] = useState([]);
     const [countries, setCountries] = useState([]);
@@ -50,6 +51,7 @@ const AddressInformation = () => {
                 setPhoneNumber(address.phoneNumber || '');
                 setCity(address.city?._id || '');
                 setCountry(address.country?._id || '');
+                setComment(address.comment || ''); // Fetch comment
                 setExistingAddress(address);
             }
         } catch (error) {
@@ -103,17 +105,9 @@ const AddressInformation = () => {
         setCity(selectedCityId);
     };
 
-    const validateName = (name) => {
-        return /^[A-Z][a-zA-Z]{1,9}$/.test(name);
-    };
-
-    const validateStreet = (street) => {
-        return /^[A-Z][a-zA-Z0-9]*([ ]+[A-Z][a-zA-Z0-9]*)*$/.test(street);
-    };
-
-    const validatePhoneNumber = (phoneNumber) => {
-        return /^0(44|45|48)\d{6}$/.test(phoneNumber);
-    };
+    const validateName = (name) => /^[A-Z][a-zA-Z]{1,9}$/.test(name);
+    const validateStreet = (street) => /^[A-Z][a-zA-Z0-9]*([ ]+[A-Z][a-zA-Z0-9]*)*$/.test(street);
+    const validatePhoneNumber = (phoneNumber) => /^0(44|45|48)\d{6}$/.test(phoneNumber);
 
     const handleNameChange = (e) => {
         const value = e.target.value;
@@ -133,6 +127,8 @@ const AddressInformation = () => {
         setPhoneNumberValid(validatePhoneNumber(value));
     };
 
+    const handleCommentChange = (e) => setComment(e.target.value);
+
     const handleSaveAddress = async (e) => {
         e.preventDefault();
         if (!validateName(name) || !validateStreet(street) || !validatePhoneNumber(phoneNumber) || !city || !country) {
@@ -149,6 +145,7 @@ const AddressInformation = () => {
             phoneNumber,
             city,
             country,
+            comment,
         };
 
         try {
@@ -289,6 +286,16 @@ const AddressInformation = () => {
                                             </Select>
                                         </FormControl>
                                     </Box>
+
+                                    <TextField
+                                        fullWidth
+                                        label="Comment"
+                                        variant="outlined"
+                                        name="comment"
+                                        value={comment}
+                                        onChange={handleCommentChange}
+                                        placeholder="Add any additional comments (optional)"
+                                    />
 
                                     <Button type="submit" variant="contained" color="primary" className="bg-orange-600 hover:bg-orange-700">
                                         Save

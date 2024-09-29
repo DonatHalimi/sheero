@@ -2,6 +2,7 @@ import React, { useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { CircularProgress, Typography, Box } from '@mui/material';
 import CancelIcon from '@mui/icons-material/Cancel';
+import { motion } from 'framer-motion';
 
 const CancelPayment = () => {
     const navigate = useNavigate();
@@ -29,7 +30,13 @@ const CancelPayment = () => {
             justifyContent="center"
             height="100vh"
         >
-            <CancelIcon color="error" style={{ fontSize: 64 }} />
+            <motion.div
+                initial={{ scale: 0 }}
+                animate={{ scale: 1.2 }}
+                transition={{ duration: 0.5, yoyo: Infinity }}
+            >
+                <CancelIcon color="error" style={{ fontSize: 64 }} />
+            </motion.div>
             <Typography variant="h4" sx={{ mt: 2, mb: 4 }}>
                 Payment Cancelled
             </Typography>

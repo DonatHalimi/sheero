@@ -177,13 +177,15 @@ const getUserOrders = async (req, res) => {
 const getOrderById = async (req, res) => {
     try {
         const { orderId } = req.params;
+        const userId = req.user._id;
+        const userRole = req.user.role;
 
         // Find the order by ID
         const order = await Order.findById(orderId)
             .populate('products.product', 'name price image')
             .populate({
                 path: 'address',
-                select: 'name phoneNumber street',
+                select: 'name phoneNumber street comment',
                 populate: [
                     { path: 'city', select: 'name zipCode' },
                     { path: 'country', select: 'name' }
@@ -194,6 +196,11 @@ const getOrderById = async (req, res) => {
         // Check if the order exists
         if (!order) {
             return res.status(404).json({ success: false, message: 'Order not found.' });
+        }
+
+        // Check if the authenticated user is the owner of the order or an admin
+        if (order.user.toString() !== userId && userRole !== 'admin') {
+            return res.status(403).json({ success: false, message: 'Access denied. This order does not belong to you.' });
         }
 
         res.json({ success: true, data: order });
@@ -251,44 +258,5 @@ const deleteOrders = async (req, res) => {
         res.status(500).json({ message: 'Server error', error: error.message });
     }
 };
-
-// TODO (MAYBE) (WEBHOOK HANDLER):
-// const handleStripeWebhook = async (req, res) => {
-//     const sig = req.headers['stripe-signature'];
-
-//     let event;
-
-//     try {
-//         event = stripe.webhooks.constructEvent(await buffer(req), sig, webhookSecret);
-//     } catch (err) {
-//         console.error(`Webhook Error: ${err.message}`);
-//         return res.status(400).send(`Webhook Error: ${err.message}`);
-//     }
-
-//     // Handle the event based on its type
-//     switch (event.type) {
-//         case 'checkout.session.completed':
-//             const session = event.data.object; // Contains the checkout session object
-//             const orderId = session.metadata.orderId; // Get the order ID from metadata
-
-//             // Update the order status to 'paid'
-//             await Order.findByIdAndUpdate(orderId, { paymentStatus: 'paid' });
-
-//             console.log(`Order ${orderId} payment successful`);
-//             break;
-
-//         // Other event types can be handled here as needed
-//         default:
-//             console.log(`Unhandled event type ${event.type}`);
-//     }
-
-//     // Respond to acknowledge receipt of the event
-//     res.json({ received: true });
-// };
-
-// // Add this route in your Express app
-// app.post('/webhook', express.json({ verify: (req, res, buf) => {
-//     req.rawBody = buf.toString();
-// }}), handleStripeWebhook);
 
 module.exports = { checkoutSession, verifyOrder, getAllOrders, getUserOrders, getOrderById, updateDeliveryStatus, deleteOrders };
