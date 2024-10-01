@@ -5,34 +5,25 @@ const Order = require('../models/Order');
 const dotenv = require('dotenv');
 const Stripe = require('stripe');
 
-// TODO (MAYBE) (WEBHOOK):
-// const { buffer } = require('micro');
-// const webhookSecret = process.env.STRIPE_WEBHOOK_SECRET;
-
 dotenv.config();
 
 const stripe = Stripe(process.env.STRIPE_SECRET_KEY);
 
-// Create Stripe Checkout Session
-const checkoutSession = async (req, res) => {
+const payWithStripe = async (req, res) => {
     try {
         const { productIds, addressId, userId, email } = req.body;
 
-        // Fetch product details
         const products = await Product.find({ '_id': { $in: productIds } });
 
-        // Fetch user's address
         const address = await Address.findById(addressId)
             .populate('city', 'name')
             .populate('country', 'name')
             .exec();
 
-        // Check if address exists
         if (!address) {
             return res.status(404).send('Address not found');
         }
 
-        // Prepare Stripe line items
         const lineItems = products.map(product => {
             const priceToUse = product.salePrice ? product.salePrice : product.price;
 
@@ -48,7 +39,6 @@ const checkoutSession = async (req, res) => {
             };
         });
 
-        // Total amount calculation
         const totalAmount = products.reduce((total, product) => {
             const priceToUse = product.salePrice ? product.salePrice : product.price;
             return total + priceToUse;
@@ -57,7 +47,6 @@ const checkoutSession = async (req, res) => {
         const shippingCost = 2;
         const totalWithShipping = totalAmount + shippingCost;
 
-        // Add a shipping line item if needed
         lineItems.push({
             price_data: {
                 currency: 'eur',
@@ -70,7 +59,6 @@ const checkoutSession = async (req, res) => {
             quantity: 1,
         });
 
-        // Create the order in the database
         const order = new Order({
             user: userId,
             products: productIds.map(productId => ({
@@ -87,7 +75,6 @@ const checkoutSession = async (req, res) => {
 
         await order.save();
 
-        // Create Stripe Checkout Session
         const session = await stripe.checkout.sessions.create({
             payment_method_types: ['card'],
             line_items: lineItems,
@@ -111,7 +98,6 @@ const checkoutSession = async (req, res) => {
             }
         });
 
-        // Update the order with the Stripe session ID
         await Order.findByIdAndUpdate(order._id, { paymentIntentId: session.id });
 
         res.json({ url: session.url });
@@ -129,7 +115,7 @@ const verifyOrder = async (req, res) => {
             await Order.findByIdAndUpdate(order_id, { paymentStatus: 'completed' });
             res.json({ success: true, message: 'Payment completed successfully.' });
         } else {
-            await Order.findByIdAndDelete(order_id); // Delete the order if payment fails
+            await Order.findByIdAndDelete(order_id);
             res.json({ success: false, message: 'Payment failed. Order has been deleted.' });
         }
     } catch (error) {
@@ -138,7 +124,52 @@ const verifyOrder = async (req, res) => {
     }
 };
 
-// Get all orders
+const payWithCash = async (req, res) => {
+    try {
+        const { productIds, addressId, userId, email } = req.body;
+
+        const products = await Product.find({ '_id': { $in: productIds } });
+
+        const address = await Address.findById(addressId)
+            .populate('city', 'name')
+            .populate('country', 'name')
+            .exec();
+
+        if (!address) {
+            return res.status(404).send('Address not found');
+        }
+
+        const totalAmount = products.reduce((total, product) => {
+            const priceToUse = product.salePrice ? product.salePrice : product.price;
+            return total + priceToUse;
+        }, 0);
+
+        const shippingCost = 2;
+        const totalWithShipping = totalAmount + shippingCost;
+
+        // Create the order in the database with "cash" payment method
+        const order = new Order({
+            user: userId,
+            products: productIds.map(productId => ({
+                product: productId,
+                quantity: 1,
+                price: products.find(product => product._id.equals(productId)).salePrice || products.find(product => product._id.equals(productId)).price
+            })),
+            address: addressId,
+            totalAmount: totalWithShipping,
+            paymentStatus: 'pending',
+            paymentMethod: 'cash',
+        });
+
+        await order.save();
+
+        res.json({ success: true, message: 'Order created successfully. Please pay with cash on delivery.' });
+    } catch (error) {
+        console.error('Error processing cash order', error);
+        res.status(500).json({ error: 'Server error', details: error.message });
+    }
+};
+
 const getAllOrders = async (req, res) => {
     try {
         const orders = await Order.find()
@@ -162,7 +193,6 @@ const getUserOrders = async (req, res) => {
             .populate('address', 'name street phoneNumber city country')
             .exec();
 
-        // Check if orders exist
         if (!orders.length) {
             return res.json({ success: false, message: 'No orders found for this user.' });
         }
@@ -180,7 +210,6 @@ const getOrderById = async (req, res) => {
         const userId = req.user._id;
         const userRole = req.user.role;
 
-        // Find the order by ID
         const order = await Order.findById(orderId)
             .populate('products.product', 'name price image')
             .populate({
@@ -193,12 +222,10 @@ const getOrderById = async (req, res) => {
             })
             .exec();
 
-        // Check if the order exists
         if (!order) {
             return res.status(404).json({ success: false, message: 'Order not found.' });
         }
 
-        // Check if the authenticated user is the owner of the order or an admin
         if (order.user.toString() !== userId && userRole !== 'admin') {
             return res.status(403).json({ success: false, message: 'Access denied. This order does not belong to you.' });
         }
@@ -212,45 +239,59 @@ const getOrderById = async (req, res) => {
 
 const updateDeliveryStatus = async (req, res) => {
     try {
-        const { orderId, status } = req.body;
+        const { orderId, status, paymentStatus } = req.body;
 
-        // Check if orderId and status are provided
         if (!orderId || !status) {
             return res.status(400).json({ success: false, message: 'orderId and status are required.' });
         }
 
-        // Update the order delivery status to the new status field
-        const order = await Order.findByIdAndUpdate(orderId, { status }, { new: true }); // Update status field
+        const order = await Order.findById(orderId).populate('products.product');
 
-        // Check if order exists
         if (!order) {
             return res.status(404).json({ success: false, message: 'Order not found.' });
         }
 
-        res.json({ success: true, message: 'Delivery status updated successfully.', order });
+        order.status = status;
+
+        // If the order is being shipped or delivered, decrease the inventory count for each product
+        if (status === 'shipped' || status === 'delivered') {
+            for (const item of order.products) {
+                const product = item.product;
+
+                if (product) {
+                    product.inventoryCount -= item.quantity;
+                    await product.save();
+                }
+            }
+        }
+
+        if (paymentStatus) {
+            order.paymentStatus = paymentStatus;
+        }
+
+        await order.save();
+
+        res.json({ success: true, message: 'Order updated successfully.', order });
     } catch (error) {
-        console.error('Error updating delivery status:', error);
-        res.status(500).json({ success: false, message: 'Error updating delivery status.' });
+        console.error('Error updating order:', error);
+        res.status(500).json({ success: false, message: 'Error updating order.' });
     }
 };
 
 const deleteOrders = async (req, res) => {
     const { ids } = req.body;
 
-    // Validate the input
     if (!ids || !Array.isArray(ids) || ids.length === 0) {
         return res.status(400).json({ message: 'Invalid or empty ids array' });
     }
 
     try {
-        // Check if all orders exist
         const orders = await Order.find({ _id: { $in: ids } });
 
         if (orders.length !== ids.length) {
             return res.status(404).json({ message: 'One or more orders not found' });
         }
 
-        // Delete the orders
         await Order.deleteMany({ _id: { $in: ids } });
 
         res.status(200).json({ message: 'Orders deleted successfully' });
@@ -259,4 +300,4 @@ const deleteOrders = async (req, res) => {
     }
 };
 
-module.exports = { checkoutSession, verifyOrder, getAllOrders, getUserOrders, getOrderById, updateDeliveryStatus, deleteOrders };
+module.exports = { payWithStripe, verifyOrder, payWithCash, getAllOrders, getUserOrders, getOrderById, updateDeliveryStatus, deleteOrders };

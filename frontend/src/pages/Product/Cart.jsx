@@ -2,22 +2,25 @@ import { DeleteOutline } from '@mui/icons-material';
 import { Paper, Table, TableBody, TableCell, TableContainer, TableHead, TableRow, Tooltip } from '@mui/material';
 import React, { useContext, useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { toast } from 'react-toastify'; // Import Toast components
+import { toast } from 'react-toastify';
 import { CheckoutButton, CustomDeleteModal, EmptyState, LoadingCart, RoundIconButton, truncateText } from '../../assets/CustomComponents';
 import emptyCartImage from '../../assets/img/empty-cart.png';
 import useAxios from '../../axiosInstance';
 import Footer from '../../components/Footer';
 import Navbar from '../../components/Navbar/Navbar';
+import PaymentModal from '../../components/Product/PaymentModal';
 import { AuthContext } from '../../context/AuthContext';
 
 const Cart = () => {
     const [cart, setCart] = useState(null);
+    const [address, setAddress] = useState(null);
+
     const [loading, setLoading] = useState(true);
     const [openModal, setOpenModal] = useState(false);
+    const [showPaymentModal, setShowPaymentModal] = useState(false);
     const axiosInstance = useAxios();
     const { auth } = useContext(AuthContext);
     const navigate = useNavigate();
-    const [address, setAddress] = useState(null);
 
     const apiUrl = 'http://localhost:5000/api/cart';
 
@@ -40,7 +43,7 @@ const Cart = () => {
 
     const updateQuantity = async (productId, quantityChange) => {
         try {
-            const { data } = await axiosInstance.put(`${apiUrl}/update-quantity`,
+            const { data } = await axiosInstance.put(`${apiUrl}/quantity/update`,
                 { productId, quantityChange },
                 { headers: { Authorization: `Bearer ${auth.accessToken}` } }
             );
@@ -89,7 +92,7 @@ const Cart = () => {
         }
     };
 
-    const handleCheckout = async () => {
+    const handleStripePayment = async () => {
         if (!address) {
             toast.warn("No address found. Click here to add one!", {
                 onClick: () => navigate('/profile/address'),
@@ -98,19 +101,19 @@ const Cart = () => {
         }
 
         try {
-            const { data } = await axiosInstance.post('/orders/create-checkout-session', {
+            const { data } = await axiosInstance.post('/orders/payment/stripe', {
                 productIds: cart.items.map(item => item.product._id),
                 addressId: address._id,
                 userId: auth.userId,
                 email: auth.email
             });
 
-            // Clear the cart after creating the checkout session
             await axiosInstance.delete(`${apiUrl}/clear`, {
                 headers: { Authorization: `Bearer ${auth.accessToken}` }
             });
 
-            // Redirect to the Stripe checkout page
+            setShowPaymentModal(false);
+
             window.location.href = data.url;
         } catch (error) {
             console.error('Error during Stripe checkout:', error.message);
@@ -118,6 +121,39 @@ const Cart = () => {
         }
     };
 
+    const handleShowModal = () => {
+        setShowPaymentModal(true);
+    };
+
+    const handleCashPayment = async () => {
+        if (!address) {
+            toast.warn("No address found. Click here to add one!", {
+                onClick: () => navigate('/profile/address'),
+            });
+            return;
+        }
+
+        try {
+            const { data } = await axiosInstance.post('/orders/payment/cash', {
+                productIds: cart.items.map(item => item.product._id),
+                addressId: address._id,
+                userId: auth.userId,
+                email: auth.email
+            });
+
+            await axiosInstance.delete(`${apiUrl}/clear`, {
+                headers: { Authorization: `Bearer ${auth.accessToken}` }
+            });
+
+            toast.success(data.message || "Order placed successfully. Please pay with cash upon delivery.");
+            setShowPaymentModal(false);
+            navigate('/profile/orders');
+        } catch (error) {
+            console.error('Error during cash payment:', error.message);
+            toast.error("Failed to place the order. Please try again.");
+            setShowPaymentModal(false);
+        }
+    };
 
     const handleProductClick = (productId) => navigate(`/product/${productId}`);
 
@@ -272,14 +308,23 @@ const Cart = () => {
                                     <TableRow>
                                         <TableCell>Total</TableCell>
                                         <TableCell align="right" className="font-bold">
-                                            {(subtotal + 2).toFixed(2)} € {/* Added shipping cost to subtotal for total */}
+                                            {(subtotal + 2).toFixed(2)} €
                                         </TableCell>
                                     </TableRow>
                                 </TableBody>
                             </Table>
                             <div className="mt-4">
-                                <CheckoutButton onClick={handleCheckout} className="w-full">Proceed to Checkout</CheckoutButton>
+                                <CheckoutButton onClick={handleShowModal} className="w-full">
+                                    Proceed to Checkout
+                                </CheckoutButton>
                             </div>
+
+                            <PaymentModal
+                                open={showPaymentModal}
+                                onClose={() => setShowPaymentModal(false)}
+                                onStripePayment={handleStripePayment}
+                                onCashPayment={handleCashPayment}
+                            />
                         </Paper>
                     </div>
                 )}

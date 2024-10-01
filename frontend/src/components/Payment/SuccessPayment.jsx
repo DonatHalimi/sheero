@@ -1,8 +1,8 @@
+import CheckCircleIcon from '@mui/icons-material/CheckCircle';
+import { Box, CircularProgress, Typography } from '@mui/material';
+import { motion } from 'framer-motion';
 import React, { useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { CircularProgress, Typography, Box } from '@mui/material';
-import CheckCircleIcon from '@mui/icons-material/CheckCircle';
-import { motion } from 'framer-motion';
 
 const SuccessPayment = () => {
     const navigate = useNavigate();

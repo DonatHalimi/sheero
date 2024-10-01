@@ -1,9 +1,9 @@
+import { Box, CircularProgress, Typography } from '@mui/material';
 import React, { useEffect, useState } from 'react';
 import { useLocation } from 'react-router-dom';
-import SuccessPayment from './SuccessPayment';
+import useAxios from '../../axiosInstance';
 import CancelPayment from './CancelPayment';
-import useAxios from '../../axiosInstance'; 
-import { CircularProgress, Box, Typography } from '@mui/material';
+import SuccessPayment from './SuccessPayment';
 
 const Verify = () => {
     const location = useLocation();

@@ -3,7 +3,7 @@ import axios from 'axios';
 import React, { useContext, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { toast } from 'react-toastify';
-import { CartWishlistButtons, ProductItemSkeleton } from '../../assets/CustomComponents';
+import { CartWishlistButtons, DiscountPercentage, OutOfStock, ProductItemSkeleton } from '../../assets/CustomComponents';
 import NoImage from '../../assets/img/product-not-found.jpg';
 import { AuthContext } from '../../context/AuthContext';
 
@@ -12,7 +12,7 @@ const ProductItem = ({ product, loading }) => {
     const { auth } = useContext(AuthContext);
     const [isLoading, setIsLoading] = useState({ cart: false, wishlist: false });
 
-    const { _id, name, image, price, salePrice } = product || {};
+    const { _id, name, image, price, salePrice, inventoryCount } = product || {};
     const imageUrl = `http://localhost:5000/${image}`;
     const discountPercentage = salePrice && price > 0 ? Math.round(((price - salePrice) / price) * 100) : 0;
     const finalPrice = salePrice > 0 ? salePrice : price;
@@ -74,11 +74,11 @@ const ProductItem = ({ product, loading }) => {
                         className="w-full h-48 object-contain rounded"
                         onError={(e) => { e.target.onerror = null; e.target.src = NoImage; }}
                     />
-                    {discountPercentage > 0 && (
-                        <span className="absolute top-0 right-0 bg-stone-500 text-white px-2 py-1 rounded text-xs">
-                            -{discountPercentage}%
-                        </span>
-                    )}
+
+                    <OutOfStock inventoryCount={inventoryCount} />
+
+                    <DiscountPercentage discountPercentage={discountPercentage} />
+
                 </div>
                 <h2 className="font-semibold h-8 overflow-hidden whitespace-nowrap text-ellipsis w-full">
                     {name}
@@ -94,6 +94,7 @@ const ProductItem = ({ product, loading }) => {
                         handleAction={handleAction}
                         isCartLoading={isLoading.cart}
                         isWishlistLoading={isLoading.wishlist}
+                        inventoryCount={product.inventoryCount}
                     />
                 </div>
             </div>

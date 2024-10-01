@@ -6,12 +6,13 @@ export { Route, BrowserRouter as Router, Routes } from 'react-router-dom';
 export { ToastContainer } from 'react-toastify';
 
 // Pages and components
-export { default as AboutUs } from '../pages/AboutUs.jsx';
 export { default as DashboardLayout } from '../components/Dashboard/DashboardLayout.jsx';
+export { default as Verify } from '../components/Payment/Verify.jsx';
 export { default as SharedWishlist } from '../components/Product/SharedWishlist.jsx';
 export { default as ProtectedRoute } from '../components/Route/ProtectedRoute';
 export { default as PublicRoute } from '../components/Route/PublicRoute';
 export { default as ToTop } from '../components/ToTop';
+export { default as AboutUs } from '../pages/AboutUs.jsx';
 export { default as Login } from '../pages/Auth/Login';
 export { default as Register } from '../pages/Auth/Register';
 export { default as ContactUs } from '../pages/ContactUs.jsx';
@@ -30,5 +31,4 @@ export { default as OrderDetails } from '../pages/Profile/OrderDetails.jsx';
 export { default as Orders } from '../pages/Profile/Orders.jsx';
 export { default as Profile } from '../pages/Profile/ProfileInformation.jsx';
 export { default as Reviews } from '../pages/Profile/Reviews.jsx';
-export { default as Verify } from '../components/Payment/Verify.jsx';
 export { default as Wishlist } from '../pages/Profile/Wishlist.jsx';

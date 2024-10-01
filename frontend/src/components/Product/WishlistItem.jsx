@@ -4,7 +4,7 @@ import axios from 'axios';
 import React, { useContext, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { toast } from 'react-toastify';
-import { AddToCartButton, BrownShoppingCartIcon, ProductItemSkeleton, WishlistButton } from '../../assets/CustomComponents';
+import { AddToCartButton, BrownShoppingCartIcon, DiscountPercentage, OutOfStock, ProductItemSkeleton, WishlistButton } from '../../assets/CustomComponents';
 import NoImage from '../../assets/img/product-not-found.jpg';
 import { AuthContext } from '../../context/AuthContext';
 
@@ -15,7 +15,7 @@ const WishlistItem = ({ product, onRemove, loading }) => {
     const { auth } = useContext(AuthContext);
     const [isActionLoading, setIsActionLoading] = useState(false);
 
-    const { _id, name, image, price, discount, salePrice } = product || {};
+    const { _id, name, image, price, discount, salePrice, inventoryCount } = product || {};
     const imageUrl = `${apiUrl}/${image}`;
     const discountPercentage = discount?.value || 0;
     const finalPrice = salePrice > 0 ? salePrice : price;
@@ -67,11 +67,11 @@ const WishlistItem = ({ product, onRemove, loading }) => {
                         className="w-full h-48 object-contain rounded"
                         onError={(e) => e.target.src = NoImage}
                     />
-                    {discountPercentage > 0 && (
-                        <span className="absolute top-2 right-2 bg-stone-500 text-white px-2 py-1 rounded text-xs">
-                            -{discountPercentage}%
-                        </span>
-                    )}
+
+                    <OutOfStock inventoryCount={inventoryCount} />
+
+                    <DiscountPercentage discountPercentage={discountPercentage} />
+
                 </div>
                 <h2 className="font-semibold h-8 overflow-hidden whitespace-nowrap text-ellipsis w-full">
                     {name}
@@ -85,7 +85,7 @@ const WishlistItem = ({ product, onRemove, loading }) => {
                     )}
                 </div>
                 <div className="flex justify-between items-center mt-auto">
-                    <AddToCartButton onClick={handleAddToCart} disabled={isActionLoading}>
+                    <AddToCartButton onClick={handleAddToCart} disabled={isActionLoading || inventoryCount === 0}>
                         <BrownShoppingCartIcon /> Add To Cart
                     </AddToCartButton>
                     <WishlistButton onClick={(e) => { e.stopPropagation(); onRemove(_id); }} disabled={isActionLoading}>

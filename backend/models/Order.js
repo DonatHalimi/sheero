@@ -18,8 +18,8 @@ const orderSchema = new mongoose.Schema({
     address: { type: mongoose.Schema.Types.ObjectId, ref: 'Address', required: true },
     totalAmount: { type: Number, required: true },
     paymentStatus: { type: String, enum: ['pending', 'completed', 'failed'], default: 'pending' },
-    paymentMethod: { type: String, enum: ['stripe'], default: 'stripe' },
-    paymentIntentId: { type: String, required: true },
+    paymentMethod: { type: String, enum: ['stripe', 'cash'], default: 'stripe' },
+    paymentIntentId: { type: String, required: function() { return this.paymentMethod === 'stripe'; } },
     status: { type: String, enum: ['pending', 'shipped', 'delivered', 'canceled'], default: 'pending' },
     createdAt: { type: Date, default: Date.now }
 });

@@ -85,7 +85,7 @@ const Reviews = () => {
         handleMenuClose();
     };
 
-    const handleEditSuccess = () => {
+    const ahandleEditSuccess = () => {
         fetchReviews();
         setOpenEditModal(false);
     };
@@ -158,7 +158,7 @@ const Reviews = () => {
                 </main>
             </Box >
 
-            <div className='mb-32' />
+            {totalReviews === 1 && <div className='mb-32' />}
             <Footer />
 
             <CustomMenu
@@ -169,33 +169,31 @@ const Reviews = () => {
                 handleDeleteClick={handleDeleteClick}
             />
 
-            {
-                selectedReview && (
-                    <>
-                        <EditReviewModal
-                            open={openEditModal}
-                            onClose={() => setOpenEditModal(false)}
-                            review={selectedReview}
-                            onEditSuccess={handleEditSuccess}
-                        />
+            {selectedReview && (
+                <>
+                    <EditReviewModal
+                        open={openEditModal}
+                        onClose={() => setOpenEditModal(false)}
+                        review={selectedReview}
+                        onEditSuccess={handleEditSuccess}
+                    />
 
-                        <CustomDeleteModal
-                            open={openDeleteModal}
-                            onClose={() => setOpenDeleteModal(false)}
-                            onDelete={handleDeleteConfirm}
-                            title="Delete Review"
-                            message="Are you sure you want to delete this review?"
-                        />
+                    <CustomDeleteModal
+                        open={openDeleteModal}
+                        onClose={() => setOpenDeleteModal(false)}
+                        onDelete={handleDeleteConfirm}
+                        title="Delete Review"
+                        message="Are you sure you want to delete this review?"
+                    />
 
-                        <ReviewModal
-                            open={openReviewModal}
-                            handleClose={() => setOpenReviewModal(false)}
-                            selectedReview={selectedReview}
-                            onImageClick={handleImageClick}
-                        />
-                    </>
-                )
-            }
+                    <ReviewModal
+                        open={openReviewModal}
+                        handleClose={() => setOpenReviewModal(false)}
+                        selectedReview={selectedReview}
+                        onImageClick={handleImageClick}
+                    />
+                </>
+            )}
         </>
     );
 };

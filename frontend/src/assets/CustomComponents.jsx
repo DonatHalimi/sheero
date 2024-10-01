@@ -69,7 +69,6 @@ import { AnimatePresence, motion } from 'framer-motion';
 import PropTypes from 'prop-types';
 import React, { useEffect, useRef, useState } from 'react';
 import { Link as RouterLink, useNavigate } from 'react-router-dom';
-import useAxios from '../axiosInstance';
 import Footer from '../components/Footer';
 import Navbar from '../components/Navbar/Navbar';
 import logo from './img/logo.png';
@@ -276,10 +275,13 @@ export const CartButton = () => {
     )
 }
 
-export const CartWishlistButtons = ({ handleAction, isCartLoading, isWishlistLoading }) => {
+export const CartWishlistButtons = ({ handleAction, isCartLoading, isWishlistLoading, inventoryCount }) => {
     return (
         <>
-            <AddToCartButton onClick={handleAction('cart')} disabled={isCartLoading || isWishlistLoading}>
+            <AddToCartButton
+                onClick={handleAction('cart')}
+                disabled={isCartLoading || isWishlistLoading || inventoryCount === 0}
+            >
                 <CartButton />
             </AddToCartButton>
             <WishlistButton onClick={handleAction('wishlist')} disabled={isCartLoading || isWishlistLoading}>
@@ -323,18 +325,48 @@ export const DetailsWishlistButton = styled(Button)(({ theme }) => ({
 }));
 
 
-export const DetailsCartWishlistButtons = ({ handleAction, isCartLoading, isWishlistLoading }) => {
+export const DetailsCartWishlistButtons = ({ handleAction, isCartLoading, isWishlistLoading, inventoryCount }) => {
     return (
         <>
-            <DetailsAddToCartButton onClick={handleAction('cart')} disabled={isCartLoading || isWishlistLoading}>
+            <DetailsAddToCartButton
+                onClick={handleAction('cart')}
+                disabled={isCartLoading || isWishlistLoading || inventoryCount === 0}
+            >
                 <CartButton />
             </DetailsAddToCartButton>
-            <DetailsWishlistButton onClick={handleAction('wishlist')} disabled={isCartLoading || isWishlistLoading}>
+            <DetailsWishlistButton
+                onClick={handleAction('wishlist')}
+                disabled={isCartLoading || isWishlistLoading}
+            >
                 <FavoriteBorderOutlined />
             </DetailsWishlistButton>
         </>
     );
 };
+
+export const OutOfStock = ({ inventoryCount }) => {
+    if (inventoryCount === 0) {
+        return (
+            <div className="absolute inset-0 bg-white opacity-75 flex items-center justify-center rounded pointer-events-none">
+                <span className="text-black bg-gray-100 rounded-md px-1 font-semibold">Out of Stock</span>
+            </div>
+        );
+    }
+
+    return null;
+};
+
+export const DiscountPercentage = ({ discountPercentage }) => {
+    if (discountPercentage > 0) {
+        return (
+            <span className="absolute top-0 right-0 bg-stone-500 text-white px-2 py-1 rounded text-xs">
+                -{discountPercentage}%
+            </span>
+        )
+    }
+
+    return null;
+}
 
 export const CustomTab = styled(Tab)(({ theme }) => ({
     flex: 1,
@@ -621,7 +653,7 @@ export const ProductDetailsSkeleton = () => {
                     <Link component={RouterLink} to="/" color="inherit" underline="none">
                         <HomeIcon color="primary" />
                     </Link>
-                    <Skeleton width={120} />
+                    <Skeleton width={200} />
                 </Breadcrumbs>
             </div>
             <div className="container mx-auto px-4 py-4 mb-8 bg-white mt-8 rounded-md max-w-5xl">
@@ -631,12 +663,15 @@ export const ProductDetailsSkeleton = () => {
                     </div>
                     <div className="md:w-1/2">
                         <Skeleton variant="text" width="80%" height={40} />
-                        <Skeleton variant="text" width="40%" height={30} style={{ marginTop: '16px' }} />
+                        <Skeleton variant="text" width="40%" height={30} />
                         <Skeleton variant="text" width="60%" height={30} />
-                        <Skeleton variant="text" width="20%" height={30} />
+                        <Skeleton variant="text" width="50%" height={30} />
+                        <div className='mt-4' />
+                        <Skeleton variant="text" width="50%" height={30} />
+                        <div className='mt-24' />
                         <div className="mt-4 flex items-center space-x-4">
-                            <Skeleton variant="rectangular" width={140} height={40} />
-                            <Skeleton variant="rectangular" width={60} height={40} />
+                            <Skeleton variant="rectangular" width={314} height={40} className='rounded-md' />
+                            <Skeleton variant="rectangular" width={150} height={40} className='rounded-md' />
                         </div>
                     </div>
                 </div>
@@ -650,15 +685,15 @@ export const ProductDetailsSkeleton = () => {
                         aria-label="product details tabs"
                         sx={{ width: '100%', display: 'flex', justifyContent: 'space-between', mb: 2 }}
                     >
-                        <Skeleton variant="rectangular" width="100%" height={40} style={{ margin: '0 4px', flexGrow: 1 }} />
-                        <Skeleton variant="rectangular" width="100%" height={40} style={{ margin: '0 4px', flexGrow: 1 }} />
-                        <Skeleton variant="rectangular" width="100%" height={40} style={{ margin: '0 4px', flexGrow: 1 }} />
+                        <Skeleton variant="rectangular" width="100%" height={40} style={{ margin: '0 4px', flexGrow: 1, borderRadius: '6px' }} />
+                        <Skeleton variant="rectangular" width="100%" height={40} style={{ margin: '0 4px', flexGrow: 1, borderRadius: '6px' }} />
+                        <Skeleton variant="rectangular" width="100%" height={40} style={{ margin: '0 4px', flexGrow: 1, borderRadius: '6px' }} />
                     </Tabs>
 
-                    <Box p={3}>
+                    <Box p={1}>
                         <Skeleton variant="text" width="80%" height={30} />
-                        <Skeleton variant="text" width="60%" height={30} style={{ marginTop: '16px' }} />
-                        <Skeleton variant="text" width="40%" height={30} style={{ marginTop: '16px' }} />
+                        <Skeleton variant="text" width="60%" height={30} className='mt-4' />
+                        <Skeleton variant="text" width="40%" height={30} className='mt-4' />
                     </Box>
                 </div>
             </div>
@@ -1027,39 +1062,6 @@ export const GoBackButton = () => {
     )
 }
 
-export const FAQSection = () => {
-    const [faqData, setFaqData] = useState([]);
-    const axiosInstance = useAxios();
-
-    useEffect(() => {
-        const fetchFAQs = async () => {
-            try {
-                const response = await axiosInstance.get('/faqs/get');
-                setFaqData(response.data);
-            } catch (error) {
-                console.error('Error fetching FAQs:', error);
-            }
-        };
-
-        fetchFAQs();
-    }, []);
-
-    return (
-        <div className="max-w-3xl mx-auto py-12 px-4 sm:px-6 lg:px-8 bg-brown-50 mt-10">
-            <GoBackButton />
-            <h1 className="text-3xl font-bold text-stone-600 mb-8 text-left">Frequently Asked Questions</h1>
-
-            <div>
-                {faqData.map((faq, index) => (
-                    <FAQItem key={index} question={faq.question} answer={faq.answer} />
-                ))}
-            </div>
-        </div>
-    );
-};
-
-export default FAQSection;
-
 export const CheckoutButton = styled(Button)(({ theme }) => ({
     backgroundColor: '#686159',
     color: 'white',
@@ -1368,7 +1370,8 @@ export const AddressInformationSkeleton = () => {
                     <Skeleton variant="text" animation="wave" width="100%" height={80} className='rounded' />
                 </div>
             </div>
-            <Skeleton variant="text" animation="wave" width={100} height={50} className='rounded' />
+            <Skeleton variant="text" animation="wave" width="100%" height={80} className='rounded' />
+            <Skeleton variant="text" animation="wave" width={90} height={50} className='rounded' />
         </div>
     );
 };

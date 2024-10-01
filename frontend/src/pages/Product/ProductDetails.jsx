@@ -1,3 +1,4 @@
+import { LocalAtm, Payment } from '@mui/icons-material';
 import { CircularProgress } from '@mui/material';
 import axios from 'axios';
 import React, { useContext, useEffect, useState } from 'react';
@@ -6,6 +7,7 @@ import { toast } from 'react-toastify';
 import {
     BreadcrumbsComponent,
     DetailsCartWishlistButtons,
+    OutOfStock,
     ProductDetailsSkeleton
 } from '../../assets/CustomComponents';
 import Footer from '../../components/Footer';
@@ -147,13 +149,16 @@ const ProductDetails = () => {
 
             <div className="container mx-auto px-4 py-4 mb-8 bg-white mt-8 rounded-md max-w-5xl">
                 <div className="flex flex-col md:flex-row gap-8">
-                    <div className="flex flex-col items-center md:w-1/2">
+                    <div className="flex flex-col items-center md:w-1/2 relative">
                         <img
                             src={imageUrl}
                             alt={name}
                             className="w-full h-80 object-contain rounded cursor-pointer"
                             onClick={() => setImagePreviewOpen(true)}
                         />
+
+                        <OutOfStock inventoryCount={inventoryCount} />
+
                     </div>
                     <div className="md:w-1/2">
                         <h1 className="text-2xl break-words">{name}</h1>
@@ -190,7 +195,12 @@ const ProductDetails = () => {
                             )}
                         </div>
 
-                        <div className="mt-4 flex items-center">
+                        <div className="flex items-center mt-2">
+                            <p className="text-xs mr-2">Quantity</p>
+                            <div className="flex-1 border-t bg-gray-100 mt-1"></div>
+                        </div>
+
+                        <div className="mt-2 flex items-center">
                             <div className="flex items-center mr-4">
                                 <button
                                     onClick={() => handleQuantityChange(-1)}
@@ -210,17 +220,37 @@ const ProductDetails = () => {
                             </div>
                             <span className="text-sm font-semibold text-stone-600 bg-stone-100 rounded-md px-2">{inventoryText}</span>
                         </div>
+
+                        <div className="flex items-center mt-2">
+                            <p className="text-xs mr-2">Payment Methods</p>
+                            <div className="flex-1 border-t bg-gray-100 mt-1"></div>
+                        </div>
+
+                        <div className="mt-2 flex items-center space-x-3">
+                            <div className="bg-gray-100 p-1 rounded-md flex items-center justify-center">
+                                <Payment color="primary" />
+                            </div>
+                            <p className="text-sm">Pay with Stripe</p>
+
+                            <div className="bg-gray-100 p-1 rounded-md flex items-center justify-center">
+                                <LocalAtm color="primary" />
+                            </div>
+                            <p className="text-sm">Pay with Cash</p>
+                        </div>
+
+
                         <div className="mt-4 flex items-center">
                             <DetailsCartWishlistButtons
                                 handleAction={handleAction}
                                 isCartLoading={isCartLoading}
                                 isWishlistLoading={isWishlistLoading}
+                                inventoryCount={product.inventoryCount}
                             />
                         </div>
                     </div>
                 </div>
 
-            </div>
+            </div >
 
             <div className="container mx-auto px-4 bg-white mt-8 mb-8 rounded-md max-w-5xl">
                 <ProductDetailsTabs product={product} />

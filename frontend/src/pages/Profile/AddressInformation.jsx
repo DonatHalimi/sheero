@@ -5,8 +5,8 @@ import { AddressInformationSkeleton, Header } from '../../assets/CustomComponent
 import useAxios from '../../axiosInstance';
 import Footer from '../../components/Footer';
 import Navbar from '../../components/Navbar/Navbar';
-import ProfileSidebar from './ProfileSidebar';
 import { AuthContext } from '../../context/AuthContext';
+import ProfileSidebar from './ProfileSidebar';
 
 const apiUrl = 'http://localhost:5000/api/addresses';
 
@@ -51,7 +51,7 @@ const AddressInformation = () => {
                 setPhoneNumber(address.phoneNumber || '');
                 setCity(address.city?._id || '');
                 setCountry(address.country?._id || '');
-                setComment(address.comment || ''); // Fetch comment
+                setComment(address.comment || '');
                 setExistingAddress(address);
             }
         } catch (error) {

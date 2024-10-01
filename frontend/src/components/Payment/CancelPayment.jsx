@@ -1,8 +1,8 @@
+import CancelIcon from '@mui/icons-material/Cancel';
+import { Box, CircularProgress, Typography } from '@mui/material';
+import { motion } from 'framer-motion';
 import React, { useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { CircularProgress, Typography, Box } from '@mui/material';
-import CancelIcon from '@mui/icons-material/Cancel';
-import { motion } from 'framer-motion';
 
 const CancelPayment = () => {
     const navigate = useNavigate();

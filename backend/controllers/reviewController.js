@@ -1,5 +1,6 @@
 const Review = require('../models/Review');
 const Product = require('../models/Product');
+const Order = require('../models/Order');
 
 const createReview = async (req, res) => {
     const { title, rating, comment } = req.body;
@@ -11,10 +12,19 @@ const createReview = async (req, res) => {
         if (!product) {
             return res.status(404).json({ message: 'Product not found' });
         }
+        const deliveredOrder = await Order.findOne({
+            user: userId,
+            'products.product': productId,
+            status: 'delivered'
+        });
+
+        if (!deliveredOrder) {
+            return res.status(403).json({ message: 'You must buy this product in order to leave a review' });
+        }
 
         const existingReview = await Review.findOne({ product: productId, user: userId });
         if (existingReview) {
-            return res.status(400).json({ message: 'You have already reviewed this product' });
+            return res.status(400).json({ message: 'You have already reviewed this product! Click here to edit it' });
         }
 
         const review = new Review({
@@ -32,6 +42,28 @@ const createReview = async (req, res) => {
     } catch (error) {
         console.error('Error creating review:', error);
         res.status(500).json({ message: 'Server error', error: error.message, stack: error.stack });
+    }
+};
+
+const checkReviewEligibility = async (req, res) => {
+    const userId = req.user.userId;
+    const productId = req.params.productId;
+
+    try {
+        const order = await Order.findOne({
+            user: userId,
+            'products.product': productId,
+            status: 'delivered'
+        });
+
+        if (order) {
+            return res.json({ canReview: true });
+        }
+
+        return res.json({ canReview: false });
+    } catch (error) {
+        console.error('Error checking review eligibility:', error);
+        res.status(500).json({ message: 'Server error' });
     }
 };
 
@@ -226,4 +258,4 @@ const getAllProducts = async (req, res) => {
     }
 };
 
-module.exports = { createReview, getReviews, getReview, getReviewsByProduct, getReviewsByUser, updateReview, deleteReview, getAllProducts, deleteReviews };
+module.exports = { createReview, checkReviewEligibility, getReviews, getReview, getReviewsByProduct, getReviewsByUser, updateReview, deleteReview, getAllProducts, deleteReviews };

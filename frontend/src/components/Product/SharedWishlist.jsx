@@ -1,4 +1,4 @@
-import React, { useContext, useEffect, useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import { useParams } from 'react-router-dom'; // Import useParams to get the userId from the URL
 import { toast } from 'react-toastify';
 import { CustomPagination, EmptyState, Header, ProductItemSkeleton } from '../../assets/CustomComponents';

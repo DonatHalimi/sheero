@@ -1,14 +1,14 @@
+import { Box } from '@mui/material';
 import React, { useContext, useEffect, useState } from 'react';
-import { Box, MenuItem, Select, Typography } from '@mui/material';
 import { Link } from 'react-router-dom';
 import { CustomPagination, EmptyState, Header, OrderItemSkeleton } from '../../assets/CustomComponents';
 import emptyOrdersImage from '../../assets/img/empty-orders.png';
 import useAxios from '../../axiosInstance';
 import Footer from '../../components/Footer';
 import Navbar from '../../components/Navbar/Navbar';
+import OrderItem from '../../components/Product/OrderItem';
 import { AuthContext } from '../../context/AuthContext';
 import ProfileSidebar from './ProfileSidebar';
-import OrderItem from '../../components/Product/OrderItem';
 
 const itemsPerPage = 5;
 
@@ -161,7 +161,7 @@ const Orders = () => {
                 </main>
             </Box>
 
-            <div className='mb-32' />
+            {totalOrders === 1 && <div className='mb-32' />}
             <Footer />
         </>
     );

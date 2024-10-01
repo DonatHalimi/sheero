@@ -29,15 +29,27 @@ const EditOrderModal = ({ open, onClose, order, onEditSuccess }) => {
             return;
         }
 
-        try {
-            await axiosInstance.put(`/orders/update-delivery-status`, { orderId: order._id, status: newStatus });
+        const updateData = { orderId: order._id, status: newStatus };
 
-            toast.success('Delivery status updated successfully');
+        if (order.paymentMethod === 'cash') {
+            if (newStatus === 'delivered') {
+                updateData.paymentStatus = 'completed';
+            } else if (newStatus === 'canceled') {
+                updateData.paymentStatus = 'failed';
+            } else if (['pending', 'shipped'].includes(newStatus)) {
+                updateData.paymentStatus = 'pending';
+            }
+        }
+
+        try {
+            await axiosInstance.put(`/orders/update-delivery-status`, updateData);
+
+            toast.success('Order updated successfully');
             onEditSuccess();
             onClose();
         } catch (error) {
-            toast.error('Error updating delivery status');
-            console.error('Error updating delivery status', error);
+            toast.error('Error updating order');
+            console.error('Error updating order', error);
         }
     };
 

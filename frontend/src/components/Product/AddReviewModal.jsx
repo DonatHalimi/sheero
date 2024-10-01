@@ -1,5 +1,6 @@
 import { Rating, TextField } from '@mui/material';
-import React, { useContext, useState } from 'react';
+import React, { useContext, useEffect, useState } from 'react';
+import { useNavigate } from 'react-router-dom';
 import { toast } from 'react-toastify';
 import { BrownButton, BrownOutlinedTextField, CustomBox, CustomModal, CustomTypography } from '../../assets/CustomComponents';
 import useAxios from '../../axiosInstance';
@@ -10,11 +11,36 @@ const AddReviewModal = ({ open, onClose, product, onReviewSuccess }) => {
     const [title, setTitle] = useState('');
     const [rating, setRating] = useState(null);
     const [comment, setComment] = useState('');
+    const [canReview, setCanReview] = useState(null);
+
     const axiosInstance = useAxios();
+    const navigate = useNavigate();
+
+    useEffect(() => {
+        const checkIfCanReview = async () => {
+            if (!auth.accessToken) return;
+
+            try {
+                const response = await axiosInstance.get(`/reviews/orders/check-review/${product._id}`);
+                setCanReview(response.data.canReview);
+            } catch (error) {
+                console.error('Error checking review eligibility:', error);
+            }
+        };
+
+        if (open) {
+            checkIfCanReview();
+        }
+    }, [open, product, auth.accessToken, axiosInstance]);
 
     const handleAddReview = async () => {
         if (!auth.accessToken) {
             toast.info('You need to be logged in to add a review');
+            return;
+        }
+
+        if (!canReview) {
+            toast.error('Product can only be reviewed after buying it');
             return;
         }
 
@@ -37,7 +63,9 @@ const AddReviewModal = ({ open, onClose, product, onReviewSuccess }) => {
             toast.success('Review added successfully');
             onReviewSuccess();
         } catch (error) {
-            toast.error(error.response?.data?.message || 'Error adding review');
+            toast.error(error.response?.data?.message || 'Error adding review', {
+                onClick: () => navigate('/profile/reviews'),
+            });
         }
     };
 
@@ -47,6 +75,12 @@ const AddReviewModal = ({ open, onClose, product, onReviewSuccess }) => {
                 <CustomTypography variant="h5" className="!text-gray-800 !font-semilight">
                     Add Review
                 </CustomTypography>
+
+                {canReview === false && (
+                    <CustomTypography variant="body2" className="!text-red-600">
+                        Product can only be reviewed after buying it.
+                    </CustomTypography>
+                )}
 
                 <TextField
                     label="Product"
