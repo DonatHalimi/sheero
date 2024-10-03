@@ -25,15 +25,15 @@ const EditReviewModal = ({ open, onClose, review, onEditSuccess }) => {
             });
             return;
         }
-
+    
         try {
-            await axiosInstance.put(`/reviews/update/${review._id}`, {
+            const response = await axiosInstance.put(`/reviews/update/${review._id}`, {
                 title,
                 rating,
                 comment,
             });
             toast.success('Review edited successfully');
-            onEditSuccess();
+            onEditSuccess(response.data);
             onClose();
         } catch (error) {
             console.error('Error editing review', error);
@@ -43,7 +43,7 @@ const EditReviewModal = ({ open, onClose, review, onEditSuccess }) => {
                 toast.error('Error editing review');
             }
         }
-    };
+    };    
 
     return (
         <CustomModal open={open} onClose={onClose}>

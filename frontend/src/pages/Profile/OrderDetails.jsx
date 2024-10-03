@@ -60,7 +60,7 @@ const OrderDetails = () => {
     return (
         <>
             <Navbar />
-            <Box className="container mx-auto max-w-4xl flex">
+            <Box className="container mx-auto max-w-5xl relative mb-16" style={{ paddingLeft: '77px' }}>
                 <ProfileSidebar />
                 <main className="p-4 relative left-32 w-full">
                     <div className="container max-w-6xl mx-auto mt-20 mb-20">

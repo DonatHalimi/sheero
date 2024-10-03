@@ -156,7 +156,7 @@ export const mainListItems = ({ setCurrentView }) => {
               sx={{ pl: 6 }}
               handleClick={() => handleItemClick('subcategories')}
               selected={activeItem === 'subcategories'}
-              icon={<CategoryOutlined />}
+              icon={<WidgetsOutlined />}
               primary="Subcategories"
             />
 
@@ -164,7 +164,7 @@ export const mainListItems = ({ setCurrentView }) => {
               sx={{ pl: 6 }}
               handleClick={() => handleItemClick('subsubcategories')}
               selected={activeItem === 'subsubcategories'}
-              icon={<WidgetsOutlined />}
+              icon={<CategoryOutlined />}
               primary="SubSubcategories"
             />
           </CollapsibleListItem>

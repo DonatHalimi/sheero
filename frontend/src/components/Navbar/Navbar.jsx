@@ -9,8 +9,6 @@ import {
     NavbarLogo,
     ProfileDropdown,
     ProfileIcon,
-
-
     RoundIconButton,
     WishlistIcon,
 } from '../../assets/CustomComponents';

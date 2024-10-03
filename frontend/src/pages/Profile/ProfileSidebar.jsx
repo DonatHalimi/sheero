@@ -24,7 +24,7 @@ const ProfileSidebar = () => {
     const greetingTime = new Date().getHours() < 12 ? "morning" : (new Date().getHours() < 18 ? "afternoon" : "evening");
 
     return (
-        <div className="absolute top-[234px] left-[320px] w-80 bg-white p-5 shadow-sm rounded-sm">
+        <div className="absolute top-24 right-[815px] w-80 bg-white p-5 shadow-sm rounded-sm">
             <Typography variant="h5" gutterBottom className="!text-gray-800 !font-semilight">
                 Good {greetingTime}, {auth.firstName}.
             </Typography>

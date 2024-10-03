@@ -1,4 +1,3 @@
-const express = require('express');
 const Product = require('../models/Product');
 const Address = require('../models/Address');
 const Order = require('../models/Order');
@@ -75,6 +74,17 @@ const payWithStripe = async (req, res) => {
 
         await order.save();
 
+        await Promise.all(
+            products.map(async (product) => {
+                if (product.inventoryCount > 0) {
+                    product.inventoryCount -= 1;
+                    await product.save();
+                } else {
+                    throw new Error(`Product ${product.name} is out of stock.`);
+                }
+            })
+        );
+
         const session = await stripe.checkout.sessions.create({
             payment_method_types: ['card'],
             line_items: lineItems,
@@ -126,7 +136,7 @@ const verifyOrder = async (req, res) => {
 
 const payWithCash = async (req, res) => {
     try {
-        const { productIds, addressId, userId, email } = req.body;
+        const { productIds, addressId, userId } = req.body;
 
         const products = await Product.find({ '_id': { $in: productIds } });
 
@@ -147,7 +157,6 @@ const payWithCash = async (req, res) => {
         const shippingCost = 2;
         const totalWithShipping = totalAmount + shippingCost;
 
-        // Create the order in the database with "cash" payment method
         const order = new Order({
             user: userId,
             products: productIds.map(productId => ({
@@ -162,6 +171,17 @@ const payWithCash = async (req, res) => {
         });
 
         await order.save();
+
+        await Promise.all(
+            products.map(async (product) => {
+                if (product.inventoryCount > 0) {
+                    product.inventoryCount -= 1;
+                    await product.save();
+                } else {
+                    throw new Error(`Product ${product.name} is out of stock.`);
+                }
+            })
+        );
 
         res.json({ success: true, message: 'Order created successfully. Please pay with cash on delivery.' });
     } catch (error) {
@@ -249,20 +269,6 @@ const updateDeliveryStatus = async (req, res) => {
 
         if (!order) {
             return res.status(404).json({ success: false, message: 'Order not found.' });
-        }
-
-        order.status = status;
-
-        // If the order is being shipped or delivered, decrease the inventory count for each product
-        if (status === 'shipped' || status === 'delivered') {
-            for (const item of order.products) {
-                const product = item.product;
-
-                if (product) {
-                    product.inventoryCount -= item.quantity;
-                    await product.save();
-                }
-            }
         }
 
         if (paymentStatus) {

@@ -14,18 +14,23 @@ const itemsPerPage = 5;
 
 const Orders = () => {
     const { auth } = useContext(AuthContext);
+    const axiosInstance = useAxios();
+
     const [orders, setOrders] = useState([]);
     const [loading, setLoading] = useState(true);
     const [error, setError] = useState(null);
     const [currentPage, setCurrentPage] = useState(1);
     const [searchTerm, setSearchTerm] = useState('');
     const [statusFilter, setStatusFilter] = useState('All');
-    const axiosInstance = useAxios();
 
     useEffect(() => {
         window.scrollTo(0, 0);
         fetchUserOrders();
     }, []);
+
+    useEffect(() => {
+        setCurrentPage(1);
+    }, [searchTerm, statusFilter]);
 
     const fetchUserOrders = async () => {
         setLoading(true);
@@ -46,16 +51,16 @@ const Orders = () => {
 
     const filteredOrders = orders.filter(order => {
         const matchesSearchTerm = [
-            order._id,
-            order.paymentStatus,
-            order.paymentMethod,
-            order.totalAmount.toString(),
-            order.paymentIntentId,
-            order.status,
+            order._id || '',
+            order.paymentStatus || '',
+            order.paymentMethod || '',
+            order.totalAmount?.toString() || '',
+            order.paymentIntentId || '',
+            order.status || '',
             ...order.products.flatMap(product => [
-                product.product.name,
-                product.quantity.toString(),
-                product.price.toString()
+                product.product?.name?.toLowerCase() || '',
+                product.quantity?.toString() || '',
+                product.price?.toString() || ''
             ])
         ].some(field => field.toLowerCase().includes(searchTerm.toLowerCase()));
 
@@ -106,7 +111,7 @@ const Orders = () => {
     return (
         <>
             <Navbar />
-            <Box className="container mx-auto max-w-4xl flex">
+            <Box className="container mx-auto max-w-5xl relative mb-16" style={{ paddingLeft: '77px' }}>
                 <ProfileSidebar />
                 <main className="p-4 relative left-32 w-full">
                     <div className="container max-w-6xl mx-auto mt-20 mb-20">
@@ -115,8 +120,10 @@ const Orders = () => {
                             searchTerm={searchTerm}
                             setSearchTerm={setSearchTerm}
                             showSearch={true}
+                            showFilter={true}
                             statusFilter={statusFilter}
                             setStatusFilter={setStatusFilter}
+                            placeholder='Search orders...'
                         />
 
                         {loading ? (

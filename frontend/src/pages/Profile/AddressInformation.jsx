@@ -171,7 +171,7 @@ const AddressInformation = () => {
     return (
         <>
             <Navbar />
-            <Box className="container mx-auto max-w-4xl flex mb-16">
+            <Box className="container mx-auto max-w-5xl relative mb-16" style={{ paddingLeft: '77px' }}>
                 <ProfileSidebar />
                 <main className="p-4 relative left-32 w-full">
                     <div className="container mx-auto mt-20 mb-20">
@@ -187,6 +187,7 @@ const AddressInformation = () => {
                                                 fullWidth
                                                 label="Name"
                                                 variant="outlined"
+                                                required
                                                 name="name"
                                                 value={name}
                                                 onChange={handleNameChange}
@@ -209,6 +210,7 @@ const AddressInformation = () => {
                                                 fullWidth
                                                 label="Street"
                                                 variant="outlined"
+                                                required
                                                 name="street"
                                                 value={street}
                                                 onChange={handleStreetChange}
@@ -232,6 +234,7 @@ const AddressInformation = () => {
                                                 fullWidth
                                                 label="Phone Number"
                                                 variant="outlined"
+                                                required
                                                 name="phoneNumber"
                                                 value={phoneNumber}
                                                 onChange={handlePhoneNumberChange}
@@ -253,7 +256,7 @@ const AddressInformation = () => {
                                     </Box>
 
                                     <Box className="flex gap-3">
-                                        <FormControl fullWidth variant="outlined">
+                                        <FormControl fullWidth variant="outlined" required error={!country}>
                                             <InputLabel>Country</InputLabel>
                                             <Select
                                                 name="country"
@@ -267,9 +270,12 @@ const AddressInformation = () => {
                                                     </MenuItem>
                                                 ))}
                                             </Select>
+                                            {!country && (
+                                                <div className="text-red-500 text-sm mt-1">Country is required</div>
+                                            )}
                                         </FormControl>
 
-                                        <FormControl fullWidth variant="outlined">
+                                        <FormControl fullWidth variant="outlined" required error={!city}>
                                             <InputLabel>City</InputLabel>
                                             <Select
                                                 name="city"
@@ -284,6 +290,9 @@ const AddressInformation = () => {
                                                     </MenuItem>
                                                 ))}
                                             </Select>
+                                            {!city && (
+                                                <div className="text-red-500 text-sm mt-1">City is required</div>
+                                            )}
                                         </FormControl>
                                     </Box>
 

@@ -111,7 +111,7 @@ const Wishlist = () => {
     return (
         <>
             <Navbar />
-            <Box className="container mx-auto max-w-4xl flex">
+            <Box className="container mx-auto max-w-5xl relative mb-16" style={{ paddingLeft: '77px' }}>
                 <ProfileSidebar />
                 <main className="flex-grow p-4 relative left-32">
                     <div className="container max-w-5xl mx-auto mt-20 mb-20">

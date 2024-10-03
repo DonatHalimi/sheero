@@ -2,14 +2,14 @@ import { Box, Typography } from '@mui/material';
 import axios from 'axios';
 import React, { useContext, useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { CustomDeleteModal, CustomMenu, CustomPagination, Header, ReviewModal } from '../../assets/CustomComponents';
-import noReviewsImage from '../../assets/img/empty-reviews.png';
+import { CustomDeleteModal, CustomMenu, CustomPagination, EmptyState, Header, ReviewItemSkeleton, ReviewModal } from '../../assets/CustomComponents';
 import Footer from '../../components/Footer';
 import Navbar from '../../components/Navbar/Navbar';
 import EditReviewModal from '../../components/Product/EditReviewModal';
 import ReviewItem from '../../components/Product/ReviewItem';
 import { AuthContext } from '../../context/AuthContext';
 import ProfileSidebar from './ProfileSidebar';
+import emptyReviewsImage from '../../assets/img/empty-reviews.png';
 
 const apiUrl = 'http://localhost:5000/api/reviews';
 const itemsPerPage = 4;
@@ -27,7 +27,7 @@ const Reviews = () => {
     const [openDeleteModal, setOpenDeleteModal] = useState(false);
     const [openReviewModal, setOpenReviewModal] = useState(false);
     const [currentPage, setCurrentPage] = useState(1);
-    const [totalReviews, setTotalReviews] = useState(0);
+    const [searchTerm, setSearchTerm] = useState('');
 
     useEffect(() => {
         window.scrollTo(0, 0);
@@ -36,6 +36,10 @@ const Reviews = () => {
         }
     }, [userId, auth.accessToken]);
 
+    useEffect(() => {
+        setCurrentPage(1);
+    }, [searchTerm]);
+
     const fetchReviews = async () => {
         setLoading(true);
         try {
@@ -43,7 +47,6 @@ const Reviews = () => {
                 headers: { Authorization: `Bearer ${auth.accessToken}` },
             });
             setReviews(response.data);
-            setTotalReviews(response.data.length);
         } catch (err) {
             console.error('Failed to fetch reviews:', err.message);
         } finally {
@@ -51,19 +54,29 @@ const Reviews = () => {
         }
     };
 
+    const filteredReviews = reviews.filter(review => {
+        const matchesSearchTerm = [
+            review.product.name?.toString(),
+            review.title?.toString(),
+            review.rating?.toString(),
+            review.comment?.toString(),
+        ].some(field => field.toLowerCase().includes(searchTerm.toLowerCase()));
+
+        return matchesSearchTerm;
+    });
+
+    const totalReviews = filteredReviews.length;
     const pageCount = Math.ceil(totalReviews / itemsPerPage);
 
     const getCurrentPageItems = () => {
         const startIndex = (currentPage - 1) * itemsPerPage;
-        return reviews.slice(startIndex, startIndex + itemsPerPage);
+        return filteredReviews.slice(startIndex, startIndex + itemsPerPage);
     };
 
     const handlePageChange = (event, value) => {
         setCurrentPage(value);
         window.scrollTo(0, 0);
     };
-
-    useEffect(() => window.scrollTo(0, 0), []);
 
     const handleMenuClick = (event, review) => {
         event.stopPropagation();
@@ -85,8 +98,12 @@ const Reviews = () => {
         handleMenuClose();
     };
 
-    const ahandleEditSuccess = () => {
-        fetchReviews();
+    const handleEditSuccess = (updatedReview) => {
+        setReviews((prevReviews) =>
+            prevReviews.map((review) =>
+                review._id === updatedReview._id ? updatedReview : review
+            )
+        );
         setOpenEditModal(false);
     };
 
@@ -114,49 +131,66 @@ const Reviews = () => {
         setOpenReviewModal(true);
     };
 
+    const marginBottomClass = filteredReviews.length === 1 ? 'mb-[103px]' : 'mb-20';
+
     return (
         <>
             <Navbar />
-            <Box className="container mx-auto max-w-4xl flex">
+            <Box className="container mx-auto max-w-5xl relative mb-16" style={{ paddingLeft: '77px' }}>
                 <ProfileSidebar />
                 <main className="p-4 relative left-32 w-full">
-                    <div className="container mx-auto max-w-6xl mt-20 mb-20">
-                        <Header title='Reviews' />
-
+                    <div className={`container mx-auto max-w-6xl mt-20 ${marginBottomClass}`}>
+                        <Header
+                            title='Reviews'
+                            searchTerm={searchTerm}
+                            setSearchTerm={setSearchTerm}
+                            showSearch={true}
+                            placeholder='Search reviews...'
+                        />
                         <div className="rounded-sm mb-2">
-                            {userId && auth.accessToken ? (
-                                <>
-                                    <ReviewItem
-                                        reviews={getCurrentPageItems()}
-                                        loading={loading}
-                                        onImageClick={handleImageClick}
-                                        onMenuClick={handleMenuClick}
-                                        onPaperClick={handlePaperClick}
-                                        noReviewsImage={noReviewsImage}
+                            {loading ? (
+                                <ReviewItemSkeleton />
+                            ) : userId && auth.accessToken ? (
+                                filteredReviews.length === 0 ? (
+                                    <EmptyState
+                                        imageSrc={emptyReviewsImage}
+                                        message={searchTerm ? "No review found matching your search" : "No review found!"}
                                     />
-                                    <Box sx={{ display: 'flex', justifyContent: 'flex-start', mb: 4 }}>
-                                        <CustomPagination
-                                            count={pageCount}
-                                            page={currentPage}
-                                            onChange={handlePageChange}
-                                            size="large"
-                                            sx={{
-                                                position: 'relative',
-                                                bottom: '16px',
-                                                '& .MuiPagination-ul': {
-                                                    justifyContent: 'flex-start',
-                                                },
-                                            }}
-                                        />
-                                    </Box>
-                                </>
+                                ) : (
+                                    <>
+                                        {getCurrentPageItems().map((review) => (
+                                            <ReviewItem
+                                                key={review._id}
+                                                review={review}
+                                                onImageClick={handleImageClick}
+                                                onMenuClick={handleMenuClick}
+                                                onCardClick={handlePaperClick}
+                                            />
+                                        ))}
+                                        <Box sx={{ display: 'flex', justifyContent: 'flex-start', mb: 4 }}>
+                                            <CustomPagination
+                                                count={pageCount}
+                                                page={currentPage}
+                                                onChange={handlePageChange}
+                                                size="large"
+                                                sx={{
+                                                    position: 'relative',
+                                                    bottom: '16px',
+                                                    '& .MuiPagination-ul': {
+                                                        justifyContent: 'flex-start',
+                                                    },
+                                                }}
+                                            />
+                                        </Box>
+                                    </>
+                                )
                             ) : (
                                 <Typography variant="body1">Please log in to view your reviews.</Typography>
                             )}
                         </div>
                     </div>
                 </main>
-            </Box >
+            </Box>
 
             {totalReviews === 1 && <div className='mb-32' />}
             <Footer />

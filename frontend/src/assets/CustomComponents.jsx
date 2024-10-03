@@ -1172,30 +1172,34 @@ export const ProductItemSkeleton = () => {
 };
 
 export const ReviewItemSkeleton = () => (
-    <div className="relative p-4 mb-4 bg-white rounded-md shadow-sm">
-        <div className="absolute top-4 right-4">
-            <Skeleton variant="circular" animation="wave" width={24} height={24} />
-        </div>
-
-        <div className="flex flex-grow">
-            <div className="flex-shrink-0 mr-4">
-                <Skeleton variant="rectangular" animation="wave" width={80} height={80} className="rounded-md" />
-            </div>
-
-            <div className="flex-grow">
-                <div className="flex items-center mb-2">
-                    <Skeleton variant="text" animation="wave" width={200} height={28} className="mr-2" />
-                    <Skeleton variant="text" animation="wave" width={100} height={28} />
+    <>
+        {Array.from({ length: 3 }).map((_, index) => (
+            <div key={index} className="relative p-4 mb-4 bg-white rounded-md shadow-sm">
+                <div className="absolute top-4 right-4">
+                    <Skeleton variant="circular" animation="wave" width={24} height={24} />
                 </div>
 
-                <div className="mb-1">
-                    <Skeleton variant="text" animation="wave" width={180} height={24} />
+                <div className="flex flex-grow">
+                    <div className="flex-shrink-0 mr-4">
+                        <Skeleton variant="rectangular" animation="wave" width={80} height={80} className="rounded-md" />
+                    </div>
+
+                    <div className="flex-grow">
+                        <div className="flex items-center mb-2">
+                            <Skeleton variant="text" animation="wave" width={200} height={28} className="mr-2" />
+                            <Skeleton variant="text" animation="wave" width={100} height={28} />
+                        </div>
+
+                        <div className="mb-1">
+                            <Skeleton variant="text" animation="wave" width={180} height={24} />
+                        </div>
+                        <Skeleton variant="text" animation="wave" width={150} height={20} className="mt-1" />
+                        <Skeleton variant="text" animation="wave" width={50} height={20} className="mt-1" />
+                    </div>
                 </div>
-                <Skeleton variant="text" animation="wave" width={150} height={20} className="mt-1" />
-                <Skeleton variant="text" animation="wave" width={50} height={20} className="mt-1" />
             </div>
-        </div>
-    </div>
+        ))}
+    </>
 );
 
 export const OrderItemSkeleton = () => {
@@ -1418,56 +1422,56 @@ export const truncateText = (text, maxLength) => {
     return text.length > maxLength ? `${text.slice(0, maxLength)}...` : text;
 };
 
-export const CustomReviewCard = ({ review, onImageClick, onMenuClick, onCardClick }) => {
-    const handleProductClick = (event, productId) => {
-        event.stopPropagation();
-        onImageClick(productId);
-    };
+// export const CustomReviewCard = ({ review, onImageClick, onMenuClick, onCardClick }) => {
+//     const handleProductClick = (event, productId) => {
+//         event.stopPropagation();
+//         onImageClick(productId);
+//     };
 
-    return (
-        <div
-            className="p-4 mb-4 shadow-md flex relative cursor-pointer bg-white rounded-md"
-            onClick={() => onCardClick(review)}
-            style={{ height: 'auto', minHeight: '120px' }}
-        >
-            <Box className="flex-shrink-0 mr-4">
-                <img
-                    src={`http://localhost:5000/${review.product.image}`}
-                    alt={review.product.name}
-                    onClick={(event) => handleProductClick(event, review.product._id)}
-                    className="w-20 h-20 object-cover rounded-md cursor-pointer hover:underline"
-                />
-            </Box>
-            <Box flexGrow={1} display="flex" flexDirection="column" justifyContent="space-between" alignItems="flex-start">
-                <Box>
-                    <Typography
-                        onClick={(event) => handleProductClick(event, review.product._id)}
-                        variant="h6"
-                        className="font-light mb-2 flex items-center ml-2 hover:underline break-words"
-                    >
-                        {truncateText(review.product.name, 20)}
-                        <Box className='ml-2'>
-                            <RatingStars rating={review.rating} />
-                        </Box>
-                    </Typography>
-                    <p className="text-base font-semibold break-words">
-                        {truncateText(review.title, 100)}
-                    </p>
-                    <div className="mt-1 text-gray-700 break-words">
-                        <Typography variant="body1" className="break-words">
-                            {truncateText(review.comment, 70)}
-                        </Typography>
-                    </div>
+//     return (
+//         <div
+//             className="p-4 mb-4 shadow-md flex relative cursor-pointer bg-white rounded-md"
+//             onClick={() => onCardClick(review)}
+//             style={{ height: 'auto', minHeight: '120px' }}
+//         >
+//             <Box className="flex-shrink-0 mr-4">
+//                 <img
+//                     src={`http://localhost:5000/${review.product.image}`}
+//                     alt={review.product.name}
+//                     onClick={(event) => handleProductClick(event, review.product._id)}
+//                     className="w-20 h-20 object-cover rounded-md cursor-pointer hover:underline"
+//                 />
+//             </Box>
+//             <Box flexGrow={1} display="flex" flexDirection="column" justifyContent="space-between" alignItems="flex-start">
+//                 <Box>
+//                     <Typography
+//                         onClick={(event) => handleProductClick(event, review.product._id)}
+//                         variant="h6"
+//                         className="font-light mb-2 flex items-center ml-2 hover:underline break-words"
+//                     >
+//                         {truncateText(review.product.name, 20)}
+//                         <Box className='ml-2'>
+//                             <RatingStars rating={review.rating} />
+//                         </Box>
+//                     </Typography>
+//                     <p className="text-base font-semibold break-words">
+//                         {truncateText(review.title, 100)}
+//                     </p>
+//                     <div className="mt-1 text-gray-700 break-words">
+//                         <Typography variant="body1" className="break-words">
+//                             {truncateText(review.comment, 70)}
+//                         </Typography>
+//                     </div>
 
-                    <Typography variant="caption" className="block mt-2 text-sm text-gray-500">
-                        {new Date(review.updatedAt || review.createdAt).toLocaleDateString()}
-                    </Typography>
-                </Box>
-                <CenteredMoreVertIcon onClick={(event) => onMenuClick(event, review)} className="absolute top-2 right-2" />
-            </Box>
-        </div>
-    );
-};
+//                     <Typography variant="caption" className="block mt-2 text-sm text-gray-500">
+//                         {new Date(review.updatedAt || review.createdAt).toLocaleDateString()}
+//                     </Typography>
+//                 </Box>
+//                 <CenteredMoreVertIcon onClick={(event) => onMenuClick(event, review)} className="absolute top-2 right-2" />
+//             </Box>
+//         </div>
+//     );
+// };
 
 export const CenteredMoreVertIcon = ({ onClick, ...props }) => (
     <Box display="flex" justifyContent="center" alignItems="center" {...props}>
@@ -1586,9 +1590,11 @@ export const Header = ({
     searchTerm,
     setSearchTerm,
     showSearch = false,
+    showFilter = false,  // Added showFilter prop
     statusFilter,
     setStatusFilter,
-    orderId
+    orderId,
+    placeholder,
 }) => {
     const isSharedWishlist = fullName.trim() !== '';
 
@@ -1603,7 +1609,7 @@ export const Header = ({
                         <TextField
                             value={searchTerm}
                             onChange={(e) => setSearchTerm(e.target.value)}
-                            placeholder="Search orders..."
+                            placeholder={placeholder}
                             variant="outlined"
                             size="small"
                             InputProps={{
@@ -1623,31 +1629,33 @@ export const Header = ({
                                 },
                             }}
                         />
-                        <Select
-                            value={statusFilter}
-                            onChange={(e) => setStatusFilter(e.target.value)}
-                            variant="outlined"
-                            size="small"
-                            sx={{
-                                width: 120,
-                                '& .MuiOutlinedInput-notchedOutline': {
-                                    borderColor: 'rgba(0, 0, 0, 0.23)',
-                                },
-                                '&:focus .MuiOutlinedInput-notchedOutline': {
-                                    borderColor: 'rgba(0, 0, 0, 0.23)',
-                                },
-                                '&.Mui-focused .MuiOutlinedInput-notchedOutline': {
-                                    borderColor: 'rgba(0, 0, 0, 0.23)',
-                                },
-                            }}
-                        >
-                            <MenuItem value="All">All</MenuItem>
-                            <MenuItem value="pending">Pending</MenuItem>
-                            <MenuItem value="shipped">Shipped</MenuItem>
-                            <MenuItem value="delivered">Delivered</MenuItem>
-                            <MenuItem value="canceled">Canceled</MenuItem>
-                        </Select>
                     </>
+                )}
+                {showFilter && (
+                    <Select
+                        value={statusFilter}
+                        onChange={(e) => setStatusFilter(e.target.value)}
+                        variant="outlined"
+                        size="small"
+                        sx={{
+                            width: 120,
+                            '& .MuiOutlinedInput-notchedOutline': {
+                                borderColor: 'rgba(0, 0, 0, 0.23)',
+                            },
+                            '&:focus .MuiOutlinedInput-notchedOutline': {
+                                borderColor: 'rgba(0, 0, 0, 0.23)',
+                            },
+                            '&.Mui-focused .MuiOutlinedInput-notchedOutline': {
+                                borderColor: 'rgba(0, 0, 0, 0.23)',
+                            },
+                        }}
+                    >
+                        <MenuItem value="All">All</MenuItem>
+                        <MenuItem value="pending">Pending</MenuItem>
+                        <MenuItem value="shipped">Shipped</MenuItem>
+                        <MenuItem value="delivered">Delivered</MenuItem>
+                        <MenuItem value="canceled">Canceled</MenuItem>
+                    </Select>
                 )}
                 {wishlistItems !== undefined && !isSharedWishlist && wishlistItems.length > 0 && (
                     <>

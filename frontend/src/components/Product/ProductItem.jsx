@@ -17,10 +17,12 @@ const ProductItem = ({ product, loading }) => {
     const discountPercentage = salePrice && price > 0 ? Math.round(((price - salePrice) / price) * 100) : 0;
     const finalPrice = salePrice > 0 ? salePrice : price;
 
-    const handleClick = () => {
-        if (_id) navigate(`/product/${_id}`);
-    };
+    const handleClick = () => { if (_id) navigate(`/product/${_id}`); };
 
+    if (loading) {
+        return <ProductItemSkeleton />;
+    }
+    
     const handleAction = (action) => async (e) => {
         e.stopPropagation();
         if (!auth.accessToken) {
@@ -54,10 +56,6 @@ const ProductItem = ({ product, loading }) => {
             setIsLoading(false);
         }
     };
-
-    if (loading) {
-        return <ProductItemSkeleton />;
-    }
 
     return (
         <>
