@@ -21,12 +21,30 @@ const orderSchema = new mongoose.Schema({
     paymentMethod: { type: String, enum: ['stripe', 'cash'], default: 'stripe' },
     paymentIntentId: { type: String, required: function() { return this.paymentMethod === 'stripe'; } },
     status: { type: String, enum: ['pending', 'shipped', 'delivered', 'canceled'], default: 'pending' },
+    arrivalDateRange: {
+        start: { type: Date, default: null },
+        end: { type: Date, default: null }
+    },
     createdAt: { type: Date, default: Date.now }
 });
 
-orderSchema.index({ _id: 1, createdAt: -1 });
+// Pre-save hook to set arrival date range
+orderSchema.pre('save', function(next) {
+    if (!this.arrivalDateRange.start && !this.arrivalDateRange.end) {
+        const startDate = new Date(this.createdAt);
+        const endDate = new Date(this.createdAt);
 
-orderSchema.pre('save', async function (next) {
+        startDate.setDate(startDate.getDate() + 7);
+        endDate.setDate(endDate.getDate() + 11);
+
+        this.arrivalDateRange.start = startDate;
+        this.arrivalDateRange.end = endDate;
+    }
+    next();
+});
+
+// Pre-save hook to ensure unique custom ID
+orderSchema.pre('save', async function(next) {
     if (this.isNew) {
         const exists = await this.constructor.findOne({ _id: this._id });
         if (exists) {

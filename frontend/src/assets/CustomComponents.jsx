@@ -203,9 +203,10 @@ export const Drawer = styled(MuiDrawer, { shouldForwardProp: (prop) => prop !== 
 export const ActiveListItemButton = styled(ListItemButton)(({ selected }) => ({
     backgroundColor: selected ? '#7C7164' : 'white',
     color: selected ? 'black' : 'inherit',
-    borderRight: selected ? '3px solid #7C7164' : '',
+    borderRight: selected ? '4px solid #7C7164' : '',
+    borderRadius: '6px',
     '&:hover': {
-        backgroundColor: selected ? 'darkred' : '#F8F8F8',
+        backgroundColor: selected ? '#7C7164' : '#F8F8F8',
     },
 }));
 
@@ -1422,56 +1423,10 @@ export const truncateText = (text, maxLength) => {
     return text.length > maxLength ? `${text.slice(0, maxLength)}...` : text;
 };
 
-// export const CustomReviewCard = ({ review, onImageClick, onMenuClick, onCardClick }) => {
-//     const handleProductClick = (event, productId) => {
-//         event.stopPropagation();
-//         onImageClick(productId);
-//     };
-
-//     return (
-//         <div
-//             className="p-4 mb-4 shadow-md flex relative cursor-pointer bg-white rounded-md"
-//             onClick={() => onCardClick(review)}
-//             style={{ height: 'auto', minHeight: '120px' }}
-//         >
-//             <Box className="flex-shrink-0 mr-4">
-//                 <img
-//                     src={`http://localhost:5000/${review.product.image}`}
-//                     alt={review.product.name}
-//                     onClick={(event) => handleProductClick(event, review.product._id)}
-//                     className="w-20 h-20 object-cover rounded-md cursor-pointer hover:underline"
-//                 />
-//             </Box>
-//             <Box flexGrow={1} display="flex" flexDirection="column" justifyContent="space-between" alignItems="flex-start">
-//                 <Box>
-//                     <Typography
-//                         onClick={(event) => handleProductClick(event, review.product._id)}
-//                         variant="h6"
-//                         className="font-light mb-2 flex items-center ml-2 hover:underline break-words"
-//                     >
-//                         {truncateText(review.product.name, 20)}
-//                         <Box className='ml-2'>
-//                             <RatingStars rating={review.rating} />
-//                         </Box>
-//                     </Typography>
-//                     <p className="text-base font-semibold break-words">
-//                         {truncateText(review.title, 100)}
-//                     </p>
-//                     <div className="mt-1 text-gray-700 break-words">
-//                         <Typography variant="body1" className="break-words">
-//                             {truncateText(review.comment, 70)}
-//                         </Typography>
-//                     </div>
-
-//                     <Typography variant="caption" className="block mt-2 text-sm text-gray-500">
-//                         {new Date(review.updatedAt || review.createdAt).toLocaleDateString()}
-//                     </Typography>
-//                 </Box>
-//                 <CenteredMoreVertIcon onClick={(event) => onMenuClick(event, review)} className="absolute top-2 right-2" />
-//             </Box>
-//         </div>
-//     );
-// };
+export const formatDate = (dateString) => {
+    const date = new Date(dateString);
+    return `${String(date.getDate()).padStart(2, '0')}/${String(date.getMonth() + 1).padStart(2, '0')}/${date.getFullYear()}`;
+};
 
 export const CenteredMoreVertIcon = ({ onClick, ...props }) => (
     <Box display="flex" justifyContent="center" alignItems="center" {...props}>
@@ -1590,7 +1545,7 @@ export const Header = ({
     searchTerm,
     setSearchTerm,
     showSearch = false,
-    showFilter = false,  // Added showFilter prop
+    showFilter = false,
     statusFilter,
     setStatusFilter,
     orderId,

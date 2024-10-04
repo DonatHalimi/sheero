@@ -1,5 +1,6 @@
 import React from 'react';
 import { Link } from 'react-router-dom';
+import { formatDate } from '../../assets/CustomComponents';
 
 const OrderItem = ({ order, renderProductImages, getStatusColor }) => {
     return (
@@ -9,7 +10,7 @@ const OrderItem = ({ order, renderProductImages, getStatusColor }) => {
                     <div className="flex items-center">
                         <p>#{order._id}</p>
                         <span className="mx-1">&#x2022;</span>
-                        <p>{new Date(order.createdAt).toLocaleDateString()}</p>
+                        <p>{formatDate(order.createdAt)}</p>
                         <span className="mx-1">&#x2022;</span>
                         <p className={getStatusColor(order.status)}>{order.status}</p>
                     </div>

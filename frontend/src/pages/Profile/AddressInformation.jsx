@@ -8,10 +8,8 @@ import Navbar from '../../components/Navbar/Navbar';
 import { AuthContext } from '../../context/AuthContext';
 import ProfileSidebar from './ProfileSidebar';
 
-const apiUrl = 'http://localhost:5000/api/addresses';
-
 const AddressInformation = () => {
-    const { auth, setAuth } = useContext(AuthContext);
+    const { auth } = useContext(AuthContext);
     const userId = auth?.userId;
     const axiosInstance = useAxios();
 
@@ -43,7 +41,7 @@ const AddressInformation = () => {
     const fetchAddress = async () => {
         try {
             setLoading(true);
-            const response = await axiosInstance.get(`${apiUrl}/user/${userId}`);
+            const response = await axiosInstance.get(`/addresses/user/${userId}`);
             const address = response.data;
             if (address) {
                 setName(address.name || '');
@@ -151,9 +149,9 @@ const AddressInformation = () => {
         try {
             let response;
             if (existingAddress) {
-                response = await axiosInstance.put(`${apiUrl}/update/${existingAddress._id}`, updatedAddress);
+                response = await axiosInstance.put(`/addresses/update/${existingAddress._id}`, updatedAddress);
             } else {
-                response = await axiosInstance.post(`${apiUrl}/create`, updatedAddress);
+                response = await axiosInstance.post(`/addresses/create`, updatedAddress);
             }
 
             if (response.status === 200 || response.status === 201) {
@@ -256,11 +254,11 @@ const AddressInformation = () => {
                                     </Box>
 
                                     <Box className="flex gap-3">
-                                        <FormControl fullWidth variant="outlined" required error={!country}>
+                                        <FormControl fullWidth variant="outlined" required>
                                             <InputLabel>Country</InputLabel>
                                             <Select
                                                 name="country"
-                                                value={country || ''}
+                                                value={country}
                                                 onChange={handleCountryChange}
                                                 label="Country"
                                             >
@@ -270,16 +268,13 @@ const AddressInformation = () => {
                                                     </MenuItem>
                                                 ))}
                                             </Select>
-                                            {!country && (
-                                                <div className="text-red-500 text-sm mt-1">Country is required</div>
-                                            )}
                                         </FormControl>
 
-                                        <FormControl fullWidth variant="outlined" required error={!city}>
+                                        <FormControl fullWidth variant="outlined" required>
                                             <InputLabel>City</InputLabel>
                                             <Select
                                                 name="city"
-                                                value={city || ''}
+                                                value={city}
                                                 onChange={handleCityChange}
                                                 label="City"
                                                 disabled={!country}
@@ -290,9 +285,6 @@ const AddressInformation = () => {
                                                     </MenuItem>
                                                 ))}
                                             </Select>
-                                            {!city && (
-                                                <div className="text-red-500 text-sm mt-1">City is required</div>
-                                            )}
                                         </FormControl>
                                     </Box>
 

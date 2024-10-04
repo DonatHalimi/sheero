@@ -1,7 +1,6 @@
 import VisibilityIcon from '@mui/icons-material/Visibility';
 import VisibilityOffIcon from '@mui/icons-material/VisibilityOff';
 import { Box, Button, IconButton, InputAdornment, TextField } from '@mui/material';
-import axios from 'axios';
 import React, { useContext, useEffect, useState } from 'react';
 import { toast } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
@@ -10,9 +9,11 @@ import Footer from '../../components/Footer';
 import Navbar from '../../components/Navbar/Navbar';
 import { AuthContext } from '../../context/AuthContext';
 import ProfileSidebar from './ProfileSidebar';
+import useAxios from '../../axiosInstance';
 
 const ProfileInformation = () => {
     const { auth, setAuth } = useContext(AuthContext);
+    const axiosInstance = useAxios();
     const [firstName, setFirstName] = useState({ firstName: auth.firstName || '' });
     const [lastName, setLastName] = useState({ lastName: auth.lastName || '' });
     const [email, setEmail] = useState({ email: auth.email || '' });
@@ -94,11 +95,7 @@ const ProfileInformation = () => {
                 return;
             }
 
-            const response = await axios.put('http://localhost:5000/api/auth/profile', updatedData, {
-                headers: {
-                    Authorization: `Bearer ${auth.accessToken}`,
-                },
-            });
+            const response = await axiosInstance.put('/auth/profile', updatedData);
 
             const newAuth = {
                 ...auth,

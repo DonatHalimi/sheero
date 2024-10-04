@@ -105,8 +105,7 @@ const Orders = () => {
         default: 'text-gray-500'
     };
 
-    const getStatusColor = (status) =>
-        `${statusClasses[status] || statusClasses.default} bg-stone-50 rounded-md px-1`;
+    const getStatusColor = (status) => `${statusClasses[status] || statusClasses.default} bg-stone-50 rounded-md px-1`;
 
     return (
         <>
@@ -119,7 +118,7 @@ const Orders = () => {
                             title='Orders'
                             searchTerm={searchTerm}
                             setSearchTerm={setSearchTerm}
-                            showSearch={true}
+                            showSearch={filteredOrders.length > 0}
                             showFilter={true}
                             statusFilter={statusFilter}
                             setStatusFilter={setStatusFilter}

@@ -1,22 +1,21 @@
 import DeleteIcon from '@mui/icons-material/DeleteOutline';
-import { CircularProgress } from '@mui/material';
-import axios from 'axios';
 import React, { useContext, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { toast } from 'react-toastify';
-import { AddToCartButton, BrownShoppingCartIcon, DiscountPercentage, OutOfStock, ProductItemSkeleton, WishlistButton } from '../../assets/CustomComponents';
+import { AddToCartButton, BrownShoppingCartIcon, DiscountPercentage, LoadingOverlay, OutOfStock, ProductItemSkeleton, WishlistButton } from '../../assets/CustomComponents';
 import NoImage from '../../assets/img/product-not-found.jpg';
 import { AuthContext } from '../../context/AuthContext';
-
-const apiUrl = 'http://localhost:5000';
+import useAxios from '../../axiosInstance';
 
 const WishlistItem = ({ product, onRemove, loading }) => {
-    const navigate = useNavigate();
     const { auth } = useContext(AuthContext);
+    const axiosInstance = useAxios();
+    const navigate = useNavigate();
+
     const [isActionLoading, setIsActionLoading] = useState(false);
 
     const { _id, name, image, price, discount, salePrice, inventoryCount } = product || {};
-    const imageUrl = `${apiUrl}/${image}`;
+    const imageUrl = `http://localhost:5000/${image}`;
     const discountPercentage = discount?.value || 0;
     const finalPrice = salePrice > 0 ? salePrice : price;
 
@@ -34,9 +33,8 @@ const WishlistItem = ({ product, onRemove, loading }) => {
 
         setIsActionLoading(true);
         try {
-            await axios.post(`${apiUrl}/api/cart/add`,
-                { productId: _id, quantity: 1 },
-                { headers: { Authorization: `Bearer ${auth.accessToken}` } }
+            await axiosInstance.post(`/cart/add`,
+                { productId: _id, quantity: 1 }
             );
 
             toast.success('Product added to cart!', { onClick: () => navigate('/cart') });
@@ -55,9 +53,7 @@ const WishlistItem = ({ product, onRemove, loading }) => {
     return (
         <>
             {isActionLoading && (
-                <div className="fixed inset-0 z-[1000] flex items-center justify-center bg-black bg-opacity-50">
-                    <CircularProgress size={60} style={{ color: '#373533' }} />
-                </div>
+                <LoadingOverlay />
             )}
             <div className="bg-white rounded-lg shadow-md p-4 flex flex-col cursor-pointer" onClick={handleClick}>
                 <div className="relative mb-2 max-w-4xl">

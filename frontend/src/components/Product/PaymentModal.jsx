@@ -6,15 +6,15 @@ const PaymentModal = ({ open, onClose, onStripePayment, onCashPayment }) => {
     const [loading, setLoading] = useState(false);
 
     const handleStripePayment = () => {
-        setLoading(true);  // Show loading overlay
-        onClose();         // Close the modal
-        onStripePayment();  // Trigger Stripe payment process
+        setLoading(true);
+        onClose();
+        onStripePayment();
     };
 
     const handleCashPayment = () => {
-        setLoading(true);  // Show loading overlay
-        onClose();         // Close the modal
-        onCashPayment();    // Trigger cash payment process
+        setLoading(true);
+        onClose();
+        onCashPayment();
     };
 
     return (

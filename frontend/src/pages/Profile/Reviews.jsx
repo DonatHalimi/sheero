@@ -10,14 +10,15 @@ import ReviewItem from '../../components/Product/ReviewItem';
 import { AuthContext } from '../../context/AuthContext';
 import ProfileSidebar from './ProfileSidebar';
 import emptyReviewsImage from '../../assets/img/empty-reviews.png';
+import useAxios from '../../axiosInstance';
 
-const apiUrl = 'http://localhost:5000/api/reviews';
 const itemsPerPage = 4;
 
 const Reviews = () => {
     const { auth } = useContext(AuthContext);
     const userId = auth?.userId;
     const navigate = useNavigate();
+    const axiosInstance = useAxios();
 
     const [reviews, setReviews] = useState([]);
     const [loading, setLoading] = useState(true);
@@ -43,9 +44,7 @@ const Reviews = () => {
     const fetchReviews = async () => {
         setLoading(true);
         try {
-            const response = await axios.get(`${apiUrl}/user/${userId}`, {
-                headers: { Authorization: `Bearer ${auth.accessToken}` },
-            });
+            const response = await axiosInstance.get(`/reviews/user/${userId}`);
             setReviews(response.data);
         } catch (err) {
             console.error('Failed to fetch reviews:', err.message);
@@ -110,17 +109,18 @@ const Reviews = () => {
     const handleDeleteConfirm = async () => {
         if (selectedReview) {
             try {
-                await axios.delete(`${apiUrl}/delete/${selectedReview._id}`, {
-                    headers: { Authorization: `Bearer ${auth.accessToken}` },
-                });
-                fetchReviews();
+                await axiosInstance.delete(`/reviews/delete/${selectedReview._id}`);
+                window.location.reload(); 
             } catch (err) {
                 console.error('Failed to delete review:', err.message);
+                if (err.response?.status === 404) {
+                    console.error('Review not found or already deleted.');
+                }
             } finally {
                 setOpenDeleteModal(false);
             }
         }
-    };
+    };        
 
     const handleImageClick = (productId) => {
         navigate(`/product/${productId}`);
@@ -144,9 +144,10 @@ const Reviews = () => {
                             title='Reviews'
                             searchTerm={searchTerm}
                             setSearchTerm={setSearchTerm}
-                            showSearch={true}
+                            showSearch={filteredReviews.length > 0}
                             placeholder='Search reviews...'
                         />
+
                         <div className="rounded-sm mb-2">
                             {loading ? (
                                 <ReviewItemSkeleton />

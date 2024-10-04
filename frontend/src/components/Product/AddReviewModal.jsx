@@ -38,36 +38,36 @@ const AddReviewModal = ({ open, onClose, product, onReviewSuccess }) => {
             toast.info('You need to be logged in to add a review');
             return;
         }
-
+    
         if (!canReview) {
             toast.error('Product can only be reviewed after buying it');
             return;
         }
-
+    
         if (title.length > 60) {
             toast.error('Title cannot exceed 60 characters');
             return;
         }
-
+    
         if (!title || rating === null || !comment) {
             toast.error('Please fill in all the fields');
             return;
         }
-
+    
         try {
             await axiosInstance.post(`/reviews/product/${product._id}`, {
                 title,
                 rating,
                 comment,
             });
-            toast.success('Review added successfully');
-            onReviewSuccess();
-        } catch (error) {
-            toast.error(error.response?.data?.message || 'Error adding review', {
+            toast.success('Review added successfully', {
                 onClick: () => navigate('/profile/reviews'),
             });
+            onReviewSuccess();
+        } catch (error) {
+            toast.error(error.response?.data?.message || 'Error adding review');
         }
-    };
+    }
 
     return (
         <CustomModal open={open} onClose={onClose}>

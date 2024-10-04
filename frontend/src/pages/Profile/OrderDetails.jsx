@@ -2,7 +2,7 @@ import { Box, LinearProgress, Table, TableBody, TableCell, TableContainer, Table
 import React, { useEffect, useState } from 'react';
 import { Link, useParams, useNavigate } from 'react-router-dom';
 import 'react-toastify/dist/ReactToastify.css';
-import { EmptyState, Header, OrderDetailsSkeleton } from '../../assets/CustomComponents';
+import { EmptyState, formatDate, Header, OrderDetailsSkeleton } from '../../assets/CustomComponents';
 import emptyOrdersImage from '../../assets/img/empty-orders.png';
 import useAxios from '../../axiosInstance';
 import Footer from '../../components/Footer';
@@ -76,9 +76,18 @@ const OrderDetails = () => {
                                         <p className="font-semibold text-center text-lg">
                                             Order Status
                                         </p>
-                                        <p className="font-semilight mb-4 text-center text-gray-500 text-md">
-                                            Order Date: {new Date(order.createdAt).toLocaleDateString()}
+                                        <p className="font-semilight mb-1 text-center text-gray-500 text-md">
+                                            Order Date: {formatDate(order.createdAt)}
                                         </p>
+                                        {order.status === 'delivered' ? (
+                                            <p className="font-semilight mb-4 text-center text-gray-500 text-md">
+                                                Arrival Date: {formatDate(order.arrivalDateRange.start)}
+                                            </p>
+                                        ) : (
+                                            <p className="font-semilight mb-4 text-center text-gray-500 text-md">
+                                                Arrival Date: {formatDate(order.arrivalDateRange.start)} - {formatDate(order.arrivalDateRange.end)}
+                                            </p>
+                                        )}
                                         <LinearProgress
                                             variant="determinate"
                                             value={getStatusProgress(order.status)}
@@ -190,82 +199,108 @@ const OrderDetails = () => {
                                     </div>
                                 </div>
 
-                                {/* Address and Payment Method Table */}
                                 <div className="grid grid-cols-1 gap-4 mb-4">
                                     <div className="bg-white shadow-md rounded-lg p-6">
-                                        <Typography variant="h6" gutterBottom>
-                                            Shipping Address
-                                        </Typography>
-                                        <TableContainer>
-                                            <Table>
-                                                <TableBody>
-                                                    <TableRow>
-                                                        <TableCell>
-                                                            <div className="flex justify-between">
-                                                                <span className="font-semibold">Name:</span>
-                                                                <span>{order.address?.name || 'Name not provided'}</span>
-                                                            </div>
-                                                        </TableCell>
-                                                    </TableRow>
-                                                    <TableRow>
-                                                        <TableCell>
-                                                            <div className="flex justify-between">
-                                                                <span className="font-semibold">Country:</span>
-                                                                <span>{order.address?.country?.name || 'Country not provided'}</span>
-                                                            </div>
-                                                        </TableCell>
-                                                    </TableRow>
-                                                    <TableRow>
-                                                        <TableCell>
-                                                            <div className="flex justify-between">
-                                                                <span className="font-semibold">City:</span>
-                                                                <span>{order.address?.city?.name || 'City not provided'}</span>
-                                                            </div>
-                                                        </TableCell>
-                                                    </TableRow>
-                                                    <TableRow>
-                                                        <TableCell>
-                                                            <div className="flex justify-between">
-                                                                <span className="font-semibold">Zip Code:</span>
-                                                                <span>{order.address?.city?.zipCode || 'Zip Code not provided'}</span>
-                                                            </div>
-                                                        </TableCell>
-                                                    </TableRow>
-                                                    <TableRow>
-                                                        <TableCell>
-                                                            <div className="flex justify-between">
-                                                                <span className="font-semibold">Street:</span>
-                                                                <span>{order.address?.street || 'Street not provided'}</span>
-                                                            </div>
-                                                        </TableCell>
-                                                    </TableRow>
-                                                    <TableRow>
-                                                        <TableCell>
-                                                            <div className="flex justify-between">
-                                                                <span className="font-semibold">Phone Number:</span>
-                                                                <span>{order.address?.phoneNumber || 'Phone number not provided'}</span>
-                                                            </div>
-                                                        </TableCell>
-                                                    </TableRow>
-                                                    <TableRow>
-                                                        <TableCell>
-                                                            <div className="flex justify-between">
-                                                                <span className="font-semibold">Comment:</span>
-                                                                <span>{order.address?.comment || 'No comment provided'}</span>
-                                                            </div>
-                                                        </TableCell>
-                                                    </TableRow>
-                                                    <TableRow>
-                                                        <TableCell>
-                                                            <div className="flex justify-between">
-                                                                <span className="font-semibold">Payment Method:</span>
-                                                                <span>{order.paymentMethod || 'Payment method not provided'}</span>
-                                                            </div>
-                                                        </TableCell>
-                                                    </TableRow>
-                                                </TableBody>
-                                            </Table>
-                                        </TableContainer>
+                                        <div className="grid grid-cols-2 gap-6">
+                                            <div>
+                                                <Typography variant="h6" gutterBottom>
+                                                    Shipping Address
+                                                </Typography>
+                                                <TableContainer>
+                                                    <Table>
+                                                        <TableBody>
+                                                            <TableRow>
+                                                                <TableCell>
+                                                                    <div className="flex justify-between">
+                                                                        <span className="font-semibold">Name:</span>
+                                                                        <span>{order.address?.name || 'Name not provided'}</span>
+                                                                    </div>
+                                                                </TableCell>
+                                                            </TableRow>
+                                                            <TableRow>
+                                                                <TableCell>
+                                                                    <div className="flex justify-between">
+                                                                        <span className="font-semibold">Country:</span>
+                                                                        <span>{order.address?.country?.name || 'Country not provided'}</span>
+                                                                    </div>
+                                                                </TableCell>
+                                                            </TableRow>
+                                                            <TableRow>
+                                                                <TableCell>
+                                                                    <div className="flex justify-between">
+                                                                        <span className="font-semibold">City:</span>
+                                                                        <span>{order.address?.city?.name || 'City not provided'}</span>
+                                                                    </div>
+                                                                </TableCell>
+                                                            </TableRow>
+                                                            <TableRow>
+                                                                <TableCell>
+                                                                    <div className="flex justify-between">
+                                                                        <span className="font-semibold">Zip Code:</span>
+                                                                        <span>{order.address?.city?.zipCode || 'Zip Code not provided'}</span>
+                                                                    </div>
+                                                                </TableCell>
+                                                            </TableRow>
+                                                            <TableRow>
+                                                                <TableCell>
+                                                                    <div className="flex justify-between">
+                                                                        <span className="font-semibold">Street:</span>
+                                                                        <span>{order.address?.street || 'Street not provided'}</span>
+                                                                    </div>
+                                                                </TableCell>
+                                                            </TableRow>
+                                                            <TableRow>
+                                                                <TableCell>
+                                                                    <div className="flex justify-between">
+                                                                        <span className="font-semibold">Phone Number:</span>
+                                                                        <span>{order.address?.phoneNumber || 'Phone number not provided'}</span>
+                                                                    </div>
+                                                                </TableCell>
+                                                            </TableRow>
+                                                            <TableRow>
+                                                                <TableCell>
+                                                                    <div className="flex justify-between">
+                                                                        <span className="font-semibold">Comment:</span>
+                                                                        <span>{order.address?.comment || 'No comment provided'}</span>
+                                                                    </div>
+                                                                </TableCell>
+                                                            </TableRow>
+                                                        </TableBody>
+                                                    </Table>
+                                                </TableContainer>
+                                            </div>
+
+                                            {/* Payment Information on the left */}
+                                            <div>
+                                                <Typography variant="h6" gutterBottom>
+                                                    Payment Information
+                                                </Typography>
+                                                <TableContainer>
+                                                    <Table>
+                                                        <TableBody>
+                                                            <TableRow>
+                                                                <TableCell>
+                                                                    <div className="flex justify-between">
+                                                                        <span className="font-semibold">Payment Method:</span>
+                                                                        <span>{order.paymentMethod ? order.paymentMethod.charAt(0).toUpperCase() + order.paymentMethod.slice(1) : 'Payment method not provided'}</span>
+                                                                    </div>
+                                                                </TableCell>
+                                                            </TableRow>
+                                                            <TableRow>
+                                                                <TableCell>
+                                                                    <div className="flex justify-between">
+                                                                        <span className="font-semibold">Payment Status:</span>
+                                                                        <span>{order.paymentStatus ? order.paymentStatus.charAt(0).toUpperCase() + order.paymentStatus.slice(1) : 'Payment status not provided'}</span>
+                                                                    </div>
+                                                                </TableCell>
+                                                            </TableRow>
+                                                        </TableBody>
+                                                    </Table>
+                                                </TableContainer>
+                                            </div>
+
+                                            {/* Shipping Address on the right */}
+                                        </div>
                                     </div>
                                 </div>
                             </>

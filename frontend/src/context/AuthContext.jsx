@@ -17,25 +17,25 @@ const decryptData = (cipherText) => {
 };
 
 const AuthProvider = ({ children }) => {
-    const getLocalStorageItem = (key) => {
-        const encryptedValue = localStorage.getItem(key);
-        if (!encryptedValue) return null;
+    const getLocalStorageItem = (key, encrypted = false) => {
+        const value = localStorage.getItem(key);
+        if (!value) return null;
         try {
-            return decryptData(encryptedValue);
+            return encrypted ? decryptData(value) : value;
         } catch (error) {
-            console.error('Decryption failed:', error);
+            console.error('Error reading localStorage:', error);
             return null;
         }
     };
 
     const [auth, setAuthState] = useState({
-        accessToken: getLocalStorageItem('accessToken'),
-        refreshToken: getLocalStorageItem('refreshToken'),
-        role: getLocalStorageItem('role'),
+        accessToken: getLocalStorageItem('accessToken', true),
+        refreshToken: getLocalStorageItem('refreshToken', true),
+        role: getLocalStorageItem('role', true),
         firstName: getLocalStorageItem('firstName'),
         lastName: getLocalStorageItem('lastName'),
         email: getLocalStorageItem('email'),
-        userId: getLocalStorageItem('userId'),
+        userId: getLocalStorageItem('userId', true),
     });
 
     const setAuth = (authData) => {
@@ -43,24 +43,22 @@ const AuthProvider = ({ children }) => {
         localStorage.setItem('accessToken', encryptData(authData.accessToken || ''));
         localStorage.setItem('refreshToken', encryptData(authData.refreshToken || ''));
         localStorage.setItem('role', encryptData(authData.role || ''));
-        localStorage.setItem('firstName', encryptData(authData.firstName || ''));
-        localStorage.setItem('lastName', encryptData(authData.lastName || ''));
-        localStorage.setItem('email', encryptData(authData.email || ''));
+        localStorage.setItem('firstName', authData.firstName || '');
+        localStorage.setItem('lastName', authData.lastName || '');
+        localStorage.setItem('email', authData.email || '');
         localStorage.setItem('userId', encryptData(authData.userId || ''));
     };
 
     const refreshAccessToken = async () => {
         try {
-            const refreshToken = getLocalStorageItem('refreshToken');
+            const refreshToken = getLocalStorageItem('refreshToken', true);
             if (!refreshToken) {
                 throw new Error('No refresh token available');
             }
 
             const response = await axios.post('http://localhost:5000/api/auth/token/refresh',
                 { refreshToken },
-                {
-                    headers: { 'Content-Type': 'application/json' },
-                }
+                { headers: { 'Content-Type': 'application/json' } }
             );
 
             const newAccessToken = response.data.accessToken;
@@ -150,4 +148,3 @@ const AuthProvider = ({ children }) => {
 };
 
 export { AuthContext, AuthProvider, decryptData, encryptData };
-

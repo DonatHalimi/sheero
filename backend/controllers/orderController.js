@@ -271,8 +271,16 @@ const updateDeliveryStatus = async (req, res) => {
             return res.status(404).json({ success: false, message: 'Order not found.' });
         }
 
+        order.status = status;
+
         if (paymentStatus) {
             order.paymentStatus = paymentStatus;
+        }
+
+        if (status === 'delivered') {
+            const currentDate = new Date();
+            order.arrivalDateRange.start = currentDate;
+            order.arrivalDateRange.end = currentDate;
         }
 
         await order.save();

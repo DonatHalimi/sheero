@@ -1,5 +1,4 @@
 import { Box } from '@mui/material';
-import axios from 'axios';
 import React, { useContext, useEffect, useState } from 'react';
 import { toast } from 'react-toastify';
 import {
@@ -15,12 +14,13 @@ import Navbar from '../../components/Navbar/Navbar';
 import WishlistItem from '../../components/Product/WishlistItem';
 import { AuthContext } from '../../context/AuthContext';
 import ProfileSidebar from './ProfileSidebar';
+import useAxios from '../../axiosInstance';
 
-const apiUrl = 'http://localhost:5000/api/wishlist';
 const itemsPerPage = 6;
 
 const Wishlist = () => {
     const { auth } = useContext(AuthContext);
+    const axiosInstance = useAxios();
     const [wishlistItems, setWishlistItems] = useState([]);
     const [loading, setLoading] = useState(true);
     const [isModalOpen, setIsModalOpen] = useState(false);
@@ -33,9 +33,7 @@ const Wishlist = () => {
         if (auth.accessToken) {
             const fetchWishlist = async () => {
                 try {
-                    const { data } = await axios.get(apiUrl, {
-                        headers: { Authorization: `Bearer ${auth.accessToken}` },
-                    });
+                    const { data } = await axiosInstance.get('/wishlist');
                     setWishlistItems(data.items);
                     setTotalItems(data.items.length);
                 } catch (error) {
@@ -50,8 +48,7 @@ const Wishlist = () => {
 
     const handleRemoveFromWishlist = async (productId) => {
         try {
-            await axios.delete(`${apiUrl}/remove`, {
-                headers: { Authorization: `Bearer ${auth.accessToken}` },
+            await axiosInstance.delete(`/wishlist/remove`, {
                 data: { productId },
             });
             setWishlistItems((items) => items.filter(item => item.product._id !== productId));
@@ -64,9 +61,7 @@ const Wishlist = () => {
 
     const handleClearWishlist = async () => {
         try {
-            await axios.delete(`${apiUrl}/clear`, {
-                headers: { Authorization: `Bearer ${auth.accessToken}` },
-            });
+            await axiosInstance.delete('/wishlist/clear');
             setWishlistItems([]);
             toast.success('Wishlist cleared successfully');
         } catch (error) {

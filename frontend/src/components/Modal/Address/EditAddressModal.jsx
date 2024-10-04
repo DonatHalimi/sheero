@@ -41,7 +41,6 @@ const EditAddressModal = ({ open, onClose, address, onEditSuccess }) => {
     }, [address]);
 
     const handleEditAddress = async () => {
-        // Prepare the updated address data
         const updates = {
             name,
             street,

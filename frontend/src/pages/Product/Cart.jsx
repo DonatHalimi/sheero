@@ -22,14 +22,10 @@ const Cart = () => {
     const { auth } = useContext(AuthContext);
     const navigate = useNavigate();
 
-    const apiUrl = 'http://localhost:5000/api/cart';
-
     useEffect(() => {
         const fetchCart = async () => {
             try {
-                const { data } = await axiosInstance.get(`${apiUrl}`, {
-                    headers: { Authorization: `Bearer ${auth.accessToken}` }
-                });
+                const { data } = await axiosInstance.get('/cart')
                 setCart(data);
             } catch (error) {
                 console.error('Failed to fetch cart:', error?.response?.data?.message || error.message);
@@ -43,9 +39,8 @@ const Cart = () => {
 
     const updateQuantity = async (productId, quantityChange) => {
         try {
-            const { data } = await axiosInstance.put(`${apiUrl}/quantity/update`,
+            const { data } = await axiosInstance.put(`/cart/quantity/update`,
                 { productId, quantityChange },
-                { headers: { Authorization: `Bearer ${auth.accessToken}` } }
             );
             setCart(data);
         } catch (error) {
@@ -55,8 +50,7 @@ const Cart = () => {
 
     const handleRemove = async (productId) => {
         try {
-            const { data } = await axiosInstance.delete(`${apiUrl}/remove`, {
-                headers: { Authorization: `Bearer ${auth.accessToken}` },
+            const { data } = await axiosInstance.delete(`/cart/remove`, {
                 data: { productId }
             });
             setCart(data);
@@ -67,9 +61,7 @@ const Cart = () => {
 
     const handleClearCart = async () => {
         try {
-            const { data } = await axiosInstance.delete(`${apiUrl}/clear`, {
-                headers: { Authorization: `Bearer ${auth.accessToken}` }
-            });
+            const { data } = await axiosInstance.delete('/cart/clear');
             setCart(data);
         } catch (error) {
             console.error('Failed to clear cart:', error?.response?.data?.message || error.message);
@@ -108,9 +100,7 @@ const Cart = () => {
                 email: auth.email
             });
 
-            await axiosInstance.delete(`${apiUrl}/clear`, {
-                headers: { Authorization: `Bearer ${auth.accessToken}` }
-            });
+            await axiosInstance.delete('/cart/clear');
 
             setShowPaymentModal(false);
 
@@ -141,9 +131,7 @@ const Cart = () => {
                 email: auth.email
             });
 
-            await axiosInstance.delete(`${apiUrl}/clear`, {
-                headers: { Authorization: `Bearer ${auth.accessToken}` }
-            });
+            await axiosInstance.delete('/cart/clear');
 
             toast.success(data.message || "Order placed successfully. Please pay with cash upon delivery.");
             setShowPaymentModal(false);
