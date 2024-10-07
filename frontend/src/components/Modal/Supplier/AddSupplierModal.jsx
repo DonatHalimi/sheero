@@ -15,22 +15,22 @@ const AddSupplierModal = ({ open, onClose, onAddSuccess }) => {
 
     const handleAddSupplier = async () => {
         if (!name || !email || !phoneNumber) {
-            toast.error('Please fill in all the fields', {
-                closeOnClick: true,
-            });
+            toast.error('Please fill in all the fields');
             return;
         }
 
+        const data = {
+            name,
+            contactInfo: {
+                email,
+                phoneNumber,
+            },
+        }
+
         try {
-            await axiosInstance.post('/suppliers/create', {
-                name,
-                contactInfo: {
-                    email,
-                    phoneNumber,
-                },
-            });
-            toast.success('Supplier added successfully');
-            onAddSuccess();
+            const response = await axiosInstance.post('/suppliers/create', data);
+            toast.success(response.data.message);
+            onAddSuccess(response.data);
             onClose();
         } catch (error) {
             console.error('Error adding supplier', error);

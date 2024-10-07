@@ -1,11 +1,19 @@
 const City = require('../models/City');
+const Country = require('../models/Country');
 
 const createCity = async (req, res) => {
     const { name, country, zipCode } = req.body;
     try {
         const city = new City({ name, country, zipCode });
+
+        const existingCountry = await Country.findById(country);
+
+        if (!existingCountry) {
+            return res.status(400).json({ message: 'Country does not exist' });
+        }
+
         await city.save();
-        res.status(201).json(city);
+        res.status(201).json({ message: 'City created succesfully', city });
     } catch (error) {
         res.status(500).json({ message: 'Server error' });
     }
@@ -39,7 +47,7 @@ const updateCity = async (req, res) => {
             { new: true }
         );
         if (!city) return res.status(404).json({ message: 'City not found' });
-        res.status(200).json(city);
+        res.status(200).json({ message: 'City updated succesfully', city });
     } catch (error) {
         res.status(500).json({ message: 'Server error' });
     }

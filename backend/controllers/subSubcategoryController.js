@@ -1,5 +1,4 @@
 const SubSubcategory = require('../models/SubSubcategory');
-const Subcategory = require('../models/Subcategory')
 const Product = require('../models/Product');
 
 const createSubSubcategory = async (req, res) => {
@@ -7,7 +6,7 @@ const createSubSubcategory = async (req, res) => {
     try {
         const subSubcategory = new SubSubcategory({ name, subcategory });
         await subSubcategory.save();
-        res.status(201).json(subSubcategory);
+        res.status(201).json({ message: 'SubSubcategory created succesfully', subSubcategory });
     } catch (error) {
         res.status(500).json({ message: 'Server error' });
     }
@@ -51,7 +50,7 @@ const updateSubSubcategory = async (req, res) => {
             { new: true }
         );
         if (!subSubcategory) return res.status(404).json({ message: 'SubSubcategory not found' });
-        res.status(200).json(subSubcategory);
+        res.status(201).json({ message: 'SubSubcategory updated succesfully', subSubcategory });
     } catch (error) {
         res.status(500).json({ message: 'Server error' });
     }

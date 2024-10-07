@@ -73,10 +73,10 @@ const OrderDetails = () => {
                                 {/* Progress Card */}
                                 <div className="grid grid-cols-1 gap-4 mb-4">
                                     <div className="bg-white shadow-md rounded-lg p-6">
-                                        <p className="font-semibold text-center text-lg">
+                                        <p className="font-semibold text-center text-lg mb-1">
                                             Order Status
                                         </p>
-                                        <p className="font-semilight mb-1 text-center text-gray-500 text-md">
+                                        <p className="font-semilight text-center text-gray-500 text-md">
                                             Order Date: {formatDate(order.createdAt)}
                                         </p>
                                         {order.status === 'delivered' ? (
@@ -298,8 +298,6 @@ const OrderDetails = () => {
                                                     </Table>
                                                 </TableContainer>
                                             </div>
-
-                                            {/* Shipping Address on the right */}
                                         </div>
                                     </div>
                                 </div>

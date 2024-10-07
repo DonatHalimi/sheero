@@ -41,9 +41,7 @@ const AddReviewModal = ({ open, onClose, onAddSuccess }) => {
 
     const handleAddReview = async () => {
         if (!title || rating < 1 || rating > 5 || !productId) {
-            toast.error('Please fill in all the fields and select a rating between 1 and 5 stars', {
-                closeOnClick: true,
-            });
+            toast.error('Please fill in all the fields and select a rating between 1 and 5 stars');
             return;
         }
 
@@ -51,20 +49,20 @@ const AddReviewModal = ({ open, onClose, onAddSuccess }) => {
         const alreadyReviewed = userReviews.some(review => review.productId === productId);
 
         if (alreadyReviewed) {
-            toast.error('You have already reviewed this product', {
-                closeOnClick: true,
-            });
+            toast.error('You have already reviewed this product', { closeOnClick: true });
             return;
         }
 
+        const data = {
+            title,
+            rating,
+            comment,
+        }
+
         try {
-            await axiosInstance.post(`/reviews/product/${productId}`, {
-                title,
-                rating,
-                comment,
-            });
-            toast.success('Review added successfully');
-            onAddSuccess();
+            const response = await axiosInstance.post(`/reviews/product/${productId}`, data);
+            toast.success(response.data.message);
+            onAddSuccess(response.data);
             onClose();
         } catch (error) {
             console.error('Error adding review', error);

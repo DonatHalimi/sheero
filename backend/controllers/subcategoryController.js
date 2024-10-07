@@ -19,7 +19,7 @@ const createSubcategory = async (req, res) => {
     try {
         const subcategory = new Subcategory({ name, category, image });
         await subcategory.save();
-        res.status(201).json(subcategory);
+        res.status(201).json({ message: 'Subcategory created succesfully', subcategory });
     } catch (error) {
         res.status(500).json({ message: 'Server error' });
     }
@@ -84,7 +84,7 @@ const updateSubcategory = async (req, res) => {
             { new: true }
         );
         if (!subcategory) return res.status(404).json({ message: 'Subcategory not found' });
-        res.status(200).json(subcategory);
+        res.status(200).json({ message: 'Subcategory updated succesfully', subcategory });
     } catch (error) {
         res.status(500).json({ message: 'Server error' });
     }

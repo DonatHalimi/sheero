@@ -1,8 +1,7 @@
 import { Box, Typography } from '@mui/material';
-import axios from 'axios';
 import React, { useContext, useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { CustomDeleteModal, CustomMenu, CustomPagination, EmptyState, Header, ReviewItemSkeleton, ReviewModal } from '../../assets/CustomComponents';
+import { CustomDeleteModal, CustomMenu, CustomPagination, EmptyState, Header, LoadingOverlay, ReviewItemSkeleton, ReviewModal } from '../../assets/CustomComponents';
 import Footer from '../../components/Footer';
 import Navbar from '../../components/Navbar/Navbar';
 import EditReviewModal from '../../components/Product/EditReviewModal';
@@ -22,6 +21,7 @@ const Reviews = () => {
 
     const [reviews, setReviews] = useState([]);
     const [loading, setLoading] = useState(true);
+    const [loadingOverlay, setLoadingOverlay] = useState(false);
     const [anchorEl, setAnchorEl] = useState(null);
     const [selectedReview, setSelectedReview] = useState(null);
     const [openEditModal, setOpenEditModal] = useState(false);
@@ -97,20 +97,28 @@ const Reviews = () => {
         handleMenuClose();
     };
 
-    const handleEditSuccess = (updatedReview) => {
+    const handleEditSuccess = async (updatedReview) => {
+        setLoadingOverlay(true);
         setReviews((prevReviews) =>
             prevReviews.map((review) =>
                 review._id === updatedReview._id ? updatedReview : review
             )
         );
         setOpenEditModal(false);
+        await fetchReviews();
+        setLoadingOverlay(false);
     };
 
     const handleDeleteConfirm = async () => {
         if (selectedReview) {
+            setLoadingOverlay(true);
+            setReviews((prevReviews) =>
+                prevReviews.filter((review) => review._id !== selectedReview._id)
+            );
+
             try {
                 await axiosInstance.delete(`/reviews/delete/${selectedReview._id}`);
-                window.location.reload(); 
+                await fetchReviews();
             } catch (err) {
                 console.error('Failed to delete review:', err.message);
                 if (err.response?.status === 404) {
@@ -118,9 +126,10 @@ const Reviews = () => {
                 }
             } finally {
                 setOpenDeleteModal(false);
+                setLoadingOverlay(false);
             }
         }
-    };        
+    };
 
     const handleImageClick = (productId) => {
         navigate(`/product/${productId}`);
@@ -147,7 +156,6 @@ const Reviews = () => {
                             showSearch={filteredReviews.length > 0}
                             placeholder='Search reviews...'
                         />
-
                         <div className="rounded-sm mb-2">
                             {loading ? (
                                 <ReviewItemSkeleton />
@@ -212,7 +220,6 @@ const Reviews = () => {
                         review={selectedReview}
                         onEditSuccess={handleEditSuccess}
                     />
-
                     <CustomDeleteModal
                         open={openDeleteModal}
                         onClose={() => setOpenDeleteModal(false)}
@@ -220,7 +227,6 @@ const Reviews = () => {
                         title="Delete Review"
                         message="Are you sure you want to delete this review?"
                     />
-
                     <ReviewModal
                         open={openReviewModal}
                         handleClose={() => setOpenReviewModal(false)}
@@ -229,6 +235,8 @@ const Reviews = () => {
                     />
                 </>
             )}
+
+            {loadingOverlay && <LoadingOverlay />}
         </>
     );
 };

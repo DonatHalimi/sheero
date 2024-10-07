@@ -1,25 +1,18 @@
 import CheckCircleIcon from '@mui/icons-material/CheckCircle';
-import { Box, CircularProgress, Typography } from '@mui/material';
+import { Box, Typography } from '@mui/material';
 import { motion } from 'framer-motion';
-import React, { useEffect, useState } from 'react';
+import React, { useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 
 const SuccessPayment = () => {
     const navigate = useNavigate();
-    const [countdown, setCountdown] = useState(3);
 
     useEffect(() => {
-        const timer = setInterval(() => {
-            setCountdown((prevCount) => {
-                if (prevCount === 1) {
-                    clearInterval(timer);
-                    navigate('/profile/orders');
-                }
-                return prevCount - 1;
-            });
-        }, 1000);
+        const timer = setTimeout(() => {
+            navigate('/profile/orders');
+        }, 4000);
 
-        return () => clearInterval(timer);
+        return () => clearTimeout(timer);
     }, [navigate]);
 
     return (
@@ -29,21 +22,37 @@ const SuccessPayment = () => {
             alignItems="center"
             justifyContent="center"
             height="100vh"
+            textAlign="center"
+            bgcolor="background.paper"
+            px={2}
         >
             <motion.div
-                initial={{ scale: 0 }}
-                animate={{ scale: 1.2 }}
-                transition={{ duration: 0.5, yoyo: Infinity }}
+                initial={{ scale: 0, rotate: 0 }}
+                animate={{ scale: 1.1, rotate: 360 }}
+                transition={{ 
+                    type: 'spring', 
+                    stiffness: 260, 
+                    damping: 20,
+                    duration: 1.5 
+                }}
+                style={{ marginBottom: '1rem' }}
             >
-                <CheckCircleIcon color="success" style={{ fontSize: 64 }} />
+                <CheckCircleIcon color="success" style={{ fontSize: 50 }} />
             </motion.div>
-            <Typography variant="h4" sx={{ mt: 2, mb: 4 }}>
+
+            <Typography variant="h4" fontWeight="bold" color="success" gutterBottom>
                 Payment Successful!
             </Typography>
-            <CircularProgress />
-            <Typography variant="body1" sx={{ mt: 2 }}>
-                Redirecting to your orders in {countdown} seconds...
-            </Typography>
+
+            <motion.div
+                initial={{ opacity: 0, y: 50 }}
+                animate={{ opacity: 1, y: 0 }}
+                transition={{ duration: 0.5, delay: 0.5 }}
+            >
+                <Typography variant="body1" fontWeight="500" color="textSecondary">
+                    Redirecting to your orders...
+                </Typography>
+            </motion.div>
         </Box>
     );
 };

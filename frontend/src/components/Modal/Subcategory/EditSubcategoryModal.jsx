@@ -47,13 +47,13 @@ const EditSubcategoryModal = ({ open, onClose, subcategory, onEditSuccess }) => 
         }
 
         try {
-            await axiosInstance.put(`/subcategories/update/${subcategory._id}`, formData, {
+            const response = await axiosInstance.put(`/subcategories/update/${subcategory._id}`, formData, {
                 headers: {
                     'Content-Type': 'multipart/form-data',
                 },
             });
-            toast.success('Subcategory updated successfully');
-            onEditSuccess();
+            toast.success(response.data.message);
+            onEditSuccess(response.data);
             onClose();
         } catch (error) {
             console.error('Error updating subcategory', error);

@@ -47,16 +47,18 @@ const AddUserModal = ({ open, onClose, onAddSuccess }) => {
             return;
         }
 
+        const data = {
+            firstName,
+            lastName,
+            email,
+            password,
+            role
+        }
+
         try {
-            await axiosInstance.post('/users/create', {
-                firstName,
-                lastName,
-                email,
-                password,
-                role
-            });
-            toast.success('User added successfully');
-            onAddSuccess();
+            const response = await axiosInstance.post('/users/create', data);
+            toast.success(response.data.message);
+            onAddSuccess(response.data);
             onClose();
         } catch (error) {
             console.error('Error adding user', error);

@@ -25,16 +25,18 @@ const EditSupplierModal = ({ open, onClose, supplier, onEditSuccess }) => {
     }, [supplier]);
 
     const handleEditSupplier = async () => {
+        const updatedData = {
+            name,
+            contactInfo: {
+                email,
+                phoneNumber,
+            },
+        }
+
         try {
-            await axiosInstance.put(`/suppliers/update/${supplier._id}`, {
-                name,
-                contactInfo: {
-                    email,
-                    phoneNumber,
-                },
-            });
-            toast.success('Supplier updated successfully');
-            onEditSuccess();
+            const response = await axiosInstance.put(`/suppliers/update/${supplier._id}`, updatedData);
+            toast.success(response.data.message);
+            onEditSuccess(response.data);
             onClose();
         } catch (error) {
             console.error('Error updating supplier', error);

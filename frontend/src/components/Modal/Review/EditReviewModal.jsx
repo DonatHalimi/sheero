@@ -38,22 +38,17 @@ const EditReviewModal = ({ open, onClose, review, onEditSuccess }) => {
     }, [review]);
 
     const handleEditReview = async () => {
-        if (!title || rating === null || !comment || !product) {
-            toast.error('Please fill in all the fields', {
-                closeOnClick: true,
-            });
-            return;
+        const updatedData = {
+            title,
+            rating,
+            comment,
+            productId: product
         }
-
+        
         try {
-            await axiosInstance.put(`/reviews/update/${review._id}`, {
-                title,
-                rating,
-                comment,
-                productId: product
-            });
-            toast.success('Review edited successfully');
-            onEditSuccess();
+            const response = await axiosInstance.put(`/reviews/update/${review._id}`, updatedData);
+            toast.success(response.data.message);
+            onEditSuccess(response.data);
             onClose();
         } catch (error) {
             console.error('Error editing review', error);

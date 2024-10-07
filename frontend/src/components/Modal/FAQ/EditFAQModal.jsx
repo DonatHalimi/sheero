@@ -19,17 +19,15 @@ const EditFAQModal = ({ open, onClose, faq, onEditSuccess }) => {
     }, [faq]);
 
     const handleEditFAQ = async () => {
-        if (!question || !answer) {
-            toast.error('Please fill in all the fields', {
-                closeOnClick: true
-            });
-            return;
+        const updatedData = {
+            question,
+            answer
         }
 
         try {
-            await axiosInstance.put(`/faqs/update/${faq._id}`, { question, answer });
-            toast.success('FAQ updated successfully');
-            onEditSuccess();
+            const response = await axiosInstance.put(`/faqs/update/${faq._id}`, updatedData);
+            toast.success(response.data.message);
+            onEditSuccess(response.data);
             onClose();
         } catch (error) {
             toast.error('Error updating FAQ');

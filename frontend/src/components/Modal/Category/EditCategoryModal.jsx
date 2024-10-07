@@ -32,13 +32,9 @@ const EditCategoryModal = ({ open, onClose, category, onEditSuccess }) => {
         }
 
         try {
-            await axiosInstance.put(`/categories/update/${category._id}`, formData, {
-                headers: {
-                    'Content-Type': 'multipart/form-data'
-                }
-            });
-            toast.success('Category updated successfully');
-            onEditSuccess();
+            const response = await axiosInstance.put(`/categories/update/${category._id}`, formData);
+            toast.success(response.data.message);
+            onEditSuccess(response.data);
             onClose();
         } catch (error) {
             console.error('Error updating category', error);

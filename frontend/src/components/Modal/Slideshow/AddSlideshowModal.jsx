@@ -16,9 +16,7 @@ const AddSlideshowModal = ({ open, onClose, onAddSuccess }) => {
 
     const handleAddImage = async () => {
         if (!title || !image) {
-            toast.error('Please fill in all the fields', {
-                closeOnClick: true
-            });
+            toast.error('Please fill in all the fields');
             return;
         }
 
@@ -28,13 +26,13 @@ const AddSlideshowModal = ({ open, onClose, onAddSuccess }) => {
         formData.append('image', image);
 
         try {
-            await axiosInstance.post('/slideshow/create', formData, {
+            const response = await axiosInstance.post('/slideshow/create', formData, {
                 headers: {
                     'Content-Type': 'multipart/form-data'
                 }
             });
-            toast.success('Slideshow image added successfully');
-            onAddSuccess();
+            toast.success(response.data.message);
+            onAddSuccess(response.data);
             onClose();
         } catch (error) {
             console.error('Error adding slideshow image', error);

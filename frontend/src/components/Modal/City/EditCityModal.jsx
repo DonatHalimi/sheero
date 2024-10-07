@@ -34,17 +34,16 @@ const EditCityModal = ({ open, onClose, city, onEditSuccess }) => {
     }, [city]);
 
     const handleEditCity = async () => {
-        if (!name || !country || !zipCode) {
-            toast.error('Please fill in all the fields', {
-                closeOnClick: true
-            });
-            return;
+        const updatedData = {
+            name,
+            country,
+            zipCode
         }
 
         try {
-            await axiosInstance.put(`/cities/update/${city._id}`, { name, country, zipCode });
-            toast.success('City updated successfully');
-            onEditSuccess();
+            const response = await axiosInstance.put(`/cities/update/${city._id}`, updatedData);
+            toast.success(response.data.message);
+            onEditSuccess(response.data);
             onClose();
         } catch (error) {
             toast.error('Error updating city');

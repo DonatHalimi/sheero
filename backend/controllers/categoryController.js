@@ -2,7 +2,6 @@ const Category = require('../models/Category');
 const Subcategory = require('../models/Subcategory')
 const Product = require('../models/Product')
 const fs = require('fs');
-const path = require('path');
 
 const createCategory = async (req, res) => {
     const { name } = req.body;
@@ -19,7 +18,7 @@ const createCategory = async (req, res) => {
     try {
         const category = new Category({ name, image });
         await category.save();
-        res.status(201).json(category);
+        res.status(201).json({ message: 'Category created succesfully', category });
     } catch (error) {
         res.status(500).json({ message: 'Server error' });
     }
@@ -73,7 +72,7 @@ const updateCategory = async (req, res) => {
             { name, image, updatedAt: Date.now() },
             { new: true }
         );
-        res.status(200).json(category);
+        res.status(200).json({ message: 'Category updated succesfully', category });
     } catch (error) {
         res.status(500).json({ message: 'Server error' });
     }
@@ -101,7 +100,7 @@ const deleteCategory = async (req, res) => {
         }
 
         await Category.findByIdAndDelete(req.params.id);
-        res.status(200).json({ message: 'Category deleted' });
+        res.status(200).json({ message: 'Category deleted succesfully' });
     } catch (error) {
         res.status(500).json({ message: 'Server error' });
     }

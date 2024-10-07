@@ -5,7 +5,10 @@ import notFound from '../assets/img/not-found.png';
 const NotFound = () => {
     return (
         <>
-            <ErrorPageComponent errorType={404} imageSrc={notFound} />
+            <ErrorPageComponent
+                errorType={404}
+                imageSrc={notFound}
+            />
         </>
     );
 };

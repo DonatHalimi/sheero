@@ -15,9 +15,7 @@ const AddCategoryModal = ({ open, onClose, onAddSuccess }) => {
 
     const handleAddCategory = async () => {
         if (!name || !image) {
-            toast.error('Please fill in all the fields', {
-                closeOnClick: true
-            });
+            toast.error('Please fill in all the fields');
             return;
         }
 
@@ -26,13 +24,9 @@ const AddCategoryModal = ({ open, onClose, onAddSuccess }) => {
         formData.append('image', image);
 
         try {
-            await axiosInstance.post('/categories/create', formData, {
-                headers: {
-                    'Content-Type': 'multipart/form-data'
-                }
-            });
-            toast.success('Category added successfully');
-            onAddSuccess();
+            const response = await axiosInstance.post('/categories/create', formData);
+            toast.success(response.data.message);
+            onAddSuccess(response.data);
             onClose();
         } catch (error) {
             console.error('Error adding category', error);

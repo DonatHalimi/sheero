@@ -29,7 +29,10 @@ const EditOrderModal = ({ open, onClose, order, onEditSuccess }) => {
             return;
         }
 
-        const updateData = { orderId: order._id, status: newStatus };
+        const updateData = {
+            orderId: order._id,
+            status: newStatus
+        };
 
         if (order.paymentMethod === 'cash') {
             if (newStatus === 'delivered') {
@@ -42,10 +45,9 @@ const EditOrderModal = ({ open, onClose, order, onEditSuccess }) => {
         }
 
         try {
-            await axiosInstance.put(`/orders/update-delivery-status`, updateData);
-
-            toast.success('Order updated successfully');
-            onEditSuccess();
+            const response = await axiosInstance.put(`/orders/status/update`, updateData);
+            toast.success(response.data.message);
+            onEditSuccess(response.data);
             onClose();
         } catch (error) {
             toast.error('Error updating order');

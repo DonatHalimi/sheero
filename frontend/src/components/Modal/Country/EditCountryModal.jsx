@@ -17,16 +17,18 @@ const EditCountryModal = ({ open, onClose, country, onEditSuccess }) => {
 
     const handleEditCountry = async () => {
         if (!name) {
-            toast.error('Please fill in the country name', {
-                closeOnClick: true
-            });
+            toast.error('Please fill in the country name', { closeOnClick: true });
             return;
         }
 
+        const updatedData = {
+            name
+        }
+
         try {
-            await axiosInstance.put(`/countries/update/${country._id}`, { name });
-            toast.success('Country updated successfully');
-            onEditSuccess();
+            const response = await axiosInstance.put(`/countries/update/${country._id}`, updatedData);
+            toast.success(response.data.message);
+            onEditSuccess(response.data);
             onClose();
         } catch (error) {
             toast.error('Error updating country');

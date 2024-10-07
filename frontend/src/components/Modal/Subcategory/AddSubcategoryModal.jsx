@@ -37,9 +37,7 @@ const AddSubcategoryModal = ({ open, onClose, onAddSuccess }) => {
 
     const handleAddSubcategory = async () => {
         if (!name || !image || !category) {
-            toast.error('Please fill in all the fields', {
-                closeOnClick: true
-            });
+            toast.error('Please fill in all the fields');
             return;
         }
 
@@ -49,13 +47,13 @@ const AddSubcategoryModal = ({ open, onClose, onAddSuccess }) => {
         formData.append('category', category._id);
 
         try {
-            await axiosInstance.post('/subcategories/create', formData, {
+            const response = await axiosInstance.post('/subcategories/create', formData, {
                 headers: {
                     'Content-Type': 'multipart/form-data'
                 }
             });
-            toast.success('Subcategory added successfully');
-            onAddSuccess();
+            toast.success(response.data.message);
+            onAddSuccess(response.data);
             onClose();
         } catch (error) {
             console.error('Error adding subcategory', error);

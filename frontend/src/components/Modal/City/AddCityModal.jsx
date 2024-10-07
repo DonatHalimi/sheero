@@ -33,16 +33,20 @@ const AddCityModal = ({ open, onClose, onAddSuccess }) => {
 
     const handleAddCity = async () => {
         if (!name || !country || !zipCode) {
-            toast.error('Please fill in all the fields', {
-                closeOnClick: true
-            });
+            toast.error('Please fill in all the fields');
             return;
         }
 
+        const data = {
+            name,
+            country,
+            zipCode
+        }
+
         try {
-            await axiosInstance.post('/cities/create', { name, country, zipCode });
-            toast.success('City added successfully');
-            onAddSuccess();
+            const response = await axiosInstance.post('/cities/create', data);
+            toast.success(response.data.message);
+            onAddSuccess(response.data);
             onClose();
         } catch (error) {
             toast.error('Error adding city');

@@ -33,13 +33,15 @@ const EditSubSubcategoryModal = ({ open, onClose, subSubcategory, onEditSuccess 
     }, [subSubcategory]);
 
     const handleEditSubSubcategory = async () => {
+        const updatedData = {
+            name,
+            subcategory
+        }
+
         try {
-            await axiosInstance.put(`/subsubcategories/update/${subSubcategory._id}`, {
-                name,
-                subcategory
-            });
-            toast.success('SubSubcategory updated successfully');
-            onEditSuccess();
+            const response = await axiosInstance.put(`/subsubcategories/update/${subSubcategory._id}`, updatedData);
+            toast.success(response.data.message);
+            onEditSuccess(response.data);
             onClose();
         } catch (error) {
             console.error('Error updating subsubcategory', error);

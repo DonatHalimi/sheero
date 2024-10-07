@@ -35,13 +35,13 @@ const EditSlideshowModal = ({ open, onClose, image, onEditSuccess }) => {
         }
 
         try {
-            await axiosInstance.put(`/slideshow/update/${image._id}`, formData, {
+            const response = await axiosInstance.put(`/slideshow/update/${image._id}`, formData, {
                 headers: {
                     'Content-Type': 'multipart/form-data'
                 }
             });
-            toast.success('Slideshow image updated successfully');
-            onEditSuccess();
+            toast.success(response.data.message);
+            onEditSuccess(response.data);
             onClose();
         } catch (error) {
             console.error('Error updating slideshow image', error);

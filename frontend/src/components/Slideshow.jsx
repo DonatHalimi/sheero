@@ -1,9 +1,11 @@
 import { Splide, SplideSlide } from '@splidejs/react-splide';
 import axios from 'axios';
 import React, { useEffect, useRef, useState } from 'react';
+import { SlideshowSkeleton } from '../assets/CustomComponents';
 
 const Slideshow = () => {
     const [images, setImages] = useState([]);
+    const [loading, setLoading] = useState(true);
     const splideRef = useRef(null);
 
     const apiUrl = 'http://localhost:5000/api/slideshow';
@@ -15,6 +17,8 @@ const Slideshow = () => {
                 setImages(data);
             } catch (error) {
                 console.error('Error fetching images:', error);
+            } finally {
+                setLoading(false);
             }
         };
 
@@ -29,28 +33,30 @@ const Slideshow = () => {
 
     return (
         <div className="w-full mx-auto mb-14">
-            <Splide
-                ref={splideRef}
-                options={{
-                    type: 'slide',
-                    perPage: 1,
-                    autoplay: true,
-                    interval: 3000,
-                    pagination: true,
-                    arrows: true,
-                    width: '100%',
-                    height: 'auto',
-                    gap: '13px',
-                    breakpoints: {
-                        1024: { perPage: 1 },
-                        600: { perPage: 1 },
-                        480: { perPage: 1 },
-                    },
-                }}
-                onMounted={() => splideRef.current?.splide.refresh()}
-            >
-                {images.length > 0 &&
-                    images.map((image) => (
+            {loading ? (
+                <SlideshowSkeleton />
+            ) : (
+                <Splide
+                    ref={splideRef}
+                    options={{
+                        type: 'slide',
+                        perPage: 1,
+                        autoplay: true,
+                        interval: 3000,
+                        pagination: true,
+                        arrows: true,
+                        width: '100%',
+                        height: 'auto',
+                        gap: '13px',
+                        breakpoints: {
+                            1024: { perPage: 1 },
+                            600: { perPage: 1 },
+                            480: { perPage: 1 },
+                        },
+                    }}
+                    onMounted={() => splideRef.current?.splide.refresh()}
+                >
+                    {images.map((image) => (
                         <SplideSlide key={image._id}>
                             <div className="flex justify-center items-center">
                                 <img
@@ -62,10 +68,11 @@ const Slideshow = () => {
                             </div>
                         </SplideSlide>
                     ))}
-                <div className="splide__progress">
-                    <div className="splide__progress__bar"></div>
-                </div>
-            </Splide>
+                    <div className="splide__progress">
+                        <div className="splide__progress__bar"></div>
+                    </div>
+                </Splide>
+            )}
         </div>
     );
 };

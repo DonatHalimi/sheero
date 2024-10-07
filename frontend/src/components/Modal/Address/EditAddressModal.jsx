@@ -41,7 +41,7 @@ const EditAddressModal = ({ open, onClose, address, onEditSuccess }) => {
     }, [address]);
 
     const handleEditAddress = async () => {
-        const updates = {
+        const updatedData = {
             name,
             street,
             phoneNumber,
@@ -51,8 +51,8 @@ const EditAddressModal = ({ open, onClose, address, onEditSuccess }) => {
         };
 
         try {
-            const response = await axiosInstance.put(`/addresses/update/${address._id}`, updates);
-            toast.success('Address updated successfully');
+            const response = await axiosInstance.put(`/addresses/update/${address._id}`, updatedData);
+            toast.success(response.data.message);
             onEditSuccess(response.data);
             onClose();
         } catch (error) {

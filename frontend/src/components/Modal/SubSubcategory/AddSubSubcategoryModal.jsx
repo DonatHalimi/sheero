@@ -34,19 +34,19 @@ const AddSubSubcategoryModal = ({ open, onClose, onAddSuccess }) => {
 
     const handleAddSubSubcategory = async () => {
         if (!name || !subcategory) {
-            toast.error('Please fill in all the fields', {
-                closeOnClick: true
-            });
+            toast.error('Please fill in all the fields');
             return;
         }
 
+        const data = {
+            name,
+            subcategory: subcategory._id
+        }
+
         try {
-            await axiosInstance.post('/subsubcategories/create', {
-                name,
-                subcategory: subcategory._id
-            });
-            toast.success('SubSubcategory added successfully');
-            onAddSuccess();
+            const response = await axiosInstance.post('/subsubcategories/create', data);
+            toast.success(response.data.message);
+            onAddSuccess(response.data);
             onClose();
         } catch (error) {
             console.error('Error adding subsubcategory', error);

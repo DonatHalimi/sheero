@@ -52,9 +52,9 @@ const EditUserModal = ({ open, onClose, user, onEditSuccess }) => {
             if (password) {
                 updatedData.password = password;
             }
-            await axiosInstance.put(`/users/update/${user._id}`, updatedData);
-            toast.success('User updated successfully');
-            onEditSuccess();
+            const response = await axiosInstance.put(`/users/update/${user._id}`, updatedData);
+            toast.success(response.data.message);
+            onEditSuccess(response.data);
             onClose();
         } catch (error) {
             toast.error('Error updating user: ' + error.message);

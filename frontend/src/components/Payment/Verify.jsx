@@ -17,9 +17,13 @@ const Verify = () => {
 
     useEffect(() => {
         const verifyPayment = async () => {
+            const data = {
+                order_id,
+                success: searchParams.get('success') === 'true'
+            }
+
             try {
-                // Pass order_id and success status in the request body
-                const response = await axiosInstance.post('/orders/verify', { order_id, success: searchParams.get('success') === 'true' });
+                const response = await axiosInstance.post('/orders/verify', data);
                 setSuccess(response.data.success);
             } catch (err) {
                 console.error('Verification failed:', err.message);
@@ -36,10 +40,7 @@ const Verify = () => {
 
     if (loading) {
         return (
-            <Box display="flex" flexDirection="column" alignItems="center" justifyContent="center" height="100vh">
-                <CircularProgress />
-                <Typography variant="body1" sx={{ mt: 2 }}>Verifying payment...</Typography>
-            </Box>
+            <CircularProgress />
         );
     }
 

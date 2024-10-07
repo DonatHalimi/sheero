@@ -38,7 +38,7 @@ const createReview = async (req, res) => {
         await review.save();
         await Product.findByIdAndUpdate(productId, { $push: { reviews: review._id } });
 
-        res.status(201).json(review);
+        res.status(201).json({ message: 'Review created succesfully', review });
     } catch (error) {
         console.error('Error creating review:', error);
         res.status(500).json({ message: 'Server error', error: error.message, stack: error.stack });
@@ -182,8 +182,8 @@ const updateReview = async (req, res) => {
                 select: 'name description price salePrice category subcategory image inventoryCount'
             });
 
-        res.status(200).json(updatedReview);
-    } catch (error) {
+            res.status(200).json({ message: 'Review updated succesfully', updatedReview });
+        } catch (error) {
         console.error('Error updating review:', error);
         res.status(500).json({ message: 'Server error', error: error.message, stack: error.stack });
     }

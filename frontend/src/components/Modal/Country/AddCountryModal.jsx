@@ -12,16 +12,18 @@ const AddCountryModal = ({ open, onClose, onAddSuccess }) => {
 
     const handleAddCountry = async () => {
         if (!name) {
-            toast.error('Please fill in the country name', {
-                closeOnClick: true
-            });
+            toast.error('Please fill in the country name');
             return;
         }
 
+        const data = {
+            name
+        }
+
         try {
-            await axiosInstance.post('/countries/create', { name });
-            toast.success('Country added successfully');
-            onAddSuccess();
+            const response = await axiosInstance.post('/countries/create', data);
+            toast.success(response.data.message);
+            onAddSuccess(response.data);
             onClose();
         } catch (error) {
             if (error.response && error.response.status === 403) {

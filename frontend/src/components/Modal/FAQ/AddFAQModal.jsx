@@ -13,16 +13,19 @@ const AddFAQModal = ({ open, onClose, onAddSuccess }) => {
 
     const handleAddFAQ = async () => {
         if (!question || !answer) {
-            toast.error('Please fill in all the fields', {
-                closeOnClick: true
-            });
+            toast.error('Please fill in all the fields');
             return;
         }
 
+        const data = {
+            question,
+            answer
+        }
+
         try {
-            await axiosInstance.post('/faqs/create', { question, answer });
-            toast.success('FAQ item added successfully');
-            onAddSuccess();
+            const response = await axiosInstance.post('/faqs/create', data);
+            toast.success(response.data.message);
+            onAddSuccess(response.data);
             onClose();
         } catch (error) {
             toast.error('Error adding FAQ item');

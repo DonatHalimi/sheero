@@ -14,10 +14,6 @@ const AddAddressModal = ({ open, onClose, onAddSuccess }) => {
     const [cities, setCities] = useState([]);
     const [countries, setCountries] = useState([]);
 
-    const [nameValid, setNameValid] = useState(true);
-    const [streetValid, setStreetValid] = useState(true);
-    const [phoneNumberValid, setPhoneNumberValid] = useState(true);
-
     const axiosInstance = useAxios();
 
     useEffect(() => {
@@ -56,38 +52,24 @@ const AddAddressModal = ({ open, onClose, onAddSuccess }) => {
         }
     };
 
-    const validateName = (name) => {
-        return name.trim().length > 0;
-    };
-
-    const validateStreet = (street) => {
-        return street.trim().length > 0;
-    };
-
-    const validatePhoneNumber = (phoneNumber) => {
-        return /^\d{3}\/\d{2}\/\d{2} \d{6}$/.test(phoneNumber);
-    };
-
     const handleAddAddress = async () => {
-        setNameValid(validateName(name));
-        setStreetValid(validateStreet(street));
-        setPhoneNumberValid(validatePhoneNumber(phoneNumber));
-
-        if (!nameValid || !streetValid || !phoneNumberValid || !comment || !city || !country) {
-            toast.error('Please fill in all fields correctly', { closeOnClick: true });
+        if (!name || !street || !phoneNumber || !comment || !city || !country) {
+            toast.error('Please fill in all the fields');
             return;
         }
 
+        const data = {
+            name,
+            street,
+            phoneNumber,
+            comment,
+            city: city?._id,
+            country: country?._id
+        };
+
         try {
-            await axiosInstance.post('/addresses/create', {
-                name,
-                street,
-                phoneNumber,
-                comment,
-                city: city._id,
-                country: country._id
-            });
-            toast.success('Address added successfully');
+            const response = await axiosInstance.post('/addresses/create', data);
+            toast.success(response.data.message);
             onAddSuccess();
             onClose();
         } catch (error) {
@@ -110,49 +92,35 @@ const AddAddressModal = ({ open, onClose, onAddSuccess }) => {
                     required
                     label="Name"
                     value={name}
-                    onChange={(e) => {
-                        setName(e.target.value);
-                        setNameValid(validateName(e.target.value));
-                    }}
+                    onChange={(e) => setName(e.target.value)}
                     className="!mb-4"
                 />
-                {!nameValid && <div className="text-red-500 text-sm mb-2">Name is required.</div>}
 
                 <BrownOutlinedTextField
                     fullWidth
                     required
                     label="Street"
                     value={street}
-                    onChange={(e) => {
-                        setStreet(e.target.value);
-                        setStreetValid(validateStreet(e.target.value));
-                    }}
+                    onChange={(e) => setStreet(e.target.value)}
                     className="!mb-4"
                 />
-                {!streetValid && <div className="text-red-500 text-sm mb-2">Street is required.</div>}
 
                 <BrownOutlinedTextField
                     fullWidth
                     required
                     label="Phone Number"
                     value={phoneNumber}
-                    onChange={(e) => {
-                        setPhoneNumber(e.target.value);
-                        setPhoneNumberValid(validatePhoneNumber(e.target.value));
-                    }}
+                    onChange={(e) => setPhoneNumber(e.target.value)}
                     placeholder="044/45/48 XXXXXX"
                     className="!mb-4"
                 />
-                {!phoneNumberValid && <div className="text-red-500 text-sm mb-2">Phone number format is invalid. (Format: XXX/XX/XX XXXXXX)</div>}
 
                 <BrownOutlinedTextField
                     fullWidth
                     required
                     label="Comment"
                     value={comment}
-                    onChange={(e) => {
-                        setComment(e.target.value);
-                    }}
+                    onChange={(e) => setComment(e.target.value)}
                     className="!mb-4"
                 />
 

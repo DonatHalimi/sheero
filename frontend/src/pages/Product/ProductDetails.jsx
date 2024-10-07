@@ -7,6 +7,7 @@ import { toast } from 'react-toastify';
 import {
     BreadcrumbsComponent,
     DetailsCartWishlistButtons,
+    LoadingOverlay,
     OutOfStock,
     ProductDetailsSkeleton
 } from '../../assets/CustomComponents';
@@ -21,8 +22,9 @@ const apiUrl = 'http://localhost:5000/api';
 
 const ProductDetails = () => {
     const { id } = useParams();
-    const navigate = useNavigate();
     const { auth } = useContext(AuthContext);
+    const navigate = useNavigate();
+
     const [product, setProduct] = useState(null);
     const [imagePreviewOpen, setImagePreviewOpen] = useState(false);
     const [loading, setLoading] = useState(true);
@@ -64,11 +66,9 @@ const ProductDetails = () => {
     };
 
     const handleQuantityChange = (change) => {
-        setQuantity(prevQuantity => {
+        setQuantity((prevQuantity) => {
             const newQuantity = prevQuantity + change;
-            if (newQuantity < 1) {
-                return 1;
-            }
+            if (newQuantity < 1) return 1;
             if (newQuantity > product.inventoryCount) {
                 toast.warning(`Only ${product.inventoryCount} items available in stock.`);
                 return product.inventoryCount;
@@ -92,7 +92,7 @@ const ProductDetails = () => {
         setLoadingState(true);
         try {
             await axios.post(`${apiUrl}/${endpoint}`, payload, {
-                headers: { Authorization: `Bearer ${auth.accessToken}` }
+                headers: { Authorization: `Bearer ${auth.accessToken}` },
             });
 
             toast.success(`Product added to ${action === 'cart' ? 'cart' : 'wishlist'}!`, {
@@ -115,17 +115,7 @@ const ProductDetails = () => {
         }
     };
 
-    if (loading) {
-        return (
-            <>
-                <Navbar />
-                <ProductDetailsSkeleton />
-                <Footer />
-            </>
-        );
-    }
-
-    const { name, image, price, salePrice, discount, inventoryCount } = product;
+    const { name, image, price, salePrice, discount, inventoryCount } = product || {};
     const imageUrl = `http://localhost:5000/${image}`;
     const originalPrice = price || 0;
     const discountPercentage = discount?.value || 0;
@@ -138,139 +128,138 @@ const ProductDetails = () => {
     return (
         <>
             {(isCartLoading || isWishlistLoading) && (
-                <div className="fixed inset-0 z-[1000] flex items-center justify-center bg-black bg-opacity-50">
-                    <CircularProgress size={60} style={{ color: '#373533' }} />
-                </div>
+                <LoadingOverlay />
             )}
 
             <Navbar />
-            <BreadcrumbsComponent product={product} />
+            {loading ? (
+                <ProductDetailsSkeleton />
+            ) : (
+                <>
+                    <BreadcrumbsComponent product={product} />
+                    <div className="container mx-auto px-4 py-4 mb-8 bg-white mt-8 rounded-md max-w-5xl">
+                        <div className="flex flex-col md:flex-row gap-8">
+                            <div className="flex flex-col items-center md:w-1/2 relative">
+                                <img
+                                    src={imageUrl}
+                                    alt={name}
+                                    className="w-full h-80 object-contain rounded cursor-pointer"
+                                    onClick={() => setImagePreviewOpen(true)}
+                                />
+                                <OutOfStock inventoryCount={inventoryCount} />
+                            </div>
+                            <div className="md:w-1/2">
+                                <h1 className="text-2xl break-words">{name}</h1>
 
+                                <p
+                                    onClick={openReviewModal}
+                                    className="underline cursor-pointer text-sm w-9 font-sm"
+                                >
+                                    Review
+                                </p>
 
-            <div className="container mx-auto px-4 py-4 mb-8 bg-white mt-8 rounded-md max-w-5xl">
-                <div className="flex flex-col md:flex-row gap-8">
-                    <div className="flex flex-col items-center md:w-1/2 relative">
-                        <img
-                            src={imageUrl}
-                            alt={name}
-                            className="w-full h-80 object-contain rounded cursor-pointer"
-                            onClick={() => setImagePreviewOpen(true)}
-                        />
-
-                        <OutOfStock inventoryCount={inventoryCount} />
-
-                    </div>
-                    <div className="md:w-1/2">
-                        <h1 className="text-2xl break-words">{name}</h1>
-
-                        <p
-                            onClick={openReviewModal}
-                            className="underline cursor-pointer text-sm w-9 font-sm"
-                        >
-                            Review
-                        </p>
-
-                        <div className="mt-2 flex flex-col">
-                            {discountPercentage > 0 ? (
-                                <>
-                                    <span className="text-gray-500 line-through text-sm">
-                                        {originalPrice.toFixed(2)} €
-                                    </span>
-                                    <span className="text-2xl font-bold text-stone-600">
-                                        {discountedPrice.toFixed(2)} €
-                                    </span>
-                                    <div className="flex items-center mt-1">
-                                        <span className="text-sm font-semibold text-stone-600">
-                                            You save {(originalPrice - discountedPrice).toFixed(2)} €
+                                <div className="mt-2 flex flex-col">
+                                    {discountPercentage > 0 ? (
+                                        <>
+                                            <span className="text-gray-500 line-through text-sm">
+                                                {originalPrice.toFixed(2)} €
+                                            </span>
+                                            <span className="text-2xl font-bold text-stone-600">
+                                                {discountedPrice.toFixed(2)} €
+                                            </span>
+                                            <div className="flex items-center mt-1">
+                                                <span className="text-sm font-semibold text-stone-600">
+                                                    You save {(originalPrice - discountedPrice).toFixed(2)} €
+                                                </span>
+                                                <span className="ml-2 text-sm font-semibold text-stone-600 bg-stone-100 rounded-md px-1">
+                                                    -{discountPercentage}%
+                                                </span>
+                                            </div>
+                                        </>
+                                    ) : (
+                                        <span className="text-2xl font-bold">
+                                            {originalPrice.toFixed(2)} €
                                         </span>
-                                        <span className="ml-2 text-sm font-semibold text-stone-600 bg-stone-100 rounded-md px-1">
-                                            -{discountPercentage}%
-                                        </span>
+                                    )}
+                                </div>
+
+                                <div className="flex items-center mt-2">
+                                    <p className="text-xs mr-2">Quantity</p>
+                                    <div className="flex-1 border-t bg-gray-100 mt-1"></div>
+                                </div>
+
+                                <div className="mt-2 flex items-center">
+                                    <div className="flex items-center mr-4">
+                                        <button
+                                            onClick={() => handleQuantityChange(-1)}
+                                            disabled={quantity <= 1}
+                                            className="px-3 py-1 border rounded-l"
+                                        >
+                                            -
+                                        </button>
+                                        <span className="px-4 py-1 border-t border-b">{quantity}</span>
+                                        <button
+                                            onClick={() => handleQuantityChange(1)}
+                                            disabled={quantity >= product.inventoryCount}
+                                            className={`px-3 py-1 border rounded-r ${quantity >= product.inventoryCount ? 'opacity-50' : ''}`}
+                                        >
+                                            +
+                                        </button>
                                     </div>
-                                </>
-                            ) : (
-                                <span className="text-2xl font-bold">
-                                    {originalPrice.toFixed(2)} €
-                                </span>
-                            )}
-                        </div>
+                                    <span className="text-sm font-semibold text-stone-600 bg-stone-100 rounded-md px-2">
+                                        {inventoryText}
+                                    </span>
+                                </div>
 
-                        <div className="flex items-center mt-2">
-                            <p className="text-xs mr-2">Quantity</p>
-                            <div className="flex-1 border-t bg-gray-100 mt-1"></div>
-                        </div>
+                                <div className="flex items-center mt-2">
+                                    <p className="text-xs mr-2">Payment Methods</p>
+                                    <div className="flex-1 border-t bg-gray-100 mt-1"></div>
+                                </div>
 
-                        <div className="mt-2 flex items-center">
-                            <div className="flex items-center mr-4">
-                                <button
-                                    onClick={() => handleQuantityChange(-1)}
-                                    disabled={quantity <= 1}
-                                    className="px-3 py-1 border rounded-l"
-                                >
-                                    -
-                                </button>
-                                <span className="px-4 py-1 border-t border-b">{quantity}</span>
-                                <button
-                                    onClick={() => handleQuantityChange(1)}
-                                    disabled={quantity >= product.inventoryCount}
-                                    className={`px-3 py-1 border rounded-r ${quantity >= product.inventoryCount ? 'opacity-50' : ''}`}
-                                >
-                                    +
-                                </button>
+                                <div className="mt-2 flex items-center space-x-3">
+                                    <div className="bg-gray-100 p-1 rounded-md flex items-center justify-center">
+                                        <Payment color="primary" />
+                                    </div>
+                                    <p className="text-sm">Pay with Stripe</p>
+
+                                    <div className="bg-gray-100 p-1 rounded-md flex items-center justify-center">
+                                        <LocalAtm color="primary" />
+                                    </div>
+                                    <p className="text-sm">Pay with Cash</p>
+                                </div>
+
+                                <div className="mt-4 flex items-center">
+                                    <DetailsCartWishlistButtons
+                                        handleAction={handleAction}
+                                        isCartLoading={isCartLoading}
+                                        isWishlistLoading={isWishlistLoading}
+                                        inventoryCount={product.inventoryCount}
+                                    />
+                                </div>
                             </div>
-                            <span className="text-sm font-semibold text-stone-600 bg-stone-100 rounded-md px-2">{inventoryText}</span>
-                        </div>
-
-                        <div className="flex items-center mt-2">
-                            <p className="text-xs mr-2">Payment Methods</p>
-                            <div className="flex-1 border-t bg-gray-100 mt-1"></div>
-                        </div>
-
-                        <div className="mt-2 flex items-center space-x-3">
-                            <div className="bg-gray-100 p-1 rounded-md flex items-center justify-center">
-                                <Payment color="primary" />
-                            </div>
-                            <p className="text-sm">Pay with Stripe</p>
-
-                            <div className="bg-gray-100 p-1 rounded-md flex items-center justify-center">
-                                <LocalAtm color="primary" />
-                            </div>
-                            <p className="text-sm">Pay with Cash</p>
-                        </div>
-
-
-                        <div className="mt-4 flex items-center">
-                            <DetailsCartWishlistButtons
-                                handleAction={handleAction}
-                                isCartLoading={isCartLoading}
-                                isWishlistLoading={isWishlistLoading}
-                                inventoryCount={product.inventoryCount}
-                            />
                         </div>
                     </div>
-                </div>
 
-            </div >
+                    <div className="container mx-auto px-4 bg-white mt-8 mb-8 rounded-md max-w-5xl">
+                        <ProductDetailsTabs product={product} />
+                    </div>
 
-            <div className="container mx-auto px-4 bg-white mt-8 mb-8 rounded-md max-w-5xl">
-                <ProductDetailsTabs product={product} />
-            </div>
+                    <ImagePreviewModal
+                        open={imagePreviewOpen}
+                        onClose={() => setImagePreviewOpen(false)}
+                        imageUrl={imageUrl}
+                    />
 
-            <ImagePreviewModal
-                open={imagePreviewOpen}
-                onClose={() => setImagePreviewOpen(false)}
-                imageUrl={imageUrl}
-            />
+                    <AddReviewModal
+                        open={isReviewModalOpen}
+                        onClose={() => setIsReviewModalOpen(false)}
+                        product={product}
+                        onReviewSuccess={handleReviewSuccess}
+                    />
 
-            {/* AddReviewModal */}
-            <AddReviewModal
-                open={isReviewModalOpen}
-                onClose={() => setIsReviewModalOpen(false)}
-                product={product}
-                onReviewSuccess={handleReviewSuccess}
-            />
-
-            <Footer />
+                    <Footer />
+                </>
+            )}
         </>
     );
 };

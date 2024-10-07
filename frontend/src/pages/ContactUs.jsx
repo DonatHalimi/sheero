@@ -94,7 +94,7 @@ const ContactUs = () => {
                     <TextField
                         label="Subject"
                         name="subject"
-                        inputRef={subjectRef} // Attach the ref to the subject field
+                        inputRef={subjectRef}
                         value={formData.subject}
                         onChange={handleChange}
                         fullWidth

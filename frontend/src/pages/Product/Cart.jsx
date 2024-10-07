@@ -12,7 +12,7 @@ import PaymentModal from '../../components/Product/PaymentModal';
 import { AuthContext } from '../../context/AuthContext';
 
 const Cart = () => {
-    const [cart, setCart] = useState(null);
+    const [cart, setCart] = useState({ items: [] });
     const [address, setAddress] = useState(null);
 
     const [loading, setLoading] = useState(true);
@@ -29,6 +29,7 @@ const Cart = () => {
                 setCart(data);
             } catch (error) {
                 console.error('Failed to fetch cart:', error?.response?.data?.message || error.message);
+                setCart({ items: [] });
             } finally {
                 setLoading(false);
             }
@@ -147,16 +148,10 @@ const Cart = () => {
 
     if (loading) return <LoadingCart />;
 
-    if (!cart || !cart.items) return <EmptyState imageSrc={emptyCartImage} message="Your cart is empty!" />;
-
-    const calculateShippingCost = () => {
-        return cart.items.reduce((total, item) => total + (item.product.shipping?.cost || 0), 0);
-    };
-
     const calculateTotalPrice = () =>
-        cart.items.reduce((total, item) => total + item.quantity * (item.product.salePrice || item.product.price), 0);
+        (cart?.items || []).reduce((total, item) => total + item.quantity * (item.product.salePrice || item.product.price), 0);
 
-    const shippingCost = calculateShippingCost();
+    const shippingCost = 2;
     const subtotal = calculateTotalPrice();
     const total = subtotal + shippingCost;
 
@@ -166,7 +161,7 @@ const Cart = () => {
             <div className="container mx-auto px-24 py-2 mb-16 bg-gray-50 mt-10 flex">
                 <div className="flex-1">
                     <h1 className="text-2xl font-semilight mb-4">Cart</h1>
-                    {cart.items.length > 0 ? (
+                    {(cart?.items?.length > 0) ? (
                         <>
                             <TableContainer component={Paper} className="bg-white">
                                 <Table>
@@ -266,7 +261,7 @@ const Cart = () => {
                 </div>
 
                 {/* Cart summary */}
-                {cart.items.length > 0 && (
+                {cart?.items?.length > 0 && (
                     <div className="ml-6 w-80 mt-12">
                         <Paper className="p-4">
                             <h2 className="text-xl font-semibold mb-2">Total of Cart</h2>

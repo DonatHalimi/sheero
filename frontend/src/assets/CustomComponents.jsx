@@ -645,7 +645,6 @@ export const BreadcrumbsComponent = ({ product }) => {
     );
 };
 
-
 export const ProductDetailsSkeleton = () => {
     return (
         <>
@@ -654,25 +653,25 @@ export const ProductDetailsSkeleton = () => {
                     <Link component={RouterLink} to="/" color="inherit" underline="none">
                         <HomeIcon color="primary" />
                     </Link>
-                    <Skeleton width={200} />
+                    <Skeleton animation="wave" width={200} />
                 </Breadcrumbs>
             </div>
             <div className="container mx-auto px-4 py-4 mb-8 bg-white mt-8 rounded-md max-w-5xl">
                 <div className="flex flex-col md:flex-row gap-8">
                     <div className="flex flex-col items-center md:w-1/2">
-                        <Skeleton variant="rectangular" width="100%" height={320} />
+                        <Skeleton variant="rectangular" animation="wave" width="100%" height={320} />
                     </div>
                     <div className="md:w-1/2">
-                        <Skeleton variant="text" width="80%" height={40} />
-                        <Skeleton variant="text" width="40%" height={30} />
-                        <Skeleton variant="text" width="60%" height={30} />
-                        <Skeleton variant="text" width="50%" height={30} />
+                        <Skeleton variant="text" animation="wave" width="80%" height={40} />
+                        <Skeleton variant="text" animation="wave" width="40%" height={30} />
+                        <Skeleton variant="text" animation="wave" width="60%" height={30} />
+                        <Skeleton variant="text" animation="wave" width="50%" height={30} />
                         <div className='mt-4' />
-                        <Skeleton variant="text" width="50%" height={30} />
+                        <Skeleton variant="text" animation="wave" width="50%" height={30} />
                         <div className='mt-24' />
                         <div className="mt-4 flex items-center space-x-4">
-                            <Skeleton variant="rectangular" width={314} height={40} className='rounded-md' />
-                            <Skeleton variant="rectangular" width={150} height={40} className='rounded-md' />
+                            <Skeleton variant="rectangular" animation="wave" width={314} height={40} className='rounded-md' />
+                            <Skeleton variant="rectangular" animation="wave" width={150} height={40} className='rounded-md' />
                         </div>
                     </div>
                 </div>
@@ -686,22 +685,64 @@ export const ProductDetailsSkeleton = () => {
                         aria-label="product details tabs"
                         sx={{ width: '100%', display: 'flex', justifyContent: 'space-between', mb: 2 }}
                     >
-                        <Skeleton variant="rectangular" width="100%" height={40} style={{ margin: '0 4px', flexGrow: 1, borderRadius: '6px' }} />
-                        <Skeleton variant="rectangular" width="100%" height={40} style={{ margin: '0 4px', flexGrow: 1, borderRadius: '6px' }} />
-                        <Skeleton variant="rectangular" width="100%" height={40} style={{ margin: '0 4px', flexGrow: 1, borderRadius: '6px' }} />
+                        <Skeleton variant="rectangular" animation="wave" width="100%" height={40} style={{ margin: '0 4px', flexGrow: 1, borderRadius: '6px' }} />
+                        <Skeleton variant="rectangular" animation="wave" width="100%" height={40} style={{ margin: '0 4px', flexGrow: 1, borderRadius: '6px' }} />
+                        <Skeleton variant="rectangular" animation="wave" width="100%" height={40} style={{ margin: '0 4px', flexGrow: 1, borderRadius: '6px' }} />
                     </Tabs>
 
                     <Box p={1}>
-                        <Skeleton variant="text" width="80%" height={30} />
-                        <Skeleton variant="text" width="60%" height={30} className='mt-4' />
-                        <Skeleton variant="text" width="40%" height={30} className='mt-4' />
+                        <Skeleton variant="text" animation="wave" width="80%" height={30} />
+                        <Skeleton variant="text" animation="wave" width="60%" height={30} className='mt-4' />
+                        <Skeleton variant="text" animation="wave" width="40%" height={30} className='mt-4' />
                     </Box>
                 </div>
             </div>
+            <Footer />
         </>
     );
 };
 
+export const SlideshowSkeleton = () => {
+    return (
+        <Box className="relative w-full mx-auto mb-14" sx={{ position: 'relative' }}>
+            <Skeleton
+                variant="rectangular"
+                animation="wave"
+                width="100%"
+                height="800px"
+                sx={{ maxWidth: '2000px', borderRadius: '8px' }}
+            />
+
+            <Skeleton
+                variant="circular"
+                animation="wave"
+                width={50}
+                height={50}
+                sx={{
+                    position: 'absolute',
+                    top: '50%',
+                    left: '20px',
+                    transform: 'translateY(-50%)',
+                    zIndex: 10
+                }}
+            />
+
+            <Skeleton
+                variant="circular"
+                animation="wave"
+                width={50}
+                height={50}
+                sx={{
+                    position: 'absolute',
+                    top: '50%',
+                    right: '20px',
+                    transform: 'translateY(-50%)',
+                    zIndex: 10
+                }}
+            />
+        </Box>
+    );
+};
 
 export const GoBackHome = () => {
     return (
@@ -1076,7 +1117,6 @@ export const CheckoutButton = styled(Button)(({ theme }) => ({
 export const LoadingCart = () => {
     return (
         <>
-            <Navbar />
             <div className="container mx-auto px-24 py-2 mb-16 bg-gray-50 mt-10 flex">
                 <div className="flex-1">
                     <h1 className="text-2xl font-semilight mb-4">Cart</h1>
@@ -1152,7 +1192,6 @@ export const LoadingCart = () => {
         </>
     );
 };
-
 
 export const ProductItemSkeleton = () => {
     return (
@@ -1849,21 +1888,17 @@ export const LoadingOverlay = () => (
 export const NavbarLogo = ({ dashboardStyling }) => {
     const navigate = useNavigate();
 
-    const handleGoHome = () => {
-        navigate('/');
-    }
-
     return (
-        <div onClick={handleGoHome}>
+        <a href="/" onClick={(e) => {
+            e.preventDefault();
+            navigate('/');
+        }}>
             <Tooltip title="Home" arrow>
-                <button
-                    onClick={handleGoHome}
-                    className={`flex items-center cursor-pointer ${dashboardStyling || ''}`}
-                >
+                <div className={`flex items-center cursor-pointer ${dashboardStyling || ''}`}>
                     <img src={logo} alt="Logo" className="h-9" />
-                </button>
+                </div>
             </Tooltip>
-        </div>
+        </a>
     );
 }
 

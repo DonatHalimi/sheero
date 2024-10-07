@@ -33,9 +33,9 @@ const Navbar = () => {
             if (!auth.accessToken) return;
             try {
                 const { data: cart } = await axiosInstance.get('/cart');
-                setCartItems(cart.items);
+                setCartItems(cart.items || []);
 
-                const total = cart.items.reduce((acc, item) => {
+                const total = (cart.items || []).reduce((acc, item) => {
                     const price = item.product.salePrice || item.product.price;
                     return acc + price * item.quantity;
                 }, 0);
@@ -52,19 +52,18 @@ const Navbar = () => {
         setIsLoading(true);
         try {
             const { data } = await axiosInstance.delete('/cart/remove', {
-                headers: { Authorization: `Bearer ${auth.accessToken}` },
                 data: { productId },
             });
             toast.success('Product removed from cart');
-            setCartItems(data.items);
+            setCartItems(data.items || []);
 
-            const updatedTotal = data.items.reduce((acc, item) => {
+            const updatedTotal = (data.items || []).reduce((acc, item) => {
                 const price = item.product.salePrice || item.product.price;
                 return acc + price * item.quantity;
             }, 0);
             setCartTotal(updatedTotal);
 
-            if (data.items.length === 0) {
+            if (data.items && data.items.length === 0) {
                 setIsCartDropdownOpen(false);
             }
         } catch (error) {

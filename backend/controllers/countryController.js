@@ -6,7 +6,7 @@ const createCountry = async (req, res) => {
     try {
         const country = new Country({ name });
         await country.save();
-        res.status(201).json(country);
+        res.status(201).json({ message: 'Country created succesfully', country });
     } catch (error) {
         res.status(500).json({ message: 'Server error' });
     }
@@ -40,7 +40,7 @@ const updateCountry = async (req, res) => {
             { new: true }
         );
         if (!country) return res.status(404).json({ message: 'Country not found' });
-        res.status(200).json(country);
+        res.status(200).json({ message: 'Country updated succesfully', country });
     } catch (error) {
         res.status(500).json({ message: 'Server error' });
     }

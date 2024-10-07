@@ -19,16 +19,14 @@ const AddContactModal = ({ open, onClose, onAddSuccess }) => {
         const { name, email, subject, message } = formData;
 
         if (!name || !email || !subject || !message) {
-            toast.error('Please fill in all fields', {
-                closeOnClick: true
-            });
+            toast.error('Please fill in all fields');
             return;
         }
 
         try {
-            await axiosInstance.post('/contact/create', { name, email, subject, message });
-            toast.success('Contact message sent successfully');
-            onAddSuccess();
+            const response = await axiosInstance.post('/contact/create', formData);
+            toast.success(response.data.message);
+            onAddSuccess(response.data);
             onClose();
         } catch (error) {
             toast.error(error.response?.data?.message || 'Error sending message');

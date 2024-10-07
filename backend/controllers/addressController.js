@@ -20,7 +20,7 @@ const createAddress = async (req, res) => {
         });
 
         await address.save();
-        res.status(201).json(address);
+        res.status(201).json({ message: 'Address created succesfully', address });
     } catch (error) {
         console.error('Error creating address:', error);
         res.status(500).json({ message: 'Server error' });
@@ -85,11 +85,11 @@ const updateAddress = async (req, res) => {
 
         const updatedAddress = await Address.findByIdAndUpdate(
             address._id,
-            { name, street, city, country, phoneNumber, comment }, 
+            { name, street, city, country, phoneNumber, comment },
             { new: true, runValidators: true }
         );
 
-        res.status(200).json(updatedAddress);
+        res.status(200).json({ message: 'Address updated succesfully', updatedAddress });
     } catch (error) {
         console.error('Error updating address:', error);
         res.status(500).json({ message: 'Server error' });

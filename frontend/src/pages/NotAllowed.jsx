@@ -5,7 +5,10 @@ import notAllowed from '../assets/img/not-found.png';
 const NotAllowed = () => {
     return (
         <>
-            <ErrorPageComponent errorType={403} imageSrc={notAllowed} />
+            <ErrorPageComponent
+                errorType={403}
+                imageSrc={notAllowed}
+            />
         </>
     );
 };
