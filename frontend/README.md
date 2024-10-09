@@ -18,7 +18,3 @@ The frontend is structured to ensure maintainability, scalability, and ease of d
 ## Backend
 
 This frontend communicates with a robust backend API, which is fully documented and accessible through Postman. For detailed information on the API endpoints, request/response formats, and usage examples, please refer to the official [API documentation](https://documenter.getpostman.com/view/31736145/2sA3kRL56j) for sheero.
-
-## Documentation
-
-More detailed frontend documentation, covering component structures, state management, and routing logic, will be added in future commits.

@@ -25,7 +25,7 @@ const SharedWishlist = () => {
         const fetchWishlist = async () => {
             setLoading(true);
             try {
-                const { data } = await axiosInstance.get(getApiUrl(`/${userId}`));
+                const { data } = await axiosInstance.get(getApiUrl(`/wishlist/${userId}`));
                 setWishlistItems(data.items);
                 setFullName(`${data.firstName} ${data.lastName}`);
                 setTotalItems(data.items.length);
