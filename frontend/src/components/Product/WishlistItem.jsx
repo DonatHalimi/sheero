@@ -24,7 +24,7 @@ const WishlistItem = ({ product, onRemove, loading }) => {
     const [isActionLoading, setIsActionLoading] = useState(false);
 
     const { _id, name, image, price, discount, salePrice, inventoryCount } = product || {};
-    const imageUrl = getImageUrl(`/${image}`);
+    const imageUrl = getImageUrl(image);
     const discountPercentage = discount?.value || 0;
     const finalPrice = salePrice > 0 ? salePrice : price;
 

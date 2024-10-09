@@ -52,7 +52,7 @@ const EditProductModal = ({ open, onClose, product, onEditSuccess }) => {
             setSubSubcategory(product.subSubcategory || null);
             setInventoryCount(product.inventoryCount || '');
             setSupplier(product.supplier || null);
-            setImagePreview(product.image ? getImageUrl(`/${product.image}`) : '');
+            setImagePreview(product.image ? getImageUrl(product.image) : '');
 
             if (product.dimensions) {
                 setLength(product.dimensions.length || '');

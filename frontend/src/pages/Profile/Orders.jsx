@@ -90,7 +90,7 @@ const Orders = () => {
                 to={`/product/${product.product._id}`}
             >
                 <img
-                    src={getImageUrl(`/${product.product.image}`)}
+                    src={getImageUrl(product.product.image)}
                     alt={product.product.name}
                     className="w-20 h-20 object-cover rounded cursor-pointer"
                 />

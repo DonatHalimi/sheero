@@ -18,7 +18,7 @@ const EditCategoryModal = ({ open, onClose, category, onEditSuccess }) => {
         if (category) {
             setName(category.name);
             if (category.image) {
-                setImagePreview(getImageUrl(`/${category.image}`));
+                setImagePreview(getImageUrl(category.image));
             } else {
                 setImagePreview('');
             }

@@ -21,7 +21,7 @@ const EditSubcategoryModal = ({ open, onClose, subcategory, onEditSuccess }) => 
         if (subcategory) {
             setName(subcategory.name || '');
             setCategory(subcategory.category?._id || '');
-            setImagePreview(subcategory.image ? getImageUrl(`/${subcategory.image}`) : '');
+            setImagePreview(subcategory.image ? getImageUrl(subcategory.image) : '');
         }
     }, [subcategory]);
 

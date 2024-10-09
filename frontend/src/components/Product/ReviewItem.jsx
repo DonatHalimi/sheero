@@ -12,7 +12,7 @@ const ReviewItem = ({ review, onImageClick, onMenuClick, onCardClick }) => {
         >
             <Box className="flex-shrink-0 mr-4">
                 <img
-                    src={getImageUrl(`/${review.product.image}`)}
+                    src={getImageUrl(review.product.image)}
                     alt={review.product.name}
                     onClick={(event) => {
                         event.stopPropagation();

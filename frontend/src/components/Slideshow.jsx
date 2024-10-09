@@ -59,7 +59,7 @@ const Slideshow = () => {
                         <SplideSlide key={image._id}>
                             <div className="flex justify-center items-center">
                                 <img
-                                    src={getImageUrl(`/${image.image}`)}
+                                    src={getImageUrl(image.image)}
                                     alt={image.title}
                                     className="w-full max-w-[2000px] h-[800px] object-cover rounded-md"
                                     onLoad={() => splideRef.current?.splide.refresh()}

@@ -14,7 +14,7 @@ const ProductItem = ({ product, loading }) => {
     const [isLoading, setIsLoading] = useState({ cart: false, wishlist: false });
 
     const { _id, name, image, price, salePrice, inventoryCount } = product || {};
-    const imageUrl = getImageUrl(`/${image}`);
+    const imageUrl = getImageUrl(image);
     const discountPercentage = salePrice && price > 0 ? Math.round(((price - salePrice) / price) * 100) : 0;
     const finalPrice = salePrice > 0 ? salePrice : price;
 

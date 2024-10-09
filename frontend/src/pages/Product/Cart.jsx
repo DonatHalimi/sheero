@@ -187,7 +187,7 @@ const Cart = () => {
                                                 <TableCell component="th" scope="row">
                                                     <div className="flex items-center">
                                                         <img
-                                                            src={getImageUrl(`/${item.product.image}`)}
+                                                            src={getImageUrl(item.product.image)}
                                                             alt={item.product.name}
                                                             className="w-20 h-20 object-cover cursor-pointer rounded mr-4"
                                                             onClick={() => handleProductClick(item.product._id)}

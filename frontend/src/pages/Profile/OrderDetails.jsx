@@ -134,7 +134,7 @@ const OrderDetails = () => {
                                                             <TableCell component="th" scope="row">
                                                                 <Link to={`/product/${product._id}`} className="flex items-center">
                                                                     <img
-                                                                        src={getImageUrl(`/${product.image}`)}
+                                                                        src={getImageUrl(product.image)}
                                                                         alt={product.name}
                                                                         className="w-20 h-20 object-cover rounded mr-2"
                                                                     />

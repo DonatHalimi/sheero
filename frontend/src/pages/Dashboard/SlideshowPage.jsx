@@ -72,11 +72,11 @@ const SlideshowPage = () => {
             render: (item) => (
                 <img
                     className='rounded-md cursor-pointer'
-                    src={getImageUrl(`/${item.image}`)}
+                    src={getImageUrl(item.image)}
                     alt=""
                     width={70}
                     style={{ position: 'relative', top: '8px' }}
-                    onClick={() => handleImageClick(getImageUrl(`/${item.image}`))}
+                    onClick={() => handleImageClick(getImageUrl(item.image))}
                 />
             )
         },
