@@ -120,10 +120,10 @@ const payWithStripe = async (req, res) => {
 };
 
 const verifyOrder = async (req, res) => {
-    const { order_id, success } = req.body;
+    const { order_id, success } = req.query;
 
     try {
-        if (success === true) {
+        if (success === 'true') {
             await Order.findByIdAndUpdate(order_id, { paymentStatus: 'completed' });
             res.json({ success: true, message: 'Payment completed successfully.' });
         } else {
