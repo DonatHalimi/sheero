@@ -3,6 +3,7 @@ import { Skeleton } from '@mui/material';
 import React, { useEffect, useRef, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import useAxios from '../../axiosInstance';
+import { getImageUrl } from '../../config';
 
 const CategoryNavbar = ({ children }) => {
     const axiosInstance = useAxios();
@@ -125,7 +126,7 @@ const CategoryNavbar = ({ children }) => {
                                                 <ul>
                                                     {subcategories[category._id].map((subcategory) => (
                                                         <li key={subcategory._id} className="mb-2 flex items-center">
-                                                            <img className='rounded-md' src={`http://localhost:5000/${subcategory.image}`} alt="" width={50} />
+                                                            <img className='rounded-md' src={getImageUrl(`/${subcategory.image}`)} alt="" width={50} />
                                                             <div>
                                                                 <button
                                                                     onClick={() => handleNavigation(`/products/subcategory/${subcategory._id}`, category._id)}

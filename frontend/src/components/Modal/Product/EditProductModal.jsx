@@ -5,6 +5,7 @@ import React, { useContext, useEffect, useState } from 'react';
 import { toast } from 'react-toastify';
 import { BrownButton, BrownOutlinedTextField, CustomPaper, OutlinedBrownButton, OutlinedBrownFormControl, VisuallyHiddenInput } from '../../../assets/CustomComponents';
 import useAxios from '../../../axiosInstance';
+import { getImageUrl } from '../../../config';
 import { AuthContext } from '../../../context/AuthContext';
 
 const EditProductModal = ({ open, onClose, product, onEditSuccess }) => {
@@ -51,7 +52,7 @@ const EditProductModal = ({ open, onClose, product, onEditSuccess }) => {
             setSubSubcategory(product.subSubcategory || null);
             setInventoryCount(product.inventoryCount || '');
             setSupplier(product.supplier || null);
-            setImagePreview(product.image ? `http://localhost:5000/${product.image}` : '');
+            setImagePreview(product.image ? getImageUrl(`/${product.image}`) : '');
 
             if (product.dimensions) {
                 setLength(product.dimensions.length || '');

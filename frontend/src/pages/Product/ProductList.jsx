@@ -2,8 +2,8 @@ import axios from 'axios';
 import React, { useEffect, useState } from 'react';
 import { CustomPagination } from '../../assets/CustomComponents';
 import ProductItem from '../../components/Product/ProductItem';
+import { getApiUrl } from '../../config';
 
-const apiUrl = 'http://localhost:5000/api/products';
 const itemsPerPage = 10;
 
 const ProductList = () => {
@@ -16,7 +16,7 @@ const ProductList = () => {
         const fetchProducts = async () => {
             setLoading(true);
             try {
-                const response = await axios.get(`${apiUrl}/get`);
+                const response = await axios.get(getApiUrl('/products/get'));
                 setProducts(response.data.products);
                 setTotalProducts(response.data.products.length);
             } catch (error) {

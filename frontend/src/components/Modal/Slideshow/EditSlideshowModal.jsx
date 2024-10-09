@@ -19,7 +19,7 @@ const EditSlideshowModal = ({ open, onClose, image, onEditSuccess }) => {
             setTitle(image.title);
             setDescription(image.description);
             if (image.image) {
-                setImagePreview(`http://localhost:5000/${image.image}`);
+                setImagePreview(getImageUrl(`/${image.image}`));
             } else {
                 setImagePreview('');
             }

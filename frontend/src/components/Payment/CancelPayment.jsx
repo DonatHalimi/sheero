@@ -29,9 +29,9 @@ const CancelPayment = () => {
             <motion.div
                 initial={{ scale: 0, rotate: 0 }}
                 animate={{ scale: 1.1, rotate: 360 }}
-                transition={{ 
-                    type: 'spring', 
-                    stiffness: 260, 
+                transition={{
+                    type: 'spring',
+                    stiffness: 260,
                     damping: 20,
                     duration: 1.5
                 }}

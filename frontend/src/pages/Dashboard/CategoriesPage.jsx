@@ -7,6 +7,7 @@ import EditCategoryModal from '../../components/Modal/Category/EditCategoryModal
 import DeleteModal from '../../components/Modal/DeleteModal';
 import ImagePreviewModal from '../../components/Modal/ImagePreviewModal';
 import { AuthContext } from '../../context/AuthContext';
+import { getImageUrl } from '../../config';
 
 const CategoriesPage = () => {
     const [categories, setCategories] = useState([]);
@@ -71,11 +72,11 @@ const CategoriesPage = () => {
             render: (item) => (
                 <img
                     className='rounded-md cursor-pointer'
-                    src={`http://localhost:5000/${item.image}`}
+                    src={getImageUrl(`/${item.image}`)}
                     alt=""
                     width={70}
                     style={{ position: 'relative', top: '3px' }}
-                    onClick={() => handleImageClick(`http://localhost:5000/${item.image}`)}
+                    onClick={() => handleImageClick(getImageUrl(`/${item.image}`))}
                 />
             )
         },

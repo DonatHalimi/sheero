@@ -7,6 +7,7 @@ import ImagePreviewModal from '../../components/Modal/ImagePreviewModal';
 import AddProductModal from '../../components/Modal/Product/AddProductModal';
 import EditProductModal from '../../components/Modal/Product/EditProductModal';
 import { AuthContext } from '../../context/AuthContext';
+import { getImageUrl } from '../../config';
 
 const ProductsPage = () => {
     const [products, setProducts] = useState([]);
@@ -91,11 +92,11 @@ const ProductsPage = () => {
             render: (item) => (
                 <img
                     className='rounded-md cursor-pointer'
-                    src={`http://localhost:5000/${item.image}`}
+                    src={getImageUrl(`/${item.image}`)}
                     alt=""
                     width={70}
                     style={{ position: 'relative', top: '7px' }}
-                    onClick={() => handleImageClick(`http://localhost:5000/${item.image}`)}
+                    onClick={() => handleImageClick(getImageUrl(`/${item.image}`))}
                 />
             )
         },

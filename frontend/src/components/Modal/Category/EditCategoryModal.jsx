@@ -3,6 +3,7 @@ import React, { useContext, useEffect, useState } from 'react';
 import { toast } from 'react-toastify';
 import { BrownButton, BrownOutlinedTextField, CustomBox, CustomModal, CustomTypography, OutlinedBrownButton, VisuallyHiddenInput } from '../../../assets/CustomComponents';
 import useAxios from '../../../axiosInstance';
+import { getImageUrl } from '../../../config';
 import { AuthContext } from '../../../context/AuthContext';
 
 const EditCategoryModal = ({ open, onClose, category, onEditSuccess }) => {
@@ -17,7 +18,7 @@ const EditCategoryModal = ({ open, onClose, category, onEditSuccess }) => {
         if (category) {
             setName(category.name);
             if (category.image) {
-                setImagePreview(`http://localhost:5000/${category.image}`);
+                setImagePreview(getImageUrl(`/${category.image}`));
             } else {
                 setImagePreview('');
             }

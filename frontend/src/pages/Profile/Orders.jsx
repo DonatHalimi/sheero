@@ -9,6 +9,7 @@ import Navbar from '../../components/Navbar/Navbar';
 import OrderItem from '../../components/Product/OrderItem';
 import { AuthContext } from '../../context/AuthContext';
 import ProfileSidebar from './ProfileSidebar';
+import { getImageUrl } from '../../config';
 
 const itemsPerPage = 5;
 
@@ -89,7 +90,7 @@ const Orders = () => {
                 to={`/product/${product.product._id}`}
             >
                 <img
-                    src={`http://localhost:5000/${product.product.image}`}
+                    src={getImageUrl(`/${product.product.image}`)}
                     alt={product.product.name}
                     className="w-20 h-20 object-cover rounded cursor-pointer"
                 />

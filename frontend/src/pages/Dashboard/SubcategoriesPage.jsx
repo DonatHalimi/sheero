@@ -7,6 +7,7 @@ import ImagePreviewModal from '../../components/Modal/ImagePreviewModal';
 import AddSubcategoryModal from '../../components/Modal/Subcategory/AddSubcategoryModal';
 import EditSubcategoryModal from '../../components/Modal/Subcategory/EditSubcategoryModal';
 import { AuthContext } from '../../context/AuthContext';
+import { getImageUrl } from '../../config';
 
 const SubcategoriesPage = () => {
     const [subcategories, setSubcategories] = useState([]);
@@ -75,11 +76,11 @@ const SubcategoriesPage = () => {
             render: (item) => (
                 <img
                     className='rounded-md cursor-pointer'
-                    src={`http://localhost:5000/${item.image}`}
+                    src={getImageUrl(`/${item.image}`)}
                     alt=""
                     width={70}
                     style={{ position: 'relative', top: '3px' }}
-                    onClick={() => handleImageClick(`http://localhost:5000/${item.image}`)}
+                    onClick={() => handleImageClick(getImageUrl(`/${item.image}`))}
                 />
             )
         },

@@ -1,12 +1,13 @@
 import { Box, LinearProgress, Table, TableBody, TableCell, TableContainer, TableHead, TableRow, Typography } from '@mui/material';
 import React, { useEffect, useState } from 'react';
-import { Link, useParams, useNavigate } from 'react-router-dom';
+import { Link, useNavigate, useParams } from 'react-router-dom';
 import 'react-toastify/dist/ReactToastify.css';
 import { EmptyState, formatDate, Header, OrderDetailsSkeleton } from '../../assets/CustomComponents';
 import emptyOrdersImage from '../../assets/img/empty-orders.png';
 import useAxios from '../../axiosInstance';
 import Footer from '../../components/Footer';
 import Navbar from '../../components/Navbar/Navbar';
+import { getImageUrl } from '../../config';
 import ProfileSidebar from './ProfileSidebar';
 
 const OrderDetails = () => {
@@ -133,7 +134,7 @@ const OrderDetails = () => {
                                                             <TableCell component="th" scope="row">
                                                                 <Link to={`/product/${product._id}`} className="flex items-center">
                                                                     <img
-                                                                        src={`http://localhost:5000/${product.image}`}
+                                                                        src={getImageUrl(`/${product.image}`)}
                                                                         alt={product.name}
                                                                         className="w-20 h-20 object-cover rounded mr-2"
                                                                     />

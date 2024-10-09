@@ -12,8 +12,9 @@ import {
     WishlistButton
 } from '../../assets/CustomComponents';
 import NoImage from '../../assets/img/product-not-found.jpg';
-import { AuthContext } from '../../context/AuthContext';
 import useAxios from '../../axiosInstance';
+import { getImageUrl } from '../../config';
+import { AuthContext } from '../../context/AuthContext';
 
 const WishlistItem = ({ product, onRemove, loading }) => {
     const { auth } = useContext(AuthContext);
@@ -23,7 +24,7 @@ const WishlistItem = ({ product, onRemove, loading }) => {
     const [isActionLoading, setIsActionLoading] = useState(false);
 
     const { _id, name, image, price, discount, salePrice, inventoryCount } = product || {};
-    const imageUrl = `http://localhost:5000/${image}`;
+    const imageUrl = getImageUrl(`/${image}`);
     const discountPercentage = discount?.value || 0;
     const finalPrice = salePrice > 0 ? salePrice : price;
 

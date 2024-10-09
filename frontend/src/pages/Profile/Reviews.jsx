@@ -2,14 +2,14 @@ import { Box, Typography } from '@mui/material';
 import React, { useContext, useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { CustomDeleteModal, CustomMenu, CustomPagination, EmptyState, Header, LoadingOverlay, ReviewItemSkeleton, ReviewModal } from '../../assets/CustomComponents';
+import emptyReviewsImage from '../../assets/img/empty-reviews.png';
+import useAxios from '../../axiosInstance';
 import Footer from '../../components/Footer';
 import Navbar from '../../components/Navbar/Navbar';
 import EditReviewModal from '../../components/Product/EditReviewModal';
 import ReviewItem from '../../components/Product/ReviewItem';
 import { AuthContext } from '../../context/AuthContext';
 import ProfileSidebar from './ProfileSidebar';
-import emptyReviewsImage from '../../assets/img/empty-reviews.png';
-import useAxios from '../../axiosInstance';
 
 const itemsPerPage = 4;
 

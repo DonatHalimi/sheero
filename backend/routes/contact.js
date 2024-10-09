@@ -5,7 +5,7 @@ const router = express.Router();
 
 router.post('/create', protect, createContact);
 router.get('/get', requireAuthAndRole('admin'), getContacts);
-router.get('/delete', requireAuthAndRole('admin'), deleteContact);
+router.delete('/delete/:id', requireAuthAndRole('admin'), deleteContact);
 router.delete('/delete-bulk', requireAuthAndRole('admin'), deleteContacts)
 
 module.exports = router;

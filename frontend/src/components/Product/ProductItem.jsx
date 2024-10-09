@@ -6,6 +6,7 @@ import { toast } from 'react-toastify';
 import { CartWishlistButtons, DiscountPercentage, OutOfStock, ProductItemSkeleton } from '../../assets/CustomComponents';
 import NoImage from '../../assets/img/product-not-found.jpg';
 import { AuthContext } from '../../context/AuthContext';
+import { getApiUrl, getImageUrl } from '../../config';
 
 const ProductItem = ({ product, loading }) => {
     const navigate = useNavigate();
@@ -13,7 +14,7 @@ const ProductItem = ({ product, loading }) => {
     const [isLoading, setIsLoading] = useState({ cart: false, wishlist: false });
 
     const { _id, name, image, price, salePrice, inventoryCount } = product || {};
-    const imageUrl = `http://localhost:5000/${image}`;
+    const imageUrl = getImageUrl(`/${image}`);
     const discountPercentage = salePrice && price > 0 ? Math.round(((price - salePrice) / price) * 100) : 0;
     const finalPrice = salePrice > 0 ? salePrice : price;
 
@@ -22,7 +23,7 @@ const ProductItem = ({ product, loading }) => {
     if (loading) {
         return <ProductItemSkeleton />;
     }
-    
+
     const handleAction = (action) => async (e) => {
         e.stopPropagation();
         if (!auth.accessToken) {
@@ -35,7 +36,7 @@ const ProductItem = ({ product, loading }) => {
 
         try {
             const endpoint = action === 'cart' ? 'cart/add' : 'wishlist/add';
-            await axios.post(`http://localhost:5000/api/${endpoint}`, {
+            await axios.post(getApiUrl(`/${endpoint}`), {
                 productId: _id,
                 ...(action === 'cart' && { quantity: 1 }),
             }, {

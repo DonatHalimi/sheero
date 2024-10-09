@@ -7,6 +7,7 @@ import noProducts from '../../assets/img/no-products.png';
 import Footer from '../../components/Footer';
 import Navbar from '../../components/Navbar/Navbar';
 import ProductItem from '../../components/Product/ProductItem';
+import { getApiUrl } from '../../config';
 
 const ProductsBySubSubCategory = () => {
     const { id } = useParams();
@@ -20,10 +21,10 @@ const ProductsBySubSubCategory = () => {
         const fetchProductsAndCategory = async () => {
             setLoading(true);
             try {
-                const subSubcategoryResponse = await axios.get(`http://localhost:5000/api/subsubcategories/get/${id}`);
+                const subSubcategoryResponse = await axios.get(getApiUrl(`/subsubcategories/get/${id}`));
                 setSubsubcategoryName(subSubcategoryResponse.data.name);
 
-                const productsResponse = await axios.get(`http://localhost:5000/api/products/get-by-subSubcategory/${id}`);
+                const productsResponse = await axios.get(getApiUrl(`/products/get-by-subSubcategory/${id}`));
                 setProducts(productsResponse.data.products);
                 setCurrentPage(1);
             } catch (error) {

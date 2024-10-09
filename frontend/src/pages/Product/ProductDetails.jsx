@@ -1,5 +1,4 @@
 import { LocalAtm, Payment } from '@mui/icons-material';
-import { CircularProgress } from '@mui/material';
 import axios from 'axios';
 import React, { useContext, useEffect, useState } from 'react';
 import { useNavigate, useParams } from 'react-router-dom';
@@ -16,9 +15,8 @@ import ImagePreviewModal from '../../components/Modal/ImagePreviewModal';
 import Navbar from '../../components/Navbar/Navbar';
 import AddReviewModal from '../../components/Product/AddReviewModal';
 import ProductDetailsTabs from '../../components/Product/ProductDetailsTabs';
+import { getApiUrl, getImageUrl } from '../../config';
 import { AuthContext } from '../../context/AuthContext';
-
-const apiUrl = 'http://localhost:5000/api';
 
 const ProductDetails = () => {
     const { id } = useParams();
@@ -36,7 +34,7 @@ const ProductDetails = () => {
     useEffect(() => {
         const fetchProduct = async () => {
             try {
-                const response = await axios.get(`${apiUrl}/products/get/${id}`);
+                const response = await axios.get(getApiUrl(`/products/get/${id}`));
                 setProduct(response.data);
             } catch (error) {
                 console.error('Error fetching product:', error);
@@ -91,7 +89,7 @@ const ProductDetails = () => {
 
         setLoadingState(true);
         try {
-            await axios.post(`${apiUrl}/${endpoint}`, payload, {
+            await axios.post(getApiUrl(`/${endpoint}`), payload, {
                 headers: { Authorization: `Bearer ${auth.accessToken}` },
             });
 
@@ -116,7 +114,7 @@ const ProductDetails = () => {
     };
 
     const { name, image, price, salePrice, discount, inventoryCount } = product || {};
-    const imageUrl = `http://localhost:5000/${image}`;
+    const imageUrl = getImageUrl(image);
     const originalPrice = price || 0;
     const discountPercentage = discount?.value || 0;
     const discountedPrice = salePrice || originalPrice;

@@ -70,8 +70,8 @@ import PropTypes from 'prop-types';
 import React, { useEffect, useRef, useState } from 'react';
 import { Link as RouterLink, useNavigate } from 'react-router-dom';
 import Footer from '../components/Footer';
-import Navbar from '../components/Navbar/Navbar';
 import logo from './img/logo.png';
+import { getImageUrl } from '../config';
 
 export const BrownOutlinedTextField = styled(TextField)({
     '& .MuiOutlinedInput-root': {
@@ -905,7 +905,7 @@ export const ReviewModal = ({ open, handleClose, selectedReview, onImageClick })
                             justifyContent: 'center'
                         }}>
                             <img
-                                src={`http://localhost:5000/${selectedReview.product.image}`}
+                                src={getImageUrl(`/${selectedReview.product.image}`)}
                                 alt={selectedReview.product.name}
                                 onClick={() => onImageClick(selectedReview.product._id)}
                                 className="w-full h-auto object-cover rounded-md cursor-pointer"
@@ -1720,7 +1720,7 @@ export const SearchDropdown = ({ results, onClickSuggestion, searchBarWidth }) =
                     onClick={() => onClickSuggestion(result._id)}
                 >
                     <img
-                        src={`http://localhost:5000/${result.image}`}
+                        src={getImageUrl(`/${result.image}`)}
                         alt={result.name}
                         style={{
                             width: '40px',
@@ -1833,7 +1833,7 @@ export const CartDropdown = ({
                             className={'flex justify-between items-center mb-4'}
                         >
                             <img
-                                src={`http://localhost:5000/${item.product.image}`}
+                                src={getImageUrl(`/${item.product.image}`)}
                                 alt={item.product.name}
                                 className="w-12 h-12 object-cover rounded cursor-pointer"
                                 onClick={() => handleProductClick(item.product._id)}

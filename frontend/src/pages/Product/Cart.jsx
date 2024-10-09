@@ -9,6 +9,7 @@ import useAxios from '../../axiosInstance';
 import Footer from '../../components/Footer';
 import Navbar from '../../components/Navbar/Navbar';
 import PaymentModal from '../../components/Product/PaymentModal';
+import { getImageUrl } from '../../config';
 import { AuthContext } from '../../context/AuthContext';
 
 const Cart = () => {
@@ -186,7 +187,7 @@ const Cart = () => {
                                                 <TableCell component="th" scope="row">
                                                     <div className="flex items-center">
                                                         <img
-                                                            src={`http://localhost:5000/${item.product.image}`}
+                                                            src={getImageUrl(`/${item.product.image}`)}
                                                             alt={item.product.name}
                                                             className="w-20 h-20 object-cover cursor-pointer rounded mr-4"
                                                             onClick={() => handleProductClick(item.product._id)}

@@ -7,6 +7,7 @@ import ImagePreviewModal from '../../components/Modal/ImagePreviewModal';
 import AddSlideshowModal from '../../components/Modal/Slideshow/AddSlideshowModal';
 import EditSlideshowModal from '../../components/Modal/Slideshow/EditSlideshowModal';
 import { AuthContext } from '../../context/AuthContext';
+import { getImageUrl } from '../../config';
 
 const SlideshowPage = () => {
     const [images, setImages] = useState([]);
@@ -71,11 +72,11 @@ const SlideshowPage = () => {
             render: (item) => (
                 <img
                     className='rounded-md cursor-pointer'
-                    src={`http://localhost:5000/${item.image}`}
+                    src={getImageUrl(`/${item.image}`)}
                     alt=""
                     width={70}
                     style={{ position: 'relative', top: '8px' }}
-                    onClick={() => handleImageClick(`http://localhost:5000/${item.image}`)}
+                    onClick={() => handleImageClick(getImageUrl(`/${item.image}`))}
                 />
             )
         },

@@ -1,6 +1,7 @@
 import axios from 'axios';
 import CryptoJS from 'crypto-js';
 import React, { createContext, useEffect, useState } from 'react';
+import { getApiUrl } from '../config';
 
 const AuthContext = createContext();
 
@@ -56,7 +57,7 @@ const AuthProvider = ({ children }) => {
                 throw new Error('No refresh token available');
             }
 
-            const response = await axios.post('http://localhost:5000/api/auth/token/refresh',
+            const response = await axios.post(getApiUrl('/auth/token/refresh'),
                 { refreshToken },
                 { headers: { 'Content-Type': 'application/json' } }
             );
@@ -80,7 +81,7 @@ const AuthProvider = ({ children }) => {
 
     const login = async (email, password) => {
         try {
-            const response = await axios.post('http://localhost:5000/api/auth/login', { email, password });
+            const response = await axios.post(getApiUrl('/auth/login'), { email, password });
 
             const authData = {
                 accessToken: response.data.accessToken,
@@ -114,7 +115,7 @@ const AuthProvider = ({ children }) => {
 
     const register = async (firstName, lastName, email, password) => {
         try {
-            await axios.post('http://localhost:5000/api/auth/register', { firstName, lastName, email, password });
+            await axios.post(getApiUrl('/auth/register'), { firstName, lastName, email, password });
             return { success: true };
         } catch (error) {
             console.error('Registration failed:', error.response?.data?.message || 'Registration failed');

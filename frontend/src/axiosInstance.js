@@ -1,12 +1,13 @@
 import axios from 'axios';
 import { useContext } from 'react';
+import { API_URL } from './config';
 import { AuthContext } from './context/AuthContext';
 
 const useAxios = () => {
     const { auth, setAuth } = useContext(AuthContext);
 
     const axiosInstance = axios.create({
-        baseURL: 'http://localhost:5000/api',
+        baseURL: API_URL,
     });
 
     // Request interceptor to add the access token to every request
@@ -34,7 +35,7 @@ const useAxios = () => {
 
                 try {
                     // Request to refresh the token
-                    const { data } = await axios.post('http://localhost:5000/api/auth/token/refresh', {
+                    const { data } = await axios.post(`${API_URL}/auth/token/refresh`, {
                         refreshToken: auth.refreshToken,
                     });
 

@@ -2,18 +2,17 @@ import { Splide, SplideSlide } from '@splidejs/react-splide';
 import axios from 'axios';
 import React, { useEffect, useRef, useState } from 'react';
 import { SlideshowSkeleton } from '../assets/CustomComponents';
+import { getApiUrl, getImageUrl } from '../config';
 
 const Slideshow = () => {
     const [images, setImages] = useState([]);
     const [loading, setLoading] = useState(true);
     const splideRef = useRef(null);
 
-    const apiUrl = 'http://localhost:5000/api/slideshow';
-
     useEffect(() => {
         const fetchImages = async () => {
             try {
-                const { data } = await axios.get(`${apiUrl}/get`);
+                const { data } = await axios.get(getApiUrl('/slideshow/get'));
                 setImages(data);
             } catch (error) {
                 console.error('Error fetching images:', error);
@@ -60,7 +59,7 @@ const Slideshow = () => {
                         <SplideSlide key={image._id}>
                             <div className="flex justify-center items-center">
                                 <img
-                                    src={`http://localhost:5000/${image.image}`}
+                                    src={getImageUrl(`/${image.image}`)}
                                     alt={image.title}
                                     className="w-full max-w-[2000px] h-[800px] object-cover rounded-md"
                                     onLoad={() => splideRef.current?.splide.refresh()}

@@ -7,8 +7,8 @@ import useAxios from '../../axiosInstance';
 import Footer from '../Footer';
 import Navbar from '../Navbar/Navbar';
 import ProductItem from './ProductItem';
+import { getApiUrl } from '../../config';
 
-const apiUrl = 'http://localhost:5000/api/wishlist';
 const itemsPerPage = 10;
 
 const SharedWishlist = () => {
@@ -25,7 +25,7 @@ const SharedWishlist = () => {
         const fetchWishlist = async () => {
             setLoading(true);
             try {
-                const { data } = await axiosInstance.get(`${apiUrl}/${userId}`);
+                const { data } = await axiosInstance.get(getApiUrl(`/${userId}`));
                 setWishlistItems(data.items);
                 setFullName(`${data.firstName} ${data.lastName}`);
                 setTotalItems(data.items.length);

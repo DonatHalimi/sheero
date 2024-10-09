@@ -8,6 +8,8 @@ dotenv.config();
 
 const stripe = Stripe(process.env.STRIPE_SECRET_KEY);
 
+const frontendUrl = process.env.NODE_ENV === 'production' ? 'https://sheero.onrender.com' : 'http://localhost:5000';
+
 const payWithStripe = async (req, res) => {
     try {
         const { productIds, addressId, userId, email } = req.body;
@@ -89,8 +91,8 @@ const payWithStripe = async (req, res) => {
             payment_method_types: ['card'],
             line_items: lineItems,
             mode: 'payment',
-            success_url: `http://localhost:3000/verify?success=true&session_id={CHECKOUT_SESSION_ID}&order_id=${order._id}`,
-            cancel_url: `http://localhost:3000/verify?success=false&session_id={CHECKOUT_SESSION_ID}&order_id=${order._id}`,
+            success_url: `${frontendUrl}/verify?success=true&session_id={CHECKOUT_SESSION_ID}&order_id=${order._id}`,
+            cancel_url: `${frontendUrl}/verify?success=false&session_id={CHECKOUT_SESSION_ID}&order_id=${order._id}`,
             customer_email: email,
             metadata: {
                 userId: userId,

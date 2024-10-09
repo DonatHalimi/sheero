@@ -9,12 +9,12 @@ import {
     ProductItemSkeleton,
 } from '../../assets/CustomComponents';
 import emptyWishlistImage from '../../assets/img/empty-wishlist.png';
+import useAxios from '../../axiosInstance';
 import Footer from '../../components/Footer';
 import Navbar from '../../components/Navbar/Navbar';
 import WishlistItem from '../../components/Product/WishlistItem';
 import { AuthContext } from '../../context/AuthContext';
 import ProfileSidebar from './ProfileSidebar';
-import useAxios from '../../axiosInstance';
 
 const itemsPerPage = 6;
 

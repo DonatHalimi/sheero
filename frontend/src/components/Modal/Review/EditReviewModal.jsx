@@ -44,7 +44,7 @@ const EditReviewModal = ({ open, onClose, review, onEditSuccess }) => {
             comment,
             productId: product
         }
-        
+
         try {
             const response = await axiosInstance.put(`/reviews/update/${review._id}`, updatedData);
             toast.success(response.data.message);

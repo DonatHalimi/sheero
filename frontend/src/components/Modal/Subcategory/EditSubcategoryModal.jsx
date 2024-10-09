@@ -4,6 +4,7 @@ import React, { useContext, useEffect, useState } from 'react';
 import { toast } from 'react-toastify';
 import { BrownButton, BrownOutlinedTextField, CustomBox, CustomModal, CustomTypography, OutlinedBrownButton, OutlinedBrownFormControl, VisuallyHiddenInput } from '../../../assets/CustomComponents';
 import useAxios from '../../../axiosInstance';
+import { getImageUrl } from '../../../config';
 import { AuthContext } from '../../../context/AuthContext';
 
 const EditSubcategoryModal = ({ open, onClose, subcategory, onEditSuccess }) => {
@@ -20,7 +21,7 @@ const EditSubcategoryModal = ({ open, onClose, subcategory, onEditSuccess }) => 
         if (subcategory) {
             setName(subcategory.name || '');
             setCategory(subcategory.category?._id || '');
-            setImagePreview(subcategory.image ? `http://localhost:5000/${subcategory.image}` : '');
+            setImagePreview(subcategory.image ? getImageUrl(`/${subcategory.image}`) : '');
         }
     }, [subcategory]);
 
