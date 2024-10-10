@@ -32,7 +32,7 @@ const AuthProvider = ({ children }) => {
     const [auth, setAuthState] = useState({
         accessToken: getLocalStorageItem('accessToken', true),
         refreshToken: getLocalStorageItem('refreshToken', true),
-        role: getLocalStorageItem('role', true) || null,
+        role: getLocalStorageItem('role', true),
         firstName: getLocalStorageItem('firstName'),
         lastName: getLocalStorageItem('lastName'),
         email: getLocalStorageItem('email'),
@@ -53,18 +53,25 @@ const AuthProvider = ({ children }) => {
     const refreshAccessToken = async () => {
         try {
             const refreshToken = getLocalStorageItem('refreshToken', true);
-            if (!refreshToken) throw new Error('No refresh token available');
+            if (!refreshToken) {
+                throw new Error('No refresh token available');
+            }
 
-            const response = await axios.post(getApiUrl('/auth/token/refresh'), { refreshToken }, { headers: { 'Content-Type': 'application/json' } });
-            const { accessToken, role } = response.data;
+            const response = await axios.post(getApiUrl('/auth/token/refresh'),
+                { refreshToken },
+                { headers: { 'Content-Type': 'application/json' } }
+            );
+
+            const newAccessToken = response.data.accessToken;
+            const newRole = response.data.role;
 
             setAuth({
                 ...auth,
-                accessToken,
-                role,
+                accessToken: newAccessToken,
+                role: newRole,
             });
 
-            return accessToken;
+            return newAccessToken;
         } catch (error) {
             console.error('Failed to refresh access token:', error.response?.data?.message || error.message);
             logout();
