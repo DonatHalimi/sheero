@@ -1,4 +1,5 @@
 const Supplier = require('../models/Supplier');
+const User = require('../models/User');
 
 const validateEmail = (email) => {
     const re = /^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$/;
@@ -6,6 +7,11 @@ const validateEmail = (email) => {
 };
 
 const createSupplier = async (req, res) => {
+    const requestingUser = await User.findById(req.user.userId).populate('role');
+    if (requestingUser.role.name !== 'admin') {
+        return res.status(403).json({ message: 'Forbidden' });
+    }
+
     const { name, contactInfo } = req.body;
 
     if (!name || !contactInfo || !contactInfo.email || !contactInfo.phoneNumber) {
@@ -30,6 +36,11 @@ const createSupplier = async (req, res) => {
 };
 
 const getSuppliers = async (req, res) => {
+    const requestingUser = await User.findById(req.user.userId).populate('role');
+    if (requestingUser.role.name !== 'admin') {
+        return res.status(403).json({ message: 'Forbidden' });
+    }
+
     try {
         const suppliers = await Supplier.find();
         res.status(200).json(suppliers);
@@ -40,6 +51,11 @@ const getSuppliers = async (req, res) => {
 };
 
 const getSupplier = async (req, res) => {
+    const requestingUser = await User.findById(req.user.userId).populate('role');
+    if (requestingUser.role.name !== 'admin') {
+        return res.status(403).json({ message: 'Forbidden' });
+    }
+
     try {
         const supplier = await Supplier.findById(req.params.id);
         if (!supplier) return res.status(404).json({ message: 'Supplier not found' });
@@ -51,6 +67,11 @@ const getSupplier = async (req, res) => {
 };
 
 const updateSupplier = async (req, res) => {
+    const requestingUser = await User.findById(req.user.userId).populate('role');
+    if (requestingUser.role.name !== 'admin') {
+        return res.status(403).json({ message: 'Forbidden' });
+    }
+
     const { name, contactInfo } = req.body;
     try {
         const supplier = await Supplier.findByIdAndUpdate(
@@ -67,6 +88,11 @@ const updateSupplier = async (req, res) => {
 };
 
 const deleteSupplier = async (req, res) => {
+    const requestingUser = await User.findById(req.user.userId).populate('role');
+    if (requestingUser.role.name !== 'admin') {
+        return res.status(403).json({ message: 'Forbidden' });
+    }
+
     try {
         const supplier = await Supplier.findByIdAndDelete(req.params.id);
         if (!supplier) return res.status(404).json({ message: 'Supplier not found' });
@@ -78,6 +104,11 @@ const deleteSupplier = async (req, res) => {
 };
 
 const deleteSuppliers = async (req, res) => {
+    const requestingUser = await User.findById(req.user.userId).populate('role');
+    if (requestingUser.role.name !== 'admin') {
+        return res.status(403).json({ message: 'Forbidden' });
+    }
+
     const { ids } = req.body;
 
     if (!ids || !Array.isArray(ids) || ids.length === 0) {

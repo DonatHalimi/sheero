@@ -1,7 +1,7 @@
 import VisibilityIcon from '@mui/icons-material/Visibility';
 import VisibilityOffIcon from '@mui/icons-material/VisibilityOff';
 import { IconButton, InputAdornment, InputLabel, MenuItem, Select } from '@mui/material';
-import React, { useContext, useState } from 'react';
+import React, { useContext, useEffect, useState } from 'react';
 import { toast } from 'react-toastify';
 import { BrownButton, BrownOutlinedTextField, CustomBox, CustomModal, CustomTypography, OutlinedBrownFormControl } from '../../../assets/CustomComponents';
 import useAxios from '../../../axiosInstance';
@@ -14,9 +14,23 @@ const AddUserModal = ({ open, onClose, onAddSuccess }) => {
     const [password, setPassword] = useState('');
     const [showPassword, setShowPassword] = useState(false);
     const [role, setRole] = useState('');
+    const [roles, setRoles] = useState([]); // Initialize roles state as an empty array
 
     const { refreshToken } = useContext(AuthContext);
     const axiosInstance = useAxios(refreshToken);
+
+    useEffect(() => {
+        const fetchRoles = async () => {
+            try {
+                const response = await axiosInstance.get('/roles/get');
+                setRoles(response.data);
+            } catch (error) {
+                console.error('Error fetching roles', error);
+            }
+        };
+
+        fetchRoles();
+    }, [axiosInstance]);
 
     const handleClickShowPassword = () => setShowPassword(!showPassword);
     const handleMouseDownPassword = () => setShowPassword(!showPassword);
@@ -43,7 +57,7 @@ const AddUserModal = ({ open, onClose, onAddSuccess }) => {
         }
 
         if (!validatePassword(password)) {
-            toast.error('Password must contain at least 8 characters, one uppercase letter, one lowercase letter, one number and one special character.');
+            toast.error('Password must contain at least 8 characters, one uppercase letter, one lowercase letter, one number, and one special character.');
             return;
         }
 
@@ -53,7 +67,7 @@ const AddUserModal = ({ open, onClose, onAddSuccess }) => {
             email,
             password,
             role
-        }
+        };
 
         try {
             const response = await axiosInstance.post('/users/create', data);
@@ -121,8 +135,11 @@ const AddUserModal = ({ open, onClose, onAddSuccess }) => {
                         value={role}
                         onChange={(e) => setRole(e.target.value)}
                     >
-                        <MenuItem value="user">User</MenuItem>
-                        <MenuItem value="admin">Admin</MenuItem>
+                        {roles.map((role) => (
+                            <MenuItem key={role._id} value={role._id}>
+                                {role.name}
+                            </MenuItem>
+                        ))}
                     </Select>
                 </OutlinedBrownFormControl>
 

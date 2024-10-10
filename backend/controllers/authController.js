@@ -1,6 +1,7 @@
 const bcrypt = require('bcryptjs');
 const jwt = require('jsonwebtoken');
 const User = require('../models/User');
+const Role = require('../models/Role');
 
 const validateName = (name) => {
     const nameRegex = /^[A-Z][a-z]{1,9}$/;
@@ -36,7 +37,7 @@ const registerUser = async (req, res) => {
         return res.status(400).json({ message: 'First Name must start with a capital letter and contain 2-10 alphabetic characters' });
     }
 
-    if(!validateName(lastName)){
+    if (!validateName(lastName)) {
         return res.status(400).json({ message: 'Last Name must start with a capital letter and contain 2-10 alphabetic characters' });
     }
 
@@ -57,7 +58,9 @@ const registerUser = async (req, res) => {
         if (existingEmail) return res.status(400).json({ message: 'Email already exists' });
 
         const hashedPassword = await bcrypt.hash(password, 10);
-        const user = new User({ firstName, lastName, email, password: hashedPassword, role });
+
+        const validRole = await Role.findById(role) || await Role.findOne({ name: 'user' });
+        const user = new User({ firstName, lastName, email, password: hashedPassword, role: validRole._id });
         await user.save();
 
         const accessToken = generateAccessToken(user);
@@ -74,7 +77,7 @@ const loginUser = async (req, res) => {
     const { email, password } = req.body;
 
     try {
-        const user = await User.findOne({ email });
+        const user = await User.findOne({ email }).populate('role');
 
         if (!user) {
             return res.status(400).json({ message: 'Invalid credentials' });
@@ -92,7 +95,7 @@ const loginUser = async (req, res) => {
             accessToken,
             refreshToken,
             userId: user._id,
-            role: user.role,
+            role: user.role.name,
             firstName: user.firstName,
             lastName: user.lastName,
             email: user.email,
@@ -112,15 +115,14 @@ const refreshAccessToken = async (req, res) => {
 
     try {
         const decoded = jwt.verify(refreshToken, process.env.JWT_REFRESH_SECRET);
-
-        const user = await User.findById(decoded.userId);
+        const user = await User.findById(decoded.userId).populate('role');
         if (!user) {
             return res.status(404).json({ message: 'User not found' });
         }
 
         const accessToken = generateAccessToken({ _id: user._id, role: user.role });
 
-        res.json({ accessToken, role: user.role });
+        res.json({ accessToken, role: user.role.name });
     } catch (error) {
         res.status(403).json({ message: 'Invalid Refresh Token' });
     }
@@ -128,7 +130,7 @@ const refreshAccessToken = async (req, res) => {
 
 const getCurrentUser = async (req, res) => {
     try {
-        const user = await User.findById(req.user.userId).select('-password');
+        const user = await User.findById(req.user.userId).populate('role').select('-password');
         if (!user) {
             return res.status(404).json({ message: 'User not found' });
         }
@@ -137,7 +139,7 @@ const getCurrentUser = async (req, res) => {
             firstName: user.firstName,
             lastName: user.lastName,
             email: user.email,
-            role: user.role,
+            role: user.role.name,
         });
     } catch (error) {
         res.status(500).json({ message: 'Server error' });
@@ -148,7 +150,7 @@ const updateUserProfile = async (req, res) => {
     const { firstName, lastName, email, password, newPassword } = req.body;
 
     try {
-        const user = await User.findById(req.user.userId);
+        const user = await User.findById(req.user.userId).populate('role');
         if (!user) {
             return res.status(404).json({ message: 'User not found' });
         }
@@ -176,7 +178,7 @@ const updateUserProfile = async (req, res) => {
             firstName: user.firstName,
             lastName: user.lastName,
             email: user.email,
-            role: user.role,
+            role: user.role.name,
         });
     } catch (error) {
         res.status(500).json({ message: 'Server error' });

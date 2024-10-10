@@ -13,6 +13,7 @@ import {
   Inventory2Outlined,
   InventoryOutlined,
   PeopleOutline,
+  PeopleOutlineOutlined,
   PersonOutline,
   PrecisionManufacturingOutlined,
   RoomOutlined,
@@ -81,6 +82,14 @@ export const mainListItems = ({ setCurrentView }) => {
             selected={activeItem === 'users'}
             icon={<PersonOutline />}
             primary="Users"
+          />
+
+          <ActiveListItem
+            sx={{ pl: 4 }}
+            handleClick={() => handleItemClick('roles')}
+            selected={activeItem === 'roles'}
+            icon={<PeopleOutlineOutlined />}
+            primary="Roles"
           />
 
           <ActiveListItem

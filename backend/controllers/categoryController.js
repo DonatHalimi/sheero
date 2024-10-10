@@ -2,8 +2,14 @@ const Category = require('../models/Category');
 const Subcategory = require('../models/Subcategory')
 const Product = require('../models/Product')
 const fs = require('fs');
+const User = require('../models/User');
 
 const createCategory = async (req, res) => {
+    const requestingUser = await User.findById(req.user.userId).populate('role');
+    if (requestingUser.role.name !== 'admin') {
+        return res.status(403).json({ message: 'Forbidden' });
+    }
+
     const { name } = req.body;
     const image = req.file ? req.file.path : '';
 
@@ -45,6 +51,11 @@ const getCategory = async (req, res) => {
 };
 
 const updateCategory = async (req, res) => {
+    const requestingUser = await User.findById(req.user.userId).populate('role');
+    if (requestingUser.role.name !== 'admin') {
+        return res.status(403).json({ message: 'Forbidden' });
+    }
+
     const { name } = req.body;
     let image = req.body.image;
     try {
@@ -79,6 +90,11 @@ const updateCategory = async (req, res) => {
 };
 
 const deleteCategory = async (req, res) => {
+    const requestingUser = await User.findById(req.user.userId).populate('role');
+    if (requestingUser.role.name !== 'admin') {
+        return res.status(403).json({ message: 'Forbidden' });
+    }
+
     try {
         const category = await Category.findById(req.params.id);
         if (!category) return res.status(404).json({ message: 'Category not found' });
@@ -107,6 +123,11 @@ const deleteCategory = async (req, res) => {
 };
 
 const deleteCategories = async (req, res) => {
+    const requestingUser = await User.findById(req.user.userId).populate('role');
+    if (requestingUser.role.name !== 'admin') {
+        return res.status(403).json({ message: 'Forbidden' });
+    }
+
     const { ids } = req.body;
 
     if (!ids || !Array.isArray(ids) || ids.length === 0) {

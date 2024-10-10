@@ -69,7 +69,7 @@ const UsersPage = () => {
         { key: 'lastName', label: 'Last Name' },
         { key: 'email', label: 'Email' },
         { key: 'password', label: 'Password' },
-        { key: 'role', label: 'Role' },
+        { key: 'role', label: 'Role', render: (user) => user.role.name },
         { key: 'actions', label: 'Actions' }
     ];
 

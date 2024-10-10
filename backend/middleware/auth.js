@@ -3,6 +3,8 @@ const Review = require('../models/Review');
 const Address = require('../models/Address');
 const Cart = require('../models/Cart');
 const Wishlist = require('../models/Wishlist');
+const Role = require('../models/Role');
+const User = require('../models/User');
 
 const authenticateToken = (req, res, next) => {
     const authHeader = req.header('Authorization');
@@ -66,11 +68,14 @@ const protect = (req, res, next) => {
     authenticateToken(req, res, next);
 };
 
-const requireAuthAndRole = (role) => {
-    return (req, res, next) => {
-        authenticateToken(req, res, (err) => {
+const requireAuthAndRole = (requiredRole) => {
+    return async (req, res, next) => {
+        await authenticateToken(req, res, async (err) => {
             if (err) return next(err);
-            if (req.user.role !== role) {
+            const requestingUser = await User.findById(req.user.userId).populate('role');
+            if (!requestingUser) return res.status(404).json({ message: 'User not found' });
+            
+            if (requestingUser.role.name !== requiredRole) {
                 return res.status(403).json({ message: 'Forbidden' });
             }
             next();

@@ -15,16 +15,31 @@ const EditUserModal = ({ open, onClose, user, onEditSuccess }) => {
     const [password, setPassword] = useState('');
     const [showPassword, setShowPassword] = useState(false);
     const [role, setRole] = useState('');
+    const [roles, setRoles] = useState([]);
 
     const { refreshToken } = useContext(AuthContext);
     const axiosInstance = useAxios(refreshToken);
+
+    useEffect(() => {
+        const fetchRoles = async () => {
+            try {
+                const response = await axiosInstance.get('/roles/get');
+                setRoles(response.data);
+            } catch (error) {
+                console.error('Error fetching roles', error);
+                toast.error('Failed to fetch roles');
+            }
+        };
+
+        fetchRoles();
+    }, [axiosInstance]);
 
     useEffect(() => {
         if (user) {
             setFirstName(user.firstName);
             setLastName(user.lastName);
             setEmail(user.email);
-            setRole(user.role);
+            setRole(user.role.name);
             setIsValidEmail(true);
         }
     }, [user]);
@@ -123,8 +138,11 @@ const EditUserModal = ({ open, onClose, user, onEditSuccess }) => {
                         value={role}
                         onChange={(e) => setRole(e.target.value)}
                     >
-                        <MenuItem value="user">User</MenuItem>
-                        <MenuItem value="admin">Admin</MenuItem>
+                        {roles.map((role) => (
+                            <MenuItem key={role._id} value={role._id}>
+                                {role.name}
+                            </MenuItem>
+                        ))}
                     </Select>
                 </OutlinedBrownFormControl>
                 <BrownButton

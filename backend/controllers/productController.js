@@ -4,8 +4,14 @@ const Subcategory = require('../models/Subcategory')
 const SubSubcategory = require('../models/SubSubcategory')
 const Review = require('../models/Review');
 const fs = require('fs');
+const User = require('../models/User');
 
 const createProduct = async (req, res) => {
+    const requestingUser = await User.findById(req.user.userId).populate('role');
+    if (requestingUser.role.name !== 'admin') {
+        return res.status(403).json({ message: 'Forbidden' });
+    }
+
     const { name, description, price, salePrice, category, subcategory, subSubcategory, inventoryCount, dimensions, variants, discount, supplier, shipping, details } = req.body;
     const image = req.file ? req.file.path : '';
     try {
@@ -84,6 +90,11 @@ const getProductsBySubSubCategory = async (req, res) => {
 }
 
 const updateProduct = async (req, res) => {
+    const requestingUser = await User.findById(req.user.userId).populate('role');
+    if (requestingUser.role.name !== 'admin') {
+        return res.status(403).json({ message: 'Forbidden' });
+    }
+
     const { name, description, price, salePrice, category, subcategory, subSubcategory, inventoryCount, dimensions, variants, discount, supplier, shipping, details } = req.body;
     let image = req.body.image;
     try {
@@ -120,6 +131,11 @@ const updateProduct = async (req, res) => {
 };
 
 const deleteProduct = async (req, res) => {
+    const requestingUser = await User.findById(req.user.userId).populate('role');
+    if (requestingUser.role.name !== 'admin') {
+        return res.status(403).json({ message: 'Forbidden' });
+    }
+
     try {
         const product = await Product.findById(req.params.id);
         if (!product) return res.status(404).json({ message: 'Product not found' });
@@ -140,6 +156,11 @@ const deleteProduct = async (req, res) => {
 };
 
 const deleteProducts = async (req, res) => {
+    const requestingUser = await User.findById(req.user.userId).populate('role');
+    if (requestingUser.role.name !== 'admin') {
+        return res.status(403).json({ message: 'Forbidden' });
+    }
+
     const { ids } = req.body;
 
     if (!ids || !Array.isArray(ids) || ids.length === 0) {
@@ -215,6 +236,11 @@ const searchProducts = async (req, res) => {
 
 // Three new functions to evade network timeouts for 'AddProductModal'
 const createProductBasic = async (req, res) => {
+    const requestingUser = await User.findById(req.user.userId).populate('role');
+    if (requestingUser.role.name !== 'admin') {
+        return res.status(403).json({ message: 'Forbidden' });
+    }
+
     const { name, description, price, salePrice, category, subcategory, subSubcategory, inventoryCount, supplier, image } = req.body;
 
     try {
@@ -243,6 +269,11 @@ const createProductBasic = async (req, res) => {
 };
 
 const uploadProductImage = async (req, res) => {
+    const requestingUser = await User.findById(req.user.userId).populate('role');
+    if (requestingUser.role.name !== 'admin') {
+        return res.status(403).json({ message: 'Forbidden' });
+    }
+
     const { productId } = req.body;
     const image = req.file ? req.file.path : '';
 
@@ -260,6 +291,11 @@ const uploadProductImage = async (req, res) => {
 };
 
 const addProductVariantsAndDetails = async (req, res) => {
+    const requestingUser = await User.findById(req.user.userId).populate('role');
+    if (requestingUser.role.name !== 'admin') {
+        return res.status(403).json({ message: 'Forbidden' });
+    }
+
     const { productId, variants, dimensions, discount, supplier, shipping, details } = req.body;
 
     try {

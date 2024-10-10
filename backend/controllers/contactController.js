@@ -1,4 +1,5 @@
 const Contact = require('../models/Contact');
+const User = require('../models/User');
 
 const createContact = async (req, res) => {
     const { name, email, subject, message } = req.body;
@@ -21,6 +22,11 @@ const getContacts = async (req, res) => {
 };
 
 const deleteContact = async (req, res) => {
+    const requestingUser = await User.findById(req.user.userId).populate('role');
+    if (requestingUser.role.name !== 'admin') {
+        return res.status(403).json({ message: 'Forbidden' });
+    }
+
     try {
         const contact = await Contact.findById(req.params.id);
         if (!contact) {
@@ -36,6 +42,11 @@ const deleteContact = async (req, res) => {
 };
 
 const deleteContacts = async (req, res) => {
+    const requestingUser = await User.findById(req.user.userId).populate('role');
+    if (requestingUser.role.name !== 'admin') {
+        return res.status(403).json({ message: 'Forbidden' });
+    }
+
     const { ids } = req.body;
 
     if (!ids || !Array.isArray(ids) || ids.length === 0) {

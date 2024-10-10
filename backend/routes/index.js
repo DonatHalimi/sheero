@@ -14,6 +14,7 @@ const orderRoutes = require('./order');
 const productRoutes = require('./product');
 const protectedRoutes = require('./protected');
 const reviewRoutes = require('./review');
+const roleRoutes = require('./role');
 const slideshowRoutes = require('./slideshow');
 const subcategoryRoutes = require('./subcategory');
 const subSubcategoryRoutes = require('./subSubcategory');
@@ -34,6 +35,7 @@ router.use('/orders', orderRoutes);
 router.use('/protected', protectedRoutes);
 router.use('/products', productRoutes);
 router.use('/reviews', reviewRoutes);
+router.use('/roles', roleRoutes)
 router.use('/slideshow', slideshowRoutes);
 router.use('/subcategories', subcategoryRoutes);
 router.use('/subsubcategories', subSubcategoryRoutes);

@@ -3,6 +3,7 @@ const Address = require('../models/Address');
 const Order = require('../models/Order');
 const dotenv = require('dotenv');
 const Stripe = require('stripe');
+const User = require('../models/User');
 
 dotenv.config();
 
@@ -193,6 +194,11 @@ const payWithCash = async (req, res) => {
 };
 
 const getAllOrders = async (req, res) => {
+    const requestingUser = await User.findById(req.user.userId).populate('role');
+    if (requestingUser.role.name !== 'admin') {
+        return res.status(403).json({ message: 'Forbidden' });
+    }
+
     try {
         const orders = await Order.find()
             .populate('user', 'firstName lastName email')
@@ -260,6 +266,11 @@ const getOrderById = async (req, res) => {
 };
 
 const updateDeliveryStatus = async (req, res) => {
+    const requestingUser = await User.findById(req.user.userId).populate('role');
+    if (requestingUser.role.name !== 'admin') {
+        return res.status(403).json({ message: 'Forbidden' });
+    }
+
     try {
         const { orderId, status, paymentStatus } = req.body;
 
@@ -295,6 +306,11 @@ const updateDeliveryStatus = async (req, res) => {
 };
 
 const deleteOrders = async (req, res) => {
+    const requestingUser = await User.findById(req.user.userId).populate('role');
+    if (requestingUser.role.name !== 'admin') {
+        return res.status(403).json({ message: 'Forbidden' });
+    }
+
     const { ids } = req.body;
 
     if (!ids || !Array.isArray(ids) || ids.length === 0) {

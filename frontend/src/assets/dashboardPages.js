@@ -8,6 +8,7 @@ import FAQPage from '../pages/Dashboard/FAQPage';
 import OrdersPage from '../pages/Dashboard/OrdersPage';
 import ProductsPage from '../pages/Dashboard/ProductsPage';
 import ReviewsPage from '../pages/Dashboard/ReviewsPage';
+import RolesPage from '../pages/Dashboard/RolesPage';
 import SlideshowPage from '../pages/Dashboard/SlideshowPage';
 import SubcategoriesPage from '../pages/Dashboard/SubcategoriesPage';
 import SubSubcategoriesPage from '../pages/Dashboard/SubSubcategoriesPage';
@@ -26,6 +27,7 @@ const pages = {
     orders: OrdersPage,
     products: ProductsPage,
     reviews: ReviewsPage,
+    roles: RolesPage,
     subcategories: SubcategoriesPage,
     subSubcategories: SubSubcategoriesPage,
     suppliers: SuppliersPage,

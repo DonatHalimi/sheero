@@ -1,6 +1,7 @@
 const Review = require('../models/Review');
 const Product = require('../models/Product');
 const Order = require('../models/Order');
+const User = require('../models/User');
 
 const createReview = async (req, res) => {
     const { title, rating, comment } = req.body;
@@ -68,6 +69,11 @@ const checkReviewEligibility = async (req, res) => {
 };
 
 const getReviews = async (req, res) => {
+    const requestingUser = await User.findById(req.user.userId).populate('role');
+    if (requestingUser.role.name !== 'admin') {
+        return res.status(403).json({ message: 'Forbidden' });
+    }
+
     try {
         const reviews = await Review.find()
             .populate({
@@ -182,8 +188,8 @@ const updateReview = async (req, res) => {
                 select: 'name description price salePrice category subcategory image inventoryCount'
             });
 
-            res.status(200).json({ message: 'Review updated succesfully', updatedReview });
-        } catch (error) {
+        res.status(200).json({ message: 'Review updated succesfully', updatedReview });
+    } catch (error) {
         console.error('Error updating review:', error);
         res.status(500).json({ message: 'Server error', error: error.message, stack: error.stack });
     }
@@ -212,6 +218,11 @@ const deleteReview = async (req, res) => {
 };
 
 const deleteReviews = async (req, res) => {
+    const requestingUser = await User.findById(req.user.userId).populate('role');
+    if (requestingUser.role.name !== 'admin') {
+        return res.status(403).json({ message: 'Forbidden' });
+    }
+
     const { ids } = req.body;
 
     if (!ids || !Array.isArray(ids) || ids.length === 0) {

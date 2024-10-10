@@ -1,6 +1,12 @@
 const FAQ = require('../models/FAQ');
+const User = require('../models/User');
 
 const createFAQ = async (req, res) => {
+    const requestingUser = await User.findById(req.user.userId).populate('role');
+    if (requestingUser.role.name !== 'admin') {
+        return res.status(403).json({ message: 'Forbidden' });
+    }
+
     const { question, answer } = req.body;
     try {
         const faq = new FAQ({ question, answer });
@@ -31,6 +37,11 @@ const getFAQ = async (req, res) => {
 };
 
 const updateFAQ = async (req, res) => {
+    const requestingUser = await User.findById(req.user.userId).populate('role');
+    if (requestingUser.role.name !== 'admin') {
+        return res.status(403).json({ message: 'Forbidden' });
+    }
+
     const { question, answer } = req.body;
     try {
         const faq = await FAQ.findByIdAndUpdate(
@@ -46,6 +57,11 @@ const updateFAQ = async (req, res) => {
 };
 
 const deleteFAQ = async (req, res) => {
+    const requestingUser = await User.findById(req.user.userId).populate('role');
+    if (requestingUser.role.name !== 'admin') {
+        return res.status(403).json({ message: 'Forbidden' });
+    }
+
     try {
         const faq = await FAQ.findById(req.params.id);
         if (!faq) return res.status(404).json({ message: 'FAQ not found' });
@@ -58,6 +74,11 @@ const deleteFAQ = async (req, res) => {
 };
 
 const deleteFAQs = async (req, res) => {
+    const requestingUser = await User.findById(req.user.userId).populate('role');
+    if (requestingUser.role.name !== 'admin') {
+        return res.status(403).json({ message: 'Forbidden' });
+    }
+
     const { ids } = req.body;
 
     if (!ids || !Array.isArray(ids) || ids.length === 0) {
