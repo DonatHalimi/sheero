@@ -235,9 +235,7 @@ const getUserOrders = async (req, res) => {
 const getOrderById = async (req, res) => {
     try {
         const { orderId } = req.params;
-        const userId = req.user._id;
-        const userRole = req.user.role;
-
+        
         const order = await Order.findById(orderId)
             .populate('products.product', 'name price image')
             .populate({
@@ -252,10 +250,6 @@ const getOrderById = async (req, res) => {
 
         if (!order) {
             return res.status(404).json({ success: false, message: 'Order not found.' });
-        }
-
-        if (order.user.toString() !== userId && userRole !== 'admin') {
-            return res.status(403).json({ success: false, message: 'Access denied. This order does not belong to you.' });
         }
 
         res.json({ success: true, data: order });
