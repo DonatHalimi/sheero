@@ -1,6 +1,6 @@
 import axios from 'axios';
+import React, { createContext, useState } from 'react';
 import CryptoJS from 'crypto-js';
-import React, { createContext, useEffect, useState } from 'react';
 import { getApiUrl } from '../config';
 
 const AuthContext = createContext();
@@ -18,65 +18,29 @@ const decryptData = (cipherText) => {
 };
 
 const AuthProvider = ({ children }) => {
-    const getLocalStorageItem = (key, encrypted = false) => {
+    const getLocalStorageItem = (key) => {
         const value = localStorage.getItem(key);
         if (!value) return null;
         try {
-            return encrypted ? decryptData(value) : value;
+            // Always decrypt the stored data
+            return decryptData(value);
         } catch (error) {
-            console.error('Error reading localStorage:', error);
+            console.error('Error decrypting localStorage:', error);
             return null;
         }
     };
 
     const [auth, setAuthState] = useState({
-        accessToken: getLocalStorageItem('accessToken', true),
-        refreshToken: getLocalStorageItem('refreshToken', true),
-        role: getLocalStorageItem('role', true),
-        firstName: getLocalStorageItem('firstName'),
-        lastName: getLocalStorageItem('lastName'),
-        email: getLocalStorageItem('email'),
-        userId: getLocalStorageItem('userId', true),
+        accessToken: getLocalStorageItem('accessToken'),
+        role: getLocalStorageItem('role'),
+        userId: getLocalStorageItem('userId'),
     });
 
     const setAuth = (authData) => {
         setAuthState(authData);
         localStorage.setItem('accessToken', encryptData(authData.accessToken || ''));
-        localStorage.setItem('refreshToken', encryptData(authData.refreshToken || ''));
         localStorage.setItem('role', encryptData(authData.role || ''));
-        localStorage.setItem('firstName', authData.firstName || '');
-        localStorage.setItem('lastName', authData.lastName || '');
-        localStorage.setItem('email', authData.email || '');
         localStorage.setItem('userId', encryptData(authData.userId || ''));
-    };
-
-    const refreshAccessToken = async () => {
-        try {
-            const refreshToken = getLocalStorageItem('refreshToken', true);
-            if (!refreshToken) {
-                throw new Error('No refresh token available');
-            }
-
-            const response = await axios.post(getApiUrl('/auth/token/refresh'),
-                { refreshToken },
-                { headers: { 'Content-Type': 'application/json' } }
-            );
-
-            const newAccessToken = response.data.accessToken;
-            const newRole = response.data.role;
-
-            setAuth({
-                ...auth,
-                accessToken: newAccessToken,
-                role: newRole,
-            });
-
-            return newAccessToken;
-        } catch (error) {
-            console.error('Failed to refresh access token:', error.response?.data?.message || error.message);
-            logout();
-            throw error;
-        }
     };
 
     const login = async (email, password) => {
@@ -84,11 +48,7 @@ const AuthProvider = ({ children }) => {
             const response = await axios.post(getApiUrl('/auth/login'), { email, password });
             const authData = {
                 accessToken: response.data.accessToken,
-                refreshToken: response.data.refreshToken,
                 role: response.data.role,
-                firstName: response.data.firstName,
-                lastName: response.data.lastName,
-                email: response.data.email,
                 userId: response.data.userId,
             };
 
@@ -102,13 +62,9 @@ const AuthProvider = ({ children }) => {
     };
 
     const logout = () => {
-        setAuth({ accessToken: null, refreshToken: null, role: null, firstName: null, lastName: null, email: null });
+        setAuth({ accessToken: null, role: null, userId: null });
         localStorage.removeItem('accessToken');
-        localStorage.removeItem('refreshToken');
         localStorage.removeItem('role');
-        localStorage.removeItem('firstName');
-        localStorage.removeItem('lastName');
-        localStorage.removeItem('email');
         localStorage.removeItem('userId');
     };
 
@@ -126,25 +82,11 @@ const AuthProvider = ({ children }) => {
         return auth.role === 'admin';
     };
 
-    useEffect(() => {
-        const refreshToken = async () => {
-            try {
-                await refreshAccessToken();
-            } catch (error) {
-                console.error('Token refresh failed:', error);
-            }
-        };
-
-        const interval = setInterval(refreshToken, 14 * 60 * 1000);
-
-        return () => clearInterval(interval);
-    }, []);
-
     return (
-        <AuthContext.Provider value={{ auth, setAuth, login, logout, register, isAdmin, refreshAccessToken }}>
+        <AuthContext.Provider value={{ auth, setAuth, login, logout, register, isAdmin }}>
             {children}
         </AuthContext.Provider>
     );
 };
 
-export { AuthContext, AuthProvider, decryptData, encryptData };
+export { AuthContext, AuthProvider };

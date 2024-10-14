@@ -1,7 +1,7 @@
 import VisibilityIcon from '@mui/icons-material/Visibility';
 import VisibilityOffIcon from '@mui/icons-material/VisibilityOff';
 import { Box, Button, IconButton, InputAdornment, TextField } from '@mui/material';
-import React, { useContext, useEffect, useState } from 'react';
+import React, { useContext, useEffect, useState, useMemo } from 'react';
 import { toast } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
 import { BrownOutlinedTextField, Header, knownEmailProviders, ProfileInformationSkeleton } from '../../assets/CustomComponents';
@@ -13,16 +13,19 @@ import ProfileSidebar from './ProfileSidebar';
 
 const ProfileInformation = () => {
     const { auth, setAuth } = useContext(AuthContext);
-    const axiosInstance = useAxios();
-    const [firstName, setFirstName] = useState({ firstName: auth.firstName || '' });
-    const [lastName, setLastName] = useState({ lastName: auth.lastName || '' });
-    const [email, setEmail] = useState({ email: auth.email || '' });
+
+    // Memoize axiosInstance to prevent unnecessary re-renders
+    const axiosInstance = useMemo(() => useAxios(), []);
+
+    const [firstName, setFirstName] = useState('');
+    const [lastName, setLastName] = useState('');
+    const [email, setEmail] = useState('');
     const [password, setPassword] = useState('');
     const [newPassword, setNewPassword] = useState('');
-
     const [loading, setLoading] = useState(false);
     const [showPassword, setShowPassword] = useState(false);
     const [showNewPassword, setShowNewPassword] = useState(false);
+
     const [firstNameValid, setFirstNameValid] = useState(true);
     const [lastNameValid, setLastNameValid] = useState(true);
     const [emailValid, setEmailValid] = useState(true);
@@ -38,7 +41,6 @@ const ProfileInformation = () => {
     const validateFirstName = (name) => /^[A-Z][a-zA-Z]{1,9}$/.test(name);
     const validateLastName = (name) => /^[A-Z][a-zA-Z]{1,9}$/.test(name);
     const validatePassword = password => /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[@$!%*?&])[A-Za-z\d@$!%*?&]{8,}$/.test(password);
-
     const validateEmail = (email) => {
         const providerPattern = knownEmailProviders.join('|');
         const regex = new RegExp(`^[a-zA-Z0-9._%+-]+@(${providerPattern})$`, 'i');
@@ -47,19 +49,19 @@ const ProfileInformation = () => {
 
     const handleFirstNameChange = (e) => {
         const value = e.target.value;
-        setFirstName({ firstName: value });
+        setFirstName(value);
         setFirstNameValid(validateFirstName(value));
     };
 
     const handleLastNameChange = (e) => {
         const value = e.target.value;
-        setLastName({ lastName: value });
+        setLastName(value);
         setLastNameValid(validateLastName(value));
     };
 
     const handleEmailChange = (e) => {
         const value = e.target.value;
-        setEmail({ email: value });
+        setEmail(value);
         setEmailValid(validateEmail(value));
     };
 
@@ -75,16 +77,36 @@ const ProfileInformation = () => {
         setNewPasswordValid(validatePassword(value));
     };
 
-    useEffect(() => window.scrollTo(0, 0), []);
+    const fetchUserData = async () => {
+        try {
+            setLoading(true);
+            const response = await axiosInstance.get('/auth/me');
+            const userData = response.data;
+
+            setFirstName(userData.firstName || '');
+            setLastName(userData.lastName || '');
+            setEmail(userData.email || '');
+        } catch (error) {
+            console.error('Failed to fetch user data:', error);
+            toast.error('Failed to load profile data');
+        } finally {
+            setLoading(false);
+        }
+    };
+
+    useEffect(() => {
+        fetchUserData();
+
+    }, [axiosInstance]);
 
     const handleSubmit = async (e) => {
         e.preventDefault();
         setLoading(true);
         try {
             const updatedData = {};
-            if (firstName.firstName !== auth.firstName) updatedData.firstName = firstName.firstName;
-            if (lastName.lastName !== auth.lastName) updatedData.lastName = lastName.lastName;
-            if (email.email !== auth.email) updatedData.email = email.email;
+            if (firstName !== auth.firstName) updatedData.firstName = firstName;
+            if (lastName !== auth.lastName) updatedData.lastName = lastName;
+            if (email !== auth.email) updatedData.email = email;
             if (newPassword) updatedData.newPassword = newPassword;
 
             if (Object.keys(updatedData).length > 0) {
@@ -99,43 +121,30 @@ const ProfileInformation = () => {
 
             const newAuth = {
                 ...auth,
-                firstName: response.data.firstName,
-                lastName: response.data.lastName,
-                email: response.data.email,
-                accessToken: response.data.accessToken || auth.accessToken
+                accessToken: response.data.accessToken || auth.accessToken,
             };
             setAuth(newAuth);
 
-            if (updatedData.firstName !== undefined) {
-                localStorage.setItem('firstName', updatedData.firstName);
-            }
-            if (updatedData.lastName !== undefined) {
-                localStorage.setItem('lastName', updatedData.lastName);
-            }
-            if (updatedData.email !== undefined) {
-                localStorage.setItem('email', updatedData.email);
-            }
+            window.location.reload();
 
             toast.success('Profile updated successfully!');
         } catch (error) {
             console.error('Profile update failed:', error);
-
+            console.error('Full error object:', JSON.stringify(error, null, 2));
             if (error.response) {
+                console.error('Error response:', error.response);
+                console.error('Error response data:', error.response.data);
                 toast.error(error.response.data.message || 'Profile update failed');
             } else if (error.request) {
-                console.error('Request data:', error.request);
+                console.error('Error request:', error.request);
                 toast.error('No response received from server');
             } else {
                 console.error('Error message:', error.message);
                 toast.error('Error occurred while updating profile');
             }
         }
-        setLoading(false);
-    };
 
-    // Function to determine if the user is adding new information
-    const isAddingNewInformation = () => {
-        return firstName.firstName !== auth.firstName || lastName.lastName !== auth.lastName || email.email !== auth.email;
+        setLoading(false);
     };
 
     return (
@@ -145,8 +154,7 @@ const ProfileInformation = () => {
                 <ProfileSidebar />
                 <main className="p-4 relative left-32 w-full">
                     <div className="container max-w-6xl mx-auto mt-20 mb-36">
-                        <Header title='Personal Information' />
-
+                        <Header title="Personal Information" />
                         <div className="bg-white shadow-sm rounded-sm p-8">
                             {loading ? (
                                 <ProfileInformationSkeleton />
@@ -159,7 +167,7 @@ const ProfileInformation = () => {
                                                 label="First Name"
                                                 variant="outlined"
                                                 name="firstName"
-                                                value={firstName.firstName}
+                                                value={firstName}
                                                 onChange={handleFirstNameChange}
                                                 onFocus={() => setFocusedField('firstName')}
                                                 onBlur={() => setFocusedField(null)}
@@ -181,7 +189,7 @@ const ProfileInformation = () => {
                                                 label="Last Name"
                                                 variant="outlined"
                                                 name="lastName"
-                                                value={lastName.lastName}
+                                                value={lastName}
                                                 onChange={handleLastNameChange}
                                                 onFocus={() => setFocusedField('lastName')}
                                                 onBlur={() => setFocusedField(null)}
@@ -204,7 +212,7 @@ const ProfileInformation = () => {
                                                 variant="outlined"
                                                 type="email"
                                                 name="email"
-                                                value={email.email}
+                                                value={email}
                                                 onChange={handleEmailChange}
                                                 onFocus={() => setFocusedField('email')}
                                                 onBlur={() => setFocusedField(null)}
@@ -221,7 +229,6 @@ const ProfileInformation = () => {
                                         </div>
                                     </Box>
 
-
                                     <Box className="flex flex-row gap-3 w-full">
                                         <div className="relative flex-grow">
                                             <BrownOutlinedTextField
@@ -231,7 +238,7 @@ const ProfileInformation = () => {
                                                 fullWidth
                                                 name="password"
                                                 label="Current Password"
-                                                type={showPassword ? "text" : "password"}
+                                                type={showPassword ? 'text' : 'password'}
                                                 id="password"
                                                 autoComplete="current-password"
                                                 value={password}
@@ -247,7 +254,7 @@ const ProfileInformation = () => {
                                                                 onMouseDown={handleMouseDownPassword}
                                                                 edge="end"
                                                             >
-                                                                {showPassword ? <VisibilityIcon className='text-stone-500' /> : <VisibilityOffIcon className='text-stone-500' />}
+                                                                {showPassword ? <VisibilityIcon className="text-stone-500" /> : <VisibilityOffIcon className="text-stone-500" />}
                                                             </IconButton>
                                                         </InputAdornment>
                                                     ),
@@ -261,6 +268,7 @@ const ProfileInformation = () => {
                                                 </div>
                                             )}
                                         </div>
+
                                         <div className="relative flex-grow">
                                             <BrownOutlinedTextField
                                                 variant="outlined"
@@ -268,7 +276,7 @@ const ProfileInformation = () => {
                                                 fullWidth
                                                 name="newPassword"
                                                 label="New Password"
-                                                type={showNewPassword ? "text" : "password"}
+                                                type={showNewPassword ? 'text' : 'password'}
                                                 id="new-password"
                                                 value={newPassword}
                                                 onChange={handleNewPasswordChange}
@@ -283,7 +291,7 @@ const ProfileInformation = () => {
                                                                 onMouseDown={handleMouseDownPassword}
                                                                 edge="end"
                                                             >
-                                                                {showNewPassword ? <VisibilityIcon className='text-stone-500' /> : <VisibilityOffIcon className='text-stone-500' />}
+                                                                {showNewPassword ? <VisibilityIcon className="text-stone-500" /> : <VisibilityOffIcon className="text-stone-500" />}
                                                             </IconButton>
                                                         </InputAdornment>
                                                     ),
@@ -300,14 +308,14 @@ const ProfileInformation = () => {
                                     </Box>
 
                                     <Button type="submit" variant="contained" color="primary" className="bg-orange-600 hover:bg-orange-700">
-                                        {isAddingNewInformation() ? 'Save' : 'Update'}
+                                        Save
                                     </Button>
                                 </form>
                             )}
                         </div>
                     </div>
                 </main>
-            </Box >
+            </Box>
             <Footer />
         </>
     );

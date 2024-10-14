@@ -19,11 +19,7 @@ const validatePassword = (password) => {
 };
 
 const generateAccessToken = (user) => {
-    return jwt.sign({ userId: user._id, role: user.role }, process.env.JWT_SECRET, { expiresIn: '1h' });
-};
-
-const generateRefreshToken = (user) => {
-    return jwt.sign({ userId: user._id }, process.env.JWT_REFRESH_SECRET, { expiresIn: '7d' });
+    return jwt.sign({ userId: user._id, role: user.role }, process.env.JWT_SECRET, { expiresIn: '7d' });
 };
 
 const registerUser = async (req, res) => {
@@ -33,12 +29,8 @@ const registerUser = async (req, res) => {
         return res.status(400).json({ message: 'All fields are required' });
     }
 
-    if (!validateName(firstName)) {
-        return res.status(400).json({ message: 'First Name must start with a capital letter and contain 2-10 alphabetic characters' });
-    }
-
-    if (!validateName(lastName)) {
-        return res.status(400).json({ message: 'Last Name must start with a capital letter and contain 2-10 alphabetic characters' });
+    if (!validateName(firstName) || !validateName(lastName)) {
+        return res.status(400).json({ message: 'Name must start with a capital letter and contain 2-10 alphabetic characters' });
     }
 
     if (!validatePassword(password)) {
@@ -46,27 +38,21 @@ const registerUser = async (req, res) => {
     }
 
     if (!validateEmail(email)) {
-        return res.status(400).json({ message: 'Email format is not correct' });
+        return res.status(400).json({ message: 'Invalid email format' });
     }
 
     try {
-        if (!process.env.JWT_SECRET || !process.env.JWT_REFRESH_SECRET) {
-            throw new Error('JWT secret keys are not set');
-        }
-
         const existingEmail = await User.findOne({ email });
         if (existingEmail) return res.status(400).json({ message: 'Email already exists' });
 
         const hashedPassword = await bcrypt.hash(password, 10);
-
         const validRole = await Role.findById(role) || await Role.findOne({ name: 'user' });
         const user = new User({ firstName, lastName, email, password: hashedPassword, role: validRole._id });
         await user.save();
 
         const accessToken = generateAccessToken(user);
-        const refreshToken = generateRefreshToken(user);
 
-        res.status(201).json({ message: 'User registered successfully', accessToken, refreshToken });
+        res.status(201).json({ message: 'User registered successfully', accessToken });
     } catch (error) {
         console.error('Server error during registration:', error);
         res.status(500).json({ message: 'Server error', error: error.message });
@@ -89,42 +75,15 @@ const loginUser = async (req, res) => {
         }
 
         const accessToken = generateAccessToken(user);
-        const refreshToken = generateRefreshToken(user);
 
         res.json({
             accessToken,
-            refreshToken,
             userId: user._id,
             role: user.role.name,
-            firstName: user.firstName,
-            lastName: user.lastName,
-            email: user.email,
         });
     } catch (error) {
         console.error('Server error during login:', error);
         res.status(500).json({ message: 'Server error' });
-    }
-};
-
-const refreshAccessToken = async (req, res) => {
-    const { refreshToken } = req.body;
-
-    if (!refreshToken) {
-        return res.status(400).json({ message: 'Refresh Token is required' });
-    }
-
-    try {
-        const decoded = jwt.verify(refreshToken, process.env.JWT_REFRESH_SECRET);
-        const user = await User.findById(decoded.userId).populate('role');
-        if (!user) {
-            return res.status(404).json({ message: 'User not found' });
-        }
-
-        const accessToken = generateAccessToken({ _id: user._id, role: user.role });
-
-        res.json({ accessToken, role: user.role.name });
-    } catch (error) {
-        res.status(403).json({ message: 'Invalid Refresh Token' });
     }
 };
 
@@ -147,32 +106,28 @@ const getCurrentUser = async (req, res) => {
 };
 
 const updateUserProfile = async (req, res) => {
-    const { firstName, lastName, email, password, newPassword } = req.body;
+    const { firstName, lastName, email, password, newPassword, role } = req.body;
 
     try {
-        const user = await User.findById(req.user.userId).populate('role');
+        const user = await User.findById(req.user.userId);
         if (!user) {
             return res.status(404).json({ message: 'User not found' });
         }
 
         if ((email || newPassword) && !await bcrypt.compare(password, user.password)) {
+            console.log('Incorrect current password');
             return res.status(400).json({ message: 'Incorrect current password' });
-        }
-
-        if (firstName && !validateName(firstName)) {
-            return res.status(400).json({ message: 'First name must start with a capital letter and contain 2-10 alphabetic characters' });
-        }
-
-        if (lastName && !validateName(lastName)) {
-            return res.status(400).json({ message: 'Last name must start with a capital letter and contain 2-10 alphabetic characters' });
         }
 
         if (firstName) user.firstName = firstName;
         if (lastName) user.lastName = lastName;
         if (email) user.email = email;
-        if (newPassword) user.password = await bcrypt.hash(newPassword, 10);
+        if (role) user.role = role;
+        if (newPassword) { user.password = await bcrypt.hash(newPassword, 10); }
 
         await user.save();
+
+        await user.populate('role');
 
         res.json({
             firstName: user.firstName,
@@ -189,4 +144,4 @@ const logoutUser = (req, res) => {
     res.json({ message: 'Logout successful' });
 };
 
-module.exports = { registerUser, loginUser, getCurrentUser, updateUserProfile, refreshAccessToken, logoutUser };
+module.exports = { registerUser, loginUser, getCurrentUser, updateUserProfile, logoutUser };

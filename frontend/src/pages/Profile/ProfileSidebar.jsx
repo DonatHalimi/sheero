@@ -4,12 +4,30 @@ import React, { useContext, useEffect, useState } from 'react';
 import { useLocation, useNavigate } from 'react-router-dom';
 import { ActiveListItem, StyledFavoriteIcon, StyledInboxIcon, StyledPersonIcon } from '../../assets/CustomComponents';
 import { AuthContext } from '../../context/AuthContext';
+import useAxios from '../../axiosInstance';
 
 const ProfileSidebar = () => {
-    const { auth } = useContext(AuthContext);
     const navigate = useNavigate();
     const location = useLocation();
     const [activeItem, setActiveItem] = useState('');
+    const [firstName, setFirstName] = useState('');
+    const axiosInstance = useAxios();
+
+    useEffect(() => {
+        const fetchUserData = async () => {
+            try {
+                const response = await axiosInstance.get('/auth/me');
+                const userData = response.data;
+
+                setFirstName(userData.firstName);
+            } catch (error) {
+                console.error('Failed to fetch user data:', error);
+                toast.error('Failed to load profile data');
+            }
+        };
+
+        fetchUserData();
+    }, []);
 
     useEffect(() => {
         const path = location.pathname.split('/')[2];
@@ -26,7 +44,7 @@ const ProfileSidebar = () => {
     return (
         <div className="absolute top-24 right-[815px] w-80 bg-white p-5 shadow-sm rounded-sm">
             <Typography variant="h5" gutterBottom className="!text-gray-800 !font-semilight">
-                Good {greetingTime}, {auth.firstName}.
+                Good {greetingTime}, {firstName}.
             </Typography>
             <span className='text-md'>Thank you for being part of sheero</span>
             <div className="border-t border-stone-200 mt-4 mb-2"></div>

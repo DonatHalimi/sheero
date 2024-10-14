@@ -72,6 +72,8 @@ import { Link as RouterLink, useNavigate } from 'react-router-dom';
 import Footer from '../components/Footer';
 import logo from './img/logo.png';
 import { getImageUrl } from '../config';
+import { toast } from 'react-toastify';
+import useAxios from '../axiosInstance';
 
 export const BrownOutlinedTextField = styled(TextField)({
     '& .MuiOutlinedInput-root': {
@@ -1376,18 +1378,26 @@ export const OrderDetailsSkeleton = () => {
 
 export const ProfileInformationSkeleton = () => {
     return (
-        <div className="space-y-2">
-            <Box className="flex gap-4">
-                <Skeleton variant="text" animation="wave" width="100%" height={56} />
-                <Skeleton variant="text" animation="wave" width="100%" height={56} />
-            </Box>
-
-            <Box className="flex gap-4">
-                <Skeleton variant="rectangular" animation="wave" width="100%" height={56} />
-                <Skeleton variant="rectangular" animation="wave" width="100%" height={56} />
-            </Box>
-
-            <Skeleton variant="rectangular" animation="wave" width={120} height={48} />
+        <div className='space-y-0'>
+            <div className="flex gap-3">
+                <div className="flex-1">
+                    <Skeleton variant="text" animation="wave" width="100%" height={80} />
+                </div>
+                <div className="flex-1">
+                    <Skeleton variant="text" animation="wave" width="100%" height={80} />
+                </div>
+                <div className="flex-1">
+                    <Skeleton variant="text" animation="wave" width="100%" height={80} />
+                </div>
+            </div>
+            <div className="flex gap-3">
+                <div className="flex-1">
+                    <Skeleton variant="text" animation="wave" width="100%" height={80} className='rounded' />
+                </div>
+                <div className="flex-1">
+                    <Skeleton variant="text" animation="wave" width="100%" height={80} className='rounded' />
+                </div>
+            </div>
         </div>
     );
 };
@@ -1902,7 +1912,26 @@ export const NavbarLogo = ({ dashboardStyling }) => {
     );
 }
 
-export const ProfileIcon = ({ auth, handleProfileDropdownToggle }) => {
+export const ProfileIcon = ({ handleProfileDropdownToggle }) => {
+    const [firstName, setFirstName] = useState('');
+    const axiosInstance = useAxios();
+
+    useEffect(() => {
+        const fetchUserData = async () => {
+            try {
+                const response = await axiosInstance.get('/auth/me');
+                const userData = response.data;
+
+                setFirstName(userData.firstName);
+            } catch (error) {
+                console.error('Failed to fetch user data:', error);
+                toast.error('Failed to load profile data');
+            }
+        };
+
+        fetchUserData();
+    }, []);
+
     return (
         <Tooltip title="Profile" arrow>
             <div className="flex items-center">
@@ -1911,8 +1940,8 @@ export const ProfileIcon = ({ auth, handleProfileDropdownToggle }) => {
                     className="flex items-center space-x-2 rounded-sm"
                 >
                     <StyledPersonIcon />
-                    {auth?.firstName && (
-                        <span className="ml-2 text-sm">{auth.firstName}</span>
+                    {firstName && (
+                        <span className="ml-2 text-sm">{firstName}</span>
                     )}
                 </ProfileButton>
             </div>

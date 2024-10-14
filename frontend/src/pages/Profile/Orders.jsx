@@ -120,7 +120,7 @@ const Orders = () => {
                             searchTerm={searchTerm}
                             setSearchTerm={setSearchTerm}
                             showSearch={filteredOrders.length > 0}
-                            showFilter={true}
+                            showFilter={orders.length > 0}
                             statusFilter={statusFilter}
                             setStatusFilter={setStatusFilter}
                             placeholder='Search orders...'

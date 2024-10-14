@@ -123,10 +123,7 @@ const Navbar = () => {
                             <>
                                 {/* Profile button */}
                                 <div className="relative">
-                                    <ProfileIcon
-                                        auth={auth}
-                                        handleProfileDropdownToggle={() => toggleDropdown('profile')}
-                                    />
+                                    <ProfileIcon handleProfileDropdownToggle={() => toggleDropdown('profile')} />
                                     {isProfileDropdownOpen && (
                                         <ProfileDropdown
                                             isAdmin={isAdmin()}
@@ -134,6 +131,7 @@ const Navbar = () => {
                                         />
                                     )}
                                 </div>
+
 
                                 {/* Wishlist & Cart buttons */}
                                 <div className="flex space-x-2">
