@@ -1,7 +1,7 @@
 import VisibilityIcon from '@mui/icons-material/Visibility';
 import VisibilityOffIcon from '@mui/icons-material/VisibilityOff';
 import { Box, Button, IconButton, InputAdornment, TextField } from '@mui/material';
-import React, { useContext, useEffect, useState, useMemo } from 'react';
+import React, { useContext, useEffect, useMemo, useState } from 'react';
 import { toast } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
 import { BrownOutlinedTextField, Header, knownEmailProviders, ProfileInformationSkeleton } from '../../assets/CustomComponents';

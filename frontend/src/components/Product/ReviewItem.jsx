@@ -1,5 +1,5 @@
-import React from 'react';
 import { Box, Typography } from '@mui/material';
+import React from 'react';
 import { CenteredMoreVertIcon, RatingStars, truncateText } from '../../assets/CustomComponents';
 import { getImageUrl } from '../../config';
 

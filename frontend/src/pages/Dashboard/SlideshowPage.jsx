@@ -6,8 +6,8 @@ import DeleteModal from '../../components/Modal/DeleteModal';
 import ImagePreviewModal from '../../components/Modal/ImagePreviewModal';
 import AddSlideshowModal from '../../components/Modal/Slideshow/AddSlideshowModal';
 import EditSlideshowModal from '../../components/Modal/Slideshow/EditSlideshowModal';
-import { AuthContext } from '../../context/AuthContext';
 import { getImageUrl } from '../../config';
+import { AuthContext } from '../../context/AuthContext';
 
 const SlideshowPage = () => {
     const [images, setImages] = useState([]);

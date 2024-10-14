@@ -1,9 +1,8 @@
 import { HomeOutlined, StarBorderOutlined } from '@mui/icons-material';
 import { List, Typography } from '@mui/material';
-import React, { useContext, useEffect, useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import { useLocation, useNavigate } from 'react-router-dom';
 import { ActiveListItem, StyledFavoriteIcon, StyledInboxIcon, StyledPersonIcon } from '../../assets/CustomComponents';
-import { AuthContext } from '../../context/AuthContext';
 import useAxios from '../../axiosInstance';
 
 const ProfileSidebar = () => {

@@ -6,8 +6,8 @@ import AddCategoryModal from '../../components/Modal/Category/AddCategoryModal';
 import EditCategoryModal from '../../components/Modal/Category/EditCategoryModal';
 import DeleteModal from '../../components/Modal/DeleteModal';
 import ImagePreviewModal from '../../components/Modal/ImagePreviewModal';
-import { AuthContext } from '../../context/AuthContext';
 import { getImageUrl } from '../../config';
+import { AuthContext } from '../../context/AuthContext';
 
 const CategoriesPage = () => {
     const [categories, setCategories] = useState([]);

@@ -6,7 +6,7 @@ import { AuthContext } from '../../../context/AuthContext';
 
 const EditRoleModal = ({ open, onClose, role, onEditSuccess }) => {
     const [name, setName] = useState('');
-    
+
     const { refreshToken } = useContext(AuthContext);
     const axiosInstance = useAxios(refreshToken);
 

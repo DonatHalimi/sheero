@@ -1,18 +1,16 @@
 import React, { useEffect, useState } from 'react';
-import { useParams } from 'react-router-dom'; // Import useParams to get the userId from the URL
 import { toast } from 'react-toastify';
 import { CustomPagination, EmptyState, Header, ProductItemSkeleton } from '../../assets/CustomComponents';
 import emptyWishlistImage from '../../assets/img/empty-wishlist.png';
 import useAxios from '../../axiosInstance';
+import { getApiUrl } from '../../config';
 import Footer from '../Footer';
 import Navbar from '../Navbar/Navbar';
 import ProductItem from './ProductItem';
-import { getApiUrl } from '../../config';
 
-const itemsPerPage = 10;
+const itemsPerPage = 10; ``
 
 const SharedWishlist = () => {
-    const { userId } = useParams();
     const axiosInstance = useAxios();
 
     const [wishlistItems, setWishlistItems] = useState([]);
@@ -25,6 +23,9 @@ const SharedWishlist = () => {
         const fetchWishlist = async () => {
             setLoading(true);
             try {
+                const userResponse = await axiosInstance.get(getApiUrl('/auth/me'));
+                const userId = userResponse.data.id;
+
                 const { data } = await axiosInstance.get(getApiUrl(`/wishlist/${userId}`));
                 setWishlistItems(data.items);
                 setFullName(`${data.firstName} ${data.lastName}`);
@@ -37,10 +38,8 @@ const SharedWishlist = () => {
             }
         };
 
-        if (userId) {
-            fetchWishlist();
-        }
-    }, [userId]);
+        fetchWishlist();
+    }, []);
 
     const pageCount = Math.ceil(totalItems / itemsPerPage);
     const getCurrentPageItems = () => {

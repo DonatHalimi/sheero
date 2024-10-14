@@ -1,6 +1,6 @@
 import axios from 'axios';
-import React, { createContext, useState } from 'react';
 import CryptoJS from 'crypto-js';
+import React, { createContext, useEffect, useState } from 'react';
 import { getApiUrl } from '../config';
 
 const AuthContext = createContext();
@@ -22,7 +22,6 @@ const AuthProvider = ({ children }) => {
         const value = localStorage.getItem(key);
         if (!value) return null;
         try {
-            // Always decrypt the stored data
             return decryptData(value);
         } catch (error) {
             console.error('Error decrypting localStorage:', error);
@@ -32,15 +31,32 @@ const AuthProvider = ({ children }) => {
 
     const [auth, setAuthState] = useState({
         accessToken: getLocalStorageItem('accessToken'),
-        role: getLocalStorageItem('role'),
-        userId: getLocalStorageItem('userId'),
+        role: null,
     });
+
+    useEffect(() => {
+        const fetchUserRole = async () => {
+            if (auth.accessToken) {
+                try {
+                    const response = await axios.get(getApiUrl('/auth/me'), {
+                        headers: { Authorization: `Bearer ${auth.accessToken}` },
+                    });
+                    setAuthState((prev) => ({
+                        ...prev,
+                        role: response.data.role,
+                    }));
+                } catch (error) {
+                    console.error('Error fetching user role:', error);
+                }
+            }
+        };
+
+        fetchUserRole();
+    }, [auth.accessToken]);
 
     const setAuth = (authData) => {
         setAuthState(authData);
         localStorage.setItem('accessToken', encryptData(authData.accessToken || ''));
-        localStorage.setItem('role', encryptData(authData.role || ''));
-        localStorage.setItem('userId', encryptData(authData.userId || ''));
     };
 
     const login = async (email, password) => {
@@ -48,8 +64,7 @@ const AuthProvider = ({ children }) => {
             const response = await axios.post(getApiUrl('/auth/login'), { email, password });
             const authData = {
                 accessToken: response.data.accessToken,
-                role: response.data.role,
-                userId: response.data.userId,
+                role: response.data.role, // Store the role temporarily for setting the state
             };
 
             setAuth(authData);
@@ -62,10 +77,8 @@ const AuthProvider = ({ children }) => {
     };
 
     const logout = () => {
-        setAuth({ accessToken: null, role: null, userId: null });
+        setAuth({ accessToken: null, role: null });
         localStorage.removeItem('accessToken');
-        localStorage.removeItem('role');
-        localStorage.removeItem('userId');
     };
 
     const register = async (firstName, lastName, email, password) => {

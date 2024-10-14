@@ -1,16 +1,17 @@
 import { CircularProgress } from '@mui/material';
-import axios from 'axios';
 import React, { useContext, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { toast } from 'react-toastify';
 import { CartWishlistButtons, DiscountPercentage, OutOfStock, ProductItemSkeleton } from '../../assets/CustomComponents';
 import NoImage from '../../assets/img/product-not-found.jpg';
-import { AuthContext } from '../../context/AuthContext';
+import useAxios from '../../axiosInstance';
 import { getApiUrl, getImageUrl } from '../../config';
+import { AuthContext } from '../../context/AuthContext';
 
 const ProductItem = ({ product, loading }) => {
-    const navigate = useNavigate();
     const { auth } = useContext(AuthContext);
+    const axiosInstance = useAxios();
+    const navigate = useNavigate();
     const [isLoading, setIsLoading] = useState({ cart: false, wishlist: false });
 
     const { _id, name, image, price, salePrice, inventoryCount } = product || {};
@@ -36,11 +37,9 @@ const ProductItem = ({ product, loading }) => {
 
         try {
             const endpoint = action === 'cart' ? 'cart/add' : 'wishlist/add';
-            await axios.post(getApiUrl(`/${endpoint}`), {
+            await axiosInstance.post(getApiUrl(`/${endpoint}`), {
                 productId: _id,
                 ...(action === 'cart' && { quantity: 1 }),
-            }, {
-                headers: { Authorization: `Bearer ${auth.accessToken}` }
             });
 
             toast.success(`Product added to ${action === 'cart' ? 'cart' : 'wishlist'}!`, {

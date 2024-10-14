@@ -6,8 +6,8 @@ import DeleteModal from '../../components/Modal/DeleteModal';
 import ImagePreviewModal from '../../components/Modal/ImagePreviewModal';
 import AddProductModal from '../../components/Modal/Product/AddProductModal';
 import EditProductModal from '../../components/Modal/Product/EditProductModal';
-import { AuthContext } from '../../context/AuthContext';
 import { getImageUrl } from '../../config';
+import { AuthContext } from '../../context/AuthContext';
 
 const ProductsPage = () => {
     const [products, setProducts] = useState([]);

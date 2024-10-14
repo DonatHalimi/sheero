@@ -1,5 +1,5 @@
 import { Box, Typography } from '@mui/material';
-import React, { useContext, useEffect, useState } from 'react';
+import React, { useMemo, useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { CustomDeleteModal, CustomMenu, CustomPagination, EmptyState, Header, LoadingOverlay, ReviewItemSkeleton, ReviewModal } from '../../assets/CustomComponents';
 import emptyReviewsImage from '../../assets/img/empty-reviews.png';
@@ -8,16 +8,13 @@ import Footer from '../../components/Footer';
 import Navbar from '../../components/Navbar/Navbar';
 import EditReviewModal from '../../components/Product/EditReviewModal';
 import ReviewItem from '../../components/Product/ReviewItem';
-import { AuthContext } from '../../context/AuthContext';
 import ProfileSidebar from './ProfileSidebar';
 
 const itemsPerPage = 4;
 
 const Reviews = () => {
-    const { auth } = useContext(AuthContext);
-    const userId = auth?.userId;
+    const axiosInstance = useMemo(() => useAxios(), []);
     const navigate = useNavigate();
-    const axiosInstance = useAxios();
 
     const [reviews, setReviews] = useState([]);
     const [loading, setLoading] = useState(true);
@@ -31,35 +28,35 @@ const Reviews = () => {
     const [searchTerm, setSearchTerm] = useState('');
 
     useEffect(() => {
+        const fetchReviews = async () => {
+            setLoading(true);
+            try {
+                const { data } = await axiosInstance.get('/auth/me');
+                const userId = data.id;
+                const reviewsResponse = await axiosInstance.get(`/reviews/user/${userId}`);
+                setReviews(reviewsResponse.data);
+            } catch (error) {
+                console.error('Error fetching reviews:', error.message);
+            } finally {
+                setLoading(false);
+            }
+        };
+
+        fetchReviews();
         window.scrollTo(0, 0);
-        if (userId && auth.accessToken) {
-            fetchReviews();
-        }
-    }, [userId, auth.accessToken]);
+    }, [axiosInstance]);
 
     useEffect(() => {
         setCurrentPage(1);
     }, [searchTerm]);
 
-    const fetchReviews = async () => {
-        setLoading(true);
-        try {
-            const response = await axiosInstance.get(`/reviews/user/${userId}`);
-            setReviews(response.data);
-        } catch (err) {
-            console.error('Failed to fetch reviews:', err.message);
-        } finally {
-            setLoading(false);
-        }
-    };
-
     const filteredReviews = reviews.filter(review => {
         const matchesSearchTerm = [
-            review.product.name?.toString(),
-            review.title?.toString(),
-            review.rating?.toString(),
-            review.comment?.toString(),
-        ].some(field => field.toLowerCase().includes(searchTerm.toLowerCase()));
+            review.product.name,
+            review.title,
+            review.rating,
+            review.comment,
+        ].some(field => field?.toString().toLowerCase().includes(searchTerm.toLowerCase()));
 
         return matchesSearchTerm;
     });
@@ -99,10 +96,8 @@ const Reviews = () => {
 
     const handleEditSuccess = async (updatedReview) => {
         setLoadingOverlay(true);
-        setReviews((prevReviews) =>
-            prevReviews.map((review) =>
-                review._id === updatedReview._id ? updatedReview : review
-            )
+        setReviews(prevReviews =>
+            prevReviews.map(review => (review._id === updatedReview._id ? updatedReview : review))
         );
         setOpenEditModal(false);
         await fetchReviews();
@@ -112,18 +107,12 @@ const Reviews = () => {
     const handleDeleteConfirm = async () => {
         if (selectedReview) {
             setLoadingOverlay(true);
-            setReviews((prevReviews) =>
-                prevReviews.filter((review) => review._id !== selectedReview._id)
-            );
-
+            setReviews(prevReviews => prevReviews.filter(review => review._id !== selectedReview._id));
             try {
                 await axiosInstance.delete(`/reviews/delete/${selectedReview._id}`);
                 await fetchReviews();
             } catch (err) {
                 console.error('Failed to delete review:', err.message);
-                if (err.response?.status === 404) {
-                    console.error('Review not found or already deleted.');
-                }
             } finally {
                 setOpenDeleteModal(false);
                 setLoadingOverlay(false);
@@ -159,7 +148,7 @@ const Reviews = () => {
                         <div className="rounded-sm mb-2">
                             {loading ? (
                                 <ReviewItemSkeleton />
-                            ) : userId && auth.accessToken ? (
+                            ) : (
                                 filteredReviews.length === 0 ? (
                                     <EmptyState
                                         imageSrc={emptyReviewsImage}
@@ -193,8 +182,6 @@ const Reviews = () => {
                                         </Box>
                                     </>
                                 )
-                            ) : (
-                                <Typography variant="body1">Please log in to view your reviews.</Typography>
                             )}
                         </div>
                     </div>

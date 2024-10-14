@@ -2,9 +2,9 @@ import React, { useContext, useEffect, useState } from 'react';
 import { DashboardHeader } from '../../assets/CustomComponents.jsx';
 import useAxios from '../../axiosInstance.js';
 import DashboardTable from '../../components/Dashboard/DashboardTable';
+import DeleteModal from '../../components/Modal/DeleteModal.jsx';
 import AddRoleModal from '../../components/Modal/Role/AddRoleModal.jsx';
 import EditRoleModal from '../../components/Modal/Role/EditRoleModal.jsx';
-import DeleteModal from '../../components/Modal/DeleteModal.jsx';
 import { AuthContext } from '../../context/AuthContext.jsx';
 
 const RolesPage = () => {
@@ -57,7 +57,7 @@ const RolesPage = () => {
     };
 
     const columns = [
-        { key: 'name', label: 'Role Name' },
+        { key: 'name', label: 'Name' },
         { key: 'actions', label: 'Actions' }
     ];
 
@@ -84,16 +84,16 @@ const RolesPage = () => {
                     onEdit={handleEdit}
                 />
 
-                <AddRoleModal 
-                    open={addRoleOpen} 
-                    onClose={() => setAddRoleOpen(false)} 
-                    onAddSuccess={fetchRoles} 
+                <AddRoleModal
+                    open={addRoleOpen}
+                    onClose={() => setAddRoleOpen(false)}
+                    onAddSuccess={fetchRoles}
                 />
-                <EditRoleModal 
-                    open={editRoleOpen} 
-                    onClose={() => setEditRoleOpen(false)} 
-                    role={selectedRole} 
-                    onEditSuccess={fetchRoles} 
+                <EditRoleModal
+                    open={editRoleOpen}
+                    onClose={() => setEditRoleOpen(false)}
+                    role={selectedRole}
+                    onEditSuccess={fetchRoles}
                 />
                 <DeleteModal
                     open={deleteRoleOpen}

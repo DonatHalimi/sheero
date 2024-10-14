@@ -1,5 +1,5 @@
 import { Box } from '@mui/material';
-import React, { useContext, useEffect, useState } from 'react';
+import React, { useEffect, useMemo, useState } from 'react';
 import { Link } from 'react-router-dom';
 import { CustomPagination, EmptyState, Header, OrderItemSkeleton } from '../../assets/CustomComponents';
 import emptyOrdersImage from '../../assets/img/empty-orders.png';
@@ -7,48 +7,45 @@ import useAxios from '../../axiosInstance';
 import Footer from '../../components/Footer';
 import Navbar from '../../components/Navbar/Navbar';
 import OrderItem from '../../components/Product/OrderItem';
-import { AuthContext } from '../../context/AuthContext';
-import ProfileSidebar from './ProfileSidebar';
 import { getImageUrl } from '../../config';
+import ProfileSidebar from './ProfileSidebar';
 
 const itemsPerPage = 5;
 
 const Orders = () => {
-    const { auth } = useContext(AuthContext);
-    const axiosInstance = useAxios();
+    const axiosInstance = useMemo(() => useAxios(), []);
 
     const [orders, setOrders] = useState([]);
     const [loading, setLoading] = useState(true);
-    const [error, setError] = useState(null);
     const [currentPage, setCurrentPage] = useState(1);
     const [searchTerm, setSearchTerm] = useState('');
     const [statusFilter, setStatusFilter] = useState('All');
 
     useEffect(() => {
+        const fetchOrders = async () => {
+            setLoading(true);
+            try {
+                const { data } = await axiosInstance.get('/auth/me');
+                const userId = data.id;
+                const ordersResponse = await axiosInstance.get(`/orders/user/${userId}`);
+                setOrders(ordersResponse.data);
+            } catch (error) {
+                console.error('Error fetching orders:', error.message);
+            } finally {
+                setLoading(false)
+            }
+        };
+
+        fetchOrders();
+    }, [axiosInstance]);
+
+    useEffect(() => {
         window.scrollTo(0, 0);
-        fetchUserOrders();
     }, []);
 
     useEffect(() => {
         setCurrentPage(1);
     }, [searchTerm, statusFilter]);
-
-    const fetchUserOrders = async () => {
-        setLoading(true);
-        try {
-            const response = await axiosInstance.get(`/orders/user/${auth.userId}`);
-            if (response.data.success) {
-                setOrders(response.data.data);
-            } else {
-                console.error(response.data.message);
-            }
-        } catch (error) {
-            console.error('Error fetching user orders:', error);
-            setError('Failed to fetch orders.');
-        } finally {
-            setLoading(false);
-        }
-    };
 
     const filteredOrders = orders.filter(order => {
         const matchesSearchTerm = [
@@ -128,8 +125,6 @@ const Orders = () => {
 
                         {loading ? (
                             <OrderItemSkeleton />
-                        ) : error ? (
-                            <div>{error}</div>
                         ) : filteredOrders.length === 0 ? (
                             <EmptyState
                                 imageSrc={emptyOrdersImage}

@@ -74,6 +74,7 @@ import logo from './img/logo.png';
 import { getImageUrl } from '../config';
 import { toast } from 'react-toastify';
 import useAxios from '../axiosInstance';
+import Navbar from '../components/Navbar/Navbar';
 
 export const BrownOutlinedTextField = styled(TextField)({
     '& .MuiOutlinedInput-root': {
@@ -1119,6 +1120,7 @@ export const CheckoutButton = styled(Button)(({ theme }) => ({
 export const LoadingCart = () => {
     return (
         <>
+            <Navbar />
             <div className="container mx-auto px-24 py-2 mb-16 bg-gray-50 mt-10 flex">
                 <div className="flex-1">
                     <h1 className="text-2xl font-semilight mb-4">Cart</h1>

@@ -6,8 +6,8 @@ import DeleteModal from '../../components/Modal/DeleteModal';
 import ImagePreviewModal from '../../components/Modal/ImagePreviewModal';
 import AddSubcategoryModal from '../../components/Modal/Subcategory/AddSubcategoryModal';
 import EditSubcategoryModal from '../../components/Modal/Subcategory/EditSubcategoryModal';
-import { AuthContext } from '../../context/AuthContext';
 import { getImageUrl } from '../../config';
+import { AuthContext } from '../../context/AuthContext';
 
 const SubcategoriesPage = () => {
     const [subcategories, setSubcategories] = useState([]);

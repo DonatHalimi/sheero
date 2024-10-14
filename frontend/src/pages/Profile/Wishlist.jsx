@@ -1,5 +1,5 @@
 import { Box } from '@mui/material';
-import React, { useContext, useEffect, useState } from 'react';
+import React, { useContext, useEffect, useMemo, useState } from 'react';
 import { toast } from 'react-toastify';
 import {
     CustomDeleteModal,
@@ -20,30 +20,33 @@ const itemsPerPage = 6;
 
 const Wishlist = () => {
     const { auth } = useContext(AuthContext);
-    const axiosInstance = useAxios();
+    const axiosInstance = useMemo(() => useAxios(), []);
     const [wishlistItems, setWishlistItems] = useState([]);
     const [loading, setLoading] = useState(true);
     const [isModalOpen, setIsModalOpen] = useState(false);
     const [currentPage, setCurrentPage] = useState(1);
+    const [userId, setUserId] = useState('');
     const [totalItems, setTotalItems] = useState(0);
 
     useEffect(() => {
         window.scrollTo(0, 0);
 
-        if (auth.accessToken) {
-            const fetchWishlist = async () => {
-                try {
-                    const { data } = await axiosInstance.get('/wishlist');
-                    setWishlistItems(data.items);
-                    setTotalItems(data.items.length);
-                } catch (error) {
-                    console.error('Error fetching wishlist:', error);
-                } finally {
-                    setLoading(false);
-                }
-            };
-            fetchWishlist();
-        }
+        const fetchData = async () => {
+            try {
+                const userResponse = await axiosInstance.get('/auth/me');
+                setUserId(userResponse.data.id);
+
+                const wishlistResponse = await axiosInstance.get('/wishlist');
+                setWishlistItems(wishlistResponse.data.items);
+                setTotalItems(wishlistResponse.data.items.length);
+            } catch (error) {
+                console.error('Error fetching data:', error);
+            } finally {
+                setLoading(false);
+            }
+        };
+
+        fetchData();
     }, [auth.accessToken]);
 
     const handleRemoveFromWishlist = async (productId) => {
@@ -73,7 +76,6 @@ const Wishlist = () => {
     };
 
     const handleShareWishlist = () => {
-        const userId = auth.userId;
         const shareUrl = `${window.location.origin}/wishlist/${userId}`;
 
         navigator.clipboard.writeText(shareUrl)

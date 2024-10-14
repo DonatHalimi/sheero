@@ -10,6 +10,7 @@ import {
     OutOfStock,
     ProductDetailsSkeleton
 } from '../../assets/CustomComponents';
+import useAxios from '../../axiosInstance';
 import Footer from '../../components/Footer';
 import ImagePreviewModal from '../../components/Modal/ImagePreviewModal';
 import Navbar from '../../components/Navbar/Navbar';
@@ -19,8 +20,9 @@ import { getApiUrl, getImageUrl } from '../../config';
 import { AuthContext } from '../../context/AuthContext';
 
 const ProductDetails = () => {
-    const { id } = useParams();
     const { auth } = useContext(AuthContext);
+    const axiosInstance = useAxios();
+    const { id } = useParams();
     const navigate = useNavigate();
 
     const [product, setProduct] = useState(null);
@@ -89,9 +91,7 @@ const ProductDetails = () => {
 
         setLoadingState(true);
         try {
-            await axios.post(getApiUrl(`/${endpoint}`), payload, {
-                headers: { Authorization: `Bearer ${auth.accessToken}` },
-            });
+            await axiosInstance.post(getApiUrl(`/${endpoint}`), payload);
 
             toast.success(`Product added to ${action === 'cart' ? 'cart' : 'wishlist'}!`, {
                 onClick: () => navigate(`/${action === 'wishlist' ? 'profile/wishlist' : 'cart'}`),

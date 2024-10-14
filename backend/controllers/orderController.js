@@ -225,7 +225,7 @@ const getUserOrders = async (req, res) => {
             return res.json({ success: false, message: 'No orders found for this user.' });
         }
 
-        res.json({ success: true, data: orders });
+        res.json(orders);
     } catch (error) {
         console.error('Error fetching user orders:', error);
         res.status(500).json({ success: false, message: 'Error fetching orders.' });

@@ -1,17 +1,14 @@
 import { Box, Button, FormControl, InputLabel, MenuItem, Select, TextField } from '@mui/material';
-import React, { useContext, useEffect, useState } from 'react';
+import React, { useEffect, useMemo, useState } from 'react';
 import { toast } from 'react-toastify';
 import { AddressInformationSkeleton, Header } from '../../assets/CustomComponents';
 import useAxios from '../../axiosInstance';
 import Footer from '../../components/Footer';
 import Navbar from '../../components/Navbar/Navbar';
-import { AuthContext } from '../../context/AuthContext';
 import ProfileSidebar from './ProfileSidebar';
 
 const AddressInformation = () => {
-    const { auth } = useContext(AuthContext);
-    const userId = auth?.userId;
-    const axiosInstance = useAxios();
+    const axiosInstance = useMemo(() => useAxios(), []);
 
     const [name, setName] = useState('');
     const [street, setStreet] = useState('');
@@ -27,18 +24,25 @@ const AddressInformation = () => {
     const [nameValid, setNameValid] = useState(true);
     const [streetValid, setStreetValid] = useState(true);
     const [phoneNumberValid, setPhoneNumberValid] = useState(true);
-
     const [focusedField, setFocusedField] = useState(null);
 
     useEffect(() => {
-        if (userId && auth.accessToken) {
-            fetchAddress();
-        }
-    }, [userId, auth.accessToken]);
+        const fetchUserData = async () => {
+            try {
+                const response = await axiosInstance.get('/auth/me');
+                const userId = response.data.id;
+                fetchAddress(userId);
+            } catch (error) {
+                console.error('Error fetching user data:', error.message);
+            }
+        };
+
+        fetchUserData();
+    }, [axiosInstance]);
 
     useEffect(() => window.scrollTo(0, 0), []);
 
-    const fetchAddress = async () => {
+    const fetchAddress = async (userId) => {
         try {
             setLoading(true);
             const response = await axiosInstance.get(`/addresses/user/${userId}`);

@@ -1,6 +1,6 @@
 import { DeleteOutline } from '@mui/icons-material';
 import { Paper, Table, TableBody, TableCell, TableContainer, TableHead, TableRow, Tooltip } from '@mui/material';
-import React, { useContext, useEffect, useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { toast } from 'react-toastify';
 import { CheckoutButton, CustomDeleteModal, EmptyState, LoadingCart, RoundIconButton, truncateText } from '../../assets/CustomComponents';
@@ -10,23 +10,34 @@ import Footer from '../../components/Footer';
 import Navbar from '../../components/Navbar/Navbar';
 import PaymentModal from '../../components/Product/PaymentModal';
 import { getImageUrl } from '../../config';
-import { AuthContext } from '../../context/AuthContext';
 
 const Cart = () => {
     const [cart, setCart] = useState({ items: [] });
     const [address, setAddress] = useState(null);
-
+    const [user, setUser] = useState(null);
     const [loading, setLoading] = useState(true);
     const [openModal, setOpenModal] = useState(false);
     const [showPaymentModal, setShowPaymentModal] = useState(false);
     const axiosInstance = useAxios();
-    const { auth } = useContext(AuthContext);
     const navigate = useNavigate();
+
+    useEffect(() => {
+        const fetchCurrentUser = async () => {
+            try {
+                const { data } = await axiosInstance.get('/auth/me');
+                setUser(data);
+            } catch (error) {
+                console.error('Failed to fetch user:', error.message);
+            }
+        };
+
+        fetchCurrentUser();
+    }, []);
 
     useEffect(() => {
         const fetchCart = async () => {
             try {
-                const { data } = await axiosInstance.get('/cart')
+                const { data } = await axiosInstance.get('/cart');
                 setCart(data);
             } catch (error) {
                 console.error('Failed to fetch cart:', error?.response?.data?.message || error.message);
@@ -35,15 +46,15 @@ const Cart = () => {
                 setLoading(false);
             }
         };
-        window.scrollTo(0, 0);
-        fetchCart();
-    }, [auth.accessToken]);
+
+        if (user) {
+            fetchCart();
+        }
+    }, [user]);
 
     const updateQuantity = async (productId, quantityChange) => {
         try {
-            const { data } = await axiosInstance.put(`/cart/quantity/update`,
-                { productId, quantityChange },
-            );
+            const { data } = await axiosInstance.put(`/cart/quantity/update`, { productId, quantityChange });
             setCart(data);
         } catch (error) {
             console.error('Failed to update quantity:', error?.response?.data?.message || error.message);
@@ -52,9 +63,7 @@ const Cart = () => {
 
     const handleRemove = async (productId) => {
         try {
-            const { data } = await axiosInstance.delete(`/cart/remove`, {
-                data: { productId }
-            });
+            const { data } = await axiosInstance.delete(`/cart/remove`, { data: { productId } });
             setCart(data);
         } catch (error) {
             console.error('Failed to remove product from cart:', error?.response?.data?.message || error.message);
@@ -72,14 +81,14 @@ const Cart = () => {
     };
 
     useEffect(() => {
-        if (auth.userId) {
+        if (user) {
             fetchAddress();
         }
-    }, [auth.userId]);
+    }, [user]);
 
     const fetchAddress = async () => {
         try {
-            const response = await axiosInstance.get(`/addresses/user/${auth.userId}`);
+            const response = await axiosInstance.get(`/addresses/user/${user.id}`);
             setAddress(response.data);
         } catch (error) {
             console.error('Error fetching address:', error.message);
@@ -98,14 +107,13 @@ const Cart = () => {
             const { data } = await axiosInstance.post('/orders/payment/stripe', {
                 productIds: cart.items.map(item => item.product._id),
                 addressId: address._id,
-                userId: auth.userId,
-                email: auth.email
+                userId: user.id,
+                email: user.email,
             });
 
             await axiosInstance.delete('/cart/clear');
 
             setShowPaymentModal(false);
-
             window.location.href = data.url;
         } catch (error) {
             console.error('Error during Stripe checkout:', error.message);
@@ -129,8 +137,8 @@ const Cart = () => {
             const { data } = await axiosInstance.post('/orders/payment/cash', {
                 productIds: cart.items.map(item => item.product._id),
                 addressId: address._id,
-                userId: auth.userId,
-                email: auth.email
+                userId: user.id,
+                email: user.email,
             });
 
             await axiosInstance.delete('/cart/clear');
@@ -315,6 +323,12 @@ const Cart = () => {
 
             </div>
             <Footer />
+            <PaymentModal
+                show={showPaymentModal}
+                onClose={() => setShowPaymentModal(false)}
+                onCashPayment={handleCashPayment}
+                onStripePayment={handleStripePayment}
+            />
         </>
     );
 };
