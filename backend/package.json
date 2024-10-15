@@ -1,7 +1,7 @@
 {
   "name": "backend",
   "version": "1.0.0",
-  "description": "Node.js backend for role-based JWT authentication for an e-commerce website with access tokens and refresh tokens",
+  "description": "Node.js backend for role-based JWT authentication for an e-commerce website with access tokens",
   "main": "index.js",
   "scripts": {
     "start": "node index.js",
