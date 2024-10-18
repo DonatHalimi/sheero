@@ -179,9 +179,14 @@ const Navbar = () => {
                                             </div>
                                         </>
                                     ) : (
-                                        <RoundIconButton onClick={() => navigate('/login')}>
-                                            <Login />
-                                        </RoundIconButton>
+                                        <>
+                                            <RoundIconButton
+                                                onClick={() => navigate('/login')}
+                                                sx={{ color: '#686159' }}
+                                            >
+                                                <Login />
+                                            </RoundIconButton>
+                                        </>
                                     )}
                                 </div>
                             </div>

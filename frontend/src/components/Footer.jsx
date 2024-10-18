@@ -26,7 +26,7 @@ const Footer = () => {
 
     const contactInfo = [
         { linkType: 'external', href: 'mailto:support@sheero.com', icon: <Email />, label: 'Email' },
-        { linkType: 'external', href: 'tel:+1234567890', icon: <Phone />, label: 'Phone' },
+        { linkType: 'external', href: 'tel:044221112', icon: <Phone />, label: 'Phone' },
         { linkType: 'internal', to: '/contact-us', icon: <ContactMail />, label: 'Contact' },
     ];
 

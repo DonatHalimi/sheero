@@ -99,7 +99,7 @@ const WishlistItem = ({ product, onRemove, loading }) => {
                         <div className="flex justify-between items-center mt-auto">
                             <AddToCartButton onClick={handleAddToCart} disabled={isActionLoading || inventoryCount === 0}>
                                 <BrownShoppingCartIcon />
-                                <span className="hidden sm:inline">Add To Cart</span>
+                                <span className="hidden sm:inline ml-3">Add To Cart</span>
                             </AddToCartButton>
                             <WishlistButton onClick={handleRemove} disabled={isActionLoading}>
                                 <DeleteIcon />

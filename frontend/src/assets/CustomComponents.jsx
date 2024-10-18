@@ -268,7 +268,6 @@ export const WishlistButton = styled(Button)(({ theme }) => ({
 
 export const BrownShoppingCartIcon = styled(ShoppingCart)(({ theme }) => ({
     color: '#57534E',
-    marginRight: 5,
     transition: 'color 0.3s ease',
 }));
 
@@ -276,7 +275,16 @@ export const CartButton = () => {
     return (
         <>
             <BrownShoppingCartIcon marginRight={false} />
-            <span className="hidden sm:inline">Add To Cart</span>
+            <span className="hidden sm:inline ml-3">Add To Cart</span>
+        </>
+    );
+};
+
+export const DetailsCartButton = () => {
+    return (
+        <>
+            <BrownShoppingCartIcon marginRight={false} />
+            <span className="ml-3">Add To Cart</span>
         </>
     );
 };
@@ -341,7 +349,7 @@ export const DetailsCartWishlistButtons = ({ handleAction, isCartLoading, isWish
                 onClick={handleAction('cart')}
                 disabled={isCartLoading || isWishlistLoading || inventoryCount === 0}
             >
-                <CartButton />
+                <DetailsCartButton />
             </DetailsAddToCartButton>
             <DetailsWishlistButton
                 onClick={handleAction('wishlist')}
@@ -1262,19 +1270,23 @@ export const LoadingCart = () => {
 
 export const ProductItemSkeleton = () => {
     return (
-        <div className="bg-white rounded-lg shadow-md p-4 flex flex-col">
-            <div className="relative mb-2">
-                <Skeleton variant="rectangular" animation="wave" width="100%" height={192} />
-            </div>
-            <Skeleton variant="text" animation="wave" width="80%" height={24} className="mt-2" />
-            <div className="flex flex-col mb-2">
-                <Skeleton variant="text" animation="wave" width="60%" height={28} className="mt-1" />
-            </div>
-            <div className="flex justify-between items-center mt-auto">
-                <Skeleton variant="rectangular" animation="wave" width={170} height={40} className='rounded' />
-                <Skeleton variant="rectangular" animation="wave" width={60} height={40} className='rounded' />
-            </div>
-        </div>
+        <>
+            {Array.from({ length: 6 }).map((_, index) => (
+                <div key={index} className="bg-white rounded-lg shadow-md p-4 flex flex-col">
+                    <div className="relative mb-2">
+                        <Skeleton variant="rectangular" animation="wave" width="100%" height={192} />
+                    </div>
+                    <Skeleton variant="text" animation="wave" width="80%" height={24} className="mt-2" />
+                    <div className="flex flex-col mb-2">
+                        <Skeleton variant="text" animation="wave" width="60%" height={28} className="mt-1" />
+                    </div>
+                    <div className="flex justify-between items-center mt-auto">
+                        <Skeleton variant="rectangular" animation="wave" width={170} height={40} className='rounded' />
+                        <Skeleton variant="rectangular" animation="wave" width={60} height={40} className='rounded' />
+                    </div>
+                </div>
+            ))}
+        </>
     );
 };
 
@@ -1954,7 +1966,7 @@ export const NavbarLogo = ({ dashboardStyling }) => {
         }}>
             <Tooltip title="Home" arrow>
                 <div className={`flex items-center cursor-pointer ${dashboardStyling || ''}`}>
-                    <img src={logo} alt="Logo" className="h-9" />
+                    <img src={logo} alt="Logo" className="w-32 md:w-auto h-9" />
                 </div>
             </Tooltip>
         </a>

@@ -1,6 +1,6 @@
 import axios from 'axios';
 import React, { useEffect, useState } from 'react';
-import { CustomPagination } from '../../assets/CustomComponents';
+import { CustomPagination, ProductItemSkeleton } from '../../assets/CustomComponents';
 import ProductItem from '../../components/Product/ProductItem';
 import { getApiUrl } from '../../config';
 
@@ -41,9 +41,8 @@ const ProductList = () => {
     };
 
     const renderProductItems = () => (
-        loading
-            ? Array.from({ length: itemsPerPage }, (_, index) => <ProductItem key={index} loading={true} />)
-            : getCurrentPageItems().map(product => <ProductItem key={product._id} product={product} loading={false} />)
+        loading ? (Array.from({ length: itemsPerPage }).map((_, index) => (<ProductItemSkeleton key={index} />))
+        ) : (getCurrentPageItems().map(product => <ProductItem key={product._id} product={product} loading={false} />))
     );
 
     return (
@@ -53,6 +52,7 @@ const ProductList = () => {
                     <h1 className="text-2xl font-semibold">Products</h1>
                 </div>
             )}
+
             <div className="grid grid-cols-2 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-3 xl:grid-cols-5 gap-4">
                 {renderProductItems()}
             </div>

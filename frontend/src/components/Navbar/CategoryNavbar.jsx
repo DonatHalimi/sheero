@@ -1,7 +1,8 @@
 import { ChevronRight } from '@mui/icons-material';
-import { Skeleton } from '@mui/material';
+import { Link, Skeleton } from '@mui/material';
 import React, { useEffect, useRef, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
+import { useSwipeable } from 'react-swipeable';
 import { CartIcon, HomeIcon, WishlistIcon } from '../../assets/CustomComponents';
 import useAxios from '../../axiosInstance';
 import { getImageUrl } from '../../config';
@@ -77,7 +78,7 @@ const CategoryNavbar = ({ isSidebarOpen, toggleSidebar }) => {
     const handleNavigation = (path, categoryId) => {
         setActiveCategory(categoryId);
         navigate(path);
-    }
+    };
 
     const toggleSubcategories = (categoryId, event) => {
         event.stopPropagation();
@@ -92,6 +93,20 @@ const CategoryNavbar = ({ isSidebarOpen, toggleSidebar }) => {
             document.body.style.overflow = '';
         }
     }, [isSidebarOpen]);
+
+    const handlers = useSwipeable({
+        onSwipedRight: () => {
+            if (!isSidebarOpen) {
+                toggleSidebar();
+            }
+        },
+        onSwipedLeft: () => {
+            if (isSidebarOpen) {
+                toggleSidebar();
+            }
+        },
+        preventDefaultTouchmoveEvent: true,
+    });
 
     return (
         <>
@@ -170,9 +185,8 @@ const CategoryNavbar = ({ isSidebarOpen, toggleSidebar }) => {
                 </div>
             </nav>
 
-
             {/* Mobile screens */}
-            <div className={`fixed top-0 left-0 w-80 h-full bg-white z-[1000] transition-transform ${isSidebarOpen ? 'translate-x-0' : '-translate-x-full'}`}>
+            <div {...handlers} className={`fixed top-0 left-0 w-80 h-full bg-white z-[1000] transition-transform transform duration-500 ease-in-out overflow-y-auto ${isSidebarOpen ? 'translate-x-0 opacity-100' : '-translate-x-full opacity-0'}`}>
                 <div className="p-2 border-b flex flex-col items-start">
                     <div className='-mx-0 h-12 bg-stone-500 flex items-center justify-start w-full rounded-md mb-2 !p-0'>
                         <h1 className="text-white font-bold text-lg pl-3">sheero</h1>
@@ -187,22 +201,21 @@ const CategoryNavbar = ({ isSidebarOpen, toggleSidebar }) => {
                     </button>
 
                     <button
-                        onClick={() => navigate('/profile/wishlist')}
-                        className='flex items-center rounded w-full text-left mb-2'
-                    >
-                        <WishlistIcon color='primary' />
-                        Wishlist
-                    </button>
-
-                    <button
                         onClick={() => navigate('/cart')}
-                        className='flex items-center rounded w-full text-left'
+                        className='flex items-center rounded w-full text-left mb-2'
                     >
                         <CartIcon color='primary' />
                         Cart
                     </button>
-                </div>
 
+                    <button
+                        onClick={() => navigate('/profile/wishlist')}
+                        className='flex items-center rounded w-full text-left'
+                    >
+                        <WishlistIcon color='primary' />
+                        Wishlist
+                    </button>
+                </div>
 
                 <ul className="p-4">
                     {loading ? (
@@ -216,6 +229,12 @@ const CategoryNavbar = ({ isSidebarOpen, toggleSidebar }) => {
                             <li key={category._id} className="mb-4">
                                 <div className="flex items-center justify-between">
                                     <div className='border-t bg-gray-50' />
+                                    <img
+                                        src={getImageUrl(category.image)}
+                                        alt=""
+                                        width={30}
+                                        className="rounded-md"
+                                    />
                                     <button
                                         onClick={() => handleNavigation(`/products/category/${category._id}`, category._id)}
                                         className={`flex-grow text-left p-2 rounded ${activeCategory === category._id ? 'bg-gray-100' : ''}`}
@@ -232,17 +251,17 @@ const CategoryNavbar = ({ isSidebarOpen, toggleSidebar }) => {
                                 {openCategory === category._id && (
                                     <ul className="ml-2">
                                         {subcategories[category._id]?.map((subcategory) => (
-                                            <li key={subcategory._id} className='mb-4'>
+                                            <li key={subcategory._id} className='mb-2 ml-3'>
                                                 <div className="flex items-center">
                                                     <img
-                                                        className="rounded-md"
                                                         src={getImageUrl(subcategory.image)}
                                                         alt=""
                                                         width={30}
+                                                        className="rounded-md"
                                                     />
                                                     <button
                                                         onClick={() => handleNavigation(`/products/subcategory/${subcategory._id}`, category._id)}
-                                                        className="block py-1 px-4 text-gray-700 hover:bg-gray-100"
+                                                        className="block py-1 px-2 text-gray-700 hover:bg-gray-100"
                                                     >
                                                         {subcategory.name}
                                                     </button>
@@ -254,7 +273,7 @@ const CategoryNavbar = ({ isSidebarOpen, toggleSidebar }) => {
                                                                 <div className="rounded-md mr-9" />
                                                                 <button
                                                                     onClick={() => handleNavigation(`/products/subSubcategory/${subsubcategory._id}`, category._id)}
-                                                                    className="block py-1 px-2 text-gray-500 hover:bg-gray-100"
+                                                                    className="block py-1 text-gray-500 hover:bg-gray-100"
                                                                 >
                                                                     {subsubcategory.name}
                                                                 </button>
@@ -270,6 +289,20 @@ const CategoryNavbar = ({ isSidebarOpen, toggleSidebar }) => {
                         ))
                     )}
                 </ul>
+
+                <div className='border-t bg-gray-50 mb-4' />
+
+                <div className="flex flex-col text-gray-400 gap-3">
+                    <span
+                        className="text-sm ml-7 no-underline"
+                        onClick={() => navigate('/faqs')}
+                    >
+                        Frequently Asked Questions
+                    </span>
+                    <span className="text-sm ml-7">Contact us:</span>
+                    <span className="text-sm ml-7">Email: support@sheero.com</span>
+                    <span className="text-sm ml-7 mb-10">Phone Number: 044221112</span>
+                </div>
             </div>
         </>
     );

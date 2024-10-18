@@ -25,24 +25,25 @@ const Reviews = () => {
     const [currentPage, setCurrentPage] = useState(1);
     const [searchTerm, setSearchTerm] = useState('');
 
-    useEffect(() => {
-        const fetchReviews = async () => {
-            setLoading(true);
-            try {
-                const { data } = await axiosInstance.get('/auth/me');
-                const userId = data.id;
-                const reviewsResponse = await axiosInstance.get(`/reviews/user/${userId}`);
-                setReviews(reviewsResponse.data);
-            } catch (error) {
-                console.error('Error fetching reviews:', error.message);
-            } finally {
-                setLoading(false);
-            }
-        };
+    useEffect(() => { window.scrollTo(0, 0); }, [])
 
+    useEffect(() => {
         fetchReviews();
-        window.scrollTo(0, 0);
     }, [axiosInstance]);
+
+    const fetchReviews = async () => {
+        setLoading(true);
+        try {
+            const { data } = await axiosInstance.get('/auth/me');
+            const userId = data.id;
+            const reviewsResponse = await axiosInstance.get(`/reviews/user/${userId}`);
+            setReviews(reviewsResponse.data);
+        } catch (error) {
+            console.error('Error fetching reviews:', error.message);
+        } finally {
+            setLoading(false);
+        }
+    };
 
     useEffect(() => {
         setCurrentPage(1);
