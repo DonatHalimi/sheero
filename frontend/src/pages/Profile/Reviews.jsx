@@ -1,14 +1,12 @@
-import { Box, Typography } from '@mui/material';
 import React, { useMemo, useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { CustomDeleteModal, CustomMenu, CustomPagination, EmptyState, Header, LoadingOverlay, ReviewItemSkeleton, ReviewModal } from '../../assets/CustomComponents';
+import { CustomDeleteModal, CustomMenu, CustomPagination, EmptyState, Header, LoadingOverlay, ProfileLayout, ReviewItemSkeleton, ReviewModal } from '../../assets/CustomComponents';
 import emptyReviewsImage from '../../assets/img/empty-reviews.png';
 import useAxios from '../../axiosInstance';
 import Footer from '../../components/Footer';
 import Navbar from '../../components/Navbar/Navbar';
 import EditReviewModal from '../../components/Product/EditReviewModal';
 import ReviewItem from '../../components/Product/ReviewItem';
-import ProfileSidebar from './ProfileSidebar';
 
 const itemsPerPage = 4;
 
@@ -134,59 +132,54 @@ const Reviews = () => {
     return (
         <>
             <Navbar />
-            <Box className="container mx-auto max-w-5xl relative mb-16" style={{ paddingLeft: '77px' }}>
-                <ProfileSidebar />
-                <main className="p-4 relative left-32 w-full">
-                    <div className={`container mx-auto max-w-6xl mt-20 ${marginBottomClass}`}>
-                        <Header
-                            title='Reviews'
-                            searchTerm={searchTerm}
-                            setSearchTerm={setSearchTerm}
-                            showSearch={filteredReviews.length > 0}
-                            placeholder='Search reviews...'
+            <ProfileLayout>
+                <Header
+                    title='Reviews'
+                    searchTerm={searchTerm}
+                    setSearchTerm={setSearchTerm}
+                    showSearch={filteredReviews.length > 0}
+                    placeholder='Search reviews...'
+                />
+                {loading ? (
+                    <ReviewItemSkeleton />
+                ) : (
+                    filteredReviews.length === 0 ? (
+                        <EmptyState
+                            imageSrc={emptyReviewsImage}
+                            message={searchTerm ? "No review found matching your search" : "No review found!"}
                         />
-                        <div className="rounded-sm mb-2">
-                            {loading ? (
-                                <ReviewItemSkeleton />
-                            ) : (
-                                filteredReviews.length === 0 ? (
-                                    <EmptyState
-                                        imageSrc={emptyReviewsImage}
-                                        message={searchTerm ? "No review found matching your search" : "No review found!"}
+                    ) : (
+                        <>
+                            <div className={`flex flex-col ${marginBottomClass}`}>
+                                {getCurrentPageItems().map((review) => (
+                                    <ReviewItem
+                                        key={review._id}
+                                        review={review}
+                                        onImageClick={handleImageClick}
+                                        onMenuClick={handleMenuClick}
+                                        onCardClick={handlePaperClick}
                                     />
-                                ) : (
-                                    <>
-                                        {getCurrentPageItems().map((review) => (
-                                            <ReviewItem
-                                                key={review._id}
-                                                review={review}
-                                                onImageClick={handleImageClick}
-                                                onMenuClick={handleMenuClick}
-                                                onCardClick={handlePaperClick}
-                                            />
-                                        ))}
-                                        <Box sx={{ display: 'flex', justifyContent: 'flex-start', mb: 4 }}>
-                                            <CustomPagination
-                                                count={pageCount}
-                                                page={currentPage}
-                                                onChange={handlePageChange}
-                                                size="large"
-                                                sx={{
-                                                    position: 'relative',
-                                                    bottom: '16px',
-                                                    '& .MuiPagination-ul': {
-                                                        justifyContent: 'flex-start',
-                                                    },
-                                                }}
-                                            />
-                                        </Box>
-                                    </>
-                                )
-                            )}
-                        </div>
-                    </div>
-                </main>
-            </Box>
+                                ))}
+                                <div className="flex justify-start sm:justify-start">
+                                    <CustomPagination
+                                        count={pageCount}
+                                        page={currentPage}
+                                        onChange={handlePageChange}
+                                        size="medium"
+                                        sx={{
+                                            position: 'relative',
+                                            bottom: '4px',
+                                            '& .MuiPagination-ul': {
+                                                justifyContent: 'flex-start',
+                                            },
+                                        }}
+                                    />
+                                </div>
+                            </div>
+                        </>
+                    )
+                )}
+            </ProfileLayout>
 
             {totalReviews === 1 && <div className='mb-32' />}
             <Footer />

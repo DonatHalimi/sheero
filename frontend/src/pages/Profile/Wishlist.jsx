@@ -7,6 +7,7 @@ import {
     EmptyState,
     Header,
     ProductItemSkeleton,
+    ProfileLayout,
 } from '../../assets/CustomComponents';
 import emptyWishlistImage from '../../assets/img/empty-wishlist.png';
 import useAxios from '../../axiosInstance';
@@ -14,7 +15,6 @@ import Footer from '../../components/Footer';
 import Navbar from '../../components/Navbar/Navbar';
 import WishlistItem from '../../components/Product/WishlistItem';
 import { AuthContext } from '../../context/AuthContext';
-import ProfileSidebar from './ProfileSidebar';
 
 const itemsPerPage = 6;
 
@@ -108,59 +108,53 @@ const Wishlist = () => {
     return (
         <>
             <Navbar />
-            <Box className="container mx-auto max-w-5xl relative mb-16" style={{ paddingLeft: '77px' }}>
-                <ProfileSidebar />
-                <main className="flex-grow p-4 relative left-32">
-                    <div className="container max-w-5xl mx-auto mt-20 mb-20">
-                        <Header
-                            title="Wishlist"
-                            wishlistItems={wishlistItems}
-                            setIsModalOpen={setIsModalOpen}
-                            handleShareWishlist={handleShareWishlist}
-                            loading={loading}
-                        />
+            <ProfileLayout>
+                <Header
+                    title="Wishlist"
+                    wishlistItems={wishlistItems}
+                    setIsModalOpen={setIsModalOpen}
+                    handleShareWishlist={handleShareWishlist}
+                />
 
-                        {loading ? (
-                            <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-3 gap-6">
-                                {Array.from({ length: itemsPerPage }).map((_, index) => (
-                                    <ProductItemSkeleton key={index} />
-                                ))}
-                            </div>
-                        ) : !wishlistItems.length ? (
-                            <EmptyState
-                                imageSrc={emptyWishlistImage}
-                                message="Your wishlist is empty!"
-                            />
-                        ) : (
-                            <>
-                                <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-3 gap-4">
-                                    {getCurrentPageItems().map(({ product }) => (
-                                        <WishlistItem
-                                            key={product._id}
-                                            product={product}
-                                            onRemove={() => handleRemoveFromWishlist(product._id)}
-                                        />
-                                    ))}
-                                </div>
-                                <Box sx={{ display: 'flex', justifyContent: 'flex-start', mb: 4 }}>
-                                    <CustomPagination
-                                        count={pageCount}
-                                        page={currentPage}
-                                        onChange={handlePageChange}
-                                        sx={{
-                                            position: 'relative',
-                                            bottom: '8px',
-                                            '& .MuiPagination-ul': {
-                                                justifyContent: 'flex-start',
-                                            },
-                                        }}
-                                    />
-                                </Box>
-                            </>
-                        )}
+                {loading ? (
+                    <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-3 gap-6">
+                        {Array.from({ length: itemsPerPage }).map((_, index) => (
+                            <ProductItemSkeleton key={index} />
+                        ))}
                     </div>
-                </main>
-            </Box>
+                ) : !wishlistItems.length ? (
+                    <EmptyState
+                        imageSrc={emptyWishlistImage}
+                        message="Your wishlist is empty!"
+                    />
+                ) : (
+                    <>
+                        <div className="grid grid-cols-2 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-3 xl:grid-cols-3 gap-4">
+                            {getCurrentPageItems().map(({ product }) => (
+                                <WishlistItem
+                                    key={product._id}
+                                    product={product}
+                                    onRemove={() => handleRemoveFromWishlist(product._id)}
+                                />
+                            ))}
+                        </div>
+                        <Box sx={{ display: 'flex', justifyContent: 'flex-start', mb: 4 }}>
+                            <CustomPagination
+                                count={pageCount}
+                                page={currentPage}
+                                onChange={handlePageChange}
+                                sx={{
+                                    position: 'relative',
+                                    bottom: '8px',
+                                    '& .MuiPagination-ul': {
+                                        justifyContent: 'flex-start',
+                                    },
+                                }}
+                            />
+                        </Box>
+                    </>
+                )}
+            </ProfileLayout>
             <Footer />
 
             <CustomDeleteModal

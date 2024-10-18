@@ -71,44 +71,43 @@ const WishlistItem = ({ product, onRemove, loading }) => {
 
     return (
         <>
-            {(isActionLoading) && <LoadingOverlay />}
-            <div className="bg-white rounded-lg shadow-md p-4 flex flex-col cursor-pointer" onClick={handleClick}>
-                {loading ? (
-                    <ProductItemSkeleton />
-                ) : (
-                    <>
-                        <div className="relative mb-2 max-w-4xl">
+            {isActionLoading && <LoadingOverlay />}
+            {loading ? (
+                <ProductItemSkeleton />
+            ) : (
+                <>
+                    <div className="bg-white rounded-lg shadow-md p-4 flex flex-col cursor-pointer" onClick={handleClick}>
+                        <div className="relative mb-2">
                             <img
                                 src={imageUrl}
                                 alt={name}
-                                className="w-full h-48 object-contain rounded"
+                                className="w-full h-32 sm:h-48 object-contain rounded"
                                 onError={(e) => e.target.src = NoImage}
                             />
                             <OutOfStock inventoryCount={inventoryCount} />
                             <DiscountPercentage discountPercentage={discountPercentage} />
                         </div>
-                        <h2 className="font-semibold h-8 overflow-hidden whitespace-nowrap text-ellipsis w-full">
+                        <h2 className="font-semibold text-sm sm:text-base h-6 sm:h-8 overflow-hidden whitespace-nowrap text-ellipsis w-full">
                             {name}
                         </h2>
                         <div className="flex flex-col mb-2">
-                            <span className="font-bold text-lg">{finalPrice.toFixed(2)} €</span>
+                            <span className="font-bold text-base sm:text-lg">{finalPrice.toFixed(2)} €</span>
                             {discountPercentage > 0 && (
-                                <span className="text-gray-500 line-through text-sm">
-                                    {price.toFixed(2)} €
-                                </span>
+                                <span className="text-gray-500 line-through text-xs sm:text-sm">{price.toFixed(2)} €</span>
                             )}
                         </div>
                         <div className="flex justify-between items-center mt-auto">
                             <AddToCartButton onClick={handleAddToCart} disabled={isActionLoading || inventoryCount === 0}>
-                                <BrownShoppingCartIcon /> Add To Cart
+                                <BrownShoppingCartIcon />
+                                <span className="hidden sm:inline">Add To Cart</span>
                             </AddToCartButton>
                             <WishlistButton onClick={handleRemove} disabled={isActionLoading}>
                                 <DeleteIcon />
                             </WishlistButton>
                         </div>
-                    </>
-                )}
-            </div>
+                    </div>
+                </>
+            )}
         </>
     );
 };

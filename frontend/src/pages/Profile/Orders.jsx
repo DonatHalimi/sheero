@@ -1,14 +1,12 @@
-import { Box } from '@mui/material';
 import React, { useEffect, useMemo, useState } from 'react';
 import { Link } from 'react-router-dom';
-import { CustomPagination, EmptyState, Header, OrderItemSkeleton } from '../../assets/CustomComponents';
+import { CustomPagination, EmptyState, Header, OrderItemSkeleton, ProfileLayout } from '../../assets/CustomComponents';
 import emptyOrdersImage from '../../assets/img/empty-orders.png';
 import useAxios from '../../axiosInstance';
 import Footer from '../../components/Footer';
 import Navbar from '../../components/Navbar/Navbar';
 import OrderItem from '../../components/Product/OrderItem';
 import { getImageUrl } from '../../config';
-import ProfileSidebar from './ProfileSidebar';
 
 const itemsPerPage = 5;
 
@@ -47,7 +45,7 @@ const Orders = () => {
         setCurrentPage(1);
     }, [searchTerm, statusFilter]);
 
-    const filteredOrders = orders.filter(order => {
+    const filteredOrders = Array.isArray(orders) ? orders.filter(order => {
         const matchesSearchTerm = [
             order._id || '',
             order.paymentStatus || '',
@@ -65,7 +63,7 @@ const Orders = () => {
         const matchesStatusFilter = statusFilter === 'All' || order.status === statusFilter;
 
         return matchesSearchTerm && matchesStatusFilter;
-    });
+    }) : [];
 
     const totalOrders = filteredOrders.length;
     const pageCount = Math.ceil(totalOrders / itemsPerPage);
@@ -81,18 +79,20 @@ const Orders = () => {
     };
 
     const renderProductImages = (products) => {
-        return products.map(product => (
-            <Link
-                key={product.product._id}
-                to={`/product/${product.product._id}`}
-            >
-                <img
-                    src={getImageUrl(product.product.image)}
-                    alt={product.product.name}
-                    className="w-20 h-20 object-cover rounded cursor-pointer"
-                />
-            </Link>
-        ));
+        if (!Array.isArray(products)) return null;
+        return products.map(product => {
+            const { _id, image, name } = product.product || {};
+            if (!_id || !image || !name) return null;
+            return (
+                <Link key={_id} to={`/product/${_id}`}>
+                    <img
+                        src={getImageUrl(image)}
+                        alt={name}
+                        className="w-20 h-20 object-cover rounded cursor-pointer"
+                    />
+                </Link>
+            );
+        });
     };
 
     const statusClasses = {
@@ -108,60 +108,57 @@ const Orders = () => {
     return (
         <>
             <Navbar />
-            <Box className="container mx-auto max-w-5xl relative mb-16" style={{ paddingLeft: '77px' }}>
-                <ProfileSidebar />
-                <main className="p-4 relative left-32 w-full">
-                    <div className="container max-w-6xl mx-auto mt-20 mb-20">
-                        <Header
-                            title='Orders'
-                            searchTerm={searchTerm}
-                            setSearchTerm={setSearchTerm}
-                            showSearch={filteredOrders.length > 0}
-                            showFilter={orders.length > 0}
-                            statusFilter={statusFilter}
-                            setStatusFilter={setStatusFilter}
-                            placeholder='Search orders...'
-                        />
+            <ProfileLayout>
 
-                        {loading ? (
-                            <OrderItemSkeleton />
-                        ) : filteredOrders.length === 0 ? (
-                            <EmptyState
-                                imageSrc={emptyOrdersImage}
-                                message={searchTerm ? "No orders found matching your search" : "No orders found!"}
+                <Header
+                    title='Orders'
+                    searchTerm={searchTerm}
+                    setSearchTerm={setSearchTerm}
+                    showSearch={filteredOrders.length > 0}
+                    showFilter={orders.length > 0}
+                    statusFilter={statusFilter}
+                    setStatusFilter={setStatusFilter}
+                    placeholder='Search orders...'
+                />
+
+                {loading ? (
+                    <OrderItemSkeleton />
+                ) : filteredOrders.length === 0 ? (
+                    <EmptyState
+                        imageSrc={emptyOrdersImage}
+                        message={searchTerm ? "No orders found matching your search" : "No orders found!"}
+                    />
+                ) : (
+                    <div className="flex flex-col">
+                        <div className="grid gap-4 mb-3">
+                            {getCurrentPageItems().map(order => (
+                                <OrderItem
+                                    key={order._id}
+                                    order={order}
+                                    renderProductImages={renderProductImages}
+                                    getStatusColor={getStatusColor}
+                                />
+                            ))}
+                        </div>
+
+                        <div className="flex justify-start sm:justify-start">
+                            <CustomPagination
+                                count={pageCount}
+                                page={currentPage}
+                                onChange={handlePageChange}
+                                size="medium"
+                                sx={{
+                                    position: 'relative',
+                                    bottom: '4px',
+                                    '& .MuiPagination-ul': {
+                                        justifyContent: 'flex-start',
+                                    },
+                                }}
                             />
-                        ) : (
-                            <>
-                                <div className="grid grid-cols-1 gap-4">
-                                    {getCurrentPageItems().map(order => (
-                                        <OrderItem
-                                            key={order._id}
-                                            order={order}
-                                            renderProductImages={renderProductImages}
-                                            getStatusColor={getStatusColor}
-                                        />
-                                    ))}
-                                </div>
-                                <Box sx={{ display: 'flex', justifyContent: 'flex-start', mb: 4 }}>
-                                    <CustomPagination
-                                        count={pageCount}
-                                        page={currentPage}
-                                        onChange={handlePageChange}
-                                        size="large"
-                                        sx={{
-                                            position: 'relative',
-                                            bottom: '8px',
-                                            '& .MuiPagination-ul': {
-                                                justifyContent: 'flex-start',
-                                            },
-                                        }}
-                                    />
-                                </Box>
-                            </>
-                        )}
+                        </div>
                     </div>
-                </main>
-            </Box>
+                )}
+            </ProfileLayout>
 
             {totalOrders === 1 && <div className='mb-32' />}
             <Footer />

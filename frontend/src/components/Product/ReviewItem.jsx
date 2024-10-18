@@ -6,11 +6,18 @@ import { getImageUrl } from '../../config';
 const ReviewItem = ({ review, onImageClick, onMenuClick, onCardClick }) => {
     return (
         <div
-            className="p-4 mb-4 shadow-md flex relative cursor-pointer bg-white rounded-md"
+            className="p-3 mb-4 shadow-md flex relative cursor-pointer bg-white rounded-md flex-col sm:flex-row"
             onClick={() => onCardClick(review)}
             style={{ height: 'auto', minHeight: '120px' }}
         >
-            <Box className="flex-shrink-0 mr-4">
+            <Box
+                className="flex-shrink-0 mb-3 sm:mb-0 sm:mr-4"
+                sx={{
+                    width: '90px',
+                    height: '90px',
+                    overflow: 'hidden',
+                }}
+            >
                 <img
                     src={getImageUrl(review.product.image)}
                     alt={review.product.name}
@@ -18,7 +25,7 @@ const ReviewItem = ({ review, onImageClick, onMenuClick, onCardClick }) => {
                         event.stopPropagation();
                         onImageClick(review.product._id);
                     }}
-                    className="w-20 h-20 object-cover rounded-md cursor-pointer hover:underline"
+                    className="object-cover w-full h-full rounded-md cursor-pointer hover:underline"
                 />
             </Box>
             <Box flexGrow={1} display="flex" flexDirection="column" justifyContent="space-between" alignItems="flex-start">
@@ -29,7 +36,7 @@ const ReviewItem = ({ review, onImageClick, onMenuClick, onCardClick }) => {
                             onImageClick(review.product._id);
                         }}
                         variant="h6"
-                        className="font-light mb-2 flex items-center ml-2 hover:underline break-words"
+                        className="font-light mb-2 flex items-center hover:underline break-words"
                     >
                         {truncateText(review.product.name, 20)}
                         <Box className="ml-2">
@@ -48,10 +55,17 @@ const ReviewItem = ({ review, onImageClick, onMenuClick, onCardClick }) => {
                         {new Date(review.updatedAt || review.createdAt).toLocaleDateString()}
                     </Typography>
                 </Box>
-                <CenteredMoreVertIcon
+                <Box
+                    sx={{
+                        position: 'absolute',
+                        top: '8px',
+                        right: '8px',
+                        zIndex: 1
+                    }}
                     onClick={(event) => onMenuClick(event, review)}
-                    className="absolute top-2 right-2"
-                />
+                >
+                    <CenteredMoreVertIcon />
+                </Box>
             </Box>
         </div>
     );

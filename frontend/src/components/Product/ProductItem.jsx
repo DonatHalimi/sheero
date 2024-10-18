@@ -69,7 +69,7 @@ const ProductItem = ({ product, loading }) => {
                     <img
                         src={imageUrl}
                         alt={name}
-                        className="w-full h-48 object-contain rounded"
+                        className="w-full h-32 sm:h-48 object-contain rounded"
                         onError={(e) => { e.target.onerror = null; e.target.src = NoImage; }}
                     />
 
@@ -78,15 +78,18 @@ const ProductItem = ({ product, loading }) => {
                     <DiscountPercentage discountPercentage={discountPercentage} />
 
                 </div>
-                <h2 className="font-semibold h-8 overflow-hidden whitespace-nowrap text-ellipsis w-full">
+
+                <h2 className="font-semibold text-sm sm:text-base h-6 sm:h-8 overflow-hidden whitespace-nowrap text-ellipsis w-full">
                     {name}
                 </h2>
+
                 <div className="flex flex-col mb-2">
-                    <span className="font-bold text-lg">{finalPrice.toFixed(2)} €</span>
+                    <span className="font-bold text-base sm:text-lg">{finalPrice.toFixed(2)} €</span>
                     {discountPercentage > 0 && (
-                        <span className="text-gray-500 line-through text-sm">{price.toFixed(2)} €</span>
+                        <span className="text-gray-500 line-through text-xs sm:text-sm">{price.toFixed(2)} €</span>
                     )}
                 </div>
+
                 <div className="flex justify-between items-center mt-auto">
                     <CartWishlistButtons
                         handleAction={handleAction}

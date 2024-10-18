@@ -64,7 +64,7 @@ const AuthProvider = ({ children }) => {
             const response = await axios.post(getApiUrl('/auth/login'), { email, password });
             const authData = {
                 accessToken: response.data.accessToken,
-                role: response.data.role, // Store the role temporarily for setting the state
+                role: response.data.role,
             };
 
             setAuth(authData);
@@ -79,6 +79,7 @@ const AuthProvider = ({ children }) => {
     const logout = () => {
         setAuth({ accessToken: null, role: null });
         localStorage.removeItem('accessToken');
+        window.location.href = '/login';
     };
 
     const register = async (firstName, lastName, email, password) => {

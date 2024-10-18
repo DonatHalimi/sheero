@@ -8,7 +8,7 @@ import Footer from '../Footer';
 import Navbar from '../Navbar/Navbar';
 import ProductItem from './ProductItem';
 
-const itemsPerPage = 10; ``
+const itemsPerPage = 10;
 
 const SharedWishlist = () => {
     const axiosInstance = useAxios();
@@ -55,7 +55,7 @@ const SharedWishlist = () => {
         <>
             <Navbar />
             <div className="container mx-auto px-4 py-8 mb-16 bg-gray-50">
-                <Header fullName={fullName} />
+                <Header fullName={fullName} loading={loading} />
 
                 {loading ? (
                     <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 gap-4">

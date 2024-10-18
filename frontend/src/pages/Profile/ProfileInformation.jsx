@@ -4,12 +4,11 @@ import { Box, Button, IconButton, InputAdornment, TextField } from '@mui/materia
 import React, { useContext, useEffect, useMemo, useState } from 'react';
 import { toast } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
-import { BrownOutlinedTextField, Header, knownEmailProviders, ProfileInformationSkeleton } from '../../assets/CustomComponents';
+import { BrownOutlinedTextField, Header, InformationSkeleton, knownEmailProviders, ProfileLayout } from '../../assets/CustomComponents';
 import useAxios from '../../axiosInstance';
 import Footer from '../../components/Footer';
 import Navbar from '../../components/Navbar/Navbar';
 import { AuthContext } from '../../context/AuthContext';
-import ProfileSidebar from './ProfileSidebar';
 
 const ProfileInformation = () => {
     const { auth, setAuth } = useContext(AuthContext);
@@ -17,6 +16,7 @@ const ProfileInformation = () => {
     // Memoize axiosInstance to prevent unnecessary re-renders
     const axiosInstance = useMemo(() => useAxios(), []);
 
+    const [initialData, setInitialData] = useState({ firstName: '', lastName: '', email: '' });
     const [firstName, setFirstName] = useState('');
     const [lastName, setLastName] = useState('');
     const [email, setEmail] = useState('');
@@ -77,26 +77,29 @@ const ProfileInformation = () => {
         setNewPasswordValid(validatePassword(value));
     };
 
-    const fetchUserData = async () => {
-        try {
-            setLoading(true);
-            const response = await axiosInstance.get('/auth/me');
-            const userData = response.data;
-
-            setFirstName(userData.firstName || '');
-            setLastName(userData.lastName || '');
-            setEmail(userData.email || '');
-        } catch (error) {
-            console.error('Failed to fetch user data:', error);
-            toast.error('Failed to load profile data');
-        } finally {
-            setLoading(false);
-        }
-    };
-
     useEffect(() => {
-        fetchUserData();
+        const fetchUserData = async () => {
+            try {
+                setLoading(true);
+                const response = await axiosInstance.get('/auth/me');
+                const userData = response.data;
 
+                const userFirstName = userData.firstName || '';
+                const userLastName = userData.lastName || '';
+                const userEmail = userData.email || '';
+
+                setInitialData({ firstName: userFirstName, lastName: userLastName, email: userEmail });
+                setFirstName(userFirstName);
+                setLastName(userLastName);
+                setEmail(userEmail);
+            } catch (error) {
+                toast.error('Failed to load profile data');
+            } finally {
+                setLoading(false);
+            }
+        };
+
+        fetchUserData();
     }, [axiosInstance]);
 
     const handleSubmit = async (e) => {
@@ -129,17 +132,11 @@ const ProfileInformation = () => {
 
             toast.success('Profile updated successfully!');
         } catch (error) {
-            console.error('Profile update failed:', error);
-            console.error('Full error object:', JSON.stringify(error, null, 2));
             if (error.response) {
-                console.error('Error response:', error.response);
-                console.error('Error response data:', error.response.data);
                 toast.error(error.response.data.message || 'Profile update failed');
             } else if (error.request) {
-                console.error('Error request:', error.request);
                 toast.error('No response received from server');
             } else {
-                console.error('Error message:', error.message);
                 toast.error('Error occurred while updating profile');
             }
         }
@@ -147,175 +144,189 @@ const ProfileInformation = () => {
         setLoading(false);
     };
 
+    const isFormUnchanged = (
+        firstName === initialData.firstName &&
+        lastName === initialData.lastName &&
+        email === initialData.email &&
+        !newPassword &&
+        !password
+    );
+
     return (
         <>
             <Navbar />
-            <Box className="container mx-auto max-w-5xl relative mb-16" style={{ paddingLeft: '77px' }}>
-                <ProfileSidebar />
-                <main className="p-4 relative left-32 w-full">
-                    <div className="container max-w-6xl mx-auto mt-20 mb-36">
-                        <Header title="Personal Information" />
-                        <div className="bg-white shadow-sm rounded-sm p-8">
-                            {loading ? (
-                                <ProfileInformationSkeleton />
-                            ) : (
-                                <form onSubmit={handleSubmit} className="space-y-2">
-                                    <Box className="flex gap-3 w-full">
-                                        <div className="relative flex-grow">
-                                            <TextField
-                                                fullWidth
-                                                label="First Name"
-                                                variant="outlined"
-                                                name="firstName"
-                                                value={firstName}
-                                                onChange={handleFirstNameChange}
-                                                onFocus={() => setFocusedField('firstName')}
-                                                onBlur={() => setFocusedField(null)}
-                                                InputLabelProps={{ className: 'text-gray-700' }}
-                                                InputProps={{ className: 'text-gray-700' }}
-                                            />
-                                            {focusedField === 'firstName' && !firstNameValid && (
-                                                <div className="absolute left-0 bottom-[-78px] bg-white text-red-500 text-sm p-2 rounded-lg shadow-md w-full z-10">
-                                                    <span className="block text-xs font-semibold mb-1">Invalid First Name</span>
-                                                    Must start with a capital letter, 2-10 characters.
-                                                    <div className="absolute top-[-5px] left-[20px] w-0 h-0 border-l-[5px] border-r-[5px] border-b-[5px] border-transparent border-b-white"></div>
-                                                </div>
-                                            )}
-                                        </div>
+            <ProfileLayout>
 
-                                        <div className="relative flex-grow">
-                                            <TextField
-                                                fullWidth
-                                                label="Last Name"
-                                                variant="outlined"
-                                                name="lastName"
-                                                value={lastName}
-                                                onChange={handleLastNameChange}
-                                                onFocus={() => setFocusedField('lastName')}
-                                                onBlur={() => setFocusedField(null)}
-                                                InputLabelProps={{ className: 'text-gray-700' }}
-                                                InputProps={{ className: 'text-gray-700' }}
-                                            />
-                                            {focusedField === 'lastName' && !lastNameValid && (
-                                                <div className="absolute left-0 bottom-[-78px] bg-white text-red-500 text-sm p-2 rounded-lg shadow-md w-full z-10">
-                                                    <span className="block text-xs font-semibold mb-1">Invalid Last Name</span>
-                                                    Must start with a capital letter, 2-10 characters.
-                                                    <div className="absolute top-[-5px] left-[20px] w-0 h-0 border-l-[5px] border-r-[5px] border-b-[5px] border-transparent border-b-white"></div>
-                                                </div>
-                                            )}
+                <Header title="Profile Information" />
+                <Box className='bg-white rounded shadow-sm mb-16'
+                    sx={{
+                        p: { xs: 3, md: 3 }
+                    }}
+                >
+                    {loading ? (
+                        <InformationSkeleton />
+                    ) : (
+                        <form onSubmit={handleSubmit} className="space-y-1">
+                            <Box sx={{ display: 'flex', flexDirection: { xs: 'column', md: 'row' }, gap: { xs: 3, md: 2 } }}>
+                                <div className="relative flex-grow">
+                                    <TextField
+                                        fullWidth
+                                        label="First Name"
+                                        variant="outlined"
+                                        name="firstName"
+                                        value={firstName}
+                                        onChange={handleFirstNameChange}
+                                        onFocus={() => setFocusedField('firstName')}
+                                        onBlur={() => setFocusedField(null)}
+                                        InputLabelProps={{ className: 'text-gray-700' }}
+                                        InputProps={{ className: 'text-gray-700' }}
+                                    />
+                                    {focusedField === 'firstName' && !firstNameValid && (
+                                        <div className="absolute left-0 bottom-[-78px] bg-white text-red-500 text-sm p-2 rounded-lg shadow-md w-full z-10">
+                                            <span className="block text-xs font-semibold mb-1">Invalid First Name</span>
+                                            Must start with a capital letter, 2-10 characters.
+                                            <div className="absolute top-[-5px] left-[20px] w-0 h-0 border-l-[5px] border-r-[5px] border-b-[5px] border-transparent border-b-white"></div>
                                         </div>
+                                    )}
+                                </div>
 
-                                        <div className="relative flex-grow">
-                                            <TextField
-                                                fullWidth
-                                                label="Email"
-                                                variant="outlined"
-                                                type="email"
-                                                name="email"
-                                                value={email}
-                                                onChange={handleEmailChange}
-                                                onFocus={() => setFocusedField('email')}
-                                                onBlur={() => setFocusedField(null)}
-                                                InputLabelProps={{ className: 'text-gray-700' }}
-                                                InputProps={{ className: 'text-gray-700' }}
-                                            />
-                                            {focusedField === 'email' && !emailValid && (
-                                                <div className="absolute left-0 bottom-[-58px] bg-white text-red-500 text-sm p-2 rounded-lg shadow-md w-full z-10">
-                                                    <span className="block text-xs font-semibold mb-1">Invalid Email</span>
-                                                    Please provide a valid email address.
-                                                    <div className="absolute top-[-5px] left-[20px] w-0 h-0 border-l-[5px] border-r-[5px] border-b-[5px] border-transparent border-b-white"></div>
-                                                </div>
-                                            )}
+                                <div className="relative flex-grow">
+                                    <TextField
+                                        fullWidth
+                                        label="Last Name"
+                                        variant="outlined"
+                                        name="lastName"
+                                        value={lastName}
+                                        onChange={handleLastNameChange}
+                                        onFocus={() => setFocusedField('lastName')}
+                                        onBlur={() => setFocusedField(null)}
+                                        InputLabelProps={{ className: 'text-gray-700' }}
+                                        InputProps={{ className: 'text-gray-700' }}
+                                    />
+                                    {focusedField === 'lastName' && !lastNameValid && (
+                                        <div className="absolute left-0 bottom-[-78px] bg-white text-red-500 text-sm p-2 rounded-lg shadow-md w-full z-10">
+                                            <span className="block text-xs font-semibold mb-1">Invalid Last Name</span>
+                                            Must start with a capital letter, 2-10 characters.
+                                            <div className="absolute top-[-5px] left-[20px] w-0 h-0 border-l-[5px] border-r-[5px] border-b-[5px] border-transparent border-b-white"></div>
                                         </div>
-                                    </Box>
+                                    )}
+                                </div>
 
-                                    <Box className="flex flex-row gap-3 w-full">
-                                        <div className="relative flex-grow">
-                                            <BrownOutlinedTextField
-                                                variant="outlined"
-                                                margin="normal"
-                                                required
-                                                fullWidth
-                                                name="password"
-                                                label="Current Password"
-                                                type={showPassword ? 'text' : 'password'}
-                                                id="password"
-                                                autoComplete="current-password"
-                                                value={password}
-                                                onChange={handlePasswordChange}
-                                                onFocus={() => setFocusedField('password')}
-                                                onBlur={() => setFocusedField(null)}
-                                                InputProps={{
-                                                    endAdornment: (
-                                                        <InputAdornment position="end">
-                                                            <IconButton
-                                                                aria-label="toggle current password visibility"
-                                                                onClick={handleClickShowPassword}
-                                                                onMouseDown={handleMouseDownPassword}
-                                                                edge="end"
-                                                            >
-                                                                {showPassword ? <VisibilityIcon className="text-stone-500" /> : <VisibilityOffIcon className="text-stone-500" />}
-                                                            </IconButton>
-                                                        </InputAdornment>
-                                                    ),
-                                                }}
-                                            />
-                                            {focusedField === 'password' && !passwordValid && (
-                                                <div className="absolute left-0 bottom-[-70px] bg-white text-red-500 text-sm p-2 rounded-lg shadow-md w-full z-10">
-                                                    <span className="block text-xs font-semibold mb-1">Invalid Password</span>
-                                                    Must be 8 characters long with uppercase, lowercase, number, and special character.
-                                                    <div className="absolute top-[-5px] left-[20px] w-0 h-0 border-l-[5px] border-r-[5px] border-b-[5px] border-transparent border-b-white"></div>
-                                                </div>
-                                            )}
+                                <div className="relative flex-grow">
+                                    <TextField
+                                        fullWidth
+                                        label="Email"
+                                        variant="outlined"
+                                        type="email"
+                                        name="email"
+                                        value={email}
+                                        onChange={handleEmailChange}
+                                        onFocus={() => setFocusedField('email')}
+                                        onBlur={() => setFocusedField(null)}
+                                        InputLabelProps={{ className: 'text-gray-700' }}
+                                        InputProps={{ className: 'text-gray-700' }}
+                                    />
+                                    {focusedField === 'email' && !emailValid && (
+                                        <div className="absolute left-0 bottom-[-58px] bg-white text-red-500 text-sm p-2 rounded-lg shadow-md w-full z-10">
+                                            <span className="block text-xs font-semibold mb-1">Invalid Email</span>
+                                            Please provide a valid email address.
+                                            <div className="absolute top-[-5px] left-[20px] w-0 h-0 border-l-[5px] border-r-[5px] border-b-[5px] border-transparent border-b-white"></div>
                                         </div>
+                                    )}
+                                </div>
+                            </Box>
 
-                                        <div className="relative flex-grow">
-                                            <BrownOutlinedTextField
-                                                variant="outlined"
-                                                margin="normal"
-                                                fullWidth
-                                                name="newPassword"
-                                                label="New Password"
-                                                type={showNewPassword ? 'text' : 'password'}
-                                                id="new-password"
-                                                value={newPassword}
-                                                onChange={handleNewPasswordChange}
-                                                onFocus={() => setFocusedField('newPassword')}
-                                                onBlur={() => setFocusedField(null)}
-                                                InputProps={{
-                                                    endAdornment: (
-                                                        <InputAdornment position="end">
-                                                            <IconButton
-                                                                aria-label="toggle new password visibility"
-                                                                onClick={handleClickShowNewPassword}
-                                                                onMouseDown={handleMouseDownPassword}
-                                                                edge="end"
-                                                            >
-                                                                {showNewPassword ? <VisibilityIcon className="text-stone-500" /> : <VisibilityOffIcon className="text-stone-500" />}
-                                                            </IconButton>
-                                                        </InputAdornment>
-                                                    ),
-                                                }}
-                                            />
-                                            {focusedField === 'newPassword' && !newPasswordValid && (
-                                                <div className="absolute left-0 bottom-[-70px] bg-white text-red-500 text-sm p-2 rounded-lg shadow-md w-full z-10">
-                                                    <span className="block text-xs font-semibold mb-1">Invalid New Password</span>
-                                                    Must be 8 characters long with uppercase, lowercase, number, and special character.
-                                                    <div className="absolute top-[-5px] left-[20px] w-0 h-0 border-l-[5px] border-r-[5px] border-b-[5px] border-transparent border-b-white"></div>
-                                                </div>
-                                            )}
+                            <Box sx={{ display: 'flex', flexDirection: { xs: 'column', md: 'row' }, gap: { xs: 0, md: 2 } }}>
+                                <div className="relative flex-grow">
+                                    <BrownOutlinedTextField
+                                        variant="outlined"
+                                        margin="normal"
+                                        required
+                                        fullWidth
+                                        name="password"
+                                        label="Current Password"
+                                        type={showPassword ? 'text' : 'password'}
+                                        id="password"
+                                        autoComplete="current-password"
+                                        value={password}
+                                        onChange={handlePasswordChange}
+                                        onFocus={() => setFocusedField('password')}
+                                        onBlur={() => setFocusedField(null)}
+                                        InputProps={{
+                                            endAdornment: (
+                                                <InputAdornment position="end">
+                                                    <IconButton
+                                                        aria-label="toggle current password visibility"
+                                                        onClick={handleClickShowPassword}
+                                                        onMouseDown={handleMouseDownPassword}
+                                                        edge="end"
+                                                    >
+                                                        {showPassword ? <VisibilityIcon className="text-stone-500" /> : <VisibilityOffIcon className="text-stone-500" />}
+                                                    </IconButton>
+                                                </InputAdornment>
+                                            ),
+                                        }}
+                                    />
+                                    {focusedField === 'password' && !passwordValid && (
+                                        <div className="absolute left-0 bottom-[-70px] bg-white text-red-500 text-sm p-2 rounded-lg shadow-md w-full z-10">
+                                            <span className="block text-xs font-semibold mb-1">Invalid Password</span>
+                                            Must be 8 characters long with uppercase, lowercase, number, and special character.
+                                            <div className="absolute top-[-5px] left-[20px] w-0 h-0 border-l-[5px] border-r-[5px] border-b-[5px] border-transparent border-b-white"></div>
                                         </div>
-                                    </Box>
+                                    )}
+                                </div>
 
-                                    <Button type="submit" variant="contained" color="primary" className="bg-orange-600 hover:bg-orange-700">
-                                        Save
-                                    </Button>
-                                </form>
-                            )}
-                        </div>
-                    </div>
-                </main>
-            </Box>
+                                <div className="relative flex-grow">
+                                    <BrownOutlinedTextField
+                                        variant="outlined"
+                                        margin="normal"
+                                        fullWidth
+                                        name="newPassword"
+                                        label="New Password"
+                                        type={showNewPassword ? 'text' : 'password'}
+                                        id="new-password"
+                                        value={newPassword}
+                                        onChange={handleNewPasswordChange}
+                                        onFocus={() => setFocusedField('newPassword')}
+                                        onBlur={() => setFocusedField(null)}
+                                        InputProps={{
+                                            endAdornment: (
+                                                <InputAdornment position="end">
+                                                    <IconButton
+                                                        aria-label="toggle new password visibility"
+                                                        onClick={handleClickShowNewPassword}
+                                                        onMouseDown={handleMouseDownPassword}
+                                                        edge="end"
+                                                    >
+                                                        {showNewPassword ? <VisibilityIcon className="text-stone-500" /> : <VisibilityOffIcon className="text-stone-500" />}
+                                                    </IconButton>
+                                                </InputAdornment>
+                                            ),
+                                        }}
+                                    />
+                                    {focusedField === 'newPassword' && !newPasswordValid && (
+                                        <div className="absolute left-0 bottom-[-70px] bg-white text-red-500 text-sm p-2 rounded-lg shadow-md w-full z-10">
+                                            <span className="block text-xs font-semibold mb-1">Invalid New Password</span>
+                                            Must be 8 characters long with uppercase, lowercase, number, and special character.
+                                            <div className="absolute top-[-5px] left-[20px] w-0 h-0 border-l-[5px] border-r-[5px] border-b-[5px] border-transparent border-b-white"></div>
+                                        </div>
+                                    )}
+                                </div>
+                            </Box>
+
+                            <Button
+                                type="submit"
+                                variant="contained"
+                                color="primary"
+                                disabled={isFormUnchanged}
+                            >
+                                Update
+                            </Button>
+                        </form>
+                    )}
+                </Box>
+            </ProfileLayout>
+
             <Footer />
         </>
     );

@@ -1,8 +1,8 @@
 import { HomeOutlined, StarBorderOutlined } from '@mui/icons-material';
-import { List, Typography } from '@mui/material';
+import { List, Skeleton, Typography } from '@mui/material';
 import React, { useEffect, useState } from 'react';
 import { useLocation, useNavigate } from 'react-router-dom';
-import { ActiveListItem, StyledFavoriteIcon, StyledInboxIcon, StyledPersonIcon } from '../../assets/CustomComponents';
+import { ActiveListItem, SidebarLayout, StyledFavoriteIcon, StyledInboxIcon, StyledPersonIcon } from '../../assets/CustomComponents';
 import useAxios from '../../axiosInstance';
 
 const ProfileSidebar = () => {
@@ -10,6 +10,7 @@ const ProfileSidebar = () => {
     const location = useLocation();
     const [activeItem, setActiveItem] = useState('');
     const [firstName, setFirstName] = useState('');
+    const [loading, setLoading] = useState(true);
     const axiosInstance = useAxios();
 
     useEffect(() => {
@@ -17,11 +18,12 @@ const ProfileSidebar = () => {
             try {
                 const response = await axiosInstance.get('/auth/me');
                 const userData = response.data;
-
                 setFirstName(userData.firstName);
             } catch (error) {
                 console.error('Failed to fetch user data:', error);
                 toast.error('Failed to load profile data');
+            } finally {
+                setLoading(false);
             }
         };
 
@@ -41,11 +43,20 @@ const ProfileSidebar = () => {
     const greetingTime = new Date().getHours() < 12 ? "morning" : (new Date().getHours() < 18 ? "afternoon" : "evening");
 
     return (
-        <div className="absolute top-24 right-[815px] w-80 bg-white p-5 shadow-sm rounded-sm">
-            <Typography variant="h5" gutterBottom className="!text-gray-800 !font-semilight">
-                Good {greetingTime}, {firstName}.
-            </Typography>
-            <span className='text-md'>Thank you for being part of sheero</span>
+        <SidebarLayout>
+            {loading ? (
+                <>
+                    <Skeleton variant="text" width={250} height={40} />
+                    <Skeleton variant="text" width={265} height={30} />
+                </>
+            ) : (
+                <>
+                    <Typography variant="h5" gutterBottom className="!text-gray-800 !font-semilight">
+                        Good {greetingTime}, {firstName}.
+                    </Typography>
+                    <span className='text-md'>Thank you for being part of sheero</span>
+                </>
+            )}
             <div className="border-t border-stone-200 mt-4 mb-2"></div>
             <List component="nav">
                 <ActiveListItem
@@ -79,7 +90,7 @@ const ProfileSidebar = () => {
                     primary="Reviews"
                 />
             </List>
-        </div>
+        </SidebarLayout>
     );
 };
 
