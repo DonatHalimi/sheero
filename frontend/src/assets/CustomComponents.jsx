@@ -4,6 +4,7 @@ import {
     Close,
     CreateOutlined,
     DashboardOutlined,
+    Delete,
     DeleteOutline,
     DeleteOutlined,
     ExpandLess,
@@ -61,7 +62,8 @@ import {
     TextField,
     Toolbar,
     Tooltip,
-    Typography
+    Typography,
+    useMediaQuery
 } from '@mui/material';
 import { styled } from '@mui/material/styles';
 import SvgIcon from '@mui/material/SvgIcon';
@@ -77,6 +79,7 @@ import Navbar from '../components/Navbar/Navbar';
 import { getImageUrl } from '../config';
 import ProfileSidebar from '../pages/Profile/ProfileSidebar';
 import logo from './img/logo.png';
+import NoImage from './img/product-not-found.jpg'
 
 export const BrownOutlinedTextField = styled(TextField)({
     '& .MuiOutlinedInput-root': {
@@ -271,6 +274,11 @@ export const BrownShoppingCartIcon = styled(ShoppingCart)(({ theme }) => ({
     transition: 'color 0.3s ease',
 }));
 
+export const DeleteButton = styled(Delete)(({ theme }) => ({
+    color: '#57534E',
+    transition: 'color 0.3s ease',
+}));
+
 export const CartButton = () => {
     return (
         <>
@@ -308,6 +316,25 @@ export const CartWishlistButtons = ({ handleAction, isCartLoading, isWishlistLoa
     );
 };
 
+export const CartDeleteButtons = ({ handleAddToCart, handleRemove, isActionLoading, inventoryCount }) => {
+    return (
+        <>
+            <AddToCartButton
+                onClick={handleAddToCart}
+                disabled={isActionLoading || inventoryCount === 0}
+            >
+                <CartButton />
+            </AddToCartButton>
+            <WishlistButton
+                onClick={handleRemove}
+                disabled={isActionLoading}
+            >
+                <DeleteButton />
+            </WishlistButton>
+        </>
+    )
+}
+
 export const DetailsAddToCartButton = styled(Button)(({ theme }) => ({
     backgroundColor: '#686159',
     color: 'white',
@@ -340,7 +367,6 @@ export const DetailsWishlistButton = styled(Button)(({ theme }) => ({
     },
     flexShrink: 0,
 }));
-
 
 export const DetailsCartWishlistButtons = ({ handleAction, isCartLoading, isWishlistLoading, inventoryCount }) => {
     return (
@@ -432,7 +458,7 @@ export const RatingStars = ({ rating }) => {
 
 export function HomeBreadCrumb(props) {
     return (
-        <SvgIcon {...props} style={{ fontSize: 20, marginBottom: 0.5 }}>
+        <SvgIcon {...props} style={{ fontSize: 17, marginBottom: 0.7 }}>
             <path d="M10 20v-6h4v6h5v-8h3L12 3 2 12h3v8z" />
         </SvgIcon>
     );
@@ -651,9 +677,13 @@ export const CustomDeleteModal = ({ open, onClose, onDelete, title, message }) =
 );
 
 export const BreadcrumbsComponent = ({ product }) => {
+    const isMobile = useMediaQuery('(max-width:600px)');
+
+    if (isMobile) return null;
+
     return (
         <div className='container mx-auto px-4 max-w-5xl relative top-6 right-4'>
-            <Breadcrumbs aria-label="breadcrumb" sx={{ mb: 4, fontSize: '14px' }}>
+            <Breadcrumbs aria-label="breadcrumb" sx={{ mb: 4, fontSize: '13px', whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>
                 <Link component={RouterLink} to="/" color="inherit" underline="none" className='hover:underline cursor-pointer'>
                     <HomeBreadCrumb color="primary" />
                 </Link>
@@ -672,7 +702,7 @@ export const BreadcrumbsComponent = ({ product }) => {
                         {product.subSubcategory.name}
                     </Link>
                 )}
-                <Typography color="text.primary" style={{ fontSize: '14px' }}>{product.name}</Typography>
+                <Typography color="text.primary" style={{ fontSize: '13px', whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>{product.name}</Typography>
             </Breadcrumbs>
         </div>
     );
@@ -941,7 +971,7 @@ export const ReviewModal = ({ open, handleClose, selectedReview, onImageClick })
                                 src={getImageUrl(selectedReview.product.image)}
                                 alt={selectedReview.product.name}
                                 onClick={() => onImageClick(selectedReview.product._id)}
-                                className="w-full h-auto object-cover rounded-md cursor-pointer"
+                                className="w-full h-auto object-contain rounded-md cursor-pointer"
                             />
                         </Box>
                         <Box sx={{
@@ -1498,7 +1528,7 @@ export const EmptyState = ({
 
     return (
         <div className={`flex flex-col items-center justify-center bg-white rounded-sm shadow-sm ${containerClass}`}>
-            <img src={imageSrc} alt={message} className={`${imageClass} object-cover mb-4`} />
+            <img src={imageSrc} alt={message} className={`${imageClass} object-contain mb-4`} />
             <p className="text-sm font-semibold mb-2">
                 {message} {dynamicValue && <span>{dynamicValue}</span>}
             </p>
@@ -1583,7 +1613,11 @@ export const SearchBarInput = ({ searchTerm, handleInputChange, handleSubmit }) 
             variant="outlined"
             autoComplete="off"
             sx={{
-                width: '400px',
+                width: {
+                    xs: '350px',
+                    sm: '400px',
+                    md: '475px'
+                },
                 borderColor: '#9e9793',
                 '& .MuiInputBase-root': {
                     height: '40px',
@@ -1769,19 +1803,30 @@ export const DashboardHeader = ({
 };
 
 
-export const SearchDropdown = ({ results, onClickSuggestion, searchBarWidth }) => {
+export const SearchDropdown = ({ results, onClickSuggestion }) => {
+    const maxTitleLength = 45;
+
+    const formatPrice = (price) => {
+        return Number(price).toFixed(2);
+    };
+
     return (
         <List
             sx={{
                 position: 'absolute',
-                width: searchBarWidth,
-                bgcolor: 'background.paper',
+                width: {
+                    xs: '350px',
+                    sm: '400px',
+                    md: '475px'
+                },
+                bgcolor: '#F9FAFB',
                 boxShadow: 1,
                 borderRadius: 1,
                 maxHeight: '400px',
                 overflowY: 'auto',
                 zIndex: 99,
                 top: '41px',
+                padding: '9px',
             }}
         >
             {results.map((result) => (
@@ -1789,6 +1834,18 @@ export const SearchDropdown = ({ results, onClickSuggestion, searchBarWidth }) =
                     key={result._id}
                     button
                     onClick={() => onClickSuggestion(result._id)}
+                    sx={{
+                        bgcolor: 'white',
+                        borderRadius: 1,
+                        boxShadow: '0px 1px 3px rgba(0, 0, 0, 0.1)',
+                        marginBottom: '8px',
+                        border: '1px solid transparent',
+                        '&:hover': {
+                            borderColor: '#78716C',
+                            backgroundColor: 'white',
+                        },
+                        transition: 'border-color 0.2s ease',
+                    }}
                 >
                     <img
                         src={getImageUrl(result.image)}
@@ -1798,30 +1855,39 @@ export const SearchDropdown = ({ results, onClickSuggestion, searchBarWidth }) =
                             height: '40px',
                             marginLeft: '-10px',
                             marginRight: '10px',
-                            objectFit: 'cover',
+                            objectFit: 'contain',
                         }}
                     />
                     <ListItemText
-                        primary={result.name}
+                        primary={truncateText(result.name, maxTitleLength)}
                         secondary={
-                            <Typography component="span" variant="body2" color="text.secondary">
+                            <>
                                 {result.salePrice ? (
                                     <>
+                                        <span className='font-bold'>€ {formatPrice(result.salePrice)}</span>
+                                        <br />
                                         <span style={{ textDecoration: 'line-through', marginRight: '8px' }}>
-                                            €{result.price}
+                                            € {formatPrice(result.price)}
                                         </span>
-                                        <span className='font-bold'>€{result.salePrice}</span>
                                     </>
                                 ) : (
-                                    `€${result.price}`
+                                    <span className='font-bold'>€ {formatPrice(result.price)}</span>
                                 )}
-                            </Typography>
+                            </>
                         }
                     />
                 </ListItem>
             ))}
         </List>
     );
+};
+
+export const formatPrice = (price) => {
+    if (price == null) return '0.00';
+    return price.toLocaleString(undefined, {
+        minimumFractionDigits: 2,
+        maximumFractionDigits: 2,
+    });
 };
 
 export const ProfileDropdown = ({ isAdmin, handleLogout }) => {
@@ -1906,7 +1972,7 @@ export const CartDropdown = ({
                             <img
                                 src={getImageUrl(item.product.image)}
                                 alt={item.product.name}
-                                className="w-12 h-12 object-cover rounded cursor-pointer"
+                                className="w-12 h-12 object-contain rounded cursor-pointer"
                                 onClick={() => handleProductClick(item.product._id)}
                             />
                             <div className="ml-2 flex-grow">
@@ -1917,7 +1983,7 @@ export const CartDropdown = ({
                                     {item.product.name}
                                 </span>
                                 <span className="block text-sm text-gray-500">
-                                    {item.quantity} x {item.product.salePrice > 0 ? item.product.salePrice : item.product.price} €
+                                    {item.quantity} x {item.product.salePrice > 0 ? formatPrice(item.product.salePrice) : formatPrice(item.product.price)} €
                                 </span>
                             </div>
                             <RoundIconButton
@@ -1934,7 +2000,7 @@ export const CartDropdown = ({
                 <div className="flex justify-between items-center mt-4 mb-4">
                     <div className="flex justify-start items-center space-x-1">
                         <span className="font-semibold">Total:</span>
-                        <span className="font-semibold">{cartTotal.toFixed(2)} €</span>
+                        <span className="font-semibold">{formatPrice(cartTotal)} €</span>
                     </div>
                 </div>
                 <Button
@@ -1949,6 +2015,21 @@ export const CartDropdown = ({
         )}
     </div>
 );
+
+export const LoginButton = () => {
+    const navigate = useNavigate();
+
+    return (
+        <>
+            <RoundIconButton
+                onClick={() => navigate('/login')}
+                sx={{ color: '#686159' }}
+            >
+                <Login />
+            </RoundIconButton>
+        </>
+    )
+}
 
 export const LoadingOverlay = () => (
     <div className="fixed inset-0 z-[1000] flex items-center justify-center bg-black bg-opacity-50">
@@ -2165,8 +2246,6 @@ export const AuthActions = ({
     isAdmin
 }) => {
 
-    const navigate = useNavigate();
-
     return (
         <div className="flex items-center space-x-6">
             <div className="flex items-center space-x-4">
@@ -2184,14 +2263,7 @@ export const AuthActions = ({
                         )}
                     </div>
                 ) : (
-                    <>
-                        <RoundIconButton
-                            onClick={() => navigate('/login')}
-                            sx={{ color: '#686159' }}
-                        >
-                            <Login />
-                        </RoundIconButton>
-                    </>
+                    <LoginButton />
                 )}
             </div>
         </div>
@@ -2263,7 +2335,7 @@ export const SidebarLayout = ({ children }) => {
                 p: { xs: 2, md: 3 },
                 boxShadow: '0 1px 3px rgba(0,0,0,0.12)',
                 borderRadius: '4px',
-                mt: { xs: 3, md: 2 }
+                mt: { xs: 10, md: 2 }
             }}
         >
             {children}

@@ -118,6 +118,17 @@ const ProductDetails = () => {
     const originalPrice = price || 0;
     const discountPercentage = discount?.value || 0;
     const discountedPrice = salePrice || originalPrice;
+    const finalPrice = salePrice > 0 ? salePrice : price;
+
+    const formattedFinalPrice = finalPrice ? finalPrice.toLocaleString(undefined, {
+        minimumFractionDigits: 2,
+        maximumFractionDigits: 2,
+    }) : '0.00';
+
+    const formattedPrice = price ? price.toLocaleString(undefined, {
+        minimumFractionDigits: 2,
+        maximumFractionDigits: 2,
+    }) : '0.00';
 
     const inventoryText = inventoryCount > 10
         ? "More than 10 articles"
@@ -135,7 +146,7 @@ const ProductDetails = () => {
             ) : (
                 <>
                     <BreadcrumbsComponent product={product} />
-                    <div className="container mx-auto px-4 py-4 mb-8 bg-white mt-8 rounded-md max-w-5xl">
+                    <div className="container mx-auto px-4 py-4 mb-8 bg-white mt-28 md:mt-8 rounded-md max-w-5xl">
                         <div className="flex flex-col md:flex-row gap-8">
                             <div className="flex flex-col items-center md:w-1/2 relative">
                                 <img
@@ -160,10 +171,10 @@ const ProductDetails = () => {
                                     {discountPercentage > 0 ? (
                                         <>
                                             <span className="text-gray-500 line-through text-sm">
-                                                {originalPrice.toFixed(2)} €
+                                                {formattedPrice} €
                                             </span>
                                             <span className="text-2xl font-bold text-stone-600">
-                                                {discountedPrice.toFixed(2)} €
+                                                {formattedFinalPrice} €
                                             </span>
                                             <div className="flex items-center mt-1">
                                                 <span className="text-sm font-semibold text-stone-600">

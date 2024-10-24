@@ -2,7 +2,7 @@ import { LinearProgress, Table, TableBody, TableCell, TableContainer, TableHead,
 import React, { useEffect, useState } from 'react';
 import { Link, useNavigate, useParams } from 'react-router-dom';
 import 'react-toastify/dist/ReactToastify.css';
-import { EmptyState, formatDate, Header, OrderDetailsSkeleton, ProfileLayout } from '../../assets/CustomComponents';
+import { EmptyState, formatDate, formatPrice, Header, OrderDetailsSkeleton, ProfileLayout } from '../../assets/CustomComponents';
 import emptyOrdersImage from '../../assets/img/empty-orders.png';
 import useAxios from '../../axiosInstance';
 import Footer from '../../components/Footer';
@@ -137,7 +137,7 @@ const OrderDetails = () => {
                                                             <img
                                                                 src={getImageUrl(product.image)}
                                                                 alt={product.name}
-                                                                className="w-20 h-20 object-cover rounded mr-2"
+                                                                className="w-20 h-20 object-contain rounded mr-2"
                                                             />
                                                             <div>
                                                                 <div className='hover:underline'>{product.name}</div>
@@ -146,7 +146,7 @@ const OrderDetails = () => {
                                                         </Link>
                                                     </TableCell>
                                                     <TableCell align="right">
-                                                        €{price.toFixed(2)}
+                                                        € {formatPrice(price)}
                                                     </TableCell>
                                                 </TableRow>
                                             ))}
@@ -169,7 +169,7 @@ const OrderDetails = () => {
                                                 </TableCell>
                                                 <TableCell align="right">
                                                     <Typography variant="body2">
-                                                        €{order.products.reduce((total, { quantity, price }) => total + (price * quantity), 0).toFixed(2)}
+                                                        € {formatPrice(order.products.reduce((total, { quantity, price }) => total + (price * quantity), 0))}
                                                     </Typography>
                                                 </TableCell>
                                             </TableRow>
@@ -180,7 +180,7 @@ const OrderDetails = () => {
                                                     Shipping:
                                                 </TableCell>
                                                 <TableCell align="right">
-                                                    <Typography variant="body2">€2.00</Typography>
+                                                    <Typography variant="body2">€ 2.00</Typography>
                                                 </TableCell>
                                             </TableRow>
 
@@ -191,7 +191,7 @@ const OrderDetails = () => {
                                                 </TableCell>
                                                 <TableCell align="right" className="font-bold">
                                                     <Typography variant="body2">
-                                                        €{order.totalAmount.toFixed(2)}
+                                                        € {formatPrice(order.totalAmount)}
                                                     </Typography>
                                                 </TableCell>
                                             </TableRow>

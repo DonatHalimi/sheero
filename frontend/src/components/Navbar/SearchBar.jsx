@@ -7,20 +7,10 @@ const SearchBar = () => {
     const [searchTerm, setSearchTerm] = useState('');
     const [suggestions, setSuggestions] = useState([]);
     const [debounceTimeout, setDebounceTimeout] = useState(null);
-    const navigate = useNavigate();
-    const axiosInstance = useAxios();
     const searchContainerRef = useRef(null);
 
-    useEffect(() => {
-        const handleClickOutside = (event) => {
-            if (searchContainerRef.current && !searchContainerRef.current.contains(event.target)) {
-                setSuggestions([]);
-            }
-        };
-
-        document.addEventListener('mousedown', handleClickOutside);
-        return () => document.removeEventListener('mousedown', handleClickOutside);
-    }, []);
+    const navigate = useNavigate();
+    const axiosInstance = useAxios();
 
     const handleInputChange = (event) => {
         const query = event.target.value;
@@ -59,6 +49,17 @@ const SearchBar = () => {
         }
     };
 
+    useEffect(() => {
+        const handleClickOutside = (event) => {
+            if (searchContainerRef.current && !searchContainerRef.current.contains(event.target)) {
+                setSuggestions([]);
+            }
+        };
+
+        document.addEventListener('mousedown', handleClickOutside);
+        return () => document.removeEventListener('mousedown', handleClickOutside);
+    }, []);
+
     return (
         <div ref={searchContainerRef} className="relative w-full flex justify-center">
             <form onSubmit={handleSubmit}>
@@ -72,7 +73,6 @@ const SearchBar = () => {
                 <SearchDropdown
                     results={suggestions}
                     onClickSuggestion={handleSuggestionClick}
-                    searchBarWidth="400px"
                 />
             )}
         </div>

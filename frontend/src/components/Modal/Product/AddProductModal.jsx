@@ -42,6 +42,8 @@ const AddProductModal = ({ open, onClose, onAddSuccess }) => {
     const { refreshToken } = useContext(AuthContext);
     const axiosInstance = useAxios(refreshToken);
 
+    const [debounceTimeout, setDebounceTimeout] = useState(null);
+
     useEffect(() => {
         const fetchData = async () => {
             try {
@@ -74,7 +76,13 @@ const AddProductModal = ({ open, onClose, onAddSuccess }) => {
             }
         };
 
-        fetchData();
+        if (debounceTimeout) clearTimeout(debounceTimeout);
+
+        setDebounceTimeout(setTimeout(fetchData, 1500));
+
+        return () => {
+            clearTimeout(debounceTimeout);
+        };
     }, [axiosInstance]);
 
     const handleImageChange = (e) => {

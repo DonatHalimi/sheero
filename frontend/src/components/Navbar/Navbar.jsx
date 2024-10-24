@@ -6,10 +6,10 @@ import {
     CartDropdown,
     CartIcon,
     LoadingOverlay,
+    LoginButton,
     NavbarLogo,
     ProfileDropdown,
     ProfileIcon,
-    RoundIconButton,
     WishlistIcon,
 } from '../../assets/CustomComponents';
 import useAxios from '../../axiosInstance';
@@ -49,6 +49,16 @@ const Navbar = () => {
         fetchCartData();
     }, [auth.accessToken, axiosInstance]);
 
+    const toggleDropdown = (type) => {
+        if (type === 'profile') {
+            setIsProfileDropdownOpen(prev => !prev);
+            setIsCartDropdownOpen(false);
+        } else if (type === 'cart') {
+            setIsCartDropdownOpen(prev => !prev);
+            setIsProfileDropdownOpen(false);
+        }
+    };
+
     const handleRemoveItem = async (productId) => {
         setIsLoading(true);
         try {
@@ -72,22 +82,6 @@ const Navbar = () => {
             toast.error('Failed to remove item from cart');
         } finally {
             setIsLoading(false);
-        }
-    };
-
-    useEffect(() => {
-        const handleProductAdded = () => setIsCartDropdownOpen(true);
-        document.addEventListener('productAddedToCart', handleProductAdded);
-        return () => document.removeEventListener('productAddedToCart', handleProductAdded);
-    }, []);
-
-    const toggleDropdown = (type) => {
-        if (type === 'profile') {
-            setIsProfileDropdownOpen(prev => !prev);
-            setIsCartDropdownOpen(false);
-        } else if (type === 'cart') {
-            setIsCartDropdownOpen(prev => !prev);
-            setIsProfileDropdownOpen(false);
         }
     };
 
@@ -116,22 +110,25 @@ const Navbar = () => {
         }
     };
 
+    useEffect(() => {
+        const handleProductAdded = () => setIsCartDropdownOpen(true);
+        document.addEventListener('productAddedToCart', handleProductAdded);
+        return () => document.removeEventListener('productAddedToCart', handleProductAdded);
+    }, []);
+
     const totalQuantity = cartItems.reduce((acc, item) => acc + item.quantity, 0);
 
     return (
         <>
             {isLoading && <LoadingOverlay />}
 
-            <nav className="fixed top-0 left-0 right-0 z-[900] bg-white">
+            <nav className="fixed top-0 left-0 right-0 z-[900] bg-white h-20">
                 <div className="mx-auto max-w-screen-xl">
                     <div className="flex flex-col w-full">
                         <div className="flex items-center p-4 w-full">
                             <div className="flex items-center justify-between w-full">
                                 <div className="flex items-center">
-                                    <button
-                                        onClick={toggleSidebar}
-                                        className="lg:hidden p-2 hover:bg-gray-100 rounded-lg mr-2"
-                                    >
+                                    <button onClick={toggleSidebar} className="lg:hidden pr-2 hover:bg-gray-100 rounded-lg mr-2">
                                         <MenuIcon className="text-stone-500" />
                                     </button>
 
@@ -148,8 +145,7 @@ const Navbar = () => {
                                     {auth.accessToken ? (
                                         <>
                                             <div className="relative z-[1000]">
-                                                <ProfileIcon
-                                                    handleProfileDropdownToggle={() => toggleDropdown('profile')}
+                                                <ProfileIcon handleProfileDropdownToggle={() => toggleDropdown('profile')}
                                                 />
                                                 {isProfileDropdownOpen && (
                                                     <ProfileDropdown
@@ -179,27 +175,20 @@ const Navbar = () => {
                                             </div>
                                         </>
                                     ) : (
-                                        <>
-                                            <RoundIconButton
-                                                onClick={() => navigate('/login')}
-                                                sx={{ color: '#686159' }}
-                                            >
-                                                <Login />
-                                            </RoundIconButton>
-                                        </>
+                                        <LoginButton />
                                     )}
                                 </div>
                             </div>
                         </div>
 
-                        <div className="lg:hidden px-4 pb-4 w-full">
+                        <div className="lg:hidden px-4 mb-4 w-full bg-white h-16 border-t border-gray-50 pt-3">
                             <SearchBar />
                         </div>
                     </div>
                 </div>
             </nav>
 
-            <div className='pt-20 bg-white'>
+            <div className="mt-20 bg-white">
                 <CategoryNavbar isSidebarOpen={isSidebarOpen} toggleSidebar={toggleSidebar} />
             </div>
         </>

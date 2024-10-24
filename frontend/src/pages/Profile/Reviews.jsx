@@ -1,4 +1,4 @@
-import React, { useMemo, useEffect, useState } from 'react';
+import React, { useEffect, useMemo, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { CustomDeleteModal, CustomMenu, CustomPagination, EmptyState, Header, LoadingOverlay, ProfileLayout, ReviewItemSkeleton, ReviewModal } from '../../assets/CustomComponents';
 import emptyReviewsImage from '../../assets/img/empty-reviews.png';

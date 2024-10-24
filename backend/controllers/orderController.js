@@ -9,7 +9,7 @@ dotenv.config();
 
 const stripe = Stripe(process.env.STRIPE_SECRET_KEY);
 
-const frontendUrl = process.env.NODE_ENV === 'production' ? 'https://sheero.onrender.com' : 'http://localhost:5000';
+const frontendUrl = process.env.NODE_ENV === 'production' ? 'https://sheero.onrender.com' : 'http://localhost:3000';
 
 const payWithStripe = async (req, res) => {
     try {
@@ -121,19 +121,30 @@ const payWithStripe = async (req, res) => {
 };
 
 const verifyOrder = async (req, res) => {
-    const { order_id, success } = req.query;
+    const { order_id, success } = req.body;
 
     try {
-        if (success === 'true') {
-            await Order.findByIdAndUpdate(order_id, { paymentStatus: 'completed' });
-            res.json({ success: true, message: 'Payment completed successfully.' });
+        const isSuccess = String(success) === 'true';
+
+        if (isSuccess) {
+            const updatedOrder = await Order.findByIdAndUpdate(order_id, { paymentStatus: 'completed' }, { new: true });
+
+            if (!updatedOrder) {
+                return res.status(404).json({ success: false, message: 'Order not found.' });
+            }
+
+            return res.json({ success: true, message: 'Payment completed successfully.', order: updatedOrder });
         } else {
-            await Order.findByIdAndDelete(order_id);
-            res.json({ success: false, message: 'Payment failed. Order has been deleted.' });
+            const deletedOrder = await Order.findByIdAndDelete(order_id);
+
+            if (!deletedOrder) {
+                return res.status(404).json({ success: false, message: 'Order not found.' });
+            }
+
+            return res.json({ success: false, message: 'Payment failed. Order has been deleted.' });
         }
     } catch (error) {
-        console.error(error);
-        res.status(500).json({ success: false, message: 'An error occurred during verification.' });
+        return res.status(500).json({ success: false, message: 'An error occurred during verification.', error: error.message });
     }
 };
 
@@ -219,6 +230,7 @@ const getUserOrders = async (req, res) => {
         const orders = await Order.find({ user: userId })
             .populate('products.product', 'name price image')
             .populate('address', 'name street phoneNumber city country')
+            .sort({ createdAt: -1 })
             .exec();
 
         if (!orders.length) {
@@ -235,7 +247,7 @@ const getUserOrders = async (req, res) => {
 const getOrderById = async (req, res) => {
     try {
         const { orderId } = req.params;
-        
+
         const order = await Order.findById(orderId)
             .populate('products.product', 'name price image')
             .populate({

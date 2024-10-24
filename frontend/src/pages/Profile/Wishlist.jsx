@@ -141,9 +141,10 @@ const Wishlist = () => {
                                 count={pageCount}
                                 page={currentPage}
                                 onChange={handlePageChange}
+                                size="medium"
                                 sx={{
                                     position: 'relative',
-                                    bottom: '8px',
+                                    bottom: '-2px',
                                     '& .MuiPagination-ul': {
                                         justifyContent: 'flex-start',
                                     },

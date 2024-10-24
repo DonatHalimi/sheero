@@ -3,7 +3,7 @@ import { Paper, Table, TableBody, TableCell, TableContainer, TableHead, TableRow
 import React, { useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { toast } from 'react-toastify';
-import { CheckoutButton, CustomDeleteModal, EmptyState, LoadingCart, RoundIconButton, truncateText } from '../../assets/CustomComponents';
+import { CheckoutButton, CustomDeleteModal, EmptyState, LoadingCart, LoadingOverlay, RoundIconButton, formatPrice, truncateText } from '../../assets/CustomComponents';
 import emptyCartImage from '../../assets/img/empty-cart.png';
 import useAxios from '../../axiosInstance';
 import Footer from '../../components/Footer';
@@ -18,6 +18,7 @@ const Cart = () => {
     const [loading, setLoading] = useState(true);
     const [openModal, setOpenModal] = useState(false);
     const [showPaymentModal, setShowPaymentModal] = useState(false);
+    const [actionLoading, setActionLoading] = useState(false);
     const axiosInstance = useAxios();
     const navigate = useNavigate();
 
@@ -62,22 +63,42 @@ const Cart = () => {
     };
 
     const handleRemove = async (productId) => {
+        setActionLoading(true);
         try {
-            const { data } = await axiosInstance.delete(`/cart/remove`, { data: { productId } });
-            setCart(data);
+            const { data } = await axiosInstance.delete('/cart/remove', {
+                data: { productId }
+            });
+
+            if (data && Array.isArray(data.items)) {
+                setCart(data);
+            } else {
+                const response = await axiosInstance.get('/cart');
+                setCart(response.data);
+            }
         } catch (error) {
             console.error('Failed to remove product from cart:', error?.response?.data?.message || error.message);
+            try {
+                const { data } = await axiosInstance.get('/cart');
+                setCart(data);
+            } catch (fetchError) {
+                console.error('Failed to fetch updated cart:', fetchError);
+            }
+        } finally {
+            setActionLoading(false);
         }
     };
 
     const handleClearCart = async () => {
+        setActionLoading(true);
         try {
             const { data } = await axiosInstance.delete('/cart/clear');
             setCart(data);
         } catch (error) {
             console.error('Failed to clear cart:', error?.response?.data?.message || error.message);
+        } finally {
+            setActionLoading(false);
+            setOpenModal(false);
         }
-        setOpenModal(false);
     };
 
     useEffect(() => {
@@ -167,6 +188,9 @@ const Cart = () => {
     return (
         <>
             <Navbar />
+
+            {actionLoading && <LoadingOverlay />}
+
             <div className="container mx-auto px-4 lg:px-24 py-2 mb-16 bg-gray-50 mt-10">
                 {/* Mobile-only header */}
                 <div className="flex justify-between items-center mb-4 px-2 md:hidden mt-10">
@@ -216,7 +240,7 @@ const Cart = () => {
                                                             <img
                                                                 src={getImageUrl(item.product.image)}
                                                                 alt={item.product.name}
-                                                                className="w-20 h-20 object-cover cursor-pointer rounded mr-4"
+                                                                className="w-20 h-20 object-contain cursor-pointer rounded mr-4"
                                                                 onClick={() => handleProductClick(item.product._id)}
                                                             />
                                                             <div>
@@ -233,16 +257,16 @@ const Cart = () => {
                                                         {item.product.salePrice ? (
                                                             <>
                                                                 <span className="text-lg font-semibold">
-                                                                    {item.product.salePrice.toFixed(2)} €
+                                                                    {formatPrice(item.product.salePrice)} €
                                                                 </span>
                                                                 <br />
                                                                 <span className="text-sm font-semibold text-stone-600 bg-stone-100 rounded-md px-1">
-                                                                    You save {(item.product.price - item.product.salePrice).toFixed(2)} €
+                                                                    You save {formatPrice(item.product.price - item.product.salePrice)} €
                                                                 </span>
                                                             </>
                                                         ) : (
                                                             <span className="text-lg font-semibold">
-                                                                {item.product.price.toFixed(2)} €
+                                                                {formatPrice(item.product.price)} €
                                                             </span>
                                                         )}
                                                     </TableCell>
@@ -269,7 +293,7 @@ const Cart = () => {
                                                     </TableCell>
                                                     <TableCell align="center">
                                                         <h2 className="text-base font-semibold">
-                                                            {(item.quantity * (item.product.salePrice || item.product.price)).toFixed(2)} €
+                                                            {formatPrice(item.quantity * (item.product.salePrice || item.product.price))} €
                                                         </h2>
                                                     </TableCell>
                                                     <TableCell align="center">
@@ -313,16 +337,17 @@ const Cart = () => {
                                                 <div className="mb-3">
                                                     {item.product.salePrice ? (
                                                         <>
-                                                            <span className="text-lg font-semibold block">
-                                                                {item.product.salePrice.toFixed(2)} €
+                                                            <span className="text-lg font-semibold">
+                                                                {formatPrice(item.product.salePrice)} €
                                                             </span>
-                                                            <span className="text-sm text-stone-600 bg-stone-100 rounded-md px-1">
-                                                                Save {(item.product.price - item.product.salePrice).toFixed(2)} €
+                                                            <br />
+                                                            <span className="text-sm font-semibold text-stone-600 bg-stone-100 rounded-md px-1">
+                                                                You save {formatPrice(item.product.price - item.product.salePrice)} €
                                                             </span>
                                                         </>
                                                     ) : (
-                                                        <span className="text-lg font-semibold block">
-                                                            {item.product.price.toFixed(2)} €
+                                                        <span className="text-lg font-semibold">
+                                                            {formatPrice(item.product.price)} €
                                                         </span>
                                                     )}
                                                 </div>
@@ -347,7 +372,7 @@ const Cart = () => {
                                                         </button>
                                                     </div>
                                                     <span className="font-semibold">
-                                                        Total: {(item.quantity * (item.product.salePrice || item.product.price)).toFixed(2)} €
+                                                        Total: {formatPrice(item.quantity * (item.product.salePrice || item.product.price))} €
                                                     </span>
                                                 </div>
                                             </div>
@@ -364,9 +389,9 @@ const Cart = () => {
                                 <div className="space-y-3">
                                     <div className="flex justify-between py-2 border-b">
                                         <span>Subtotal</span>
-                                        <span>{subtotal.toFixed(2)} €</span>
+                                        <span>{formatPrice(subtotal)} €</span>
                                     </div>
-                                    <div className={`flex justify-between py-2 ${cart.items.some(item => item.product.salePrice) ? 'border-b' : ''}`}>
+                                    <div className="flex justify-between py-2 border-b">
                                         <span>Shipping</span>
                                         <span>{shippingCost.toFixed(2)} €</span>
                                     </div>
@@ -383,9 +408,9 @@ const Cart = () => {
                                             </span>
                                         </div>
                                     )}
-                                    <div className="flex justify-between py-2 font-bold border-t !mb-2">
+                                    <div className="flex justify-between py-2 font-bold !mb-2">
                                         <span>Total</span>
-                                        <span>{total.toFixed(2)} €</span>
+                                        <span>{formatPrice(total)} €</span>
                                     </div>
                                 </div>
                                 <CheckoutButton

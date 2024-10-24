@@ -30,7 +30,7 @@ const Orders = () => {
             } catch (error) {
                 console.error('Error fetching orders:', error.message);
             } finally {
-                setLoading(false)
+                setLoading(false);
             }
         };
 
@@ -88,7 +88,7 @@ const Orders = () => {
                     <img
                         src={getImageUrl(image)}
                         alt={name}
-                        className="w-20 h-20 object-cover rounded cursor-pointer"
+                        className="w-20 h-20 object-contain rounded cursor-pointer"
                     />
                 </Link>
             );

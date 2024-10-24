@@ -20,14 +20,20 @@ const Verify = () => {
             const data = {
                 order_id,
                 success: searchParams.get('success') === 'true'
-            }
+            };
 
             try {
                 const response = await axiosInstance.post('/orders/verify', data);
-                setSuccess(response.data.success);
+
+                if (response.data.success) {
+                    setSuccess(true);
+                } else {
+                    setError(response.data.message);
+                    setSuccess(false);
+                }
             } catch (err) {
-                console.error('Verification failed:', err.message);
-                setError(err.message);
+                setError(err.response?.data?.message || err.message);
+                setSuccess(false);
             } finally {
                 setLoading(false);
             }
@@ -35,6 +41,9 @@ const Verify = () => {
 
         if (session_id && order_id) {
             verifyPayment();
+        } else {
+            setError('Missing required parameters');
+            setLoading(false);
         }
     }, [session_id, order_id, axiosInstance]);
 

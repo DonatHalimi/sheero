@@ -1,6 +1,7 @@
 const Subcategory = require('../models/Subcategory');
 const Product = require('../models/Product');
-const Subsubcategory = require('../models/SubSubcategory')
+const Subsubcategory = require('../models/SubSubcategory');
+const User = require('../models/User');
 const fs = require('fs');
 const path = require('path');
 

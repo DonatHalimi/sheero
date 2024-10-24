@@ -37,7 +37,7 @@ const AboutUs = () => {
                 component="img"
                 alt="Our mission"
                 height="300"
-                image="https://via.placeholder.com/600x400" // Replace with actual image
+                image="https://via.placeholder.com/600x400"
                 className="object-cover"
               />
             </Card>
@@ -52,7 +52,7 @@ const AboutUs = () => {
                 component="img"
                 alt="Our Story"
                 height="300"
-                image="https://via.placeholder.com/600x400" // Replace with actual image
+                image="https://via.placeholder.com/600x400"
                 className="object-cover"
               />
             </Card>

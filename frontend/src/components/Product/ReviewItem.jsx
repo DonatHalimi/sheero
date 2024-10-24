@@ -25,7 +25,7 @@ const ReviewItem = ({ review, onImageClick, onMenuClick, onCardClick }) => {
                         event.stopPropagation();
                         onImageClick(review.product._id);
                     }}
-                    className="object-cover w-full h-full rounded-md cursor-pointer hover:underline"
+                    className="object-contain w-full h-full rounded-md cursor-pointer hover:underline"
                 />
             </Box>
             <Box flexGrow={1} display="flex" flexDirection="column" justifyContent="space-between" alignItems="flex-start">

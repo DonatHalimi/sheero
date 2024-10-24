@@ -11,13 +11,13 @@ import ProductItem from './ProductItem';
 const itemsPerPage = 10;
 
 const SharedWishlist = () => {
-    const axiosInstance = useAxios();
-
     const [wishlistItems, setWishlistItems] = useState([]);
     const [fullName, setFullName] = useState('');
     const [currentPage, setCurrentPage] = useState(1);
     const [totalItems, setTotalItems] = useState(0);
     const [loading, setLoading] = useState(true);
+
+    const axiosInstance = useAxios();
 
     useEffect(() => {
         const fetchWishlist = async () => {

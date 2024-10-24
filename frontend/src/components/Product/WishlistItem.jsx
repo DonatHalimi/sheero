@@ -1,16 +1,7 @@
-import DeleteIcon from '@mui/icons-material/DeleteOutline';
 import React, { useContext, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { toast } from 'react-toastify';
-import {
-    AddToCartButton,
-    BrownShoppingCartIcon,
-    DiscountPercentage,
-    LoadingOverlay,
-    OutOfStock,
-    ProductItemSkeleton,
-    WishlistButton
-} from '../../assets/CustomComponents';
+import { CartDeleteButtons, DiscountPercentage, formatPrice, LoadingOverlay, OutOfStock, ProductItemSkeleton } from '../../assets/CustomComponents';
 import NoImage from '../../assets/img/product-not-found.jpg';
 import useAxios from '../../axiosInstance';
 import { getImageUrl } from '../../config';
@@ -27,6 +18,9 @@ const WishlistItem = ({ product, onRemove, loading }) => {
     const imageUrl = getImageUrl(image);
     const discountPercentage = discount?.value || 0;
     const finalPrice = salePrice > 0 ? salePrice : price;
+
+    const formattedFinalPrice = formatPrice(finalPrice);
+    const formattedPrice = formatPrice(price);
 
     const handleClick = () => { if (_id) navigate(`/product/${_id}`); };
 
@@ -76,34 +70,39 @@ const WishlistItem = ({ product, onRemove, loading }) => {
                 <ProductItemSkeleton />
             ) : (
                 <>
-                    <div className="bg-white rounded-lg shadow-md p-4 flex flex-col cursor-pointer" onClick={handleClick}>
+                    <div className="bg-white rounded-lg shadow-sm p-4 flex flex-col cursor-pointer transition-shadow duration-300 hover:shadow-md" onClick={handleClick}>
                         <div className="relative mb-2">
                             <img
                                 src={imageUrl}
                                 alt={name}
                                 className="w-full h-32 sm:h-48 object-contain rounded"
-                                onError={(e) => e.target.src = NoImage}
+                                onError={(e) => { e.target.onerror = null; e.target.src = NoImage; }}
                             />
+                            <div className="absolute inset-0 rounded transition-opacity duration-300 hover:opacity-20 opacity-0 bg-white" />
+
                             <OutOfStock inventoryCount={inventoryCount} />
+
                             <DiscountPercentage discountPercentage={discountPercentage} />
                         </div>
-                        <h2 className="font-semibold text-sm sm:text-base h-6 sm:h-8 overflow-hidden whitespace-nowrap text-ellipsis w-full">
+
+                        <h2 className="font-semibold text-sm sm:text-base h-6 sm:h-8 overflow-hidden whitespace-nowrap text-ellipsis w-full hover:underline">
                             {name}
                         </h2>
+
                         <div className="flex flex-col mb-2">
-                            <span className="font-bold text-base sm:text-lg">{finalPrice.toFixed(2)} €</span>
+                            <span className="font-bold text-base sm:text-lg">{formattedFinalPrice} €</span>
                             {discountPercentage > 0 && (
-                                <span className="text-gray-500 line-through text-xs sm:text-sm">{price.toFixed(2)} €</span>
+                                <span className="text-gray-500 line-through text-xs sm:text-sm">{formattedPrice} €</span>
                             )}
                         </div>
+
                         <div className="flex justify-between items-center mt-auto">
-                            <AddToCartButton onClick={handleAddToCart} disabled={isActionLoading || inventoryCount === 0}>
-                                <BrownShoppingCartIcon />
-                                <span className="hidden sm:inline ml-3">Add To Cart</span>
-                            </AddToCartButton>
-                            <WishlistButton onClick={handleRemove} disabled={isActionLoading}>
-                                <DeleteIcon />
-                            </WishlistButton>
+                            <CartDeleteButtons
+                                handleAddToCart={handleAddToCart}
+                                handleRemove={handleRemove}
+                                isActionLoading={isActionLoading}
+                                inventoryCount={inventoryCount}
+                            />
                         </div>
                     </div>
                 </>

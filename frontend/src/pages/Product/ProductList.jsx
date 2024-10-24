@@ -4,7 +4,7 @@ import { CustomPagination, ProductItemSkeleton } from '../../assets/CustomCompon
 import ProductItem from '../../components/Product/ProductItem';
 import { getApiUrl } from '../../config';
 
-const itemsPerPage = 10;
+const itemsPerPage = 40;
 
 const ProductList = () => {
     const [products, setProducts] = useState([]);
@@ -47,12 +47,6 @@ const ProductList = () => {
 
     return (
         <div className="container mx-auto p-4 pr-6 mb-16 bg-gray-50">
-            {totalProducts > 0 && !loading && (
-                <div className="sticky top-0 z-10 mb-2 bg-gray-50">
-                    <h1 className="text-2xl font-semibold">Products</h1>
-                </div>
-            )}
-
             <div className="grid grid-cols-2 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-3 xl:grid-cols-5 gap-4">
                 {renderProductItems()}
             </div>
@@ -64,7 +58,7 @@ const ProductList = () => {
                     onChange={handlePageChange}
                     sx={{
                         position: 'relative',
-                        bottom: '8px',
+                        bottom: '-2px',
                     }}
                 />
             )}

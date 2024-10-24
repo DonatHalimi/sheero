@@ -1,7 +1,7 @@
 import { ChevronRight } from '@mui/icons-material';
 import { Link, Skeleton } from '@mui/material';
 import React, { useEffect, useRef, useState } from 'react';
-import { useNavigate } from 'react-router-dom';
+import { useLocation, useNavigate } from 'react-router-dom';
 import { useSwipeable } from 'react-swipeable';
 import { CartIcon, HomeIcon, WishlistIcon } from '../../assets/CustomComponents';
 import useAxios from '../../axiosInstance';
@@ -13,11 +13,12 @@ const CategoryNavbar = ({ isSidebarOpen, toggleSidebar }) => {
     const [subcategories, setSubcategories] = useState({});
     const [subsubcategories, setSubsubcategories] = useState({});
     const [openCategory, setOpenCategory] = useState(null);
-    const [activeCategory, setActiveCategory] = useState(null);
+    const [activeCategory, setActiveCategory] = useState('');
     const [loading, setLoading] = useState(!categories.length);
 
     const categoryListRef = useRef(null);
     const navigate = useNavigate();
+    const location = useLocation();  // Track the current URL
 
     useEffect(() => {
         if (!categories.length) {
@@ -67,13 +68,11 @@ const CategoryNavbar = ({ isSidebarOpen, toggleSidebar }) => {
         setOpenCategory(null);
     };
 
-    const calculateDropdownStyle = () => {
-        if (categoryListRef.current) {
-            const { width, left, bottom } = categoryListRef.current.getBoundingClientRect();
-            return { width: `${width}px`, left: `${left}px`, top: `${bottom}px` };
-        }
-        return {};
-    };
+    useEffect(() => {
+        const pathArray = location.pathname.split('/');  // Split the URL path into segments
+        const categoryId = pathArray[3] || '';  // Get the category ID from the path (assuming it's in the 4th position)
+        setActiveCategory(categoryId);  // Set the active category based on the URL
+    }, [location]);
 
     const handleNavigation = (path, categoryId) => {
         setActiveCategory(categoryId);
@@ -84,6 +83,14 @@ const CategoryNavbar = ({ isSidebarOpen, toggleSidebar }) => {
         event.stopPropagation();
         setOpenCategory(openCategory === categoryId ? null : categoryId);
         fetchSubcategories(categoryId);
+    };
+
+    const calculateDropdownStyle = () => {
+        if (categoryListRef.current) {
+            const { width, left, bottom } = categoryListRef.current.getBoundingClientRect();
+            return { width: `${width}px`, left: `${left}px`, top: `${bottom}px` };
+        }
+        return {};
     };
 
     useEffect(() => {
@@ -110,9 +117,9 @@ const CategoryNavbar = ({ isSidebarOpen, toggleSidebar }) => {
 
     return (
         <>
-            {isSidebarOpen && (
-                <div className="fixed inset-0 bg-black opacity-50 z-40" onClick={toggleSidebar} />
-            )}
+            {isSidebarOpen && (<div onClick={toggleSidebar} className="fixed inset-0 bg-black opacity-50 z-40" />)}
+
+            {openCategory && (<div className="fixed inset-0 bg-black opacity-50 z-40" />)}
 
             {/* Desktop screens */}
             <nav className="hidden lg:block bg-white shadow-sm border-t border-gray-50 relative z-50">
@@ -127,7 +134,7 @@ const CategoryNavbar = ({ isSidebarOpen, toggleSidebar }) => {
                                 ))
                             ) : (
                                 categories.map((category) => (
-                                    <li
+                                    <div
                                         key={category._id}
                                         onMouseEnter={() => handleCategoryHover(category._id)}
                                         onMouseLeave={handleCategoryLeave}
@@ -140,44 +147,49 @@ const CategoryNavbar = ({ isSidebarOpen, toggleSidebar }) => {
                                             {category.name}
                                         </button>
                                         {openCategory === category._id && subcategories[category._id]?.length > 0 && (
-                                            <div className="fixed bg-white shadow-xl rounded-lg p-4 z-50" style={calculateDropdownStyle()}>
-                                                <ul>
+                                            <div
+                                                className="fixed bg-white shadow-xl rounded-lg p-4 z-50"
+                                                style={calculateDropdownStyle()}
+                                            >
+                                                <div className="grid grid-cols-1 lg:grid-cols-3 gap-2">
                                                     {subcategories[category._id].map((subcategory) => (
-                                                        <li key={subcategory._id} className="mb-2 flex items-center">
+                                                        <div key={subcategory._id} className="flex items-left">
                                                             <img
                                                                 src={getImageUrl(subcategory.image)}
                                                                 alt=""
                                                                 width={50}
-                                                                className="rounded-md"
+                                                                height={50}
+                                                                className="rounded-md object-contain mr-2"
                                                             />
                                                             <div>
                                                                 <button
                                                                     onClick={() => handleNavigation(`/products/subcategory/${subcategory._id}`, category._id)}
-                                                                    className="block py-2 px-4 ml-2 text-gray-700 hover:bg-gray-100 font-semibold"
+                                                                    className="block py-2 px-2 mr-1 rounded text-gray-700 hover:bg-gray-100 font-semibold"
                                                                 >
                                                                     {subcategory.name}
                                                                 </button>
                                                                 {subsubcategories[subcategory._id]?.length > 0 && (
-                                                                    <ul className="pl-4">
+                                                                    <div className="flex flex-wrap lg:flex-wrap text-start lg:text-left">
                                                                         {subsubcategories[subcategory._id].map((subsubcategory) => (
-                                                                            <li key={subsubcategory._id}>
+                                                                            <div key={subsubcategory._id} className='text-start'>
                                                                                 <button
                                                                                     onClick={() => handleNavigation(`/products/subSubcategory/${subsubcategory._id}`, category._id)}
-                                                                                    className="block py-1 px-2 ml-2 text-gray-500 hover:bg-gray-100"
+                                                                                    className="block py-1 px-2 ml-1 rounded text-gray-500 hover:bg-gray-100"
                                                                                 >
                                                                                     {subsubcategory.name}
                                                                                 </button>
-                                                                            </li>
+                                                                            </div>
                                                                         ))}
-                                                                    </ul>
+                                                                    </div>
                                                                 )}
                                                             </div>
-                                                        </li>
+                                                        </div>
                                                     ))}
-                                                </ul>
+                                                </div>
+
                                             </div>
                                         )}
-                                    </li>
+                                    </div>
                                 ))
                             )}
                         </ul>
@@ -237,7 +249,7 @@ const CategoryNavbar = ({ isSidebarOpen, toggleSidebar }) => {
                                     />
                                     <button
                                         onClick={() => handleNavigation(`/products/category/${category._id}`, category._id)}
-                                        className={`flex-grow text-left p-2 rounded ${activeCategory === category._id ? 'bg-gray-100' : ''}`}
+                                        className={`flex-grow text-left p-2 ${activeCategory === category._id ? 'bg-gray-100' : ''}`}
                                     >
                                         {category.name}
                                     </button>
@@ -301,7 +313,7 @@ const CategoryNavbar = ({ isSidebarOpen, toggleSidebar }) => {
                     </span>
                     <span className="text-sm ml-7">Contact us:</span>
                     <span className="text-sm ml-7">Email: support@sheero.com</span>
-                    <span className="text-sm ml-7 mb-10">Phone Number: 044221112</span>
+                    <span className="text-sm ml-7 mb-10">Tel.: 044888999</span>
                 </div>
             </div>
         </>
