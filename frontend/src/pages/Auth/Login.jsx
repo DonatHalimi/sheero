@@ -66,6 +66,8 @@ const Login = () => {
         response.success ? navigate('/') : toast.error(response.message);
     };
 
+    const isFormValid = emailValid && passwordValid;
+
     return (
         <Box className='flex flex-col bg-neutral-50 min-h-[100vh]'>
             <Navbar />
@@ -87,6 +89,7 @@ const Login = () => {
                                 onChange={handleEmailChange}
                                 onFocus={() => setFocusedField('email')}
                                 onBlur={() => setFocusedField(null)}
+                                error={!emailValid}
                             />
                             {focusedField === 'email' && !emailValid && (
                                 <div className="absolute left-0 bottom-[-50px] bg-white text-red-500 text-sm p-2 rounded-lg shadow-md w-full z-10">
@@ -111,6 +114,7 @@ const Login = () => {
                                 onChange={handlePasswordChange}
                                 onFocus={() => setFocusedField('password')}
                                 onBlur={() => setFocusedField(null)}
+                                error={!passwordValid}
                                 InputProps={{
                                     endAdornment: (
                                         <InputAdornment position="end">
@@ -140,6 +144,7 @@ const Login = () => {
                             fullWidth
                             variant="contained"
                             sx={{ mb: 2 }}
+                            disabled={!isFormValid}
                         >
                             Log In
                         </BrownButton>

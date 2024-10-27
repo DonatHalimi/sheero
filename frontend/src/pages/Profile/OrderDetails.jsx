@@ -3,7 +3,7 @@ import React, { useEffect, useState } from 'react';
 import { Link, useNavigate, useParams } from 'react-router-dom';
 import 'react-toastify/dist/ReactToastify.css';
 import { EmptyState, formatDate, formatPrice, Header, OrderDetailsSkeleton, ProfileLayout } from '../../assets/CustomComponents';
-import emptyOrdersImage from '../../assets/img/empty-orders.png';
+import emptyOrdersImage from '../../assets/img/empty/orders.png';
 import useAxios from '../../axiosInstance';
 import Footer from '../../components/Footer';
 import Navbar from '../../components/Navbar/Navbar';

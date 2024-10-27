@@ -2,7 +2,7 @@ import { Typography } from '@mui/material';
 import React, { useEffect, useState } from 'react';
 import { useLocation } from 'react-router-dom';
 import { CustomPagination, EmptyState, GoBackButton } from '../../assets/CustomComponents';
-import noResultsImage from '../../assets/img/no-results.png';
+import noResultsImage from '../../assets/img/empty/search-results.png';
 import useAxios from '../../axiosInstance';
 import Footer from '../../components/Footer';
 import Navbar from '../../components/Navbar/Navbar';

@@ -3,7 +3,7 @@ import React, { useContext, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { toast } from 'react-toastify';
 import { CartWishlistButtons, DiscountPercentage, formatPrice, OutOfStock, ProductItemSkeleton } from '../../assets/CustomComponents';
-import NoImage from '../../assets/img/product-not-found.jpg';
+import NoImage from '../../assets/img/errors/product-not-found.png';
 import useAxios from '../../axiosInstance';
 import { getApiUrl, getImageUrl } from '../../config';
 import { AuthContext } from '../../context/AuthContext';
@@ -72,8 +72,9 @@ const ProductItem = ({ product, loading }) => {
                     <img
                         src={imageUrl}
                         alt={name}
-                        className="w-full h-32 sm:h-48 object-contain rounded"
+                        loading="lazy"
                         onError={(e) => { e.target.onerror = null; e.target.src = NoImage; }}
+                        className="w-full h-32 sm:h-48 object-contain rounded"
                     />
                     <div className="absolute inset-0 rounded transition-opacity duration-300 hover:opacity-20 opacity-0 bg-white" />
 

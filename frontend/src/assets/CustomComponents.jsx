@@ -78,8 +78,7 @@ import Footer from '../components/Footer';
 import Navbar from '../components/Navbar/Navbar';
 import { getImageUrl } from '../config';
 import ProfileSidebar from '../pages/Profile/ProfileSidebar';
-import logo from './img/logo.png';
-import NoImage from './img/product-not-found.jpg'
+import logo from './img/brand/logo.png';
 
 export const BrownOutlinedTextField = styled(TextField)({
     '& .MuiOutlinedInput-root': {
@@ -947,22 +946,23 @@ export const ReviewModal = ({ open, handleClose, selectedReview, onImageClick })
                 top: '50%',
                 left: '50%',
                 transform: 'translate(-50%, -50%)',
-                width: '80%',
+                width: { xs: '95%', sm: '80%' },
                 maxWidth: '800px',
                 bgcolor: 'background.paper',
                 borderRadius: '8px',
                 boxShadow: 24,
                 display: 'flex',
-                flexDirection: 'column',
+                flexDirection: { xs: 'column', sm: 'row' },
                 p: 2,
                 outline: 'none',
             }}>
                 {selectedReview && selectedReview.user && (
-                    <Box sx={{ display: 'flex', flex: 1 }}>
+                    <Box sx={{ display: 'flex', flex: 1, flexDirection: { xs: 'column', sm: 'row' } }}>
                         <Box sx={{
-                            width: '40%',
+                            width: { xs: '100%', sm: '40%' },
                             flexShrink: 0,
-                            mr: 2,
+                            mr: { sm: 2 },
+                            mb: { xs: 2, sm: 0 },
                             display: 'flex',
                             alignItems: 'center',
                             justifyContent: 'center'
@@ -972,34 +972,42 @@ export const ReviewModal = ({ open, handleClose, selectedReview, onImageClick })
                                 alt={selectedReview.product.name}
                                 onClick={() => onImageClick(selectedReview.product._id)}
                                 className="w-full h-auto object-contain rounded-md cursor-pointer"
+                                style={{ maxHeight: '200px' }}
                             />
                         </Box>
                         <Box sx={{
                             flexGrow: 1,
                             display: 'flex',
                             flexDirection: 'column',
-                            justifyContent: 'space-between'
+                            justifyContent: 'space-between',
+                            textAlign: 'justify'
                         }}>
                             <Box sx={{ display: 'flex', alignItems: 'flex-end', mb: 2 }}>
                                 <Box sx={{ flexGrow: 1 }}>
-                                    <Box>
-                                        <Typography id="review-modal-title" variant="h6" component="h2" mb={1} className="break-words">
-                                            {selectedReview.user.firstName} {selectedReview.user.lastName}
-                                            <Typography variant="caption" color="text.secondary" component="span" sx={{ ml: 1 }}>
-                                                {new Date(selectedReview.updatedAt || selectedReview.createdAt).toLocaleDateString()}
-                                            </Typography>
-                                            <RatingStars rating={selectedReview.rating} />
+                                    <Typography id="review-modal-title" variant="h6" component="h2" mb={1} sx={{ fontSize: { xs: '1rem', sm: '1.25rem' }, textAlign: 'justify' }}>
+                                        {selectedReview.user.firstName} {selectedReview.user.lastName}
+                                        <Typography variant="caption" color="text.secondary" component="span" sx={{ ml: 1 }}>
+                                            {new Date(selectedReview.updatedAt || selectedReview.createdAt).toLocaleDateString()}
                                         </Typography>
-                                    </Box>
-                                    <Typography variant="h6" component="h2" display="flex" alignItems="center" className="break-words">
-                                        <span style={{ maxWidth: 'calc(100% - 120px)' }}>
+                                        <RatingStars rating={selectedReview.rating} />
+                                    </Typography>
+                                    <Typography variant="h6" component="h2" display="flex" alignItems="center" sx={{ fontSize: { xs: '1rem', sm: '1.25rem' }, textAlign: 'justify' }}>
+                                        <span style={{ maxWidth: '360px', textAlign: 'left' }}>
                                             {selectedReview.product.name}
                                         </span>
                                     </Typography>
-
-                                    <p className="font-semibold mt-1 break-words">
+                                    <Box
+                                        sx={{
+                                            textAlign: 'justify',
+                                            overflow: 'hidden',
+                                            textOverflow: 'ellipsis',
+                                            whiteSpace: 'nowrap',
+                                            width: '100%',
+                                        }}
+                                        className="font-semibold mt-1 break-words"
+                                    >
                                         {selectedReview.title}
-                                    </p>
+                                    </Box>
                                     <textarea
                                         value={selectedReview.comment}
                                         readOnly
@@ -1018,6 +1026,7 @@ export const ReviewModal = ({ open, handleClose, selectedReview, onImageClick })
                                             borderRadius: '4px',
                                             marginTop: '6px',
                                             outline: 'none',
+                                            textAlign: 'justify'
                                         }}
                                         onFocus={(e) => e.target.style.border = 'none'}
                                     />
@@ -1038,6 +1047,7 @@ export const ReviewModal = ({ open, handleClose, selectedReview, onImageClick })
         </Modal>
     );
 };
+
 
 export const ProductTabs = ({ value, handleChange }) => {
     return (
@@ -1301,7 +1311,7 @@ export const LoadingCart = () => {
 export const ProductItemSkeleton = () => {
     return (
         <>
-            {Array.from({ length: 6 }).map((_, index) => (
+            {Array.from({ length: 15 }).map((_, index) => (
                 <div key={index} className="bg-white rounded-lg shadow-md p-4 flex flex-col">
                     <div className="relative mb-2">
                         <Skeleton variant="rectangular" animation="wave" width="100%" height={192} />
@@ -1963,7 +1973,7 @@ export const CartDropdown = ({
             <div className="text-sm text-left">You have no products in your cart</div>
         ) : (
             <>
-                <ul className="mt-2 mb-4">
+                <ul className="mt-2 mb-2 overflow-y-auto max-h-60">
                     {cartItems.map(item => (
                         <li
                             key={`${item.product._id}-${item.quantity}`}
@@ -2088,7 +2098,7 @@ export const ProfileIcon = ({ handleProfileDropdownToggle }) => {
                         <Skeleton variant="text" width={80} height={20} className="ml-1" />
                     ) : (
                         firstName && (
-                            <span className="ml-2 text-sm">{firstName}</span>
+                            <span className="ml-2 text-sm overflow-hidden text-ellipsis">{firstName}</span>
                         )
                     )}
                 </ProfileButton>

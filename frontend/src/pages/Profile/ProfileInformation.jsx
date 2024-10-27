@@ -144,6 +144,12 @@ const ProfileInformation = () => {
         setLoading(false);
     };
 
+    const isFormValid = (
+        firstNameValid && lastNameValid && emailValid &&
+        (password ? passwordValid : true) &&
+        (newPassword ? newPasswordValid : true)
+    );
+
     const isFormUnchanged = (
         firstName === initialData.firstName &&
         lastName === initialData.lastName &&
@@ -318,7 +324,7 @@ const ProfileInformation = () => {
                                 type="submit"
                                 variant="contained"
                                 color="primary"
-                                disabled={isFormUnchanged}
+                                disabled={isFormUnchanged || !isFormValid}
                             >
                                 Update
                             </Button>

@@ -64,7 +64,7 @@ const ContactUs = () => {
 
             <Container
                 maxWidth="xs"
-                className="my-10 p-5 bg-white shadow-md rounded-lg"
+                className="mt-40 md:mt-10 mb-10 p-5 bg-white shadow-md rounded-lg"
             >
                 <p className="text-3xl mb-4 text-left">
                     Contact Us

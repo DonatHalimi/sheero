@@ -38,13 +38,13 @@ const ReviewItem = ({ review, onImageClick, onMenuClick, onCardClick }) => {
                         variant="h6"
                         className="font-light mb-2 flex items-center hover:underline break-words"
                     >
-                        {truncateText(review.product.name, 20)}
+                        {truncateText(review.product.name, 30)}
                         <Box className="ml-2">
                             <RatingStars rating={review.rating} />
                         </Box>
                     </Typography>
                     <p className="text-base font-semibold break-words">
-                        {truncateText(review.title, 100)}
+                        {truncateText(review.title, 70)}
                     </p>
                     <div className="mt-1 text-gray-700 break-words">
                         <Typography variant="body1" className="break-words">

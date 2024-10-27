@@ -40,15 +40,16 @@ const ProductList = () => {
         setCurrentPage(value);
     };
 
-    const renderProductItems = () => (
-        loading ? (Array.from({ length: itemsPerPage }).map((_, index) => (<ProductItemSkeleton key={index} />))
-        ) : (getCurrentPageItems().map(product => <ProductItem key={product._id} product={product} loading={false} />))
-    );
-
     return (
         <div className="container mx-auto p-4 pr-6 mb-16 bg-gray-50">
             <div className="grid grid-cols-2 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-3 xl:grid-cols-5 gap-4">
-                {renderProductItems()}
+                {loading ? (
+                    <ProductItemSkeleton />
+                ) : (
+                    getCurrentPageItems().map(product => (
+                        <ProductItem key={product._id} product={product} />
+                    ))
+                )}
             </div>
 
             {!loading && totalProducts > 0 && (

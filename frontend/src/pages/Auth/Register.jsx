@@ -18,6 +18,7 @@ const Register = () => {
     const [firstNameValid, setFirstNameValid] = useState(true);
     const [lastNameValid, setLastNameValid] = useState(true);
     const [emailValid, setEmailValid] = useState(true);
+    const [passwordValid, setPasswordValid] = useState(true);
     const [focusedField, setFocusedField] = useState(null);
 
     const { register } = useContext(AuthContext);
@@ -56,6 +57,12 @@ const Register = () => {
         setEmailValid(validateEmail(value));
     };
 
+    const handlePasswordChange = (e) => {
+        const value = e.target.value;
+        setPassword(value);
+        setPasswordValid(validatePassword(value));
+    };
+
     const handleSubmit = async (e) => {
         e.preventDefault();
         if (!firstName || !lastName || !email || !password) {
@@ -84,6 +91,8 @@ const Register = () => {
         }
     };
 
+    const isFormValid = firstNameValid && lastNameValid && emailValid && passwordValid;
+
     return (
         <Box className='flex flex-col bg-neutral-50 min-h-[100vh]'>
             <Navbar />
@@ -107,6 +116,7 @@ const Register = () => {
                                 onChange={handleFirstNameChange}
                                 onFocus={() => setFocusedField('firstName')}
                                 onBlur={() => setFocusedField(null)}
+                                error={!firstNameValid}
                             />
                             {focusedField === 'firstName' && !firstNameValid && (
                                 <div className="absolute left-0 bottom-[-50px] bg-white text-red-500 text-sm p-2 rounded-lg shadow-md w-full z-10">
@@ -130,6 +140,7 @@ const Register = () => {
                                 onChange={handleLastNameChange}
                                 onFocus={() => setFocusedField('lastName')}
                                 onBlur={() => setFocusedField(null)}
+                                error={!lastNameValid}
                             />
                             {focusedField === 'lastName' && !lastNameValid && (
                                 <div className="absolute left-0 bottom-[-50px] bg-white text-red-500 text-sm p-2 rounded-lg shadow-md w-full z-10">
@@ -152,6 +163,7 @@ const Register = () => {
                                 onChange={handleEmailChange}
                                 onFocus={() => setFocusedField('email')}
                                 onBlur={() => setFocusedField(null)}
+                                error={!emailValid}
                                 type='email'
                             />
                             {focusedField === 'email' && !emailValid && (
@@ -163,7 +175,6 @@ const Register = () => {
                             )}
                         </div>
 
-                        {/* Password */}
                         <div className="relative">
                             <BrownOutlinedTextField
                                 margin="normal"
@@ -174,11 +185,10 @@ const Register = () => {
                                 type={showPassword ? "text" : "password"}
                                 autoComplete="new-password"
                                 value={password}
-                                onChange={(e) => {
-                                    setPassword(e.target.value);
-                                }}
+                                onChange={handlePasswordChange}
                                 onFocus={() => setFocusedField('password')}
                                 onBlur={() => setFocusedField(null)}
+                                error={!passwordValid}
                                 InputProps={{
                                     endAdornment: (
                                         <InputAdornment position="end">
@@ -194,7 +204,7 @@ const Register = () => {
                                 }}
                                 sx={{ mb: 3 }}
                             />
-                            {focusedField === 'password' && !validatePassword(password) && (
+                            {focusedField === 'password' && !passwordValid && (
                                 <div className="absolute left-0 bottom-[-54px] bg-white text-red-500 text-sm p-2 rounded-lg shadow-md w-full z-10">
                                     <span className="block text-xs font-semibold mb-1">Invalid Password</span>
                                     Must be 8 characters long with uppercase, lowercase, number, and special character.
@@ -208,6 +218,7 @@ const Register = () => {
                             fullWidth
                             variant="contained"
                             sx={{ mb: 2 }}
+                            disabled={!isFormValid}
                         >
                             Register
                         </BrownButton>

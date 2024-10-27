@@ -168,6 +168,8 @@ const AddressInformation = () => {
         }
     };
 
+    const isFormValid = nameValid && streetValid && phoneNumberValid && city && country;
+
     const isFormUnchanged = existingAddress &&
         name === existingAddress.name &&
         street === existingAddress.street &&
@@ -314,8 +316,7 @@ const AddressInformation = () => {
                                 type="submit"
                                 variant="contained"
                                 color="primary"
-                                disabled={isFormUnchanged}
-                                className='relative bottom-2'
+                                disabled={isFormUnchanged || !isFormValid}
                             >
                                 {existingAddress ? 'Update' : 'Add'}
                             </Button>

@@ -1,13 +1,15 @@
-import { ChevronRight } from '@mui/icons-material';
-import { Link, Skeleton } from '@mui/material';
-import React, { useEffect, useRef, useState } from 'react';
+import { ChevronRight, Person } from '@mui/icons-material';
+import { Skeleton } from '@mui/material';
+import React, { useContext, useEffect, useRef, useState } from 'react';
 import { useLocation, useNavigate } from 'react-router-dom';
 import { useSwipeable } from 'react-swipeable';
 import { CartIcon, HomeIcon, WishlistIcon } from '../../assets/CustomComponents';
 import useAxios from '../../axiosInstance';
 import { getImageUrl } from '../../config';
+import { AuthContext } from '../../context/AuthContext';
 
 const CategoryNavbar = ({ isSidebarOpen, toggleSidebar }) => {
+    const { auth } = useContext(AuthContext);
     const axiosInstance = useAxios();
     const [categories, setCategories] = useState([]);
     const [subcategories, setSubcategories] = useState({});
@@ -18,7 +20,7 @@ const CategoryNavbar = ({ isSidebarOpen, toggleSidebar }) => {
 
     const categoryListRef = useRef(null);
     const navigate = useNavigate();
-    const location = useLocation();  // Track the current URL
+    const location = useLocation();
 
     useEffect(() => {
         if (!categories.length) {
@@ -69,14 +71,18 @@ const CategoryNavbar = ({ isSidebarOpen, toggleSidebar }) => {
     };
 
     useEffect(() => {
-        const pathArray = location.pathname.split('/');  // Split the URL path into segments
-        const categoryId = pathArray[3] || '';  // Get the category ID from the path (assuming it's in the 4th position)
-        setActiveCategory(categoryId);  // Set the active category based on the URL
+        const pathArray = location.pathname.split('/');
+        const categoryId = pathArray[3] || '';
+        setActiveCategory(categoryId);
     }, [location]);
 
     const handleNavigation = (path, categoryId) => {
         setActiveCategory(categoryId);
         navigate(path);
+
+        if (isSidebarOpen) {
+            toggleSidebar();
+        }
     };
 
     const toggleSubcategories = (categoryId, event) => {
@@ -98,6 +104,7 @@ const CategoryNavbar = ({ isSidebarOpen, toggleSidebar }) => {
             document.body.style.overflow = 'hidden';
         } else {
             document.body.style.overflow = '';
+            setOpenCategory(null);
         }
     }, [isSidebarOpen]);
 
@@ -115,11 +122,20 @@ const CategoryNavbar = ({ isSidebarOpen, toggleSidebar }) => {
         preventDefaultTouchmoveEvent: true,
     });
 
+    const handleBackdropClick = (e) => {
+        if (e.target === e.currentTarget) {
+            toggleSidebar();
+        }
+    };
+
     return (
         <>
-            {isSidebarOpen && (<div onClick={toggleSidebar} className="fixed inset-0 bg-black opacity-50 z-40" />)}
-
-            {openCategory && (<div className="fixed inset-0 bg-black opacity-50 z-40" />)}
+            {(isSidebarOpen || openCategory) && (
+                <div
+                    onClick={handleBackdropClick}
+                    className={`fixed inset-0 bg-black transition-opacity duration-300 z-40 ${isSidebarOpen ? 'opacity-50' : openCategory ? 'opacity-50' : 'opacity-0'}`}
+                />
+            )}
 
             {/* Desktop screens */}
             <nav className="hidden lg:block bg-white shadow-sm border-t border-gray-50 relative z-50">
@@ -198,32 +214,34 @@ const CategoryNavbar = ({ isSidebarOpen, toggleSidebar }) => {
             </nav>
 
             {/* Mobile screens */}
-            <div {...handlers} className={`fixed top-0 left-0 w-80 h-full bg-white z-[1000] transition-transform transform duration-500 ease-in-out overflow-y-auto ${isSidebarOpen ? 'translate-x-0 opacity-100' : '-translate-x-full opacity-0'}`}>
+            <div
+                {...handlers}
+                onClick={(e) => e.stopPropagation()}
+                className={`fixed top-0 left-0 w-80 h-full bg-white z-[1000] transition-transform transform duration-500 ease-in-out overflow-y-auto ${isSidebarOpen ? 'translate-x-0 opacity-100' : '-translate-x-full opacity-0'}`}
+            >
                 <div className="p-2 border-b flex flex-col items-start">
-                    <div className='-mx-0 h-12 bg-stone-500 flex items-center justify-start w-full rounded-md mb-2 !p-0'>
+                    <div className='-mx-0 h-12 bg-stone-500 flex items-center justify-between w-full rounded-md mb-2 !p-0'>
                         <h1 className="text-white font-bold text-lg pl-3">sheero</h1>
+                        <div className="flex items-center pr-3">
+                            <button onClick={() => navigate('/profile/me')} className="text-white hover:opacity-80 mr-1">
+                                {auth.accessToken ? (
+                                    <Person />
+                                ) : null}
+                            </button>
+                        </div>
                     </div>
 
-                    <button
-                        onClick={() => navigate('/')}
-                        className='flex items-center rounded w-full text-left mb-2'
-                    >
+                    <button onClick={() => navigate('/')} className='flex items-center rounded w-full text-left mb-2'>
                         <HomeIcon color='primary' />
                         Home
                     </button>
 
-                    <button
-                        onClick={() => navigate('/cart')}
-                        className='flex items-center rounded w-full text-left mb-2'
-                    >
+                    <button onClick={() => navigate('/cart')} className='flex items-center rounded w-full text-left mb-2'>
                         <CartIcon color='primary' />
                         Cart
                     </button>
 
-                    <button
-                        onClick={() => navigate('/profile/wishlist')}
-                        className='flex items-center rounded w-full text-left'
-                    >
+                    <button onClick={() => navigate('/profile/wishlist')} className='flex items-center rounded w-full text-left'>
                         <WishlistIcon color='primary' />
                         Wishlist
                     </button>
@@ -237,19 +255,21 @@ const CategoryNavbar = ({ isSidebarOpen, toggleSidebar }) => {
                             </li>
                         ))
                     ) : (
-                        categories.map((category) => (
-                            <li key={category._id} className="mb-4">
+                        categories.map((category, index) => (
+                            <li
+                                key={category._id}
+                                className={`mb-4 ${index === categories.length - 1 ? 'mb-[2px]' : ''}`}
+                            >
                                 <div className="flex items-center justify-between">
                                     <div className='border-t bg-gray-50' />
                                     <img
                                         src={getImageUrl(category.image)}
                                         alt=""
-                                        width={30}
-                                        className="rounded-md"
+                                        width={25}
                                     />
                                     <button
                                         onClick={() => handleNavigation(`/products/category/${category._id}`, category._id)}
-                                        className={`flex-grow text-left p-2 ${activeCategory === category._id ? 'bg-gray-100' : ''}`}
+                                        className={`flex-grow text-left p-2 ml-2 ${activeCategory === category._id ? 'bg-gray-100' : ''}`}
                                     >
                                         {category.name}
                                     </button>
@@ -269,11 +289,10 @@ const CategoryNavbar = ({ isSidebarOpen, toggleSidebar }) => {
                                                         src={getImageUrl(subcategory.image)}
                                                         alt=""
                                                         width={30}
-                                                        className="rounded-md"
                                                     />
                                                     <button
                                                         onClick={() => handleNavigation(`/products/subcategory/${subcategory._id}`, category._id)}
-                                                        className="block py-1 px-2 text-gray-700 hover:bg-gray-100"
+                                                        className="block py-1 px-3 mt-[2px] text-gray-700 hover:bg-gray-100"
                                                     >
                                                         {subcategory.name}
                                                     </button>
@@ -281,15 +300,15 @@ const CategoryNavbar = ({ isSidebarOpen, toggleSidebar }) => {
                                                 {subsubcategories[subcategory._id]?.length > 0 && (
                                                     <ul className="pl-4">
                                                         {subsubcategories[subcategory._id].map((subsubcategory) => (
-                                                            <li key={subsubcategory._id} className="flex items-center">
+                                                            <div key={subsubcategory._id} className="flex items-center mb-1">
                                                                 <div className="rounded-md mr-9" />
                                                                 <button
                                                                     onClick={() => handleNavigation(`/products/subSubcategory/${subsubcategory._id}`, category._id)}
-                                                                    className="block py-1 text-gray-500 hover:bg-gray-100"
+                                                                    className="block py-1 px-1 text-gray-500 hover:bg-gray-100"
                                                                 >
                                                                     {subsubcategory.name}
                                                                 </button>
-                                                            </li>
+                                                            </div>
                                                         ))}
                                                     </ul>
                                                 )}
@@ -306,12 +325,14 @@ const CategoryNavbar = ({ isSidebarOpen, toggleSidebar }) => {
 
                 <div className="flex flex-col text-gray-400 gap-3">
                     <span
-                        className="text-sm ml-7 no-underline"
                         onClick={() => navigate('/faqs')}
+                        className="text-sm ml-7 underline"
                     >
                         Frequently Asked Questions
                     </span>
-                    <span className="text-sm ml-7">Contact us:</span>
+                    <span
+                        onClick={() => navigate('/contact-us')}
+                        className="text-sm ml-7 underline">Contact us:</span>
                     <span className="text-sm ml-7">Email: support@sheero.com</span>
                     <span className="text-sm ml-7 mb-10">Tel.: 044888999</span>
                 </div>

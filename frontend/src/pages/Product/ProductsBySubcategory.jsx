@@ -2,8 +2,8 @@ import { Skeleton } from '@mui/material';
 import axios from 'axios';
 import React, { useEffect, useState } from 'react';
 import { useParams } from 'react-router-dom';
-import { CustomPagination, EmptyState, GoBackButton } from '../../assets/CustomComponents';
-import noProducts from '../../assets/img/no-products.png';
+import { CustomPagination, EmptyState, GoBackButton, ProductItemSkeleton } from '../../assets/CustomComponents';
+import noProducts from '../../assets/img/products/no-products.png';
 import Footer from '../../components/Footer';
 import Navbar from '../../components/Navbar/Navbar';
 import ProductItem from '../../components/Product/ProductItem';
@@ -48,12 +48,6 @@ const ProductsBySubcategory = () => {
         setCurrentPage(value);
     };
 
-    const renderProductItems = () => (
-        loading
-            ? Array.from({ length: itemsPerPage }, (_, index) => <ProductItem key={index} loading={true} />)
-            : getCurrentPageItems().map(product => <ProductItem key={product._id} product={product} loading={false} />)
-    );
-
     return (
         <>
             <Navbar />
@@ -82,7 +76,13 @@ const ProductsBySubcategory = () => {
                 </div>
 
                 <div className="grid grid-cols-2 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-3 xl:grid-cols-5 gap-4">
-                    {renderProductItems()}
+                    {loading ? (
+                        <ProductItemSkeleton />
+                    ) : (
+                        getCurrentPageItems().map(product => (
+                            <ProductItem key={product._id} product={product} />
+                        ))
+                    )}
                 </div>
 
                 {!loading && products.length > 0 && (

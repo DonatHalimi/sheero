@@ -9,7 +9,7 @@ import {
     ProductItemSkeleton,
     ProfileLayout,
 } from '../../assets/CustomComponents';
-import emptyWishlistImage from '../../assets/img/empty-wishlist.png';
+import emptyWishlistImage from '../../assets/img/empty/wishlist.png';
 import useAxios from '../../axiosInstance';
 import Footer from '../../components/Footer';
 import Navbar from '../../components/Navbar/Navbar';

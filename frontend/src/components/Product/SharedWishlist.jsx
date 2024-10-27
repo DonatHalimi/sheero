@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from 'react';
 import { toast } from 'react-toastify';
 import { CustomPagination, EmptyState, Header, ProductItemSkeleton } from '../../assets/CustomComponents';
-import emptyWishlistImage from '../../assets/img/empty-wishlist.png';
+import emptyWishlistImage from '../../assets/img/empty/wishlist.png';
 import useAxios from '../../axiosInstance';
 import { getApiUrl } from '../../config';
 import Footer from '../Footer';
@@ -54,7 +54,7 @@ const SharedWishlist = () => {
     return (
         <>
             <Navbar />
-            <div className="container mx-auto px-4 py-8 mb-16 bg-gray-50">
+            <div className="container mx-auto px-4 py-8 mb-16 mt-32 md:mt-0 bg-gray-50">
                 <Header fullName={fullName} loading={loading} />
 
                 {loading ? (

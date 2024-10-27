@@ -51,6 +51,7 @@ To set up the project locally, follow these steps:
    **Frontend (`client/.env`)**
    ```bash
    VITE_CRYPTOJS_SECRET_KEY=<your-cryptojs-secret-key>
+   NODE_ENV=development
    ```
 
 5. Start the backend server:

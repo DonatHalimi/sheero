@@ -4,7 +4,7 @@ import React, { useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { toast } from 'react-toastify';
 import { CheckoutButton, CustomDeleteModal, EmptyState, LoadingCart, LoadingOverlay, RoundIconButton, formatPrice, truncateText } from '../../assets/CustomComponents';
-import emptyCartImage from '../../assets/img/empty-cart.png';
+import emptyCartImage from '../../assets/img/empty/cart.png';
 import useAxios from '../../axiosInstance';
 import Footer from '../../components/Footer';
 import Navbar from '../../components/Navbar/Navbar';
@@ -193,15 +193,17 @@ const Cart = () => {
 
             <div className="container mx-auto px-4 lg:px-24 py-2 mb-16 bg-gray-50 mt-10">
                 {/* Mobile-only header */}
-                <div className="flex justify-between items-center mb-4 px-2 md:hidden mt-10">
-                    <h1 className="text-2xl font-semilight">Cart</h1>
+                <div className="bg-white p-4 rounded-md shadow-sm mb-3 flex justify-between items-center px-2 md:hidden mt-16">
+                    <h1 className="text-2xl font-semilight ml-2">Cart</h1>
                     {cart?.items?.length > 0 && (
-                        <RoundIconButton
-                            onClick={() => setOpenModal(true)}
-                            className="cursor-pointer"
-                        >
-                            <DeleteOutline color="primary" />
-                        </RoundIconButton>
+                        <Tooltip title="Clear cart" arrow placement="top">
+                            <RoundIconButton
+                                onClick={() => setOpenModal(true)}
+                                className="cursor-pointer"
+                            >
+                                <DeleteOutline color="primary" />
+                            </RoundIconButton>
+                        </Tooltip>
                     )}
                 </div>
 
@@ -316,7 +318,7 @@ const Cart = () => {
                                             <img
                                                 src={getImageUrl(item.product.image)}
                                                 alt={item.product.name}
-                                                className="w-24 h-24 object-cover rounded cursor-pointer"
+                                                className="w-24 h-24 object-contain rounded cursor-pointer"
                                                 onClick={() => handleProductClick(item.product._id)}
                                             />
                                             <div className="flex-1">
@@ -372,7 +374,7 @@ const Cart = () => {
                                                         </button>
                                                     </div>
                                                     <span className="font-semibold">
-                                                        Total: {formatPrice(item.quantity * (item.product.salePrice || item.product.price))} €
+                                                        {formatPrice(item.quantity * (item.product.salePrice || item.product.price))} €
                                                     </span>
                                                 </div>
                                             </div>
