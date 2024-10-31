@@ -24,7 +24,7 @@ import {
     ShoppingCart,
     ShoppingCartOutlined,
     Star,
-    StarBorder,
+    StarBorder
 } from '@mui/icons-material';
 import {
     Badge,
@@ -68,6 +68,7 @@ import {
 import { styled } from '@mui/material/styles';
 import SvgIcon from '@mui/material/SvgIcon';
 import { GridToolbar } from '@mui/x-data-grid';
+import { Splide, SplideSlide } from '@splidejs/react-splide';
 import { AnimatePresence, motion } from 'framer-motion';
 import PropTypes from 'prop-types';
 import React, { useEffect, useRef, useState } from 'react';
@@ -76,6 +77,7 @@ import { toast } from 'react-toastify';
 import useAxios from '../axiosInstance';
 import Footer from '../components/Footer';
 import Navbar from '../components/Navbar/Navbar';
+import FilterSidebar from '../components/Product/FilterSidebar';
 import { getImageUrl } from '../config';
 import ProfileSidebar from '../pages/Profile/ProfileSidebar';
 import logo from './img/brand/logo.png';
@@ -281,7 +283,7 @@ export const DeleteButton = styled(Delete)(({ theme }) => ({
 export const CartButton = () => {
     return (
         <>
-            <BrownShoppingCartIcon marginRight={false} />
+            <BrownShoppingCartIcon />
             <span className="hidden sm:inline ml-3">Add To Cart</span>
         </>
     );
@@ -290,7 +292,7 @@ export const CartButton = () => {
 export const DetailsCartButton = () => {
     return (
         <>
-            <BrownShoppingCartIcon marginRight={false} />
+            <BrownShoppingCartIcon />
             <span className="ml-3">Add To Cart</span>
         </>
     );
@@ -469,12 +471,15 @@ export const HomeIcon = () => {
     const handleHomeClick = () => {
         navigate('/');
     };
+
     return (
-        <RoundIconButton onClick={handleHomeClick}>
-            <StyledHomeIcon />
-        </RoundIconButton>
-    )
-}
+        <div onClick={handleHomeClick}>
+            <RoundIconButton>
+                <StyledHomeIcon />
+            </RoundIconButton>
+        </div>
+    );
+};
 
 export const RoundIconButton = styled(IconButton)(({ theme }) => ({
     color: theme.palette.primary.contrastText,
@@ -675,7 +680,7 @@ export const CustomDeleteModal = ({ open, onClose, onDelete, title, message }) =
     </Modal>
 );
 
-export const BreadcrumbsComponent = ({ product }) => {
+export const DetailsBreadcrumbs = ({ product }) => {
     const isMobile = useMediaQuery('(max-width:600px)');
 
     if (isMobile) return null;
@@ -683,21 +688,21 @@ export const BreadcrumbsComponent = ({ product }) => {
     return (
         <div className='container mx-auto px-4 max-w-5xl relative top-6 right-4'>
             <Breadcrumbs aria-label="breadcrumb" sx={{ mb: 4, fontSize: '13px', whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>
-                <Link component={RouterLink} to="/" color="inherit" underline="none" className='hover:underline cursor-pointer'>
-                    <HomeBreadCrumb color="primary" />
+                <Link component={RouterLink} to="/" color="inherit" underline="none" className='cursor-pointer'>
+                    <HomeBreadCrumb className="text-stone-500 hover:text-stone-700" />
                 </Link>
                 {product.category && (
-                    <Link component={RouterLink} to={`/products/category/${product.category._id}`} color="inherit" underline="none" className='hover:underline cursor-pointer'>
+                    <Link component={RouterLink} to={`/category/${product.category._id}`} color="inherit" underline="none" className='hover:underline cursor-pointer'>
                         {product.category.name}
                     </Link>
                 )}
                 {product.subcategory && (
-                    <Link component={RouterLink} to={`/products/subcategory/${product.subcategory._id}`} color="inherit" underline="none" className='hover:underline cursor-pointer'>
+                    <Link component={RouterLink} to={`/subcategory/${product.subcategory._id}`} color="inherit" underline="none" className='hover:underline cursor-pointer'>
                         {product.subcategory.name}
                     </Link>
                 )}
                 {product.subSubcategory && (
-                    <Link component={RouterLink} to={`/products/subSubcategory/${product.subSubcategory._id}`} color="inherit" underline="none" className='hover:underline cursor-pointer'>
+                    <Link component={RouterLink} to={`/subSubcategory/${product.subSubcategory._id}`} color="inherit" underline="none" className='hover:underline cursor-pointer'>
                         {product.subSubcategory.name}
                     </Link>
                 )}
@@ -707,13 +712,75 @@ export const BreadcrumbsComponent = ({ product }) => {
     );
 };
 
+const BreadcrumbSeparator = () => (
+    <span className="mx-2 text-gray-400 select-none">/</span>
+);
+
+const BreadcrumbLink = ({ onClick, children }) => (
+    <button
+        onClick={onClick}
+        className="text-sm text-gray-600 hover:text-gray-900 hover:underline"
+    >
+        {children}
+    </button>
+);
+
+const BreadcrumbText = ({ children }) => (
+    <span className="text-sm text-gray-900">
+        {children}
+    </span>
+);
+
+export const Breadcrumb = ({ type, data }) => {
+    const navigate = useNavigate();
+
+    const crumbs = [
+        <BreadcrumbLink key="home" onClick={(e) => { e.preventDefault(); navigate('/'); }}>
+            <HomeBreadCrumb className="text-stone-500 hover:text-stone-700" />
+        </BreadcrumbLink>
+    ];
+
+    if (type === 'category') {
+        crumbs.push(<BreadcrumbSeparator />, <BreadcrumbText key="category">{data.name}</BreadcrumbText>);
+    } else if (type === 'subcategory' && data.category) {
+        crumbs.push(
+            <BreadcrumbSeparator />,
+            <BreadcrumbLink key="category" onClick={(e) => { e.preventDefault(); navigate(`/category/${data.category._id}`); }}>
+                {data.category.name}
+            </BreadcrumbLink>,
+            <BreadcrumbSeparator />,
+            <BreadcrumbText key="subcategory">{data.name}</BreadcrumbText>
+        );
+    } else if (type === 'subSubcategory') {
+        if (data.category) {
+            crumbs.push(
+                <BreadcrumbSeparator />,
+                <BreadcrumbLink key="category" onClick={(e) => { e.preventDefault(); navigate(`/category/${data.category._id}`); }}>
+                    {data.category.name}
+                </BreadcrumbLink>
+            );
+        }
+        if (data.subcategory) {
+            crumbs.push(
+                <BreadcrumbSeparator />,
+                <BreadcrumbLink key="subcategory" onClick={(e) => { e.preventDefault(); navigate(`/subcategory/${data.subcategory._id}`); }}>
+                    {data.subcategory.name}
+                </BreadcrumbLink>
+            );
+        }
+        crumbs.push(<BreadcrumbSeparator />, <BreadcrumbText key="subSubcategory">{data.name}</BreadcrumbText>);
+    }
+
+    return <nav className="flex items-center space-x-1 mt-6 md:mt-0">{crumbs}</nav>;
+};
+
 export const ProductDetailsSkeleton = () => {
     return (
         <>
             <div className='container mx-auto px-4 max-w-5xl relative top-6 right-4'>
                 <Breadcrumbs aria-label="breadcrumb" sx={{ mb: 4, fontSize: '14px' }}>
                     <Link component={RouterLink} to="/" color="inherit" underline="none">
-                        <HomeBreadCrumb color="primary" />
+                        <HomeBreadCrumb className="text-stone-500 hover:text-stone-700" />
                     </Link>
                     <Skeleton animation="wave" width={200} />
                 </Breadcrumbs>
@@ -1312,7 +1379,7 @@ export const ProductItemSkeleton = () => {
     return (
         <>
             {Array.from({ length: 15 }).map((_, index) => (
-                <div key={index} className="bg-white rounded-lg shadow-md p-4 flex flex-col">
+                <div key={index} className="bg-white rounded-md shadow-md p-4 flex flex-col">
                     <div className="relative mb-2">
                         <Skeleton variant="rectangular" animation="wave" width="100%" height={192} />
                     </div>
@@ -1364,7 +1431,7 @@ export const ReviewItemSkeleton = () => (
 export const OrderItemSkeleton = () => {
     return (
         <>
-            <Box className="grid grid-cols-1 gap-4">
+            <Box className="grid grid-cols-1 gap-4 rounded-md">
                 {Array.from({ length: 3 }).map((_, index) => (
                     <Box key={index} className="bg-white shadow-md rounded-lg p-6 relative">
                         <Box className="flex justify-between items-center mb-4">
@@ -1702,7 +1769,7 @@ export const Header = ({
     const isSharedWishlist = fullName.trim() !== '';
 
     return (
-        <div className="bg-white p-4 rounded-sm shadow-sm mb-3 flex justify-between items-center">
+        <div className="bg-white p-4 rounded-md shadow-sm mb-3 flex justify-between items-center">
             <Typography variant="h5" className="text-gray-800 font-semilight">
                 {loading ? (
                     <Skeleton width={150} />
@@ -2182,6 +2249,72 @@ export const DashboardCollapse = ({ toggleDrawer }) => {
     )
 }
 
+export const SplideList = ({ items, id, loading, onCardClick, showImage = true }) => {
+    const [skeletonCount, setSkeletonCount] = useState(1);
+
+    useEffect(() => {
+        const updateSkeletonCount = () => {
+            setSkeletonCount(window.innerWidth >= 768 ? 3 : 1);
+        };
+
+        updateSkeletonCount();
+        window.addEventListener('resize', updateSkeletonCount);
+
+        return () => window.removeEventListener('resize', updateSkeletonCount);
+    }, []);
+
+    return (
+        <div className="max-w-[870px] mb-14">
+            {loading ? (
+                <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+                    {[...Array(skeletonCount)].map((_, index) => (
+                        <Skeleton
+                            key={index}
+                            variant="rectangular"
+                            width="100%"
+                            height={60}
+                            animation="wave"
+                            className="rounded-md"
+                        />
+                    ))}
+                </div>
+            ) : (
+                <Splide
+                    options={{
+                        type: 'slide',
+                        perPage: 3,
+                        breakpoints: {
+                            768: { perPage: 2 },
+                            480: { perPage: 1 },
+                        },
+                        gap: '1rem',
+                        pagination: false,
+                        drag: true,
+                    }}
+                >
+                    {(items[id] || []).map(item => (
+                        <SplideSlide key={item._id}>
+                            <div
+                                onClick={() => onCardClick(item._id)}
+                                className="flex items-center p-4 bg-white rounded-md cursor-pointer hover:underline hover:shadow-lg transition-shadow duration-300"
+                            >
+                                {showImage && (
+                                    <img
+                                        src={getImageUrl(item.image)}
+                                        alt={item.name}
+                                        className="object-contain mr-3 w-7 h-7"
+                                    />
+                                )}
+                                <span className="font-medium text-base">{truncateText(item.name, 24)}</span>
+                            </div>
+                        </SplideSlide>
+                    ))}
+                </Splide>
+            )}
+        </div>
+    );
+};
+
 export const DropdownMenu = ({ auth, isAdmin, onLogout }) => {
     const [isDropdownOpen, setIsDropdownOpen] = useState(false);
     const dropdownRef = useRef(null);
@@ -2343,13 +2476,13 @@ export const SidebarLayout = ({ children }) => {
                 width: { xs: '100%', md: '320px' },
                 bgcolor: 'white',
                 p: { xs: 2, md: 3 },
-                boxShadow: '0 1px 3px rgba(0,0,0,0.12)',
-                borderRadius: '4px',
+                boxShadow: '0 1px 2px 0 rgb(0 0 0 / 0.05)',
+                borderRadius: '6px',
                 mt: { xs: 10, md: 2 }
             }}
         >
             {children}
-        </Box>
+        </Box >
     )
 }
 
@@ -2383,6 +2516,61 @@ export const ProfileLayout = ({ children }) => {
         </Box>
     );
 };
+
+export const FilterLayout = ({
+    children,
+    loading,
+    products,
+    noProducts,
+    breadcrumbType,
+    breadcrumbData,
+    onApplyPriceFilter,
+    onSaleToggle = false,
+}) => (
+    <Box
+        sx={{
+            maxWidth: '1250px',
+            mx: 'auto',
+            px: { xs: 2, md: 3 },
+            display: 'flex',
+            flexDirection: { xs: 'column', md: 'row' },
+            gap: { md: 3 },
+            position: 'relative',
+            mb: 10,
+            mt: { xs: 18, md: 5 },
+        }}
+    >
+        <div className="absolute top-0 z-10 pb-4 bg-gray-50">
+            {loading ? (
+                <Skeleton variant="text" animation="wave" width={250} height={20} />
+            ) : products.length > 0 ? (
+                <div>
+                    <Breadcrumb type={breadcrumbType} data={breadcrumbData} />
+                </div>
+            ) : (
+                <EmptyState
+                    imageSrc={noProducts}
+                    message="No products found for"
+                    dynamicValue={breadcrumbData?.name}
+                    containerClass="p-8 mt-4 mx-14 md:mx-16 lg:mx-72"
+                    imageClass="w-32 h-32"
+                />
+            )}
+        </div>
+        <FilterSidebar onApplyPriceFilter={onApplyPriceFilter} onSaleToggle={onSaleToggle} />
+        <Box
+            component="main"
+            sx={{
+                flex: 1,
+                ml: { md: '332px' },
+                width: '100%',
+                mt: { xs: 4, md: 5 },
+            }}
+        >
+            {children}
+        </Box>
+    </Box>
+);
 
 export const knownEmailProviders = [
     'gmail.com',

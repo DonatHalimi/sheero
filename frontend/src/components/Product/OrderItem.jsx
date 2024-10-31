@@ -7,8 +7,8 @@ const OrderItem = ({ order, renderProductImages, getStatusColor }) => {
     const symbol = '•';
 
     return (
-        <div className="bg-white shadow-md rounded-lg p-6">
-            <Link to={`/profile/orders/${id}`}>
+        <Link to={`/profile/orders/${id}`}>
+            <div className="bg-white shadow rounded-md p-6 hover:shadow-md transition-shadow duration-300">
                 <div className="flex justify-between text-sm capitalize mb-4">
                     <div className="flex items-center">
                         <p>#{id}</p>
@@ -25,8 +25,8 @@ const OrderItem = ({ order, renderProductImages, getStatusColor }) => {
                 <div className="mt-4 flex space-x-2">
                     {renderProductImages(products)}
                 </div>
-            </Link>
-        </div>
+            </div >
+        </Link>
     );
 };
 

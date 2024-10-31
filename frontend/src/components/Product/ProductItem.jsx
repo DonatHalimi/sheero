@@ -67,7 +67,7 @@ const ProductItem = ({ product, loading }) => {
                     <CircularProgress size={60} style={{ color: '#373533' }} />
                 </div>
             )}
-            <div className="bg-white rounded-lg shadow-sm p-4 flex flex-col cursor-pointer transition-shadow duration-300 hover:shadow-md" onClick={handleClick}>
+            <div className="bg-white rounded-md shadow-sm p-4 flex flex-col cursor-pointer transition-shadow duration-300 hover:shadow-md" onClick={handleClick}>
                 <div className="relative mb-2">
                     <img
                         src={imageUrl}

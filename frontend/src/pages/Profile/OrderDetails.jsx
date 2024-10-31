@@ -69,7 +69,7 @@ const OrderDetails = () => {
                     <>
                         {/* Progress Card */}
                         <div className="grid grid-cols-1 gap-4 mb-4">
-                            <div className="bg-white shadow-md rounded-lg p-6">
+                            <div className="bg-white shadow rounded-md p-6">
                                 <p className="font-semibold text-center text-lg mb-1">
                                     Order Status
                                 </p>
@@ -118,7 +118,7 @@ const OrderDetails = () => {
 
                         {/* Products Table */}
                         <div className="grid grid-cols-1 gap-4 mb-4">
-                            <div className="bg-white shadow-md rounded-lg p-6">
+                            <div className="bg-white shadow rounded-md p-6">
                                 <TableContainer>
                                     <Table>
                                         <TableHead>
@@ -158,7 +158,7 @@ const OrderDetails = () => {
 
                         {/* Total Amount Card */}
                         <div className="grid grid-cols-1 gap-4 mb-4">
-                            <div className="bg-white shadow-md rounded-lg p-6">
+                            <div className="bg-white shadow rounded p-6">
                                 <TableContainer>
                                     <Table>
                                         <TableBody>
@@ -202,7 +202,7 @@ const OrderDetails = () => {
                         </div>
 
                         <div className="grid grid-cols-1 gap-4 mb-4">
-                            <div className="bg-white shadow-md rounded-lg p-6">
+                            <div className="bg-white shadow rounded-md p-6">
                                 <div className="grid grid-cols-2 gap-6">
                                     <div>
                                         <Typography variant="h6" gutterBottom>

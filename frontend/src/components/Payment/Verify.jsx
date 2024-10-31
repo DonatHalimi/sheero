@@ -1,4 +1,4 @@
-import { Box, CircularProgress, Typography } from '@mui/material';
+import { CircularProgress } from '@mui/material';
 import React, { useEffect, useState } from 'react';
 import { useLocation } from 'react-router-dom';
 import useAxios from '../../axiosInstance';
@@ -12,7 +12,6 @@ const Verify = () => {
     const order_id = searchParams.get('order_id');
     const [loading, setLoading] = useState(true);
     const [success, setSuccess] = useState(false);
-    const [error, setError] = useState(null);
     const axiosInstance = useAxios();
 
     useEffect(() => {
@@ -25,15 +24,9 @@ const Verify = () => {
             try {
                 const response = await axiosInstance.post('/orders/verify', data);
 
-                if (response.data.success) {
-                    setSuccess(true);
-                } else {
-                    setError(response.data.message);
-                    setSuccess(false);
-                }
+                setSuccess(response.data.success);
             } catch (err) {
-                setError(err.response?.data?.message || err.message);
-                setSuccess(false);
+                console.error(err);
             } finally {
                 setLoading(false);
             }
@@ -42,24 +35,13 @@ const Verify = () => {
         if (session_id && order_id) {
             verifyPayment();
         } else {
-            setError('Missing required parameters');
+            console.error('Missing required parameters');
             setLoading(false);
         }
     }, [session_id, order_id, axiosInstance]);
 
     if (loading) {
-        return (
-            <CircularProgress />
-        );
-    }
-
-    if (error) {
-        return (
-            <Box display="flex" flexDirection="column" alignItems="center" justifyContent="center" height="100vh">
-                <Typography variant="h4" color="error">Verification Failed</Typography>
-                <Typography variant="body1">{error}</Typography>
-            </Box>
-        );
+        return <CircularProgress />;
     }
 
     return success ? <SuccessPayment /> : <CancelPayment />;

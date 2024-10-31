@@ -5,58 +5,37 @@ import { CustomModal, LoadingOverlay } from '../../assets/CustomComponents';
 const PaymentModal = ({ open, onClose, onStripePayment, onCashPayment }) => {
     const [loading, setLoading] = useState(false);
 
-    const handleStripePayment = () => {
+    const handlePayment = (paymentMethod) => {
         setLoading(true);
         onClose();
-        onStripePayment();
-    };
-
-    const handleCashPayment = () => {
-        setLoading(true);
-        onClose();
-        onCashPayment();
+        paymentMethod();
     };
 
     return (
         <>
             <CustomModal open={open} onClose={onClose}>
-                <div className="flex justify-between p-4 space-x-4">
-                    {/* Pay with Stripe option */}
+                <div className="flex flex-col sm:flex-row justify-between gap-6 p-3">
                     <div
-                        className="w-1/2 border-2 rounded-md p-3 cursor-pointer hover:border-blue-500 transition-all flex flex-col justify-between"
-                        onClick={handleStripePayment}
-                        title="Stripe Payment"
+                        className="w-full sm:w-3/4 border rounded-lg p-4 cursor-pointer hover:border-blue-500 transition-all flex flex-col items-center text-center shadow-sm"
+                        onClick={() => handlePayment(onStripePayment)}
                     >
-                        <div className="flex flex-col items-center mb-2">
-                            <Payment fontSize="large" className="text-blue-500" />
-                            <h2 className="text-center text-lg font-semibold mt-2">Pay with Stripe</h2>
-                        </div>
-                        <p className="text-center text-sm text-gray-500">
-                            Use your credit or debit card via Stripe.
-                        </p>
-                        <div className="mt-2 p-1 bg-blue-50 text-blue-600 text-center rounded text-sm">
-                            Secure online payment with Stripe
-                        </div>
+                        <Payment fontSize="large" className="text-blue-500 mb-3" />
+                        <h2 className="text-lg font-semibold mb-1">Pay with Stripe</h2>
+                        <p className="text-gray-600 mb-3">Use your card via Stripe.</p>
+                        <span className="text-blue-600 bg-blue-100 py-1 px-2 rounded text-sm">Secure online payment</span>
                     </div>
 
-                    {/* Pay with Cash option */}
                     <div
-                        className="w-1/2 border-2 rounded-md p-3 cursor-pointer hover:border-green-500 transition-all flex flex-col justify-between"
-                        onClick={handleCashPayment}
-                        title="Cash on Delivery"
+                        className="w-full sm:w-3/4 border rounded-lg p-4 cursor-pointer hover:border-green-500 transition-all flex flex-col items-center text-center shadow-sm"
+                        onClick={() => handlePayment(onCashPayment)}
                     >
-                        <div className="flex flex-col items-center mb-2">
-                            <LocalAtm fontSize="large" className="text-green-500" />
-                            <h2 className="text-center text-lg font-semibold mt-2">Pay with Cash</h2>
-                        </div>
-                        <p className="text-center text-sm text-gray-500">
-                            Pay with cash upon delivery.
-                        </p>
-                        <div className="mt-2 p-1 bg-green-50 text-green-600 text-center rounded text-sm">
-                            Pay when you receive your order
-                        </div>
+                        <LocalAtm fontSize="large" className="text-green-500 mb-3" />
+                        <h2 className="text-lg font-semibold mb-1">Cash on Delivery</h2>
+                        <p className="text-gray-600 mb-3">Pay with cash upon delivery.</p>
+                        <span className="text-green-600 bg-green-100 py-1 px-2 rounded text-sm">Pay upon order receipt</span>
                     </div>
                 </div>
+
             </CustomModal>
 
             {loading && <LoadingOverlay />}

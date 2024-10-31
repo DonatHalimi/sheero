@@ -1,5 +1,6 @@
 import React, { useContext } from 'react';
 import { Navigate } from 'react-router-dom';
+import { LoadingOverlay } from '../../assets/CustomComponents';
 import { AuthContext } from '../../context/AuthContext';
 
 /**
@@ -10,7 +11,11 @@ import { AuthContext } from '../../context/AuthContext';
  * @return {JSX.Element} The rendered children or a redirect to the login or not-allowed page.
  */
 const ProtectedRoute = ({ children, adminOnly }) => {
-    const { auth, isAdmin } = useContext(AuthContext);
+    const { auth, isAdmin, isLoading } = useContext(AuthContext);
+
+    if (isLoading) {
+        return <LoadingOverlay />
+    }
 
     if (!auth.accessToken) {
         return <Navigate to="/login" />;

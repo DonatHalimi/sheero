@@ -15,7 +15,9 @@ cartSchema.methods.calculateTotalPrice = async function () {
     await this.populate('items.product');
 
     this.totalPrice = this.items.reduce((total, item) => {
-        return total + item.quantity * item.product.price;
+        const productPrice = item.product.salePrice || item.product.price;
+        const itemTotal = item.quantity * productPrice;
+        return total + itemTotal;
     }, 0);
 
     return this.totalPrice;

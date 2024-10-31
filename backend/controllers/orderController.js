@@ -1,9 +1,9 @@
-const Product = require('../models/Product');
 const Address = require('../models/Address');
 const Order = require('../models/Order');
 const dotenv = require('dotenv');
 const Stripe = require('stripe');
 const User = require('../models/User');
+const Cart = require('../models/Cart');
 
 dotenv.config();
 
@@ -13,49 +13,37 @@ const frontendUrl = process.env.NODE_ENV === 'production' ? 'https://sheero.onre
 
 const payWithStripe = async (req, res) => {
     try {
-        const { productIds, addressId, userId, email } = req.body;
+        const { cartId, addressId, userId, email } = req.body;
 
-        const products = await Product.find({ '_id': { $in: productIds } });
-
+        const cart = await Cart.findById(cartId).populate('items.product');
         const address = await Address.findById(addressId)
             .populate('city', 'name')
             .populate('country', 'name')
             .exec();
 
-        if (!address) {
-            return res.status(404).send('Address not found');
+        if (!cart || !address) {
+            return res.status(404).send('Cart or address not found');
         }
 
-        const lineItems = products.map(product => {
-            const priceToUse = product.salePrice ? product.salePrice : product.price;
-
-            return {
-                price_data: {
-                    currency: 'eur',
-                    product_data: {
-                        name: product.name,
-                    },
-                    unit_amount: Math.round(priceToUse * 100),
-                },
-                quantity: 1,
-            };
-        });
-
-        const totalAmount = products.reduce((total, product) => {
-            const priceToUse = product.salePrice ? product.salePrice : product.price;
-            return total + priceToUse;
-        }, 0);
-
+        const totalAmount = await cart.calculateTotalPrice();
         const shippingCost = 2;
         const totalWithShipping = totalAmount + shippingCost;
+
+        const lineItems = cart.items.map(item => ({
+            price_data: {
+                currency: 'eur',
+                product_data: {
+                    name: item.product.name,
+                },
+                unit_amount: Math.round((item.product.salePrice || item.product.price) * 100),
+            },
+            quantity: item.quantity,
+        }));
 
         lineItems.push({
             price_data: {
                 currency: 'eur',
-                product_data: {
-                    name: 'Shipping',
-                    description: `Shipping cost`,
-                },
+                product_data: { name: 'Shipping', description: `Shipping cost` },
                 unit_amount: Math.round(shippingCost * 100),
             },
             quantity: 1,
@@ -63,10 +51,10 @@ const payWithStripe = async (req, res) => {
 
         const order = new Order({
             user: userId,
-            products: productIds.map(productId => ({
-                product: productId,
-                quantity: 1,
-                price: products.find(product => product._id.equals(productId)).salePrice || products.find(product => product._id.equals(productId)).price
+            products: cart.items.map(item => ({
+                product: item.product._id,
+                quantity: item.quantity,
+                price: item.product.salePrice || item.product.price,
             })),
             address: addressId,
             totalAmount: totalWithShipping,
@@ -78,12 +66,12 @@ const payWithStripe = async (req, res) => {
         await order.save();
 
         await Promise.all(
-            products.map(async (product) => {
-                if (product.inventoryCount > 0) {
-                    product.inventoryCount -= 1;
-                    await product.save();
+            cart.items.map(async (item) => {
+                if (item.product.inventoryCount >= item.quantity) {
+                    item.product.inventoryCount -= item.quantity;
+                    await item.product.save();
                 } else {
-                    throw new Error(`Product ${product.name} is out of stock.`);
+                    throw new Error(`Product ${item.product.name} is out of stock.`);
                 }
             })
         );
@@ -135,11 +123,7 @@ const verifyOrder = async (req, res) => {
 
             return res.json({ success: true, message: 'Payment completed successfully.', order: updatedOrder });
         } else {
-            const deletedOrder = await Order.findByIdAndDelete(order_id);
-
-            if (!deletedOrder) {
-                return res.status(404).json({ success: false, message: 'Order not found.' });
-            }
+            await Order.findByIdAndDelete(order_id);
 
             return res.json({ success: false, message: 'Payment failed. Order has been deleted.' });
         }
@@ -150,36 +134,31 @@ const verifyOrder = async (req, res) => {
 
 const payWithCash = async (req, res) => {
     try {
-        const { productIds, addressId, userId } = req.body;
+        const { cartId, addressId, userId } = req.body;
 
-        const products = await Product.find({ '_id': { $in: productIds } });
-
+        const cart = await Cart.findById(cartId).populate('items.product');
         const address = await Address.findById(addressId)
             .populate('city', 'name')
             .populate('country', 'name')
             .exec();
 
-        if (!address) {
-            return res.status(404).send('Address not found');
+        if (!cart || !address) {
+            return res.status(404).send('Cart or address not found');
         }
 
-        const totalAmount = products.reduce((total, product) => {
-            const priceToUse = product.salePrice ? product.salePrice : product.price;
-            return total + priceToUse;
-        }, 0);
-
+        const subtotal = await cart.calculateTotalPrice();
         const shippingCost = 2;
-        const totalWithShipping = totalAmount + shippingCost;
+        const totalAmount = subtotal + shippingCost;
 
         const order = new Order({
             user: userId,
-            products: productIds.map(productId => ({
-                product: productId,
-                quantity: 1,
-                price: products.find(product => product._id.equals(productId)).salePrice || products.find(product => product._id.equals(productId)).price
+            products: cart.items.map(item => ({
+                product: item.product._id,
+                quantity: item.quantity,
+                price: item.product.salePrice || item.product.price,
             })),
             address: addressId,
-            totalAmount: totalWithShipping,
+            totalAmount: totalAmount,
             paymentStatus: 'pending',
             paymentMethod: 'cash',
         });
@@ -187,12 +166,12 @@ const payWithCash = async (req, res) => {
         await order.save();
 
         await Promise.all(
-            products.map(async (product) => {
-                if (product.inventoryCount > 0) {
-                    product.inventoryCount -= 1;
-                    await product.save();
+            cart.items.map(async (item) => {
+                if (item.product.inventoryCount >= item.quantity) {
+                    item.product.inventoryCount -= item.quantity;
+                    await item.product.save();
                 } else {
-                    throw new Error(`Product ${product.name} is out of stock.`);
+                    throw new Error(`Product ${item.product.name} is out of stock.`);
                 }
             })
         );

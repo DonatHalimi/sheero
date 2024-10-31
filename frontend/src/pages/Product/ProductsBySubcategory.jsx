@@ -1,28 +1,55 @@
-import { Skeleton } from '@mui/material';
+import '@splidejs/splide/dist/css/splide.min.css';
 import axios from 'axios';
 import React, { useEffect, useState } from 'react';
-import { useParams } from 'react-router-dom';
-import { CustomPagination, EmptyState, GoBackButton, ProductItemSkeleton } from '../../assets/CustomComponents';
+import { useNavigate, useParams } from 'react-router-dom';
+import { CustomPagination, FilterLayout, ProductItemSkeleton, SplideList } from '../../assets/CustomComponents';
 import noProducts from '../../assets/img/products/no-products.png';
 import Footer from '../../components/Footer';
 import Navbar from '../../components/Navbar/Navbar';
 import ProductItem from '../../components/Product/ProductItem';
 import { getApiUrl } from '../../config';
 
+const itemsPerPage = 40;
+
 const ProductsBySubcategory = () => {
     const { id } = useParams();
+
     const [products, setProducts] = useState([]);
-    const [subcategoryName, setSubcategoryName] = useState('');
+    const [filteredProducts, setFilteredProducts] = useState([]);
+    const [subsubcategories, setSubsubcategories] = useState({});
+    const [subcategoryData, setSubcategoryData] = useState(null);
     const [currentPage, setCurrentPage] = useState(1);
+
     const [loading, setLoading] = useState(true);
-    const itemsPerPage = 40;
+    const [loadingSubSubcategories, setLoadingSubSubcategories] = useState(true);
+    const [priceFilter, setPriceFilter] = useState({ min: '', max: '' });
+
+    const navigate = useNavigate();
+
+    const fetchSubSubcategories = async (subcategoryId) => {
+        setLoadingSubSubcategories(true);
+        if (!subsubcategories[subcategoryId]) {
+            try {
+                const { data } = await axios.get(getApiUrl(`/subsubcategories/get-by-subCategory/${subcategoryId}`));
+                setSubsubcategories(prev => ({ ...prev, [subcategoryId]: data }));
+            } catch (error) {
+                console.error('Error fetching subcategories:', error);
+            } finally {
+                setLoadingSubSubcategories(false);
+            }
+        } else {
+            setLoadingSubSubcategories(false);
+        }
+    };
 
     useEffect(() => {
         const fetchProductsAndSubcategory = async () => {
             setLoading(true);
             try {
                 const subcategoryResponse = await axios.get(getApiUrl(`/subcategories/get/${id}`));
-                setSubcategoryName(subcategoryResponse.data.name);
+                setSubcategoryData(subcategoryResponse.data);
+
+                await fetchSubSubcategories(id);
 
                 const productsResponse = await axios.get(getApiUrl(`/products/get-by-subcategory/${id}`));
                 setProducts(productsResponse.data.products);
@@ -37,66 +64,94 @@ const ProductsBySubcategory = () => {
         fetchProductsAndSubcategory();
     }, [id]);
 
-    const pageCount = Math.ceil(products.length / itemsPerPage);
+    useEffect(() => {
+        setFilteredProducts(products);
+    }, [products]);
+
+    const handleApplyPriceFilter = (range) => {
+        setPriceFilter(range);
+
+        let filtered = [...products];
+
+        filtered = filtered.filter(product => {
+            const priceToCheck = product.salePrice || product.price;
+            if (range.min && priceToCheck < parseFloat(range.min)) return false;
+            if (range.max && priceToCheck > parseFloat(range.max)) return false;
+            return true;
+        });
+
+        setFilteredProducts(filtered);
+        setCurrentPage(1);
+    };
+
+    const pageCount = Math.ceil(filteredProducts.length / itemsPerPage);
 
     const getCurrentPageItems = () => {
         const startIndex = (currentPage - 1) * itemsPerPage;
-        return products.slice(startIndex, startIndex + itemsPerPage);
+        return filteredProducts.slice(startIndex, startIndex + itemsPerPage);
     };
 
     const handlePageChange = (event, value) => {
         setCurrentPage(value);
     };
 
+    const handleSubSubcategoryClick = (subSubcategoryId) => {
+        navigate(`/subSubcategory/${subSubcategoryId}`);
+    };
+
     return (
         <>
             <Navbar />
 
-            <div className="container mx-auto p-4 mb-16 bg-gray-50 mt-5">
-                {products.length > 0 && (
-                    <GoBackButton />
-                )}
-
-                <div className="sticky top-0 z-10 pb-4 bg-gray-50">
-                    {loading ? (
-                        <Skeleton variant="text" animation="wave" width={250} height={20} />
-                    ) : products.length > 0 ? (
-                        <h1 className="text-2xl font-semibold" id='product-container'>
-                            Products in {subcategoryName}
-                        </h1>
-                    ) : (
-                        <EmptyState
-                            imageSrc={noProducts}
-                            message="No products found for"
-                            dynamicValue={subcategoryName}
-                            containerClass="p-8 mt-4 mx-14 md:mx-16 lg:mx-72"
-                            imageClass="w-32 h-32"
-                        />
-                    )}
-                </div>
-
-                <div className="grid grid-cols-2 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-3 xl:grid-cols-5 gap-4">
-                    {loading ? (
-                        <ProductItemSkeleton />
-                    ) : (
-                        getCurrentPageItems().map(product => (
-                            <ProductItem key={product._id} product={product} />
-                        ))
-                    )}
-                </div>
-
-                {!loading && products.length > 0 && (
-                    <CustomPagination
-                        count={pageCount}
-                        page={currentPage}
-                        onChange={handlePageChange}
-                        sx={{
-                            position: 'relative',
-                            bottom: '-2px',
-                        }}
+            <FilterLayout
+                loading={loading}
+                products={filteredProducts}
+                noProducts={noProducts}
+                breadcrumbType="subcategory"
+                breadcrumbData={{
+                    name: subcategoryData?.name || '',
+                    _id: id,
+                    category: {
+                        _id: subcategoryData?.category?._id || '',
+                        name: subcategoryData?.category?.name || '',
+                    },
+                }}
+                onApplyPriceFilter={handleApplyPriceFilter}
+            >
+                <div className="mb-16 bg-gray-50">
+                    <SplideList
+                        items={subsubcategories}
+                        id={id}
+                        loading={loadingSubSubcategories}
+                        showImage={false}
+                        onCardClick={handleSubSubcategoryClick}
                     />
-                )}
-            </div>
+
+                    <div className="grid grid-cols-2 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-3 gap-4">
+                        {loading ? (
+                            <ProductItemSkeleton />
+                        ) : (
+                            getCurrentPageItems().map(product => (
+                                <ProductItem key={product._id} product={product} />
+                            ))
+                        )}
+                    </div>
+
+                    <div className="flex justify-start">
+                        {!loading && filteredProducts.length > 0 && (
+                            <CustomPagination
+                                count={pageCount}
+                                page={currentPage}
+                                onChange={handlePageChange}
+                                sx={{
+                                    position: 'relative',
+                                    bottom: '-2px',
+                                }}
+                            />
+                        )}
+                    </div>
+                </div>
+            </FilterLayout>
             <Footer />
         </>
     );

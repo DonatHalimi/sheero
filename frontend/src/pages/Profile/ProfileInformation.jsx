@@ -164,7 +164,7 @@ const ProfileInformation = () => {
             <ProfileLayout>
 
                 <Header title="Profile Information" />
-                <Box className='bg-white rounded shadow-sm mb-16'
+                <Box className='bg-white rounded-md shadow-sm mb-16'
                     sx={{
                         p: { xs: 3, md: 3 }
                     }}

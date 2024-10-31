@@ -33,10 +33,22 @@ const AuthProvider = ({ children }) => {
         accessToken: getLocalStorageItem('accessToken'),
         role: null,
     });
+    const [isLoading, setIsLoading] = useState(true);
 
     useEffect(() => {
+        const checkTokenExpiration = () => {
+            const tokenCreationTime = localStorage.getItem('tokenCreationTime');
+            if (tokenCreationTime) {
+                const expirationTime = 7 * 24 * 60 * 60 * 1000;
+                if (Date.now() - tokenCreationTime > expirationTime) {
+                    logout();
+                }
+            }
+        };
+
         const fetchUserRole = async () => {
             if (auth.accessToken) {
+                checkTokenExpiration();
                 try {
                     const response = await axios.get(getApiUrl('/auth/me'), {
                         headers: { Authorization: `Bearer ${auth.accessToken}` },
@@ -47,7 +59,12 @@ const AuthProvider = ({ children }) => {
                     }));
                 } catch (error) {
                     console.error('Error fetching user role:', error);
+                } finally {
+                    setIsLoading(false);
                 }
+            } else {
+                checkTokenExpiration();
+                setIsLoading(false);
             }
         };
 
@@ -57,6 +74,14 @@ const AuthProvider = ({ children }) => {
     const setAuth = (authData) => {
         setAuthState(authData);
         localStorage.setItem('accessToken', encryptData(authData.accessToken || ''));
+        localStorage.setItem('tokenCreationTime', Date.now());
+    };
+
+    const logout = () => {
+        setAuth({ accessToken: null, role: null });
+        localStorage.removeItem('accessToken');
+        localStorage.removeItem('tokenCreationTime');
+        window.location.href = '/login';
     };
 
     const login = async (email, password) => {
@@ -68,18 +93,11 @@ const AuthProvider = ({ children }) => {
             };
 
             setAuth(authData);
-
             return { success: true };
         } catch (error) {
             console.error('Login failed:', error.response?.data?.message || 'Login failed');
             return { success: false, message: error.response?.data?.message || 'Login failed' };
         }
-    };
-
-    const logout = () => {
-        setAuth({ accessToken: null, role: null });
-        localStorage.removeItem('accessToken');
-        window.location.href = '/login';
     };
 
     const register = async (firstName, lastName, email, password) => {
@@ -97,7 +115,7 @@ const AuthProvider = ({ children }) => {
     };
 
     return (
-        <AuthContext.Provider value={{ auth, setAuth, login, logout, register, isAdmin }}>
+        <AuthContext.Provider value={{ auth, setAuth, login, logout, register, isAdmin, isLoading }}>
             {children}
         </AuthContext.Provider>
     );

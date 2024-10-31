@@ -25,9 +25,11 @@ const FAQs = () => {
         <>
             <Navbar />
 
-            <div className="max-w-3xl mx-auto py-12 px-4 sm:px-6 lg:px-8 bg-brown-50 mt-10">
+            <div className="max-w-3xl mx-auto py-12 px-4 sm:px-6 lg:px-8 bg-brown-50 mt-4">
                 <GoBackButton />
-                <h1 className="text-3xl font-bold text-stone-600 mb-8 text-left">Frequently Asked Questions</h1>
+                <div className="bg-white text-bold text-stone-600 p-4 rounded-md shadow-sm mb-3 flex justify-between items-center px-2">
+                    <h1 className="text-2xl font-bold font-semilight ml-2">Frequently Asked Questions</h1>
+                </div>
 
                 <div>
                     {faqData.map((faq, index) => (

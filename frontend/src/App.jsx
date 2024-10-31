@@ -44,9 +44,9 @@ const App = () => (
       <Route path="/faqs" element={<FAQs />} />
       <Route path="/not-allowed" element={<NotAllowed />} />
 
-      <Route path="/products/category/:id/" element={<ProductsByCategory />} />
-      <Route path="/products/subcategory/:id/" element={<ProductsBySubcategory />} />
-      <Route path="/products/subSubcategory/:id/" element={<ProductsBySubSubCategory />} />
+      <Route path="/category/:id/" element={<ProductsByCategory />} />
+      <Route path="/subcategory/:id/" element={<ProductsBySubcategory />} />
+      <Route path="/subSubcategory/:id/" element={<ProductsBySubSubCategory />} />
       <Route path="/product/:id" element={<ProductDetails />} />
       <Route path="/search" element={<SearchResults />} />
       <Route path="/wishlist/:userId" element={<SharedWishlist />} />

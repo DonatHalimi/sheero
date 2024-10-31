@@ -7,6 +7,7 @@ import { getApiUrl, getImageUrl } from '../config';
 const Slideshow = () => {
     const [images, setImages] = useState([]);
     const [loading, setLoading] = useState(true);
+    
     const splideRef = useRef(null);
 
     useEffect(() => {

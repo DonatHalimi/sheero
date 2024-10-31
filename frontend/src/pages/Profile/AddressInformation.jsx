@@ -184,7 +184,7 @@ const AddressInformation = () => {
             <ProfileLayout>
                 <Header title="Address" />
 
-                <Box className='bg-white rounded shadow-sm'
+                <Box className='bg-white rounded-md shadow-sm'
                     sx={{
                         p: { xs: 3, md: 3 }
                     }}

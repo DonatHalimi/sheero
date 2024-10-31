@@ -4,7 +4,7 @@ import React, { useContext, useEffect, useState } from 'react';
 import { useNavigate, useParams } from 'react-router-dom';
 import { toast } from 'react-toastify';
 import {
-    BreadcrumbsComponent,
+    DetailsBreadcrumbs,
     DetailsCartWishlistButtons,
     LoadingOverlay,
     OutOfStock,
@@ -145,7 +145,7 @@ const ProductDetails = () => {
                 <ProductDetailsSkeleton />
             ) : (
                 <>
-                    <BreadcrumbsComponent product={product} />
+                    <DetailsBreadcrumbs product={product} />
                     <div className="container mx-auto px-4 py-4 mb-8 bg-white mt-28 md:mt-8 rounded-md max-w-5xl">
                         <div className="flex flex-col md:flex-row gap-8">
                             <div className="flex flex-col items-center md:w-1/2 relative">

@@ -15,15 +15,16 @@ const Reviews = () => {
     const navigate = useNavigate();
 
     const [reviews, setReviews] = useState([]);
-    const [loading, setLoading] = useState(true);
-    const [loadingOverlay, setLoadingOverlay] = useState(false);
     const [anchorEl, setAnchorEl] = useState(null);
     const [selectedReview, setSelectedReview] = useState(null);
     const [openEditModal, setOpenEditModal] = useState(false);
     const [openDeleteModal, setOpenDeleteModal] = useState(false);
     const [openReviewModal, setOpenReviewModal] = useState(false);
-    const [currentPage, setCurrentPage] = useState(1);
     const [searchTerm, setSearchTerm] = useState('');
+
+    const [currentPage, setCurrentPage] = useState(1);
+    const [loading, setLoading] = useState(true);
+    const [loadingOverlay, setLoadingOverlay] = useState(false);
 
     useEffect(() => { window.scrollTo(0, 0); }, [])
 

@@ -22,6 +22,8 @@ const Cart = () => {
     const axiosInstance = useAxios();
     const navigate = useNavigate();
 
+    useEffect(() => { window.scrollTo(0, 0) }, [])
+
     useEffect(() => {
         const fetchCurrentUser = async () => {
             try {
@@ -126,7 +128,7 @@ const Cart = () => {
 
         try {
             const { data } = await axiosInstance.post('/orders/payment/stripe', {
-                productIds: cart.items.map(item => item.product._id),
+                cartId: cart._id,
                 addressId: address._id,
                 userId: user.id,
                 email: user.email,
@@ -156,10 +158,9 @@ const Cart = () => {
 
         try {
             const { data } = await axiosInstance.post('/orders/payment/cash', {
-                productIds: cart.items.map(item => item.product._id),
+                cartId: cart._id,
                 addressId: address._id,
                 userId: user.id,
-                email: user.email,
             });
 
             await axiosInstance.delete('/cart/clear');
@@ -185,6 +186,8 @@ const Cart = () => {
     const subtotal = calculateTotalPrice();
     const total = subtotal + shippingCost;
 
+    const productLabel = cart?.items?.length > 1 ? 'Products' : 'Product';
+
     return (
         <>
             <Navbar />
@@ -207,7 +210,7 @@ const Cart = () => {
                     )}
                 </div>
 
-                <h1 className="text-2xl font-semilight mb-4 px-2 hidden md:block">Cart</h1>
+                <h1 className="text-2xl font-semilight mb-2 hidden md:block">Cart</h1>
 
                 {cart?.items?.length > 0 ? (
                     <div className="flex flex-col lg:flex-row gap-6">
@@ -218,7 +221,7 @@ const Cart = () => {
                                     <Table>
                                         <TableHead>
                                             <TableRow>
-                                                <TableCell>Product</TableCell>
+                                                <TableCell>{productLabel}</TableCell>
                                                 <TableCell align="center">Price</TableCell>
                                                 <TableCell align="center">Quantity</TableCell>
                                                 <TableCell align="center">Total</TableCell>
@@ -284,10 +287,7 @@ const Cart = () => {
                                                             <button
                                                                 onClick={() => updateQuantity(item.product._id, 1)}
                                                                 disabled={item.quantity >= item.product.inventoryCount}
-                                                                className={`border rounded-sm px-3 py-1 ${item.quantity >= item.product.inventoryCount
-                                                                    ? 'opacity-50 cursor-not-allowed'
-                                                                    : ''
-                                                                    }`}
+                                                                className={`border rounded-sm px-3 py-1 ${item.quantity >= item.product.inventoryCount ? 'opacity-50 cursor-not-allowed' : ''}`}
                                                             >
                                                                 +
                                                             </button>
@@ -365,10 +365,7 @@ const Cart = () => {
                                                         <button
                                                             onClick={() => updateQuantity(item.product._id, 1)}
                                                             disabled={item.quantity >= item.product.inventoryCount}
-                                                            className={`px-3 py-1 border-l ${item.quantity >= item.product.inventoryCount
-                                                                ? 'opacity-50'
-                                                                : ''
-                                                                }`}
+                                                            className={`px-3 py-1 border-l ${item.quantity >= item.product.inventoryCount ? 'opacity-50' : ''}`}
                                                         >
                                                             +
                                                         </button>

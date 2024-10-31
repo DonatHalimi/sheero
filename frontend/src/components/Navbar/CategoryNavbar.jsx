@@ -11,11 +11,13 @@ import { AuthContext } from '../../context/AuthContext';
 const CategoryNavbar = ({ isSidebarOpen, toggleSidebar }) => {
     const { auth } = useContext(AuthContext);
     const axiosInstance = useAxios();
+
     const [categories, setCategories] = useState([]);
     const [subcategories, setSubcategories] = useState({});
     const [subsubcategories, setSubsubcategories] = useState({});
     const [openCategory, setOpenCategory] = useState(null);
     const [activeCategory, setActiveCategory] = useState('');
+
     const [loading, setLoading] = useState(!categories.length);
 
     const categoryListRef = useRef(null);
@@ -158,7 +160,7 @@ const CategoryNavbar = ({ isSidebarOpen, toggleSidebar }) => {
                                     >
                                         <button
                                             className={`flex items-center justify-between w-full py-2 px-3 text-gray-900 rounded md:w-auto md:border-0 md:p-0 ${activeCategory === category._id ? 'bg-gray-200 px-4' : 'hover:bg-stone-400 md:hover:bg-transparent md:hover:text-stone-600'}`}
-                                            onClick={() => handleNavigation(`/products/category/${category._id}`, category._id)}
+                                            onClick={() => handleNavigation(`/category/${category._id}`, category._id)}
                                         >
                                             {category.name}
                                         </button>
@@ -173,13 +175,11 @@ const CategoryNavbar = ({ isSidebarOpen, toggleSidebar }) => {
                                                             <img
                                                                 src={getImageUrl(subcategory.image)}
                                                                 alt=""
-                                                                width={50}
-                                                                height={50}
-                                                                className="rounded-md object-contain mr-2"
+                                                                className="rounded-md object-contain mr-2 w-12 h-12"
                                                             />
                                                             <div>
                                                                 <button
-                                                                    onClick={() => handleNavigation(`/products/subcategory/${subcategory._id}`, category._id)}
+                                                                    onClick={() => handleNavigation(`/subcategory/${subcategory._id}`, category._id)}
                                                                     className="block py-2 px-2 mr-1 rounded text-gray-700 hover:bg-gray-100 font-semibold"
                                                                 >
                                                                     {subcategory.name}
@@ -189,7 +189,7 @@ const CategoryNavbar = ({ isSidebarOpen, toggleSidebar }) => {
                                                                         {subsubcategories[subcategory._id].map((subsubcategory) => (
                                                                             <div key={subsubcategory._id} className='text-start'>
                                                                                 <button
-                                                                                    onClick={() => handleNavigation(`/products/subSubcategory/${subsubcategory._id}`, category._id)}
+                                                                                    onClick={() => handleNavigation(`/subSubcategory/${subsubcategory._id}`, category._id)}
                                                                                     className="block py-1 px-2 ml-1 rounded text-gray-500 hover:bg-gray-100"
                                                                                 >
                                                                                     {subsubcategory.name}
@@ -221,7 +221,9 @@ const CategoryNavbar = ({ isSidebarOpen, toggleSidebar }) => {
             >
                 <div className="p-2 border-b flex flex-col items-start">
                     <div className='-mx-0 h-12 bg-stone-500 flex items-center justify-between w-full rounded-md mb-2 !p-0'>
-                        <h1 className="text-white font-bold text-lg pl-3">sheero</h1>
+                        <h1 className="text-white font-bold text-lg pl-3 cursor-pointer" onClick={() => navigate('/')}>
+                            sheero
+                        </h1>
                         <div className="flex items-center pr-3">
                             <button onClick={() => navigate('/profile/me')} className="text-white hover:opacity-80 mr-1">
                                 {auth.accessToken ? (
@@ -265,10 +267,10 @@ const CategoryNavbar = ({ isSidebarOpen, toggleSidebar }) => {
                                     <img
                                         src={getImageUrl(category.image)}
                                         alt=""
-                                        width={25}
+                                        className='object-contain w-6 h-6'
                                     />
                                     <button
-                                        onClick={() => handleNavigation(`/products/category/${category._id}`, category._id)}
+                                        onClick={() => handleNavigation(`/category/${category._id}`, category._id)}
                                         className={`flex-grow text-left p-2 ml-2 ${activeCategory === category._id ? 'bg-gray-100' : ''}`}
                                     >
                                         {category.name}
@@ -288,11 +290,11 @@ const CategoryNavbar = ({ isSidebarOpen, toggleSidebar }) => {
                                                     <img
                                                         src={getImageUrl(subcategory.image)}
                                                         alt=""
-                                                        width={30}
+                                                        className='object-contain w-6 h-6'
                                                     />
                                                     <button
-                                                        onClick={() => handleNavigation(`/products/subcategory/${subcategory._id}`, category._id)}
-                                                        className="block py-1 px-3 mt-[2px] text-gray-700 hover:bg-gray-100"
+                                                        onClick={() => handleNavigation(`/subcategory/${subcategory._id}`, category._id)}
+                                                        className="block py-1 px-2 mt-[2px] text-gray-700 hover:bg-gray-100"
                                                     >
                                                         {subcategory.name}
                                                     </button>
@@ -303,8 +305,8 @@ const CategoryNavbar = ({ isSidebarOpen, toggleSidebar }) => {
                                                             <div key={subsubcategory._id} className="flex items-center mb-1">
                                                                 <div className="rounded-md mr-9" />
                                                                 <button
-                                                                    onClick={() => handleNavigation(`/products/subSubcategory/${subsubcategory._id}`, category._id)}
-                                                                    className="block py-1 px-1 text-gray-500 hover:bg-gray-100"
+                                                                    onClick={() => handleNavigation(`/subSubcategory/${subsubcategory._id}`, category._id)}
+                                                                    className="block py-1 text-gray-500 hover:bg-gray-100"
                                                                 >
                                                                     {subsubcategory.name}
                                                                 </button>
