@@ -2,11 +2,6 @@ const bcrypt = require('bcryptjs');
 const User = require('../models/User');
 
 const createUser = async (req, res) => {
-    const requestingUser = await User.findById(req.user.userId).populate('role');
-    if (requestingUser.role.name !== 'admin') {
-        return res.status(403).json({ message: 'Forbidden' });
-    }
-
     try {
         const { firstName, lastName, email, password, role } = req.body;
 
@@ -32,14 +27,8 @@ const createUser = async (req, res) => {
 };
 
 const getUsers = async (req, res) => {
-    const requestingUser = await User.findById(req.user.userId).populate('role');
-    if (requestingUser.role.name !== 'admin') {
-        return res.status(403).json({ message: 'Forbidden' });
-    }
-
     try {
         const users = await User.find().populate('role', 'name');
-
         res.status(200).json({ users });
     } catch (error) {
         res.status(500).json({ message: 'Server error' });
@@ -47,11 +36,6 @@ const getUsers = async (req, res) => {
 };
 
 const getUser = async (req, res) => {
-    const requestingUser = await User.findById(req.user.userId).populate('role');
-    if (requestingUser.role.name !== 'admin') {
-        return res.status(403).json({ message: 'Forbidden' });
-    }
-
     try {
         const user = await User.findById(req.params.id);
         if (!user) {
@@ -65,11 +49,6 @@ const getUser = async (req, res) => {
 };
 
 const updateUser = async (req, res) => {
-    const requestingUser = await User.findById(req.user.userId).populate('role');
-    if (requestingUser.role.name !== 'admin') {
-        return res.status(403).json({ message: 'Forbidden' });
-    }
-
     try {
         if (req.body.password) {
             req.body.password = await bcrypt.hash(req.body.password, 10);
@@ -87,11 +66,6 @@ const updateUser = async (req, res) => {
 };
 
 const deleteUser = async (req, res) => {
-    const requestingUser = await User.findById(req.user.userId).populate('role');
-    if (requestingUser.role.name !== 'admin') {
-        return res.status(403).json({ message: 'Forbidden' });
-    }
-
     try {
         const deletedUser = await User.findByIdAndDelete(req.params.id);
         if (!deletedUser) {
@@ -105,11 +79,6 @@ const deleteUser = async (req, res) => {
 };
 
 const deleteUsers = async (req, res) => {
-    const requestingUser = await User.findById(req.user.userId).populate('role');
-    if (requestingUser.role.name !== 'admin') {
-        return res.status(403).json({ message: 'Forbidden' });
-    }
-
     const { ids } = req.body;
 
     if (!ids || !Array.isArray(ids) || ids.length === 0) {

@@ -1,8 +1,21 @@
 import { HomeOutlined, StarBorderOutlined } from '@mui/icons-material';
-import { List, Skeleton, Typography } from '@mui/material';
+import { List, Typography } from '@mui/material';
 import React, { useEffect, useState } from 'react';
 import { useLocation, useNavigate } from 'react-router-dom';
-import { ActiveListItem, SidebarLayout, StyledFavoriteIcon, StyledInboxIcon, StyledPersonIcon } from '../../assets/CustomComponents';
+import { toast } from 'react-toastify';
+import {
+    ActiveListItem,
+    CustomAddressIcon,
+    CustomOrdersIcon,
+    CustomProfileIcon,
+    CustomReviewsIcon,
+    CustomWishlistIcon,
+    LoadingProfile,
+    SidebarLayout,
+    StyledFavoriteIcon,
+    StyledInboxIcon,
+    StyledPersonIcon
+} from '../../assets/CustomComponents';
 import useAxios from '../../axiosInstance';
 
 const ProfileSidebar = () => {
@@ -17,8 +30,7 @@ const ProfileSidebar = () => {
         const fetchUserData = async () => {
             try {
                 const response = await axiosInstance.get('/auth/me');
-                const userData = response.data;
-                setFirstName(userData.firstName);
+                setFirstName(response.data.firstName);
             } catch (error) {
                 console.error('Failed to fetch user data:', error);
                 toast.error('Failed to load profile data');
@@ -26,7 +38,6 @@ const ProfileSidebar = () => {
                 setLoading(false);
             }
         };
-
         fetchUserData();
     }, []);
 
@@ -41,54 +52,40 @@ const ProfileSidebar = () => {
     };
 
     const greetingTime = new Date().getHours() < 12 ? "morning" : (new Date().getHours() < 18 ? "afternoon" : "evening");
+    const greetingH = `Good ${greetingTime}, ${firstName}.`;
+    const greetingM = 'Thank you for being part of sheero';
+
+    const items = [
+        { key: 'me', label: 'Profile', icon: <CustomProfileIcon isActive={true} />, inactiveIcon: <StyledPersonIcon />, },
+        { key: 'address', label: 'Address', icon: <CustomAddressIcon isActive={true} />, inactiveIcon: <HomeOutlined />, },
+        { key: 'orders', label: 'Orders', icon: <CustomOrdersIcon isActive={true} />, inactiveIcon: <StyledInboxIcon />, },
+        { key: 'wishlist', label: 'Wishlist', icon: <CustomWishlistIcon isActive={true} />, inactiveIcon: <StyledFavoriteIcon />, },
+        { key: 'reviews', label: 'Reviews', icon: <CustomReviewsIcon isActive={true} />, inactiveIcon: <StarBorderOutlined />, },
+    ];
 
     return (
         <SidebarLayout>
             {loading ? (
-                <>
-                    <Skeleton variant="text" width={250} height={40} />
-                    <Skeleton variant="text" width={265} height={30} />
-                </>
+                <LoadingProfile />
             ) : (
                 <>
                     <Typography variant="h5" gutterBottom className="!text-gray-800 !font-semilight">
-                        Good {greetingTime}, {firstName}.
+                        {greetingH}
                     </Typography>
-                    <span className='text-md'>Thank you for being part of sheero</span>
+                    <span className="text-md">{greetingM}</span>
                 </>
             )}
-            <div className="border-t border-stone-200 mt-4 mb-2"></div>
+            <div className="border-t border-stone-200 mt-4 mb-2" />
             <List component="nav">
-                <ActiveListItem
-                    handleClick={() => handleItemClick('me')}
-                    selected={activeItem === 'me'}
-                    icon={<StyledPersonIcon />}
-                    primary="Profile"
-                />
-                <ActiveListItem
-                    handleClick={() => handleItemClick('address')}
-                    selected={activeItem === 'address'}
-                    icon={<HomeOutlined />}
-                    primary="Address"
-                />
-                <ActiveListItem
-                    handleClick={() => handleItemClick('orders')}
-                    selected={activeItem === 'orders'}
-                    icon={<StyledInboxIcon />}
-                    primary="Orders"
-                />
-                <ActiveListItem
-                    handleClick={() => handleItemClick('wishlist')}
-                    selected={activeItem === 'wishlist'}
-                    icon={<StyledFavoriteIcon />}
-                    primary="Wishlist"
-                />
-                <ActiveListItem
-                    handleClick={() => handleItemClick('reviews')}
-                    selected={activeItem === 'reviews'}
-                    icon={<StarBorderOutlined />}
-                    primary="Reviews"
-                />
+                {items.map(({ key, label, icon, inactiveIcon }) => (
+                    <ActiveListItem
+                        key={key}
+                        handleClick={() => handleItemClick(key)}
+                        selected={activeItem === key}
+                        icon={activeItem === key ? icon : inactiveIcon}
+                        primary={label}
+                    />
+                ))}
             </List>
         </SidebarLayout>
     );

@@ -30,6 +30,15 @@ const Footer = () => {
         { linkType: 'internal', to: '/contact-us', icon: <ContactMail />, label: 'Contact' },
     ];
 
+    const currentYear = new Date().getFullYear();
+
+    const displayYear = () => {
+        if (currentYear === 2024) {
+            return '2024';
+        }
+        return `2024 - ${currentYear}`;
+    };
+
     return (
         <footer className="bg-stone-600 text-white">
             <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
@@ -99,7 +108,9 @@ const Footer = () => {
                 </div>
 
                 <div className="mt-8 pt-8 border-t border-stone-700 text-center select-none">
-                    <p className="text-gray-200 text-left md:text-center">&copy; 2023 sheero. All Rights Reserved. - <a href='https://github.com/DonatHalimi' target='_blank' className='underline'>Donat</a></p>
+                    <p className="text-gray-200 text-left md:text-center">
+                        &copy; {displayYear()} sheero. All Rights Reserved. - <a href='https://github.com/DonatHalimi' target='_blank' className='underline'>Donat</a>
+                    </p>
                 </div>
             </div>
         </footer>

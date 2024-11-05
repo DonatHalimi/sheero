@@ -3,11 +3,6 @@ const User = require('../models/User');
 
 const createRole = async (req, res) => {
     try {
-        const requestingUser = await User.findById(req.user.userId).populate('role');
-        if (requestingUser.role.name !== 'admin') {
-            return res.status(403).json({ message: 'Forbidden' });
-        }
-
         const role = new Role(req.body);
         await role.save();
         res.status(201).json({ message: 'Role created successfully', role });
@@ -18,11 +13,6 @@ const createRole = async (req, res) => {
 
 const getRoles = async (req, res) => {
     try {
-        const requestingUser = await User.findById(req.user.userId).populate('role');
-        if (requestingUser.role.name !== 'admin') {
-            return res.status(403).json({ message: 'Forbidden' });
-        }
-
         const roles = await Role.find();
         res.status(200).json(roles);
     } catch (error) {
@@ -32,11 +22,6 @@ const getRoles = async (req, res) => {
 
 const getRoleById = async (req, res) => {
     try {
-        const requestingUser = await User.findById(req.user.userId).populate('role');
-        if (requestingUser.role.name !== 'admin') {
-            return res.status(403).json({ message: 'Forbidden' });
-        }
-
         const role = await Role.findById(req.params.id);
         if (!role) {
             return res.status(404).send('Role not found');
@@ -49,11 +34,6 @@ const getRoleById = async (req, res) => {
 
 const updateRole = async (req, res) => {
     try {
-        const requestingUser = await User.findById(req.user.userId).populate('role');
-        if (requestingUser.role.name !== 'admin') {
-            return res.status(403).json({ message: 'Forbidden' });
-        }
-
         const role = await Role.findByIdAndUpdate(req.params.id, req.body, { new: true, runValidators: true });
         if (!role) {
             return res.status(404).send('Role not found');
@@ -66,11 +46,6 @@ const updateRole = async (req, res) => {
 
 const deleteRole = async (req, res) => {
     try {
-        const requestingUser = await User.findById(req.user.userId).populate('role');
-        if (requestingUser.role.name !== 'admin') {
-            return res.status(403).json({ message: 'Forbidden' });
-        }
-
         const role = await Role.findByIdAndDelete(req.params.id);
         if (!role) {
             return res.status(404).send('Role not found');
@@ -82,11 +57,6 @@ const deleteRole = async (req, res) => {
 };
 
 const deleteRoles = async (req, res) => {
-    const requestingUser = await User.findById(req.user.userId).populate('role');
-    if (requestingUser.role.name !== 'admin') {
-        return res.status(403).json({ message: 'Forbidden' });
-    }
-
     const { ids } = req.body;
 
     if (!ids || !Array.isArray(ids) || ids.length === 0) {

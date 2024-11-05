@@ -21,33 +21,30 @@ const Navbar = () => {
     const { auth, isAdmin, logout } = useContext(AuthContext);
     const [cartItems, setCartItems] = useState([]);
     const [cartTotal, setCartTotal] = useState(0);
-    const [isLoading, setIsLoading] = useState(false);
     const [isProfileDropdownOpen, setIsProfileDropdownOpen] = useState(false);
     const [isCartDropdownOpen, setIsCartDropdownOpen] = useState(false);
     const [isSidebarOpen, setIsSidebarOpen] = useState(false);
 
+    const [isLoading, setIsLoading] = useState(false);
+
     const axiosInstance = useAxios();
     const navigate = useNavigate();
 
-    useEffect(() => {
-        const fetchCartData = async () => {
-            if (!auth.accessToken) return;
-            try {
-                const { data: cart } = await axiosInstance.get('/cart');
-                setCartItems(cart.items || []);
+    const fetchCartData = async () => {
+        if (!auth.accessToken) return;
+        try {
+            const { data: cart } = await axiosInstance.get('/cart');
+            setCartItems(cart.items || []);
 
-                const total = (cart.items || []).reduce((acc, item) => {
-                    const price = item.product.salePrice || item.product.price;
-                    return acc + price * item.quantity;
-                }, 0);
-                setCartTotal(total);
-            } catch (error) {
-                console.log('Error fetching cart data:', error);
-            }
-        };
-
-        fetchCartData();
-    }, [auth.accessToken, axiosInstance]);
+            const total = (cart.items || []).reduce((acc, item) => {
+                const price = item.product.salePrice || item.product.price;
+                return acc + price * item.quantity;
+            }, 0);
+            setCartTotal(total);
+        } catch (error) {
+            console.log('Error fetching cart data:', error);
+        }
+    };
 
     const toggleDropdown = (type) => {
         if (type === 'profile') {
@@ -62,19 +59,12 @@ const Navbar = () => {
     const handleRemoveItem = async (productId) => {
         setIsLoading(true);
         try {
-            const { data } = await axiosInstance.delete('/cart/remove', {
-                data: { productId },
-            });
+            await axiosInstance.delete('/cart/remove', { data: { productId } });
             toast.success('Product removed from cart');
-            setCartItems(data.items || []);
 
-            const updatedTotal = (data.items || []).reduce((acc, item) => {
-                const price = item.product.salePrice || item.product.price;
-                return acc + price * item.quantity;
-            }, 0);
-            setCartTotal(updatedTotal);
+            await fetchCartData();
 
-            if (data.items && data.items.length === 0) {
+            if (cartItems.length === 1) {
                 setIsCartDropdownOpen(false);
             }
         } catch (error) {
@@ -111,10 +101,21 @@ const Navbar = () => {
     };
 
     useEffect(() => {
-        const handleProductAdded = () => setIsCartDropdownOpen(true);
-        document.addEventListener('productAddedToCart', handleProductAdded);
-        return () => document.removeEventListener('productAddedToCart', handleProductAdded);
-    }, []);
+        if (auth.accessToken) {
+            fetchCartData();
+        }
+
+        const handleCartUpdate = () => {
+            fetchCartData();
+            setIsCartDropdownOpen(true);
+        };
+
+        document.addEventListener('cartUpdated', handleCartUpdate);
+
+        return () => {
+            document.removeEventListener('cartUpdated', handleCartUpdate);
+        };
+    }, [auth.accessToken]);
 
     const totalQuantity = cartItems.reduce((acc, item) => acc + item.quantity, 0);
 
@@ -145,10 +146,13 @@ const Navbar = () => {
                                     {auth.accessToken ? (
                                         <>
                                             <div className="relative z-[1000]">
-                                                <ProfileIcon handleProfileDropdownToggle={() => toggleDropdown('profile')}
+                                                <ProfileIcon
+                                                    handleProfileDropdownToggle={() => toggleDropdown('profile')}
+                                                    isDropdownOpen={isProfileDropdownOpen}
                                                 />
                                                 {isProfileDropdownOpen && (
                                                     <ProfileDropdown
+                                                        isOpen={isProfileDropdownOpen}
                                                         isAdmin={isAdmin()}
                                                         handleLogout={handleLogout}
                                                     />
@@ -159,11 +163,13 @@ const Navbar = () => {
 
                                             <div className="relative z-[1000]">
                                                 <CartIcon
-                                                    totalQuantity={totalQuantity}
                                                     handleCartDropdownToggle={() => toggleDropdown('cart')}
+                                                    totalQuantity={totalQuantity}
+                                                    isDropdownOpen={isCartDropdownOpen}
                                                 />
                                                 {isCartDropdownOpen && (
                                                     <CartDropdown
+                                                        isOpen={isCartDropdownOpen}
                                                         cartItems={cartItems}
                                                         cartTotal={cartTotal}
                                                         handleRemoveItem={handleRemoveItem}

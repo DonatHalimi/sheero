@@ -39,7 +39,7 @@ const EditUserModal = ({ open, onClose, user, onEditSuccess }) => {
             setFirstName(user.firstName);
             setLastName(user.lastName);
             setEmail(user.email);
-            setRole(user.role.name);
+            setRole(user.role._id);
             setIsValidEmail(true);
         }
     }, [user]);

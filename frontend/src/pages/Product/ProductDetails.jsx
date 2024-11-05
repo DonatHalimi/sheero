@@ -98,7 +98,7 @@ const ProductDetails = () => {
             });
 
             if (action === 'cart') {
-                document.dispatchEvent(new CustomEvent('productAddedToCart', { detail: product._id }));
+                document.dispatchEvent(new CustomEvent('cartUpdated', { detail: product._id }));
             }
 
             if (action === 'cart' && quantity > product.inventoryCount) {
@@ -136,9 +136,7 @@ const ProductDetails = () => {
 
     return (
         <>
-            {(isCartLoading || isWishlistLoading) && (
-                <LoadingOverlay />
-            )}
+            {(isCartLoading || isWishlistLoading) && (<LoadingOverlay />)}
 
             <Navbar />
             {loading ? (
@@ -152,8 +150,8 @@ const ProductDetails = () => {
                                 <img
                                     src={imageUrl}
                                     alt={name}
-                                    className="w-full h-80 object-contain rounded cursor-pointer"
                                     onClick={() => setImagePreviewOpen(true)}
+                                    className="w-full h-80 object-contain rounded cursor-pointer"
                                 />
                                 <OutOfStock inventoryCount={inventoryCount} />
                             </div>

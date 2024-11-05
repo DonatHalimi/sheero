@@ -21,8 +21,11 @@ const ProductsByCategory = () => {
     const [loadingSubcategories, setLoadingSubcategories] = useState(true);
     const [filteredProducts, setFilteredProducts] = useState([]);
     const [priceFilter, setPriceFilter] = useState({ min: '', max: '' });
+    const [sortOrder, setSortOrder] = useState('relevancy');
 
     const navigate = useNavigate();
+
+    useEffect(() => window.scrollTo(0, 0), [id])
 
     const fetchSubcategories = async (categoryId) => {
         setLoadingSubcategories(true);
@@ -79,6 +82,33 @@ const ProductsByCategory = () => {
         setCurrentPage(1);
     };
 
+    const handleSortChange = (event) => {
+        const order = event.target.value;
+        setSortOrder(order);
+        let sortedProducts = [...filteredProducts];
+
+        switch (order) {
+            case 'lowToHigh':
+                sortedProducts.sort((a, b) => (a.salePrice || a.price) - (b.salePrice || b.price));
+                break;
+            case 'highToLow':
+                sortedProducts.sort((a, b) => (b.salePrice || b.price) - (a.salePrice || a.price));
+                break;
+            case 'newest':
+                sortedProducts.sort((a, b) => new Date(b.createdAt || b.updatedAt) - new Date(a.createdAt || a.updatedAt));
+                break;
+            case 'highestSale':
+                sortedProducts.sort((a, b) => (b.discount?.value || 0) - (a.discount?.value || 0));
+                break;
+            default:
+                sortedProducts = products;
+                break;
+        }
+
+        setFilteredProducts(sortedProducts);
+        setCurrentPage(1);
+    };
+
     const pageCount = Math.ceil(filteredProducts.length / itemsPerPage);
 
     const getCurrentPageItems = () => {
@@ -110,11 +140,14 @@ const ProductsByCategory = () => {
                         items={subcategories}
                         id={id}
                         loading={loadingSubcategories}
-                        showImage={true}
                         onCardClick={handleSubcategoryClick}
+                        showImage={true}
+                        sortOrder={sortOrder}
+                        onSortChange={handleSortChange}
+                        showTopStyle={true}
                     />
 
-                    <div className="grid grid-cols-2 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-3 gap-4 mt-4">
+                    <div className="grid grid-cols-2 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-3 gap-4 mt-6">
                         {loading ? (
                             <ProductItemSkeleton />
                         ) : (

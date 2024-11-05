@@ -1,13 +1,7 @@
 const Country = require('../models/Country');
 const City = require('../models/City');
-const User = require('../models/User');
 
 const createCountry = async (req, res) => {
-    const requestingUser = await User.findById(req.user.userId).populate('role');
-    if (requestingUser.role.name !== 'admin') {
-        return res.status(403).json({ message: 'Forbidden' });
-    }
-
     const { name } = req.body;
     try {
         const country = new Country({ name });
@@ -38,11 +32,6 @@ const getCountry = async (req, res) => {
 };
 
 const updateCountry = async (req, res) => {
-    const requestingUser = await User.findById(req.user.userId).populate('role');
-    if (requestingUser.role.name !== 'admin') {
-        return res.status(403).json({ message: 'Forbidden' });
-    }
-
     const { name } = req.body;
     try {
         const country = await Country.findByIdAndUpdate(
@@ -58,11 +47,6 @@ const updateCountry = async (req, res) => {
 };
 
 const deleteCountry = async (req, res) => {
-    const requestingUser = await User.findById(req.user.userId).populate('role');
-    if (requestingUser.role.name !== 'admin') {
-        return res.status(403).json({ message: 'Forbidden' });
-    }
-
     try {
         const country = await Country.findById(req.params.id);
         if (!country) {
@@ -79,11 +63,6 @@ const deleteCountry = async (req, res) => {
 };
 
 const deleteCountries = async (req, res) => {
-    const requestingUser = await User.findById(req.user.userId).populate('role');
-    if (requestingUser.role.name !== 'admin') {
-        return res.status(403).json({ message: 'Forbidden' });
-    }
-
     const { ids } = req.body;
 
     if (!ids || !Array.isArray(ids) || ids.length === 0) {

@@ -34,6 +34,8 @@ const ProfileInformation = () => {
 
     const [focusedField, setFocusedField] = useState(null);
 
+    useEffect(() => window.scrollTo(0, 0), [])
+
     const handleClickShowPassword = () => setShowPassword(!showPassword);
     const handleClickShowNewPassword = () => setShowNewPassword(!showNewPassword);
     const handleMouseDownPassword = (event) => event.preventDefault();

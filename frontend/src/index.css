@@ -103,6 +103,38 @@ img {
     height: 25px;
 }
 
+@keyframes slideIn {
+    from {
+        opacity: 0;
+        transform: translateY(100px);
+    }
+
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+@keyframes slideOut {
+    from {
+        opacity: 1;
+        transform: translateY(0);
+    }
+
+    to {
+        opacity: 0;
+        transform: translateY(100px);
+    }
+}
+
+.to-top-button.visible {
+    animation: slideIn 0.5s forwards;
+}
+
+.to-top-button.hidden {
+    animation: slideOut 0.5s forwards;
+}
+
 .splide__arrow {
     background-color: white;
     border: none;
@@ -136,46 +168,10 @@ img {
     background: #ccc;
 }
 
-@keyframes slideIn {
-    from {
-        opacity: 0;
-        transform: translateY(100px);
-    }
-
-    to {
-        opacity: 1;
-        transform: translateY(0);
-    }
-}
-
-@keyframes slideOut {
-    from {
-        opacity: 1;
-        transform: translateY(0);
-    }
-
-    to {
-        opacity: 0;
-        transform: translateY(100px);
-    }
-}
-
-.to-top-button.visible {
-    animation: slideIn 0.5s forwards;
-}
-
-.to-top-button.hidden {
-    animation: slideOut 0.5s forwards;
-}
-
 body,
 #root {
     margin: 0;
     padding: 0;
-}
-
-.no-scroll {
-    overflow: hidden;
 }
 
 @media (max-width: 768px) {

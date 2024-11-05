@@ -1,13 +1,7 @@
 const SubSubcategory = require('../models/SubSubcategory');
 const Product = require('../models/Product');
-const User = require('../models/User');
 
 const createSubSubcategory = async (req, res) => {
-    const requestingUser = await User.findById(req.user.userId).populate('role');
-    if (requestingUser.role.name !== 'admin') {
-        return res.status(403).json({ message: 'Forbidden' });
-    }
-
     const { name, subcategory } = req.body;
     try {
         const subSubcategory = new SubSubcategory({ name, subcategory });
@@ -48,11 +42,6 @@ const getSubSubcategoriesBySubcategory = async (req, res) => {
 };
 
 const updateSubSubcategory = async (req, res) => {
-    const requestingUser = await User.findById(req.user.userId).populate('role');
-    if (requestingUser.role.name !== 'admin') {
-        return res.status(403).json({ message: 'Forbidden' });
-    }
-
     const { name, subcategory } = req.body;
     try {
         const subSubcategory = await SubSubcategory.findByIdAndUpdate(
@@ -68,11 +57,6 @@ const updateSubSubcategory = async (req, res) => {
 };
 
 const deleteSubSubcategory = async (req, res) => {
-    const requestingUser = await User.findById(req.user.userId).populate('role');
-    if (requestingUser.role.name !== 'admin') {
-        return res.status(403).json({ message: 'Forbidden' });
-    }
-
     try {
         const subSubcategory = await SubSubcategory.findById(req.params.id);
         if (!subSubcategory) return res.status(404).json({ message: 'SubSubcategory not found' });
@@ -90,11 +74,6 @@ const deleteSubSubcategory = async (req, res) => {
 };
 
 const deleteSubSubcategories = async (req, res) => {
-    const requestingUser = await User.findById(req.user.userId).populate('role');
-    if (requestingUser.role.name !== 'admin') {
-        return res.status(403).json({ message: 'Forbidden' });
-    }
-
     const { ids } = req.body;
 
     if (!ids || !Array.isArray(ids) || ids.length === 0) {

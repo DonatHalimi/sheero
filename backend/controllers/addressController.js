@@ -1,5 +1,4 @@
 const Address = require('../models/Address');
-const User = require('../models/User');
 
 const createAddress = async (req, res) => {
     const { name, street, city, country, phoneNumber, comment } = req.body;
@@ -30,11 +29,6 @@ const createAddress = async (req, res) => {
 
 const getAddresses = async (req, res) => {
     try {
-        const requestingUser = await User.findById(req.user.userId).populate('role');
-        if (requestingUser.role.name !== 'admin') {
-            return res.status(403).json({ message: 'Forbidden' });
-        }
-
         const addresses = await Address.find()
             .populate('user', 'firstName lastName email')
             .populate('city', 'name zipCode')
@@ -118,11 +112,6 @@ const deleteAddress = async (req, res) => {
 };
 
 const deleteAddresses = async (req, res) => {
-    const requestingUser = await User.findById(req.user.userId).populate('role');
-    if (requestingUser.role.name !== 'admin') {
-        return res.status(403).json({ message: 'Forbidden' });
-    }
-    
     const { ids } = req.body;
 
     if (!ids || !Array.isArray(ids) || ids.length === 0) {

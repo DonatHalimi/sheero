@@ -18,6 +18,8 @@ const AddressInformation = () => {
     const [existingAddress, setExistingAddress] = useState(null);
     const [cities, setCities] = useState([]);
     const [countries, setCountries] = useState([]);
+    const [isSubmitted, setIsSubmitted] = useState(false);
+
     const [loading, setLoading] = useState(true);
 
     const [nameValid, setNameValid] = useState(true);
@@ -160,6 +162,7 @@ const AddressInformation = () => {
             if (response.status === 200 || response.status === 201) {
                 toast.success(existingAddress ? 'Address updated successfully' : 'Address added successfully');
                 setExistingAddress(response.data);
+                setIsSubmitted(true);
             } else {
                 toast.error('Unexpected response from server');
             }
@@ -275,6 +278,9 @@ const AddressInformation = () => {
                                         value={country}
                                         onChange={handleCountryChange}
                                         label="Country"
+                                        MenuProps={{
+                                            disableScrollLock: true,
+                                        }}
                                     >
                                         {countries.map((country) => (
                                             <MenuItem key={country._id} value={country._id}>
@@ -292,6 +298,9 @@ const AddressInformation = () => {
                                         onChange={handleCityChange}
                                         label="City"
                                         disabled={!country}
+                                        MenuProps={{
+                                            disableScrollLock: true,
+                                        }}
                                     >
                                         {cities.map((city) => (
                                             <MenuItem key={city._id} value={city._id}>
@@ -316,13 +325,13 @@ const AddressInformation = () => {
                                 type="submit"
                                 variant="contained"
                                 color="primary"
-                                disabled={isFormUnchanged || !isFormValid}
+                                disabled={isFormUnchanged || !isFormValid || isSubmitted}
                             >
                                 {existingAddress ? 'Update' : 'Add'}
                             </Button>
                         </form>
                     )}
-                </Box >
+                </Box>
             </ProfileLayout>
             <Footer />
         </>

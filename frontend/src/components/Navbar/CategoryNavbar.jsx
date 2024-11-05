@@ -166,7 +166,7 @@ const CategoryNavbar = ({ isSidebarOpen, toggleSidebar }) => {
                                         </button>
                                         {openCategory === category._id && subcategories[category._id]?.length > 0 && (
                                             <div
-                                                className="fixed bg-white shadow-xl rounded-lg p-4 z-50"
+                                                className="fixed bg-white shadow-xl rounded-md p-4 z-50"
                                                 style={calculateDropdownStyle()}
                                             >
                                                 <div className="grid grid-cols-1 lg:grid-cols-3 gap-2">

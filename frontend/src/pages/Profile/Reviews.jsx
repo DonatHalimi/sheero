@@ -144,43 +144,41 @@ const Reviews = () => {
                 />
                 {loading ? (
                     <ReviewItemSkeleton />
+                ) : (filteredReviews.length === 0 ? (
+                    <EmptyState
+                        imageSrc={emptyReviewsImage}
+                        message={searchTerm ? "No review found matching your search" : "No review found!"}
+                    />
                 ) : (
-                    filteredReviews.length === 0 ? (
-                        <EmptyState
-                            imageSrc={emptyReviewsImage}
-                            message={searchTerm ? "No review found matching your search" : "No review found!"}
-                        />
-                    ) : (
-                        <>
-                            <div className={`flex flex-col ${marginBottomClass}`}>
-                                {getCurrentPageItems().map((review) => (
-                                    <ReviewItem
-                                        key={review._id}
-                                        review={review}
-                                        onImageClick={handleImageClick}
-                                        onMenuClick={handleMenuClick}
-                                        onCardClick={handlePaperClick}
-                                    />
-                                ))}
-                                <div className="flex justify-start sm:justify-start">
-                                    <CustomPagination
-                                        count={pageCount}
-                                        page={currentPage}
-                                        onChange={handlePageChange}
-                                        size="medium"
-                                        sx={{
-                                            position: 'relative',
-                                            bottom: '4px',
-                                            '& .MuiPagination-ul': {
-                                                justifyContent: 'flex-start',
-                                            },
-                                        }}
-                                    />
-                                </div>
+                    <>
+                        <div className={`flex flex-col ${marginBottomClass}`}>
+                            {getCurrentPageItems().map((review) => (
+                                <ReviewItem
+                                    key={review._id}
+                                    review={review}
+                                    onImageClick={handleImageClick}
+                                    onMenuClick={handleMenuClick}
+                                    onCardClick={handlePaperClick}
+                                />
+                            ))}
+                            <div className="flex justify-start sm:justify-start">
+                                <CustomPagination
+                                    count={pageCount}
+                                    page={currentPage}
+                                    onChange={handlePageChange}
+                                    size="medium"
+                                    sx={{
+                                        position: 'relative',
+                                        bottom: '4px',
+                                        '& .MuiPagination-ul': {
+                                            justifyContent: 'flex-start',
+                                        },
+                                    }}
+                                />
                             </div>
-                        </>
-                    )
-                )}
+                        </div>
+                    </>
+                ))}
             </ProfileLayout>
 
             {totalReviews === 1 && <div className='mb-32' />}

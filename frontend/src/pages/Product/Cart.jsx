@@ -418,13 +418,6 @@ const Cart = () => {
                                 >
                                     Proceed to Checkout
                                 </CheckoutButton>
-
-                                <PaymentModal
-                                    open={showPaymentModal}
-                                    onClose={() => setShowPaymentModal(false)}
-                                    onStripePayment={handleStripePayment}
-                                    onCashPayment={handleCashPayment}
-                                />
                             </div>
                         </div>
                     </div>
@@ -432,6 +425,13 @@ const Cart = () => {
                     <EmptyState imageSrc={emptyCartImage} message="Your cart is empty!" />
                 )}
             </div>
+
+            <PaymentModal
+                open={showPaymentModal}
+                onClose={() => setShowPaymentModal(false)}
+                onStripePayment={handleStripePayment}
+                onCashPayment={handleCashPayment}
+            />
 
             <CustomDeleteModal
                 open={openModal}

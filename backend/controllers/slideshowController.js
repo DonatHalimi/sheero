@@ -1,13 +1,7 @@
 const SlideshowImage = require('../models/SlideshowImage');
 const fs = require('fs');
-const User = require('../models/User');
 
 const createImage = async (req, res) => {
-    const requestingUser = await User.findById(req.user.userId).populate('role');
-    if (requestingUser.role.name !== 'admin') {
-        return res.status(403).json({ message: 'Forbidden' });
-    }
-
     const { title, description } = req.body;
     const image = req.file ? req.file.path : '';
     try {
@@ -39,11 +33,6 @@ const getImage = async (req, res) => {
 };
 
 const updateImage = async (req, res) => {
-    const requestingUser = await User.findById(req.user.userId).populate('role');
-    if (requestingUser.role.name !== 'admin') {
-        return res.status(403).json({ message: 'Forbidden' });
-    }
-
     const { title, description } = req.body;
     let image = req.body.image;
     try {
@@ -78,11 +67,6 @@ const updateImage = async (req, res) => {
 };
 
 const deleteImage = async (req, res) => {
-    const requestingUser = await User.findById(req.user.userId).populate('role');
-    if (requestingUser.role.name !== 'admin') {
-        return res.status(403).json({ message: 'Forbidden' });
-    }
-
     try {
         const image = await SlideshowImage.findById(req.params.id);
         if (!image) return res.status(404).json({ message: 'Image not found' });
@@ -101,11 +85,6 @@ const deleteImage = async (req, res) => {
 };
 
 const deleteImages = async (req, res) => {
-    const requestingUser = await User.findById(req.user.userId).populate('role');
-    if (requestingUser.role.name !== 'admin') {
-        return res.status(403).json({ message: 'Forbidden' });
-    }
-
     const { ids } = req.body;
 
     if (!ids || !Array.isArray(ids) || ids.length === 0) {

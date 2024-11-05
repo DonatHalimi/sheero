@@ -5,9 +5,7 @@ import { ThemeProvider } from '@mui/material/styles';
 import Toolbar from '@mui/material/Toolbar';
 import React, { useContext, useState } from 'react';
 import { Outlet } from 'react-router-dom';
-import {
-    DashboardCollapse, DashboardNavbar, Drawer,
-} from '../../assets/CustomComponents';
+import { DashboardCollapse, DashboardNavbar, Drawer } from '../../assets/CustomComponents';
 import { AuthContext } from '../../context/AuthContext';
 import theme from '../../theme';
 import { mainListItems, secondaryListItems } from './listItems';

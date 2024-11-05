@@ -1,9 +1,4 @@
 const jwt = require('jsonwebtoken');
-const Review = require('../models/Review');
-const Address = require('../models/Address');
-const Cart = require('../models/Cart');
-const Wishlist = require('../models/Wishlist');
-const Role = require('../models/Role');
 const User = require('../models/User');
 
 const authenticateToken = (req, res, next) => {
@@ -74,7 +69,7 @@ const requireAuthAndRole = (requiredRole) => {
             if (err) return next(err);
             const requestingUser = await User.findById(req.user.userId).populate('role');
             if (!requestingUser) return res.status(404).json({ message: 'User not found' });
-            
+
             if (requestingUser.role.name !== requiredRole) {
                 return res.status(403).json({ message: 'Forbidden' });
             }
@@ -83,102 +78,28 @@ const requireAuthAndRole = (requiredRole) => {
     };
 };
 
-// TRY LATER: TO MAKE SURE USER EDITS THEIR OWN REVIEW/ADDRESS/CART/WISHLIST
+const requireOwnershipOrAdmin = (Model) => {
+    return async (req, res, next) => {
+        const resourceId = req.params.id;
+        const userId = req.user.userId;
+        const userRole = req.user.role;
 
-// const checkReviewOwnership = async (req, res, next) => {
-//     try {
-//         const reviewId = req.params.id;
-//         const userId = req.user.userId;
-//         const userRole = req.user.role;
+        try {
+            const resource = await Model.findById(resourceId);
+            if (!resource) {
+                return res.status(404).json({ message: 'Resource not found' });
+            }
 
-//         const review = await Review.findById(reviewId);
+            if (resource.user.toString() !== userId && userRole.name !== 'admin') {
+                return res.status(403).json({ message: 'You are not authorized to perform this action' });
+            }
 
-//         if (!review) {
-//             return res.status(404).json({ message: 'Review not found' });
-//         }
+            next();
+        } catch (error) {
+            console.error('Error checking ownership:', error);
+            res.status(500).json({ message: 'Server error' });
+        }
+    };
+};
 
-//         if (review.user.toString() !== userId && userRole !== 'admin') {
-//             return res.status(403).json({ message: 'You are not authorized to modify this review' });
-//         }
-
-//         // If the user is the owner or an admin, allow the operation
-//         next();
-//     } catch (error) {
-//         console.error('Error checking review ownership:', error);
-//         res.status(500).json({ message: 'Server error', error: error.message });
-//     }
-// };
-
-// const checkAddressOwnership = async (req, res, next) => {
-//     try {
-//         const addressId = req.params.id;
-//         const userId = req.user.userId;
-//         const userRole = req.user.role;
-
-//         const address = await Address.findById(addressId);
-
-//         if (!address) {
-//             return res.status(404).json({ message: 'Address not found' });
-//         }
-
-//         if (address.user.toString() !== userId && userRole !== 'admin') {
-//             return res.status(403).json({ message: 'You are not authorized to modify this address' });
-//         }
-
-//         // If the user is the owner or an admin, allow the operation
-//         next();
-//     } catch (error) {
-//         console.error('Error checking address ownership:', error);
-//         res.status(500).json({ message: 'Server error', error: error.message });
-//     }
-// };
-
-// const checkCartOwnership = async (req, res, next) => {
-//     try {
-//         const cartId = req.params.id;
-//         const userId = req.user.userId;
-//         const userRole = req.user.role;
-
-//         const cart = await Cart.findById(cartId);
-
-//         if (!cart) {
-//             return res.status(404).json({ message: 'Cart not found' });
-//         }
-
-//         if (cart.user.toString() !== userId && userRole !== 'admin') {
-//             return res.status(403).json({ message: 'You are not authorized to modify this cart' });
-//         }
-
-//         // If the user is the owner or an admin, allow the operation
-//         next();
-//     } catch (error) {
-//         console.error('Error checking cart ownership:', error);
-//         res.status(500).json({ message: 'Server error', error: error.message });
-//     }
-// };
-
-// const checkWishlistOwnership = async (req, res, next) => {
-//     try {
-//         const wishlistId = req.params.id;
-//         const userId = req.user.userId;
-//         const userRole = req.user.role;
-
-//         const wishlist = await Wishlist.findById(wishlistId);
-
-//         if (!wishlist) {
-//             return res.status(404).json({ message: 'Wishlist not found' });
-//         }
-
-//         if (wishlist.user.toString() !== userId && userRole !== 'admin') {
-//             return res.status(403).json({ message: 'You are not authorized to modify this wishlist' });
-//         }
-
-//         // If the user is the owner or an admin, allow the operation
-//         next();
-//     } catch (error) {
-//         console.error('Error checking wishlist ownership:', error);
-//         res.status(500).json({ message: 'Server error', error: error.message });
-//     }
-// };
-
-module.exports = { authenticateToken, authorizeRole, protect, requireAuthAndRole, refreshAccessToken };
+module.exports = { authenticateToken, authorizeRole, protect, requireAuthAndRole, refreshAccessToken, requireOwnershipOrAdmin };

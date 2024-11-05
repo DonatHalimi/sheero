@@ -1,5 +1,7 @@
 import {
     ArrowBack,
+    ArrowBackIosNew,
+    ArrowForwardIos,
     ChevronLeft,
     Close,
     CreateOutlined,
@@ -9,13 +11,17 @@ import {
     DeleteOutlined,
     ExpandLess,
     ExpandMore,
+    Favorite,
     FavoriteBorderOutlined,
+    Home,
     HomeOutlined,
+    Inbox,
     InboxOutlined,
     Login,
     Logout,
     Menu as MenuIcon,
     MoreVert,
+    Person,
     PersonOutlined,
     QuestionAnswerOutlined,
     Search,
@@ -36,6 +42,7 @@ import {
     FormControl,
     IconButton,
     InputAdornment,
+    InputLabel,
     Link,
     List,
     ListItem,
@@ -69,9 +76,9 @@ import { styled } from '@mui/material/styles';
 import SvgIcon from '@mui/material/SvgIcon';
 import { GridToolbar } from '@mui/x-data-grid';
 import { Splide, SplideSlide } from '@splidejs/react-splide';
-import { AnimatePresence, motion } from 'framer-motion';
+import { AnimatePresence, motion, spring } from 'framer-motion';
 import PropTypes from 'prop-types';
-import React, { useEffect, useRef, useState } from 'react';
+import React, { forwardRef, useEffect, useRef, useState } from 'react';
 import { Link as RouterLink, useNavigate } from 'react-router-dom';
 import { toast } from 'react-toastify';
 import useAxios from '../axiosInstance';
@@ -81,6 +88,32 @@ import FilterSidebar from '../components/Product/FilterSidebar';
 import { getImageUrl } from '../config';
 import ProfileSidebar from '../pages/Profile/ProfileSidebar';
 import logo from './img/brand/logo.png';
+import {
+    customMenuProps,
+    filterLayoutStyling,
+    getExpandIconProps,
+    getMotionDivProps,
+    goBackButtonStyling,
+    headerFilterStyling,
+    headerSearchStyling,
+    layoutContainerStyle,
+    paginationStackStyling,
+    paginationStyling,
+    profileLayoutStyling,
+    reviewCommentStyling,
+    reviewContainerStyling,
+    reviewContentStyling,
+    reviewImageStyling,
+    reviewTextAreaStyling,
+    reviewTitleContainerStyling,
+    reviewTitleStyling,
+    searchBarInputStyling,
+    searchDropdownImageStyling,
+    searchDropdownItemStyling,
+    searchDropdownStyling,
+    sidebarLayoutStyling,
+    slideShowSkeletonStyling
+} from './sx';
 
 export const BrownOutlinedTextField = styled(TextField)({
     '& .MuiOutlinedInput-root': {
@@ -494,7 +527,7 @@ export const ProfileButton = styled(IconButton)(({ theme }) => ({
     display: 'flex',
     alignItems: 'center',
     justifyContent: 'flex-start',
-    borderRadius: '0.125rem',
+    borderRadius: '6px',
     '&:hover': {
         backgroundColor: theme.palette.action.hover,
     },
@@ -618,6 +651,14 @@ export const StyledShoppingCartIcon = styled(ShoppingCartOutlined)({
     color: '#666666',
 });
 
+const activeColor = '#7C7164';
+
+export const CustomProfileIcon = ({ isActive }) => <Person style={{ color: isActive ? activeColor : 'inherit' }} />;
+export const CustomAddressIcon = ({ isActive }) => <Home style={{ color: isActive ? activeColor : 'inherit' }} />;
+export const CustomOrdersIcon = ({ isActive }) => <Inbox style={{ color: isActive ? activeColor : 'inherit' }} />;
+export const CustomWishlistIcon = ({ isActive }) => <Favorite style={{ color: isActive ? activeColor : 'inherit' }} />;
+export const CustomReviewsIcon = ({ isActive }) => <Star style={{ color: isActive ? activeColor : 'inherit' }} />;
+
 export const DashboardTableStyling = {
     border: 'none',
     '& .MuiDataGrid-main': {
@@ -638,17 +679,51 @@ export const DashboardTableStyling = {
     '--DataGrid-overlayHeight': '300px',
 };
 
-export const CustomModal = ({ open, onClose, children, ...props }) => (
-    <Modal
-        open={open}
-        onClose={onClose}
-        className="flex items-center justify-center"
-        {...props}
+export const BounceAnimation = forwardRef(({ children }, ref) => (
+    <motion.div
+        ref={ref}
+        initial={{
+            y: "100%",
+            opacity: 0,
+            filter: "blur(10px)"
+        }}
+        animate={{
+            y: 0,
+            opacity: 1,
+            filter: "blur(0px)"
+        }}
+        exit={{
+            y: "100%",
+            opacity: 0,
+            filter: "blur(10px)"
+        }}
+        transition={{
+            type: "spring",
+            damping: 15,
+            stiffness: 200,
+            mass: 1.2,
+            bounce: 0.25
+        }}
     >
-        <Box className="bg-white p-2 rounded-lg shadow-lg max-w-md w-full focus:outline-none">
-            {children}
-        </Box>
-    </Modal>
+        {children}
+    </motion.div>
+));
+
+export const CustomModal = ({ open, onClose, children, ...props }) => (
+    <AnimatePresence>
+        <Modal
+            open={open}
+            onClose={onClose}
+            className="flex items-center justify-center"
+            {...props}
+        >
+            <BounceAnimation>
+                <Box className="bg-white p-2 rounded-lg shadow-lg max-w-md w-full focus:outline-none">
+                    {children}
+                </Box>
+            </BounceAnimation>
+        </Modal>
+    </AnimatePresence>
 );
 
 export const CustomBox = (props) => (
@@ -807,7 +882,6 @@ export const ProductDetailsSkeleton = () => {
             </div>
 
             <div className="container mx-auto px-4 py-4 mb-8 bg-white mt-8 rounded-md max-w-5xl">
-
                 <div className="mt-8">
                     <Tabs
                         value={0}
@@ -833,7 +907,7 @@ export const ProductDetailsSkeleton = () => {
 
 export const SlideshowSkeleton = () => {
     return (
-        <Box className="relative w-full mx-auto mb-14" sx={{ position: 'relative' }}>
+        <Box sx={{ position: 'relative' }} className="relative w-full mx-auto mb-14">
             <Skeleton
                 variant="rectangular"
                 animation="wave"
@@ -847,13 +921,7 @@ export const SlideshowSkeleton = () => {
                 animation="wave"
                 width={50}
                 height={50}
-                sx={{
-                    position: 'absolute',
-                    top: '50%',
-                    left: '20px',
-                    transform: 'translateY(-50%)',
-                    zIndex: 10
-                }}
+                sx={slideShowSkeletonStyling}
             />
 
             <Skeleton
@@ -861,13 +929,7 @@ export const SlideshowSkeleton = () => {
                 animation="wave"
                 width={50}
                 height={50}
-                sx={{
-                    position: 'absolute',
-                    top: '50%',
-                    right: '20px',
-                    transform: 'translateY(-50%)',
-                    zIndex: 10
-                }}
+                sx={slideShowSkeletonStyling}
             />
         </Box>
     );
@@ -880,21 +942,7 @@ export const GoBackHome = () => {
             to="/"
             variant="contained"
             color="primary"
-            sx={{
-                display: 'flex',
-                alignItems: 'center',
-                gap: 1,
-                textTransform: 'none',
-                padding: '10px 14px',
-                backgroundColor: '#686159',
-                '&:hover': {
-                    backgroundColor: '#5b504b',
-                },
-                borderRadius: '5px',
-                boxShadow: 'none',
-                width: '50%',
-                margin: '0 auto',
-            }}
+            sx={goBackButtonStyling}
         >
             <ArrowBack />
             <Typography variant="button" sx={{ color: 'white' }}>
@@ -961,10 +1009,7 @@ export const ReviewsList = ({ reviews, openModal }) => {
                     <ReviewCard
                         key={index}
                         onClick={() => openModal(review)}
-                        style={{
-                            cursor: 'pointer',
-                            overflow: 'hidden',
-                        }}
+                        style={{ cursor: 'pointer', overflow: 'hidden' }}
                     >
                         <Box className="flex justify-between items-center w-52">
                             <p className='font-semibold text-lg mr-4'>
@@ -972,20 +1017,10 @@ export const ReviewsList = ({ reviews, openModal }) => {
                             </p>
                             <RatingStars rating={review.rating} />
                         </Box>
-                        <p className="font-semibold" style={{
-                            maxWidth: '200px',
-                            overflow: 'hidden',
-                            textOverflow: 'ellipsis',
-                            whiteSpace: 'nowrap'
-                        }}>
+                        <p style={reviewTitleStyling}>
                             {review.title}
                         </p>
-                        <p style={{
-                            maxWidth: '200px',
-                            overflow: 'hidden',
-                            textOverflow: 'ellipsis',
-                            whiteSpace: 'nowrap',
-                        }}>
+                        <p style={reviewCommentStyling}>
                             {review.comment}
                         </p>
                         <Typography variant="caption" color="text.secondary">
@@ -1008,32 +1043,10 @@ export const ReviewModal = ({ open, handleClose, selectedReview, onImageClick })
             aria-labelledby="review-modal-title"
             aria-describedby="review-modal-description"
         >
-            <Box sx={{
-                position: 'relative',
-                top: '50%',
-                left: '50%',
-                transform: 'translate(-50%, -50%)',
-                width: { xs: '95%', sm: '80%' },
-                maxWidth: '800px',
-                bgcolor: 'background.paper',
-                borderRadius: '8px',
-                boxShadow: 24,
-                display: 'flex',
-                flexDirection: { xs: 'column', sm: 'row' },
-                p: 2,
-                outline: 'none',
-            }}>
+            <Box sx={reviewContainerStyling}>
                 {selectedReview && selectedReview.user && (
                     <Box sx={{ display: 'flex', flex: 1, flexDirection: { xs: 'column', sm: 'row' } }}>
-                        <Box sx={{
-                            width: { xs: '100%', sm: '40%' },
-                            flexShrink: 0,
-                            mr: { sm: 2 },
-                            mb: { xs: 2, sm: 0 },
-                            display: 'flex',
-                            alignItems: 'center',
-                            justifyContent: 'center'
-                        }}>
+                        <Box sx={reviewImageStyling}>
                             <img
                                 src={getImageUrl(selectedReview.product.image)}
                                 alt={selectedReview.product.name}
@@ -1042,13 +1055,8 @@ export const ReviewModal = ({ open, handleClose, selectedReview, onImageClick })
                                 style={{ maxHeight: '200px' }}
                             />
                         </Box>
-                        <Box sx={{
-                            flexGrow: 1,
-                            display: 'flex',
-                            flexDirection: 'column',
-                            justifyContent: 'space-between',
-                            textAlign: 'justify'
-                        }}>
+
+                        <Box sx={reviewContentStyling}>
                             <Box sx={{ display: 'flex', alignItems: 'flex-end', mb: 2 }}>
                                 <Box sx={{ flexGrow: 1 }}>
                                     <Typography id="review-modal-title" variant="h6" component="h2" mb={1} sx={{ fontSize: { xs: '1rem', sm: '1.25rem' }, textAlign: 'justify' }}>
@@ -1058,44 +1066,23 @@ export const ReviewModal = ({ open, handleClose, selectedReview, onImageClick })
                                         </Typography>
                                         <RatingStars rating={selectedReview.rating} />
                                     </Typography>
+
                                     <Typography variant="h6" component="h2" display="flex" alignItems="center" sx={{ fontSize: { xs: '1rem', sm: '1.25rem' }, textAlign: 'justify' }}>
                                         <span style={{ maxWidth: '360px', textAlign: 'left' }}>
                                             {selectedReview.product.name}
                                         </span>
                                     </Typography>
-                                    <Box
-                                        sx={{
-                                            textAlign: 'justify',
-                                            overflow: 'hidden',
-                                            textOverflow: 'ellipsis',
-                                            whiteSpace: 'nowrap',
-                                            width: '100%',
-                                        }}
-                                        className="font-semibold mt-1 break-words"
-                                    >
+
+                                    <Box sx={reviewTitleContainerStyling}>
                                         {selectedReview.title}
                                     </Box>
+
                                     <textarea
                                         value={selectedReview.comment}
                                         readOnly
-                                        className="custom-textarea break-words"
-                                        style={{
-                                            width: '90%',
-                                            height: 'auto',
-                                            minHeight: '150px',
-                                            maxHeight: '200px',
-                                            overflowY: 'auto',
-                                            border: 'none',
-                                            background: 'transparent',
-                                            resize: 'none',
-                                            fontSize: '16px',
-                                            boxSizing: 'border-box',
-                                            borderRadius: '4px',
-                                            marginTop: '6px',
-                                            outline: 'none',
-                                            textAlign: 'justify'
-                                        }}
+                                        style={reviewTextAreaStyling}
                                         onFocus={(e) => e.target.style.border = 'none'}
+                                        className="custom-textarea break-words"
                                     />
                                 </Box>
                             </Box>
@@ -1115,14 +1102,13 @@ export const ReviewModal = ({ open, handleClose, selectedReview, onImageClick })
     );
 };
 
-
 export const ProductTabs = ({ value, handleChange }) => {
     return (
         <Tabs
             value={value}
             onChange={handleChange}
             aria-label="product details tabs"
-            sx={{ width: '100%', display: 'flex', justifyContent: 'center' }}
+            sx={{ display: 'flex', justifyContent: 'center', width: '100%' }}
         >
             <CustomTab label="Description" />
             <CustomTab label="Details" />
@@ -1139,12 +1125,7 @@ export const CustomPagination = ({ count, page, onChange, size = 'large', sx = {
     return (
         <Stack
             spacing={2}
-            sx={{
-                marginTop: 1,
-                alignItems: 'center',
-                justifyContent: 'center',
-                ...sx,
-            }}
+            sx={paginationStackStyling(sx)}
         >
             <Pagination
                 count={count}
@@ -1153,24 +1134,7 @@ export const CustomPagination = ({ count, page, onChange, size = 'large', sx = {
                 shape="rounded"
                 variant="outlined"
                 size={size}
-                sx={{
-                    '& .MuiPaginationItem-page': {
-                        color: '#686159',
-                    },
-                    '& .MuiPaginationItem-page.Mui-selected': {
-                        backgroundColor: '#686159',
-                        color: 'white',
-                        '&:hover': {
-                            backgroundColor: '#686159',
-                            color: 'white',
-                        },
-                    },
-                    '& .MuiPaginationItem-page:not(.Mui-selected):hover': {
-                        backgroundColor: '#686159',
-                        color: 'white',
-                    },
-                    ...sx,
-                }}
+                sx={paginationStyling(sx)}
             />
         </Stack>
     );
@@ -1191,22 +1155,13 @@ export const FAQItem = ({ question, answer }) => {
                     <QuestionAnswerOutlined className="mr-2 text-brown-600" />
                     {question}
                 </span>
-                <motion.span
-                    animate={{ rotate: isOpen ? 180 : 0 }}
-                    transition={{ duration: 0.3 }}
-                >
+                <motion.span {...getExpandIconProps(isOpen)}>
                     <ExpandMore className="text-brown-600" />
                 </motion.span>
             </motion.button>
             <AnimatePresence>
                 {isOpen && (
-                    <motion.div
-                        initial={{ opacity: 0, height: 0 }}
-                        animate={{ opacity: 1, height: 'auto' }}
-                        exit={{ opacity: 0, height: 0 }}
-                        transition={{ duration: 0.3 }}
-                        className="bg-white rounded-b-md shadow-md mt-1 overflow-hidden"
-                    >
+                    <motion.div {...getMotionDivProps(isOpen)}>
                         <div className="p-6 text-brown-700">
                             <p>{answer}</p>
                         </div>
@@ -1253,6 +1208,13 @@ export const CheckoutButton = styled(Button)(({ theme }) => ({
         backgroundColor: '#5b504b',
     },
 }));
+
+export const LoadingProfile = () => (
+    <>
+        <Skeleton variant="text" width={250} height={40} />
+        <Skeleton variant="text" width={265} height={30} />
+    </>
+);
 
 export const LoadingCart = () => {
     return (
@@ -1611,8 +1573,8 @@ export const EmptyState = ({
             </p>
             {subMessage && <h1 className="text-sm font-semibold mb-2">{subMessage}</h1>}
             <h2
-                className="text-base font-semibold cursor-pointer hover:underline"
                 onClick={() => navigate('/')}
+                className="text-base font-semibold cursor-pointer hover:underline"
             >
                 {buttonText}
             </h2>
@@ -1647,7 +1609,6 @@ export const CenteredMoreVertIcon = ({ onClick, ...props }) => (
     </Box>
 );
 
-
 export const CustomMenu = ({
     anchorEl,
     open,
@@ -1660,20 +1621,8 @@ export const CustomMenu = ({
             anchorEl={anchorEl}
             open={Boolean(anchorEl)}
             onClose={handleMenuClose}
-            PaperProps={{
-                sx: {
-                    boxShadow: '0px 2px 4px rgba(0, 0, 0, 0.2)',
-                    transform: 'translate(-10px, 10px)',
-                },
-            }}
-            anchorOrigin={{
-                vertical: 'bottom',
-                horizontal: 'right',
-            }}
-            transformOrigin={{
-                vertical: 'top',
-                horizontal: 'right',
-            }}
+            {...customMenuProps}
+            disableScrollLock
         >
             <MenuItem onClick={handleEditClick}>Edit</MenuItem>
             <MenuItem onClick={handleDeleteClick}>Delete</MenuItem>
@@ -1689,24 +1638,7 @@ export const SearchBarInput = ({ searchTerm, handleInputChange, handleSubmit }) 
             placeholder='Search products...'
             variant="outlined"
             autoComplete="off"
-            sx={{
-                width: {
-                    xs: '350px',
-                    sm: '400px',
-                    md: '475px'
-                },
-                borderColor: '#9e9793',
-                '& .MuiInputBase-root': {
-                    height: '40px',
-                    display: 'flex',
-                    alignItems: 'center'
-                },
-                '& .MuiInputBase-input': {
-                    padding: '0 14px',
-                    height: '40px',
-                    lineHeight: '40px',
-                },
-            }}
+            sx={searchBarInputStyling}
             InputProps={{
                 endAdornment: (
                     <InputAdornment position="end">
@@ -1768,6 +1700,8 @@ export const Header = ({
 }) => {
     const isSharedWishlist = fullName.trim() !== '';
 
+    const { open, menuRef, menuProps, menuHandlers } = useScrollAwayMenu();
+
     return (
         <div className="bg-white p-4 rounded-md shadow-sm mb-3 flex justify-between items-center">
             <Typography variant="h5" className="text-gray-800 font-semilight">
@@ -1788,50 +1722,32 @@ export const Header = ({
                             placeholder={placeholder}
                             variant="outlined"
                             size="small"
+                            sx={headerSearchStyling}
                             InputProps={{
-                                endAdornment: <Search className="text-gray-400 ml-1" />,
-                                sx: {
-                                    '& .MuiOutlinedInput-root': {
-                                        '& fieldset': {
-                                            borderColor: 'rgba(0, 0, 0, 0.23)',
-                                        },
-                                        '&:focus fieldset': {
-                                            borderColor: 'rgba(0, 0, 0, 0.23)',
-                                        },
-                                        '&.Mui-focused fieldset': {
-                                            borderColor: 'rgba(0, 0, 0, 0.23)',
-                                        },
-                                    },
-                                },
+                                endAdornment: <Search className="text-gray-400 ml-1" />
                             }}
                         />
                     </>
                 )}
                 {showFilter && (
-                    <Select
-                        value={statusFilter}
-                        onChange={(e) => setStatusFilter(e.target.value)}
-                        variant="outlined"
-                        size="small"
-                        sx={{
-                            width: 120,
-                            '& .MuiOutlinedInput-notchedOutline': {
-                                borderColor: 'rgba(0, 0, 0, 0.23)',
-                            },
-                            '&:focus .MuiOutlinedInput-notchedOutline': {
-                                borderColor: 'rgba(0, 0, 0, 0.23)',
-                            },
-                            '&.Mui-focused .MuiOutlinedInput-notchedOutline': {
-                                borderColor: 'rgba(0, 0, 0, 0.23)',
-                            },
-                        }}
-                    >
-                        <MenuItem value="All">All</MenuItem>
-                        <MenuItem value="pending">Pending</MenuItem>
-                        <MenuItem value="shipped">Shipped</MenuItem>
-                        <MenuItem value="delivered">Delivered</MenuItem>
-                        <MenuItem value="canceled">Canceled</MenuItem>
-                    </Select>
+                    <div ref={menuRef}>
+                        <Select
+                            open={open}
+                            {...menuHandlers}
+                            value={statusFilter}
+                            onChange={(e) => setStatusFilter(e.target.value)}
+                            variant="outlined"
+                            size="small"
+                            sx={headerFilterStyling}
+                            MenuProps={menuProps}
+                        >
+                            <MenuItem value="All">All</MenuItem>
+                            <MenuItem value="pending">Pending</MenuItem>
+                            <MenuItem value="shipped">Shipped</MenuItem>
+                            <MenuItem value="delivered">Delivered</MenuItem>
+                            <MenuItem value="canceled">Canceled</MenuItem>
+                        </Select>
+                    </div>
                 )}
                 {wishlistItems !== undefined && !isSharedWishlist && wishlistItems.length > 0 && (
                     <>
@@ -1888,52 +1804,18 @@ export const SearchDropdown = ({ results, onClickSuggestion }) => {
     };
 
     return (
-        <List
-            sx={{
-                position: 'absolute',
-                width: {
-                    xs: '350px',
-                    sm: '400px',
-                    md: '475px'
-                },
-                bgcolor: '#F9FAFB',
-                boxShadow: 1,
-                borderRadius: 1,
-                maxHeight: '400px',
-                overflowY: 'auto',
-                zIndex: 99,
-                top: '41px',
-                padding: '9px',
-            }}
-        >
+        <List sx={searchDropdownStyling}>
             {results.map((result) => (
                 <ListItem
                     key={result._id}
                     button
                     onClick={() => onClickSuggestion(result._id)}
-                    sx={{
-                        bgcolor: 'white',
-                        borderRadius: 1,
-                        boxShadow: '0px 1px 3px rgba(0, 0, 0, 0.1)',
-                        marginBottom: '8px',
-                        border: '1px solid transparent',
-                        '&:hover': {
-                            borderColor: '#78716C',
-                            backgroundColor: 'white',
-                        },
-                        transition: 'border-color 0.2s ease',
-                    }}
+                    sx={searchDropdownItemStyling}
                 >
                     <img
                         src={getImageUrl(result.image)}
                         alt={result.name}
-                        style={{
-                            width: '40px',
-                            height: '40px',
-                            marginLeft: '-10px',
-                            marginRight: '10px',
-                            objectFit: 'contain',
-                        }}
+                        style={searchDropdownImageStyling}
                     />
                     <ListItemText
                         primary={truncateText(result.name, maxTitleLength)}
@@ -1967,7 +1849,22 @@ export const formatPrice = (price) => {
     });
 };
 
-export const ProfileDropdown = ({ isAdmin, handleLogout }) => {
+const DropdownAnimation = ({ isOpen, children }) => (
+    <AnimatePresence>
+        {isOpen && (
+            <motion.div
+                initial={{ opacity: 0, translateY: 10 }}
+                animate={{ opacity: 1, translateY: 0 }}
+                exit={{ opacity: 0, translateY: 10 }}
+                transition={{ stiffness: 100, damping: 15 }}
+            >
+                {children}
+            </motion.div>
+        )}
+    </AnimatePresence>
+);
+
+export const ProfileDropdown = ({ isOpen, isAdmin, handleLogout }) => {
     const navigate = useNavigate();
 
     const handleNavigate = (path) => {
@@ -1979,119 +1876,126 @@ export const ProfileDropdown = ({ isAdmin, handleLogout }) => {
             className="absolute right-0 mt-1 w-48 bg-white border shadow-lg rounded-lg p-2"
             tabIndex="0"
         >
-            {isAdmin && (
-                <>
-                    <button
-                        onClick={() => handleNavigate('/dashboard/users')}
-                        className="flex items-center px-2 py-2 mb-2 text-stone-700 hover:bg-stone-100 no-underline w-full text-left"
-                    >
-                        <StyledDashboardIcon className="mr-2" />
-                        Dashboard
-                    </button>
-                    <hr className='border-stone-200 mb-2' />
-                </>
-            )}
-            <button
-                onClick={() => handleNavigate('/profile/me')}
-                className="flex items-center px-2 py-2 text-stone-700 hover:bg-stone-100 no-underline w-full text-left"
-            >
-                <StyledPersonIcon className="mr-2" />
-                Profile
-            </button>
-            <button
-                onClick={() => handleNavigate('/profile/orders')}
-                className="flex items-center px-2 py-2 text-stone-700 hover:bg-stone-100 no-underline w-full text-left"
-            >
-                <StyledInboxIcon className="mr-2" />
-                Orders
-            </button>
-            <button
-                onClick={() => handleNavigate('/profile/wishlist')}
-                className="flex items-center px-2 py-2 mb-2 text-stone-700 hover:bg-stone-100 no-underline w-full text-left"
-            >
-                <StyledFavoriteIcon className="mr-2" />
-                Wishlist
-            </button>
-            <hr className='border-stone-200 mb-2' />
-            <button
-                onClick={handleLogout}
-                className="flex items-center w-full px-2 py-2 text-stone-700 hover:bg-stone-100 text-left"
-            >
-                <StyledLogoutIcon className="mr-2" />
-                Log Out
-            </button>
+            <DropdownAnimation isOpen={isOpen}>
+                {isAdmin && (
+                    <>
+                        <button
+                            onClick={() => handleNavigate('/dashboard/users')}
+                            className="flex items-center px-2 py-2 mb-2 text-stone-700 hover:bg-stone-100 no-underline w-full text-left"
+                        >
+                            <StyledDashboardIcon className="mr-2" />
+                            Dashboard
+                        </button>
+                        <hr className='border-stone-200 mb-2' />
+                    </>
+                )}
+                <button
+                    onClick={() => handleNavigate('/profile/me')}
+                    className="flex items-center px-2 py-2 text-stone-700 hover:bg-stone-100 no-underline w-full text-left"
+                >
+                    <StyledPersonIcon className="mr-2" />
+                    Profile
+                </button>
+                <button
+                    onClick={() => handleNavigate('/profile/orders')}
+                    className="flex items-center px-2 py-2 text-stone-700 hover:bg-stone-100 no-underline w-full text-left"
+                >
+                    <StyledInboxIcon className="mr-2" />
+                    Orders
+                </button>
+                <button
+                    onClick={() => handleNavigate('/profile/wishlist')}
+                    className="flex items-center px-2 py-2 mb-2 text-stone-700 hover:bg-stone-100 no-underline w-full text-left"
+                >
+                    <StyledFavoriteIcon className="mr-2" />
+                    Wishlist
+                </button>
+                <hr className='border-stone-200 mb-2' />
+                <button
+                    onClick={handleLogout}
+                    className="flex items-center w-full px-2 py-2 text-stone-700 hover:bg-stone-100 text-left"
+                >
+                    <StyledLogoutIcon className="mr-2" />
+                    Log Out
+                </button>
+            </DropdownAnimation>
         </div>
     );
 };
 
 export const CartDropdown = ({
+    isOpen,
     cartItems,
     cartTotal,
     handleRemoveItem,
     handleGoToCart,
     isLoading,
     handleProductClick
-}) => (
-    <div
-        className="absolute right-0 mt-1 w-96 bg-white border shadow-lg rounded-lg p-4"
-        tabIndex="0"
-    >
-        {cartItems.length === 0 ? (
-            <div className="text-sm text-left">You have no products in your cart</div>
-        ) : (
-            <>
-                <ul className="mt-2 mb-2 overflow-y-auto max-h-60">
-                    {cartItems.map(item => (
-                        <li
-                            key={`${item.product._id}-${item.quantity}`}
-                            className={'flex justify-between items-center mb-4'}
-                        >
-                            <img
-                                src={getImageUrl(item.product.image)}
-                                alt={item.product.name}
-                                className="w-12 h-12 object-contain rounded cursor-pointer"
-                                onClick={() => handleProductClick(item.product._id)}
-                            />
-                            <div className="ml-2 flex-grow">
-                                <span
-                                    className="block font-semibold cursor-pointer hover:underline truncate max-w-[calc(22ch)]"
-                                    onClick={() => handleProductClick(item.product._id)}
+}) => {
+    return (
+        <div
+            className="absolute right-0 mt-1 w-96 bg-white border shadow-lg rounded-lg p-4"
+            tabIndex="0"
+        >
+            <DropdownAnimation isOpen={isOpen}>
+                {cartItems.length === 0 ? (
+                    <div className="text-sm text-left">You have no products in your cart</div>
+                ) : (
+                    <>
+                        <ul className="mt-2 mb-2 overflow-y-auto max-h-60">
+                            {cartItems.map(item => (
+                                <li
+                                    key={`${item.product._id}-${item.quantity}`}
+                                    className={'flex justify-between items-center mb-4'}
                                 >
-                                    {item.product.name}
-                                </span>
-                                <span className="block text-sm text-gray-500">
-                                    {item.quantity} x {item.product.salePrice > 0 ? formatPrice(item.product.salePrice) : formatPrice(item.product.price)} €
-                                </span>
+                                    <img
+                                        src={getImageUrl(item.product.image)}
+                                        alt={item.product.name}
+                                        className="w-12 h-12 object-contain rounded cursor-pointer"
+                                        onClick={() => handleProductClick(item.product._id)}
+                                    />
+                                    <div className="ml-2 flex-grow">
+                                        <span
+                                            className="block font-semibold cursor-pointer hover:underline truncate max-w-[calc(22ch)]"
+                                            onClick={() => handleProductClick(item.product._id)}
+                                        >
+                                            {item.product.name}
+                                        </span>
+                                        <span className="block text-sm text-gray-500">
+                                            {item.quantity} x {item.product.salePrice > 0 ? formatPrice(item.product.salePrice) : formatPrice(item.product.price)} €
+                                        </span>
+                                    </div>
+                                    <RoundIconButton
+                                        style={{ backgroundColor: 'white' }}
+                                        onClick={() => handleRemoveItem(item.product._id)}
+                                        disabled={isLoading}
+                                    >
+                                        <BrownDeleteOutlinedIcon />
+                                    </RoundIconButton>
+                                </li>
+                            ))}
+                        </ul>
+                        <hr className='border-stone-200' />
+                        <div className="flex justify-between items-center mt-4 mb-4">
+                            <div className="flex justify-start items-center space-x-1">
+                                <span className="font-semibold">Total:</span>
+                                <span className="font-semibold">{formatPrice(cartTotal)} €</span>
                             </div>
-                            <RoundIconButton
-                                style={{ backgroundColor: 'white' }}
-                                onClick={() => handleRemoveItem(item.product._id)}
-                                disabled={isLoading}
-                            >
-                                <BrownDeleteOutlinedIcon />
-                            </RoundIconButton>
-                        </li>
-                    ))}
-                </ul>
-                <hr className='border-stone-200' />
-                <div className="flex justify-between items-center mt-4 mb-4">
-                    <div className="flex justify-start items-center space-x-1">
-                        <span className="font-semibold">Total:</span>
-                        <span className="font-semibold">{formatPrice(cartTotal)} €</span>
-                    </div>
-                </div>
-                <Button
-                    style={{ backgroundColor: '#686159', color: 'white' }}
-                    onClick={handleGoToCart}
-                    className='w-full rounded-md'
-                    disabled={isLoading}
-                >
-                    Go to Cart
-                </Button>
-            </>
-        )}
-    </div>
-);
+                        </div>
+                        <Button
+                            style={{ backgroundColor: '#686159', color: 'white' }}
+                            onClick={handleGoToCart}
+                            className='w-full rounded-md'
+                            disabled={isLoading}
+                        >
+                            Go to Cart
+                        </Button>
+                    </>
+                )}
+            </DropdownAnimation>
+        </div>
+    );
+};
 
 export const LoginButton = () => {
     const navigate = useNavigate();
@@ -2131,7 +2035,7 @@ export const NavbarLogo = ({ dashboardStyling }) => {
     );
 }
 
-export const ProfileIcon = ({ handleProfileDropdownToggle }) => {
+export const ProfileIcon = ({ handleProfileDropdownToggle, isDropdownOpen }) => {
     const [firstName, setFirstName] = useState('');
     const [loading, setLoading] = useState(true);
     const axiosInstance = useAxios();
@@ -2160,7 +2064,7 @@ export const ProfileIcon = ({ handleProfileDropdownToggle }) => {
                     onMouseDown={handleProfileDropdownToggle}
                     className="flex items-center space-x-2 rounded-sm"
                 >
-                    <StyledPersonIcon />
+                    {isDropdownOpen ? <StyledPersonIcon component={Person} /> : <StyledPersonIcon component={PersonOutlined} />}
                     {loading ? (
                         <Skeleton variant="text" width={80} height={20} className="ml-1" />
                     ) : (
@@ -2188,7 +2092,7 @@ export const WishlistIcon = () => {
     );
 };
 
-export const CartIcon = ({ totalQuantity, handleCartDropdownToggle }) => {
+export const CartIcon = ({ totalQuantity, handleCartDropdownToggle, isDropdownOpen }) => {
     return (
         <RoundIconButton aria-label="cart" onMouseDown={handleCartDropdownToggle}>
             <Badge
@@ -2197,15 +2101,19 @@ export const CartIcon = ({ totalQuantity, handleCartDropdownToggle }) => {
                     vertical: 'top',
                     horizontal: 'right',
                 }}
-                color="secondary"
+                sx={{
+                    '& .MuiBadge-badge': {
+                        backgroundColor: '#7C7164',
+                        color: 'white',
+                    },
+                }}
                 showZero
             >
-                <StyledShoppingCartIcon />
+                {isDropdownOpen ? <StyledShoppingCartIcon component={ShoppingCart} /> : <StyledShoppingCartIcon component={ShoppingCartOutlined} />}
             </Badge>
         </RoundIconButton>
     );
 };
-
 
 export const CollapseIcon = ({ toggleDrawer }) => {
     return (
@@ -2236,82 +2144,241 @@ export const ExtendIcon = ({ toggleDrawer, open }) => {
 
 export const DashboardCollapse = ({ toggleDrawer }) => {
     return (
-        <Toolbar
-            sx={{
-                display: 'flex',
-                alignItems: 'center',
-                justifyContent: 'flex-end',
-                px: [1],
-            }}
-        >
+        <Toolbar sx={{ display: 'flex', alignItems: 'center', justifyContent: 'flex-end', px: [1] }}>
             <CollapseIcon toggleDrawer={toggleDrawer} />
         </Toolbar>
     )
 }
 
-export const SplideList = ({ items, id, loading, onCardClick, showImage = true }) => {
-    const [skeletonCount, setSkeletonCount] = useState(1);
+export const useScrollAwayMenu = () => {
+    const [open, setOpen] = useState(false);
+    const menuRef = useRef(null);
 
     useEffect(() => {
-        const updateSkeletonCount = () => {
-            setSkeletonCount(window.innerWidth >= 768 ? 3 : 1);
+        const handleScroll = (e) => {
+            if (!open) return;
+
+            const menuElement = menuRef.current;
+            if (!menuElement) return;
+
+            const menuRect = menuElement.getBoundingClientRect();
+            const viewportHeight = window.innerHeight;
+
+            if (menuRect.bottom < 0 || menuRect.top > viewportHeight) {
+                setOpen(false);
+            }
         };
 
+        window.addEventListener('scroll', handleScroll, { passive: true });
+        return () => window.removeEventListener('scroll', handleScroll);
+    }, [open]);
+
+    const menuProps = {
+        disableScrollLock: true,
+        disableRestoreFocus: true,
+        anchorOrigin: {
+            vertical: 'bottom',
+            horizontal: 'left',
+        },
+        transformOrigin: {
+            vertical: 'top',
+            horizontal: 'left',
+        }
+    };
+
+    return {
+        open,
+        setOpen,
+        menuRef,
+        menuProps,
+        menuHandlers: {
+            onOpen: () => setOpen(true),
+            onClose: () => setOpen(false)
+        }
+    };
+};
+
+const SplideSkeleton = ({ count }) => (
+    <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+        {[...Array(count)].map((_, index) => (
+            <Skeleton
+                key={index}
+                variant="rectangular"
+                width="100%"
+                height={60}
+                animation="wave"
+                className="rounded-md"
+            />
+        ))}
+    </div>
+);
+
+const SplideSlides = ({ items, onCardClick, showImage, splideRef }) => (
+    <Splide
+        ref={splideRef}
+        options={{
+            type: 'slide',
+            perPage: 3,
+            breakpoints: {
+                768: { perPage: 2 },
+                480: { perPage: 1 },
+            },
+            gap: '1rem',
+            pagination: false,
+            drag: true,
+            arrows: false,
+        }}
+    >
+        {items.map(item => (
+            <SplideSlide key={item._id}>
+                <div
+                    onClick={() => onCardClick(item._id)}
+                    className="flex items-center p-4 bg-white rounded-md cursor-pointer hover:underline hover:shadow-lg transition-shadow duration-300"
+                >
+                    {showImage && (
+                        <img
+                            src={getImageUrl(item.image)}
+                            alt={item.name}
+                            className="object-contain mr-3 w-7 h-7"
+                        />
+                    )}
+                    <span className="font-medium text-base">{truncateText(item.name, 24)}</span>
+                </div>
+            </SplideSlide>
+        ))}
+    </Splide>
+);
+
+const SplideArrows = ({ loading, items, id, handlePrev, isBeginning, handleNext, isEnd }) => {
+    if (loading || (isBeginning && isEnd) || !items[id]?.length || items[id].length == 1) return null;
+
+    return (
+        <div className="flex justify-end mt-2 space-x-2">
+            <IconButton
+                onClick={handlePrev}
+                color="primary"
+                aria-label="Previous slide"
+                size="small"
+                disabled={isBeginning}
+                className={isBeginning ? 'opacity-50 cursor-not-allowed' : ''}
+            >
+                <ArrowBackIosNew fontSize="small" />
+            </IconButton>
+            <IconButton
+                onClick={handleNext}
+                color="primary"
+                aria-label="Next slide"
+                size="small"
+                disabled={isEnd}
+                className={isEnd ? 'opacity-50 cursor-not-allowed' : ''}
+            >
+                <ArrowForwardIos fontSize="small" />
+            </IconButton>
+        </div>
+    );
+};
+
+const SplideSort = ({ sortOrder, onSortChange, showTopStyle = true }) => {
+    const { open, menuRef, menuProps, menuHandlers } = useScrollAwayMenu();
+
+    return (
+        <div className={`flex justify-between items-baseline ${showTopStyle ? 'relative top-1' : ''}`}>
+            <p className="text-base text-stone-600">Products</p>
+            <div ref={menuRef}>
+                <FormControl variant="outlined" size="small" className="w-56">
+                    <InputLabel>Sort By</InputLabel>
+                    <Select
+                        open={open}
+                        {...menuHandlers}
+                        value={sortOrder}
+                        onChange={onSortChange}
+                        label="Sort By"
+                        MenuProps={menuProps}
+                    >
+                        <MenuItem value="relevancy">Relevancy</MenuItem>
+                        <MenuItem value="lowToHigh">Price: Low to High</MenuItem>
+                        <MenuItem value="highToLow">Price: High to Low</MenuItem>
+                        <MenuItem value="newest">Newest</MenuItem>
+                        <MenuItem value="highestSale">Highest sale percentage</MenuItem>
+                    </Select>
+                </FormControl>
+            </div>
+        </div>
+    );
+};
+
+export const SplideList = ({
+    items,
+    id,
+    loading,
+    onCardClick,
+    showImage = true,
+    sortOrder,
+    onSortChange,
+    showSplide = true,
+    showTopStyle = true,
+}) => {
+    const [skeletonCount, setSkeletonCount] = useState(1);
+    const [isBeginning, setIsBeginning] = useState(true);
+    const [isEnd, setIsEnd] = useState(false);
+    const splideRef = useRef(null);
+
+    useEffect(() => {
+        const updateSkeletonCount = () => setSkeletonCount(window.innerWidth >= 768 ? 3 : 1);
         updateSkeletonCount();
         window.addEventListener('resize', updateSkeletonCount);
-
         return () => window.removeEventListener('resize', updateSkeletonCount);
     }, []);
 
+    useEffect(() => {
+        if (splideRef.current && splideRef.current.splide) {
+            const splide = splideRef.current.splide;
+            const updateButtons = () => {
+                setIsBeginning(splide.index === 0);
+                setIsEnd(splide.index === splide.length - splide.options.perPage);
+            };
+
+            updateButtons();
+            splide.on('moved', updateButtons);
+            splide.on('resize', updateButtons);
+
+            return () => {
+                splide.off('moved', updateButtons);
+                splide.off('resize', updateButtons);
+            };
+        }
+    }, [items, id]);
+
+    const handlePrev = () => splideRef.current.splide.go('<');
+    const handleNext = () => splideRef.current.splide.go('>');
+
     return (
-        <div className="max-w-[870px] mb-14">
-            {loading ? (
-                <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-                    {[...Array(skeletonCount)].map((_, index) => (
-                        <Skeleton
-                            key={index}
-                            variant="rectangular"
-                            width="100%"
-                            height={60}
-                            animation="wave"
-                            className="rounded-md"
+        <>
+            {showSplide && (
+                <div className="max-w-[870px] mb-11">
+                    {loading ? (
+                        <SplideSkeleton count={skeletonCount} />
+                    ) : (
+                        <SplideSlides
+                            items={items[id] || []}
+                            onCardClick={onCardClick}
+                            showImage={showImage}
+                            splideRef={splideRef}
                         />
-                    ))}
+                    )}
+                    <SplideArrows
+                        loading={loading}
+                        items={items}
+                        id={id}
+                        handlePrev={handlePrev}
+                        isBeginning={isBeginning}
+                        handleNext={handleNext}
+                        isEnd={isEnd}
+                    />
                 </div>
-            ) : (
-                <Splide
-                    options={{
-                        type: 'slide',
-                        perPage: 3,
-                        breakpoints: {
-                            768: { perPage: 2 },
-                            480: { perPage: 1 },
-                        },
-                        gap: '1rem',
-                        pagination: false,
-                        drag: true,
-                    }}
-                >
-                    {(items[id] || []).map(item => (
-                        <SplideSlide key={item._id}>
-                            <div
-                                onClick={() => onCardClick(item._id)}
-                                className="flex items-center p-4 bg-white rounded-md cursor-pointer hover:underline hover:shadow-lg transition-shadow duration-300"
-                            >
-                                {showImage && (
-                                    <img
-                                        src={getImageUrl(item.image)}
-                                        alt={item.name}
-                                        className="object-contain mr-3 w-7 h-7"
-                                    />
-                                )}
-                                <span className="font-medium text-base">{truncateText(item.name, 24)}</span>
-                            </div>
-                        </SplideSlide>
-                    ))}
-                </Splide>
             )}
-        </div>
+            <SplideSort sortOrder={sortOrder} onSortChange={onSortChange} showTopStyle={showTopStyle} />
+        </>
     );
 };
 
@@ -2388,18 +2455,19 @@ export const AuthActions = ({
     handleLogout,
     isAdmin
 }) => {
-
     return (
         <div className="flex items-center space-x-6">
             <div className="flex items-center space-x-4">
                 {auth.accessToken ? (
                     <div className="relative ml-4">
                         <ProfileIcon
-                            auth={auth}
                             handleProfileDropdownToggle={handleProfileDropdownToggle}
+                            isDropdownOpen={isDropdownOpen}
+                            auth={auth}
                         />
                         {isDropdownOpen && (
                             <ProfileDropdown
+                                isOpen={isDropdownOpen}
                                 isAdmin={isAdmin}
                                 handleLogout={handleLogout}
                             />
@@ -2418,10 +2486,7 @@ export const DashboardAppBar = ({ open, children }) => {
         <AppBar
             position="absolute"
             open={open}
-            sx={{
-                boxShadow: '1px 0px 3px rgba(0, 0, 0, 0.1)',
-                display: 'flex',
-            }}
+            sx={{ boxShadow: '1px 0px 3px rgba(0, 0, 0, 0.1)', display: 'flex' }}
         >
             {children}
         </AppBar>
@@ -2430,13 +2495,7 @@ export const DashboardAppBar = ({ open, children }) => {
 
 export const DashboardToolbar = ({ children }) => {
     return (
-        <Toolbar
-            sx={{
-                display: 'flex',
-                justifyContent: 'space-between',
-                alignItems: 'center',
-            }}
-        >
+        <Toolbar sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
             {children}
         </Toolbar>
     )
@@ -2468,48 +2527,19 @@ export const DashboardNavbar = ({ open, toggleDrawer, auth, isDropdownOpen, hand
 
 export const SidebarLayout = ({ children }) => {
     return (
-        <Box
-            sx={{
-                position: { xs: 'static', md: 'absolute' },
-                top: { md: '24px' },
-                left: { md: '10' },
-                width: { xs: '100%', md: '320px' },
-                bgcolor: 'white',
-                p: { xs: 2, md: 3 },
-                boxShadow: '0 1px 2px 0 rgb(0 0 0 / 0.05)',
-                borderRadius: '6px',
-                mt: { xs: 10, md: 2 }
-            }}
-        >
+        <Box sx={sidebarLayoutStyling}>
             {children}
-        </Box >
+        </Box>
     )
 }
 
 export const ProfileLayout = ({ children }) => {
     return (
-        <Box
-            sx={{
-                maxWidth: '1250px',
-                mx: 'auto',
-                px: { xs: 2, md: 3 },
-                display: 'flex',
-                flexDirection: { xs: 'column', md: 'row' },
-                gap: { md: 3 },
-                position: 'relative',
-                mb: 10,
-                mt: 5
-            }}
-        >
+        <Box sx={profileLayoutStyling}>
             <ProfileSidebar />
             <Box
                 component="main"
-                sx={{
-                    flex: 1,
-                    ml: { md: '332px' },
-                    width: '100%',
-                    mt: { xs: 4, md: 5 },
-                }}
+                sx={layoutContainerStyle}
             >
                 {children}
             </Box>
@@ -2527,19 +2557,7 @@ export const FilterLayout = ({
     onApplyPriceFilter,
     onSaleToggle = false,
 }) => (
-    <Box
-        sx={{
-            maxWidth: '1250px',
-            mx: 'auto',
-            px: { xs: 2, md: 3 },
-            display: 'flex',
-            flexDirection: { xs: 'column', md: 'row' },
-            gap: { md: 3 },
-            position: 'relative',
-            mb: 10,
-            mt: { xs: 18, md: 5 },
-        }}
-    >
+    <Box sx={filterLayoutStyling}>
         <div className="absolute top-0 z-10 pb-4 bg-gray-50">
             {loading ? (
                 <Skeleton variant="text" animation="wave" width={250} height={20} />
@@ -2560,12 +2578,7 @@ export const FilterLayout = ({
         <FilterSidebar onApplyPriceFilter={onApplyPriceFilter} onSaleToggle={onSaleToggle} />
         <Box
             component="main"
-            sx={{
-                flex: 1,
-                ml: { md: '332px' },
-                width: '100%',
-                mt: { xs: 4, md: 5 },
-            }}
+            sx={layoutContainerStyle}
         >
             {children}
         </Box>

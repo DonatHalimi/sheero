@@ -13,6 +13,8 @@ const PaymentModal = ({ open, onClose, onStripePayment, onCashPayment }) => {
 
     return (
         <>
+            {loading && <LoadingOverlay />}
+            
             <CustomModal open={open} onClose={onClose}>
                 <div className="flex flex-col sm:flex-row justify-between gap-6 p-3">
                     <div
@@ -37,8 +39,6 @@ const PaymentModal = ({ open, onClose, onStripePayment, onCashPayment }) => {
                 </div>
 
             </CustomModal>
-
-            {loading && <LoadingOverlay />}
         </>
     );
 };

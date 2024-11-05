@@ -1,13 +1,7 @@
 const City = require('../models/City');
 const Country = require('../models/Country');
-const User = require('../models/User');
 
 const createCity = async (req, res) => {
-    const requestingUser = await User.findById(req.user.userId).populate('role');
-    if (requestingUser.role.name !== 'admin') {
-        return res.status(403).json({ message: 'Forbidden' });
-    }
-
     const { name, country, zipCode } = req.body;
     try {
         const city = new City({ name, country, zipCode });
@@ -45,11 +39,6 @@ const getCity = async (req, res) => {
 };
 
 const updateCity = async (req, res) => {
-    const requestingUser = await User.findById(req.user.userId).populate('role');
-    if (requestingUser.role.name !== 'admin') {
-        return res.status(403).json({ message: 'Forbidden' });
-    }
-
     const { name, country, zipCode } = req.body;
     try {
         const city = await City.findByIdAndUpdate(
@@ -65,11 +54,6 @@ const updateCity = async (req, res) => {
 };
 
 const deleteCity = async (req, res) => {
-    const requestingUser = await User.findById(req.user.userId).populate('role');
-    if (requestingUser.role.name !== 'admin') {
-        return res.status(403).json({ message: 'Forbidden' });
-    }
-
     try {
         const city = await City.findById(req.params.id);
         if (!city) {
@@ -86,11 +70,6 @@ const deleteCity = async (req, res) => {
 };
 
 const deleteCities = async (req, res) => {
-    const requestingUser = await User.findById(req.user.userId).populate('role');
-    if (requestingUser.role.name !== 'admin') {
-        return res.status(403).json({ message: 'Forbidden' });
-    }
-
     const { ids } = req.body;
 
     if (!ids || !Array.isArray(ids) || ids.length === 0) {

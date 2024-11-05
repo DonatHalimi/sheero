@@ -2,7 +2,7 @@ import React, { useContext, useEffect, useState } from 'react';
 import { DashboardHeader } from '../../assets/CustomComponents';
 import useAxios from '../../axiosInstance';
 import DashboardTable from '../../components/Dashboard/DashboardTable';
-import DeleteModal from '../../components/Modal/DeleteModal'; // Ensure this is imported
+import DeleteModal from '../../components/Modal/DeleteModal';
 import EditOrderModal from '../../components/Modal/Order/EditOrderModal';
 import { AuthContext } from '../../context/AuthContext';
 

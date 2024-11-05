@@ -44,7 +44,7 @@ const WishlistItem = ({ product, onRemove, loading }) => {
 
             toast.success('Product added to cart!', { onClick: () => navigate('/cart') });
 
-            document.dispatchEvent(new CustomEvent('productAddedToCart', { detail: _id }));
+            document.dispatchEvent(new CustomEvent('cartUpdated', { detail: _id }));
         } catch (error) {
             const errorMsg = error.response?.data?.message || 'Failed to add product to cart.';
             toast.error(errorMsg, { onClick: () => navigate('/cart') });

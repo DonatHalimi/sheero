@@ -1,7 +1,6 @@
 const Review = require('../models/Review');
 const Product = require('../models/Product');
 const Order = require('../models/Order');
-const User = require('../models/User');
 
 const createReview = async (req, res) => {
     const { title, rating, comment } = req.body;
@@ -69,11 +68,6 @@ const checkReviewEligibility = async (req, res) => {
 };
 
 const getReviews = async (req, res) => {
-    const requestingUser = await User.findById(req.user.userId).populate('role');
-    if (requestingUser.role.name !== 'admin') {
-        return res.status(403).json({ message: 'Forbidden' });
-    }
-
     try {
         const reviews = await Review.find()
             .populate({
@@ -158,18 +152,9 @@ const getReviewsByUser = async (req, res) => {
 
 const updateReview = async (req, res) => {
     const { title, rating, comment } = req.body;
-    const userId = req.user.userId;
-    const userRole = req.user.role;
 
     try {
         const review = await Review.findById(req.params.id);
-
-        if (!review) return res.status(404).json({ message: 'Review not found' });
-
-        if (review.user.toString() !== userId && userRole !== 'admin') {
-            console.error('User mismatch:', userId, review.user.toString());
-            return res.status(403).json({ message: 'You are not authorized to update this review' });
-        }
 
         if (title !== undefined) review.title = title;
         if (rating !== undefined) review.rating = rating;
@@ -196,16 +181,10 @@ const updateReview = async (req, res) => {
 };
 
 const deleteReview = async (req, res) => {
-    const userId = req.user.userId;
-    const userRole = req.user.role;
     try {
         const review = await Review.findById(req.params.id);
 
         if (!review) return res.status(404).json({ message: 'Review not found' });
-
-        if (review.user.toString() !== userId && userRole !== 'admin') {
-            return res.status(403).json({ message: 'You are not authorized to delete this review' });
-        }
 
         await Review.findByIdAndDelete(req.params.id);
         await Product.findByIdAndUpdate(review.product, { $pull: { reviews: review._id } });
@@ -218,31 +197,17 @@ const deleteReview = async (req, res) => {
 };
 
 const deleteReviews = async (req, res) => {
-    const requestingUser = await User.findById(req.user.userId).populate('role');
-    if (requestingUser.role.name !== 'admin') {
-        return res.status(403).json({ message: 'Forbidden' });
-    }
-
     const { ids } = req.body;
 
     if (!ids || !Array.isArray(ids) || ids.length === 0) {
         return res.status(400).json({ message: 'Invalid or empty ids array' });
     }
 
-    const userId = req.user.userId;
-    const userRole = req.user.role;
-
     try {
         const reviews = await Review.find({ _id: { $in: ids } });
 
         if (reviews.length !== ids.length) {
             return res.status(404).json({ message: 'One or more reviews not found' });
-        }
-
-        for (const review of reviews) {
-            if (review.user.toString() !== userId && userRole !== 'admin') {
-                return res.status(403).json({ message: 'You are not authorized to delete one or more of these reviews' });
-            }
         }
 
         const productIds = reviews.map(review => review.product);
