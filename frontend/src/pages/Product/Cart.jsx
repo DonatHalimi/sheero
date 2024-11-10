@@ -6,7 +6,7 @@ import { toast } from 'react-toastify';
 import { CheckoutButton, CustomDeleteModal, EmptyState, LoadingCart, LoadingOverlay, RoundIconButton, formatPrice, truncateText } from '../../assets/CustomComponents';
 import emptyCartImage from '../../assets/img/empty/cart.png';
 import useAxios from '../../axiosInstance';
-import Footer from '../../components/Footer';
+import Footer from '../../components/Utils/Footer';
 import Navbar from '../../components/Navbar/Navbar';
 import PaymentModal from '../../components/Product/PaymentModal';
 import { getImageUrl } from '../../config';
@@ -119,13 +119,6 @@ const Cart = () => {
     };
 
     const handleStripePayment = async () => {
-        if (!address) {
-            toast.warn("No address found. Click here to add one!", {
-                onClick: () => navigate('/profile/address'),
-            });
-            return;
-        }
-
         try {
             const { data } = await axiosInstance.post('/orders/payment/stripe', {
                 cartId: cart._id,
@@ -145,17 +138,17 @@ const Cart = () => {
     };
 
     const handleShowModal = () => {
-        setShowPaymentModal(true);
-    };
-
-    const handleCashPayment = async () => {
         if (!address) {
             toast.warn("No address found. Click here to add one!", {
                 onClick: () => navigate('/profile/address'),
+                autoClose: false,
             });
             return;
         }
+        setShowPaymentModal(true);
+    };    
 
+    const handleCashPayment = async () => {
         try {
             const { data } = await axiosInstance.post('/orders/payment/cash', {
                 cartId: cart._id,

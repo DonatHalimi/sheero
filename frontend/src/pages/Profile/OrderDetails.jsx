@@ -5,13 +5,15 @@ import 'react-toastify/dist/ReactToastify.css';
 import { EmptyState, formatDate, formatPrice, Header, OrderDetailsSkeleton, ProfileLayout } from '../../assets/CustomComponents';
 import emptyOrdersImage from '../../assets/img/empty/orders.png';
 import useAxios from '../../axiosInstance';
-import Footer from '../../components/Footer';
+import Footer from '../../components/Utils/Footer';
 import Navbar from '../../components/Navbar/Navbar';
 import { getImageUrl } from '../../config';
+import ReturnModal from '../../components/Product/ReturnModal';
 
 const OrderDetails = () => {
     const { orderId } = useParams();
     const [order, setOrder] = useState(null);
+    const [isReturnModalOpen, setIsReturnModalOpen] = useState(false);
     const [loading, setLoading] = useState(true);
     const axiosInstance = useAxios();
     const navigate = useNavigate();
@@ -42,6 +44,8 @@ const OrderDetails = () => {
         }
     };
 
+    const openReturnModal = () => setIsReturnModalOpen(true);
+
     const getStatusProgress = (status) => {
         switch (status) {
             case 'pending':
@@ -61,7 +65,12 @@ const OrderDetails = () => {
         <>
             <Navbar />
             <ProfileLayout>
-                <Header title="Order:" orderId={orderId} />
+                <Header
+                    title="Order:"
+                    orderId={orderId}
+                    isOrderDetails={order?.status === "delivered"}
+                    openReturnModal={openReturnModal}
+                />
 
                 {loading ? (
                     <OrderDetailsSkeleton />
@@ -311,6 +320,12 @@ const OrderDetails = () => {
                     />
                 )}
             </ProfileLayout>
+
+            <ReturnModal
+                open={isReturnModalOpen}
+                onClose={() => setIsReturnModalOpen(false)}
+                products={order ? order.products : []}
+            />
 
             <Footer />
         </>

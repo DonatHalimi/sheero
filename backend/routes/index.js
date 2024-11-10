@@ -13,6 +13,7 @@ const faqRoutes = require('./faq');
 const orderRoutes = require('./order');
 const productRoutes = require('./product');
 const protectedRoutes = require('./protected');
+const returnRoutes = require('./return');
 const reviewRoutes = require('./review');
 const roleRoutes = require('./role');
 const slideshowRoutes = require('./slideshow');
@@ -34,6 +35,7 @@ router.use('/faqs', faqRoutes);
 router.use('/orders', orderRoutes);
 router.use('/protected', protectedRoutes);
 router.use('/products', productRoutes);
+router.use('/returns', returnRoutes)
 router.use('/reviews', reviewRoutes);
 router.use('/roles', roleRoutes)
 router.use('/slideshow', slideshowRoutes);

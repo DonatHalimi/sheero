@@ -8,6 +8,7 @@ const useAxios = () => {
 
     const axiosInstance = axios.create({
         baseURL: API_URL,
+        withCredentials: true,
     });
 
     // Request interceptor to add the access token to every request

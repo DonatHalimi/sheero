@@ -1,6 +1,6 @@
 import React from 'react';
-import { ErrorPageComponent } from '../assets/CustomComponents';
-import notAllowed from '../assets/img/errors/not-allowed.png';
+import { ErrorPageComponent } from '../../assets/CustomComponents';
+import notAllowed from '../../assets/img/errors/not-allowed.png';
 
 const NotAllowed = () => {
     return (

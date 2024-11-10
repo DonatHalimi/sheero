@@ -4,7 +4,7 @@ import { useLocation } from 'react-router-dom';
 import { CustomPagination, EmptyState, GoBackButton } from '../../assets/CustomComponents';
 import noResultsImage from '../../assets/img/empty/search-results.png';
 import useAxios from '../../axiosInstance';
-import Footer from '../../components/Footer';
+import Footer from '../../components/Utils/Footer';
 import Navbar from '../../components/Navbar/Navbar';
 import ProductItem from '../../components/Product/ProductItem';
 
@@ -19,6 +19,8 @@ const SearchResults = () => {
     const location = useLocation();
 
     const query = new URLSearchParams(location.search).get('query');
+
+    useEffect(() => { window.scrollTo(0, 0); }, []);
 
     useEffect(() => {
         const fetchSearchResults = async () => {
@@ -36,10 +38,6 @@ const SearchResults = () => {
             fetchSearchResults();
         }
     }, [query, axiosInstance]);
-
-    useEffect(() => {
-        window.scrollTo(0, 0);
-    }, []);
 
     const pageCount = Math.ceil(totalProducts / itemsPerPage);
 

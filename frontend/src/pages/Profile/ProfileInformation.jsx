@@ -6,8 +6,8 @@ import { toast } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
 import { BrownOutlinedTextField, Header, InformationSkeleton, knownEmailProviders, ProfileLayout } from '../../assets/CustomComponents';
 import useAxios from '../../axiosInstance';
-import Footer from '../../components/Footer';
 import Navbar from '../../components/Navbar/Navbar';
+import Footer from '../../components/Utils/Footer';
 import { AuthContext } from '../../context/AuthContext';
 
 const ProfileInformation = () => {

@@ -8,12 +8,14 @@ import {
     CustomAddressIcon,
     CustomOrdersIcon,
     CustomProfileIcon,
+    CustomReturnIcon,
     CustomReviewsIcon,
     CustomWishlistIcon,
     LoadingProfile,
     SidebarLayout,
     StyledFavoriteIcon,
     StyledInboxIcon,
+    StyledMoveToInboxIcon,
     StyledPersonIcon
 } from '../../assets/CustomComponents';
 import useAxios from '../../axiosInstance';
@@ -59,6 +61,7 @@ const ProfileSidebar = () => {
         { key: 'me', label: 'Profile', icon: <CustomProfileIcon isActive={true} />, inactiveIcon: <StyledPersonIcon />, },
         { key: 'address', label: 'Address', icon: <CustomAddressIcon isActive={true} />, inactiveIcon: <HomeOutlined />, },
         { key: 'orders', label: 'Orders', icon: <CustomOrdersIcon isActive={true} />, inactiveIcon: <StyledInboxIcon />, },
+        { key: 'returns', label: 'Returns', icon: <CustomReturnIcon isActive={true} />, inactiveIcon: <StyledMoveToInboxIcon />, },
         { key: 'wishlist', label: 'Wishlist', icon: <CustomWishlistIcon isActive={true} />, inactiveIcon: <StyledFavoriteIcon />, },
         { key: 'reviews', label: 'Reviews', icon: <CustomReviewsIcon isActive={true} />, inactiveIcon: <StarBorderOutlined />, },
     ];

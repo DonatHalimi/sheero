@@ -1,7 +1,7 @@
-import { Typography, TextField, Collapse, IconButton, Box, Button, Switch } from '@mui/material';
-import { ExpandMore, ExpandLess, PaidOutlined } from '@mui/icons-material';
+import { ExpandLess, ExpandMore, PaidOutlined } from '@mui/icons-material';
+import { Box, Button, Collapse, IconButton, TextField, Typography } from '@mui/material';
 import React, { useState } from 'react';
-import { OutlinedBrownButton, SidebarLayout } from '../../assets/CustomComponents';
+import { SidebarLayout } from '../../assets/CustomComponents';
 
 const FilterSidebar = ({ onApplyPriceFilter }) => {
     const [priceFilterOpen, setPriceFilterOpen] = useState(true);

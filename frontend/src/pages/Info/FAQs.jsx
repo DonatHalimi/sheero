@@ -1,11 +1,13 @@
 import React, { useEffect, useState } from 'react';
-import { FAQItem, GoBackButton } from '../assets/CustomComponents';
-import useAxios from '../axiosInstance';
-import Footer from '../components/Footer';
-import Navbar from '../components/Navbar/Navbar';
+import { FAQItem, GoBackButton, FaqSkeleton } from '../../assets/CustomComponents';
+import useAxios from '../../axiosInstance';
+import Footer from '../../components/Utils/Footer';
+import Navbar from '../../components/Navbar/Navbar';
 
 const FAQs = () => {
     const [faqData, setFaqData] = useState([]);
+    const [loading, setLoading] = useState(true);
+
     const axiosInstance = useAxios();
 
     useEffect(() => {
@@ -15,6 +17,8 @@ const FAQs = () => {
                 setFaqData(response.data);
             } catch (error) {
                 console.error('Error fetching FAQs:', error);
+            } finally {
+                setLoading(false);
             }
         };
 
@@ -32,13 +36,16 @@ const FAQs = () => {
                 </div>
 
                 <div>
-                    {faqData.map((faq, index) => (
-                        <FAQItem key={index} question={faq.question} answer={faq.answer} />
-                    ))}
+                    {loading ?
+                        <FaqSkeleton />
+                        : faqData.map((faq, index) => (
+                            <FAQItem key={index} question={faq.question} answer={faq.answer} />
+                        ))
+                    }
                 </div>
             </div>
 
-            <div className='mt-20'></div>
+            <div className='mt-20' />
             <Footer />
         </>
     );

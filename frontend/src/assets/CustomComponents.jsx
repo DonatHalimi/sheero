@@ -21,6 +21,8 @@ import {
     Logout,
     Menu as MenuIcon,
     MoreVert,
+    MoveToInbox,
+    MoveToInboxOutlined,
     Person,
     PersonOutlined,
     QuestionAnswerOutlined,
@@ -76,13 +78,13 @@ import { styled } from '@mui/material/styles';
 import SvgIcon from '@mui/material/SvgIcon';
 import { GridToolbar } from '@mui/x-data-grid';
 import { Splide, SplideSlide } from '@splidejs/react-splide';
-import { AnimatePresence, motion, spring } from 'framer-motion';
+import { AnimatePresence, motion } from 'framer-motion';
 import PropTypes from 'prop-types';
 import React, { forwardRef, useEffect, useRef, useState } from 'react';
 import { Link as RouterLink, useNavigate } from 'react-router-dom';
 import { toast } from 'react-toastify';
 import useAxios from '../axiosInstance';
-import Footer from '../components/Footer';
+import Footer from '../components/Utils/Footer';
 import Navbar from '../components/Navbar/Navbar';
 import FilterSidebar from '../components/Product/FilterSidebar';
 import { getImageUrl } from '../config';
@@ -647,6 +649,10 @@ export const StyledInboxIcon = styled(InboxOutlined)({
     color: '#666666',
 });
 
+export const StyledMoveToInboxIcon = styled(MoveToInboxOutlined)({
+    color: '#666666',
+});
+
 export const StyledShoppingCartIcon = styled(ShoppingCartOutlined)({
     color: '#666666',
 });
@@ -656,6 +662,7 @@ const activeColor = '#7C7164';
 export const CustomProfileIcon = ({ isActive }) => <Person style={{ color: isActive ? activeColor : 'inherit' }} />;
 export const CustomAddressIcon = ({ isActive }) => <Home style={{ color: isActive ? activeColor : 'inherit' }} />;
 export const CustomOrdersIcon = ({ isActive }) => <Inbox style={{ color: isActive ? activeColor : 'inherit' }} />;
+export const CustomReturnIcon =({ isActive }) => <MoveToInbox style={{ color: isActive ? activeColor : 'inherit' }} />; 
 export const CustomWishlistIcon = ({ isActive }) => <Favorite style={{ color: isActive ? activeColor : 'inherit' }} />;
 export const CustomReviewsIcon = ({ isActive }) => <Star style={{ color: isActive ? activeColor : 'inherit' }} />;
 
@@ -905,35 +912,33 @@ export const ProductDetailsSkeleton = () => {
     );
 };
 
-export const SlideshowSkeleton = () => {
-    return (
-        <Box sx={{ position: 'relative' }} className="relative w-full mx-auto mb-14">
-            <Skeleton
-                variant="rectangular"
-                animation="wave"
-                width="100%"
-                height="800px"
-                sx={{ maxWidth: '2000px', borderRadius: '8px' }}
-            />
+export const SlideshowSkeleton = () => (
+    <Box sx={{ position: 'relative' }} className="relative w-full mx-auto mb-14">
+        <Skeleton
+            variant="rectangular"
+            animation="wave"
+            width="100%"
+            height="800px"
+            sx={{ maxWidth: '2000px', borderRadius: '8px' }}
+        />
 
-            <Skeleton
-                variant="circular"
-                animation="wave"
-                width={50}
-                height={50}
-                sx={slideShowSkeletonStyling}
-            />
+        <Skeleton
+            variant="circular"
+            animation="wave"
+            width={50}
+            height={50}
+            sx={{ ...slideShowSkeletonStyling, left: '20px' }}
+        />
 
-            <Skeleton
-                variant="circular"
-                animation="wave"
-                width={50}
-                height={50}
-                sx={slideShowSkeletonStyling}
-            />
-        </Box>
-    );
-};
+        <Skeleton
+            variant="circular"
+            animation="wave"
+            width={50}
+            height={50}
+            sx={{ ...slideShowSkeletonStyling, right: '20px', left: 'auto' }}
+        />
+    </Box>
+);
 
 export const GoBackHome = () => {
     return (
@@ -1171,6 +1176,17 @@ export const FAQItem = ({ question, answer }) => {
         </div>
     );
 };
+
+export const FaqSkeleton = () => (
+    <>
+        {Array(3).fill().map((_, index) => (
+            <div key={index} className="mb-4">
+                <Skeleton variant="rectangular" height={60} animation="wave" className="rounded-md mb-2" />
+                <Skeleton variant="rectangular" height={50} animation="wave" className="rounded-md mb-2" />
+            </div>
+        ))}
+    </>
+);
 
 export const GoBackArrow = () => {
     return (
@@ -1697,17 +1713,41 @@ export const Header = ({
     setStatusFilter,
     orderId,
     placeholder,
+    filterType = 'orders',
+    isOrderDetails = false,
+    products,
+    openReturnModal,
+    handleReturnSubmit
 }) => {
     const isSharedWishlist = fullName.trim() !== '';
-
     const { open, menuRef, menuProps, menuHandlers } = useScrollAwayMenu();
+
+    const getStatusOptions = () => {
+        if (filterType === 'orders') {
+            return [
+                { value: 'All', label: 'All' },
+                { value: 'pending', label: 'Pending' },
+                { value: 'shipped', label: 'Shipped' },
+                { value: 'delivered', label: 'Delivered' },
+                { value: 'canceled', label: 'Canceled' }
+            ];
+        } else if (filterType === 'returns') {
+            return [
+                { value: 'All', label: 'All' },
+                { value: 'pending', label: 'Pending' },
+                { value: 'approved', label: 'Approved' },
+                { value: 'rejected', label: 'Rejected' }
+            ];
+        }
+        return [];
+    };
 
     return (
         <div className="bg-white p-4 rounded-md shadow-sm mb-3 flex justify-between items-center">
             <Typography variant="h5" className="text-gray-800 font-semilight">
                 {loading ? (
                     <Skeleton width={150} />
-                ) : isSharedWishlist ? (
+                ) : fullName.trim() ? (
                     `${fullName}'s Wishlist`
                 ) : (
                     `${title} ${orderId ? `#${orderId}` : ''}`
@@ -1715,19 +1755,17 @@ export const Header = ({
             </Typography>
             <div className="flex items-center space-x-4">
                 {showSearch && (
-                    <>
-                        <TextField
-                            value={searchTerm}
-                            onChange={(e) => setSearchTerm(e.target.value)}
-                            placeholder={placeholder}
-                            variant="outlined"
-                            size="small"
-                            sx={headerSearchStyling}
-                            InputProps={{
-                                endAdornment: <Search className="text-gray-400 ml-1" />
-                            }}
-                        />
-                    </>
+                    <TextField
+                        value={searchTerm}
+                        onChange={(e) => setSearchTerm(e.target.value)}
+                        placeholder={placeholder}
+                        variant="outlined"
+                        size="small"
+                        sx={headerSearchStyling}
+                        InputProps={{
+                            endAdornment: <Search className="text-gray-400 ml-1" />
+                        }}
+                    />
                 )}
                 {showFilter && (
                     <div ref={menuRef}>
@@ -1741,14 +1779,20 @@ export const Header = ({
                             sx={headerFilterStyling}
                             MenuProps={menuProps}
                         >
-                            <MenuItem value="All">All</MenuItem>
-                            <MenuItem value="pending">Pending</MenuItem>
-                            <MenuItem value="shipped">Shipped</MenuItem>
-                            <MenuItem value="delivered">Delivered</MenuItem>
-                            <MenuItem value="canceled">Canceled</MenuItem>
+                            {getStatusOptions().map((option) => (
+                                <MenuItem key={option.value} value={option.value}>
+                                    {option.label}
+                                </MenuItem>
+                            ))}
                         </Select>
                     </div>
                 )}
+                {isOrderDetails && (
+                    <Button variant="outlined" onClick={openReturnModal}>
+                        Request Return
+                    </Button>
+                )}
+                {/* Wishlist related buttons */}
                 {wishlistItems !== undefined && !isSharedWishlist && wishlistItems.length > 0 && (
                     <>
                         <ShareWishlist handleShareWishlist={handleShareWishlist} loading={loading} />
@@ -2149,6 +2193,36 @@ export const DashboardCollapse = ({ toggleDrawer }) => {
         </Toolbar>
     )
 }
+
+export const ImageSlide = ({ image, onLoad }) => (
+    <SplideSlide>
+        <div className="flex justify-center items-center">
+            <img
+                src={getImageUrl(image.image)}
+                alt={image.title}
+                onLoad={onLoad}
+                className="w-full max-w-[2000px] h-[800px] object-cover rounded-md"
+            />
+        </div>
+    </SplideSlide>
+);
+
+export const splideOptions = {
+    type: 'slide',
+    perPage: 1,
+    autoplay: true,
+    interval: 3000,
+    pagination: true,
+    arrows: true,
+    width: '100%',
+    height: 'auto',
+    gap: '13px',
+    breakpoints: {
+        1024: { perPage: 1 },
+        600: { perPage: 1 },
+        480: { perPage: 1 },
+    },
+};
 
 export const useScrollAwayMenu = () => {
     const [open, setOpen] = useState(false);

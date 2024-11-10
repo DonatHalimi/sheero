@@ -9,7 +9,7 @@ const OrderItem = ({ order, renderProductImages, getStatusColor }) => {
     return (
         <Link to={`/profile/orders/${id}`}>
             <div className="bg-white shadow rounded-md p-6 hover:shadow-md transition-shadow duration-300">
-                <div className="flex justify-between text-sm capitalize mb-4">
+                <div className="flex justify-between text-sm mb-4">
                     <div className="flex items-center">
                         <p>#{id}</p>
                         <span className="mx-1">{symbol}</span>

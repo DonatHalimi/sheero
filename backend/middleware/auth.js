@@ -59,7 +59,7 @@ const refreshAccessToken = (req, res) => {
     });
 };
 
-const protect = (req, res, next) => {
+const requireAuth = (req, res, next) => {
     authenticateToken(req, res, next);
 };
 
@@ -102,4 +102,4 @@ const requireOwnershipOrAdmin = (Model) => {
     };
 };
 
-module.exports = { authenticateToken, authorizeRole, protect, requireAuthAndRole, refreshAccessToken, requireOwnershipOrAdmin };
+module.exports = { authenticateToken, authorizeRole, requireAuth, requireAuthAndRole, refreshAccessToken, requireOwnershipOrAdmin };

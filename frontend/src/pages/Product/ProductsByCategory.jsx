@@ -4,7 +4,7 @@ import React, { useEffect, useState } from 'react';
 import { useNavigate, useParams } from 'react-router-dom';
 import { CustomPagination, FilterLayout, ProductItemSkeleton, SplideList } from '../../assets/CustomComponents';
 import noProducts from '../../assets/img/products/no-products.png';
-import Footer from '../../components/Footer';
+import Footer from '../../components/Utils/Footer';
 import Navbar from '../../components/Navbar/Navbar';
 import ProductItem from '../../components/Product/ProductItem';
 import { getApiUrl } from '../../config';
@@ -13,6 +13,7 @@ const itemsPerPage = 40;
 
 const ProductsByCategory = () => {
     const { id } = useParams();
+    
     const [products, setProducts] = useState([]);
     const [subcategories, setSubcategories] = useState([]);
     const [categoryName, setCategoryName] = useState('');

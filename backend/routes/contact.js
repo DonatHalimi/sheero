@@ -1,9 +1,9 @@
 const express = require('express');
 const { createContact, getContacts, deleteContact, deleteContacts } = require('../controllers/contactController');
-const { requireAuthAndRole, protect } = require('../middleware/auth.js');
+const { requireAuthAndRole, requireAuth } = require('../middleware/auth.js');
 const router = express.Router();
 
-router.post('/create', protect, createContact);
+router.post('/create', requireAuth, createContact);
 router.get('/get', requireAuthAndRole('admin'), getContacts);
 router.delete('/delete/:id', requireAuthAndRole('admin'), deleteContact);
 router.delete('/delete-bulk', requireAuthAndRole('admin'), deleteContacts)

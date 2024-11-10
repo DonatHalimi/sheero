@@ -1,76 +1,66 @@
 import React, { useEffect, useMemo, useState } from 'react';
-import { Link } from 'react-router-dom';
 import { CustomPagination, EmptyState, Header, OrderItemSkeleton, ProfileLayout } from '../../assets/CustomComponents';
-import emptyOrdersImage from '../../assets/img/empty/orders.png';
+import emptyReturnsImage from '../../assets/img/empty/orders.png';
 import useAxios from '../../axiosInstance';
 import Navbar from '../../components/Navbar/Navbar';
-import OrderItem from '../../components/Product/OrderItem';
+import ReturnItem from '../../components/Product/ReturnItem';
 import Footer from '../../components/Utils/Footer';
-import { getImageUrl } from '../../config';
 
 const itemsPerPage = 5;
 
-const Orders = () => {
+const Returns = () => {
     const axiosInstance = useMemo(() => useAxios(), []);
-
-    const [orders, setOrders] = useState([]);
+    const [returns, setReturns] = useState([]);
     const [loading, setLoading] = useState(true);
     const [currentPage, setCurrentPage] = useState(1);
     const [searchTerm, setSearchTerm] = useState('');
     const [statusFilter, setStatusFilter] = useState('All');
 
     useEffect(() => {
-        const fetchOrders = async () => {
+        const fetchReturns = async () => {
             setLoading(true);
             try {
                 const { data } = await axiosInstance.get('/auth/me');
                 const userId = data.id;
-                const ordersResponse = await axiosInstance.get(`/orders/user/${userId}`);
-                setOrders(ordersResponse.data);
+                const returnsResponse = await axiosInstance.get(`/returns/user/${userId}`);
+                setReturns(returnsResponse.data);
             } catch (error) {
-                console.error('Error fetching orders:', error.message);
+                console.error('Error fetching returns:', error.message);
             } finally {
                 setLoading(false);
             }
         };
 
-        fetchOrders();
+        fetchReturns();
     }, [axiosInstance]);
 
-    useEffect(() => {
-        window.scrollTo(0, 0);
-    }, []);
+    useEffect(() => { window.scrollTo(0, 0); }, []);
 
     useEffect(() => {
         setCurrentPage(1);
     }, [searchTerm, statusFilter]);
 
-    const filteredOrders = Array.isArray(orders) ? orders.filter(order => {
+    const filteredReturns = Array.isArray(returns) ? returns.filter(returnRequest => {
         const matchesSearchTerm = [
-            order._id || '',
-            order.paymentStatus || '',
-            order.paymentMethod || '',
-            order.totalAmount?.toString() || '',
-            order.paymentIntentId || '',
-            order.status || '',
-            ...order.products.flatMap(product => [
-                product.product?.name?.toLowerCase() || '',
-                product.quantity?.toString() || '',
-                product.price?.toString() || ''
-            ])
+            returnRequest._id || '',
+            returnRequest.reason || '',
+            returnRequest.status || '',
+            ...(Array.isArray(returnRequest.products)
+                ? returnRequest.products.map(product => product?.name?.toLowerCase() || '')
+                : [returnRequest.products?.name?.toLowerCase() || ''])
         ].some(field => field.toLowerCase().includes(searchTerm.toLowerCase()));
 
-        const matchesStatusFilter = statusFilter === 'All' || order.status === statusFilter;
+        const matchesStatusFilter = statusFilter === 'All' || returnRequest.status === statusFilter;
 
         return matchesSearchTerm && matchesStatusFilter;
     }) : [];
 
-    const totalOrders = filteredOrders.length;
-    const pageCount = Math.ceil(totalOrders / itemsPerPage);
+    const totalReturns = filteredReturns.length;
+    const pageCount = Math.ceil(totalReturns / itemsPerPage);
 
     const getCurrentPageItems = () => {
         const startIndex = (currentPage - 1) * itemsPerPage;
-        return filteredOrders.slice(startIndex, startIndex + itemsPerPage);
+        return filteredReturns.slice(startIndex, startIndex + itemsPerPage);
     };
 
     const handlePageChange = (event, value) => {
@@ -78,28 +68,10 @@ const Orders = () => {
         window.scrollTo(0, 0);
     };
 
-    const renderProductImages = (products) => {
-        if (!Array.isArray(products)) return null;
-        return products.map(product => {
-            const { _id, image, name } = product.product || {};
-            if (!_id || !image || !name) return null;
-            return (
-                <Link key={_id} to={`/product/${_id}`}>
-                    <img
-                        src={getImageUrl(image)}
-                        alt={name}
-                        className="w-20 h-20 object-contain rounded cursor-pointer"
-                    />
-                </Link>
-            );
-        });
-    };
-
     const statusClasses = {
         pending: 'text-yellow-500',
-        shipped: 'text-blue-400',
-        delivered: 'text-green-500',
-        canceled: 'text-red-500',
+        approved: 'text-green-500',
+        rejected: 'text-red-500',
         default: 'text-gray-500'
     };
 
@@ -111,32 +83,33 @@ const Orders = () => {
             <ProfileLayout>
 
                 <Header
-                    title='Orders'
+                    title="Returns"
                     searchTerm={searchTerm}
                     setSearchTerm={setSearchTerm}
-                    showSearch={filteredOrders.length > 0}
-                    showFilter={orders.length > 0}
+                    showSearch={filteredReturns.length > 0}
+                    showFilter={returns.length > 0}
                     statusFilter={statusFilter}
                     setStatusFilter={setStatusFilter}
-                    placeholder='Search orders...'
+                    placeholder="Search returns..."
+                    filterType="returns"
                 />
 
                 {loading ? (
                     <OrderItemSkeleton />
-                ) : filteredOrders.length === 0 ? (
+                ) : filteredReturns.length === 0 ? (
                     <EmptyState
-                        imageSrc={emptyOrdersImage}
-                        message={searchTerm ? "No orders found matching your search" : "No orders found!"}
+                        imageSrc={emptyReturnsImage}
+                        message={searchTerm ? "No returns found matching your search" : "No returns found!"}
                     />
                 ) : (
                     <div className="flex flex-col">
                         <div className="grid gap-4 mb-3">
-                            {getCurrentPageItems().map(order => (
-                                <OrderItem
-                                    key={order._id}
-                                    order={order}
-                                    renderProductImages={renderProductImages}
+                            {getCurrentPageItems().map(returnRequest => (
+                                <ReturnItem
+                                    key={returnRequest._id}
+                                    returnRequest={returnRequest}
                                     getStatusColor={getStatusColor}
+                                    products={returnRequest.products}
                                 />
                             ))}
                         </div>
@@ -160,10 +133,10 @@ const Orders = () => {
                 )}
             </ProfileLayout>
 
-            {totalOrders === 1 && <div className='mb-48' />}
+            {totalReturns === 1 && <div className="mb-48" />}
             <Footer />
         </>
     );
 };
 
-export default Orders;
+export default Returns;

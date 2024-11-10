@@ -26,8 +26,8 @@ const ToTop = () => {
     return (
         <button
             onClick={scrollToTop}
-            className={`to-top-button ${isVisible ? 'visible' : 'hidden'}`}
             aria-label="Scroll to top"
+            className={`to-top-button ${isVisible ? 'visible' : 'hidden'}`}
         >
             <ArrowUpwardIcon className="to-top-arrow" />
         </button>

@@ -7,6 +7,7 @@ import DashboardContent from '../pages/Dashboard/DashboardContent';
 import FAQPage from '../pages/Dashboard/FAQPage';
 import OrdersPage from '../pages/Dashboard/OrdersPage';
 import ProductsPage from '../pages/Dashboard/ProductsPage';
+import ReturnsPage from '../pages/Dashboard/ReturnsPage';
 import ReviewsPage from '../pages/Dashboard/ReviewsPage';
 import RolesPage from '../pages/Dashboard/RolesPage';
 import SlideshowPage from '../pages/Dashboard/SlideshowPage';
@@ -26,6 +27,7 @@ const pages = {
     main: DashboardContent,
     orders: OrdersPage,
     products: ProductsPage,
+    returns: ReturnsPage,
     reviews: ReviewsPage,
     roles: RolesPage,
     subcategories: SubcategoriesPage,

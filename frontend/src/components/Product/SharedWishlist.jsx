@@ -4,8 +4,8 @@ import { CustomPagination, EmptyState, Header, ProductItemSkeleton } from '../..
 import emptyWishlistImage from '../../assets/img/empty/wishlist.png';
 import useAxios from '../../axiosInstance';
 import { getApiUrl } from '../../config';
-import Footer from '../Footer';
 import Navbar from '../Navbar/Navbar';
+import Footer from '../Utils/Footer';
 import ProductItem from './ProductItem';
 
 const itemsPerPage = 10;

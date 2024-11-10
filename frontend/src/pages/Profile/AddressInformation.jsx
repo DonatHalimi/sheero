@@ -3,7 +3,7 @@ import React, { useEffect, useMemo, useState } from 'react';
 import { toast } from 'react-toastify';
 import { Header, InformationSkeleton, ProfileLayout } from '../../assets/CustomComponents';
 import useAxios from '../../axiosInstance';
-import Footer from '../../components/Footer';
+import Footer from '../../components/Utils/Footer';
 import Navbar from '../../components/Navbar/Navbar';
 
 const AddressInformation = () => {

@@ -18,7 +18,11 @@ const AddReviewModal = ({ open, onClose, product, onReviewSuccess }) => {
 
     useEffect(() => {
         const checkIfCanReview = async () => {
-            if (!auth.accessToken) return;
+            if (!auth.accessToken) {
+                toast.error('You need to log in first.');
+                navigate('/login');
+                return;
+            }
 
             try {
                 const response = await axiosInstance.get(`/reviews/orders/check-review/${product._id}`);
@@ -67,7 +71,9 @@ const AddReviewModal = ({ open, onClose, product, onReviewSuccess }) => {
             });
             onReviewSuccess();
         } catch (error) {
-            toast.error(error.response?.data?.message || 'Error adding review');
+            toast.info(error.response?.data?.message, {
+                onClick: () => navigate('/profile/reviews'),
+            });
         }
     }
 

@@ -38,11 +38,14 @@ const ProductList = () => {
 
     const handlePageChange = (event, value) => {
         setCurrentPage(value);
+        
+        // Scroll to the product grid on page change
+        document.getElementById('product-grid').scrollIntoView({ behavior: 'smooth' });
     };
 
     return (
         <div className="container mx-auto p-4 pr-6 mb-16 bg-gray-50">
-            <div className="grid grid-cols-2 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-3 xl:grid-cols-5 gap-4">
+            <div id="product-grid" className="grid grid-cols-2 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-3 xl:grid-cols-5 gap-4">
                 {loading ? (
                     <ProductItemSkeleton />
                 ) : (

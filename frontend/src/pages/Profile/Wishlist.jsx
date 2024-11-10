@@ -11,9 +11,9 @@ import {
 } from '../../assets/CustomComponents';
 import emptyWishlistImage from '../../assets/img/empty/wishlist.png';
 import useAxios from '../../axiosInstance';
-import Footer from '../../components/Footer';
 import Navbar from '../../components/Navbar/Navbar';
 import WishlistItem from '../../components/Product/WishlistItem';
+import Footer from '../../components/Utils/Footer';
 import { AuthContext } from '../../context/AuthContext';
 
 const itemsPerPage = 6;

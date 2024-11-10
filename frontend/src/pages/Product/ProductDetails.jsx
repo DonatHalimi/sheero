@@ -6,12 +6,13 @@ import { toast } from 'react-toastify';
 import {
     DetailsBreadcrumbs,
     DetailsCartWishlistButtons,
+    formatPrice,
     LoadingOverlay,
     OutOfStock,
     ProductDetailsSkeleton
 } from '../../assets/CustomComponents';
 import useAxios from '../../axiosInstance';
-import Footer from '../../components/Footer';
+import Footer from '../../components/Utils/Footer';
 import ImagePreviewModal from '../../components/Modal/ImagePreviewModal';
 import Navbar from '../../components/Navbar/Navbar';
 import AddReviewModal from '../../components/Product/AddReviewModal';
@@ -33,6 +34,19 @@ const ProductDetails = () => {
     const [isReviewModalOpen, setIsReviewModalOpen] = useState(false);
     const [quantity, setQuantity] = useState(1);
 
+    const { name, image, price, salePrice, discount, inventoryCount } = product || {};
+    const imageUrl = getImageUrl(image);
+    const originalPrice = price || 0;
+    const discountPercentage = discount?.value || 0;
+    const discountedPrice = salePrice || originalPrice;
+    const finalPrice = salePrice > 0 ? salePrice : price;
+
+    const inventoryText = inventoryCount > 10
+        ? "More than 10 articles"
+        : `${inventoryCount} article${inventoryCount !== 1 ? 's' : ''} left`;
+
+    useEffect(() => { window.scrollTo(0, 0); }, []);
+
     useEffect(() => {
         const fetchProduct = async () => {
             try {
@@ -47,10 +61,6 @@ const ProductDetails = () => {
         };
         fetchProduct();
     }, [id]);
-
-    useEffect(() => {
-        window.scrollTo(0, 0);
-    }, []);
 
     const openReviewModal = () => {
         if (!auth.accessToken) {
@@ -113,27 +123,6 @@ const ProductDetails = () => {
         }
     };
 
-    const { name, image, price, salePrice, discount, inventoryCount } = product || {};
-    const imageUrl = getImageUrl(image);
-    const originalPrice = price || 0;
-    const discountPercentage = discount?.value || 0;
-    const discountedPrice = salePrice || originalPrice;
-    const finalPrice = salePrice > 0 ? salePrice : price;
-
-    const formattedFinalPrice = finalPrice ? finalPrice.toLocaleString(undefined, {
-        minimumFractionDigits: 2,
-        maximumFractionDigits: 2,
-    }) : '0.00';
-
-    const formattedPrice = price ? price.toLocaleString(undefined, {
-        minimumFractionDigits: 2,
-        maximumFractionDigits: 2,
-    }) : '0.00';
-
-    const inventoryText = inventoryCount > 10
-        ? "More than 10 articles"
-        : `${inventoryCount} article${inventoryCount !== 1 ? 's' : ''} left`;
-
     return (
         <>
             {(isCartLoading || isWishlistLoading) && (<LoadingOverlay />)}
@@ -169,10 +158,10 @@ const ProductDetails = () => {
                                     {discountPercentage > 0 ? (
                                         <>
                                             <span className="text-gray-500 line-through text-sm">
-                                                {formattedPrice} €
+                                                {formatPrice(originalPrice)} €
                                             </span>
                                             <span className="text-2xl font-bold text-stone-600">
-                                                {formattedFinalPrice} €
+                                                {formatPrice(finalPrice)} €
                                             </span>
                                             <div className="flex items-center mt-1">
                                                 <span className="text-sm font-semibold text-stone-600">
@@ -185,7 +174,7 @@ const ProductDetails = () => {
                                         </>
                                     ) : (
                                         <span className="text-2xl font-bold">
-                                            {originalPrice.toFixed(2)} €
+                                            {formatPrice(originalPrice)} €
                                         </span>
                                     )}
                                 </div>

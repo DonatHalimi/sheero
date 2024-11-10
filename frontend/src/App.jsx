@@ -18,7 +18,7 @@ import {
   Profile,
   ProtectedRoute,
   PublicRoute,
-  React,
+  Returns,
   Register,
   Reviews,
   Route,
@@ -64,6 +64,7 @@ const App = () => (
       <Route path="/profile/address" element={<ProtectedRoute><Addresses /></ProtectedRoute>} />
       <Route path="/profile/orders" element={<ProtectedRoute><Orders /></ProtectedRoute>} />
       <Route path="/profile/orders/:orderId" element={<ProtectedRoute><OrderDetails /></ProtectedRoute>} />
+      <Route path="/profile/returns" element={<ProtectedRoute><Returns /></ProtectedRoute>} />
       <Route path="/profile/wishlist" element={<ProtectedRoute><Wishlist /></ProtectedRoute>} />
       <Route path="/profile/reviews" element={<ProtectedRoute><Reviews /></ProtectedRoute>} />
       <Route path="/verify" element={<ProtectedRoute><Verify /></ProtectedRoute>} />
