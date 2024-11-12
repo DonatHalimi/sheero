@@ -12,11 +12,11 @@ import {
     ProductDetailsSkeleton
 } from '../../assets/CustomComponents';
 import useAxios from '../../axiosInstance';
-import Footer from '../../components/Utils/Footer';
 import ImagePreviewModal from '../../components/Modal/ImagePreviewModal';
 import Navbar from '../../components/Navbar/Navbar';
-import AddReviewModal from '../../components/Product/AddReviewModal';
-import ProductDetailsTabs from '../../components/Product/ProductDetailsTabs';
+import AddReviewModal from '../../components/Product/Modals/AddReviewModal';
+import ProductDetailsTabs from '../../components/Product/Utils/ProductDetailsTabs';
+import Footer from '../../components/Utils/Footer';
 import { getApiUrl, getImageUrl } from '../../config';
 import { AuthContext } from '../../context/AuthContext';
 

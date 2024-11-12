@@ -1,15 +1,16 @@
 import React, { useEffect, useMemo, useState } from 'react';
-import { CustomPagination, EmptyState, Header, OrderItemSkeleton, ProfileLayout } from '../../assets/CustomComponents';
+import { calculatePageCount, CustomPagination, EmptyState, getPaginatedItems, handlePageChange, Header, OrderItemSkeleton, ProfileLayout } from '../../assets/CustomComponents';
 import emptyReturnsImage from '../../assets/img/empty/orders.png';
 import useAxios from '../../axiosInstance';
 import Navbar from '../../components/Navbar/Navbar';
-import ReturnItem from '../../components/Product/ReturnItem';
+import ReturnItem from '../../components/Product/Items/ReturnItem';
 import Footer from '../../components/Utils/Footer';
 
-const itemsPerPage = 5;
+const itemsPerPage = 4;
 
 const Returns = () => {
     const axiosInstance = useMemo(() => useAxios(), []);
+
     const [returns, setReturns] = useState([]);
     const [loading, setLoading] = useState(true);
     const [currentPage, setCurrentPage] = useState(1);
@@ -55,19 +56,6 @@ const Returns = () => {
         return matchesSearchTerm && matchesStatusFilter;
     }) : [];
 
-    const totalReturns = filteredReturns.length;
-    const pageCount = Math.ceil(totalReturns / itemsPerPage);
-
-    const getCurrentPageItems = () => {
-        const startIndex = (currentPage - 1) * itemsPerPage;
-        return filteredReturns.slice(startIndex, startIndex + itemsPerPage);
-    };
-
-    const handlePageChange = (event, value) => {
-        setCurrentPage(value);
-        window.scrollTo(0, 0);
-    };
-
     const statusClasses = {
         pending: 'text-yellow-500',
         approved: 'text-green-500',
@@ -76,6 +64,13 @@ const Returns = () => {
     };
 
     const getStatusColor = (status) => `${statusClasses[status] || statusClasses.default} capitalize bg-stone-50 rounded-md px-1`;
+
+    const applyMargin = () => {
+        return (filteredReturns.length === 1 || currentPageItems.length === 1) ? 'mb-20' : '';
+    };
+
+    const pageCount = calculatePageCount(filteredReturns, itemsPerPage);
+    const currentPageItems = getPaginatedItems(filteredReturns, currentPage, itemsPerPage);
 
     return (
         <>
@@ -86,7 +81,7 @@ const Returns = () => {
                     title="Returns"
                     searchTerm={searchTerm}
                     setSearchTerm={setSearchTerm}
-                    showSearch={filteredReturns.length > 0}
+                    showSearch={returns.length > 0}
                     showFilter={returns.length > 0}
                     statusFilter={statusFilter}
                     setStatusFilter={setStatusFilter}
@@ -102,9 +97,9 @@ const Returns = () => {
                         message={searchTerm ? "No returns found matching your search" : "No returns found!"}
                     />
                 ) : (
-                    <div className="flex flex-col">
+                    <div className={`flex flex-col ${applyMargin()}`}>
                         <div className="grid gap-4 mb-3">
-                            {getCurrentPageItems().map(returnRequest => (
+                            {currentPageItems.map(returnRequest => (
                                 <ReturnItem
                                     key={returnRequest._id}
                                     returnRequest={returnRequest}
@@ -118,7 +113,7 @@ const Returns = () => {
                             <CustomPagination
                                 count={pageCount}
                                 page={currentPage}
-                                onChange={handlePageChange}
+                                onChange={handlePageChange(setCurrentPage)}
                                 size="medium"
                                 sx={{
                                     position: 'relative',
@@ -133,7 +128,7 @@ const Returns = () => {
                 )}
             </ProfileLayout>
 
-            {totalReturns === 1 && <div className="mb-48" />}
+            {filteredReturns.length === 1 && <div className="mb-48" />}
             <Footer />
         </>
     );

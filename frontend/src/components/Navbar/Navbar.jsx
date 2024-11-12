@@ -26,16 +26,17 @@ const Navbar = () => {
     const [isSidebarOpen, setIsSidebarOpen] = useState(false);
 
     const [isLoading, setIsLoading] = useState(false);
+    const [isFetchingCart, setIsFetchingCart] = useState(false);
 
     const axiosInstance = useAxios();
     const navigate = useNavigate();
 
     const fetchCartData = async () => {
         if (!auth.accessToken) return;
+        setIsFetchingCart(true);
         try {
             const { data: cart } = await axiosInstance.get('/cart');
             setCartItems(cart.items || []);
-
             const total = (cart.items || []).reduce((acc, item) => {
                 const price = item.product.salePrice || item.product.price;
                 return acc + price * item.quantity;
@@ -43,6 +44,8 @@ const Navbar = () => {
             setCartTotal(total);
         } catch (error) {
             console.log('Error fetching cart data:', error);
+        } finally {
+            setIsFetchingCart(false);
         }
     };
 
@@ -174,7 +177,7 @@ const Navbar = () => {
                                                         cartTotal={cartTotal}
                                                         handleRemoveItem={handleRemoveItem}
                                                         handleGoToCart={handleGoToCart}
-                                                        isLoading={isLoading}
+                                                        isLoading={isFetchingCart}
                                                         handleProductClick={handleProductClick}
                                                     />
                                                 )}

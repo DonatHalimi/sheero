@@ -1,10 +1,10 @@
-import { Button, Checkbox, CircularProgress, FormControl, InputLabel, ListItemText, MenuItem, Select, TextField, Typography } from '@mui/material';
+import { Checkbox, FormControl, FormControlLabel, InputLabel, ListItemText, MenuItem, Select, TextField, Typography } from '@mui/material';
 import React, { useEffect, useState } from 'react';
 import { useNavigate, useParams } from 'react-router-dom';
 import { toast } from 'react-toastify';
-import { CustomBox, CustomModal } from '../../assets/CustomComponents';
-import useAxios from '../../axiosInstance';
-import { getImageUrl } from '../../config';
+import { BrownButton, CustomBox, CustomModal, LoadingReturn } from '../../../assets/CustomComponents';
+import useAxios from '../../../axiosInstance';
+import { getImageUrl } from '../../../config';
 
 const ReturnModal = ({ open, onClose }) => {
     const { orderId } = useParams();
@@ -12,6 +12,7 @@ const ReturnModal = ({ open, onClose }) => {
     const [selectedProducts, setSelectedProducts] = useState([]);
     const [reason, setReason] = useState('');
     const [customReason, setCustomReason] = useState('');
+    const [confirmSelection, setConfirmSelection] = useState(false);
     const [loading, setLoading] = useState(true);
 
     const axiosInstance = useAxios();
@@ -21,7 +22,6 @@ const ReturnModal = ({ open, onClose }) => {
         'Damaged Item',
         'Wrong Item Delivered',
         'Item Not as Described',
-        'Too Big/Too Small',
         'Changed My Mind',
         'Other'
     ];
@@ -37,7 +37,9 @@ const ReturnModal = ({ open, onClose }) => {
             setLoading(true);
             const response = await axiosInstance.get(`/orders/${orderId}`);
             if (response.data.success) {
-                setOrderProducts(response.data.data.products);
+                const products = response.data.data.products;
+                setOrderProducts(products);
+                setSelectedProducts(products.map(({ product }) => product._id));
             } else {
                 console.error('Failed to fetch order products');
             }
@@ -67,7 +69,7 @@ const ReturnModal = ({ open, onClose }) => {
 
     const handleSubmit = async () => {
         if (selectedProducts.length === 0 || reason.trim() === '') {
-            alert("Please select at least one product and provide a reason for the return.");
+            toast.error("Please select at least one product and provide a reason for the return.");
             return;
         }
 
@@ -106,14 +108,16 @@ const ReturnModal = ({ open, onClose }) => {
         }
     };
 
+    const isDisabled = !selectedProducts.length || !reason || (reason === 'Other' && customReason.length < 5 || customReason.length > 20) || !confirmSelection;
+
     return (
-        <CustomModal open={open} onClose={onClose} aria-labelledby="return-modal" aria-describedby="return-modal-description">
+        <CustomModal open={open} onClose={onClose}>
             <CustomBox>
                 <Typography variant="h6" className='!mb-3'>
                     Return Products
                 </Typography>
                 {loading ? (
-                    <CircularProgress />
+                    <LoadingReturn />
                 ) : (
                     <>
                         <FormControl fullWidth>
@@ -129,7 +133,7 @@ const ReturnModal = ({ open, onClose }) => {
                                 }
                             >
                                 {orderProducts.map(({ product, quantity }) => (
-                                    <MenuItem key={product._id} value={product._id} style={{ display: 'flex', alignItems: 'center' }}>
+                                    <MenuItem key={product._id} value={product._id} className='flex items-center'>
                                         <Checkbox checked={selectedProducts.indexOf(product._id) > -1} />
                                         <img
                                             src={getImageUrl(product.image)}
@@ -137,7 +141,15 @@ const ReturnModal = ({ open, onClose }) => {
                                             className='w-7 h-7 object-contain mr-2'
                                         />
                                         <ListItemText
-                                            primary={product.name}
+                                            primary={
+                                                <Typography
+                                                    variant="body2"
+                                                    noWrap
+                                                    style={{ maxWidth: 300 }}
+                                                >
+                                                    {product.name}
+                                                </Typography>
+                                            }
                                             secondary={`Qty: ${quantity}`}
                                         />
                                     </MenuItem>
@@ -174,9 +186,25 @@ const ReturnModal = ({ open, onClose }) => {
                             />
                         )}
 
-                        <Button variant="contained" color="primary" onClick={handleSubmit} className='!mt-3'>
+                        <FormControlLabel
+                            control={
+                                <Checkbox
+                                    checked={confirmSelection}
+                                    onChange={(e) => setConfirmSelection(e.target.checked)}
+                                    color="primary"
+                                />
+                            }
+                            label="I confirm the selected products are correct"
+                        />
+
+                        <BrownButton
+                            onClick={handleSubmit}
+                            disabled={isDisabled}
+                            fullWidth
+                            className='!mt-3'
+                        >
                             Submit Return Request
-                        </Button>
+                        </BrownButton>
                     </>
                 )}
             </CustomBox>

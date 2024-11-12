@@ -85,6 +85,7 @@ Once the application is running, you can access it in your web browser at `http:
 - Shopping cart functionality
 - Simple payment options with Stripe or cash
 - Real-time order tracking for updates on your purchases
+- Users can make a return request for specific product(s) from an order if the status is marked as `Delivered`
 - Reviews and ratings for products
 
 ### Technologies Used

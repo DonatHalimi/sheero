@@ -1,14 +1,14 @@
 import { DeleteOutline } from '@mui/icons-material';
-import { Paper, Table, TableBody, TableCell, TableContainer, TableHead, TableRow, Tooltip } from '@mui/material';
+import { Table, TableBody, TableCell, TableContainer, TableHead, TableRow, Tooltip } from '@mui/material';
 import React, { useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { toast } from 'react-toastify';
 import { CheckoutButton, CustomDeleteModal, EmptyState, LoadingCart, LoadingOverlay, RoundIconButton, formatPrice, truncateText } from '../../assets/CustomComponents';
 import emptyCartImage from '../../assets/img/empty/cart.png';
 import useAxios from '../../axiosInstance';
-import Footer from '../../components/Utils/Footer';
 import Navbar from '../../components/Navbar/Navbar';
-import PaymentModal from '../../components/Product/PaymentModal';
+import PaymentModal from '../../components/Product/Modals/PaymentModal';
+import Footer from '../../components/Utils/Footer';
 import { getImageUrl } from '../../config';
 
 const Cart = () => {
@@ -146,7 +146,7 @@ const Cart = () => {
             return;
         }
         setShowPaymentModal(true);
-    };    
+    };
 
     const handleCashPayment = async () => {
         try {
@@ -189,7 +189,7 @@ const Cart = () => {
 
             <div className="container mx-auto px-4 lg:px-24 py-2 mb-16 bg-gray-50 mt-10">
                 {/* Mobile-only header */}
-                <div className="bg-white p-4 rounded-md shadow-sm mb-3 flex justify-between items-center px-2 md:hidden mt-16">
+                <div className="bg-white p-4 rounded-md shadow-sm mb-3 flex justify-between items-center px-2 md:hidden mt-[72px]">
                     <h1 className="text-2xl font-semilight ml-2">Cart</h1>
                     {cart?.items?.length > 0 && (
                         <Tooltip title="Clear cart" arrow placement="top">
@@ -210,7 +210,7 @@ const Cart = () => {
                         <div className="flex-1">
                             {/* Desktop Table View */}
                             <div className="hidden lg:block">
-                                <TableContainer component={Paper} className="bg-white">
+                                <TableContainer className="bg-white rounded-lg">
                                     <Table>
                                         <TableHead>
                                             <TableRow>

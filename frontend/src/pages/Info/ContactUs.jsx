@@ -2,8 +2,8 @@ import { Box, Button, Container, TextField } from '@mui/material';
 import React, { useContext, useEffect, useRef, useState } from 'react';
 import { toast } from 'react-toastify';
 import useAxios from '../../axiosInstance';
-import Footer from '../../components/Utils/Footer';
 import Navbar from '../../components/Navbar/Navbar';
+import Footer from '../../components/Utils/Footer';
 import { AuthContext } from '../../context/AuthContext';
 
 const ContactUs = () => {

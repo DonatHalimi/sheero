@@ -1,7 +1,7 @@
 import { Typography } from '@mui/material';
 import React, { useEffect, useState } from 'react';
-import { DetailsBox, ProductTabs, ReviewModal, ReviewsList, TabPanel } from '../../assets/CustomComponents';
-import useAxios from '../../axiosInstance';
+import { DetailsBox, ProductTabs, ReviewModal, ReviewsList, TabPanel } from '../../../assets/CustomComponents';
+import useAxios from '../../../axiosInstance';
 
 const ProductDetailsTabs = ({ product }) => {
   const [value, setValue] = useState(0);

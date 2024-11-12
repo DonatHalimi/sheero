@@ -1,7 +1,7 @@
 import React from 'react';
 import { Link } from 'react-router-dom';
-import { formatDate } from '../../assets/CustomComponents';
-import { getImageUrl } from '../../config';
+import { formatDate } from '../../../assets/CustomComponents';
+import { getImageUrl } from '../../../config';
 
 const ReturnItem = ({ returnRequest, getStatusColor }) => {
     const { _id: id, createdAt, status, reason, customReason, products } = returnRequest;

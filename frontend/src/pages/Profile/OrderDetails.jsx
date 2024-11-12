@@ -5,18 +5,19 @@ import 'react-toastify/dist/ReactToastify.css';
 import { EmptyState, formatDate, formatPrice, Header, OrderDetailsSkeleton, ProfileLayout } from '../../assets/CustomComponents';
 import emptyOrdersImage from '../../assets/img/empty/orders.png';
 import useAxios from '../../axiosInstance';
-import Footer from '../../components/Utils/Footer';
 import Navbar from '../../components/Navbar/Navbar';
+import ReturnModal from '../../components/Product/Modals/ReturnModal';
+import Footer from '../../components/Utils/Footer';
 import { getImageUrl } from '../../config';
-import ReturnModal from '../../components/Product/ReturnModal';
 
 const OrderDetails = () => {
     const { orderId } = useParams();
+    const axiosInstance = useAxios();
+    const navigate = useNavigate();
+
     const [order, setOrder] = useState(null);
     const [isReturnModalOpen, setIsReturnModalOpen] = useState(false);
     const [loading, setLoading] = useState(true);
-    const axiosInstance = useAxios();
-    const navigate = useNavigate();
 
     useEffect(() => {
         window.scrollTo(0, 0);

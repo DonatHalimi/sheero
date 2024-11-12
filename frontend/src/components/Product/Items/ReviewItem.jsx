@@ -1,12 +1,12 @@
 import React from 'react';
-import { CenteredMoreVertIcon, RatingStars, truncateText } from '../../assets/CustomComponents';
-import { getImageUrl } from '../../config';
+import { CenteredMoreVertIcon, RatingStars, truncateText } from '../../../assets/CustomComponents';
+import { getImageUrl } from '../../../config';
 
 const ReviewItem = ({ review, onImageClick, onMenuClick, onCardClick }) => {
     return (
         <div
             onClick={() => onCardClick(review)}
-            className="bg-white p-3 mb-4 h-auto min-h-[120px] shadow flex relative cursor-pointer rounded-md hover:shadow-md transition-shadow duration-300 flex-col sm:flex-row"
+            className="bg-white p-4 h-auto min-h-[120px] shadow flex relative cursor-pointer rounded-md hover:shadow-md transition-shadow duration-300 flex-col sm:flex-row"
         >
             <div className="flex-shrink-0 mb-3 sm:mb-0 sm:mr-4 w-[90px] h-[90px] overflow-hidden">
                 <img
@@ -47,13 +47,13 @@ const ReviewItem = ({ review, onImageClick, onMenuClick, onCardClick }) => {
                     </span>
                 </div>
                 <div
+                    onClick={(event) => onMenuClick(event, review)}
                     style={{
                         position: 'absolute',
                         top: '8px',
                         right: '8px',
                         zIndex: 1
                     }}
-                    onClick={(event) => onMenuClick(event, review)}
                 >
                     <CenteredMoreVertIcon />
                 </div>

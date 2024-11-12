@@ -1,10 +1,11 @@
 import React, { useEffect, useMemo, useState } from 'react';
 import { Link } from 'react-router-dom';
-import { CustomPagination, EmptyState, Header, OrderItemSkeleton, ProfileLayout } from '../../assets/CustomComponents';
+import { calculatePageCount, CustomPagination, EmptyState, getPaginatedItems, handlePageChange, Header, OrderItemSkeleton, ProfileLayout } from '../../assets/CustomComponents';
 import emptyOrdersImage from '../../assets/img/empty/orders.png';
+import { paginationSx } from '../../assets/sx';
 import useAxios from '../../axiosInstance';
 import Navbar from '../../components/Navbar/Navbar';
-import OrderItem from '../../components/Product/OrderItem';
+import OrderItem from '../../components/Product/Items/OrderItem';
 import Footer from '../../components/Utils/Footer';
 import { getImageUrl } from '../../config';
 
@@ -65,19 +66,6 @@ const Orders = () => {
         return matchesSearchTerm && matchesStatusFilter;
     }) : [];
 
-    const totalOrders = filteredOrders.length;
-    const pageCount = Math.ceil(totalOrders / itemsPerPage);
-
-    const getCurrentPageItems = () => {
-        const startIndex = (currentPage - 1) * itemsPerPage;
-        return filteredOrders.slice(startIndex, startIndex + itemsPerPage);
-    };
-
-    const handlePageChange = (event, value) => {
-        setCurrentPage(value);
-        window.scrollTo(0, 0);
-    };
-
     const renderProductImages = (products) => {
         if (!Array.isArray(products)) return null;
         return products.map(product => {
@@ -105,6 +93,9 @@ const Orders = () => {
 
     const getStatusColor = (status) => `${statusClasses[status] || statusClasses.default} capitalize bg-stone-50 rounded-md px-1`;
 
+    const pageCount = calculatePageCount(filteredOrders, itemsPerPage);
+    const currentPageItems = getPaginatedItems(filteredOrders, currentPage, itemsPerPage);
+
     return (
         <>
             <Navbar />
@@ -114,7 +105,7 @@ const Orders = () => {
                     title='Orders'
                     searchTerm={searchTerm}
                     setSearchTerm={setSearchTerm}
-                    showSearch={filteredOrders.length > 0}
+                    showSearch={orders.length > 0}
                     showFilter={orders.length > 0}
                     statusFilter={statusFilter}
                     setStatusFilter={setStatusFilter}
@@ -131,7 +122,7 @@ const Orders = () => {
                 ) : (
                     <div className="flex flex-col">
                         <div className="grid gap-4 mb-3">
-                            {getCurrentPageItems().map(order => (
+                            {currentPageItems.map(order => (
                                 <OrderItem
                                     key={order._id}
                                     order={order}
@@ -145,22 +136,16 @@ const Orders = () => {
                             <CustomPagination
                                 count={pageCount}
                                 page={currentPage}
-                                onChange={handlePageChange}
+                                onChange={handlePageChange(setCurrentPage)}
                                 size="medium"
-                                sx={{
-                                    position: 'relative',
-                                    bottom: '4px',
-                                    '& .MuiPagination-ul': {
-                                        justifyContent: 'flex-start',
-                                    },
-                                }}
+                                sx={paginationSx}
                             />
                         </div>
                     </div>
                 )}
             </ProfileLayout>
 
-            {totalOrders === 1 && <div className='mb-48' />}
+            {filteredOrders.length === 1 && <div className='mb-48' />}
             <Footer />
         </>
     );

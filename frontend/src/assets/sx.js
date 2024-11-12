@@ -276,3 +276,11 @@ export const getExpandIconProps = (isOpen) => ({
     animate: { rotate: isOpen ? 180 : 0 },
     transition: { duration: 0.3 },
 });
+
+export const paginationSx = {
+    position: 'relative',
+    bottom: '4px',
+    '& .MuiPagination-ul': {
+        justifyContent: 'flex-start',
+    },
+}

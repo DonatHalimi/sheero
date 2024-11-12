@@ -1,8 +1,8 @@
 import React, { useEffect, useState } from 'react';
-import { FAQItem, GoBackButton, FaqSkeleton } from '../../assets/CustomComponents';
+import { FAQItem, FaqSkeleton, GoBackButton } from '../../assets/CustomComponents';
 import useAxios from '../../axiosInstance';
-import Footer from '../../components/Utils/Footer';
 import Navbar from '../../components/Navbar/Navbar';
+import Footer from '../../components/Utils/Footer';
 
 const FAQs = () => {
     const [faqData, setFaqData] = useState([]);

@@ -1,17 +1,17 @@
-import { CircularProgress } from '@mui/material';
 import React, { useContext, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { toast } from 'react-toastify';
-import { CartWishlistButtons, DiscountPercentage, formatPrice, OutOfStock, ProductItemSkeleton } from '../../assets/CustomComponents';
-import NoImage from '../../assets/img/errors/product-not-found.png';
-import useAxios from '../../axiosInstance';
-import { getApiUrl, getImageUrl } from '../../config';
-import { AuthContext } from '../../context/AuthContext';
+import { CartWishlistButtons, DiscountPercentage, formatPrice, LoadingOverlay, OutOfStock, ProductItemSkeleton } from '../../../assets/CustomComponents';
+import NoImage from '../../../assets/img/errors/product-not-found.png';
+import useAxios from '../../../axiosInstance';
+import { getApiUrl, getImageUrl } from '../../../config';
+import { AuthContext } from '../../../context/AuthContext';
 
-const ProductItem = ({ product, loading }) => {
+const ProductItem = ({ product }) => {
     const { auth } = useContext(AuthContext);
     const axiosInstance = useAxios();
     const navigate = useNavigate();
+
     const [isLoading, setIsLoading] = useState({ cart: false, wishlist: false });
 
     const { _id, name, image, price, salePrice, inventoryCount } = product || {};
@@ -23,10 +23,6 @@ const ProductItem = ({ product, loading }) => {
     const formattedPrice = formatPrice(price);
 
     const handleClick = () => { if (_id) navigate(`/product/${_id}`); };
-
-    if (loading) {
-        return <ProductItemSkeleton />;
-    }
 
     const handleAction = (action) => async (e) => {
         e.stopPropagation();
@@ -56,18 +52,15 @@ const ProductItem = ({ product, loading }) => {
             const errorMsg = error.response?.data?.message || `Failed to add product to ${action}.`;
             toast.info(errorMsg, { onClick: () => navigate(`/${action === 'wishlist' ? 'profile/wishlist' : 'cart'}`) });
         } finally {
-            setIsLoading(false);
+            setIsLoading((prev) => ({ ...prev, [action]: false }));
         }
     };
 
     return (
         <>
-            {Object.values(isLoading).some(Boolean) && (
-                <div className="fixed inset-0 z-[1000] flex items-center justify-center bg-black bg-opacity-50">
-                    <CircularProgress size={60} style={{ color: '#373533' }} />
-                </div>
-            )}
-            <div className="bg-white rounded-md shadow-sm p-4 flex flex-col cursor-pointer transition-shadow duration-300 hover:shadow-md" onClick={handleClick}>
+            {(isLoading.cart || isLoading.wishlist) && <LoadingOverlay />}
+
+            <div onClick={handleClick} className="bg-white rounded-md shadow-sm p-4 flex flex-col cursor-pointer transition-shadow duration-300 hover:shadow-md" >
                 <div className="relative mb-2">
                     <img
                         src={imageUrl}
@@ -94,7 +87,7 @@ const ProductItem = ({ product, loading }) => {
                     )}
                 </div>
 
-                <div className="flex justify-between items-center mt-auto">
+                <div onClick={(e) => e.stopPropagation()} className="flex justify-between items-center mt-auto">
                     <CartWishlistButtons
                         handleAction={handleAction}
                         isCartLoading={isLoading.cart}
@@ -102,7 +95,7 @@ const ProductItem = ({ product, loading }) => {
                         inventoryCount={product.inventoryCount}
                     />
                 </div>
-            </div >
+            </div>
         </>
     );
 };

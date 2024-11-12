@@ -56,6 +56,7 @@ import {
     Modal,
     AppBar as MuiAppBar, Drawer as MuiDrawer,
     Pagination,
+    PaginationItem,
     Paper,
     Select,
     Skeleton,
@@ -84,9 +85,9 @@ import React, { forwardRef, useEffect, useRef, useState } from 'react';
 import { Link as RouterLink, useNavigate } from 'react-router-dom';
 import { toast } from 'react-toastify';
 import useAxios from '../axiosInstance';
-import Footer from '../components/Utils/Footer';
 import Navbar from '../components/Navbar/Navbar';
-import FilterSidebar from '../components/Product/FilterSidebar';
+import FilterSidebar from '../components/Product/Utils/FilterSidebar';
+import Footer from '../components/Utils/Footer';
 import { getImageUrl } from '../config';
 import ProfileSidebar from '../pages/Profile/ProfileSidebar';
 import logo from './img/brand/logo.png';
@@ -116,6 +117,7 @@ import {
     sidebarLayoutStyling,
     slideShowSkeletonStyling
 } from './sx';
+import ProductItem from '../components/Product/Items/ProductItem';
 
 export const BrownOutlinedTextField = styled(TextField)({
     '& .MuiOutlinedInput-root': {
@@ -128,32 +130,36 @@ export const BrownOutlinedTextField = styled(TextField)({
     },
 });
 
-export const BrownButton = styled(Button)(({ theme }) => ({
+export const BrownButton = styled(Button)({
     backgroundColor: '#686159',
     color: 'white',
     '&:hover': {
-        backgroundColor: '#5b504b',
+        backgroundColor: '#5B504B',
     },
-}));
+    '&.Mui-disabled': {
+        backgroundColor: '#E0E0E0',
+        color: '#A6A6A6'
+    },
+});
 
 export const BoldTableCell = styled(TableCell)({
     fontWeight: 'bold',
     backgroundColor: '#F8F8F8'
 });
 
-export const OutlinedBrownButton = styled(Button)(({ theme }) => ({
+export const OutlinedBrownButton = styled(Button)({
     color: '#493c30',
     borderColor: '#83776B',
     borderWidth: '1px',
     borderStyle: 'solid',
     backgroundColor: 'transparent',
     '&:hover': {
-        borderColor: '#5b504b',
+        borderColor: '#5B504B',
         backgroundColor: 'rgba(0, 0, 0, 0.04)',
     },
-}));
+});
 
-export const ActionButton = styled(Button)(({ theme }) => ({
+export const ActionButton = styled(Button)({
     position: 'relative',
     right: '10px',
     width: '30px',
@@ -161,7 +167,7 @@ export const ActionButton = styled(Button)(({ theme }) => ({
     '&:hover': {
         backgroundColor: '#F8F8F8',
     },
-}));
+});
 
 export const BrownCreateOutlinedIcon = styled(CreateOutlined)({
     color: '#493c30',
@@ -186,7 +192,7 @@ export const VisuallyHiddenInput = styled('input')({
     width: 1,
 });
 
-export const OutlinedBrownFormControl = styled(FormControl)(({ theme }) => ({
+export const OutlinedBrownFormControl = styled(FormControl)({
     '& .MuiOutlinedInput-root': {
         '&.Mui-focused fieldset': {
             borderColor: '#7C7164',
@@ -195,7 +201,7 @@ export const OutlinedBrownFormControl = styled(FormControl)(({ theme }) => ({
     '& .MuiInputLabel-root.Mui-focused': {
         color: '#7C7164',
     },
-}));
+});
 
 const drawerWidth = 240;
 
@@ -277,7 +283,7 @@ export const ActiveListItem = ({ icon, primary, handleClick, selected, sx }) => 
 );
 
 export const AddToCartButton = styled(Button)(({ theme }) => ({
-    backgroundColor: '#f7f7f7',
+    backgroundColor: '#F7F7F7',
     color: '#57534E',
     transition: 'background-color 0.3s ease-in-out, color 0.3s ease-in-out',
     '&:hover': {
@@ -292,59 +298,63 @@ export const AddToCartButton = styled(Button)(({ theme }) => ({
     marginRight: theme.spacing(2),
 }));
 
-export const WishlistButton = styled(Button)(({ theme }) => ({
+export const WishlistButton = styled(Button)({
     color: '#493c30',
-    backgroundColor: '#f7f7f7',
+    backgroundColor: '#F7F7F7',
     transition: 'background-color 0.3s ease-in-out, color 0.3s ease-in-out',
     '&:hover': {
-        borderColor: '#5b504b',
-        backgroundColor: '#e0e0e0',
+        borderColor: '#5B504B',
+        backgroundColor: '#E0E0E0',
         color: '#686159',
         transition: 'color 0.3s ease-in-out',
     },
     flexShrink: 0,
-}));
+});
 
-export const BrownShoppingCartIcon = styled(ShoppingCart)(({ theme }) => ({
+export const BrownShoppingCartIcon = styled(ShoppingCart)({
     color: '#57534E',
     transition: 'color 0.3s ease',
-}));
+});
 
-export const DeleteButton = styled(Delete)(({ theme }) => ({
+export const DeleteButton = styled(Delete)({
     color: '#57534E',
     transition: 'color 0.3s ease',
-}));
+});
 
-export const CartButton = () => {
+export const CartButton = ({ isOutOfStock }) => {
     return (
         <>
-            <BrownShoppingCartIcon />
-            <span className="hidden sm:inline ml-3">Add To Cart</span>
+            <BrownShoppingCartIcon style={{ color: isOutOfStock ? '#A6A6A6' : '' }} />
+            <span className="hidden sm:inline ml-3" style={{ color: isOutOfStock ? '#A6A6A6' : '' }}>Add To Cart</span>
         </>
     );
 };
 
-export const DetailsCartButton = () => {
+export const DetailsCartButton = ({ isOutOfStock }) => {
     return (
         <>
-            <BrownShoppingCartIcon />
-            <span className="ml-3">Add To Cart</span>
+            <BrownShoppingCartIcon style={{ color: isOutOfStock ? '#A6A6A6' : '' }} />
+            <span className="ml-3" style={{ color: isOutOfStock ? '#A6A6A6' : '' }}>Add To Cart</span>
         </>
     );
 };
 
 export const CartWishlistButtons = ({ handleAction, isCartLoading, isWishlistLoading, inventoryCount }) => {
+    const isOutOfStock = inventoryCount === 0;
+
     return (
         <>
             <AddToCartButton
-                onClick={handleAction('cart')}
-                disabled={isCartLoading || isWishlistLoading || inventoryCount === 0}
+                onClick={!isOutOfStock ? handleAction('cart') : null}
+                disabled={isCartLoading || isWishlistLoading || isOutOfStock}
+                className={`${isOutOfStock ? 'cursor-not-allowed' : 'cursor-pointer'}`}
             >
-                <CartButton />
+                <CartButton isOutOfStock={isOutOfStock} />
             </AddToCartButton>
             <WishlistButton
                 onClick={handleAction('wishlist')}
                 disabled={isCartLoading || isWishlistLoading}
+                className="cursor-pointer"
             >
                 <FavoriteBorderOutlined />
             </WishlistButton>
@@ -353,13 +363,15 @@ export const CartWishlistButtons = ({ handleAction, isCartLoading, isWishlistLoa
 };
 
 export const CartDeleteButtons = ({ handleAddToCart, handleRemove, isActionLoading, inventoryCount }) => {
+    const isOutOfStock = inventoryCount === 0;
+
     return (
         <>
             <AddToCartButton
                 onClick={handleAddToCart}
                 disabled={isActionLoading || inventoryCount === 0}
             >
-                <CartButton />
+                <CartButton isOutOfStock={isOutOfStock} />
             </AddToCartButton>
             <WishlistButton
                 onClick={handleRemove}
@@ -380,7 +392,7 @@ export const DetailsAddToCartButton = styled(Button)(({ theme }) => ({
         transition: 'color 0.3s ease-in-out',
     },
     '&:hover': {
-        backgroundColor: '#4c4844',
+        backgroundColor: '#5B504B',
         color: 'white',
         '& .MuiSvgIcon-root': {
             color: 'white',
@@ -390,28 +402,30 @@ export const DetailsAddToCartButton = styled(Button)(({ theme }) => ({
     marginRight: theme.spacing(2),
 }));
 
-export const DetailsWishlistButton = styled(Button)(({ theme }) => ({
+export const DetailsWishlistButton = styled(Button)({
     color: '#493c30',
-    backgroundColor: '#f7f7f7',
+    backgroundColor: '#F7F7F7',
     width: '150px',
     transition: 'background-color 0.3s ease-in-out, color 0.3s ease-in-out',
     '&:hover': {
-        borderColor: '#5b504b',
-        backgroundColor: '#e0e0e0',
+        borderColor: '#5B504B',
+        backgroundColor: '#E0E0E0',
         color: '#686159',
         transition: 'color 0.3s ease-in-out',
     },
     flexShrink: 0,
-}));
+});
 
 export const DetailsCartWishlistButtons = ({ handleAction, isCartLoading, isWishlistLoading, inventoryCount }) => {
+    const isOutOfStock = inventoryCount === 0;
+
     return (
         <>
             <DetailsAddToCartButton
                 onClick={handleAction('cart')}
                 disabled={isCartLoading || isWishlistLoading || inventoryCount === 0}
             >
-                <DetailsCartButton />
+                <DetailsCartButton isOutOfStock={isOutOfStock} />
             </DetailsAddToCartButton>
             <DetailsWishlistButton
                 onClick={handleAction('wishlist')}
@@ -453,8 +467,8 @@ export const CustomTab = styled(Tab)(({ theme }) => ({
     borderBottom: '1px solid #dddddd',
     fontWeight: theme.typography.fontWeightRegular,
     '&:hover': {
-        backgroundColor: '#f2f2f2',
-        color: '#59514a',
+        backgroundColor: '#F2F2F2',
+        color: '#59514A',
     },
     '&.Mui-selected': {
         borderBottom: `2px solid ${theme.palette.primary.main}`,
@@ -477,9 +491,9 @@ export const ReviewCard = styled(Paper)(({ theme }) => ({
     whiteSpace: 'nowrap',
 }));
 
-export const ReviewContent = styled(Box)(({ theme }) => ({
+export const ReviewContent = styled(Box)({
     flex: 1,
-}));
+});
 
 export const RatingStars = ({ rating }) => {
     const stars = Array(5).fill(false).map((_, index) => index < rating);
@@ -546,7 +560,7 @@ export const CustomToolbar = () => {
     );
 };
 
-export const StyledGridOverlay = styled('div')(({ theme }) => ({
+export const StyledGridOverlay = styled('div')({
     display: 'flex',
     flexDirection: 'column',
     alignItems: 'center',
@@ -558,24 +572,24 @@ export const StyledGridOverlay = styled('div')(({ theme }) => ({
     '& .no-rows-secondary': {
         fill: '#A49589',
     },
-}));
+});
 
-export const StyledBox = styled(Box)(({ theme }) => ({
+export const StyledBox = styled(Box)({
     position: 'fixed',
     inset: 0,
     zIndex: 50,
     display: 'flex',
     alignItems: 'center',
     justifyContent: 'center',
-}));
+});
 
-export const CloseButtonStyled = styled(IconButton)(({ theme }) => ({
+export const CloseButtonStyled = styled(IconButton)({
     position: 'absolute',
     top: 16,
     right: 16,
     color: '#fff',
     zIndex: 1400,
-}));
+});
 
 export const StyledImage = styled('img')({
     maxHeight: '80%',
@@ -662,7 +676,7 @@ const activeColor = '#7C7164';
 export const CustomProfileIcon = ({ isActive }) => <Person style={{ color: isActive ? activeColor : 'inherit' }} />;
 export const CustomAddressIcon = ({ isActive }) => <Home style={{ color: isActive ? activeColor : 'inherit' }} />;
 export const CustomOrdersIcon = ({ isActive }) => <Inbox style={{ color: isActive ? activeColor : 'inherit' }} />;
-export const CustomReturnIcon =({ isActive }) => <MoveToInbox style={{ color: isActive ? activeColor : 'inherit' }} />; 
+export const CustomReturnIcon = ({ isActive }) => <MoveToInbox style={{ color: isActive ? activeColor : 'inherit' }} />;
 export const CustomWishlistIcon = ({ isActive }) => <Favorite style={{ color: isActive ? activeColor : 'inherit' }} />;
 export const CustomReviewsIcon = ({ isActive }) => <Star style={{ color: isActive ? activeColor : 'inherit' }} />;
 
@@ -742,24 +756,30 @@ export const CustomTypography = (props) => (
 );
 
 export const CustomDeleteModal = ({ open, onClose, onDelete, title, message }) => (
-    <Modal open={open} onClose={onClose} className="flex items-center justify-center outline-none">
-        <Box className="bg-white p-4 rounded-lg shadow-lg max-w-md w-full">
-            <Typography variant="h6" className="text-xl font-bold mb-2">
-                {title}
-            </Typography>
-            <Typography variant="body1" className="mb-4">
-                {message}
-            </Typography>
-            <div className="flex justify-end mt-4">
-                <OutlinedBrownButton onClick={onClose} variant="outlined" className='!mr-4'>
-                    Cancel
-                </OutlinedBrownButton>
-                <BrownButton onClick={onDelete} variant="contained" color="error">
-                    Delete
-                </BrownButton>
-            </div>
-        </Box>
-    </Modal>
+    <AnimatePresence>
+        <Modal open={open} onClose={onClose} className="flex items-center justify-center outline-none">
+            <BounceAnimation>
+                <Box
+                    className="bg-white p-4 rounded-lg shadow-lg w-full"
+                >
+                    <Typography variant="h6" className="text-xl font-bold mb-2">
+                        {title}
+                    </Typography>
+                    <Typography variant="body1" className="mb-4">
+                        {message}
+                    </Typography>
+                    <div className="flex justify-end mt-4">
+                        <OutlinedBrownButton onClick={onClose} variant="outlined" className="!mr-4">
+                            Cancel
+                        </OutlinedBrownButton>
+                        <BrownButton onClick={onDelete} variant="contained" color="error">
+                            Delete
+                        </BrownButton>
+                    </div>
+                </Box>
+            </BounceAnimation>
+        </Modal>
+    </AnimatePresence>
 );
 
 export const DetailsBreadcrumbs = ({ product }) => {
@@ -818,7 +838,7 @@ export const Breadcrumb = ({ type, data }) => {
 
     const crumbs = [
         <BreadcrumbLink key="home" onClick={(e) => { e.preventDefault(); navigate('/'); }}>
-            <HomeBreadCrumb className="text-stone-500 hover:text-stone-700" />
+            <HomeBreadCrumb className="text-stone-500 hover:text-[#5C504B] transition-colors duration-300" />
         </BreadcrumbLink>
     ];
 
@@ -942,7 +962,7 @@ export const SlideshowSkeleton = () => (
 
 export const GoBackHome = () => {
     return (
-        <Button
+        <BrownButton
             component={RouterLink}
             to="/"
             variant="contained"
@@ -953,7 +973,7 @@ export const GoBackHome = () => {
             <Typography variant="button" sx={{ color: 'white' }}>
                 Go back home
             </Typography>
-        </Button>
+        </BrownButton>
     );
 };
 
@@ -998,13 +1018,13 @@ export const TabPanel = ({ children, value, index }) => {
     );
 };
 
-export const DetailsBox = styled(Box)(({ theme }) => ({
+export const DetailsBox = styled(Box)({
     width: '100%',
     display: 'flex',
     flexDirection: 'column',
     alignItems: 'flex-start',
     marginBottom: '5rem',
-}));
+});
 
 export const ReviewsList = ({ reviews, openModal }) => {
     return (
@@ -1128,10 +1148,7 @@ export const CustomPagination = ({ count, page, onChange, size = 'large', sx = {
     if (!paginationEnabled) return null;
 
     return (
-        <Stack
-            spacing={2}
-            sx={paginationStackStyling(sx)}
-        >
+        <Stack spacing={2} sx={paginationStackStyling(sx)}>
             <Pagination
                 count={count}
                 page={page}
@@ -1140,10 +1157,20 @@ export const CustomPagination = ({ count, page, onChange, size = 'large', sx = {
                 variant="outlined"
                 size={size}
                 sx={paginationStyling(sx)}
+                renderItem={(item) => (
+                    <PaginationItem
+                        {...item}
+                        sx={{
+                            display: item.type === 'previous' && page === 1 ? 'none' : 'inline-flex',
+                            ...(item.type === 'next' && page === count ? { display: 'none' } : {}),
+                        }}
+                    />
+                )}
             />
         </Stack>
     );
 };
+
 
 export const FAQItem = ({ question, answer }) => {
     const [isOpen, setIsOpen] = useState(false);
@@ -1215,21 +1242,36 @@ export const GoBackButton = () => {
     )
 }
 
-export const CheckoutButton = styled(Button)(({ theme }) => ({
+export const CheckoutButton = styled(Button)({
     backgroundColor: '#686159',
     color: 'white',
     fontSize: '1.02rem',
     padding: '4px 20px',
     '&:hover': {
-        backgroundColor: '#5b504b',
+        backgroundColor: '#5B504B',
     },
-}));
+});
 
 export const LoadingProfile = () => (
     <>
-        <Skeleton variant="text" width={250} height={40} />
-        <Skeleton variant="text" width={265} height={30} />
+        <Skeleton variant="text" animation="wave" width={250} height={40} />
+        <Skeleton variant="text" animation="wave" width={265} height={30} />
     </>
+);
+
+export const LoadingReturn = () => (
+    <Box sx={{ p: 1, width: '100%', display: 'flex', flexDirection: 'column', gap: 2 }} >
+        <Skeleton variant="rectangular" animation="wave" width={400} height={56} className='rounded' />
+
+        <Skeleton variant="rectangular" animation="wave" width={400} height={56} className='rounded' />
+
+        <Box sx={{ display: 'flex', alignItems: 'center' }} >
+            <Skeleton variant="rectangular" animation="wave" width={24} height={24} className='rounded' />
+            <Skeleton variant="text" animation="wave" width="60%" height={24} sx={{ ml: 1 }} className='rounded' />
+        </Box>
+
+        <Skeleton variant="rectangular" animation="wave" width="100%" height={40} className='rounded' />
+    </Box>
 );
 
 export const LoadingCart = () => {
@@ -1238,28 +1280,29 @@ export const LoadingCart = () => {
             <Navbar />
             <div className="container mx-auto px-4 lg:px-24 py-2 mb-16 bg-gray-50 mt-10">
                 {/* Mobile-only header */}
-                <div className="md:hidden flex justify-between items-center mb-4 px-2 mt-10">
-                    <Skeleton variant="text" width={80} height={32} />
+                <div className="bg-white p-4 rounded-md shadow-sm mb-3 flex justify-between items-center px-2 md:hidden mt-[72px]">
+                    <h1 className="text-2xl font-semilight ml-2">Cart</h1>
+                    <Skeleton variant="circular" animation="wave" width={32} height={32} />
                 </div>
 
                 {/* Desktop-only header */}
                 <div className="hidden md:block mb-4">
-                    <Skeleton variant="text" width={80} height={32} />
+                    <h1 className="text-2xl font-semilight mb-2 hidden md:block">Cart</h1>
                 </div>
 
                 <div className="flex flex-col lg:flex-row gap-6">
                     <div className="flex-1">
                         {/* Desktop Table View */}
                         <div className="hidden lg:block">
-                            <TableContainer component={Paper} className="bg-white">
+                            <TableContainer className="bg-white rounded-lg">
                                 <Table>
                                     <TableHead>
                                         <TableRow>
-                                            <TableCell><Skeleton variant="text" width={100} height={20} /></TableCell>
-                                            <TableCell align="center"><Skeleton variant="text" width={80} height={20} /></TableCell>
-                                            <TableCell align="center"><Skeleton variant="text" width={80} height={20} /></TableCell>
-                                            <TableCell align="center"><Skeleton variant="text" width={80} height={20} /></TableCell>
-                                            <TableCell align="center"><Skeleton variant="text" width={40} height={20} /></TableCell>
+                                            <TableCell><Skeleton variant="text" animation="wave" width={100} height={20} /></TableCell>
+                                            <TableCell align="center"><Skeleton variant="text" animation="wave" width={80} height={20} /></TableCell>
+                                            <TableCell align="center"><Skeleton variant="text" animation="wave" width={80} height={20} /></TableCell>
+                                            <TableCell align="center"><Skeleton variant="text" animation="wave" width={80} height={20} /></TableCell>
+                                            <TableCell align="center"><Skeleton variant="circular" animation="wave" width={32} height={32} /></TableCell>
                                         </TableRow>
                                     </TableHead>
                                     <TableBody>
@@ -1267,24 +1310,24 @@ export const LoadingCart = () => {
                                             <TableRow key={index}>
                                                 <TableCell>
                                                     <div className="flex items-center">
-                                                        <Skeleton variant="rectangular" width={80} height={80} className="mr-4 rounded" />
-                                                        <Skeleton variant="text" width={120} height={20} />
+                                                        <Skeleton variant="rectangular" animation="wave" width={80} height={80} className="mr-4 rounded" />
+                                                        <Skeleton variant="text" animation="wave" width={120} height={20} />
                                                     </div>
                                                 </TableCell>
                                                 <TableCell align="center">
-                                                    <Skeleton variant="text" width={60} height={20} />
-                                                    <Skeleton variant="text" width={80} height={16} />
+                                                    <Skeleton variant="text" animation="wave" width={60} height={20} />
+                                                    <Skeleton variant="text" animation="wave" width={80} height={16} />
                                                 </TableCell>
                                                 <TableCell align="center">
                                                     <div className="flex justify-center items-center">
-                                                        <Skeleton variant="rectangular" width={100} height={36} />
+                                                        <Skeleton variant="rectangular" animation="wave" width={100} height={36} />
                                                     </div>
                                                 </TableCell>
                                                 <TableCell align="center">
-                                                    <Skeleton variant="text" width={60} height={20} />
+                                                    <Skeleton variant="text" animation="wave" width={60} height={20} />
                                                 </TableCell>
                                                 <TableCell align="center">
-                                                    <Skeleton variant="circular" width={32} height={32} />
+                                                    <Skeleton variant="circular" animation="wave" width={32} height={32} />
                                                 </TableCell>
                                             </TableRow>
                                         ))}
@@ -1296,55 +1339,55 @@ export const LoadingCart = () => {
                         {/* Mobile Card View */}
                         <div className="lg:hidden space-y-4">
                             {Array.from(new Array(3)).map((_, index) => (
-                                <Paper key={index} className="p-4">
+                                <div key={index} className="bg-white rounded-lg p-4">
                                     <div className="flex gap-4">
-                                        <Skeleton variant="rectangular" width={96} height={96} className="rounded" />
+                                        <Skeleton variant="rectangular" animation="wave" width={96} height={96} className="rounded" />
                                         <div className="flex-1">
                                             <div className="flex justify-between items-start">
-                                                <Skeleton variant="text" width="60%" height={24} />
-                                                <Skeleton variant="circular" width={32} height={32} />
+                                                <Skeleton variant="text" animation="wave" width="60%" height={24} />
+                                                <Skeleton variant="circular" animation="wave" width={32} height={32} />
                                             </div>
                                             <div className="mb-3">
-                                                <Skeleton variant="text" width={80} height={24} />
-                                                <Skeleton variant="text" width={120} height={20} />
+                                                <Skeleton variant="text" animation="wave" width={80} height={24} />
+                                                <Skeleton variant="text" animation="wave" width={120} height={20} />
                                             </div>
                                             <div className="flex items-center justify-between">
-                                                <Skeleton variant="rectangular" width={120} height={36} className="rounded" />
-                                                <Skeleton variant="text" width={80} height={24} />
+                                                <Skeleton variant="rectangular" animation="wave" width={120} height={36} className="rounded" />
+                                                <Skeleton variant="text" animation="wave" width={80} height={24} />
                                             </div>
                                         </div>
                                     </div>
-                                </Paper>
+                                </div>
                             ))}
                         </div>
                     </div>
 
                     {/* Cart Summary Section */}
                     <div className="lg:w-80 w-full">
-                        <Paper className="p-4">
-                            <Skeleton variant="text" width={140} height={32} className="mb-4" />
+                        <div className="bg-white p-4">
+                            <Skeleton variant="text" animation="wave" width={140} height={32} className="mb-4" />
                             <div className="space-y-3">
                                 <div className="flex justify-between py-2 border-b">
-                                    <Skeleton variant="text" width={80} height={24} />
-                                    <Skeleton variant="text" width={60} height={24} />
+                                    <Skeleton variant="text" animation="wave" width={80} height={24} />
+                                    <Skeleton variant="text" animation="wave" width={60} height={24} />
                                 </div>
                                 <div className="flex justify-between py-2 border-b">
-                                    <Skeleton variant="text" width={80} height={24} />
-                                    <Skeleton variant="text" width={60} height={24} />
+                                    <Skeleton variant="text" animation="wave" width={80} height={24} />
+                                    <Skeleton variant="text" animation="wave" width={60} height={24} />
                                 </div>
                                 <div className="flex justify-between py-2 border-b">
-                                    <Skeleton variant="text" width={100} height={24} />
-                                    <Skeleton variant="text" width={60} height={24} />
+                                    <Skeleton variant="text" animation="wave" width={100} height={24} />
+                                    <Skeleton variant="text" animation="wave" width={60} height={24} />
                                 </div>
                                 <div className="flex justify-between py-2">
-                                    <Skeleton variant="text" width={80} height={24} />
-                                    <Skeleton variant="text" width={60} height={24} />
+                                    <Skeleton variant="text" animation="wave" width={80} height={24} />
+                                    <Skeleton variant="text" animation="wave" width={60} height={24} />
                                 </div>
                             </div>
                             <div className="mt-4">
-                                <Skeleton variant="rectangular" height={48} className="rounded" />
+                                <Skeleton variant="rectangular" animation="wave" height={48} className="rounded" />
                             </div>
-                        </Paper>
+                        </div>
                     </div>
                 </div>
             </div>
@@ -1353,10 +1396,10 @@ export const LoadingCart = () => {
     );
 };
 
-export const ProductItemSkeleton = () => {
+export const ProductItemSkeleton = ({ count = 15 }) => {
     return (
         <>
-            {Array.from({ length: 15 }).map((_, index) => (
+            {Array.from({ length: count }).map((_, index) => (
                 <div key={index} className="bg-white rounded-md shadow-md p-4 flex flex-col">
                     <div className="relative mb-2">
                         <Skeleton variant="rectangular" animation="wave" width="100%" height={192} />
@@ -1792,7 +1835,6 @@ export const Header = ({
                         Request Return
                     </Button>
                 )}
-                {/* Wishlist related buttons */}
                 {wishlistItems !== undefined && !isSharedWishlist && wishlistItems.length > 0 && (
                     <>
                         <ShareWishlist handleShareWishlist={handleShareWishlist} loading={loading} />
@@ -1838,7 +1880,6 @@ export const DashboardHeader = ({
         </div>
     );
 };
-
 
 export const SearchDropdown = ({ results, onClickSuggestion }) => {
     const maxTitleLength = 45;
@@ -1967,6 +2008,27 @@ export const ProfileDropdown = ({ isOpen, isAdmin, handleLogout }) => {
     );
 };
 
+export const LoadingCartDropdown = () => {
+    return (
+        <>
+            <div className="space-y-4">
+                {[...Array(2)].map((_, index) => (
+                    <div key={index} className="flex justify-between items-center">
+                        <Skeleton variant="rectangular" width={48} height={48} animation="wave" />
+                        <div className="ml-2 flex-grow space-y-1">
+                            <Skeleton variant="text" width="80%" height={20} animation="wave" />
+                            <Skeleton variant="text" width="50%" height={16} animation="wave" />
+                        </div>
+                        <Skeleton variant="circular" width={24} height={24} animation="wave" />
+                    </div>
+                ))}
+                <Skeleton variant="text" width="40%" height={24} animation="wave" className="mt-4" />
+                <Skeleton variant="rectangular" width="100%" height={40} animation="wave" />
+            </div>
+        </>
+    );
+};
+
 export const CartDropdown = ({
     isOpen,
     cartItems,
@@ -1977,12 +2039,11 @@ export const CartDropdown = ({
     handleProductClick
 }) => {
     return (
-        <div
-            className="absolute right-0 mt-1 w-96 bg-white border shadow-lg rounded-lg p-4"
-            tabIndex="0"
-        >
+        <div tabIndex="0" className="absolute right-0 mt-1 w-96 bg-white border shadow-lg rounded-lg p-4">
             <DropdownAnimation isOpen={isOpen}>
-                {cartItems.length === 0 ? (
+                {isLoading ? (
+                    <LoadingCartDropdown />
+                ) : cartItems.length === 0 ? (
                     <div className="text-sm text-left">You have no products in your cart</div>
                 ) : (
                     <>
@@ -1990,18 +2051,18 @@ export const CartDropdown = ({
                             {cartItems.map(item => (
                                 <li
                                     key={`${item.product._id}-${item.quantity}`}
-                                    className={'flex justify-between items-center mb-4'}
+                                    className="flex justify-between items-center mb-4"
                                 >
                                     <img
                                         src={getImageUrl(item.product.image)}
                                         alt={item.product.name}
-                                        className="w-12 h-12 object-contain rounded cursor-pointer"
                                         onClick={() => handleProductClick(item.product._id)}
+                                        className="w-12 h-12 object-contain rounded cursor-pointer"
                                     />
                                     <div className="ml-2 flex-grow">
                                         <span
-                                            className="block font-semibold cursor-pointer hover:underline truncate max-w-[calc(22ch)]"
                                             onClick={() => handleProductClick(item.product._id)}
+                                            className="block font-semibold cursor-pointer hover:underline truncate max-w-[calc(22ch)]"
                                         >
                                             {item.product.name}
                                         </span>
@@ -2010,7 +2071,6 @@ export const CartDropdown = ({
                                         </span>
                                     </div>
                                     <RoundIconButton
-                                        style={{ backgroundColor: 'white' }}
                                         onClick={() => handleRemoveItem(item.product._id)}
                                         disabled={isLoading}
                                     >
@@ -2019,21 +2079,16 @@ export const CartDropdown = ({
                                 </li>
                             ))}
                         </ul>
-                        <hr className='border-stone-200' />
+                        <hr className="border-stone-200" />
                         <div className="flex justify-between items-center mt-4 mb-4">
                             <div className="flex justify-start items-center space-x-1">
                                 <span className="font-semibold">Total:</span>
                                 <span className="font-semibold">{formatPrice(cartTotal)} €</span>
                             </div>
                         </div>
-                        <Button
-                            style={{ backgroundColor: '#686159', color: 'white' }}
-                            onClick={handleGoToCart}
-                            className='w-full rounded-md'
-                            disabled={isLoading}
-                        >
+                        <BrownButton onClick={handleGoToCart} disabled={isLoading} fullWidth>
                             Go to Cart
-                        </Button>
+                        </BrownButton>
                     </>
                 )}
             </DropdownAnimation>
@@ -2177,8 +2232,8 @@ export const ExtendIcon = ({ toggleDrawer, open }) => {
                 color="primary"
                 aria-label="open drawer"
                 onClick={toggleDrawer}
-                className='mr-36'
                 sx={{ ...(open && { display: 'none' }) }}
+                className='mr-36'
             >
                 <MenuIcon />
             </IconButton>
@@ -2382,7 +2437,7 @@ const SplideSort = ({ sortOrder, onSortChange, showTopStyle = true }) => {
 };
 
 export const SplideList = ({
-    items,
+    items = {},
     id,
     loading,
     onCardClick,
@@ -2426,6 +2481,9 @@ export const SplideList = ({
     const handlePrev = () => splideRef.current.splide.go('<');
     const handleNext = () => splideRef.current.splide.go('>');
 
+    const currentItems = items[id] || [];
+    const showArrows = currentItems.length >= 3;
+
     return (
         <>
             {showSplide && (
@@ -2434,21 +2492,23 @@ export const SplideList = ({
                         <SplideSkeleton count={skeletonCount} />
                     ) : (
                         <SplideSlides
-                            items={items[id] || []}
+                            items={currentItems}
                             onCardClick={onCardClick}
                             showImage={showImage}
                             splideRef={splideRef}
                         />
                     )}
-                    <SplideArrows
-                        loading={loading}
-                        items={items}
-                        id={id}
-                        handlePrev={handlePrev}
-                        isBeginning={isBeginning}
-                        handleNext={handleNext}
-                        isEnd={isEnd}
-                    />
+                    {showArrows && (
+                        <SplideArrows
+                            loading={loading}
+                            items={items}
+                            id={id}
+                            handlePrev={handlePrev}
+                            isBeginning={isBeginning}
+                            handleNext={handleNext}
+                            isEnd={isEnd}
+                        />
+                    )}
                 </div>
             )}
             <SplideSort sortOrder={sortOrder} onSortChange={onSortChange} showTopStyle={showTopStyle} />
@@ -2658,6 +2718,53 @@ export const FilterLayout = ({
         </Box>
     </Box>
 );
+
+export const ProductGrid = ({ loading, currentPageItems, isMainPage = false }) => (
+    <div className={`grid grid-cols-2 sm:grid-cols-2 md:grid-cols-3 ${isMainPage ? 'lg:grid-cols-5' : 'lg:grid-cols-3'} gap-4 mt-6`}>
+        {loading ? (
+            <ProductItemSkeleton />
+        ) : (
+            currentPageItems.map(product => <ProductItem key={product._id} product={product} />)
+        )}
+    </div>
+);
+
+export const handlePageChange = (setPage) => (event, value) => {
+    setPage(value);
+    window.scrollTo(0, 0);
+};
+
+export const calculatePageCount = (items, itemsPerPage) => Math.ceil(items.length / itemsPerPage);
+
+export const getPaginatedItems = (items, currentPage, itemsPerPage) => {
+    const startIndex = (currentPage - 1) * itemsPerPage;
+    return items.slice(startIndex, startIndex + itemsPerPage);
+};
+
+export const filterProductsByPrice = (products, range) => {
+    return products.filter(product => {
+        const priceToCheck = product.salePrice || product.price;
+        if (range.min && priceToCheck < parseFloat(range.min)) return false;
+        if (range.max && priceToCheck > parseFloat(range.max)) return false;
+        return true;
+    });
+};
+
+export const sortProducts = (products, order) => {
+    let sortedProducts = [...products];
+    switch (order) {
+        case 'lowToHigh':
+            return sortedProducts.sort((a, b) => (a.salePrice || a.price) - (b.salePrice || b.price));
+        case 'highToLow':
+            return sortedProducts.sort((a, b) => (b.salePrice || b.price) - (a.salePrice || a.price));
+        case 'newest':
+            return sortedProducts.sort((a, b) => new Date(b.createdAt || b.updatedAt) - new Date(a.createdAt || a.updatedAt));
+        case 'highestSale':
+            return sortedProducts.sort((a, b) => (b.discount?.value || 0) - (a.discount?.value || 0));
+        default:
+            return products;
+    }
+};
 
 export const knownEmailProviders = [
     'gmail.com',

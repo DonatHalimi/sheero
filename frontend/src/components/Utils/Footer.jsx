@@ -36,10 +36,10 @@ const Footer = () => {
 
         <footer className="bg-stone-600 text-white">
             <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
-    
+
                 {/* Grid layout for footer sections */}
                 <div className="grid grid-cols-1 md:grid-cols-4 gap-8">
-                    
+
                     {/* Brand Description and Social Links */}
                     <div>
                         <h3 className="text-lg font-semibold mb-4 select-none"><Link to="/">sheero</Link></h3>
@@ -55,7 +55,7 @@ const Footer = () => {
                             ))}
                         </div>
                     </div>
-    
+
                     {/* Quick Links Section */}
                     <div>
                         <h3 className="text-lg font-semibold mb-4 select-none">Quick Links</h3>
@@ -67,7 +67,7 @@ const Footer = () => {
                             ))}
                         </ul>
                     </div>
-    
+
                     {/* Customer Service Links */}
                     <div>
                         <h3 className="text-lg font-semibold mb-4 select-none">Customer Service</h3>
@@ -79,7 +79,7 @@ const Footer = () => {
                             ))}
                         </ul>
                     </div>
-    
+
                     {/* Contact Information */}
                     <div>
                         <h3 className="text-lg font-semibold mb-4 select-none">Contact Us</h3>
@@ -100,9 +100,9 @@ const Footer = () => {
                             ))}
                         </div>
                     </div>
-    
+
                 </div>
-    
+
                 {/* Footer bottom section with copyright */}
                 <div className="mt-8 pt-8 border-t border-stone-700 text-center select-none">
                     <p className="text-gray-200 text-left md:text-center">

@@ -1,12 +1,12 @@
 import React, { useEffect, useState } from 'react';
 import { toast } from 'react-toastify';
-import { CustomPagination, EmptyState, Header, ProductItemSkeleton } from '../../assets/CustomComponents';
-import emptyWishlistImage from '../../assets/img/empty/wishlist.png';
-import useAxios from '../../axiosInstance';
-import { getApiUrl } from '../../config';
-import Navbar from '../Navbar/Navbar';
-import Footer from '../Utils/Footer';
-import ProductItem from './ProductItem';
+import { CustomPagination, EmptyState, Header, ProductItemSkeleton } from '../../../assets/CustomComponents';
+import emptyWishlistImage from '../../../assets/img/empty/wishlist.png';
+import useAxios from '../../../axiosInstance';
+import { getApiUrl } from '../../../config';
+import Navbar from '../../Navbar/Navbar';
+import Footer from '../../Utils/Footer';
+import ProductItem from '../Items/ProductItem';
 
 const itemsPerPage = 10;
 

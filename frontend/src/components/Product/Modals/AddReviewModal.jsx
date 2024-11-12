@@ -2,9 +2,9 @@ import { Rating, TextField } from '@mui/material';
 import React, { useContext, useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { toast } from 'react-toastify';
-import { BrownButton, BrownOutlinedTextField, CustomBox, CustomModal, CustomTypography } from '../../assets/CustomComponents';
-import useAxios from '../../axiosInstance';
-import { AuthContext } from '../../context/AuthContext';
+import { BrownButton, BrownOutlinedTextField, CustomBox, CustomModal, CustomTypography } from '../../../assets/CustomComponents';
+import useAxios from '../../../axiosInstance';
+import { AuthContext } from '../../../context/AuthContext';
 
 const AddReviewModal = ({ open, onClose, product, onReviewSuccess }) => {
     const { auth } = useContext(AuthContext);

@@ -1,12 +1,14 @@
 import React, { useEffect, useMemo, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { CustomDeleteModal, CustomMenu, CustomPagination, EmptyState, Header, LoadingOverlay, ProfileLayout, ReviewItemSkeleton, ReviewModal } from '../../assets/CustomComponents';
+import { toast } from 'react-toastify';
+import { calculatePageCount, CustomDeleteModal, CustomMenu, CustomPagination, EmptyState, getPaginatedItems, handlePageChange, Header, LoadingOverlay, ProfileLayout, ReviewItemSkeleton, ReviewModal } from '../../assets/CustomComponents';
 import emptyReviewsImage from '../../assets/img/empty/reviews.png';
+import { paginationSx } from '../../assets/sx';
 import useAxios from '../../axiosInstance';
-import Footer from '../../components/Utils/Footer';
 import Navbar from '../../components/Navbar/Navbar';
-import EditReviewModal from '../../components/Product/EditReviewModal';
-import ReviewItem from '../../components/Product/ReviewItem';
+import ReviewItem from '../../components/Product/Items/ReviewItem';
+import EditReviewModal from '../../components/Product/Modals/EditReviewModal';
+import Footer from '../../components/Utils/Footer';
 
 const itemsPerPage = 4;
 
@@ -61,19 +63,6 @@ const Reviews = () => {
         return matchesSearchTerm;
     });
 
-    const totalReviews = filteredReviews.length;
-    const pageCount = Math.ceil(totalReviews / itemsPerPage);
-
-    const getCurrentPageItems = () => {
-        const startIndex = (currentPage - 1) * itemsPerPage;
-        return filteredReviews.slice(startIndex, startIndex + itemsPerPage);
-    };
-
-    const handlePageChange = (event, value) => {
-        setCurrentPage(value);
-        window.scrollTo(0, 0);
-    };
-
     const handleMenuClick = (event, review) => {
         event.stopPropagation();
         setAnchorEl(event.currentTarget);
@@ -111,6 +100,7 @@ const Reviews = () => {
             try {
                 await axiosInstance.delete(`/reviews/delete/${selectedReview._id}`);
                 await fetchReviews();
+                toast.success('Review deleted successfully');
             } catch (err) {
                 console.error('Failed to delete review:', err.message);
             } finally {
@@ -129,30 +119,36 @@ const Reviews = () => {
         setOpenReviewModal(true);
     };
 
-    const marginBottomClass = filteredReviews.length === 1 ? 'mb-[103px]' : 'mb-20';
+    const applyMargin = () => {
+        return (filteredReviews.length === 1 || currentPageItems.length === 1) ? 'mb-32' : '';
+    };
+
+    const pageCount = calculatePageCount(filteredReviews, itemsPerPage);
+    const currentPageItems = getPaginatedItems(filteredReviews, currentPage, itemsPerPage);
 
     return (
         <>
             <Navbar />
             <ProfileLayout>
+
                 <Header
                     title='Reviews'
                     searchTerm={searchTerm}
                     setSearchTerm={setSearchTerm}
-                    showSearch={filteredReviews.length > 0}
+                    showSearch={reviews.length > 0}
                     placeholder='Search reviews...'
                 />
                 {loading ? (
                     <ReviewItemSkeleton />
-                ) : (filteredReviews.length === 0 ? (
+                ) : filteredReviews.length === 0 ? (
                     <EmptyState
                         imageSrc={emptyReviewsImage}
                         message={searchTerm ? "No review found matching your search" : "No review found!"}
                     />
                 ) : (
-                    <>
-                        <div className={`flex flex-col ${marginBottomClass}`}>
-                            {getCurrentPageItems().map((review) => (
+                    <div className={`flex flex-col ${applyMargin()}`}>
+                        <div className="grid gap-4 mb-3">
+                            {currentPageItems.map((review) => (
                                 <ReviewItem
                                     key={review._id}
                                     review={review}
@@ -161,27 +157,22 @@ const Reviews = () => {
                                     onCardClick={handlePaperClick}
                                 />
                             ))}
-                            <div className="flex justify-start sm:justify-start">
-                                <CustomPagination
-                                    count={pageCount}
-                                    page={currentPage}
-                                    onChange={handlePageChange}
-                                    size="medium"
-                                    sx={{
-                                        position: 'relative',
-                                        bottom: '4px',
-                                        '& .MuiPagination-ul': {
-                                            justifyContent: 'flex-start',
-                                        },
-                                    }}
-                                />
-                            </div>
                         </div>
-                    </>
-                ))}
+
+                        <div className="flex justify-start sm:justify-start">
+                            <CustomPagination
+                                count={pageCount}
+                                page={currentPage}
+                                onChange={handlePageChange(setCurrentPage)}
+                                size="medium"
+                                sx={paginationSx}
+                            />
+                        </div>
+                    </div>
+                )}
             </ProfileLayout>
 
-            {totalReviews === 1 && <div className='mb-32' />}
+            {filteredReviews.length === 1 && <div className='mb-44' />}
             <Footer />
 
             <CustomMenu

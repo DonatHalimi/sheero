@@ -1,10 +1,10 @@
-import { Box, Button, FormControl, InputLabel, MenuItem, Select, TextField } from '@mui/material';
+import { Box, FormControl, InputLabel, MenuItem, Select, TextField } from '@mui/material';
 import React, { useEffect, useMemo, useState } from 'react';
 import { toast } from 'react-toastify';
-import { Header, InformationSkeleton, ProfileLayout } from '../../assets/CustomComponents';
+import { BrownButton, Header, InformationSkeleton, ProfileLayout } from '../../assets/CustomComponents';
 import useAxios from '../../axiosInstance';
-import Footer from '../../components/Utils/Footer';
 import Navbar from '../../components/Navbar/Navbar';
+import Footer from '../../components/Utils/Footer';
 
 const AddressInformation = () => {
     const axiosInstance = useMemo(() => useAxios(), []);
@@ -109,7 +109,7 @@ const AddressInformation = () => {
     };
 
     const validateName = (name) => /^[A-Z][a-zA-Z]{1,9}$/.test(name);
-    const validateStreet = (street) => /^[A-Z][a-zA-Z0-9]*([ ]+[A-Z][a-zA-Z0-9]*)*$/.test(street);
+    const validateStreet = (street) => /^[A-Z][a-zA-Z0-9\s\-\.]{1,26}$/.test(street);
     const validatePhoneNumber = (phoneNumber) => /^0(44|45|48)\d{6}$/.test(phoneNumber);
 
     const handleNameChange = (e) => {
@@ -187,7 +187,7 @@ const AddressInformation = () => {
             <ProfileLayout>
                 <Header title="Address" />
 
-                <Box className='bg-white rounded-md shadow-sm'
+                <Box className='bg-white rounded-md shadow-sm mb-3'
                     sx={{
                         p: { xs: 3, md: 3 }
                     }}
@@ -215,7 +215,7 @@ const AddressInformation = () => {
                                     {focusedField === 'name' && !nameValid && (
                                         <div className="absolute left-0 bottom-[-78px] bg-white text-red-500 text-sm p-2 rounded-lg shadow-md w-full z-10">
                                             <span className="block text-xs font-semibold mb-1">Invalid Name</span>
-                                            Must start with a capital letter, 2-10 characters.
+                                            Must start with a capital letter and be 2 to 10 characters long.
                                             <div className="absolute top-[-5px] left-[20px] w-0 h-0 border-l-[5px] border-r-[5px] border-b-[5px] border-transparent border-b-white"></div>
                                         </div>
                                     )}
@@ -236,9 +236,9 @@ const AddressInformation = () => {
                                         InputProps={{ className: 'text-gray-700' }}
                                     />
                                     {focusedField === 'street' && !streetValid && (
-                                        <div className="absolute left-0 bottom-[-58px] bg-white text-red-500 text-sm p-2 rounded-lg shadow-md w-full z-10">
+                                        <div className="absolute left-0 bottom-[-78px] bg-white text-red-500 text-sm p-2 rounded-lg shadow-md w-full z-10">
                                             <span className="block text-xs font-semibold mb-1">Invalid Street</span>
-                                            Must start with a capital letter.
+                                            Must start with a capital letter and be 2 to 27 characters long.
                                             <div className="absolute top-[-5px] left-[20px] w-0 h-0 border-l-[5px] border-r-[5px] border-b-[5px] border-transparent border-b-white"></div>
                                         </div>
                                     )}
@@ -321,14 +321,14 @@ const AddressInformation = () => {
                                 placeholder="Add any additional comments (optional)"
                             />
 
-                            <Button
+                            <BrownButton
                                 type="submit"
                                 variant="contained"
                                 color="primary"
                                 disabled={isFormUnchanged || !isFormValid || isSubmitted}
                             >
                                 {existingAddress ? 'Update' : 'Add'}
-                            </Button>
+                            </BrownButton>
                         </form>
                     )}
                 </Box>

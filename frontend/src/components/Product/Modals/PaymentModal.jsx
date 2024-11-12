@@ -1,6 +1,6 @@
 import { LocalAtm, Payment } from '@mui/icons-material';
 import React, { useState } from 'react';
-import { CustomModal, LoadingOverlay } from '../../assets/CustomComponents';
+import { CustomModal, LoadingOverlay } from '../../../assets/CustomComponents';
 
 const PaymentModal = ({ open, onClose, onStripePayment, onCashPayment }) => {
     const [loading, setLoading] = useState(false);

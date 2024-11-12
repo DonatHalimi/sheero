@@ -1,18 +1,10 @@
-import { Box } from '@mui/material';
 import React, { useContext, useEffect, useMemo, useState } from 'react';
 import { toast } from 'react-toastify';
-import {
-    CustomDeleteModal,
-    CustomPagination,
-    EmptyState,
-    Header,
-    ProductItemSkeleton,
-    ProfileLayout,
-} from '../../assets/CustomComponents';
+import { calculatePageCount, CustomDeleteModal, CustomPagination, EmptyState, getPaginatedItems, handlePageChange, Header, ProductItemSkeleton, ProfileLayout } from '../../assets/CustomComponents';
 import emptyWishlistImage from '../../assets/img/empty/wishlist.png';
 import useAxios from '../../axiosInstance';
 import Navbar from '../../components/Navbar/Navbar';
-import WishlistItem from '../../components/Product/WishlistItem';
+import WishlistItem from '../../components/Product/Items/WishlistItem';
 import Footer from '../../components/Utils/Footer';
 import { AuthContext } from '../../context/AuthContext';
 
@@ -21,12 +13,12 @@ const itemsPerPage = 6;
 const Wishlist = () => {
     const { auth } = useContext(AuthContext);
     const axiosInstance = useMemo(() => useAxios(), []);
+
     const [wishlistItems, setWishlistItems] = useState([]);
     const [loading, setLoading] = useState(true);
     const [isModalOpen, setIsModalOpen] = useState(false);
     const [currentPage, setCurrentPage] = useState(1);
     const [userId, setUserId] = useState('');
-    const [totalItems, setTotalItems] = useState(0);
 
     useEffect(() => {
         window.scrollTo(0, 0);
@@ -38,7 +30,6 @@ const Wishlist = () => {
 
                 const wishlistResponse = await axiosInstance.get('/wishlist');
                 setWishlistItems(wishlistResponse.data.items);
-                setTotalItems(wishlistResponse.data.items.length);
             } catch (error) {
                 console.error('Error fetching data:', error);
             } finally {
@@ -93,17 +84,8 @@ const Wishlist = () => {
             });
     };
 
-    const pageCount = Math.ceil(totalItems / itemsPerPage);
-
-    const getCurrentPageItems = () => {
-        const startIndex = (currentPage - 1) * itemsPerPage;
-        return wishlistItems.slice(startIndex, startIndex + itemsPerPage);
-    };
-
-    const handlePageChange = (event, value) => {
-        setCurrentPage(value);
-        window.scrollTo(0, 0);
-    };
+    const pageCount = calculatePageCount(wishlistItems, itemsPerPage);
+    const currentPageItems = getPaginatedItems(wishlistItems, currentPage, itemsPerPage);
 
     return (
         <>
@@ -118,7 +100,7 @@ const Wishlist = () => {
 
                 {loading ? (
                     <div className="grid grid-cols-2 sm:grid-cols-2 md:grid-cols-3 gap-6">
-                        <ProductItemSkeleton />
+                        <ProductItemSkeleton count={6} />
                     </div>
                 ) : !wishlistItems.length ? (
                     <EmptyState
@@ -128,7 +110,7 @@ const Wishlist = () => {
                 ) : (
                     <>
                         <div className="grid grid-cols-2 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-3 xl:grid-cols-3 gap-4">
-                            {getCurrentPageItems().map(({ product }) => (
+                            {currentPageItems.map(({ product }) => (
                                 <WishlistItem
                                     key={product._id}
                                     product={product}
@@ -136,21 +118,24 @@ const Wishlist = () => {
                                 />
                             ))}
                         </div>
-                        <Box sx={{ display: 'flex', justifyContent: 'flex-start', mb: 4 }}>
-                            <CustomPagination
-                                count={pageCount}
-                                page={currentPage}
-                                onChange={handlePageChange}
-                                size="medium"
-                                sx={{
-                                    position: 'relative',
-                                    bottom: '-2px',
-                                    '& .MuiPagination-ul': {
-                                        justifyContent: 'flex-start',
-                                    },
-                                }}
-                            />
-                        </Box>
+
+                        <div className="flex justify-start">
+                            {!loading && wishlistItems.length > 0 && (
+                                <CustomPagination
+                                    count={pageCount}
+                                    page={currentPage}
+                                    onChange={handlePageChange(setCurrentPage)}
+                                    size="medium"
+                                    sx={{
+                                        position: 'relative',
+                                        bottom: '-2px',
+                                        '& .MuiPagination-ul': {
+                                            justifyContent: 'flex-start',
+                                        },
+                                    }}
+                                />
+                            )}
+                        </div>
                     </>
                 )}
             </ProfileLayout>

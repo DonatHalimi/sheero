@@ -5,8 +5,8 @@ import React, { useContext, useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { toast } from 'react-toastify';
 import { BrownButton, BrownOutlinedTextField, knownEmailProviders } from '../../assets/CustomComponents';
-import Footer from '../../components/Utils/Footer';
 import Navbar from '../../components/Navbar/Navbar';
+import Footer from '../../components/Utils/Footer';
 import { AuthContext } from '../../context/AuthContext';
 
 const Login = () => {

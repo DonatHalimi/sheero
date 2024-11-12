@@ -1,6 +1,6 @@
 import React from 'react';
 import { Link } from 'react-router-dom';
-import { formatDate, formatPrice } from '../../assets/CustomComponents';
+import { formatDate, formatPrice } from '../../../assets/CustomComponents';
 
 const OrderItem = ({ order, renderProductImages, getStatusColor }) => {
     const { _id: id, createdAt, status, totalAmount, products } = order;

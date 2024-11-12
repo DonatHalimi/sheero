@@ -1,7 +1,7 @@
 import { ExpandLess, ExpandMore, PaidOutlined } from '@mui/icons-material';
-import { Box, Button, Collapse, IconButton, TextField, Typography } from '@mui/material';
+import { Box, Collapse, IconButton, TextField, Typography } from '@mui/material';
 import React, { useState } from 'react';
-import { SidebarLayout } from '../../assets/CustomComponents';
+import { BrownButton, SidebarLayout } from '../../../assets/CustomComponents';
 
 const FilterSidebar = ({ onApplyPriceFilter }) => {
     const [priceFilterOpen, setPriceFilterOpen] = useState(true);
@@ -64,9 +64,9 @@ const FilterSidebar = ({ onApplyPriceFilter }) => {
                             />
                         </Box>
 
-                        <Button variant="contained" onClick={applyFilter} className='!mt-2'>
+                        <BrownButton variant="contained" onClick={applyFilter} className='!mt-2'>
                             Apply Filter
-                        </Button>
+                        </BrownButton>
                     </div>
                 </Collapse>
             </div>

@@ -5,7 +5,6 @@ const returnReasons = [
     'Damaged Item',
     'Wrong Item Delivered',
     'Item Not as Described',
-    'Too Big/Too Small',
     'Changed My Mind',
     'Other'
 ];

@@ -1,7 +1,6 @@
 import axios from 'axios';
 import React, { useEffect, useState } from 'react';
-import { CustomPagination, ProductItemSkeleton } from '../../assets/CustomComponents';
-import ProductItem from '../../components/Product/ProductItem';
+import { calculatePageCount, CustomPagination, getPaginatedItems, ProductGrid, ProductItemSkeleton } from '../../assets/CustomComponents';
 import { getApiUrl } from '../../config';
 
 const itemsPerPage = 40;
@@ -29,31 +28,25 @@ const ProductList = () => {
         fetchProducts();
     }, []);
 
-    const pageCount = Math.ceil(totalProducts / itemsPerPage);
+    const scrollToProductGrid = () => {
+        const offset = 100;
+        const scrollPosition = document.getElementById('product-grid')?.getBoundingClientRect().top + window.scrollY - offset;
 
-    const getCurrentPageItems = () => {
-        const startIndex = (currentPage - 1) * itemsPerPage;
-        return products.slice(startIndex, startIndex + itemsPerPage);
+        if (scrollPosition) window.scrollTo({ top: scrollPosition, behavior: 'smooth' });
     };
 
     const handlePageChange = (event, value) => {
         setCurrentPage(value);
-        
-        // Scroll to the product grid on page change
-        document.getElementById('product-grid').scrollIntoView({ behavior: 'smooth' });
+        scrollToProductGrid();
     };
 
+    const pageCount = calculatePageCount(products, itemsPerPage);
+    const currentPageItems = getPaginatedItems(products, currentPage, itemsPerPage);
+
     return (
-        <div className="container mx-auto p-4 pr-6 mb-16 bg-gray-50">
-            <div id="product-grid" className="grid grid-cols-2 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-3 xl:grid-cols-5 gap-4">
-                {loading ? (
-                    <ProductItemSkeleton />
-                ) : (
-                    getCurrentPageItems().map(product => (
-                        <ProductItem key={product._id} product={product} />
-                    ))
-                )}
-            </div>
+        <div id="product-grid" className="container mx-auto p-4 pr-6 mb-16 bg-gray-50">
+
+            <ProductGrid loading={loading} currentPageItems={currentPageItems} isMainPage={true} />
 
             {!loading && totalProducts > 0 && (
                 <CustomPagination
