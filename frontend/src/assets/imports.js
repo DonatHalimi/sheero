@@ -31,6 +31,7 @@ export { default as OrderDetails } from '../pages/Profile/OrderDetails';
 export { default as Orders } from '../pages/Profile/Orders';
 export { default as Profile } from '../pages/Profile/ProfileInformation';
 export { default as Returns } from '../pages/Profile/Returns';
+export { default as ReturnDetails } from '../pages/Profile/ReturnDetails';
 export { default as Reviews } from '../pages/Profile/Reviews';
 export { default as Wishlist } from '../pages/Profile/Wishlist';
 

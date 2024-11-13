@@ -1,7 +1,7 @@
 import React, { useEffect, useMemo, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { toast } from 'react-toastify';
-import { calculatePageCount, CustomDeleteModal, CustomMenu, CustomPagination, EmptyState, getPaginatedItems, handlePageChange, Header, LoadingOverlay, ProfileLayout, ReviewItemSkeleton, ReviewModal } from '../../assets/CustomComponents';
+import { calculatePageCount, CustomDeleteModal, CustomMenu, CustomPagination, EmptyState, getPaginatedItems, handlePageChange, Header, LoadingOverlay, ProfileLayout, LoadingReviewItem, ReviewModal } from '../../assets/CustomComponents';
 import emptyReviewsImage from '../../assets/img/empty/reviews.png';
 import { paginationSx } from '../../assets/sx';
 import useAxios from '../../axiosInstance';
@@ -139,7 +139,7 @@ const Reviews = () => {
                     placeholder='Search reviews...'
                 />
                 {loading ? (
-                    <ReviewItemSkeleton />
+                    <LoadingReviewItem />
                 ) : filteredReviews.length === 0 ? (
                     <EmptyState
                         imageSrc={emptyReviewsImage}

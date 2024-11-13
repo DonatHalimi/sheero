@@ -1,5 +1,5 @@
 import React, { useEffect, useMemo, useState } from 'react';
-import { calculatePageCount, CustomPagination, EmptyState, getPaginatedItems, handlePageChange, Header, OrderItemSkeleton, ProfileLayout } from '../../assets/CustomComponents';
+import { calculatePageCount, CustomPagination, EmptyState, getPaginatedItems, handlePageChange, Header, LoadingOrderItem, ProfileLayout } from '../../assets/CustomComponents';
 import emptyReturnsImage from '../../assets/img/empty/orders.png';
 import useAxios from '../../axiosInstance';
 import Navbar from '../../components/Navbar/Navbar';
@@ -58,8 +58,9 @@ const Returns = () => {
 
     const statusClasses = {
         pending: 'text-yellow-500',
-        approved: 'text-green-500',
+        approved: 'text-blue-500',
         rejected: 'text-red-500',
+        processed: 'text-green-500',
         default: 'text-gray-500'
     };
 
@@ -90,7 +91,7 @@ const Returns = () => {
                 />
 
                 {loading ? (
-                    <OrderItemSkeleton />
+                    <LoadingOrderItem />
                 ) : filteredReturns.length === 0 ? (
                     <EmptyState
                         imageSrc={emptyReturnsImage}

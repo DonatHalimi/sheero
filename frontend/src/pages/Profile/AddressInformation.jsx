@@ -1,7 +1,7 @@
 import { Box, FormControl, InputLabel, MenuItem, Select, TextField } from '@mui/material';
 import React, { useEffect, useMemo, useState } from 'react';
 import { toast } from 'react-toastify';
-import { BrownButton, Header, InformationSkeleton, ProfileLayout } from '../../assets/CustomComponents';
+import { BrownButton, Header, LoadingInformation, ProfileLayout } from '../../assets/CustomComponents';
 import useAxios from '../../axiosInstance';
 import Navbar from '../../components/Navbar/Navbar';
 import Footer from '../../components/Utils/Footer';
@@ -193,7 +193,7 @@ const AddressInformation = () => {
                     }}
                 >
                     {loading ? (
-                        <InformationSkeleton showAdditionalField={true} />
+                        <LoadingInformation showAdditionalField={true} />
                     ) : (
                         <form onSubmit={handleSaveAddress} className="space-y-5">
                             <Box sx={{ display: 'flex', flexDirection: { xs: 'column', md: 'row' }, gap: { xs: 3, md: 2 } }}>

@@ -1,6 +1,6 @@
 import axios from 'axios';
 import React, { useEffect, useState } from 'react';
-import { calculatePageCount, CustomPagination, getPaginatedItems, ProductGrid, ProductItemSkeleton } from '../../assets/CustomComponents';
+import { calculatePageCount, CustomPagination, getPaginatedItems, ProductGrid } from '../../assets/CustomComponents';
 import { getApiUrl } from '../../config';
 
 const itemsPerPage = 40;

@@ -2,7 +2,7 @@ import { LinearProgress, Table, TableBody, TableCell, TableContainer, TableHead,
 import React, { useEffect, useState } from 'react';
 import { Link, useNavigate, useParams } from 'react-router-dom';
 import 'react-toastify/dist/ReactToastify.css';
-import { EmptyState, formatDate, formatPrice, Header, OrderDetailsSkeleton, ProfileLayout } from '../../assets/CustomComponents';
+import { EmptyState, formatDate, formatPrice, Header, LoadingOrderDetails, ProfileLayout } from '../../assets/CustomComponents';
 import emptyOrdersImage from '../../assets/img/empty/orders.png';
 import useAxios from '../../axiosInstance';
 import Navbar from '../../components/Navbar/Navbar';
@@ -38,7 +38,6 @@ const OrderDetails = () => {
                 navigate('/');
             } else {
                 console.error('Error fetching order details:', error);
-                setError('An error occurred while fetching the order details.');
             }
         } finally {
             setLoading(false);
@@ -74,7 +73,7 @@ const OrderDetails = () => {
                 />
 
                 {loading ? (
-                    <OrderDetailsSkeleton />
+                    <LoadingOrderDetails />
                 ) : order ? (
                     <>
                         {/* Progress Card */}
@@ -87,11 +86,11 @@ const OrderDetails = () => {
                                     Order Date: {formatDate(order.createdAt)}
                                 </p>
                                 {order.status === 'delivered' ? (
-                                    <p className="font-semilight mb-4 text-center text-gray-500 text-md">
+                                    <p className="font-semilight mb-3 text-center text-gray-500 text-md">
                                         Arrival Date: {formatDate(order.arrivalDateRange.start)}
                                     </p>
                                 ) : (
-                                    <p className="font-semilight mb-4 text-center text-gray-500 text-md">
+                                    <p className="font-semilight mb-3 text-center text-gray-500 text-md">
                                         Arrival Date: {formatDate(order.arrivalDateRange.start)} - {formatDate(order.arrivalDateRange.end)}
                                     </p>
                                 )}
@@ -111,15 +110,9 @@ const OrderDetails = () => {
                                         <span className="text-center font-semibold bg-stone-100 rounded-md px-1">Canceled</span>
                                     ) : (
                                         <>
-                                            <span className={`text-center ${order.status === 'pending' ? 'font-semibold bg-stone-100 rounded-md px-1' : ''}`}>
-                                                Pending
-                                            </span>
-                                            <span className={`text-center ${order.status === 'shipped' ? 'font-semibold bg-stone-100 rounded-md px-1' : ''}`}>
-                                                Shipped
-                                            </span>
-                                            <span className={`text-center ${order.status === 'delivered' ? 'font-semibold bg-stone-100 rounded-md px-1' : ''}`}>
-                                                Delivered
-                                            </span>
+                                            <span className={`text-center ${order.status === 'pending' ? 'font-semibold bg-stone-100 rounded-md px-1' : ''}`}>Pending</span>
+                                            <span className={`text-center ${order.status === 'shipped' ? 'font-semibold bg-stone-100 rounded-md px-1' : ''}`}>Shipped</span>
+                                            <span className={`text-center ${order.status === 'delivered' ? 'font-semibold bg-stone-100 rounded-md px-1' : ''}`}>Delivered</span>
                                         </>
                                     )}
                                 </div>

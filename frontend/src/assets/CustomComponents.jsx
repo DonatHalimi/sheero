@@ -321,6 +321,8 @@ export const DeleteButton = styled(Delete)({
     transition: 'color 0.3s ease',
 });
 
+export const WaveSkeleton = (props) => <Skeleton animation="wave" {...props} />;
+
 export const CartButton = ({ isOutOfStock }) => {
     return (
         <>
@@ -876,7 +878,7 @@ export const Breadcrumb = ({ type, data }) => {
     return <nav className="flex items-center space-x-1 mt-6 md:mt-0">{crumbs}</nav>;
 };
 
-export const ProductDetailsSkeleton = () => {
+export const LoadingProductDetails = () => {
     return (
         <>
             <div className='container mx-auto px-4 max-w-5xl relative top-6 right-4'>
@@ -884,25 +886,25 @@ export const ProductDetailsSkeleton = () => {
                     <Link component={RouterLink} to="/" color="inherit" underline="none">
                         <HomeBreadCrumb className="text-stone-500 hover:text-stone-700" />
                     </Link>
-                    <Skeleton animation="wave" width={200} />
+                    <WaveSkeleton width={200} />
                 </Breadcrumbs>
             </div>
             <div className="container mx-auto px-4 py-4 mb-8 bg-white mt-8 rounded-md max-w-5xl">
                 <div className="flex flex-col md:flex-row gap-8">
                     <div className="flex flex-col items-center md:w-1/2">
-                        <Skeleton variant="rectangular" animation="wave" width="100%" height={320} />
+                        <WaveSkeleton variant="rectangular" width="100%" height={320} />
                     </div>
                     <div className="md:w-1/2">
-                        <Skeleton variant="text" animation="wave" width="80%" height={40} />
-                        <Skeleton variant="text" animation="wave" width="40%" height={30} />
-                        <Skeleton variant="text" animation="wave" width="60%" height={30} />
-                        <Skeleton variant="text" animation="wave" width="50%" height={30} />
+                        <WaveSkeleton variant="text" width="80%" height={40} />
+                        <WaveSkeleton variant="text" width="40%" height={30} />
+                        <WaveSkeleton variant="text" width="60%" height={30} />
+                        <WaveSkeleton variant="text" width="50%" height={30} />
                         <div className='mt-4' />
-                        <Skeleton variant="text" animation="wave" width="50%" height={30} />
+                        <WaveSkeleton variant="text" width="50%" height={30} />
                         <div className='mt-24' />
                         <div className="mt-4 flex items-center space-x-4">
-                            <Skeleton variant="rectangular" animation="wave" width={314} height={40} className='rounded-md' />
-                            <Skeleton variant="rectangular" animation="wave" width={150} height={40} className='rounded-md' />
+                            <WaveSkeleton variant="rectangular" width={314} height={40} className='rounded-md' />
+                            <WaveSkeleton variant="rectangular" width={150} height={40} className='rounded-md' />
                         </div>
                     </div>
                 </div>
@@ -915,15 +917,15 @@ export const ProductDetailsSkeleton = () => {
                         aria-label="product details tabs"
                         sx={{ width: '100%', display: 'flex', justifyContent: 'space-between', mb: 2 }}
                     >
-                        <Skeleton variant="rectangular" animation="wave" width="100%" height={40} style={{ margin: '0 4px', flexGrow: 1, borderRadius: '6px' }} />
-                        <Skeleton variant="rectangular" animation="wave" width="100%" height={40} style={{ margin: '0 4px', flexGrow: 1, borderRadius: '6px' }} />
-                        <Skeleton variant="rectangular" animation="wave" width="100%" height={40} style={{ margin: '0 4px', flexGrow: 1, borderRadius: '6px' }} />
+                        <WaveSkeleton variant="rectangular" width="100%" height={40} style={{ margin: '0 4px', flexGrow: 1, borderRadius: '6px' }} />
+                        <WaveSkeleton variant="rectangular" width="100%" height={40} style={{ margin: '0 4px', flexGrow: 1, borderRadius: '6px' }} />
+                        <WaveSkeleton variant="rectangular" width="100%" height={40} style={{ margin: '0 4px', flexGrow: 1, borderRadius: '6px' }} />
                     </Tabs>
 
                     <Box p={1}>
-                        <Skeleton variant="text" animation="wave" width="80%" height={30} />
-                        <Skeleton variant="text" animation="wave" width="60%" height={30} className='mt-4' />
-                        <Skeleton variant="text" animation="wave" width="40%" height={30} className='mt-4' />
+                        <WaveSkeleton variant="text" width="80%" height={30} />
+                        <WaveSkeleton variant="text" width="60%" height={30} className='mt-4' />
+                        <WaveSkeleton variant="text" width="40%" height={30} className='mt-4' />
                     </Box>
                 </div>
             </div>
@@ -932,31 +934,14 @@ export const ProductDetailsSkeleton = () => {
     );
 };
 
-export const SlideshowSkeleton = () => (
+export const LoadingSlideshow = () => (
     <Box sx={{ position: 'relative' }} className="relative w-full mx-auto mb-14">
-        <Skeleton
-            variant="rectangular"
-            animation="wave"
-            width="100%"
-            height="800px"
-            sx={{ maxWidth: '2000px', borderRadius: '8px' }}
+        <WaveSkeleton variant="rectangular" width="100%" height="800px" sx={{ maxWidth: '2000px', borderRadius: '8px' }} />
+
+        <WaveSkeleton variant="circular" width={50} height={50} sx={{ ...slideShowSkeletonStyling, left: '20px' }}
         />
 
-        <Skeleton
-            variant="circular"
-            animation="wave"
-            width={50}
-            height={50}
-            sx={{ ...slideShowSkeletonStyling, left: '20px' }}
-        />
-
-        <Skeleton
-            variant="circular"
-            animation="wave"
-            width={50}
-            height={50}
-            sx={{ ...slideShowSkeletonStyling, right: '20px', left: 'auto' }}
-        />
+        <WaveSkeleton variant="circular" width={50} height={50} sx={{ ...slideShowSkeletonStyling, right: '20px', left: 'auto' }} />
     </Box>
 );
 
@@ -1204,12 +1189,12 @@ export const FAQItem = ({ question, answer }) => {
     );
 };
 
-export const FaqSkeleton = () => (
+export const LoadingFaq = () => (
     <>
         {Array(3).fill().map((_, index) => (
             <div key={index} className="mb-4">
-                <Skeleton variant="rectangular" height={60} animation="wave" className="rounded-md mb-2" />
-                <Skeleton variant="rectangular" height={50} animation="wave" className="rounded-md mb-2" />
+                <WaveSkeleton variant="rectangular" height={60} className="rounded-md mb-2" />
+                <WaveSkeleton variant="rectangular" height={50} className="rounded-md mb-2" />
             </div>
         ))}
     </>
@@ -1254,23 +1239,23 @@ export const CheckoutButton = styled(Button)({
 
 export const LoadingProfile = () => (
     <>
-        <Skeleton variant="text" animation="wave" width={250} height={40} />
-        <Skeleton variant="text" animation="wave" width={265} height={30} />
+        <WaveSkeleton variant="text" width={250} height={40} />
+        <WaveSkeleton variant="text" width={265} height={30} />
     </>
 );
 
 export const LoadingReturn = () => (
     <Box sx={{ p: 1, width: '100%', display: 'flex', flexDirection: 'column', gap: 2 }} >
-        <Skeleton variant="rectangular" animation="wave" width={400} height={56} className='rounded' />
+        <WaveSkeleton variant="rectangular" width={400} height={56} className='rounded' />
 
-        <Skeleton variant="rectangular" animation="wave" width={400} height={56} className='rounded' />
+        <WaveSkeleton variant="rectangular" width={400} height={56} className='rounded' />
 
         <Box sx={{ display: 'flex', alignItems: 'center' }} >
-            <Skeleton variant="rectangular" animation="wave" width={24} height={24} className='rounded' />
-            <Skeleton variant="text" animation="wave" width="60%" height={24} sx={{ ml: 1 }} className='rounded' />
+            <WaveSkeleton variant="rectangular" width={24} height={24} className='rounded' />
+            <WaveSkeleton variant="text" width="60%" height={24} sx={{ ml: 1 }} className='rounded' />
         </Box>
 
-        <Skeleton variant="rectangular" animation="wave" width="100%" height={40} className='rounded' />
+        <WaveSkeleton variant="rectangular" width="100%" height={40} className='rounded' />
     </Box>
 );
 
@@ -1282,7 +1267,7 @@ export const LoadingCart = () => {
                 {/* Mobile-only header */}
                 <div className="bg-white p-4 rounded-md shadow-sm mb-3 flex justify-between items-center px-2 md:hidden mt-[72px]">
                     <h1 className="text-2xl font-semilight ml-2">Cart</h1>
-                    <Skeleton variant="circular" animation="wave" width={32} height={32} />
+                    <WaveSkeleton variant="circular" width={32} height={32} />
                 </div>
 
                 {/* Desktop-only header */}
@@ -1298,11 +1283,11 @@ export const LoadingCart = () => {
                                 <Table>
                                     <TableHead>
                                         <TableRow>
-                                            <TableCell><Skeleton variant="text" animation="wave" width={100} height={20} /></TableCell>
-                                            <TableCell align="center"><Skeleton variant="text" animation="wave" width={80} height={20} /></TableCell>
-                                            <TableCell align="center"><Skeleton variant="text" animation="wave" width={80} height={20} /></TableCell>
-                                            <TableCell align="center"><Skeleton variant="text" animation="wave" width={80} height={20} /></TableCell>
-                                            <TableCell align="center"><Skeleton variant="circular" animation="wave" width={32} height={32} /></TableCell>
+                                            <TableCell><WaveSkeleton variant="text" width={100} height={20} /></TableCell>
+                                            <TableCell align="center"><WaveSkeleton variant="text" width={80} height={20} /></TableCell>
+                                            <TableCell align="center"><WaveSkeleton variant="text" width={80} height={20} /></TableCell>
+                                            <TableCell align="center"><WaveSkeleton variant="text" width={80} height={20} /></TableCell>
+                                            <TableCell align="center"><WaveSkeleton variant="circular" width={32} height={32} /></TableCell>
                                         </TableRow>
                                     </TableHead>
                                     <TableBody>
@@ -1310,24 +1295,24 @@ export const LoadingCart = () => {
                                             <TableRow key={index}>
                                                 <TableCell>
                                                     <div className="flex items-center">
-                                                        <Skeleton variant="rectangular" animation="wave" width={80} height={80} className="mr-4 rounded" />
-                                                        <Skeleton variant="text" animation="wave" width={120} height={20} />
+                                                        <WaveSkeleton variant="rectangular" width={80} height={80} className="mr-4 rounded" />
+                                                        <WaveSkeleton variant="text" width={120} height={20} />
                                                     </div>
                                                 </TableCell>
                                                 <TableCell align="center">
-                                                    <Skeleton variant="text" animation="wave" width={60} height={20} />
-                                                    <Skeleton variant="text" animation="wave" width={80} height={16} />
+                                                    <WaveSkeleton variant="text" width={60} height={20} />
+                                                    <WaveSkeleton variant="text" width={80} height={16} />
                                                 </TableCell>
                                                 <TableCell align="center">
                                                     <div className="flex justify-center items-center">
-                                                        <Skeleton variant="rectangular" animation="wave" width={100} height={36} />
+                                                        <WaveSkeleton variant="rectangular" width={100} height={36} />
                                                     </div>
                                                 </TableCell>
                                                 <TableCell align="center">
-                                                    <Skeleton variant="text" animation="wave" width={60} height={20} />
+                                                    <WaveSkeleton variant="text" width={60} height={20} />
                                                 </TableCell>
                                                 <TableCell align="center">
-                                                    <Skeleton variant="circular" animation="wave" width={32} height={32} />
+                                                    <WaveSkeleton variant="circular" width={32} height={32} />
                                                 </TableCell>
                                             </TableRow>
                                         ))}
@@ -1341,19 +1326,19 @@ export const LoadingCart = () => {
                             {Array.from(new Array(3)).map((_, index) => (
                                 <div key={index} className="bg-white rounded-lg p-4">
                                     <div className="flex gap-4">
-                                        <Skeleton variant="rectangular" animation="wave" width={96} height={96} className="rounded" />
+                                        <WaveSkeleton variant="rectangular" width={96} height={96} className="rounded" />
                                         <div className="flex-1">
                                             <div className="flex justify-between items-start">
-                                                <Skeleton variant="text" animation="wave" width="60%" height={24} />
-                                                <Skeleton variant="circular" animation="wave" width={32} height={32} />
+                                                <WaveSkeleton variant="text" width="60%" height={24} />
+                                                <WaveSkeleton variant="circular" width={32} height={32} />
                                             </div>
                                             <div className="mb-3">
-                                                <Skeleton variant="text" animation="wave" width={80} height={24} />
-                                                <Skeleton variant="text" animation="wave" width={120} height={20} />
+                                                <WaveSkeleton variant="text" width={80} height={24} />
+                                                <WaveSkeleton variant="text" width={120} height={20} />
                                             </div>
                                             <div className="flex items-center justify-between">
-                                                <Skeleton variant="rectangular" animation="wave" width={120} height={36} className="rounded" />
-                                                <Skeleton variant="text" animation="wave" width={80} height={24} />
+                                                <WaveSkeleton variant="rectangular" width={120} height={36} className="rounded" />
+                                                <WaveSkeleton variant="text" width={80} height={24} />
                                             </div>
                                         </div>
                                     </div>
@@ -1365,27 +1350,27 @@ export const LoadingCart = () => {
                     {/* Cart Summary Section */}
                     <div className="lg:w-80 w-full">
                         <div className="bg-white p-4">
-                            <Skeleton variant="text" animation="wave" width={140} height={32} className="mb-4" />
+                            <WaveSkeleton variant="text" width={140} height={32} className="mb-4" />
                             <div className="space-y-3">
                                 <div className="flex justify-between py-2 border-b">
-                                    <Skeleton variant="text" animation="wave" width={80} height={24} />
-                                    <Skeleton variant="text" animation="wave" width={60} height={24} />
+                                    <WaveSkeleton variant="text" width={80} height={24} />
+                                    <WaveSkeleton variant="text" width={60} height={24} />
                                 </div>
                                 <div className="flex justify-between py-2 border-b">
-                                    <Skeleton variant="text" animation="wave" width={80} height={24} />
-                                    <Skeleton variant="text" animation="wave" width={60} height={24} />
+                                    <WaveSkeleton variant="text" width={80} height={24} />
+                                    <WaveSkeleton variant="text" width={60} height={24} />
                                 </div>
                                 <div className="flex justify-between py-2 border-b">
-                                    <Skeleton variant="text" animation="wave" width={100} height={24} />
-                                    <Skeleton variant="text" animation="wave" width={60} height={24} />
+                                    <WaveSkeleton variant="text" width={100} height={24} />
+                                    <WaveSkeleton variant="text" width={60} height={24} />
                                 </div>
                                 <div className="flex justify-between py-2">
-                                    <Skeleton variant="text" animation="wave" width={80} height={24} />
-                                    <Skeleton variant="text" animation="wave" width={60} height={24} />
+                                    <WaveSkeleton variant="text" width={80} height={24} />
+                                    <WaveSkeleton variant="text" width={60} height={24} />
                                 </div>
                             </div>
                             <div className="mt-4">
-                                <Skeleton variant="rectangular" animation="wave" height={48} className="rounded" />
+                                <WaveSkeleton variant="rectangular" height={48} className="rounded" />
                             </div>
                         </div>
                     </div>
@@ -1396,21 +1381,21 @@ export const LoadingCart = () => {
     );
 };
 
-export const ProductItemSkeleton = ({ count = 15 }) => {
+export const LoadingProductItem = ({ count = 15 }) => {
     return (
         <>
             {Array.from({ length: count }).map((_, index) => (
                 <div key={index} className="bg-white rounded-md shadow-md p-4 flex flex-col">
                     <div className="relative mb-2">
-                        <Skeleton variant="rectangular" animation="wave" width="100%" height={192} />
+                        <WaveSkeleton variant="rectangular" width="100%" height={192} />
                     </div>
-                    <Skeleton variant="text" animation="wave" width="80%" height={24} className="mt-2" />
+                    <WaveSkeleton variant="text" width="80%" height={24} className="mt-2" />
                     <div className="flex flex-col mb-2">
-                        <Skeleton variant="text" animation="wave" width="60%" height={28} className="mt-1" />
+                        <WaveSkeleton variant="text" width="60%" height={28} className="mt-1" />
                     </div>
                     <div className="flex justify-between items-center mt-auto">
-                        <Skeleton variant="rectangular" animation="wave" width={170} height={40} className='rounded' />
-                        <Skeleton variant="rectangular" animation="wave" width={60} height={40} className='rounded' />
+                        <WaveSkeleton variant="rectangular" width={170} height={40} className='rounded' />
+                        <WaveSkeleton variant="rectangular" width={60} height={40} className='rounded' />
                     </div>
                 </div>
             ))}
@@ -1418,30 +1403,30 @@ export const ProductItemSkeleton = ({ count = 15 }) => {
     );
 };
 
-export const ReviewItemSkeleton = () => (
+export const LoadingReviewItem = () => (
     <>
         {Array.from({ length: 3 }).map((_, index) => (
             <div key={index} className="relative p-4 mb-4 bg-white rounded-md shadow-sm">
                 <div className="absolute top-4 right-4">
-                    <Skeleton variant="circular" animation="wave" width={24} height={24} />
+                    <WaveSkeleton variant="circular" width={24} height={24} />
                 </div>
 
                 <div className="flex flex-grow">
                     <div className="flex-shrink-0 mr-4">
-                        <Skeleton variant="rectangular" animation="wave" width={80} height={80} className="rounded-md" />
+                        <WaveSkeleton variant="rectangular" width={80} height={80} className="rounded-md" />
                     </div>
 
                     <div className="flex-grow">
                         <div className="flex items-center mb-2">
-                            <Skeleton variant="text" animation="wave" width={200} height={28} className="mr-2" />
-                            <Skeleton variant="text" animation="wave" width={100} height={28} />
+                            <WaveSkeleton variant="text" width={200} height={28} className="mr-2" />
+                            <WaveSkeleton variant="text" width={100} height={28} />
                         </div>
 
                         <div className="mb-1">
-                            <Skeleton variant="text" animation="wave" width={180} height={24} />
+                            <WaveSkeleton variant="text" width={180} height={24} />
                         </div>
-                        <Skeleton variant="text" animation="wave" width={150} height={20} className="mt-1" />
-                        <Skeleton variant="text" animation="wave" width={50} height={20} className="mt-1" />
+                        <WaveSkeleton variant="text" width={150} height={20} className="mt-1" />
+                        <WaveSkeleton variant="text" width={50} height={20} className="mt-1" />
                     </div>
                 </div>
             </div>
@@ -1449,22 +1434,22 @@ export const ReviewItemSkeleton = () => (
     </>
 );
 
-export const OrderItemSkeleton = () => {
+export const LoadingOrderItem = () => {
     return (
         <>
             <Box className="grid grid-cols-1 gap-4 rounded-md">
                 {Array.from({ length: 3 }).map((_, index) => (
                     <Box key={index} className="bg-white shadow-md rounded-lg p-6 relative">
                         <Box className="flex justify-between items-center mb-4">
-                            <Skeleton variant="text" animation="wave" width="40%" />
+                            <WaveSkeleton variant="text" width="40%" />
                             <Box>
-                                <Skeleton variant="text" animation="wave" width={100} />
+                                <WaveSkeleton variant="text" width={100} />
                             </Box>
                         </Box>
                         <div className="flex space-x-3 mt-4 mb-2">
-                            <Skeleton variant="rectangular" animation="wave" height={50} width={50} className='rounded' />
-                            <Skeleton variant="rectangular" animation="wave" height={50} width={50} className='rounded' />
-                            <Skeleton variant="rectangular" animation="wave" height={50} width={50} className='rounded' />
+                            <WaveSkeleton variant="rectangular" height={50} width={50} className='rounded' />
+                            <WaveSkeleton variant="rectangular" height={50} width={50} className='rounded' />
+                            <WaveSkeleton variant="rectangular" height={50} width={50} className='rounded' />
                         </div>
                     </Box>
                 ))}
@@ -1473,52 +1458,52 @@ export const OrderItemSkeleton = () => {
     );
 };
 
-export const OrderDetailsSkeleton = () => {
+export const LoadingOrderDetails = ({ isOrder = true }) => {
     return (
         <Box>
-            {/* Progress Card Skeleton */}
+            {/* Progress Card WaveSkeleton */}
             <Box className="bg-white shadow-md rounded-lg p-6 mb-4">
                 <div className='flex flex-col items-center'>
-                    <Skeleton variant="text" width="60%" height={30} />
-                    <Skeleton variant="text" width="40%" height={20} />
+                    <WaveSkeleton variant="text" width="60%" height={30} />
+                    <WaveSkeleton variant="text" width="40%" height={20} />
                 </div>
                 <div className='flex flex-col items-center'>
-                    <Skeleton variant="text" width="50%" height={40} />
+                    <WaveSkeleton variant="text" width="50%" height={40} />
                 </div>
                 <Box className="flex justify-center gap-20">
-                    <Skeleton variant="text" width="10%" height={20} />
-                    <Skeleton variant="text" width="10%" height={20} />
-                    <Skeleton variant="text" width="10%" height={20} />
+                    <WaveSkeleton variant="text" width="10%" height={20} />
+                    <WaveSkeleton variant="text" width="10%" height={20} />
+                    <WaveSkeleton variant="text" width="10%" height={20} />
                 </Box>
             </Box>
 
-            {/* Products Table Skeleton */}
+            {/* Products Table WaveSkeleton */}
             <Box className="bg-white shadow-md rounded-lg p-6 mb-4">
                 <TableContainer>
                     <Table>
                         <TableHead>
                             <TableRow>
                                 <TableCell>
-                                    <Skeleton variant="text" width="40%" height={30} />
+                                    <WaveSkeleton variant="text" width="40%" height={30} />
                                 </TableCell>
                                 <TableCell>
-                                    <Skeleton variant="text" width="100%" height={30} />
+                                    <WaveSkeleton variant="text" width="100%" height={30} />
                                 </TableCell>
                             </TableRow>
                         </TableHead>
                         <TableBody>
-                            {Array.from({ length: 2 }).map((_, index) => (
+                            {Array.from({ length: 3 }).map((_, index) => (
                                 <TableRow key={index}>
                                     <TableCell component="th" scope="row" className="font-bold">
                                         <Box display="flex" alignItems="center">
-                                            <Skeleton variant="rectangular" width={80} height={80} />
+                                            <WaveSkeleton variant="rectangular" width={80} height={80} />
                                             <Box ml={2}>
-                                                <Skeleton variant="text" width={150} height={20} />
+                                                <WaveSkeleton variant="text" width={150} height={20} />
                                             </Box>
                                         </Box>
                                     </TableCell>
                                     <TableCell align="right">
-                                        <Skeleton variant="text" width="50%" height={30} />
+                                        <WaveSkeleton variant="text" width="50%" height={30} />
                                     </TableCell>
                                 </TableRow>
                             ))}
@@ -1527,88 +1512,152 @@ export const OrderDetailsSkeleton = () => {
                 </TableContainer>
             </Box>
 
-            {/* Total Amount Card Skeleton */}
-            <Box className="bg-white shadow-md rounded-lg p-6 mb-4">
-                <TableContainer>
-                    <Table>
-                        <TableBody>
-                            <TableRow>
-                                <TableCell component="th" scope="row" className="font-bold">
-                                    <Skeleton variant="text" width="100%" height={30} />
-                                </TableCell>
-                                <TableCell align="right">
-                                    <Skeleton variant="text" width="50%" height={30} />
-                                </TableCell>
-                            </TableRow>
-                            <TableRow>
-                                <TableCell component="th" scope="row" className="font-bold">
-                                    <Skeleton variant="text" width="100%" height={30} />
-                                </TableCell>
-                                <TableCell align="right">
-                                    <Skeleton variant="text" width="50%" height={30} />
-                                </TableCell>
-                            </TableRow>
-                            <TableRow>
-                                <TableCell component="th" scope="row" className="font-bold">
-                                    <Skeleton variant="text" width="100%" height={30} />
-                                </TableCell>
-                                <TableCell align="right">
-                                    <Skeleton variant="text" width="50%" height={30} />
-                                </TableCell>
-                            </TableRow>
-                        </TableBody>
-                    </Table>
-                </TableContainer>
-            </Box>
+            {isOrder && (
+                <>
+                    {/* Total Amount Card WaveSkeleton */}
+                    <Box className="bg-white shadow-md rounded-lg p-6 mb-4">
+                        <TableContainer>
+                            <Table>
+                                <TableHead>
+                                    <TableRow>
+                                        <TableCell>
+                                            <WaveSkeleton variant="text" width="20%" height={30} />
+                                        </TableCell>
+                                        <TableCell>
+                                            <WaveSkeleton variant="text" width="100%" height={30} />
+                                        </TableCell>
+                                    </TableRow>
+                                </TableHead>
+                                <TableBody>
+                                    {Array.from({ length: 3 }).map((_, index) => (
+                                        <TableRow key={index}>
+                                            <TableCell component="th" scope="row" className="font-bold">
+                                                <Box display="flex" alignItems="center">
+                                                    <WaveSkeleton variant="text" width={100} height={20} />
+                                                </Box>
+                                            </TableCell>
+                                            <TableCell align="right">
+                                                <WaveSkeleton variant="text" width="50%" height={30} />
+                                            </TableCell>
+                                        </TableRow>
+                                    ))}
+                                </TableBody>
+                            </Table>
+                        </TableContainer>
+                    </Box>
 
-            {/* Address and Payment Method Table Skeleton */}
-            <Box className="bg-white shadow-md rounded-lg p-6 mb-4">
-                <TableContainer>
-                    <Table>
-                        <TableBody>
-                            {Array.from({ length: 6 }).map((_, index) => (
-                                <TableRow key={index}>
-                                    <TableCell component="th" scope="row" className="font-bold">
-                                        <Skeleton variant="text" width="100%" height={30} />
-                                    </TableCell>
-                                </TableRow>
-                            ))}
-                        </TableBody>
-                    </Table>
-                </TableContainer>
-            </Box>
-        </Box>
+                    {/* Address and Payment Method Table WaveSkeleton */}
+                    <Box className="bg-white shadow-md rounded-lg p-6 mb-4">
+                        <TableContainer>
+                            <Table>
+                                <TableBody>
+                                    {Array.from({ length: 6 }).map((_, index) => (
+                                        <TableRow key={index}>
+                                            <TableCell component="th" scope="row" className="font-bold">
+                                                <WaveSkeleton variant="text" width="100%" height={30} />
+                                            </TableCell>
+                                        </TableRow>
+                                    ))}
+                                </TableBody>
+                            </Table>
+                        </TableContainer>
+                    </Box>
+                </>
+            )}
+        </Box >
     );
 };
 
-export const InformationSkeleton = ({ showAdditionalField }) => {
+export const LoadingCategoryDropdown = () => (
+    <div className="static bottom-4 bg-white rounded-md p-2 w-[1200px]">
+        <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
+            {Array.from({ length: 6 }).map((_, index) => (
+                <div key={index} className="flex items-start">
+                    <WaveSkeleton variant="rectangular" width={48} height={48} className="mr-2 rounded-md" />
+                    <div>
+                        <WaveSkeleton variant="text" width={100} height={24} className="mb-2 rounded" />
+                        <div className="flex flex-wrap">
+                            {Array.from({ length: 2 }).map((_, subIndex) => (
+                                <WaveSkeleton key={subIndex} variant="text" width={80} height={20} className={`mb-1 ${subIndex === 1 ? 'ml-1' : ''} rounded`} />
+                            ))}
+                        </div>
+                    </div>
+                </div>
+            ))}
+        </div>
+    </div>
+);
+
+export const CategoryDropdown = ({ category, subcategories, subsubcategories, navigate, dropdownStyle, loading }) => (
+    <div style={dropdownStyle()} className="fixed bg-white shadow-xl rounded-md p-4 z-50">
+        {loading ? (
+            <LoadingCategoryDropdown />
+        ) : (
+            <div className="grid grid-cols-1 lg:grid-cols-3 gap-2">
+                {subcategories[category._id]?.map((subcategory) => (
+                    <div key={subcategory._id} className="flex items-left">
+                        <img
+                            src={getImageUrl(subcategory.image)}
+                            alt=""
+                            className="rounded-md object-contain mr-2 w-12 h-12"
+                        />
+                        <div>
+                            <button
+                                onClick={() => navigate(`/subcategory/${subcategory._id}`, category._id)}
+                                className="block py-2 px-2 mr-1 rounded text-gray-700 hover:bg-gray-100 font-semibold"
+                            >
+                                {subcategory.name}
+                            </button>
+                            {subsubcategories[subcategory._id]?.length > 0 && (
+                                <div className="flex flex-wrap lg:flex-wrap text-start lg:text-left">
+                                    {subsubcategories[subcategory._id].map((subsubcategory) => (
+                                        <div key={subsubcategory._id} className="text-start">
+                                            <button
+                                                onClick={() => navigate(`/subSubcategory/${subsubcategory._id}`, category._id)}
+                                                className="block py-1 px-2 ml-1 rounded text-gray-500 hover:bg-gray-100"
+                                            >
+                                                {subsubcategory.name}
+                                            </button>
+                                        </div>
+                                    ))}
+                                </div>
+                            )}
+                        </div>
+                    </div>
+                ))}
+            </div>
+        )}
+    </div>
+);
+
+export const LoadingInformation = ({ showAdditionalField }) => {
     return (
         <Box className='space-y-0'>
             <Box sx={{ display: 'flex', flexDirection: { xs: 'column', md: 'row' }, gap: { xs: 3, md: 2 } }}>
                 <div className="flex-1">
-                    <Skeleton variant="text" animation="wave" width="100%" height={70} />
+                    <WaveSkeleton variant="text" width="100%" height={70} />
                 </div>
                 <div className="flex-1">
-                    <Skeleton variant="text" animation="wave" width="100%" height={70} />
+                    <WaveSkeleton variant="text" width="100%" height={70} />
                 </div>
                 <div className="flex-1">
-                    <Skeleton variant="text" animation="wave" width="100%" height={70} />
+                    <WaveSkeleton variant="text" width="100%" height={70} />
                 </div>
             </Box>
             <Box sx={{ display: 'flex', flexDirection: { xs: 'column', md: 'row' }, gap: { xs: 3, md: 2 } }}>
                 <div className="flex-1">
-                    <Skeleton variant="text" animation="wave" width="100%" height={70} className='rounded' />
+                    <WaveSkeleton variant="text" width="100%" height={70} className='rounded' />
                 </div>
                 <div className="flex-1">
-                    <Skeleton variant="text" animation="wave" width="100%" height={70} className='rounded' />
+                    <WaveSkeleton variant="text" width="100%" height={70} className='rounded' />
                 </div>
             </Box>
             {showAdditionalField && (
                 <>
-                    <Skeleton variant="text" animation="wave" width="100%" height={70} className='rounded' />
+                    <WaveSkeleton variant="text" width="100%" height={70} className='rounded' />
                 </>
             )}
-            <Skeleton variant="text" animation="wave" width={90} height={40} className='rounded' />
+            <WaveSkeleton variant="text" width={90} height={40} className='rounded' />
         </Box>
     );
 };
@@ -1755,12 +1804,11 @@ export const Header = ({
     statusFilter,
     setStatusFilter,
     orderId,
+    returnId,
     placeholder,
     filterType = 'orders',
     isOrderDetails = false,
-    products,
     openReturnModal,
-    handleReturnSubmit
 }) => {
     const isSharedWishlist = fullName.trim() !== '';
     const { open, menuRef, menuProps, menuHandlers } = useScrollAwayMenu();
@@ -1779,6 +1827,7 @@ export const Header = ({
                 { value: 'All', label: 'All' },
                 { value: 'pending', label: 'Pending' },
                 { value: 'approved', label: 'Approved' },
+                { value: 'processed', label: 'Processed' },
                 { value: 'rejected', label: 'Rejected' }
             ];
         }
@@ -1789,11 +1838,11 @@ export const Header = ({
         <div className="bg-white p-4 rounded-md shadow-sm mb-3 flex justify-between items-center">
             <Typography variant="h5" className="text-gray-800 font-semilight">
                 {loading ? (
-                    <Skeleton width={150} />
+                    <WaveSkeleton width={150} />
                 ) : fullName.trim() ? (
                     `${fullName}'s Wishlist`
                 ) : (
-                    `${title} ${orderId ? `#${orderId}` : ''}`
+                    `${title} ${orderId ? `#${orderId}` : ''} ${returnId ? `#${returnId}` : ''}`
                 )}
             </Typography>
             <div className="flex items-center space-x-4">
@@ -2014,16 +2063,16 @@ export const LoadingCartDropdown = () => {
             <div className="space-y-4">
                 {[...Array(2)].map((_, index) => (
                     <div key={index} className="flex justify-between items-center">
-                        <Skeleton variant="rectangular" width={48} height={48} animation="wave" />
+                        <WaveSkeleton variant="rectangular" width={48} height={48} />
                         <div className="ml-2 flex-grow space-y-1">
-                            <Skeleton variant="text" width="80%" height={20} animation="wave" />
-                            <Skeleton variant="text" width="50%" height={16} animation="wave" />
+                            <WaveSkeleton variant="text" width="80%" height={20} />
+                            <WaveSkeleton variant="text" width="50%" height={16} />
                         </div>
-                        <Skeleton variant="circular" width={24} height={24} animation="wave" />
+                        <WaveSkeleton variant="circular" width={24} height={24} />
                     </div>
                 ))}
-                <Skeleton variant="text" width="40%" height={24} animation="wave" className="mt-4" />
-                <Skeleton variant="rectangular" width="100%" height={40} animation="wave" />
+                <WaveSkeleton variant="text" width="40%" height={24} className="mt-4" />
+                <WaveSkeleton variant="rectangular" width="100%" height={40} />
             </div>
         </>
     );
@@ -2165,7 +2214,7 @@ export const ProfileIcon = ({ handleProfileDropdownToggle, isDropdownOpen }) => 
                 >
                     {isDropdownOpen ? <StyledPersonIcon component={Person} /> : <StyledPersonIcon component={PersonOutlined} />}
                     {loading ? (
-                        <Skeleton variant="text" width={80} height={20} className="ml-1" />
+                        <WaveSkeleton variant="text" width={80} height={20} className="ml-1" />
                     ) : (
                         firstName && (
                             <span className="ml-2 text-sm overflow-hidden text-ellipsis">{firstName}</span>
@@ -2327,17 +2376,10 @@ export const useScrollAwayMenu = () => {
     };
 };
 
-const SplideSkeleton = ({ count }) => (
+const LoadingSplide = ({ count }) => (
     <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
         {[...Array(count)].map((_, index) => (
-            <Skeleton
-                key={index}
-                variant="rectangular"
-                width="100%"
-                height={60}
-                animation="wave"
-                className="rounded-md"
-            />
+            <WaveSkeleton key={index} variant="rectangular" width="100%" height={60} className="rounded-md" />
         ))}
     </div>
 );
@@ -2450,13 +2492,24 @@ export const SplideList = ({
     const [skeletonCount, setSkeletonCount] = useState(1);
     const [isBeginning, setIsBeginning] = useState(true);
     const [isEnd, setIsEnd] = useState(false);
+    const [isMobileView, setIsMobileView] = useState(window.innerWidth < 768);
     const splideRef = useRef(null);
 
+    // Mobile WaveSkeleton and arrow visibility
     useEffect(() => {
         const updateSkeletonCount = () => setSkeletonCount(window.innerWidth >= 768 ? 3 : 1);
+        const updateViewType = () => setIsMobileView(window.innerWidth < 768);
+
         updateSkeletonCount();
+        updateViewType();
+
         window.addEventListener('resize', updateSkeletonCount);
-        return () => window.removeEventListener('resize', updateSkeletonCount);
+        window.addEventListener('resize', updateViewType);
+
+        return () => {
+            window.removeEventListener('resize', updateSkeletonCount);
+            window.removeEventListener('resize', updateViewType);
+        };
     }, []);
 
     useEffect(() => {
@@ -2482,14 +2535,14 @@ export const SplideList = ({
     const handleNext = () => splideRef.current.splide.go('>');
 
     const currentItems = items[id] || [];
-    const showArrows = currentItems.length >= 3;
+    const showArrows = isMobileView || currentItems.length >= 3;
 
     return (
         <>
             {showSplide && (
                 <div className="max-w-[870px] mb-11">
                     {loading ? (
-                        <SplideSkeleton count={skeletonCount} />
+                        <LoadingSplide count={skeletonCount} />
                     ) : (
                         <SplideSlides
                             items={currentItems}
@@ -2694,7 +2747,7 @@ export const FilterLayout = ({
     <Box sx={filterLayoutStyling}>
         <div className="absolute top-0 z-10 pb-4 bg-gray-50">
             {loading ? (
-                <Skeleton variant="text" animation="wave" width={250} height={20} />
+                <WaveSkeleton variant="text" width={250} height={20} />
             ) : products.length > 0 ? (
                 <div>
                     <Breadcrumb type={breadcrumbType} data={breadcrumbData} />
@@ -2722,7 +2775,7 @@ export const FilterLayout = ({
 export const ProductGrid = ({ loading, currentPageItems, isMainPage = false }) => (
     <div className={`grid grid-cols-2 sm:grid-cols-2 md:grid-cols-3 ${isMainPage ? 'lg:grid-cols-5' : 'lg:grid-cols-3'} gap-4 mt-6`}>
         {loading ? (
-            <ProductItemSkeleton />
+            <LoadingProductItem />
         ) : (
             currentPageItems.map(product => <ProductItem key={product._id} product={product} />)
         )}

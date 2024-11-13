@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from 'react';
 import { toast } from 'react-toastify';
-import { CustomPagination, EmptyState, Header, ProductItemSkeleton } from '../../../assets/CustomComponents';
+import { CustomPagination, EmptyState, Header, LoadingProductItem } from '../../../assets/CustomComponents';
 import emptyWishlistImage from '../../../assets/img/empty/wishlist.png';
 import useAxios from '../../../axiosInstance';
 import { getApiUrl } from '../../../config';
@@ -59,7 +59,7 @@ const SharedWishlist = () => {
 
                 {loading ? (
                     <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 gap-4">
-                        {[...Array(3)].map((_, index) => <ProductItemSkeleton key={index} />)}
+                        <LoadingProductItem />
                     </div>
                 ) : wishlistItems.length > 0 ? (
                     <>

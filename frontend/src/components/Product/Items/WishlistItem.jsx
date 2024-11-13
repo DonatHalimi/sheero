@@ -1,7 +1,7 @@
 import React, { useContext, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { toast } from 'react-toastify';
-import { CartDeleteButtons, DiscountPercentage, formatPrice, LoadingOverlay, OutOfStock, ProductItemSkeleton } from '../../../assets/CustomComponents';
+import { CartDeleteButtons, DiscountPercentage, formatPrice, LoadingOverlay, OutOfStock } from '../../../assets/CustomComponents';
 import NoImage from '../../../assets/img/errors/product-not-found.png';
 import useAxios from '../../../axiosInstance';
 import { getImageUrl } from '../../../config';

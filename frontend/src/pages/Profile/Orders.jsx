@@ -1,6 +1,6 @@
 import React, { useEffect, useMemo, useState } from 'react';
 import { Link } from 'react-router-dom';
-import { calculatePageCount, CustomPagination, EmptyState, getPaginatedItems, handlePageChange, Header, OrderItemSkeleton, ProfileLayout } from '../../assets/CustomComponents';
+import { calculatePageCount, CustomPagination, EmptyState, getPaginatedItems, handlePageChange, Header, LoadingOrderItem, ProfileLayout } from '../../assets/CustomComponents';
 import emptyOrdersImage from '../../assets/img/empty/orders.png';
 import { paginationSx } from '../../assets/sx';
 import useAxios from '../../axiosInstance';
@@ -113,7 +113,7 @@ const Orders = () => {
                 />
 
                 {loading ? (
-                    <OrderItemSkeleton />
+                    <LoadingOrderItem />
                 ) : filteredOrders.length === 0 ? (
                     <EmptyState
                         imageSrc={emptyOrdersImage}

@@ -9,7 +9,7 @@ import {
     formatPrice,
     LoadingOverlay,
     OutOfStock,
-    ProductDetailsSkeleton
+    LoadingProductDetails
 } from '../../assets/CustomComponents';
 import useAxios from '../../axiosInstance';
 import ImagePreviewModal from '../../components/Modal/ImagePreviewModal';
@@ -129,7 +129,7 @@ const ProductDetails = () => {
 
             <Navbar />
             {loading ? (
-                <ProductDetailsSkeleton />
+                <LoadingProductDetails />
             ) : (
                 <>
                     <DetailsBreadcrumbs product={product} />

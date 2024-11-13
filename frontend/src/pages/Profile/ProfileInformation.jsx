@@ -4,7 +4,7 @@ import { Box, Button, IconButton, InputAdornment, TextField } from '@mui/materia
 import React, { useContext, useEffect, useMemo, useState } from 'react';
 import { toast } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
-import { BrownOutlinedTextField, Header, InformationSkeleton, knownEmailProviders, ProfileLayout } from '../../assets/CustomComponents';
+import { BrownOutlinedTextField, Header, LoadingInformation, knownEmailProviders, ProfileLayout } from '../../assets/CustomComponents';
 import useAxios from '../../axiosInstance';
 import Navbar from '../../components/Navbar/Navbar';
 import Footer from '../../components/Utils/Footer';
@@ -173,7 +173,7 @@ const ProfileInformation = () => {
                     }}
                 >
                     {loading ? (
-                        <InformationSkeleton />
+                        <LoadingInformation />
                     ) : (
                         <form onSubmit={handleSubmit} className="space-y-1">
                             <Box sx={{ display: 'flex', flexDirection: { xs: 'column', md: 'row' }, gap: { xs: 3, md: 2 } }}>

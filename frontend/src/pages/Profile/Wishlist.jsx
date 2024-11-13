@@ -1,6 +1,6 @@
 import React, { useContext, useEffect, useMemo, useState } from 'react';
 import { toast } from 'react-toastify';
-import { calculatePageCount, CustomDeleteModal, CustomPagination, EmptyState, getPaginatedItems, handlePageChange, Header, ProductItemSkeleton, ProfileLayout } from '../../assets/CustomComponents';
+import { calculatePageCount, CustomDeleteModal, CustomPagination, EmptyState, getPaginatedItems, handlePageChange, Header, LoadingProductItem, ProfileLayout } from '../../assets/CustomComponents';
 import emptyWishlistImage from '../../assets/img/empty/wishlist.png';
 import useAxios from '../../axiosInstance';
 import Navbar from '../../components/Navbar/Navbar';
@@ -100,7 +100,7 @@ const Wishlist = () => {
 
                 {loading ? (
                     <div className="grid grid-cols-2 sm:grid-cols-2 md:grid-cols-3 gap-6">
-                        <ProductItemSkeleton count={6} />
+                        <LoadingProductItem count={6} />
                     </div>
                 ) : !wishlistItems.length ? (
                     <EmptyState

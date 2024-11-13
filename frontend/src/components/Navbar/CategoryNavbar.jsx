@@ -3,7 +3,7 @@ import { Skeleton } from '@mui/material';
 import React, { useContext, useEffect, useRef, useState } from 'react';
 import { useLocation, useNavigate } from 'react-router-dom';
 import { useSwipeable } from 'react-swipeable';
-import { CartIcon, HomeIcon, WishlistIcon } from '../../assets/CustomComponents';
+import { CartIcon, CategoryDropdown, HomeIcon, WishlistIcon } from '../../assets/CustomComponents';
 import useAxios from '../../axiosInstance';
 import { getImageUrl } from '../../config';
 import { AuthContext } from '../../context/AuthContext';
@@ -19,6 +19,7 @@ const CategoryNavbar = ({ isSidebarOpen, toggleSidebar }) => {
     const [activeCategory, setActiveCategory] = useState('');
 
     const [loading, setLoading] = useState(!categories.length);
+    const [dropdownLoading, setDropdownLoading] = useState(true);
 
     const categoryListRef = useRef(null);
     const navigate = useNavigate();
@@ -27,12 +28,13 @@ const CategoryNavbar = ({ isSidebarOpen, toggleSidebar }) => {
     useEffect(() => {
         if (!categories.length) {
             const fetchCategories = async () => {
+                setLoading(true);
                 try {
                     const { data } = await axiosInstance.get('/categories/get');
                     setCategories(data);
-                    setLoading(false);
                 } catch (error) {
                     console.error('Error fetching categories:', error);
+                } finally {
                     setLoading(false);
                 }
             };
@@ -63,9 +65,11 @@ const CategoryNavbar = ({ isSidebarOpen, toggleSidebar }) => {
         }
     };
 
-    const handleCategoryHover = (categoryId) => {
+    const handleCategoryHover = async (categoryId) => {
         setOpenCategory(categoryId);
-        fetchSubcategories(categoryId);
+        setDropdownLoading(true);
+        await fetchSubcategories(categoryId);
+        setDropdownLoading(false);
     };
 
     const handleCategoryLeave = () => {
@@ -143,12 +147,10 @@ const CategoryNavbar = ({ isSidebarOpen, toggleSidebar }) => {
             <nav className="hidden lg:block bg-white shadow-sm border-t border-gray-50 relative z-50">
                 <div className="flex justify-between items-center mx-auto max-w-screen-xl p-4 relative z-50">
                     <div className="items-center justify-between font-medium w-full">
-                        <ul ref={categoryListRef} className="flex space-x-8 rtl:space-x-reverse">
+                        <ul ref={categoryListRef} className="flex space-x-9 rtl:space-x-reverse">
                             {loading ? (
                                 Array(10).fill().map((_, index) => (
-                                    <li key={index} className="relative">
-                                        <Skeleton variant="text" animation="wave" width={100} height={40} />
-                                    </li>
+                                    <Skeleton variant="text" animation="wave" width={100} height={40} />
                                 ))
                             ) : (
                                 categories.map((category) => (
@@ -164,46 +166,15 @@ const CategoryNavbar = ({ isSidebarOpen, toggleSidebar }) => {
                                         >
                                             {category.name}
                                         </button>
-                                        {openCategory === category._id && subcategories[category._id]?.length > 0 && (
-                                            <div
-                                                className="fixed bg-white shadow-xl rounded-md p-4 z-50"
-                                                style={calculateDropdownStyle()}
-                                            >
-                                                <div className="grid grid-cols-1 lg:grid-cols-3 gap-2">
-                                                    {subcategories[category._id].map((subcategory) => (
-                                                        <div key={subcategory._id} className="flex items-left">
-                                                            <img
-                                                                src={getImageUrl(subcategory.image)}
-                                                                alt=""
-                                                                className="rounded-md object-contain mr-2 w-12 h-12"
-                                                            />
-                                                            <div>
-                                                                <button
-                                                                    onClick={() => handleNavigation(`/subcategory/${subcategory._id}`, category._id)}
-                                                                    className="block py-2 px-2 mr-1 rounded text-gray-700 hover:bg-gray-100 font-semibold"
-                                                                >
-                                                                    {subcategory.name}
-                                                                </button>
-                                                                {subsubcategories[subcategory._id]?.length > 0 && (
-                                                                    <div className="flex flex-wrap lg:flex-wrap text-start lg:text-left">
-                                                                        {subsubcategories[subcategory._id].map((subsubcategory) => (
-                                                                            <div key={subsubcategory._id} className='text-start'>
-                                                                                <button
-                                                                                    onClick={() => handleNavigation(`/subSubcategory/${subsubcategory._id}`, category._id)}
-                                                                                    className="block py-1 px-2 ml-1 rounded text-gray-500 hover:bg-gray-100"
-                                                                                >
-                                                                                    {subsubcategory.name}
-                                                                                </button>
-                                                                            </div>
-                                                                        ))}
-                                                                    </div>
-                                                                )}
-                                                            </div>
-                                                        </div>
-                                                    ))}
-                                                </div>
-
-                                            </div>
+                                        {openCategory === category._id && (
+                                            <CategoryDropdown
+                                                category={category}
+                                                subcategories={subcategories}
+                                                subsubcategories={subsubcategories}
+                                                navigate={handleNavigation}
+                                                dropdownStyle={calculateDropdownStyle}
+                                                loading={dropdownLoading}
+                                            />
                                         )}
                                     </div>
                                 ))
@@ -214,7 +185,7 @@ const CategoryNavbar = ({ isSidebarOpen, toggleSidebar }) => {
             </nav>
 
             {/* Mobile screens */}
-            <div
+            <div div
                 {...handlers}
                 onClick={(e) => e.stopPropagation()}
                 className={`fixed top-0 left-0 w-80 h-full bg-white z-[1000] transition-transform transform duration-500 ease-in-out overflow-y-auto ${isSidebarOpen ? 'translate-x-0 opacity-100' : '-translate-x-full opacity-0'}`}
@@ -338,7 +309,7 @@ const CategoryNavbar = ({ isSidebarOpen, toggleSidebar }) => {
                     <span className="text-sm ml-7">Email: support@sheero.com</span>
                     <span className="text-sm ml-7 mb-10">Tel.: 044888999</span>
                 </div>
-            </div>
+            </div >
         </>
     );
 };

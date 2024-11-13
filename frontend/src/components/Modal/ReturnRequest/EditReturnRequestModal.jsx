@@ -51,6 +51,7 @@ const EditReturnRequestModal = ({ open, onClose, returnRequest, onEditSuccess })
                 >
                     <MenuItem value="pending">Pending</MenuItem>
                     <MenuItem value="approved">Approved</MenuItem>
+                    <MenuItem value="processed">Processed</MenuItem>
                     <MenuItem value="rejected">Rejected</MenuItem>
                 </Select>
 

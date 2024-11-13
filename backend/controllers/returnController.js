@@ -4,7 +4,7 @@ const Order = require('../models/Order');
 const createReturnRequest = async (req, res) => {
     const { orderId, productIds, reason, customReason } = req.body;
     const userId = req.user.userId;
-    
+
     try {
         const order = await Order.findById(orderId);
         if (!order) {
@@ -88,6 +88,27 @@ const getAllReturnRequests = async (req, res) => {
     }
 };
 
+const getReturnRequestById = async (req, res) => {
+    try {
+        const { returnId } = req.params;
+
+        const returnRequest = await ReturnRequest.findById(returnId)
+            .populate('products', 'name price image')
+            .populate({ path: 'order', select: 'status' })
+            .populate({ path: 'user', select: '_id firstName lastName email' })
+            .exec();
+
+        if (!returnRequest) {
+            return res.status(404).json({ success: false, message: 'Return request not found.' });
+        }
+
+        res.json({ success: true, data: returnRequest });
+    } catch (error) {
+        console.error(error);  // Log error for debugging
+        res.status(500).json({ message: 'Server error', error: error.message });
+    }
+};
+
 const getReturnRequestsByUser = async (req, res) => {
     const userId = req.params.userId;
 
@@ -152,4 +173,4 @@ const deleteReturnRequests = async (req, res) => {
     }
 };
 
-module.exports = { createReturnRequest, manageReturnRequest, getAllReturnRequests, getReturnRequestsByUser, deleteReturnRequest, deleteReturnRequests };
+module.exports = { createReturnRequest, manageReturnRequest, getAllReturnRequests, getReturnRequestById, getReturnRequestsByUser, deleteReturnRequest, deleteReturnRequests };

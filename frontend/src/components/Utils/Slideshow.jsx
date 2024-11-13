@@ -1,7 +1,7 @@
 import { Splide } from '@splidejs/react-splide';
 import axios from 'axios';
 import React, { useEffect, useRef, useState } from 'react';
-import { ImageSlide, SlideshowSkeleton, splideOptions } from '../../assets/CustomComponents';
+import { ImageSlide, LoadingSlideshow, splideOptions } from '../../assets/CustomComponents';
 import { getApiUrl } from '../../config';
 
 const Slideshow = () => {
@@ -34,7 +34,7 @@ const Slideshow = () => {
     return (
         <div className="w-full mx-auto mb-14">
             {loading ? (
-                <SlideshowSkeleton />
+                <LoadingSlideshow />
             ) : (
                 <Splide ref={splideRef} options={splideOptions} onMounted={() => splideRef.current?.splide.refresh()}>
                     {images.map((image) => (

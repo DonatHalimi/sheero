@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from 'react';
-import { FAQItem, FaqSkeleton, GoBackButton } from '../../assets/CustomComponents';
+import { FAQItem, LoadingFaq, GoBackButton } from '../../assets/CustomComponents';
 import useAxios from '../../axiosInstance';
 import Navbar from '../../components/Navbar/Navbar';
 import Footer from '../../components/Utils/Footer';
@@ -37,7 +37,7 @@ const FAQs = () => {
 
                 <div>
                     {loading ?
-                        <FaqSkeleton />
+                        <LoadingFaq />
                         : faqData.map((faq, index) => (
                             <FAQItem key={index} question={faq.question} answer={faq.answer} />
                         ))

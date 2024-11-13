@@ -239,7 +239,6 @@ const getOrderById = async (req, res) => {
 
         res.json({ success: true, data: order });
     } catch (error) {
-        console.error('Error fetching order:', error);
         res.status(500).json({ success: false, message: 'Error fetching order.' });
     }
 };
