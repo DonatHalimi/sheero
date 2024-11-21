@@ -25,6 +25,7 @@ const AddressInformation = () => {
     const [nameValid, setNameValid] = useState(true);
     const [streetValid, setStreetValid] = useState(true);
     const [phoneNumberValid, setPhoneNumberValid] = useState(true);
+    const [commentValid, setCommentValid] = useState(true);
     const [focusedField, setFocusedField] = useState(null);
 
     useEffect(() => window.scrollTo(0, 0), []);
@@ -111,6 +112,7 @@ const AddressInformation = () => {
     const validateName = (name) => /^[A-Z][a-zA-Z]{1,9}$/.test(name);
     const validateStreet = (street) => /^[A-Z][a-zA-Z0-9\s\-\.]{1,26}$/.test(street);
     const validatePhoneNumber = (phoneNumber) => /^0(44|45|48)\d{6}$/.test(phoneNumber);
+    const validateComment = (comment) => /^[a-zA-Z0-9\s]{2,25}$/.test(comment);
 
     const handleNameChange = (e) => {
         const value = e.target.value;
@@ -130,7 +132,11 @@ const AddressInformation = () => {
         setPhoneNumberValid(validatePhoneNumber(value));
     };
 
-    const handleCommentChange = (e) => setComment(e.target.value);
+    const handleCommentChange = (e) => {
+        const value = e.target.value;
+        setComment(value);
+        setCommentValid(validateComment(value));
+    };
 
     const handleSaveAddress = async (e) => {
         e.preventDefault();
@@ -139,6 +145,7 @@ const AddressInformation = () => {
             setNameValid(validateName(name));
             setStreetValid(validateStreet(street));
             setPhoneNumberValid(validatePhoneNumber(phoneNumber));
+            setCommentValid(validate(comment));
             return;
         }
 
@@ -167,11 +174,18 @@ const AddressInformation = () => {
                 toast.error('Unexpected response from server');
             }
         } catch (error) {
-            toast.error('Error saving address');
+            if (error.response?.data?.errors) {
+                const mappedErrors = error.response.data.errors.map((err) => ({
+                    message: err.message,
+                }));
+                mappedErrors.forEach((err) => toast.error(err.message));
+            } else {
+                toast.error('Error saving address');
+            }
         }
     };
 
-    const isFormValid = nameValid && streetValid && phoneNumberValid && city && country;
+    const isFormValid = nameValid && streetValid && phoneNumberValid && commentValid && city && country;
 
     const isFormUnchanged = existingAddress &&
         name === existingAddress.name &&
@@ -311,15 +325,26 @@ const AddressInformation = () => {
                                 </FormControl>
                             </Box>
 
-                            <TextField
-                                fullWidth
-                                label="Comment"
-                                variant="outlined"
-                                name="comment"
-                                value={comment}
-                                onChange={handleCommentChange}
-                                placeholder="Add any additional comments (optional)"
-                            />
+                            <div className="relative w-full">
+                                <TextField
+                                    fullWidth
+                                    label="Comment"
+                                    variant="outlined"
+                                    name="comment"
+                                    value={comment}
+                                    onChange={handleCommentChange}
+                                    onFocus={() => setFocusedField('comment')}
+                                    onBlur={() => setFocusedField(null)}
+                                    placeholder="Add any additional comments (optional)"
+                                />
+                                {focusedField === 'comment' && !commentValid && (
+                                    <div className="absolute left-0 bottom-[-58px] bg-white text-red-500 text-sm p-2 rounded-lg shadow-md w-full z-10">
+                                        <span className="block text-xs font-semibold mb-1">Invalid Comment</span>
+                                        Must be 2 to 25 characters long.
+                                        <div className="absolute top-[-5px] left-[20px] w-0 h-0 border-l-[5px] border-r-[5px] border-b-[5px] border-transparent border-b-white"></div>
+                                    </div>
+                                )}
+                            </div>
 
                             <BrownButton
                                 type="submit"

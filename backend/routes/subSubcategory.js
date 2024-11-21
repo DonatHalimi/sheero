@@ -1,14 +1,17 @@
 const express = require('express');
-const router = express.Router();
-const { createSubSubcategory, getSubSubcategories, getSubSubcategory, getSubSubcategoriesBySubcategory, updateSubSubcategory, deleteSubSubcategory, deleteSubSubcategories } = require('../controllers/subSubcategoryController');
+const { createSubSubcategory, getSubSubcategories, getSubSubcategoryById, getSubSubcategoriesBySubcategory, updateSubSubcategory, deleteSubSubcategory, deleteSubSubcategories } = require('../controllers/subSubcategoryController');
+const { createSchema, getByIdSchema, updateSchema, deleteSchema, deleteBulkSchema } = require('../validations/subSubcategory');
 const { requireAuthAndRole } = require('../middleware/auth');
+const validate = require('../middleware/validation');
 
-router.post('/create', requireAuthAndRole('admin'), createSubSubcategory);
+const router = express.Router();
+
+router.post('/create', requireAuthAndRole('admin'), validate(createSchema), createSubSubcategory);
 router.get('/get', getSubSubcategories);
-router.get('/get/:id', getSubSubcategory);
+router.get('/get/:id', validate(getByIdSchema), getSubSubcategoryById);
 router.get('/get-by-subCategory/:subcategoryId', getSubSubcategoriesBySubcategory);
-router.put('/update/:id', requireAuthAndRole('admin'), updateSubSubcategory);
-router.delete('/delete/:id', requireAuthAndRole('admin'), deleteSubSubcategory);
-router.delete('/delete-bulk', requireAuthAndRole('admin'), deleteSubSubcategories);
+router.put('/update/:id', requireAuthAndRole('admin'), validate(updateSchema), updateSubSubcategory);
+router.delete('/delete/:id', requireAuthAndRole('admin'), validate(deleteSchema), deleteSubSubcategory);
+router.delete('/delete-bulk', requireAuthAndRole('admin'), validate(deleteBulkSchema), deleteSubSubcategories);
 
 module.exports = router;

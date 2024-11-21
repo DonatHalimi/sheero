@@ -2,6 +2,7 @@ const Contact = require('../models/Contact');
 
 const createContact = async (req, res) => {
     const { name, email, subject, message } = req.body;
+
     try {
         const contact = new Contact({ name, email, subject, message });
         await contact.save();
@@ -30,7 +31,6 @@ const deleteContact = async (req, res) => {
         await Contact.findByIdAndDelete(req.params.id);
         res.status(200).json({ message: 'Contact deleted successfully' });
     } catch (error) {
-        console.error('Error deleting contact:', error);
         res.status(500).json({ message: 'Server error', error: error.message });
     }
 };
@@ -38,22 +38,11 @@ const deleteContact = async (req, res) => {
 const deleteContacts = async (req, res) => {
     const { ids } = req.body;
 
-    if (!ids || !Array.isArray(ids) || ids.length === 0) {
-        return res.status(400).json({ message: 'Invalid or empty ids array' });
-    }
-
     try {
-        const contacts = await Contact.find({ _id: { $in: ids } });
-
-        if (contacts.length !== ids.length) {
-            return res.status(404).json({ message: 'One or more contacts not found' });
-        }
-
         await Contact.deleteMany({ _id: { $in: ids } });
 
         res.status(200).json({ message: 'Contacts deleted successfully' });
     } catch (error) {
-        console.error('Error deleting contacts:', error);
         res.status(500).json({ message: 'Server error', error: error.message });
     }
 };

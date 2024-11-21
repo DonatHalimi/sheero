@@ -10,19 +10,20 @@ import Navbar from '../../components/Navbar/Navbar';
 import { AuthContext } from '../../context/AuthContext';
 
 const Register = () => {
+    const { register } = useContext(AuthContext);
+    const navigate = useNavigate();
+
     const [firstName, setFirstName] = useState('');
     const [lastName, setLastName] = useState('');
     const [email, setEmail] = useState('');
     const [password, setPassword] = useState('');
     const [showPassword, setShowPassword] = useState(false);
+
     const [firstNameValid, setFirstNameValid] = useState(true);
     const [lastNameValid, setLastNameValid] = useState(true);
     const [emailValid, setEmailValid] = useState(true);
     const [passwordValid, setPasswordValid] = useState(true);
     const [focusedField, setFocusedField] = useState(null);
-
-    const { register } = useContext(AuthContext);
-    const navigate = useNavigate();
 
     useEffect(() => { window.scrollTo(0, 0); }, []);
 
@@ -77,21 +78,27 @@ const Register = () => {
         if (!validatePassword(password)) {
             return toast.error('Password must be at least 8 characters long, with one uppercase letter, one lowercase letter, one number, and one special character');
         }
+    
+        const response = await register(firstName, lastName, email, password);
+    
         try {
-            const response = await register(firstName, lastName, email, password);
             if (response.success) {
                 toast.success('Registration successful');
-                navigate('/login');
+                if (response.loginResponse?.success) {
+                    toast.success('Login successful');
+                }
+            } else if (response.errors) {
+                response.errors.forEach((error) => toast.error(`${error.message}`));
             } else {
-                toast.error(response.message || 'Registration failed');
+                toast.error(response.message);
             }
         } catch (error) {
             toast.error('An error occurred during registration');
             console.error('Registration error:', error);
         }
-    };
+    };    
 
-    const isFormValid = firstNameValid && lastNameValid && emailValid && passwordValid;
+    const isFormValid = firstNameValid && lastNameValid && emailValid && passwordValid && firstName && lastName && email && password;
 
     return (
         <Box className='flex flex-col bg-neutral-50 min-h-[100vh]'>

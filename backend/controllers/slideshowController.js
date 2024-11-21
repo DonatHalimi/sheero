@@ -4,6 +4,7 @@ const fs = require('fs');
 const createImage = async (req, res) => {
     const { title, description } = req.body;
     const image = req.file ? req.file.path : '';
+
     try {
         const slideshowImage = new SlideshowImage({ title, image, description });
         await slideshowImage.save();
@@ -22,10 +23,9 @@ const getImages = async (req, res) => {
     }
 };
 
-const getImage = async (req, res) => {
+const getImageById = async (req, res) => {
     try {
         const image = await SlideshowImage.findById(req.params.id);
-        if (!image) return res.status(404).json({ message: 'Image not found' });
         res.status(200).json(image);
     } catch (error) {
         res.status(500).json({ message: 'Server error' });
@@ -69,7 +69,6 @@ const updateImage = async (req, res) => {
 const deleteImage = async (req, res) => {
     try {
         const image = await SlideshowImage.findById(req.params.id);
-        if (!image) return res.status(404).json({ message: 'Image not found' });
 
         if (image.image) {
             fs.unlink(image.image, (err) => {
@@ -87,16 +86,8 @@ const deleteImage = async (req, res) => {
 const deleteImages = async (req, res) => {
     const { ids } = req.body;
 
-    if (!ids || !Array.isArray(ids) || ids.length === 0) {
-        return res.status(400).json({ message: 'Invalid or empty ids array' });
-    }
-
     try {
         const images = await SlideshowImage.find({ _id: { $in: ids } });
-
-        if (images.length !== ids.length) {
-            return res.status(404).json({ message: 'One or more images not found' });
-        }
 
         for (const image of images) {
             if (image.image) {
@@ -114,4 +105,4 @@ const deleteImages = async (req, res) => {
     }
 };
 
-module.exports = { createImage, getImages, getImage, updateImage, deleteImage, deleteImages };
+module.exports = { createImage, getImages, getImageById, updateImage, deleteImage, deleteImages };

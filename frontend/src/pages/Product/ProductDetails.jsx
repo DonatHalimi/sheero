@@ -8,8 +8,8 @@ import {
     DetailsCartWishlistButtons,
     formatPrice,
     LoadingOverlay,
-    OutOfStock,
-    LoadingProductDetails
+    LoadingProductDetails,
+    OutOfStock
 } from '../../assets/CustomComponents';
 import useAxios from '../../axiosInstance';
 import ImagePreviewModal from '../../components/Modal/ImagePreviewModal';

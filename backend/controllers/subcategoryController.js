@@ -8,14 +8,6 @@ const createSubcategory = async (req, res) => {
     const { name, category } = req.body;
     const image = req.file ? req.file.path : '';
 
-    if (!category) {
-        return res.status(400).json({ message: 'Category is required' });
-    }
-
-    if (!image || !req.file) {
-        return res.status(400).json({ message: 'Image is required' });
-    }
-
     try {
         const subcategory = new Subcategory({ name, category, image });
         await subcategory.save();
@@ -28,17 +20,15 @@ const createSubcategory = async (req, res) => {
 const getSubcategories = async (req, res) => {
     try {
         const subcategories = await Subcategory.find().populate('category');
-        if (!subcategories) return res.status(404).json({ message: 'Subcategories not found' });
         res.status(200).json(subcategories);
     } catch (error) {
         res.status(500).json({ message: 'Server error' });
     }
 };
 
-const getSubcategory = async (req, res) => {
+const getSubcategoryById = async (req, res) => {
     try {
         const subcategory = await Subcategory.findById(req.params.id).populate('category');
-        if (!subcategory) return res.status(404).json({ message: 'Subcategory not found' });
         res.status(200).json(subcategory);
     } catch (error) {
         res.status(500).json({ message: 'Server error' });
@@ -58,9 +48,9 @@ const getSubcategoriesByCategory = async (req, res) => {
 const updateSubcategory = async (req, res) => {
     const { name, category } = req.body;
     let image = req.body.image;
+
     try {
         const oldSubcategory = await Subcategory.findById(req.params.id);
-        if (!oldSubcategory) return res.status(404).json({ message: 'Subcategory not found' });
 
         if (req.file) {
             if (oldSubcategory.image) {
@@ -93,17 +83,6 @@ const updateSubcategory = async (req, res) => {
 const deleteSubcategory = async (req, res) => {
     try {
         const subcategory = await Subcategory.findById(req.params.id);
-        if (!subcategory) return res.status(404).json({ message: 'Subcategory not found' });
-
-        const products = await Product.find({ subcategory: req.params.id });
-        if (products.length > 0) {
-            return res.status(400).json({ message: 'Cannot delete subcategory with existing products' });
-        }
-
-        const subsubcategories = await Subsubcategory.find({ category: req.params.id });
-        if (subsubcategories.length > 0) {
-            return res.status(400).json({ message: 'Cannot delete subcategory with existing subsubcategories' });
-        }
 
         if (subcategory.image) {
             fs.unlink(subcategory.image, (err) => {
@@ -121,28 +100,10 @@ const deleteSubcategory = async (req, res) => {
 const deleteSubcategories = async (req, res) => {
     const { ids } = req.body;
 
-    if (!ids || !Array.isArray(ids) || ids.length === 0) {
-        return res.status(400).json({ message: 'Invalid or empty ids array' });
-    }
-
     try {
         const subcategories = await Subcategory.find({ _id: { $in: ids } });
 
-        if (subcategories.length !== ids.length) {
-            return res.status(404).json({ message: 'One or more subcategories not found' });
-        }
-
         for (const subcategory of subcategories) {
-            const products = await Product.find({ subcategory: req.params.id });
-            if (products.length > 0) {
-                return res.status(400).json({ message: `Cannot delete subcategory ${subcategory.name} with existing products` });
-            }
-
-            const subSubcategories = await Subsubcategory.find({ subcategory: req.params.id });
-            if (subSubcategories.length > 0) {
-                return res.status(400).json({ message: `Cannot delete subcategory ${subcategory.name} with existing subSubcategories` });
-            }
-
             if (subcategory.image) {
                 fs.unlink(subcategory.image, (err) => {
                     if (err) console.error('Error deleting image:', err);
@@ -159,4 +120,4 @@ const deleteSubcategories = async (req, res) => {
     }
 };
 
-module.exports = { createSubcategory, getSubcategories, getSubcategory, getSubcategoriesByCategory, updateSubcategory, deleteSubcategory, deleteSubcategories };
+module.exports = { createSubcategory, getSubcategories, getSubcategoryById, getSubcategoriesByCategory, updateSubcategory, deleteSubcategory, deleteSubcategories };

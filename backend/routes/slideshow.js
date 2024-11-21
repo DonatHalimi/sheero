@@ -1,14 +1,17 @@
 const express = require('express');
-const router = express.Router();
-const { createImage, getImages, getImage, updateImage, deleteImage, deleteImages } = require('../controllers/slideshowController');
+const { createImage, getImages, getImageById, updateImage, deleteImage, deleteImages } = require('../controllers/slideshowController');
+const { createSchema, getByIdSchema, updateSchema, deleteSchema, deleteBulkSchema } = require('../validations/slideshow');
 const { requireAuthAndRole } = require('../middleware/auth');
 const upload = require('../middleware/upload')
+const validate = require('../middleware/validation');
 
-router.post('/create', requireAuthAndRole('admin'), upload.single('image'), createImage);
+const router = express.Router();
+
+router.post('/create', requireAuthAndRole('admin'), upload.single('image'), validate(createSchema), createImage);
 router.get('/get', getImages);
-router.get('/get/:id', getImage);
-router.put('/update/:id', requireAuthAndRole('admin'), upload.single('image'), updateImage);
-router.delete('/delete/:id', requireAuthAndRole('admin'), deleteImage);
-router.delete('/delete-bulk', requireAuthAndRole('admin'), deleteImages);
+router.get('/get/:id', validate(getByIdSchema), getImageById);
+router.put('/update/:id', requireAuthAndRole('admin'), upload.single('image'), validate(updateSchema), updateImage);
+router.delete('/delete/:id', requireAuthAndRole('admin'), validate(deleteSchema), deleteImage);
+router.delete('/delete-bulk', requireAuthAndRole('admin'), validate(deleteBulkSchema), deleteImages);
 
 module.exports = router;

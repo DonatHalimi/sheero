@@ -13,7 +13,13 @@ const ReturnModal = ({ open, onClose }) => {
     const [reason, setReason] = useState('');
     const [customReason, setCustomReason] = useState('');
     const [confirmSelection, setConfirmSelection] = useState(false);
+
     const [loading, setLoading] = useState(true);
+
+    const [customReasonValid, setCustomReasonValid] = useState(true);
+    const [focusedField, setFocusedField] = useState(null);
+
+    const validateCustomReason = (reason) => /^[A-Z][a-zA-Z\s]{5,20}$/.test(reason);
 
     const axiosInstance = useAxios();
     const navigate = useNavigate();
@@ -51,12 +57,12 @@ const ReturnModal = ({ open, onClose }) => {
     };
 
     const handleProductChange = (event) => {
-        const { value } = event.target;
+        const value = event.target.value;
         setSelectedProducts(value);
     };
 
     const handleReasonChange = (event) => {
-        const { value } = event.target;
+        const value = event.target.value;
         setReason(value);
         if (value !== 'Other') {
             setCustomReason('');
@@ -64,7 +70,9 @@ const ReturnModal = ({ open, onClose }) => {
     };
 
     const handleCustomReasonChange = (event) => {
-        setCustomReason(event.target.value);
+        const value = event.target.value;
+        setCustomReason(value);
+        setCustomReasonValid(validateCustomReason(value));
     };
 
     const handleSubmit = async () => {
@@ -73,18 +81,9 @@ const ReturnModal = ({ open, onClose }) => {
             return;
         }
 
-        if (reason === 'Other') {
-            const customReasonLength = customReason.trim().length;
-
-            if (customReasonLength < 5) {
-                toast.error('Custom reason must be at least 5 characters long');
-                return;
-            }
-
-            if (customReasonLength > 20) {
-                toast.error('Custom reason must not exceed 20 characters');
-                return;
-            }
+        if (reason === 'Other' && !customReasonValid) {
+            toast.error('Custom reason must start with a capital letter and be 5 to 20 characters long.');
+            return;
         }
 
         const returnData = {
@@ -96,19 +95,26 @@ const ReturnModal = ({ open, onClose }) => {
 
         try {
             await axiosInstance.post('/returns/create', returnData);
-            toast.success('Return request made successfully', {
+
+            toast.success('Return request submitted successfully', {
                 onClick: () => navigate('/profile/returns'),
             });
             onClose();
         } catch (error) {
-            toast.info(error.response?.data?.message, {
-                onClick: () => navigate('/profile/returns'),
-            });
+            if (error.response && error.response.status === 400 && error.response.data.errors) {
+                error.response.data.errors.forEach(err => {
+                    toast.info(`${err.message}`, {
+                        onClick: () => navigate('/profile/returns'),
+                    });
+                });
+            } else {
+                toast.error(error.response?.data?.message || 'Error submitting return request.');
+            }
             console.error('Error submitting return request:', error);
         }
     };
 
-    const isDisabled = !selectedProducts.length || !reason || (reason === 'Other' && customReason.length < 5 || customReason.length > 20) || !confirmSelection;
+    const isDisabled = !selectedProducts.length || !reason || (reason === 'Other' && !customReasonValid) || !confirmSelection;
 
     return (
         <CustomModal open={open} onClose={onClose}>
@@ -174,16 +180,25 @@ const ReturnModal = ({ open, onClose }) => {
                         </FormControl>
 
                         {reason === 'Other' && (
-                            <TextField
-                                label="Please specify the reason"
-                                multiline
-                                rows={4}
-                                fullWidth
-                                value={customReason}
-                                onChange={handleCustomReasonChange}
-                                variant="outlined"
-                                margin="normal"
-                            />
+                            <>
+                                <TextField
+                                    label="Please specify the reason"
+                                    fullWidth
+                                    value={customReason}
+                                    onChange={handleCustomReasonChange}
+                                    onFocus={() => setFocusedField('customReason')}
+                                    onBlur={() => setFocusedField(null)}
+                                    variant="outlined"
+                                    margin="normal"
+                                />
+                                {focusedField === 'customReason' && !customReasonValid && (
+                                    <div className="absolute left-4 right-4 bottom-[57px] bg-white text-red-500 text-sm p-2 rounded-lg shadow-md z-10">
+                                        <span className="block text-xs font-semibold mb-1">Invalid Reason</span>
+                                        Must start with a capital letter and be 5 to 20 characters long.
+                                        <div className="absolute top-[-5px] left-[20px] w-0 h-0 border-l-[5px] border-r-[5px] border-b-[5px] border-transparent border-b-white"></div>
+                                    </div>
+                                )}
+                            </>
                         )}
 
                         <FormControlLabel

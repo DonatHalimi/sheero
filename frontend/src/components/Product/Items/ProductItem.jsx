@@ -49,8 +49,16 @@ const ProductItem = ({ product }) => {
                 document.dispatchEvent(new CustomEvent('cartUpdated', { detail: _id }));
             }
         } catch (error) {
-            const errorMsg = error.response?.data?.message || `Failed to add product to ${action}.`;
-            toast.info(errorMsg, { onClick: () => navigate(`/${action === 'wishlist' ? 'profile/wishlist' : 'cart'}`) });
+            if (error.response?.data?.errors && Array.isArray(error.response.data.errors)) {
+                error.response.data.errors.forEach((err) => {
+                    toast.info(`${err.message}`, {
+                        onClick: () => navigate(`/${action === 'wishlist' ? 'profile/wishlist' : 'cart'}`)
+                    });
+                });
+            } else {
+                const errorMsg = error.response?.data?.message || `Failed to add product to ${action}.`;
+                toast.info(errorMsg, { onClick: () => navigate(`/${action === 'wishlist' ? 'profile/wishlist' : 'cart'}`) });
+            }
         } finally {
             setIsLoading((prev) => ({ ...prev, [action]: false }));
         }

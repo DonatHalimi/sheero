@@ -1,16 +1,18 @@
 const express = require('express');
-const { createSubcategory, getSubcategories, getSubcategory, getSubcategoriesByCategory, updateSubcategory, deleteSubcategory, deleteSubcategories } = require('../controllers/subcategoryController');
-const upload = require('../middleware/upload');
+const { createSubcategory, getSubcategories, getSubcategoryById, getSubcategoriesByCategory, updateSubcategory, deleteSubcategory, deleteSubcategories } = require('../controllers/subcategoryController');
+const { createSchema, getByIdSchema, updateSchema, deleteSchema, deleteBulkSchema } = require('../validations/subcategory');
 const { requireAuthAndRole } = require('../middleware/auth');
+const upload = require('../middleware/upload');
+const validate = require('../middleware/validation');
 
 const router = express.Router();
 
-router.post('/create', requireAuthAndRole('admin'), upload.single('image'), createSubcategory);
+router.post('/create', requireAuthAndRole('admin'), upload.single('image'), validate(createSchema), createSubcategory);
 router.get('/get', getSubcategories);
-router.get('/get/:id', getSubcategory);
+router.get('/get/:id', validate(getByIdSchema), getSubcategoryById);
 router.get('/get-by-category/:categoryId', getSubcategoriesByCategory);
-router.put('/update/:id', requireAuthAndRole('admin'), upload.single('image'), updateSubcategory);
-router.delete('/delete/:id', requireAuthAndRole('admin'), deleteSubcategory);
-router.delete('/delete-bulk', requireAuthAndRole('admin'), deleteSubcategories)
+router.put('/update/:id', requireAuthAndRole('admin'), upload.single('image'), validate(updateSchema), updateSubcategory);
+router.delete('/delete/:id', requireAuthAndRole('admin'), validate(deleteSchema), deleteSubcategory);
+router.delete('/delete-bulk', requireAuthAndRole('admin'), validate(deleteBulkSchema), deleteSubcategories)
 
 module.exports = router;

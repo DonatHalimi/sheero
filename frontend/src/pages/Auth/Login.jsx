@@ -10,18 +10,18 @@ import Footer from '../../components/Utils/Footer';
 import { AuthContext } from '../../context/AuthContext';
 
 const Login = () => {
+    const { login } = useContext(AuthContext);
+    const navigate = useNavigate();
+
     const [email, setEmail] = useState('');
     const [password, setPassword] = useState('');
     const [showPassword, setShowPassword] = useState(false);
-    const { login } = useContext(AuthContext);
-    const navigate = useNavigate();
+
     const [emailValid, setEmailValid] = useState(true);
     const [passwordValid, setPasswordValid] = useState(true);
     const [focusedField, setFocusedField] = useState(null);
 
-    useEffect(() => {
-        window.scrollTo(0, 0);
-    }, []);
+    useEffect(() => { window.scrollTo(0, 0); }, []);
 
     const handleClickShowPassword = () => setShowPassword(!showPassword);
     const handleMouseDownPassword = (event) => event.preventDefault();
@@ -62,11 +62,20 @@ const Login = () => {
             toast.error('Password does not meet requirements');
             return;
         }
+
         const response = await login(email, password);
-        response.success ? navigate('/') : toast.error(response.message);
+
+        if (response.success) {
+            toast.success('Login successful');
+            navigate('/');
+        } else if (response.errors) {
+            response.errors.forEach((error) => toast.error(`${error.message}`));
+        } else {
+            toast.error(response.message);
+        }
     };
 
-    const isFormValid = emailValid && passwordValid;
+    const isFormValid = emailValid && passwordValid && email && password;
 
     return (
         <Box className='flex flex-col bg-neutral-50 min-h-[100vh]'>

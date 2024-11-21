@@ -13,6 +13,13 @@ const AddReviewModal = ({ open, onClose, product, onReviewSuccess }) => {
     const [comment, setComment] = useState('');
     const [canReview, setCanReview] = useState(null);
 
+    const [titleValid, setTitleValid] = useState(true);
+    const [commentValid, setCommentValid] = useState(true);
+    const [focusedField, setFocusedField] = useState(null);
+
+    const validateTitle = (v) => /^[A-Z][\Wa-zA-Z\s]{2,40}$/.test(v);
+    const validateComment = (v) => /^[A-Z][\Wa-zA-Z\s]{3,500}$/.test(v);
+
     const axiosInstance = useAxios();
     const navigate = useNavigate();
 
@@ -36,6 +43,18 @@ const AddReviewModal = ({ open, onClose, product, onReviewSuccess }) => {
             checkIfCanReview();
         }
     }, [open, product, auth.accessToken, axiosInstance]);
+
+    const handleTitleChange = (event) => {
+        const value = event.target.value;
+        setTitle(value);
+        setTitleValid(validateTitle(value));
+    };
+
+    const handleCommentChange = (event) => {
+        const value = event.target.value;
+        setComment(value);
+        setCommentValid(validateComment(value));
+    };
 
     const handleAddReview = async () => {
         if (!auth.accessToken) {
@@ -62,20 +81,29 @@ const AddReviewModal = ({ open, onClose, product, onReviewSuccess }) => {
             title,
             rating,
             comment,
-        }
+        };
 
         try {
             await axiosInstance.post(`/reviews/product/${product._id}`, data);
+
             toast.success('Review added successfully', {
                 onClick: () => navigate('/profile/reviews'),
             });
             onReviewSuccess();
         } catch (error) {
-            toast.info(error.response?.data?.message, {
-                onClick: () => navigate('/profile/reviews'),
-            });
+            if (error.response && error.response.data.errors) {
+                error.response.data.errors.forEach((err) => {
+                    toast.error(`${err.message}`, {
+                        onClick: () => navigate('/profile/reviews'),
+                    });
+                });
+            } else {
+                toast.error('Error adding review');
+            }
         }
-    }
+    };
+
+    const isDisabled = !canReview || !title || !rating || !comment || !titleValid || !commentValid;
 
     return (
         <CustomModal open={open} onClose={onClose}>
@@ -104,10 +132,19 @@ const AddReviewModal = ({ open, onClose, product, onReviewSuccess }) => {
                 <TextField
                     label="Title"
                     value={title}
-                    onChange={(e) => setTitle(e.target.value)}
+                    onChange={handleTitleChange}
+                    onFocus={() => setFocusedField('title')}
+                    onBlur={() => setFocusedField(null)}
                     fullWidth
                     className="!mb-4"
                 />
+                {focusedField === 'title' && !titleValid && (
+                    <div className="absolute left-4 right-4 bottom-[206px] bg-white text-red-500 text-sm p-2 rounded-lg shadow-md z-10">
+                        <span className="block text-xs font-semibold mb-1">Invalid Title</span>
+                        Must start with a capital letter and be 2 to 40 characters long.
+                        <div className="absolute top-[-5px] left-[20px] w-0 h-0 border-l-[5px] border-r-[5px] border-b-[5px] border-transparent border-b-white"></div>
+                    </div>
+                )}
 
                 <Rating
                     name="product-rating"
@@ -117,21 +154,38 @@ const AddReviewModal = ({ open, onClose, product, onReviewSuccess }) => {
                     max={5}
                     min={1}
                     size="large"
-                    sx={{ color: '#6D4C41', '& .MuiRating-iconFilled': { color: '#5A504B' }, '& .MuiRating-iconEmpty': { color: '#D7CCC8' } }}
+                    sx={{
+                        color: '#6D4C41',
+                        '& .MuiRating-iconFilled': { color: '#5A504B' },
+                        '& .MuiRating-iconEmpty': { color: '#D7CCC8' },
+                    }}
                     className="mb-6"
                 />
 
                 <BrownOutlinedTextField
                     label="Comment"
                     value={comment}
-                    onChange={(e) => setComment(e.target.value)}
+                    onChange={handleCommentChange}
+                    onFocus={() => setFocusedField('comment')}
+                    onBlur={() => setFocusedField(null)}
                     fullWidth
                     multiline
                     rows={4}
                     className="!mb-4"
                 />
+                {focusedField === 'comment' && !commentValid && (
+                    <div className="absolute left-4 right-4 bottom-[13px] bg-white text-red-500 text-sm p-2 rounded-lg shadow-md z-10">
+                        <span className="block text-xs font-semibold mb-1">Invalid Comment</span>
+                        Must start with a capital letter and be 3 to 500 characters long.
+                        <div className="absolute top-[-5px] left-[20px] w-0 h-0 border-l-[5px] border-r-[5px] border-b-[5px] border-transparent border-b-white"></div>
+                    </div>
+                )}
 
-                <BrownButton onClick={handleAddReview} fullWidth>
+                <BrownButton
+                    onClick={handleAddReview}
+                    disabled={isDisabled}
+                    fullWidth
+                >
                     Submit Review
                 </BrownButton>
             </CustomBox>

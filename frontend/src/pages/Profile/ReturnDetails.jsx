@@ -1,4 +1,4 @@
-import { LinearProgress, Table, TableBody, TableCell, TableContainer, TableHead, TableRow, Typography } from '@mui/material';
+import { LinearProgress, Table, TableBody, TableCell, TableContainer, TableHead, TableRow } from '@mui/material';
 import React, { useEffect, useState } from 'react';
 import { Link, useNavigate, useParams } from 'react-router-dom';
 import { EmptyState, formatDate, Header, LoadingOrderDetails, ProfileLayout } from '../../assets/CustomComponents';
@@ -24,6 +24,7 @@ const ReturnDetails = () => {
     const fetchReturnDetails = async () => {
         try {
             const response = await axiosInstance.get(`/returns/${returnId}`);
+            console.log(Object.keys(response.data.data));
             if (response.data.success) {
                 setReturnRequest(response.data.data);
             } else {
@@ -36,6 +37,12 @@ const ReturnDetails = () => {
             setLoading(false);
         }
     };
+
+    const displayReason = returnRequest
+        ? (returnRequest.reason === 'Other'
+            ? returnRequest.customReason
+            : returnRequest.reason)
+        : '';
 
     const getStatusProgress = (status) => {
         switch (status) {
@@ -99,18 +106,18 @@ const ReturnDetails = () => {
                                         <TableBody>
                                             {returnRequest.products.map(({ _id, name, image }) => (
                                                 <TableRow key={_id}>
-                                                    <TableCell component="th" scope="row">
+                                                    <TableCell component="th" scope="row" className='w-10/12'>
                                                         <Link to={`/product/${_id}`} className="flex items-center">
                                                             <img
                                                                 src={getImageUrl(image)}
                                                                 alt={name}
-                                                                className="w-20 h-20 object-contain rounded mr-2"
+                                                                className="w-16 h-16 object-contain rounded mr-2"
                                                             />
                                                             <div className='hover:underline'>{name}</div>
                                                         </Link>
                                                     </TableCell>
                                                     <TableCell align="right">
-                                                        {returnRequest.reason}
+                                                        {displayReason}
                                                     </TableCell>
                                                 </TableRow>
                                             ))}

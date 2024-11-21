@@ -1,39 +1,23 @@
-import AddressesPage from '../pages/Dashboard/AddressesPage';
-import CategoriesPage from '../pages/Dashboard/CategoriesPage';
-import CitiesPage from '../pages/Dashboard/CitiesPage';
-import ContactPage from '../pages/Dashboard/ContactPage';
-import CountriesPage from '../pages/Dashboard/CountriesPage';
-import DashboardContent from '../pages/Dashboard/DashboardContent';
-import FAQPage from '../pages/Dashboard/FAQPage';
-import OrdersPage from '../pages/Dashboard/OrdersPage';
-import ProductsPage from '../pages/Dashboard/ProductsPage';
-import ReturnsPage from '../pages/Dashboard/ReturnsPage';
-import ReviewsPage from '../pages/Dashboard/ReviewsPage';
-import RolesPage from '../pages/Dashboard/RolesPage';
-import SlideshowPage from '../pages/Dashboard/SlideshowPage';
-import SubcategoriesPage from '../pages/Dashboard/SubcategoriesPage';
-import SubSubcategoriesPage from '../pages/Dashboard/SubSubcategoriesPage';
-import SuppliersPage from '../pages/Dashboard/SuppliersPage';
-import UsersPage from '../pages/Dashboard/UsersPage';
+import React from 'react';
 
 const pages = {
-    addresses: AddressesPage,
-    categories: CategoriesPage,
-    cities: CitiesPage,
-    contacts: ContactPage,
-    countries: CountriesPage,
-    faqs: FAQPage,
-    images: SlideshowPage,
-    main: DashboardContent,
-    orders: OrdersPage,
-    products: ProductsPage,
-    returns: ReturnsPage,
-    reviews: ReviewsPage,
-    roles: RolesPage,
-    subcategories: SubcategoriesPage,
-    subSubcategories: SubSubcategoriesPage,
-    suppliers: SuppliersPage,
-    users: UsersPage,
+    addresses: React.lazy(() => import('../pages/Dashboard/AddressesPage')),
+    categories: React.lazy(() => import('../pages/Dashboard/CategoriesPage')),
+    cities: React.lazy(() => import('../pages/Dashboard/CitiesPage')),
+    contacts: React.lazy(() => import('../pages/Dashboard/ContactPage')),
+    countries: React.lazy(() => import('../pages/Dashboard/CountriesPage')),
+    faqs: React.lazy(() => import('../pages/Dashboard/FAQPage')),
+    images: React.lazy(() => import('../pages/Dashboard/SlideshowPage')),
+    main: React.lazy(() => import('../pages/Dashboard/DashboardContent')),
+    orders: React.lazy(() => import('../pages/Dashboard/OrdersPage')),
+    products: React.lazy(() => import('../pages/Dashboard/ProductsPage')),
+    returns: React.lazy(() => import('../pages/Dashboard/ReturnsPage')),
+    reviews: React.lazy(() => import('../pages/Dashboard/ReviewsPage')),
+    roles: React.lazy(() => import('../pages/Dashboard/RolesPage')),
+    subcategories: React.lazy(() => import('../pages/Dashboard/SubcategoriesPage')),
+    subSubcategories: React.lazy(() => import('../pages/Dashboard/SubSubcategoriesPage')),
+    suppliers: React.lazy(() => import('../pages/Dashboard/SuppliersPage')),
+    users: React.lazy(() => import('../pages/Dashboard/UsersPage')),
 };
 
 export default pages;

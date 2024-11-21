@@ -132,9 +132,9 @@ const verifyOrder = async (req, res) => {
 };
 
 const payWithCash = async (req, res) => {
+    const { cartId, addressId, userId } = req.body;
+    
     try {
-        const { cartId, addressId, userId } = req.body;
-
         const cart = await Cart.findById(cartId).populate('items.product');
         const address = await Address.findById(addressId)
             .populate('city', 'name')
@@ -197,9 +197,9 @@ const getAllOrders = async (req, res) => {
 };
 
 const getUserOrders = async (req, res) => {
+    const userId = req.params.userId;
+    
     try {
-        const userId = req.params.userId;
-
         const orders = await Order.find({ user: userId })
             .populate('products.product', 'name price image')
             .populate('address', 'name street phoneNumber city country')
@@ -218,9 +218,9 @@ const getUserOrders = async (req, res) => {
 };
 
 const getOrderById = async (req, res) => {
+    const { orderId } = req.params;
+    
     try {
-        const { orderId } = req.params;
-
         const order = await Order.findById(orderId)
             .populate('products.product', 'name price image')
             .populate({
@@ -244,9 +244,9 @@ const getOrderById = async (req, res) => {
 };
 
 const updateDeliveryStatus = async (req, res) => {
+    const { orderId, status, paymentStatus } = req.body;
+    
     try {
-        const { orderId, status, paymentStatus } = req.body;
-
         if (!orderId || !status) {
             return res.status(400).json({ success: false, message: 'orderId and status are required.' });
         }

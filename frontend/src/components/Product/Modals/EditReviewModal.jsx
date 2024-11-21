@@ -8,7 +8,13 @@ const EditReviewModal = ({ open, onClose, review, onEditSuccess }) => {
     const [title, setTitle] = useState('');
     const [rating, setRating] = useState(null);
     const [comment, setComment] = useState('');
+    const [titleValid, setTitleValid] = useState(true);
+    const [commentValid, setCommentValid] = useState(true);
+    const [focusedField, setFocusedField] = useState(null);
     const axiosInstance = useAxios();
+
+    const validateTitle = (v) => /^[A-Z][\Wa-zA-Z\s]{2,40}$/.test(v);
+    const validateComment = (v) => /^[A-Z][\Wa-zA-z\s]{3,500}$/.test(v);
 
     useEffect(() => {
         if (review) {
@@ -18,12 +24,24 @@ const EditReviewModal = ({ open, onClose, review, onEditSuccess }) => {
         }
     }, [review]);
 
+    const handleTitleChange = (event) => {
+        const value = event.target.value;
+        setTitle(value);
+        setTitleValid(validateTitle(value));
+    };
+
+    const handleCommentChange = (event) => {
+        const value = event.target.value;
+        setComment(value);
+        setCommentValid(validateComment(value));
+    };
+
     const handleEditReview = async () => {
         const updatedData = {
             title,
             rating,
             comment,
-        }
+        };
 
         try {
             const response = await axiosInstance.put(`/reviews/update/${review._id}`, updatedData);
@@ -39,6 +57,8 @@ const EditReviewModal = ({ open, onClose, review, onEditSuccess }) => {
             }
         }
     };
+
+    const isDisabled = !title || !rating || !comment || !titleValid || !commentValid;
 
     return (
         <CustomModal open={open} onClose={onClose}>
@@ -61,10 +81,19 @@ const EditReviewModal = ({ open, onClose, review, onEditSuccess }) => {
                 <TextField
                     label="Title"
                     value={title}
-                    onChange={(e) => setTitle(e.target.value)}
+                    onChange={handleTitleChange}
+                    onFocus={() => setFocusedField('title')}
+                    onBlur={() => setFocusedField(null)}
                     fullWidth
                     className="!mb-4"
                 />
+                {focusedField === 'title' && !titleValid && (
+                    <div className="absolute left-4 right-4 bottom-[206px] bg-white text-red-500 text-sm p-2 rounded-lg shadow-md z-10">
+                        <span className="block text-xs font-semibold mb-1">Invalid Title</span>
+                        Must start with a capital letter and be 2 to 40 characters long.
+                        <div className="absolute top-[-5px] left-[20px] w-0 h-0 border-l-[5px] border-r-[5px] border-b-[5px] border-transparent border-b-white"></div>
+                    </div>
+                )}
 
                 <Rating
                     name="product-rating"
@@ -81,14 +110,23 @@ const EditReviewModal = ({ open, onClose, review, onEditSuccess }) => {
                 <BrownOutlinedTextField
                     label="Comment"
                     value={comment}
-                    onChange={(e) => setComment(e.target.value)}
+                    onChange={handleCommentChange}
+                    onFocus={() => setFocusedField('comment')}
+                    onBlur={() => setFocusedField(null)}
                     fullWidth
                     multiline
                     rows={4}
                     className="!mb-4"
                 />
+                {focusedField === 'comment' && !commentValid && (
+                    <div className="absolute left-4 right-4 bottom-[13px] bg-white text-red-500 text-sm p-2 rounded-lg shadow-md z-10">
+                        <span className="block text-xs font-semibold mb-1">Invalid Comment</span>
+                        Must start with a capital letter and be 3 to 500 characters long.
+                        <div className="absolute top-[-5px] left-[20px] w-0 h-0 border-l-[5px] border-r-[5px] border-b-[5px] border-transparent border-b-white"></div>
+                    </div>
+                )}
 
-                <BrownButton onClick={handleEditReview} fullWidth>
+                <BrownButton onClick={handleEditReview} disabled={isDisabled} fullWidth>
                     Save Changes
                 </BrownButton>
             </CustomBox>

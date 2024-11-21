@@ -135,12 +135,12 @@ const OrderDetails = () => {
                                         <TableBody>
                                             {order.products.map(({ product, quantity, price }) => (
                                                 <TableRow key={product._id}>
-                                                    <TableCell component="th" scope="row">
+                                                    <TableCell component="th" scope="row" className='w-10/12'>
                                                         <Link to={`/product/${product._id}`} className="flex items-center">
                                                             <img
                                                                 src={getImageUrl(product.image)}
                                                                 alt={product.name}
-                                                                className="w-20 h-20 object-contain rounded mr-2"
+                                                                className="w-16 h-16 object-contain rounded mr-2"
                                                             />
                                                             <div>
                                                                 <div className='hover:underline'>{product.name}</div>

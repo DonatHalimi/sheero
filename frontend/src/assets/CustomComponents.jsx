@@ -61,6 +61,7 @@ import {
     Select,
     Skeleton,
     Stack,
+    SvgIcon,
     Tab,
     Table,
     TableBody,
@@ -76,7 +77,6 @@ import {
     useMediaQuery
 } from '@mui/material';
 import { styled } from '@mui/material/styles';
-import SvgIcon from '@mui/material/SvgIcon';
 import { GridToolbar } from '@mui/x-data-grid';
 import { Splide, SplideSlide } from '@splidejs/react-splide';
 import { AnimatePresence, motion } from 'framer-motion';
@@ -86,10 +86,7 @@ import { Link as RouterLink, useNavigate } from 'react-router-dom';
 import { toast } from 'react-toastify';
 import useAxios from '../axiosInstance';
 import Navbar from '../components/Navbar/Navbar';
-import FilterSidebar from '../components/Product/Utils/FilterSidebar';
-import Footer from '../components/Utils/Footer';
 import { getImageUrl } from '../config';
-import ProfileSidebar from '../pages/Profile/ProfileSidebar';
 import logo from './img/brand/logo.png';
 import {
     customMenuProps,
@@ -117,7 +114,10 @@ import {
     sidebarLayoutStyling,
     slideShowSkeletonStyling
 } from './sx';
-import ProductItem from '../components/Product/Items/ProductItem';
+const ProductItem = React.lazy(() => import('../components/Product/Items/ProductItem'));
+const FilterSidebar = React.lazy(() => import('../components/Product/Utils/FilterSidebar'));
+const Footer = React.lazy(() => import('../components/Utils/Footer'));
+const ProfileSidebar = React.lazy(() => import('../pages/Profile/ProfileSidebar'));
 
 export const BrownOutlinedTextField = styled(TextField)({
     '& .MuiOutlinedInput-root': {
@@ -148,7 +148,7 @@ export const BoldTableCell = styled(TableCell)({
 });
 
 export const OutlinedBrownButton = styled(Button)({
-    color: '#493c30',
+    color: '#493C30',
     borderColor: '#83776B',
     borderWidth: '1px',
     borderStyle: 'solid',
@@ -170,11 +170,11 @@ export const ActionButton = styled(Button)({
 });
 
 export const BrownCreateOutlinedIcon = styled(CreateOutlined)({
-    color: '#493c30',
+    color: '#493C30',
 });
 
 export const BrownDeleteOutlinedIcon = styled(DeleteOutlined)({
-    color: '#493c30',
+    color: '#493C30',
     '&:hover': {
         cursor: 'pointer',
     }
@@ -260,28 +260,6 @@ export const ActiveListItemButton = styled(ListItemButton)(({ selected }) => ({
     },
 }));
 
-export const CollapsibleListItem = ({ open, handleClick, icon, primary, children }) => (
-    <>
-        <ListItemButton onClick={handleClick}>
-            <ListItemIcon>{icon}</ListItemIcon>
-            <ListItemText primary={primary} />
-            {open ? <ExpandLess /> : <ExpandMore />}
-        </ListItemButton>
-        <Collapse in={open} timeout="auto" unmountOnExit>
-            <List component="div" disablePadding>
-                {children}
-            </List>
-        </Collapse>
-    </>
-);
-
-export const ActiveListItem = ({ icon, primary, handleClick, selected, sx }) => (
-    <ActiveListItemButton onClick={handleClick} selected={selected} sx={sx}>
-        <ListItemIcon>{icon}</ListItemIcon>
-        <ListItemText primary={primary} />
-    </ActiveListItemButton>
-);
-
 export const AddToCartButton = styled(Button)(({ theme }) => ({
     backgroundColor: '#F7F7F7',
     color: '#57534E',
@@ -321,70 +299,6 @@ export const DeleteButton = styled(Delete)({
     transition: 'color 0.3s ease',
 });
 
-export const WaveSkeleton = (props) => <Skeleton animation="wave" {...props} />;
-
-export const CartButton = ({ isOutOfStock }) => {
-    return (
-        <>
-            <BrownShoppingCartIcon style={{ color: isOutOfStock ? '#A6A6A6' : '' }} />
-            <span className="hidden sm:inline ml-3" style={{ color: isOutOfStock ? '#A6A6A6' : '' }}>Add To Cart</span>
-        </>
-    );
-};
-
-export const DetailsCartButton = ({ isOutOfStock }) => {
-    return (
-        <>
-            <BrownShoppingCartIcon style={{ color: isOutOfStock ? '#A6A6A6' : '' }} />
-            <span className="ml-3" style={{ color: isOutOfStock ? '#A6A6A6' : '' }}>Add To Cart</span>
-        </>
-    );
-};
-
-export const CartWishlistButtons = ({ handleAction, isCartLoading, isWishlistLoading, inventoryCount }) => {
-    const isOutOfStock = inventoryCount === 0;
-
-    return (
-        <>
-            <AddToCartButton
-                onClick={!isOutOfStock ? handleAction('cart') : null}
-                disabled={isCartLoading || isWishlistLoading || isOutOfStock}
-                className={`${isOutOfStock ? 'cursor-not-allowed' : 'cursor-pointer'}`}
-            >
-                <CartButton isOutOfStock={isOutOfStock} />
-            </AddToCartButton>
-            <WishlistButton
-                onClick={handleAction('wishlist')}
-                disabled={isCartLoading || isWishlistLoading}
-                className="cursor-pointer"
-            >
-                <FavoriteBorderOutlined />
-            </WishlistButton>
-        </>
-    );
-};
-
-export const CartDeleteButtons = ({ handleAddToCart, handleRemove, isActionLoading, inventoryCount }) => {
-    const isOutOfStock = inventoryCount === 0;
-
-    return (
-        <>
-            <AddToCartButton
-                onClick={handleAddToCart}
-                disabled={isActionLoading || inventoryCount === 0}
-            >
-                <CartButton isOutOfStock={isOutOfStock} />
-            </AddToCartButton>
-            <WishlistButton
-                onClick={handleRemove}
-                disabled={isActionLoading}
-            >
-                <DeleteButton />
-            </WishlistButton>
-        </>
-    )
-}
-
 export const DetailsAddToCartButton = styled(Button)(({ theme }) => ({
     backgroundColor: '#686159',
     color: 'white',
@@ -417,51 +331,6 @@ export const DetailsWishlistButton = styled(Button)({
     },
     flexShrink: 0,
 });
-
-export const DetailsCartWishlistButtons = ({ handleAction, isCartLoading, isWishlistLoading, inventoryCount }) => {
-    const isOutOfStock = inventoryCount === 0;
-
-    return (
-        <>
-            <DetailsAddToCartButton
-                onClick={handleAction('cart')}
-                disabled={isCartLoading || isWishlistLoading || inventoryCount === 0}
-            >
-                <DetailsCartButton isOutOfStock={isOutOfStock} />
-            </DetailsAddToCartButton>
-            <DetailsWishlistButton
-                onClick={handleAction('wishlist')}
-                disabled={isCartLoading || isWishlistLoading}
-            >
-                <FavoriteBorderOutlined />
-            </DetailsWishlistButton>
-        </>
-    );
-};
-
-export const OutOfStock = ({ inventoryCount }) => {
-    if (inventoryCount === 0) {
-        return (
-            <div className="absolute inset-0 bg-white opacity-75 flex items-center justify-center rounded pointer-events-none">
-                <span className="text-black bg-gray-100 rounded-md px-1 font-semibold">Out of Stock</span>
-            </div>
-        );
-    }
-
-    return null;
-};
-
-export const DiscountPercentage = ({ discountPercentage }) => {
-    if (discountPercentage > 0) {
-        return (
-            <span className="absolute top-0 right-0 bg-stone-500 text-white px-2 py-1 rounded text-xs">
-                -{discountPercentage}%
-            </span>
-        )
-    }
-
-    return null;
-}
 
 export const CustomTab = styled(Tab)(({ theme }) => ({
     flex: 1,
@@ -496,71 +365,6 @@ export const ReviewCard = styled(Paper)(({ theme }) => ({
 export const ReviewContent = styled(Box)({
     flex: 1,
 });
-
-export const RatingStars = ({ rating }) => {
-    const stars = Array(5).fill(false).map((_, index) => index < rating);
-    return (
-        <Box display="flex">
-            {stars.map((filled, index) =>
-                filled ? <Star key={index} color="primary" /> : <StarBorder key={index} />
-            )}
-        </Box>
-    );
-};
-
-export function HomeBreadCrumb(props) {
-    return (
-        <SvgIcon {...props} style={{ fontSize: 17, marginBottom: 0.7 }}>
-            <path d="M10 20v-6h4v6h5v-8h3L12 3 2 12h3v8z" />
-        </SvgIcon>
-    );
-}
-
-export const HomeIcon = () => {
-    const navigate = useNavigate();
-
-    const handleHomeClick = () => {
-        navigate('/');
-    };
-
-    return (
-        <div onClick={handleHomeClick}>
-            <RoundIconButton>
-                <StyledHomeIcon />
-            </RoundIconButton>
-        </div>
-    );
-};
-
-export const RoundIconButton = styled(IconButton)(({ theme }) => ({
-    color: theme.palette.primary.contrastText,
-    width: '40px',
-    height: '40px',
-}));
-
-export const ProfileButton = styled(IconButton)(({ theme }) => ({
-    color: 'black',
-    width: '100px',
-    height: '40px',
-    display: 'flex',
-    alignItems: 'center',
-    justifyContent: 'flex-start',
-    borderRadius: '6px',
-    '&:hover': {
-        backgroundColor: theme.palette.action.hover,
-    },
-}));
-
-export const CustomToolbar = () => {
-    return (
-        <>
-            <div className="flex justify-end px-4">
-                <GridToolbar />
-            </div>
-            <hr className="border-t border-gray-200 my-2" />
-        </>
-    );
-};
 
 export const StyledGridOverlay = styled('div')({
     display: 'flex',
@@ -600,38 +404,34 @@ export const StyledImage = styled('img')({
     borderRadius: '10px',
 });
 
-export function CustomNoRowsOverlay() {
-    return (
-        <StyledGridOverlay>
-            <svg
-                xmlns="http://www.w3.org/2000/svg"
-                fill="none"
-                width={96}
-                viewBox="0 0 452 257"
-                aria-hidden
-                focusable="false"
-            >
-                <path
-                    className="no-rows-primary"
-                    d="M348 69c-46.392 0-84 37.608-84 84s37.608 84 84 84 84-37.608 84-84-37.608-84-84-84Zm-104 84c0-57.438 46.562-104 104-104s104 46.562 104 104-46.562 104-104 104-104-46.562-104-104Z"
-                />
-                <path
-                    className="no-rows-primary"
-                    d="M308.929 113.929c3.905-3.905 10.237-3.905 14.142 0l63.64 63.64c3.905 3.905 3.905 10.236 0 14.142-3.906 3.905-10.237 3.905-14.142 0l-63.64-63.64c-3.905-3.905-3.905-10.237 0-14.142Z"
-                />
-                <path
-                    className="no-rows-primary"
-                    d="M308.929 191.711c-3.905-3.906-3.905-10.237 0-14.142l63.64-63.64c3.905-3.905 10.236-3.905 14.142 0 3.905 3.905 3.905 10.237 0 14.142l-63.64 63.64c-3.905 3.905-10.237 3.905-14.142 0Z"
-                />
-                <path
-                    className="no-rows-secondary"
-                    d="M0 10C0 4.477 4.477 0 10 0h380c5.523 0 10 4.477 10 10s-4.477 10-10 10H10C4.477 20 0 15.523 0 10ZM0 59c0-5.523 4.477-10 10-10h231c5.523 0 10 4.477 10 10s-4.477 10-10 10H10C4.477 69 0 64.523 0 59ZM0 106c0-5.523 4.477-10 10-10h203c5.523 0 10 4.477 10 10s-4.477 10-10 10H10c-5.523 0-10-4.477-10-10ZM0 153c0-5.523 4.477-10 10-10h195.5c5.523 0 10 4.477 10 10s-4.477 10-10 10H10c-5.523 0-10-4.477-10-10ZM0 200c0-5.523 4.477-10 10-10h203c5.523 0 10 4.477 10 10s-4.477 10-10 10H10c-5.523 0-10-4.477-10-10ZM0 247c0-5.523 4.477-10 10-10h231c5.523 0 10 4.477 10 10s-4.477 10-10 10H10c-5.523 0-10-4.477-10-10Z"
-                />
-            </svg>
-            <Box className='mt-4 font-bold text-stone-500'>No rows found</Box>
-        </StyledGridOverlay>
-    );
-}
+export const RoundIconButton = styled(IconButton)(({ theme }) => ({
+    color: theme.palette.primary.contrastText,
+    width: '40px',
+    height: '40px',
+}));
+
+export const ProfileButton = styled(IconButton)(({ theme }) => ({
+    color: 'black',
+    width: '100px',
+    height: '40px',
+    display: 'flex',
+    alignItems: 'center',
+    justifyContent: 'flex-start',
+    borderRadius: '6px',
+    '&:hover': {
+        backgroundColor: theme.palette.action.hover,
+    },
+}));
+
+export const CheckoutButton = styled(Button)({
+    backgroundColor: '#686159',
+    color: 'white',
+    fontSize: '1.02rem',
+    padding: '4px 20px',
+    '&:hover': {
+        backgroundColor: '#5B504B',
+    },
+});
 
 export const CustomPaper = (props) => (
     <Paper {...props} sx={{ maxHeight: 200, overflow: 'auto' }} />
@@ -701,6 +501,715 @@ export const DashboardTableStyling = {
     },
     '--DataGrid-overlayHeight': '300px',
 };
+
+export const WaveSkeleton = (props) => <Skeleton animation="wave" {...props} />;
+
+// Loading skeletons start
+export const LoadingProductDetails = () => {
+    return (
+        <>
+            <div className='container mx-auto px-4 max-w-5xl relative top-6 right-4'>
+                <Breadcrumbs aria-label="breadcrumb" sx={{ mb: 4, fontSize: '14px' }}>
+                    <Link component={RouterLink} to="/" color="inherit" underline="none">
+                        <HomeBreadCrumb className="text-stone-500 hover:text-stone-700" />
+                    </Link>
+                    <WaveSkeleton width={200} />
+                </Breadcrumbs>
+            </div>
+            <div className="container mx-auto px-4 py-4 mb-8 bg-white mt-8 rounded-md max-w-5xl">
+                <div className="flex flex-col md:flex-row gap-8">
+                    <div className="flex flex-col items-center md:w-1/2">
+                        <WaveSkeleton variant="rectangular" width="100%" height={320} />
+                    </div>
+                    <div className="md:w-1/2">
+                        <WaveSkeleton variant="text" width="80%" height={40} />
+                        <WaveSkeleton variant="text" width="40%" height={30} />
+                        <WaveSkeleton variant="text" width="60%" height={30} />
+                        <WaveSkeleton variant="text" width="50%" height={30} />
+                        <div className='mt-4' />
+                        <WaveSkeleton variant="text" width="50%" height={30} />
+                        <div className='mt-24' />
+                        <div className="mt-4 flex items-center space-x-4">
+                            <WaveSkeleton variant="rectangular" width={314} height={40} className='rounded-md' />
+                            <WaveSkeleton variant="rectangular" width={150} height={40} className='rounded-md' />
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div className="container mx-auto px-4 py-4 mb-8 bg-white mt-8 rounded-md max-w-5xl">
+                <div className="mt-8">
+                    <Tabs
+                        value={0}
+                        aria-label="product details tabs"
+                        sx={{ width: '100%', display: 'flex', justifyContent: 'space-between', mb: 2 }}
+                    >
+                        <WaveSkeleton variant="rectangular" width="100%" height={40} style={{ margin: '0 4px', flexGrow: 1, borderRadius: '6px' }} />
+                        <WaveSkeleton variant="rectangular" width="100%" height={40} style={{ margin: '0 4px', flexGrow: 1, borderRadius: '6px' }} />
+                        <WaveSkeleton variant="rectangular" width="100%" height={40} style={{ margin: '0 4px', flexGrow: 1, borderRadius: '6px' }} />
+                    </Tabs>
+
+                    <Box p={1}>
+                        <WaveSkeleton variant="text" width="80%" height={30} />
+                        <WaveSkeleton variant="text" width="60%" height={30} className='mt-4' />
+                        <WaveSkeleton variant="text" width="40%" height={30} className='mt-4' />
+                    </Box>
+                </div>
+            </div>
+            <Footer />
+        </>
+    );
+};
+
+export const LoadingSlideshow = () => (
+    <Box sx={{ position: 'relative' }} className="relative w-full mx-auto mb-14">
+        <WaveSkeleton variant="rectangular" width="100%" height="800px" sx={{ maxWidth: '2000px', borderRadius: '8px' }} />
+
+        <WaveSkeleton variant="circular" width={50} height={50} sx={{ ...slideShowSkeletonStyling, left: '20px' }}
+        />
+
+        <WaveSkeleton variant="circular" width={50} height={50} sx={{ ...slideShowSkeletonStyling, right: '20px', left: 'auto' }} />
+    </Box>
+);
+
+export const LoadingFaq = () => (
+    <>
+        {Array(3).fill().map((_, index) => (
+            <div key={index} className="mb-4">
+                <WaveSkeleton variant="rectangular" height={60} className="rounded-md mb-2" />
+                <WaveSkeleton variant="rectangular" height={50} className="rounded-md mb-2" />
+            </div>
+        ))}
+    </>
+);
+
+export const LoadingProfile = () => (
+    <>
+        <WaveSkeleton variant="text" width={250} height={40} />
+        <WaveSkeleton variant="text" width={265} height={30} />
+    </>
+);
+
+export const LoadingReturn = () => (
+    <Box sx={{ p: 1, width: '100%', display: 'flex', flexDirection: 'column', gap: 2 }} >
+        <WaveSkeleton variant="rectangular" width={400} height={56} className='rounded' />
+
+        <WaveSkeleton variant="rectangular" width={400} height={56} className='rounded' />
+
+        <Box sx={{ display: 'flex', alignItems: 'center' }} >
+            <WaveSkeleton variant="rectangular" width={24} height={24} className='rounded' />
+            <WaveSkeleton variant="text" width="60%" height={24} sx={{ ml: 1 }} className='rounded' />
+        </Box>
+
+        <WaveSkeleton variant="rectangular" width="100%" height={40} className='rounded' />
+    </Box>
+);
+
+export const LoadingCart = () => {
+    return (
+        <>
+            <Navbar />
+            <div className="container mx-auto px-4 lg:px-24 py-2 mb-16 bg-gray-50 mt-10">
+                {/* Mobile-only header */}
+                <div className="bg-white p-4 rounded-md shadow-sm mb-3 flex justify-between items-center px-2 md:hidden mt-[72px]">
+                    <h1 className="text-2xl font-semilight ml-2">Cart</h1>
+                    <WaveSkeleton variant="circular" width={32} height={32} />
+                </div>
+
+                {/* Desktop-only header */}
+                <div className="hidden md:block mb-4">
+                    <h1 className="text-2xl font-semilight mb-2 hidden md:block">Cart</h1>
+                </div>
+
+                <div className="flex flex-col lg:flex-row gap-6">
+                    <div className="flex-1">
+                        {/* Desktop Table View */}
+                        <div className="hidden lg:block">
+                            <TableContainer className="bg-white rounded-lg">
+                                <Table>
+                                    <TableHead>
+                                        <TableRow>
+                                            <TableCell><WaveSkeleton variant="text" width={100} height={20} /></TableCell>
+                                            <TableCell align="center"><WaveSkeleton variant="text" width={80} height={20} /></TableCell>
+                                            <TableCell align="center"><WaveSkeleton variant="text" width={80} height={20} /></TableCell>
+                                            <TableCell align="center"><WaveSkeleton variant="text" width={80} height={20} /></TableCell>
+                                            <TableCell align="center"><WaveSkeleton variant="circular" width={32} height={32} /></TableCell>
+                                        </TableRow>
+                                    </TableHead>
+                                    <TableBody>
+                                        {Array.from(new Array(3)).map((_, index) => (
+                                            <TableRow key={index}>
+                                                <TableCell>
+                                                    <div className="flex items-center">
+                                                        <WaveSkeleton variant="rectangular" width={80} height={80} className="mr-4 rounded" />
+                                                        <WaveSkeleton variant="text" width={120} height={20} />
+                                                    </div>
+                                                </TableCell>
+                                                <TableCell align="center">
+                                                    <WaveSkeleton variant="text" width={60} height={20} />
+                                                    <WaveSkeleton variant="text" width={80} height={16} />
+                                                </TableCell>
+                                                <TableCell align="center">
+                                                    <div className="flex justify-center items-center">
+                                                        <WaveSkeleton variant="rectangular" width={100} height={36} />
+                                                    </div>
+                                                </TableCell>
+                                                <TableCell align="center">
+                                                    <WaveSkeleton variant="text" width={60} height={20} />
+                                                </TableCell>
+                                                <TableCell align="center">
+                                                    <WaveSkeleton variant="circular" width={32} height={32} />
+                                                </TableCell>
+                                            </TableRow>
+                                        ))}
+                                    </TableBody>
+                                </Table>
+                            </TableContainer>
+                        </div>
+
+                        {/* Mobile Card View */}
+                        <div className="lg:hidden space-y-4">
+                            {Array.from(new Array(3)).map((_, index) => (
+                                <div key={index} className="bg-white rounded-lg p-4">
+                                    <div className="flex gap-4">
+                                        <WaveSkeleton variant="rectangular" width={96} height={96} className="rounded" />
+                                        <div className="flex-1">
+                                            <div className="flex justify-between items-start">
+                                                <WaveSkeleton variant="text" width="60%" height={24} />
+                                                <WaveSkeleton variant="circular" width={32} height={32} />
+                                            </div>
+                                            <div className="mb-3">
+                                                <WaveSkeleton variant="text" width={80} height={24} />
+                                                <WaveSkeleton variant="text" width={120} height={20} />
+                                            </div>
+                                            <div className="flex items-center justify-between">
+                                                <WaveSkeleton variant="rectangular" width={120} height={36} className="rounded" />
+                                                <WaveSkeleton variant="text" width={80} height={24} />
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            ))}
+                        </div>
+                    </div>
+
+                    {/* Cart Summary Section */}
+                    <div className="lg:w-80 w-full">
+                        <div className="bg-white p-4">
+                            <WaveSkeleton variant="text" width={140} height={32} className="mb-4" />
+                            <div className="space-y-3">
+                                <div className="flex justify-between py-2 border-b">
+                                    <WaveSkeleton variant="text" width={80} height={24} />
+                                    <WaveSkeleton variant="text" width={60} height={24} />
+                                </div>
+                                <div className="flex justify-between py-2 border-b">
+                                    <WaveSkeleton variant="text" width={80} height={24} />
+                                    <WaveSkeleton variant="text" width={60} height={24} />
+                                </div>
+                                <div className="flex justify-between py-2 border-b">
+                                    <WaveSkeleton variant="text" width={100} height={24} />
+                                    <WaveSkeleton variant="text" width={60} height={24} />
+                                </div>
+                                <div className="flex justify-between py-2">
+                                    <WaveSkeleton variant="text" width={80} height={24} />
+                                    <WaveSkeleton variant="text" width={60} height={24} />
+                                </div>
+                            </div>
+                            <div className="mt-4">
+                                <WaveSkeleton variant="rectangular" height={48} className="rounded" />
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <Footer />
+        </>
+    );
+};
+
+export const LoadingProductItem = ({ count = 15 }) => {
+    return (
+        <>
+            {Array.from({ length: count }).map((_, index) => (
+                <div key={index} className="bg-white rounded-md shadow-sm p-4 flex flex-col">
+                    <div className="relative mb-2">
+                        <WaveSkeleton variant="rectangular" width="100%" height={200} className="rounded" />
+                    </div>
+                    <WaveSkeleton variant="text" width="80%" height={20} className="mt-2" />
+                    <div className="flex flex-col mb-5">
+                        <WaveSkeleton variant="text" width="60%" height={24} className="mt-1" />
+                    </div>
+                    <div className="flex justify-between items-center mt-auto">
+                        <WaveSkeleton variant="rectangular" width={170} height={40} className="rounded" />
+                        <WaveSkeleton variant="rectangular" width={60} height={40} className="rounded" />
+                    </div>
+                </div>
+            ))}
+        </>
+    );
+};
+
+export const LoadingReviewItem = () => (
+    <>
+        {Array.from({ length: 3 }).map((_, index) => (
+            <div key={index} className="relative p-4 mb-4 bg-white rounded-md shadow-sm">
+                <div className="absolute top-4 right-4">
+                    <WaveSkeleton variant="circular" width={24} height={24} />
+                </div>
+
+                <div className="flex flex-grow">
+                    <div className="flex-shrink-0 mr-4">
+                        <WaveSkeleton variant="rectangular" width={80} height={80} className="rounded-md" />
+                    </div>
+
+                    <div className="flex-grow">
+                        <div className="flex items-center mb-2">
+                            <WaveSkeleton variant="text" width={200} height={28} className="mr-2" />
+                            <WaveSkeleton variant="text" width={100} height={28} />
+                        </div>
+
+                        <div className="mb-1">
+                            <WaveSkeleton variant="text" width={180} height={24} />
+                        </div>
+                        <WaveSkeleton variant="text" width={150} height={20} className="mt-1" />
+                        <WaveSkeleton variant="text" width={50} height={20} className="mt-1" />
+                    </div>
+                </div>
+            </div>
+        ))}
+    </>
+);
+
+export const LoadingOrderItem = () => {
+    return (
+        <>
+            <Box className="grid grid-cols-1 gap-4 rounded-md">
+                {Array.from({ length: 3 }).map((_, index) => (
+                    <Box key={index} className="bg-white shadow-md rounded-lg p-6 relative">
+                        <Box className="flex justify-between items-center mb-4">
+                            <WaveSkeleton variant="text" width="40%" />
+                            <Box>
+                                <WaveSkeleton variant="text" width={100} />
+                            </Box>
+                        </Box>
+                        <div className="flex space-x-3 mt-4 mb-2">
+                            <WaveSkeleton variant="rectangular" height={50} width={50} className='rounded' />
+                            <WaveSkeleton variant="rectangular" height={50} width={50} className='rounded' />
+                            <WaveSkeleton variant="rectangular" height={50} width={50} className='rounded' />
+                        </div>
+                    </Box>
+                ))}
+            </Box>
+        </>
+    );
+};
+
+export const LoadingOrderDetails = ({ isOrder = true }) => {
+    return (
+        <Box>
+            {/* Progress Card WaveSkeleton */}
+            <Box className="bg-white shadow-md rounded-lg p-6 mb-4">
+                <div className='flex flex-col items-center'>
+                    <WaveSkeleton variant="text" width="60%" height={30} />
+                    <WaveSkeleton variant="text" width="40%" height={20} />
+                </div>
+                <div className='flex flex-col items-center'>
+                    <WaveSkeleton variant="text" width="50%" height={40} />
+                </div>
+                <Box className="flex justify-center gap-20">
+                    {Array.from({ length: 3 }).map((_, index) => (
+                        <WaveSkeleton variant="text" width="10%" height={20} />
+                    ))}
+                </Box>
+            </Box>
+
+            {/* Products Table WaveSkeleton */}
+            <Box className="bg-white shadow-md rounded-lg p-6 mb-4">
+                <TableContainer>
+                    <Table>
+                        <TableHead>
+                            <TableRow>
+                                <TableCell>
+                                    <WaveSkeleton variant="text" width="15%" height={30} />
+                                </TableCell>
+                                <TableCell>
+                                    <WaveSkeleton variant="text" width="100%" height={30} />
+                                </TableCell>
+                            </TableRow>
+                        </TableHead>
+                        <TableBody>
+                            {Array.from({ length: 3 }).map((_, index) => (
+                                <TableRow key={index}>
+                                    <TableCell component="th" scope="row">
+                                        <Box display="flex" alignItems="center">
+                                            <WaveSkeleton variant="rectangular" width={80} height={80} className='rounded-md' />
+                                            <Box ml={2}>
+                                                <WaveSkeleton variant="text" width={150} height={20} />
+                                            </Box>
+                                        </Box>
+                                    </TableCell>
+                                    <TableCell component="th" scope="row" align="right">
+                                        <WaveSkeleton variant="text" width="50%" height={30} />
+                                    </TableCell>
+                                </TableRow>
+                            ))}
+                        </TableBody>
+                    </Table>
+                </TableContainer>
+            </Box>
+
+            {isOrder && (
+                <>
+                    {/* Total Amount Card WaveSkeleton */}
+                    <Box className="bg-white shadow-md rounded-lg p-6 mb-4">
+                        <TableContainer>
+                            <Table>
+                                <TableHead>
+                                    <TableRow>
+                                        <TableCell>
+                                            <WaveSkeleton variant="text" width="20%" height={30} />
+                                        </TableCell>
+                                        <TableCell>
+                                            <WaveSkeleton variant="text" width="100%" height={30} />
+                                        </TableCell>
+                                    </TableRow>
+                                </TableHead>
+                                <TableBody>
+                                    {Array.from({ length: 3 }).map((_, index) => (
+                                        <TableRow key={index}>
+                                            <TableCell component="th" scope="row" className="font-bold">
+                                                <Box display="flex" alignItems="center">
+                                                    <WaveSkeleton variant="text" width={75} height={30} />
+                                                </Box>
+                                            </TableCell>
+                                            <TableCell component="th" scope="row">
+                                                <WaveSkeleton variant="text" width="50%" height={30} />
+                                            </TableCell>
+                                        </TableRow>
+                                    ))}
+                                </TableBody>
+                            </Table>
+                        </TableContainer>
+                    </Box>
+
+                    {/* Address and Payment Method Table WaveSkeleton */}
+                    <Box className="bg-white shadow-md rounded-lg p-6 mb-4">
+                        <TableContainer>
+                            <Table>
+                                <TableBody>
+                                    {Array.from({ length: 6 }).map((_, index) => (
+                                        <TableRow key={index}>
+                                            <TableCell component="th" scope="row" className="font-bold">
+                                                <WaveSkeleton variant="text" width="100%" height={30} />
+                                            </TableCell>
+                                        </TableRow>
+                                    ))}
+                                </TableBody>
+                            </Table>
+                        </TableContainer>
+                    </Box>
+                </>
+            )}
+        </Box >
+    );
+};
+
+export const LoadingCategoryDropdown = () => (
+    <div className="static bottom-4 bg-white rounded-md p-2 w-[1280px]">
+        <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
+            {Array.from({ length: 6 }).map((_, index) => (
+                <div key={index} className="flex items-start">
+                    <WaveSkeleton variant="rectangular" width={48} height={48} className="mr-2 rounded-md" />
+                    <div>
+                        <WaveSkeleton variant="text" width={100} height={24} className="mb-2 rounded" />
+                        <div className="flex flex-wrap">
+                            {Array.from({ length: 2 }).map((_, subIndex) => (
+                                <WaveSkeleton key={subIndex} variant="text" width={80} height={20} className={`mb-1 ${subIndex === 1 ? 'ml-1' : ''} rounded`} />
+                            ))}
+                        </div>
+                    </div>
+                </div>
+            ))}
+        </div>
+    </div>
+);
+
+export const LoadingInformation = ({ showAdditionalField }) => {
+    return (
+        <Box className='space-y-0'>
+            <Box sx={{ display: 'flex', flexDirection: { xs: 'column', md: 'row' }, gap: { xs: 3, md: 2 } }}>
+                <div className="flex-1">
+                    <WaveSkeleton variant="text" width="100%" height={70} />
+                </div>
+                <div className="flex-1">
+                    <WaveSkeleton variant="text" width="100%" height={70} />
+                </div>
+                <div className="flex-1">
+                    <WaveSkeleton variant="text" width="100%" height={70} />
+                </div>
+            </Box>
+            <Box sx={{ display: 'flex', flexDirection: { xs: 'column', md: 'row' }, gap: { xs: 3, md: 2 } }}>
+                <div className="flex-1">
+                    <WaveSkeleton variant="text" width="100%" height={70} className='rounded' />
+                </div>
+                <div className="flex-1">
+                    <WaveSkeleton variant="text" width="100%" height={70} className='rounded' />
+                </div>
+            </Box>
+            {showAdditionalField && (
+                <>
+                    <WaveSkeleton variant="text" width="100%" height={70} className='rounded' />
+                </>
+            )}
+            <WaveSkeleton variant="text" width={90} height={40} className='rounded' />
+        </Box>
+    );
+};
+
+export const LoadingCartDropdown = () => {
+    return (
+        <>
+            <div className="space-y-4">
+                {[...Array(2)].map((_, index) => (
+                    <div key={index} className="flex justify-between items-center">
+                        <WaveSkeleton variant="rectangular" width={48} height={48} />
+                        <div className="ml-2 flex-grow space-y-1">
+                            <WaveSkeleton variant="text" width="80%" height={20} />
+                            <WaveSkeleton variant="text" width="50%" height={16} />
+                        </div>
+                        <WaveSkeleton variant="circular" width={24} height={24} />
+                    </div>
+                ))}
+                <WaveSkeleton variant="text" width="40%" height={24} className="mt-4" />
+                <WaveSkeleton variant="rectangular" width="100%" height={40} />
+            </div>
+        </>
+    );
+};
+
+export const LoadingOverlay = () => (
+    <div className="fixed inset-0 z-[1000] flex items-center justify-center bg-black bg-opacity-50">
+        <CircularProgress size={60} style={{ color: '#FFFFFF' }} />
+    </div>
+);
+
+const LoadingSplide = ({ count }) => (
+    <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+        {[...Array(count)].map((_, index) => (
+            <WaveSkeleton key={index} variant="rectangular" width="100%" height={60} className="rounded-md" />
+        ))}
+    </div>
+);
+
+// Loading skeletons end
+
+export const CollapsibleListItem = ({ open, handleClick, icon, primary, children }) => (
+    <>
+        <ListItemButton onClick={handleClick}>
+            <ListItemIcon>{icon}</ListItemIcon>
+            <ListItemText primary={primary} />
+            {open ? <ExpandLess /> : <ExpandMore />}
+        </ListItemButton>
+        <Collapse in={open} timeout="auto" unmountOnExit>
+            <List component="div" disablePadding>
+                {children}
+            </List>
+        </Collapse>
+    </>
+);
+
+export const ActiveListItem = ({ icon, primary, handleClick, selected, sx }) => (
+    <ActiveListItemButton onClick={handleClick} selected={selected} sx={sx}>
+        <ListItemIcon>{icon}</ListItemIcon>
+        <ListItemText primary={primary} />
+    </ActiveListItemButton>
+);
+
+export const CartButton = ({ isOutOfStock }) => {
+    return (
+        <>
+            <BrownShoppingCartIcon style={{ color: isOutOfStock ? '#A6A6A6' : '' }} />
+            <span className="hidden sm:inline ml-3" style={{ color: isOutOfStock ? '#A6A6A6' : '' }}>Add To Cart</span>
+        </>
+    );
+};
+
+export const DetailsCartButton = ({ isOutOfStock }) => {
+    return (
+        <>
+            <BrownShoppingCartIcon style={{ color: isOutOfStock ? '#A6A6A6' : '' }} />
+            <span className="ml-3" style={{ color: isOutOfStock ? '#A6A6A6' : '' }}>Add To Cart</span>
+        </>
+    );
+};
+
+export const CartWishlistButtons = ({ handleAction, isCartLoading, isWishlistLoading, inventoryCount }) => {
+    const isOutOfStock = inventoryCount === 0;
+
+    return (
+        <>
+            <AddToCartButton
+                onClick={!isOutOfStock ? handleAction('cart') : null}
+                disabled={isCartLoading || isWishlistLoading || isOutOfStock}
+                className={`${isOutOfStock ? 'cursor-not-allowed' : 'cursor-pointer'}`}
+            >
+                <CartButton isOutOfStock={isOutOfStock} />
+            </AddToCartButton>
+            <WishlistButton
+                onClick={handleAction('wishlist')}
+                disabled={isCartLoading || isWishlistLoading}
+                className="cursor-pointer"
+            >
+                <FavoriteBorderOutlined />
+            </WishlistButton>
+        </>
+    );
+};
+
+export const CartDeleteButtons = ({ handleAddToCart, handleRemove, isActionLoading, inventoryCount }) => {
+    const isOutOfStock = inventoryCount === 0;
+
+    return (
+        <>
+            <AddToCartButton
+                onClick={handleAddToCart}
+                disabled={isActionLoading || inventoryCount === 0}
+            >
+                <CartButton isOutOfStock={isOutOfStock} />
+            </AddToCartButton>
+            <WishlistButton
+                onClick={handleRemove}
+                disabled={isActionLoading}
+            >
+                <DeleteButton />
+            </WishlistButton>
+        </>
+    )
+}
+
+export const DetailsCartWishlistButtons = ({ handleAction, isCartLoading, isWishlistLoading, inventoryCount }) => {
+    const isOutOfStock = inventoryCount === 0;
+
+    return (
+        <>
+            <DetailsAddToCartButton
+                onClick={handleAction('cart')}
+                disabled={isCartLoading || isWishlistLoading || inventoryCount === 0}
+            >
+                <DetailsCartButton isOutOfStock={isOutOfStock} />
+            </DetailsAddToCartButton>
+            <DetailsWishlistButton
+                onClick={handleAction('wishlist')}
+                disabled={isCartLoading || isWishlistLoading}
+            >
+                <FavoriteBorderOutlined />
+            </DetailsWishlistButton>
+        </>
+    );
+};
+
+export const OutOfStock = ({ inventoryCount }) => {
+    if (inventoryCount === 0) {
+        return (
+            <div className="absolute inset-0 bg-white opacity-75 flex items-center justify-center rounded pointer-events-none">
+                <span className="text-black bg-gray-100 rounded-md px-1 font-semibold">Out of Stock</span>
+            </div>
+        );
+    }
+
+    return null;
+};
+
+export const DiscountPercentage = ({ discountPercentage }) => {
+    if (discountPercentage > 0) {
+        return (
+            <span className="absolute top-0 right-0 bg-stone-500 text-white px-2 py-1 rounded text-xs">
+                -{discountPercentage}%
+            </span>
+        )
+    }
+
+    return null;
+}
+
+export const RatingStars = ({ rating }) => {
+    const stars = Array(5).fill(false).map((_, index) => index < rating);
+    return (
+        <Box display="flex">
+            {stars.map((filled, index) =>
+                filled ? <Star key={index} color="primary" /> : <StarBorder key={index} />
+            )}
+        </Box>
+    );
+};
+
+export function HomeBreadCrumb(props) {
+    return (
+        <SvgIcon {...props} style={{ fontSize: 17, marginBottom: 0.7 }}>
+            <path d="M10 20v-6h4v6h5v-8h3L12 3 2 12h3v8z" />
+        </SvgIcon>
+    );
+}
+
+export const HomeIcon = () => {
+    const navigate = useNavigate();
+
+    const handleHomeClick = () => {
+        navigate('/');
+    };
+
+    return (
+        <div onClick={handleHomeClick}>
+            <RoundIconButton>
+                <StyledHomeIcon />
+            </RoundIconButton>
+        </div>
+    );
+};
+
+export const CustomToolbar = () => {
+    return (
+        <>
+            <div className="flex justify-end px-4">
+                <GridToolbar />
+            </div>
+            <hr className="border-t border-gray-200 my-2" />
+        </>
+    );
+};
+
+export function CustomNoRowsOverlay() {
+    return (
+        <StyledGridOverlay>
+            <svg
+                xmlns="http://www.w3.org/2000/svg"
+                fill="none"
+                width={96}
+                viewBox="0 0 452 257"
+                aria-hidden
+                focusable="false"
+            >
+                <path
+                    className="no-rows-primary"
+                    d="M348 69c-46.392 0-84 37.608-84 84s37.608 84 84 84 84-37.608 84-84-37.608-84-84-84Zm-104 84c0-57.438 46.562-104 104-104s104 46.562 104 104-46.562 104-104 104-104-46.562-104-104Z"
+                />
+                <path
+                    className="no-rows-primary"
+                    d="M308.929 113.929c3.905-3.905 10.237-3.905 14.142 0l63.64 63.64c3.905 3.905 3.905 10.236 0 14.142-3.906 3.905-10.237 3.905-14.142 0l-63.64-63.64c-3.905-3.905-3.905-10.237 0-14.142Z"
+                />
+                <path
+                    className="no-rows-primary"
+                    d="M308.929 191.711c-3.905-3.906-3.905-10.237 0-14.142l63.64-63.64c3.905-3.905 10.236-3.905 14.142 0 3.905 3.905 3.905 10.237 0 14.142l-63.64 63.64c-3.905 3.905-10.237 3.905-14.142 0Z"
+                />
+                <path
+                    className="no-rows-secondary"
+                    d="M0 10C0 4.477 4.477 0 10 0h380c5.523 0 10 4.477 10 10s-4.477 10-10 10H10C4.477 20 0 15.523 0 10ZM0 59c0-5.523 4.477-10 10-10h231c5.523 0 10 4.477 10 10s-4.477 10-10 10H10C4.477 69 0 64.523 0 59ZM0 106c0-5.523 4.477-10 10-10h203c5.523 0 10 4.477 10 10s-4.477 10-10 10H10c-5.523 0-10-4.477-10-10ZM0 153c0-5.523 4.477-10 10-10h195.5c5.523 0 10 4.477 10 10s-4.477 10-10 10H10c-5.523 0-10-4.477-10-10ZM0 200c0-5.523 4.477-10 10-10h203c5.523 0 10 4.477 10 10s-4.477 10-10 10H10c-5.523 0-10-4.477-10-10ZM0 247c0-5.523 4.477-10 10-10h231c5.523 0 10 4.477 10 10s-4.477 10-10 10H10c-5.523 0-10-4.477-10-10Z"
+                />
+            </svg>
+            <Box className='mt-4 font-bold text-stone-500'>No rows found</Box>
+        </StyledGridOverlay>
+    );
+}
 
 export const BounceAnimation = forwardRef(({ children }, ref) => (
     <motion.div
@@ -816,10 +1325,6 @@ export const DetailsBreadcrumbs = ({ product }) => {
     );
 };
 
-const BreadcrumbSeparator = () => (
-    <span className="mx-2 text-gray-400 select-none">/</span>
-);
-
 const BreadcrumbLink = ({ onClick, children }) => (
     <button
         onClick={onClick}
@@ -827,6 +1332,10 @@ const BreadcrumbLink = ({ onClick, children }) => (
     >
         {children}
     </button>
+);
+
+const BreadcrumbSeparator = () => (
+    <span className="mx-2 text-gray-400 select-none">/</span>
 );
 
 const BreadcrumbText = ({ children }) => (
@@ -877,73 +1386,6 @@ export const Breadcrumb = ({ type, data }) => {
 
     return <nav className="flex items-center space-x-1 mt-6 md:mt-0">{crumbs}</nav>;
 };
-
-export const LoadingProductDetails = () => {
-    return (
-        <>
-            <div className='container mx-auto px-4 max-w-5xl relative top-6 right-4'>
-                <Breadcrumbs aria-label="breadcrumb" sx={{ mb: 4, fontSize: '14px' }}>
-                    <Link component={RouterLink} to="/" color="inherit" underline="none">
-                        <HomeBreadCrumb className="text-stone-500 hover:text-stone-700" />
-                    </Link>
-                    <WaveSkeleton width={200} />
-                </Breadcrumbs>
-            </div>
-            <div className="container mx-auto px-4 py-4 mb-8 bg-white mt-8 rounded-md max-w-5xl">
-                <div className="flex flex-col md:flex-row gap-8">
-                    <div className="flex flex-col items-center md:w-1/2">
-                        <WaveSkeleton variant="rectangular" width="100%" height={320} />
-                    </div>
-                    <div className="md:w-1/2">
-                        <WaveSkeleton variant="text" width="80%" height={40} />
-                        <WaveSkeleton variant="text" width="40%" height={30} />
-                        <WaveSkeleton variant="text" width="60%" height={30} />
-                        <WaveSkeleton variant="text" width="50%" height={30} />
-                        <div className='mt-4' />
-                        <WaveSkeleton variant="text" width="50%" height={30} />
-                        <div className='mt-24' />
-                        <div className="mt-4 flex items-center space-x-4">
-                            <WaveSkeleton variant="rectangular" width={314} height={40} className='rounded-md' />
-                            <WaveSkeleton variant="rectangular" width={150} height={40} className='rounded-md' />
-                        </div>
-                    </div>
-                </div>
-            </div>
-
-            <div className="container mx-auto px-4 py-4 mb-8 bg-white mt-8 rounded-md max-w-5xl">
-                <div className="mt-8">
-                    <Tabs
-                        value={0}
-                        aria-label="product details tabs"
-                        sx={{ width: '100%', display: 'flex', justifyContent: 'space-between', mb: 2 }}
-                    >
-                        <WaveSkeleton variant="rectangular" width="100%" height={40} style={{ margin: '0 4px', flexGrow: 1, borderRadius: '6px' }} />
-                        <WaveSkeleton variant="rectangular" width="100%" height={40} style={{ margin: '0 4px', flexGrow: 1, borderRadius: '6px' }} />
-                        <WaveSkeleton variant="rectangular" width="100%" height={40} style={{ margin: '0 4px', flexGrow: 1, borderRadius: '6px' }} />
-                    </Tabs>
-
-                    <Box p={1}>
-                        <WaveSkeleton variant="text" width="80%" height={30} />
-                        <WaveSkeleton variant="text" width="60%" height={30} className='mt-4' />
-                        <WaveSkeleton variant="text" width="40%" height={30} className='mt-4' />
-                    </Box>
-                </div>
-            </div>
-            <Footer />
-        </>
-    );
-};
-
-export const LoadingSlideshow = () => (
-    <Box sx={{ position: 'relative' }} className="relative w-full mx-auto mb-14">
-        <WaveSkeleton variant="rectangular" width="100%" height="800px" sx={{ maxWidth: '2000px', borderRadius: '8px' }} />
-
-        <WaveSkeleton variant="circular" width={50} height={50} sx={{ ...slideShowSkeletonStyling, left: '20px' }}
-        />
-
-        <WaveSkeleton variant="circular" width={50} height={50} sx={{ ...slideShowSkeletonStyling, right: '20px', left: 'auto' }} />
-    </Box>
-);
 
 export const GoBackHome = () => {
     return (
@@ -1156,7 +1598,6 @@ export const CustomPagination = ({ count, page, onChange, size = 'large', sx = {
     );
 };
 
-
 export const FAQItem = ({ question, answer }) => {
     const [isOpen, setIsOpen] = useState(false);
 
@@ -1189,17 +1630,6 @@ export const FAQItem = ({ question, answer }) => {
     );
 };
 
-export const LoadingFaq = () => (
-    <>
-        {Array(3).fill().map((_, index) => (
-            <div key={index} className="mb-4">
-                <WaveSkeleton variant="rectangular" height={60} className="rounded-md mb-2" />
-                <WaveSkeleton variant="rectangular" height={50} className="rounded-md mb-2" />
-            </div>
-        ))}
-    </>
-);
-
 export const GoBackArrow = () => {
     return (
         <div className="flex justify-start">
@@ -1226,367 +1656,6 @@ export const GoBackButton = () => {
         </div>
     )
 }
-
-export const CheckoutButton = styled(Button)({
-    backgroundColor: '#686159',
-    color: 'white',
-    fontSize: '1.02rem',
-    padding: '4px 20px',
-    '&:hover': {
-        backgroundColor: '#5B504B',
-    },
-});
-
-export const LoadingProfile = () => (
-    <>
-        <WaveSkeleton variant="text" width={250} height={40} />
-        <WaveSkeleton variant="text" width={265} height={30} />
-    </>
-);
-
-export const LoadingReturn = () => (
-    <Box sx={{ p: 1, width: '100%', display: 'flex', flexDirection: 'column', gap: 2 }} >
-        <WaveSkeleton variant="rectangular" width={400} height={56} className='rounded' />
-
-        <WaveSkeleton variant="rectangular" width={400} height={56} className='rounded' />
-
-        <Box sx={{ display: 'flex', alignItems: 'center' }} >
-            <WaveSkeleton variant="rectangular" width={24} height={24} className='rounded' />
-            <WaveSkeleton variant="text" width="60%" height={24} sx={{ ml: 1 }} className='rounded' />
-        </Box>
-
-        <WaveSkeleton variant="rectangular" width="100%" height={40} className='rounded' />
-    </Box>
-);
-
-export const LoadingCart = () => {
-    return (
-        <>
-            <Navbar />
-            <div className="container mx-auto px-4 lg:px-24 py-2 mb-16 bg-gray-50 mt-10">
-                {/* Mobile-only header */}
-                <div className="bg-white p-4 rounded-md shadow-sm mb-3 flex justify-between items-center px-2 md:hidden mt-[72px]">
-                    <h1 className="text-2xl font-semilight ml-2">Cart</h1>
-                    <WaveSkeleton variant="circular" width={32} height={32} />
-                </div>
-
-                {/* Desktop-only header */}
-                <div className="hidden md:block mb-4">
-                    <h1 className="text-2xl font-semilight mb-2 hidden md:block">Cart</h1>
-                </div>
-
-                <div className="flex flex-col lg:flex-row gap-6">
-                    <div className="flex-1">
-                        {/* Desktop Table View */}
-                        <div className="hidden lg:block">
-                            <TableContainer className="bg-white rounded-lg">
-                                <Table>
-                                    <TableHead>
-                                        <TableRow>
-                                            <TableCell><WaveSkeleton variant="text" width={100} height={20} /></TableCell>
-                                            <TableCell align="center"><WaveSkeleton variant="text" width={80} height={20} /></TableCell>
-                                            <TableCell align="center"><WaveSkeleton variant="text" width={80} height={20} /></TableCell>
-                                            <TableCell align="center"><WaveSkeleton variant="text" width={80} height={20} /></TableCell>
-                                            <TableCell align="center"><WaveSkeleton variant="circular" width={32} height={32} /></TableCell>
-                                        </TableRow>
-                                    </TableHead>
-                                    <TableBody>
-                                        {Array.from(new Array(3)).map((_, index) => (
-                                            <TableRow key={index}>
-                                                <TableCell>
-                                                    <div className="flex items-center">
-                                                        <WaveSkeleton variant="rectangular" width={80} height={80} className="mr-4 rounded" />
-                                                        <WaveSkeleton variant="text" width={120} height={20} />
-                                                    </div>
-                                                </TableCell>
-                                                <TableCell align="center">
-                                                    <WaveSkeleton variant="text" width={60} height={20} />
-                                                    <WaveSkeleton variant="text" width={80} height={16} />
-                                                </TableCell>
-                                                <TableCell align="center">
-                                                    <div className="flex justify-center items-center">
-                                                        <WaveSkeleton variant="rectangular" width={100} height={36} />
-                                                    </div>
-                                                </TableCell>
-                                                <TableCell align="center">
-                                                    <WaveSkeleton variant="text" width={60} height={20} />
-                                                </TableCell>
-                                                <TableCell align="center">
-                                                    <WaveSkeleton variant="circular" width={32} height={32} />
-                                                </TableCell>
-                                            </TableRow>
-                                        ))}
-                                    </TableBody>
-                                </Table>
-                            </TableContainer>
-                        </div>
-
-                        {/* Mobile Card View */}
-                        <div className="lg:hidden space-y-4">
-                            {Array.from(new Array(3)).map((_, index) => (
-                                <div key={index} className="bg-white rounded-lg p-4">
-                                    <div className="flex gap-4">
-                                        <WaveSkeleton variant="rectangular" width={96} height={96} className="rounded" />
-                                        <div className="flex-1">
-                                            <div className="flex justify-between items-start">
-                                                <WaveSkeleton variant="text" width="60%" height={24} />
-                                                <WaveSkeleton variant="circular" width={32} height={32} />
-                                            </div>
-                                            <div className="mb-3">
-                                                <WaveSkeleton variant="text" width={80} height={24} />
-                                                <WaveSkeleton variant="text" width={120} height={20} />
-                                            </div>
-                                            <div className="flex items-center justify-between">
-                                                <WaveSkeleton variant="rectangular" width={120} height={36} className="rounded" />
-                                                <WaveSkeleton variant="text" width={80} height={24} />
-                                            </div>
-                                        </div>
-                                    </div>
-                                </div>
-                            ))}
-                        </div>
-                    </div>
-
-                    {/* Cart Summary Section */}
-                    <div className="lg:w-80 w-full">
-                        <div className="bg-white p-4">
-                            <WaveSkeleton variant="text" width={140} height={32} className="mb-4" />
-                            <div className="space-y-3">
-                                <div className="flex justify-between py-2 border-b">
-                                    <WaveSkeleton variant="text" width={80} height={24} />
-                                    <WaveSkeleton variant="text" width={60} height={24} />
-                                </div>
-                                <div className="flex justify-between py-2 border-b">
-                                    <WaveSkeleton variant="text" width={80} height={24} />
-                                    <WaveSkeleton variant="text" width={60} height={24} />
-                                </div>
-                                <div className="flex justify-between py-2 border-b">
-                                    <WaveSkeleton variant="text" width={100} height={24} />
-                                    <WaveSkeleton variant="text" width={60} height={24} />
-                                </div>
-                                <div className="flex justify-between py-2">
-                                    <WaveSkeleton variant="text" width={80} height={24} />
-                                    <WaveSkeleton variant="text" width={60} height={24} />
-                                </div>
-                            </div>
-                            <div className="mt-4">
-                                <WaveSkeleton variant="rectangular" height={48} className="rounded" />
-                            </div>
-                        </div>
-                    </div>
-                </div>
-            </div>
-            <Footer />
-        </>
-    );
-};
-
-export const LoadingProductItem = ({ count = 15 }) => {
-    return (
-        <>
-            {Array.from({ length: count }).map((_, index) => (
-                <div key={index} className="bg-white rounded-md shadow-md p-4 flex flex-col">
-                    <div className="relative mb-2">
-                        <WaveSkeleton variant="rectangular" width="100%" height={192} />
-                    </div>
-                    <WaveSkeleton variant="text" width="80%" height={24} className="mt-2" />
-                    <div className="flex flex-col mb-2">
-                        <WaveSkeleton variant="text" width="60%" height={28} className="mt-1" />
-                    </div>
-                    <div className="flex justify-between items-center mt-auto">
-                        <WaveSkeleton variant="rectangular" width={170} height={40} className='rounded' />
-                        <WaveSkeleton variant="rectangular" width={60} height={40} className='rounded' />
-                    </div>
-                </div>
-            ))}
-        </>
-    );
-};
-
-export const LoadingReviewItem = () => (
-    <>
-        {Array.from({ length: 3 }).map((_, index) => (
-            <div key={index} className="relative p-4 mb-4 bg-white rounded-md shadow-sm">
-                <div className="absolute top-4 right-4">
-                    <WaveSkeleton variant="circular" width={24} height={24} />
-                </div>
-
-                <div className="flex flex-grow">
-                    <div className="flex-shrink-0 mr-4">
-                        <WaveSkeleton variant="rectangular" width={80} height={80} className="rounded-md" />
-                    </div>
-
-                    <div className="flex-grow">
-                        <div className="flex items-center mb-2">
-                            <WaveSkeleton variant="text" width={200} height={28} className="mr-2" />
-                            <WaveSkeleton variant="text" width={100} height={28} />
-                        </div>
-
-                        <div className="mb-1">
-                            <WaveSkeleton variant="text" width={180} height={24} />
-                        </div>
-                        <WaveSkeleton variant="text" width={150} height={20} className="mt-1" />
-                        <WaveSkeleton variant="text" width={50} height={20} className="mt-1" />
-                    </div>
-                </div>
-            </div>
-        ))}
-    </>
-);
-
-export const LoadingOrderItem = () => {
-    return (
-        <>
-            <Box className="grid grid-cols-1 gap-4 rounded-md">
-                {Array.from({ length: 3 }).map((_, index) => (
-                    <Box key={index} className="bg-white shadow-md rounded-lg p-6 relative">
-                        <Box className="flex justify-between items-center mb-4">
-                            <WaveSkeleton variant="text" width="40%" />
-                            <Box>
-                                <WaveSkeleton variant="text" width={100} />
-                            </Box>
-                        </Box>
-                        <div className="flex space-x-3 mt-4 mb-2">
-                            <WaveSkeleton variant="rectangular" height={50} width={50} className='rounded' />
-                            <WaveSkeleton variant="rectangular" height={50} width={50} className='rounded' />
-                            <WaveSkeleton variant="rectangular" height={50} width={50} className='rounded' />
-                        </div>
-                    </Box>
-                ))}
-            </Box>
-        </>
-    );
-};
-
-export const LoadingOrderDetails = ({ isOrder = true }) => {
-    return (
-        <Box>
-            {/* Progress Card WaveSkeleton */}
-            <Box className="bg-white shadow-md rounded-lg p-6 mb-4">
-                <div className='flex flex-col items-center'>
-                    <WaveSkeleton variant="text" width="60%" height={30} />
-                    <WaveSkeleton variant="text" width="40%" height={20} />
-                </div>
-                <div className='flex flex-col items-center'>
-                    <WaveSkeleton variant="text" width="50%" height={40} />
-                </div>
-                <Box className="flex justify-center gap-20">
-                    <WaveSkeleton variant="text" width="10%" height={20} />
-                    <WaveSkeleton variant="text" width="10%" height={20} />
-                    <WaveSkeleton variant="text" width="10%" height={20} />
-                </Box>
-            </Box>
-
-            {/* Products Table WaveSkeleton */}
-            <Box className="bg-white shadow-md rounded-lg p-6 mb-4">
-                <TableContainer>
-                    <Table>
-                        <TableHead>
-                            <TableRow>
-                                <TableCell>
-                                    <WaveSkeleton variant="text" width="40%" height={30} />
-                                </TableCell>
-                                <TableCell>
-                                    <WaveSkeleton variant="text" width="100%" height={30} />
-                                </TableCell>
-                            </TableRow>
-                        </TableHead>
-                        <TableBody>
-                            {Array.from({ length: 3 }).map((_, index) => (
-                                <TableRow key={index}>
-                                    <TableCell component="th" scope="row" className="font-bold">
-                                        <Box display="flex" alignItems="center">
-                                            <WaveSkeleton variant="rectangular" width={80} height={80} />
-                                            <Box ml={2}>
-                                                <WaveSkeleton variant="text" width={150} height={20} />
-                                            </Box>
-                                        </Box>
-                                    </TableCell>
-                                    <TableCell align="right">
-                                        <WaveSkeleton variant="text" width="50%" height={30} />
-                                    </TableCell>
-                                </TableRow>
-                            ))}
-                        </TableBody>
-                    </Table>
-                </TableContainer>
-            </Box>
-
-            {isOrder && (
-                <>
-                    {/* Total Amount Card WaveSkeleton */}
-                    <Box className="bg-white shadow-md rounded-lg p-6 mb-4">
-                        <TableContainer>
-                            <Table>
-                                <TableHead>
-                                    <TableRow>
-                                        <TableCell>
-                                            <WaveSkeleton variant="text" width="20%" height={30} />
-                                        </TableCell>
-                                        <TableCell>
-                                            <WaveSkeleton variant="text" width="100%" height={30} />
-                                        </TableCell>
-                                    </TableRow>
-                                </TableHead>
-                                <TableBody>
-                                    {Array.from({ length: 3 }).map((_, index) => (
-                                        <TableRow key={index}>
-                                            <TableCell component="th" scope="row" className="font-bold">
-                                                <Box display="flex" alignItems="center">
-                                                    <WaveSkeleton variant="text" width={100} height={20} />
-                                                </Box>
-                                            </TableCell>
-                                            <TableCell align="right">
-                                                <WaveSkeleton variant="text" width="50%" height={30} />
-                                            </TableCell>
-                                        </TableRow>
-                                    ))}
-                                </TableBody>
-                            </Table>
-                        </TableContainer>
-                    </Box>
-
-                    {/* Address and Payment Method Table WaveSkeleton */}
-                    <Box className="bg-white shadow-md rounded-lg p-6 mb-4">
-                        <TableContainer>
-                            <Table>
-                                <TableBody>
-                                    {Array.from({ length: 6 }).map((_, index) => (
-                                        <TableRow key={index}>
-                                            <TableCell component="th" scope="row" className="font-bold">
-                                                <WaveSkeleton variant="text" width="100%" height={30} />
-                                            </TableCell>
-                                        </TableRow>
-                                    ))}
-                                </TableBody>
-                            </Table>
-                        </TableContainer>
-                    </Box>
-                </>
-            )}
-        </Box >
-    );
-};
-
-export const LoadingCategoryDropdown = () => (
-    <div className="static bottom-4 bg-white rounded-md p-2 w-[1200px]">
-        <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
-            {Array.from({ length: 6 }).map((_, index) => (
-                <div key={index} className="flex items-start">
-                    <WaveSkeleton variant="rectangular" width={48} height={48} className="mr-2 rounded-md" />
-                    <div>
-                        <WaveSkeleton variant="text" width={100} height={24} className="mb-2 rounded" />
-                        <div className="flex flex-wrap">
-                            {Array.from({ length: 2 }).map((_, subIndex) => (
-                                <WaveSkeleton key={subIndex} variant="text" width={80} height={20} className={`mb-1 ${subIndex === 1 ? 'ml-1' : ''} rounded`} />
-                            ))}
-                        </div>
-                    </div>
-                </div>
-            ))}
-        </div>
-    </div>
-);
 
 export const CategoryDropdown = ({ category, subcategories, subsubcategories, navigate, dropdownStyle, loading }) => (
     <div style={dropdownStyle()} className="fixed bg-white shadow-xl rounded-md p-4 z-50">
@@ -1629,38 +1698,6 @@ export const CategoryDropdown = ({ category, subcategories, subsubcategories, na
         )}
     </div>
 );
-
-export const LoadingInformation = ({ showAdditionalField }) => {
-    return (
-        <Box className='space-y-0'>
-            <Box sx={{ display: 'flex', flexDirection: { xs: 'column', md: 'row' }, gap: { xs: 3, md: 2 } }}>
-                <div className="flex-1">
-                    <WaveSkeleton variant="text" width="100%" height={70} />
-                </div>
-                <div className="flex-1">
-                    <WaveSkeleton variant="text" width="100%" height={70} />
-                </div>
-                <div className="flex-1">
-                    <WaveSkeleton variant="text" width="100%" height={70} />
-                </div>
-            </Box>
-            <Box sx={{ display: 'flex', flexDirection: { xs: 'column', md: 'row' }, gap: { xs: 3, md: 2 } }}>
-                <div className="flex-1">
-                    <WaveSkeleton variant="text" width="100%" height={70} className='rounded' />
-                </div>
-                <div className="flex-1">
-                    <WaveSkeleton variant="text" width="100%" height={70} className='rounded' />
-                </div>
-            </Box>
-            {showAdditionalField && (
-                <>
-                    <WaveSkeleton variant="text" width="100%" height={70} className='rounded' />
-                </>
-            )}
-            <WaveSkeleton variant="text" width={90} height={40} className='rounded' />
-        </Box>
-    );
-};
 
 export const EmptyState = ({
     imageSrc,
@@ -2057,27 +2094,6 @@ export const ProfileDropdown = ({ isOpen, isAdmin, handleLogout }) => {
     );
 };
 
-export const LoadingCartDropdown = () => {
-    return (
-        <>
-            <div className="space-y-4">
-                {[...Array(2)].map((_, index) => (
-                    <div key={index} className="flex justify-between items-center">
-                        <WaveSkeleton variant="rectangular" width={48} height={48} />
-                        <div className="ml-2 flex-grow space-y-1">
-                            <WaveSkeleton variant="text" width="80%" height={20} />
-                            <WaveSkeleton variant="text" width="50%" height={16} />
-                        </div>
-                        <WaveSkeleton variant="circular" width={24} height={24} />
-                    </div>
-                ))}
-                <WaveSkeleton variant="text" width="40%" height={24} className="mt-4" />
-                <WaveSkeleton variant="rectangular" width="100%" height={40} />
-            </div>
-        </>
-    );
-};
-
 export const CartDropdown = ({
     isOpen,
     cartItems,
@@ -2159,12 +2175,6 @@ export const LoginButton = () => {
         </>
     )
 }
-
-export const LoadingOverlay = () => (
-    <div className="fixed inset-0 z-[1000] flex items-center justify-center bg-black bg-opacity-50">
-        <CircularProgress size={60} style={{ color: '#373533' }} />
-    </div>
-);
 
 export const NavbarLogo = ({ dashboardStyling }) => {
     const navigate = useNavigate();
@@ -2375,14 +2385,6 @@ export const useScrollAwayMenu = () => {
         }
     };
 };
-
-const LoadingSplide = ({ count }) => (
-    <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-        {[...Array(count)].map((_, index) => (
-            <WaveSkeleton key={index} variant="rectangular" width="100%" height={60} className="rounded-md" />
-        ))}
-    </div>
-);
 
 const SplideSlides = ({ items, onCardClick, showImage, splideRef }) => (
     <Splide

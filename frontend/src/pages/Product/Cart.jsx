@@ -53,12 +53,25 @@ const Cart = () => {
         if (user) {
             fetchCart();
         }
+
+        const handleCartUpdate = () => {
+            if (user) {
+                fetchCart();
+            }
+        };
+
+        window.addEventListener('cartUpdate', handleCartUpdate);
+
+        return () => {
+            window.removeEventListener('cartUpdate', handleCartUpdate);
+        };
     }, [user]);
 
     const updateQuantity = async (productId, quantityChange) => {
         try {
             const { data } = await axiosInstance.put(`/cart/quantity/update`, { productId, quantityChange });
             setCart(data);
+            document.dispatchEvent(new CustomEvent('cartUpdated', { detail: data }));
         } catch (error) {
             console.error('Failed to update quantity:', error?.response?.data?.message || error.message);
         }
@@ -73,15 +86,18 @@ const Cart = () => {
 
             if (data && Array.isArray(data.items)) {
                 setCart(data);
+                document.dispatchEvent(new CustomEvent('cartUpdated', { detail: data }));
             } else {
                 const response = await axiosInstance.get('/cart');
                 setCart(response.data);
+                document.dispatchEvent(new CustomEvent('cartUpdated', { detail: response.data }));
             }
         } catch (error) {
             console.error('Failed to remove product from cart:', error?.response?.data?.message || error.message);
             try {
                 const { data } = await axiosInstance.get('/cart');
                 setCart(data);
+                document.dispatchEvent(new CustomEvent('cartUpdated', { detail: data }));
             } catch (fetchError) {
                 console.error('Failed to fetch updated cart:', fetchError);
             }
@@ -95,6 +111,7 @@ const Cart = () => {
         try {
             const { data } = await axiosInstance.delete('/cart/clear');
             setCart(data);
+            document.dispatchEvent(new CustomEvent('cartUpdated', { detail: data }));
         } catch (error) {
             console.error('Failed to clear cart:', error?.response?.data?.message || error.message);
         } finally {

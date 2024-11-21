@@ -1,7 +1,7 @@
 const mongoose = require('mongoose');
 
 // Enum for predefined reasons
-const returnReasons = [
+const reasons = [
     'Damaged Item',
     'Wrong Item Delivered',
     'Item Not as Described',
@@ -20,8 +20,8 @@ const returnRequestSchema = new mongoose.Schema({
     order: { type: String, required: true },
     products: [{ type: mongoose.Schema.Types.ObjectId, ref: 'Product', required: true }],
     user: { type: mongoose.Schema.Types.ObjectId, ref: 'User', required: true },
-    reason: { type: String, enum: returnReasons, required: true },
-    customReason: { type: String, required: function () { return this.reason === 'Other'; }, minlength: 5, maxlength: 20 },
+    reason: { type: String, enum: reasons, required: true },
+    customReason: { type: String, required: function () { return this.reason === 'Other'; } },
     status: { type: String, enum: ['pending', 'approved', 'processed', 'rejected'], default: 'pending' },
     createdAt: { type: Date, default: Date.now }
 });

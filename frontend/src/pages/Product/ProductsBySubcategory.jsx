@@ -128,7 +128,7 @@ const ProductsBySubcategory = () => {
                                 count={pageCount}
                                 page={currentPage}
                                 onChange={handlePageChange(setCurrentPage)}
-                                sx={{ position: 'relative', bottom: '-2px'}}
+                                sx={{ position: 'relative', bottom: '-2px' }}
                             />
                         )}
                     </div>

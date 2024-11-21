@@ -4,7 +4,7 @@ import { Box, Button, IconButton, InputAdornment, TextField } from '@mui/materia
 import React, { useContext, useEffect, useMemo, useState } from 'react';
 import { toast } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
-import { BrownOutlinedTextField, Header, LoadingInformation, knownEmailProviders, ProfileLayout } from '../../assets/CustomComponents';
+import { BrownButton, BrownOutlinedTextField, Header, knownEmailProviders, LoadingInformation, ProfileLayout } from '../../assets/CustomComponents';
 import useAxios from '../../axiosInstance';
 import Navbar from '../../components/Navbar/Navbar';
 import Footer from '../../components/Utils/Footer';
@@ -193,7 +193,7 @@ const ProfileInformation = () => {
                                     {focusedField === 'firstName' && !firstNameValid && (
                                         <div className="absolute left-0 bottom-[-78px] bg-white text-red-500 text-sm p-2 rounded-lg shadow-md w-full z-10">
                                             <span className="block text-xs font-semibold mb-1">Invalid First Name</span>
-                                            Must start with a capital letter, 2-10 characters.
+                                            Must start with a capital letter and be 2 to 10 characters long.
                                             <div className="absolute top-[-5px] left-[20px] w-0 h-0 border-l-[5px] border-r-[5px] border-b-[5px] border-transparent border-b-white"></div>
                                         </div>
                                     )}
@@ -215,7 +215,7 @@ const ProfileInformation = () => {
                                     {focusedField === 'lastName' && !lastNameValid && (
                                         <div className="absolute left-0 bottom-[-78px] bg-white text-red-500 text-sm p-2 rounded-lg shadow-md w-full z-10">
                                             <span className="block text-xs font-semibold mb-1">Invalid Last Name</span>
-                                            Must start with a capital letter, 2-10 characters.
+                                            Must start with a capital letter and be 2 to 10 characters long.
                                             <div className="absolute top-[-5px] left-[20px] w-0 h-0 border-l-[5px] border-r-[5px] border-b-[5px] border-transparent border-b-white"></div>
                                         </div>
                                     )}
@@ -323,14 +323,14 @@ const ProfileInformation = () => {
                                 </div>
                             </Box>
 
-                            <Button
+                            <BrownButton
                                 type="submit"
                                 variant="contained"
                                 color="primary"
                                 disabled={isFormUnchanged || !isFormValid}
                             >
                                 Update
-                            </Button>
+                            </BrownButton>
                         </form>
                     )}
                 </Box>

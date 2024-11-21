@@ -1,21 +1,19 @@
 const bcrypt = require('bcryptjs');
 const User = require('../models/User');
+const Role = require('../models/Role');
 
 const createUser = async (req, res) => {
+    const { firstName, lastName, email, password, role } = req.body;
+    const hashedPassword = await bcrypt.hash(password, 10);
+    const validRole = role ? await Role.findById(role) : await Role.findOne({ name: 'user' });
+
     try {
-        const { firstName, lastName, email, password, role } = req.body;
-
-        const existingEmail = await User.findOne({ email });
-        if (existingEmail) return res.status(400).json({ message: 'Email already exists' });
-
-        const hashedPassword = await bcrypt.hash(password, 10);
-
         const newUser = new User({
             firstName,
             lastName,
             email,
             password: hashedPassword,
-            role
+            role: validRole._id,
         });
 
         await newUser.save();
@@ -35,12 +33,9 @@ const getUsers = async (req, res) => {
     }
 };
 
-const getUser = async (req, res) => {
+const getUserById = async (req, res) => {
     try {
         const user = await User.findById(req.params.id);
-        if (!user) {
-            return res.status(404).json({ message: 'User not found' });
-        }
         res.status(200).json(user);
     } catch (error) {
         console.error('Error fetching user:', error);
@@ -53,11 +48,7 @@ const updateUser = async (req, res) => {
         if (req.body.password) {
             req.body.password = await bcrypt.hash(req.body.password, 10);
         }
-
         const updatedUser = await User.findByIdAndUpdate(req.params.id, req.body, { new: true });
-        if (!updatedUser) {
-            return res.status(404).json({ message: 'User not found' });
-        }
         res.status(200).json({ message: 'User updated successfully', updatedUser });
     } catch (error) {
         console.error('Error updating user:', error);
@@ -67,10 +58,7 @@ const updateUser = async (req, res) => {
 
 const deleteUser = async (req, res) => {
     try {
-        const deletedUser = await User.findByIdAndDelete(req.params.id);
-        if (!deletedUser) {
-            return res.status(404).json({ message: 'User not found' });
-        }
+        await User.findByIdAndDelete(req.params.id);
         res.status(200).json({ message: 'User deleted successfully' });
     } catch (error) {
         console.error('Error deleting user:', error);
@@ -81,17 +69,7 @@ const deleteUser = async (req, res) => {
 const deleteUsers = async (req, res) => {
     const { ids } = req.body;
 
-    if (!ids || !Array.isArray(ids) || ids.length === 0) {
-        return res.status(400).json({ message: 'Invalid or empty ids array' });
-    }
-
     try {
-        const users = await User.find({ _id: { $in: ids } });
-
-        if (users.length !== ids.length) {
-            return res.status(404).json({ message: 'One or more users not found' });
-        }
-
         await User.deleteMany({ _id: { $in: ids } });
 
         res.status(200).json({ message: 'Users deleted successfully' });
@@ -100,4 +78,4 @@ const deleteUsers = async (req, res) => {
     }
 };
 
-module.exports = { createUser, getUsers, getUser, updateUser, deleteUser, deleteUsers };
+module.exports = { createUser, getUsers, getUserById, updateUser, deleteUser, deleteUsers };

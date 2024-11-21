@@ -1,13 +1,16 @@
 const express = require('express');
-const { getUsers, getUser, createUser, updateUser, deleteUser, deleteUsers } = require('../controllers/userController');
-const router = express.Router();
+const { getUsers, getUserById, createUser, updateUser, deleteUser, deleteUsers } = require('../controllers/userController');
+const { createSchema, getByIdSchema, updateSchema, deleteSchema, deleteBulkSchema } = require('../validations/user');
 const { requireAuthAndRole } = require('../middleware/auth');
+const validate = require('../middleware/validation');
 
-router.post('/create', requireAuthAndRole('admin'), createUser);
+const router = express.Router();
+
+router.post('/create', requireAuthAndRole('admin'), validate(createSchema), createUser);
 router.get('/get', requireAuthAndRole('admin'), getUsers);
-router.get('/get/:id', requireAuthAndRole('admin'), getUser);
-router.put('/update/:id', requireAuthAndRole('admin'), updateUser);
-router.delete('/delete/:id', requireAuthAndRole('admin'), deleteUser);
-router.delete('/delete-bulk', requireAuthAndRole('admin'), deleteUsers);
+router.get('/get/:id', requireAuthAndRole('admin'), validate(getByIdSchema), getUserById);
+router.put('/update/:id', requireAuthAndRole('admin'), validate(updateSchema), updateUser);
+router.delete('/delete/:id', requireAuthAndRole('admin'), validate(deleteSchema), deleteUser);
+router.delete('/delete-bulk', requireAuthAndRole('admin'), validate(deleteBulkSchema), deleteUsers);
 
 module.exports = router;

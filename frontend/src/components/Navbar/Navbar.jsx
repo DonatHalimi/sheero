@@ -1,6 +1,6 @@
 import { Menu as MenuIcon } from '@mui/icons-material';
 import React, { useContext, useEffect, useState } from 'react';
-import { useNavigate } from 'react-router-dom';
+import { useLocation, useNavigate } from 'react-router-dom';
 import { toast } from 'react-toastify';
 import {
     CartDropdown,
@@ -24,6 +24,7 @@ const Navbar = () => {
     const [isProfileDropdownOpen, setIsProfileDropdownOpen] = useState(false);
     const [isCartDropdownOpen, setIsCartDropdownOpen] = useState(false);
     const [isSidebarOpen, setIsSidebarOpen] = useState(false);
+    const location = useLocation();
 
     const [isLoading, setIsLoading] = useState(false);
     const [isFetchingCart, setIsFetchingCart] = useState(false);
@@ -67,6 +68,8 @@ const Navbar = () => {
 
             await fetchCartData();
 
+            window.dispatchEvent(new Event('cartUpdate'));
+
             if (cartItems.length === 1) {
                 setIsCartDropdownOpen(false);
             }
@@ -104,14 +107,16 @@ const Navbar = () => {
     };
 
     useEffect(() => {
+        const handleCartUpdate = () => {
+            fetchCartData();
+            if (location.pathname !== '/cart') {
+                setIsCartDropdownOpen(true);
+            }
+        };
+
         if (auth.accessToken) {
             fetchCartData();
         }
-
-        const handleCartUpdate = () => {
-            fetchCartData();
-            setIsCartDropdownOpen(true);
-        };
 
         document.addEventListener('cartUpdated', handleCartUpdate);
 

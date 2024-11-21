@@ -17,7 +17,8 @@ const fileFilter = (req, file, cb) => {
     if (mimeType && extname) {
         return cb(null, true);
     }
-    cb('Error: File upload only supports the following filetypes - ' + allowedFileTypes);
+    req.fileValidationError = 'Invalid file type. Only JPEG, JPG, and PNG are allowed';
+    cb(null, false);
 };
 
 const upload = multer({

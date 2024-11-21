@@ -1,21 +1,14 @@
 const Cart = require('../models/Cart');
-const Product = require('../models/Product');
 
 const addToCart = async (req, res) => {
+    const userId = req.user.userId;
+    const { productId, quantity } = req.body;
+
     try {
-        const userId = req.user.userId;
-
-        const { productId, quantity } = req.body;
-
         let cart = await Cart.findOne({ user: userId });
 
         if (!cart) {
             cart = new Cart({ user: userId, items: [] });
-        }
-
-        const product = await Product.findById(productId);
-        if (!product) {
-            return res.status(404).json({ message: 'Product not found' });
         }
 
         const cartItemIndex = cart.items.findIndex(item => item.product.toString() === productId);
@@ -36,14 +29,20 @@ const addToCart = async (req, res) => {
     }
 };
 
-const getCart = async (req, res) => {
-    try {
-        const userId = req.user.userId;
+const getCartByUser = async (req, res) => {
+    const userId = req.user.userId;
 
+    try {
         const cart = await Cart.findOne({ user: userId }).populate('items.product');
-        if (!cart) {
-            return res.status(404).json({ message: 'Cart not found' });
-        }
+        res.json(cart);
+    } catch (err) {
+        res.status(500).json({ message: 'Server Error', error: err.message });
+    }
+};
+
+const getAllCarts = async (req, res) => {
+    try {
+        const cart = await Cart.find().populate('items.product');
         res.json(cart);
     } catch (err) {
         res.status(500).json({ message: 'Server Error', error: err.message });
@@ -51,19 +50,13 @@ const getCart = async (req, res) => {
 };
 
 const updateCartItemQuantity = async (req, res) => {
-    try {
-        const userId = req.user.userId;
-        const { productId, quantityChange } = req.body;
+    const userId = req.user.userId;
+    const { productId, quantityChange } = req.body;
 
+    try {
         const cart = await Cart.findOne({ user: userId });
-        if (!cart) {
-            return res.status(404).json({ message: 'Cart not found' });
-        }
 
         const cartItemIndex = cart.items.findIndex(item => item.product.toString() === productId);
-        if (cartItemIndex === -1) {
-            return res.status(404).json({ message: 'Product not found in cart' });
-        }
 
         cart.items[cartItemIndex].quantity += quantityChange;
 
@@ -82,26 +75,13 @@ const updateCartItemQuantity = async (req, res) => {
 };
 
 const removeFromCart = async (req, res) => {
+    const userId = req.user.userId;
+    const { productId } = req.body;
+
     try {
-        const userId = req.user.userId;
-        const { productId } = req.body;
-
-        const product = await Product.findById(productId);
-        if (!product) {
-            return res.status(404).json({ message: 'Product not found' });
-        }
-
         const cart = await Cart.findOne({ user: userId });
-        if (!cart) {
-            return res.status(404).json({ message: 'Cart not found' });
-        }
 
-        const initialItemCount = cart.items.length;
         cart.items = cart.items.filter(item => item.product.toString() !== productId);
-
-        if (initialItemCount === cart.items.length) {
-            return res.status(404).json({ message: 'Product not found in cart' });
-        }
 
         cart.calculateTotalPrice();
         await cart.save();
@@ -113,13 +93,10 @@ const removeFromCart = async (req, res) => {
 };
 
 const clearCart = async (req, res) => {
-    try {
-        const userId = req.user.userId;
+    const userId = req.user.userId;
 
+    try {
         const cart = await Cart.findOne({ user: userId });
-        if (!cart) {
-            return res.status(404).json({ message: 'Cart not found' });
-        }
 
         cart.items = [];
         cart.totalPrice = 0;
@@ -132,4 +109,4 @@ const clearCart = async (req, res) => {
     }
 };
 
-module.exports = { getCart, addToCart, updateCartItemQuantity, removeFromCart, clearCart };
+module.exports = { addToCart, getCartByUser, getAllCarts, updateCartItemQuantity, removeFromCart, clearCart };

@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from 'react';
-import { FAQItem, LoadingFaq, GoBackButton } from '../../assets/CustomComponents';
+import { FAQItem, GoBackButton, LoadingFaq } from '../../assets/CustomComponents';
 import useAxios from '../../axiosInstance';
 import Navbar from '../../components/Navbar/Navbar';
 import Footer from '../../components/Utils/Footer';

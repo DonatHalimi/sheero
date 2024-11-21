@@ -2,31 +2,19 @@ const Review = require('../models/Review');
 const Product = require('../models/Product');
 const Order = require('../models/Order');
 
+const populateR = (query) => {
+    return query.populate([
+        { path: 'user', select: '_id firstName lastName email' },
+        { path: 'product', select: 'name description price salePrice category subcategory image inventoryCount' },
+    ]);
+};
+
 const createReview = async (req, res) => {
     const { title, rating, comment } = req.body;
     const productId = req.params.productId;
     const userId = req.user.userId;
 
     try {
-        const product = await Product.findById(productId);
-        if (!product) {
-            return res.status(404).json({ message: 'Product not found' });
-        }
-        const deliveredOrder = await Order.findOne({
-            user: userId,
-            'products.product': productId,
-            status: 'delivered'
-        });
-
-        if (!deliveredOrder) {
-            return res.status(403).json({ message: 'You must buy this product in order to leave a review' });
-        }
-
-        const existingReview = await Review.findOne({ product: productId, user: userId });
-        if (existingReview) {
-            return res.status(400).json({ message: 'You have already reviewed this product! Click here to edit it' });
-        }
-
         const review = new Review({
             product: productId,
             user: userId,
@@ -69,33 +57,16 @@ const checkReviewEligibility = async (req, res) => {
 
 const getReviews = async (req, res) => {
     try {
-        const reviews = await Review.find()
-            .populate({
-                path: 'user',
-                select: '_id firstName lastName email'
-            })
-            .populate({
-                path: 'product',
-                select: 'name description price salePrice category subcategory image inventoryCount'
-            });
+        const reviews = await populateR(Review.find());
         res.status(200).json(reviews);
     } catch (error) {
         res.status(500).json({ message: 'Server error' });
     }
 };
 
-const getReview = async (req, res) => {
+const getReviewById = async (req, res) => {
     try {
-        const review = await Review.findById(req.params.id)
-            .populate({
-                path: 'user',
-                select: '_id firstName lastName email'
-            })
-            .populate({
-                path: 'product',
-                select: 'name description price salePrice category subcategory image inventoryCount'
-            });
-        if (!review) return res.status(404).json({ message: 'Review not found' });
+        const review = await populateR(Review.findById(req.params.id));
         res.status(200).json(review);
     } catch (error) {
         res.status(500).json({ message: 'Server error' });
@@ -106,20 +77,7 @@ const getReviewsByProduct = async (req, res) => {
     const productId = req.params.productId;
 
     try {
-        const reviews = await Review.find({ product: productId })
-            .populate({
-                path: 'user',
-                select: '_id firstName lastName email'
-            })
-            .populate({
-                path: 'product',
-                select: 'name description price salePrice category subcategory image inventoryCount'
-            });
-
-        if (reviews.length === 0) {
-            return res.status(404).json({ message: 'No reviews found for this product' });
-        }
-
+        const reviews = await populateR(Review.find({ product: productId }));
         res.status(200).json(reviews);
     } catch (error) {
         res.status(500).json({ message: 'Server error', error: error.message });
@@ -130,20 +88,7 @@ const getReviewsByUser = async (req, res) => {
     const userId = req.params.userId;
 
     try {
-        const reviews = await Review.find({ user: userId })
-            .populate({
-                path: 'user',
-                select: '_id firstName lastName email'
-            })
-            .populate({
-                path: 'product',
-                select: 'name description price salePrice category subcategory image inventoryCount'
-            });
-
-        if (reviews.length === 0) {
-            return res.status(404).json({ message: 'No reviews found for this user' });
-        }
-
+        const reviews = await populateR(Review.find({ user: userId }));
         res.status(200).json(reviews);
     } catch (error) {
         res.status(500).json({ message: 'Server error', error: error.message });
@@ -163,17 +108,8 @@ const updateReview = async (req, res) => {
 
         await review.save();
 
-        const updatedReview = await Review.findById(req.params.id)
-            .populate({
-                path: 'user',
-                select: '_id email'
-            })
-            .populate({
-                path: 'product',
-                select: 'name description price salePrice category subcategory image inventoryCount'
-            });
-
-        res.status(200).json({ message: 'Review updated succesfully', updatedReview });
+        const updatedReview = await populateR(Review.findById(req.params.id));
+        res.status(200).json({ message: 'Review updated successfully', updatedReview });
     } catch (error) {
         console.error('Error updating review:', error);
         res.status(500).json({ message: 'Server error', error: error.message, stack: error.stack });
@@ -184,8 +120,6 @@ const deleteReview = async (req, res) => {
     try {
         const review = await Review.findById(req.params.id);
 
-        if (!review) return res.status(404).json({ message: 'Review not found' });
-
         await Review.findByIdAndDelete(req.params.id);
         await Product.findByIdAndUpdate(review.product, { $pull: { reviews: review._id } });
 
@@ -195,23 +129,14 @@ const deleteReview = async (req, res) => {
         res.status(500).json({ message: 'Server error', error: error.message, stack: error.stack });
     }
 };
-
 const deleteReviews = async (req, res) => {
     const { ids } = req.body;
-
-    if (!ids || !Array.isArray(ids) || ids.length === 0) {
-        return res.status(400).json({ message: 'Invalid or empty ids array' });
-    }
 
     try {
         const reviews = await Review.find({ _id: { $in: ids } });
 
-        if (reviews.length !== ids.length) {
-            return res.status(404).json({ message: 'One or more reviews not found' });
-        }
-
         const productIds = reviews.map(review => review.product);
-
+        
         await Review.deleteMany({ _id: { $in: ids } });
 
         await Product.updateMany(
@@ -234,4 +159,4 @@ const getAllProducts = async (req, res) => {
     }
 };
 
-module.exports = { createReview, checkReviewEligibility, getReviews, getReview, getReviewsByProduct, getReviewsByUser, updateReview, deleteReview, getAllProducts, deleteReviews };
+module.exports = { createReview, checkReviewEligibility, getReviews, getReviewById, getReviewsByProduct, getReviewsByUser, updateReview, deleteReview, getAllProducts, deleteReviews };

@@ -95,16 +95,43 @@ const AuthProvider = ({ children }) => {
             setAuth(authData);
             return { success: true };
         } catch (error) {
-            console.error('Login failed:', error.response?.data?.message || 'Login failed');
+            if (error.response?.data?.errors) {
+                const mappedErrors = error.response.data.errors.map((err) => ({
+                    message: err.message,
+                }));
+                return { success: false, errors: mappedErrors };
+            }
+
             return { success: false, message: error.response?.data?.message || 'Login failed' };
         }
     };
 
-    const register = async (firstName, lastName, email, password) => {
+    const register = async (firstName, lastName, email, password, role) => {
         try {
-            await axios.post(getApiUrl('/auth/register'), { firstName, lastName, email, password });
-            return { success: true };
+            await axios.post(getApiUrl('/auth/register'), {
+                firstName,
+                lastName,
+                email,
+                password,
+                role,
+            });
+    
+            // Automatically log the user in after successful registration
+            const loginResponse = await login(email, password);
+    
+            if (loginResponse.success) {
+                return { success: true, loginResponse };
+            } else {
+                return loginResponse;
+            }
         } catch (error) {
+            if (error.response?.data?.errors) {
+                const mappedErrors = error.response.data.errors.map((err) => ({
+                    message: err.message,
+                }));
+                return { success: false, errors: mappedErrors };
+            }
+    
             console.error('Registration failed:', error.response?.data?.message || 'Registration failed');
             return { success: false, message: error.response?.data?.message || 'Registration failed' };
         }

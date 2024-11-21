@@ -1,15 +1,21 @@
+import { KeyboardArrowDown } from '@mui/icons-material';
+import { CircularProgress, Typography } from '@mui/material';
 import axios from 'axios';
 import React, { useEffect, useState } from 'react';
-import { calculatePageCount, CustomPagination, getPaginatedItems, ProductGrid } from '../../assets/CustomComponents';
+import { useInView } from 'react-intersection-observer';
+import { BrownButton, ProductGrid } from '../../assets/CustomComponents';
 import { getApiUrl } from '../../config';
 
-const itemsPerPage = 40;
+const initalItems = 39;
 
 const ProductList = () => {
     const [products, setProducts] = useState([]);
-    const [loading, setLoading] = useState(true);
-    const [currentPage, setCurrentPage] = useState(1);
+    const [loading, setLoading] = useState(false);
     const [totalProducts, setTotalProducts] = useState(0);
+    const [visibleProducts, setVisibleProducts] = useState(initalItems);
+    const [autoLoadEnabled, setAutoLoadEnabled] = useState(false);
+
+    const { ref: loadMoreRef, inView } = useInView({ threshold: 1 });
 
     useEffect(() => {
         const fetchProducts = async () => {
@@ -28,36 +34,53 @@ const ProductList = () => {
         fetchProducts();
     }, []);
 
-    const scrollToProductGrid = () => {
-        const offset = 100;
-        const scrollPosition = document.getElementById('product-grid')?.getBoundingClientRect().top + window.scrollY - offset;
+    useEffect(() => {
+        if (inView && autoLoadEnabled && visibleProducts < totalProducts) {
+            handleLoadMore();
+        }
+    }, [inView]);
 
-        if (scrollPosition) window.scrollTo({ top: scrollPosition, behavior: 'smooth' });
+    const handleLoadMore = () => {
+        setVisibleProducts((prev) => Math.min(prev + initalItems, totalProducts));
     };
 
-    const handlePageChange = (event, value) => {
-        setCurrentPage(value);
-        scrollToProductGrid();
+    const enableAutoLoad = () => {
+        setAutoLoadEnabled(true);
+        handleLoadMore();
     };
-
-    const pageCount = calculatePageCount(products, itemsPerPage);
-    const currentPageItems = getPaginatedItems(products, currentPage, itemsPerPage);
 
     return (
         <div id="product-grid" className="container mx-auto p-4 pr-6 mb-16 bg-gray-50">
+            <ProductGrid loading={loading} currentPageItems={products.slice(0, visibleProducts)} isMainPage={true} />
 
-            <ProductGrid loading={loading} currentPageItems={currentPageItems} isMainPage={true} />
+            {loading && (
+                <div className="flex justify-center mt-6">
+                    <CircularProgress />
+                </div>
+            )}
 
-            {!loading && totalProducts > 0 && (
-                <CustomPagination
-                    count={pageCount}
-                    page={currentPage}
-                    onChange={handlePageChange}
-                    sx={{
-                        position: 'relative',
-                        bottom: '-2px',
-                    }}
-                />
+            {!loading && visibleProducts < totalProducts && (
+                <div ref={loadMoreRef} className="flex justify-center mt-6">
+                    {!autoLoadEnabled ? (
+                        <BrownButton
+                            variant="contained"
+                            onClick={enableAutoLoad}
+                            endIcon={<KeyboardArrowDown />}
+                        >
+                            Load More Products
+                        </BrownButton>
+                    ) : (
+                        <CircularProgress />
+                    )}
+                </div>
+            )}
+
+            {!loading && visibleProducts >= totalProducts && (
+                <div className="flex justify-center mt-6">
+                    <Typography variant="body1" color="textSecondary">
+                        End of Results
+                    </Typography>
+                </div>
             )}
         </div>
     );

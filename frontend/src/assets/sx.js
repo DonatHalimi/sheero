@@ -96,7 +96,7 @@ export const reviewTextAreaStyling = {
     borderRadius: '4px',
     marginTop: '6px',
     outline: 'none',
-    textAlign: 'justify'
+    textAlign: 'left'
 }
 
 export const paginationStackStyling = (customSx = {}) => ({

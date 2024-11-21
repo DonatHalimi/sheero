@@ -74,7 +74,7 @@ To set up the project locally, follow these steps:
 
 ## Usage
 
-Once the application is running, you can access it in your web browser at `http://localhost:3000`. You can register a new account, browse products, add items to your cart, and make purchases.
+Once the application is running, you can access it in your web browser at `http://localhost:3000`. You can register a new account, browse products, add an address, add items to your cart, and make purchases.
 
 ## Features
 
@@ -167,8 +167,8 @@ The backend is a Node.js API server designed to handle requests, manage authenti
     "jsonwebtoken": "^9.0.2",
     "mongoose": "^8.5.1",
     "multer": "^1.4.5-lts.1",
-    "shortid": "^2.2.16",
-    "stripe": "^16.12.0"
+    "stripe": "^16.12.0",
+    "yup": "^1.4.0"
   },
   "devDependencies": {
     "nodemon": "^3.1.4"
@@ -183,14 +183,14 @@ The backend is a Node.js API server designed to handle requests, manage authenti
 - [**Nodemon**](https://www.npmjs.com/package/nodemon): Automatically restarts the server on file changes, speeding up development.
 - [**JWT (jsonwebtoken)**](https://jwt.io/introduction): Used for secure authentication and authorization via tokens.
 - [**Bcrypt.js**](https://www.npmjs.com/package/bcryptjs): A hashing library for securely storing and comparing user passwords.
-- [**Stripe**](https://stripe.com): For processing payments securely with easy integration.
-- [**Multer**](https://www.npmjs.com/package/multer): A middleware for handling multipart form data, in this case mainly used for uploading images.
-- [**ShortID**](https://www.npmjs.com/package/shortid): Generates unique, non-sequential IDs for orders.
+- [**Stripe**](https://www.npmjs.com/package/stripe): For securely processing payments online with ease, with out-of-the-box integration.
+- [**Multer**](https://www.npmjs.com/package/multer): A middleware for handling multipart form data, in this case used for uploading images.
+- [**Yup**](https://www.npmjs.com/package/yup): A JavaScript schema builder for value parsing and validation, in this case used for data validation.
 - [**CORS**](https://www.npmjs.com/package/cors): Middleware for enabling Cross-Origin Resource Sharing, allowing frontend access from different domains.
 
 ## Stripe Payment Testing
 
-You can use the following test card details to simulate payments in Stripe ([Official Stripe documentation website](https://docs.stripe.com/testing?testing-method=card-numbers) in case of any changes):
+You can use the following test card details to simulate payments in Stripe. If any problem occurs, refer to the [official Stripe documentation](https://docs.stripe.com/testing?testing-method=card-numbers).
 
 | Brand                | Number              | CVC           | Expiry Date   |
 |----------------------|---------------------|---------------|---------------|

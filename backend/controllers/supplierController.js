@@ -39,7 +39,7 @@ const getSuppliers = async (req, res) => {
     }
 };
 
-const getSupplier = async (req, res) => {
+const getSupplierById = async (req, res) => {
     try {
         const supplier = await Supplier.findById(req.params.id);
         if (!supplier) return res.status(404).json({ message: 'Supplier not found' });
@@ -99,4 +99,4 @@ const deleteSuppliers = async (req, res) => {
     }
 };
 
-module.exports = { createSupplier, getSuppliers, getSupplier, updateSupplier, deleteSupplier, deleteSuppliers };
+module.exports = { createSupplier, getSuppliers, getSupplierById, updateSupplier, deleteSupplier, deleteSuppliers };
