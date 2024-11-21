@@ -915,7 +915,7 @@ export const LoadingOrderDetails = ({ isOrder = true }) => {
 };
 
 export const LoadingCategoryDropdown = () => (
-    <div className="static bottom-4 bg-white rounded-md p-2 w-[1280px]">
+    <div className="static bottom-4 bg-white rounded-md p-2 w-[1200px]">
         <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
             {Array.from({ length: 6 }).map((_, index) => (
                 <div key={index} className="flex items-start">
