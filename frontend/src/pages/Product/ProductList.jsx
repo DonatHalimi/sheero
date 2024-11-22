@@ -6,7 +6,7 @@ import { useInView } from 'react-intersection-observer';
 import { BrownButton, ProductGrid } from '../../assets/CustomComponents';
 import { getApiUrl } from '../../config';
 
-const initalItems = 39;
+const initalItems = 49;
 
 const ProductList = () => {
     const [products, setProducts] = useState([]);

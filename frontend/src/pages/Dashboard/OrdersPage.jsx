@@ -68,10 +68,25 @@ const OrdersPage = () => {
             render: (order) => order.products.map((item) => item.quantity).join(', ')
         },
         { key: 'totalAmount', label: 'Total Amount' },
+        { key: 'paymentMethod', label: 'Payment Method' },
         { key: 'paymentStatus', label: 'Payment Status' },
         { key: 'status', label: 'Delivery Status' },
+        {
+            key: 'arrivalDateRange',
+            label: 'Delivery Date',
+            render: (order) => {
+                const startDate = order.arrivalDateRange.start
+                    ? new Date(order.arrivalDateRange.start).toLocaleDateString()
+                    : 'N/A';
+                const endDate = order.arrivalDateRange.end
+                    ? new Date(order.arrivalDateRange.end).toLocaleDateString()
+                    : 'N/A';
+                return `${startDate} - ${endDate}`;
+            }
+        },
         { key: 'actions', label: 'Actions' }
     ];
+
 
     return (
         <div className='container mx-auto max-w-screen-2xl px-4 mt-20'>

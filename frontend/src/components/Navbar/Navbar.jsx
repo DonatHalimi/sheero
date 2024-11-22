@@ -19,6 +19,7 @@ import SearchBar from './SearchBar';
 
 const Navbar = () => {
     const { auth, isAdmin, logout } = useContext(AuthContext);
+
     const [cartItems, setCartItems] = useState([]);
     const [cartTotal, setCartTotal] = useState(0);
     const [isProfileDropdownOpen, setIsProfileDropdownOpen] = useState(false);

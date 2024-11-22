@@ -562,11 +562,10 @@ export const LoadingProductDetails = () => {
 };
 
 export const LoadingSlideshow = () => (
-    <Box sx={{ position: 'relative' }} className="relative w-full mx-auto mb-14">
-        <WaveSkeleton variant="rectangular" width="100%" height="800px" sx={{ maxWidth: '2000px', borderRadius: '8px' }} />
+    <Box className="relative w-full mx-auto mb-14 flex justify-center items-center">
+        <WaveSkeleton variant="rectangular" width="100%" height="800px" sx={{ maxWidth: '1920px', maxHeight: '500px', borderRadius: '8px' }} />
 
-        <WaveSkeleton variant="circular" width={50} height={50} sx={{ ...slideShowSkeletonStyling, left: '20px' }}
-        />
+        <WaveSkeleton variant="circular" width={50} height={50} sx={{ ...slideShowSkeletonStyling, left: '20px' }} />
 
         <WaveSkeleton variant="circular" width={50} height={50} sx={{ ...slideShowSkeletonStyling, right: '20px', left: 'auto' }} />
     </Box>
@@ -2315,7 +2314,8 @@ export const ImageSlide = ({ image, onLoad }) => (
                 src={getImageUrl(image.image)}
                 alt={image.title}
                 onLoad={onLoad}
-                className="w-full max-w-[2000px] h-[800px] object-cover rounded-md"
+                style={{ width: '1920px', height: '500px' }}
+                className="object-cover rounded-md"
             />
         </div>
     </SplideSlide>
@@ -2330,7 +2330,7 @@ export const splideOptions = {
     arrows: true,
     width: '100%',
     height: 'auto',
-    gap: '13px',
+    gap: '11px',
     breakpoints: {
         1024: { perPage: 1 },
         600: { perPage: 1 },

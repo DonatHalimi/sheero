@@ -14,7 +14,7 @@ const AboutUs = () => {
             About Us
           </Typography>
           <Typography variant="body1" className="text-lg text-gray-600">
-            At Sheero, we believe in delivering the best products for our customers. Learn more about our mission and values.
+            At sheero, we believe in delivering the best products for our customers. Learn more about our mission and values.
           </Typography>
         </Box>
 
@@ -24,10 +24,10 @@ const AboutUs = () => {
             <Typography variant="h5" className="text-3xl font-semibold text-gray-800 mb-4">
               Our Mission
             </Typography>
-            <Typography variant="body1" className="text-lg text-gray-600 mb-4">
+            <Typography variant="body1" className="text-lg text-gray-600 !mt-2">
               Our mission is to provide high-quality products at unbeatable prices, making online shopping easy and accessible for everyone. We strive to deliver excellence in both products and customer service.
             </Typography>
-            <Button variant="contained" color="primary" className="mt-4 w-fit self-start">
+            <Button variant="contained" color="primary" className="!mt-4 w-fit self-start">
               <Link to="/" className="text-white no-underline">Shop Now</Link>
             </Button>
           </Box>
@@ -61,15 +61,15 @@ const AboutUs = () => {
             <Typography variant="h5" className="text-3xl font-semibold text-gray-800 mb-4">
               Our Story
             </Typography>
-            <Typography variant="body1" className="text-lg text-gray-600 mb-4">
-              Founded in 2023, Sheero began with a vision to revolutionize the e-commerce space. We started as a small startup and have grown into a trusted platform for thousands of customers worldwide. Our success is rooted in our passion for quality and customer satisfaction.
+            <Typography variant="body1" className="text-lg text-gray-600 !mt-2">
+              Founded in 2023, sheero began with a vision to revolutionize the e-commerce space. We started as a small startup and have grown into a trusted platform for thousands of customers worldwide. Our success is rooted in our passion for quality and customer satisfaction.
             </Typography>
           </Box>
         </Box>
 
         {/* Values Section */}
         <Box className="text-center mb-16">
-          <Typography variant="h5" className="text-3xl font-semibold text-gray-800 mb-8">
+          <Typography variant="h5" className="text-3xl font-semibold text-gray-800 !mb-4">
             Our Core Values
           </Typography>
           <Box className="grid grid-cols-1 md:grid-cols-3 gap-8">
@@ -113,10 +113,10 @@ const AboutUs = () => {
 
         {/* Call to Action */}
         <Box className="text-center">
-          <Typography variant="h6" className="text-2xl font-semibold text-gray-800 mb-4">
+          <Typography variant="h6" className="text-2xl font-semibold text-gray-800 !mb-4">
             Ready to start your shopping journey with us?
           </Typography>
-          <Button variant="contained" color="primary" size="large" className="mt-4">
+          <Button variant="contained" color="primary" size="large" className="mb-4">
             <Link to="/" className="text-white no-underline">Explore Our Products</Link>
           </Button>
         </Box>
