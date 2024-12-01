@@ -1,9 +1,8 @@
 import { FormControl, InputLabel, MenuItem, Rating, Select, TextField } from '@mui/material';
-import React, { useContext, useEffect, useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import { toast } from 'react-toastify';
 import { BrownButton, BrownOutlinedTextField, CustomBox, CustomModal, CustomTypography } from '../../../assets/CustomComponents';
 import useAxios from '../../../axiosInstance';
-import { AuthContext } from '../../../context/AuthContext';
 
 const AddReviewModal = ({ open, onClose, onAddSuccess }) => {
     const [title, setTitle] = useState('');
@@ -13,8 +12,7 @@ const AddReviewModal = ({ open, onClose, onAddSuccess }) => {
     const [products, setProducts] = useState([]);
     const [userReviews, setUserReviews] = useState([]);
 
-    const { refreshToken } = useContext(AuthContext);
-    const axiosInstance = useAxios(refreshToken);
+    const axiosInstance = useAxios();
 
     useEffect(() => {
         const fetchProducts = async () => {

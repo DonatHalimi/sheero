@@ -1,10 +1,9 @@
 import UploadIcon from '@mui/icons-material/Upload';
-import React, { useContext, useEffect, useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import { toast } from 'react-toastify';
 import { BrownButton, BrownOutlinedTextField, CustomBox, CustomModal, CustomTypography, OutlinedBrownButton, VisuallyHiddenInput } from '../../../assets/CustomComponents';
 import useAxios from '../../../axiosInstance';
 import { getImageUrl } from '../../../config';
-import { AuthContext } from '../../../context/AuthContext';
 
 const EditSlideshowModal = ({ open, onClose, image, onEditSuccess }) => {
     const [title, setTitle] = useState('');
@@ -12,8 +11,7 @@ const EditSlideshowModal = ({ open, onClose, image, onEditSuccess }) => {
     const [newImage, setNewImage] = useState(null);
     const [imagePreview, setImagePreview] = useState('');
 
-    const { refreshToken } = useContext(AuthContext);
-    const axiosInstance = useAxios(refreshToken);
+    const axiosInstance = useAxios();
 
     useEffect(() => {
         if (image) {

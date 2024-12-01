@@ -114,6 +114,8 @@ import {
     sidebarLayoutStyling,
     slideShowSkeletonStyling
 } from './sx';
+import { useDispatch, useSelector } from 'react-redux';
+import { loadUser } from '../store/actions/authActions';
 const ProductItem = React.lazy(() => import('../components/Product/Items/ProductItem'));
 const FilterSidebar = React.lazy(() => import('../components/Product/Utils/FilterSidebar'));
 const Footer = React.lazy(() => import('../components/Utils/Footer'));
@@ -582,13 +584,6 @@ export const LoadingFaq = () => (
     </>
 );
 
-export const LoadingProfile = () => (
-    <>
-        <WaveSkeleton variant="text" width={250} height={40} />
-        <WaveSkeleton variant="text" width={265} height={30} />
-    </>
-);
-
 export const LoadingReturn = () => (
     <Box sx={{ p: 1, width: '100%', display: 'flex', flexDirection: 'column', gap: 2 }} >
         <WaveSkeleton variant="rectangular" width={400} height={56} className='rounded' />
@@ -757,10 +752,6 @@ export const LoadingReviewItem = () => (
                 </div>
 
                 <div className="flex flex-grow">
-                    <div className="flex-shrink-0 mr-4">
-                        <WaveSkeleton variant="rectangular" width={80} height={80} className="rounded-md" />
-                    </div>
-
                     <div className="flex-grow">
                         <div className="flex items-center mb-2">
                             <WaveSkeleton variant="text" width={200} height={28} className="mr-2" />
@@ -1245,11 +1236,11 @@ export const CustomModal = ({ open, onClose, children, ...props }) => (
         <Modal
             open={open}
             onClose={onClose}
-            className="flex items-center justify-center"
             {...props}
+            className="flex items-center justify-center p-4 sm:p-0"
         >
             <BounceAnimation>
-                <Box className="bg-white p-2 rounded-lg shadow-lg max-w-md w-full focus:outline-none">
+                <Box className="bg-white rounded-lg shadow-lg w-full mx-auto max-w-[95vw] sm:max-w-md focus:outline-none">
                     {children}
                 </Box>
             </BounceAnimation>
@@ -1258,7 +1249,7 @@ export const CustomModal = ({ open, onClose, children, ...props }) => (
 );
 
 export const CustomBox = (props) => (
-    <Box className="bg-white p-2 rounded-lg max-w-md w-full focus:outline-none" {...props} />
+    <Box className="bg-white p-3 sm:p-4 rounded-lg w-full focus:outline-none" {...props} />
 );
 
 export const CustomTypography = (props) => (
@@ -2193,26 +2184,7 @@ export const NavbarLogo = ({ dashboardStyling }) => {
 }
 
 export const ProfileIcon = ({ handleProfileDropdownToggle, isDropdownOpen }) => {
-    const [firstName, setFirstName] = useState('');
-    const [loading, setLoading] = useState(true);
-    const axiosInstance = useAxios();
-
-    useEffect(() => {
-        const fetchUserData = async () => {
-            try {
-                const response = await axiosInstance.get('/auth/me');
-                const userData = response.data;
-                setFirstName(userData.firstName);
-            } catch (error) {
-                console.error('Failed to fetch user data:', error);
-                toast.error('Failed to load profile data');
-            } finally {
-                setLoading(false);
-            }
-        };
-
-        fetchUserData();
-    }, []);
+    const { user, loading } = useSelector((state) => state.auth);
 
     return (
         <Tooltip title="Profile" arrow>
@@ -2225,8 +2197,8 @@ export const ProfileIcon = ({ handleProfileDropdownToggle, isDropdownOpen }) => 
                     {loading ? (
                         <WaveSkeleton variant="text" width={80} height={20} className="ml-1" />
                     ) : (
-                        firstName && (
-                            <span className="ml-2 text-sm overflow-hidden text-ellipsis">{firstName}</span>
+                        user?.firstName && (
+                            <span className="ml-2 text-sm overflow-hidden text-ellipsis">{user.firstName}</span>
                         )
                     )}
                 </ProfileButton>
@@ -2647,7 +2619,7 @@ export const AuthActions = ({
     return (
         <div className="flex items-center space-x-6">
             <div className="flex items-center space-x-4">
-                {auth.accessToken ? (
+                {auth ? (
                     <div className="relative ml-4">
                         <ProfileIcon
                             handleProfileDropdownToggle={handleProfileDropdownToggle}

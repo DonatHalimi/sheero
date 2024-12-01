@@ -1,67 +1,44 @@
-import React, { useEffect, useMemo, useState } from 'react';
+import React, { useEffect, useState } from 'react';
+import { useDispatch, useSelector } from 'react-redux';
 import { useNavigate } from 'react-router-dom';
 import { toast } from 'react-toastify';
 import { calculatePageCount, CustomDeleteModal, CustomMenu, CustomPagination, EmptyState, getPaginatedItems, handlePageChange, Header, LoadingOverlay, LoadingReviewItem, ProfileLayout, ReviewModal } from '../../assets/CustomComponents';
 import emptyReviewsImage from '../../assets/img/empty/reviews.png';
 import { paginationSx } from '../../assets/sx';
-import useAxios from '../../axiosInstance';
 import Navbar from '../../components/Navbar/Navbar';
 import ReviewItem from '../../components/Product/Items/ReviewItem';
 import EditReviewModal from '../../components/Product/Modals/EditReviewModal';
 import Footer from '../../components/Utils/Footer';
+import { deleteUserReview, getUserReviews } from '../../store/actions/reviewActions';
 
 const itemsPerPage = 4;
 
 const Reviews = () => {
-    const axiosInstance = useMemo(() => useAxios(), []);
+    const { user } = useSelector((state) => state.auth);
+    const { reviews, loading } = useSelector((state) => state.reviews);
+    const dispatch = useDispatch();
     const navigate = useNavigate();
 
-    const [reviews, setReviews] = useState([]);
     const [anchorEl, setAnchorEl] = useState(null);
     const [selectedReview, setSelectedReview] = useState(null);
     const [openEditModal, setOpenEditModal] = useState(false);
     const [openDeleteModal, setOpenDeleteModal] = useState(false);
     const [openReviewModal, setOpenReviewModal] = useState(false);
+
     const [searchTerm, setSearchTerm] = useState('');
-
-    const [currentPage, setCurrentPage] = useState(1);
-    const [loading, setLoading] = useState(true);
     const [loadingOverlay, setLoadingOverlay] = useState(false);
+    const [currentPage, setCurrentPage] = useState(1);
 
-    useEffect(() => { window.scrollTo(0, 0); }, [])
-
-    useEffect(() => {
-        fetchReviews();
-    }, [axiosInstance]);
-
-    const fetchReviews = async () => {
-        setLoading(true);
-        try {
-            const { data } = await axiosInstance.get('/auth/me');
-            const userId = data.id;
-            const reviewsResponse = await axiosInstance.get(`/reviews/user/${userId}`);
-            setReviews(reviewsResponse.data);
-        } catch (error) {
-            console.error('Error fetching reviews:', error.message);
-        } finally {
-            setLoading(false);
-        }
-    };
+    useEffect(() => { window.scrollTo(0, 0) }, []);
 
     useEffect(() => {
-        setCurrentPage(1);
-    }, [searchTerm]);
+        dispatch(getUserReviews(user.id));
+    }, [dispatch, user.id]);
 
-    const filteredReviews = reviews.filter(review => {
-        const matchesSearchTerm = [
-            review.product.name,
-            review.title,
-            review.rating,
-            review.comment,
-        ].some(field => field?.toString().toLowerCase().includes(searchTerm.toLowerCase()));
-
-        return matchesSearchTerm;
-    });
+    const filteredReviews = reviews.filter(({ product: { name }, title, rating, comment }) =>
+        [name, title, rating, comment]
+            .some(field => field?.toString().toLowerCase().includes(searchTerm.toLowerCase()))
+    );
 
     const handleMenuClick = (event, review) => {
         event.stopPropagation();
@@ -78,34 +55,27 @@ const Reviews = () => {
         handleMenuClose();
     };
 
+    const handleEditSuccess = () => {
+        setLoadingOverlay(false);
+        dispatch(getUserReviews(user.id));
+    };
+
     const handleDeleteClick = () => {
         setOpenDeleteModal(true);
         handleMenuClose();
     };
 
-    const handleEditSuccess = async (updatedReview) => {
-        setLoadingOverlay(true);
-        setReviews(prevReviews =>
-            prevReviews.map(review => (review._id === updatedReview._id ? updatedReview : review))
-        );
-        setOpenEditModal(false);
-        await fetchReviews();
-        setLoadingOverlay(false);
-    };
-
     const handleDeleteConfirm = async () => {
         if (selectedReview) {
-            setLoadingOverlay(true);
-            setReviews(prevReviews => prevReviews.filter(review => review._id !== selectedReview._id));
             try {
-                await axiosInstance.delete(`/reviews/delete/${selectedReview._id}`);
-                await fetchReviews();
+                await dispatch(deleteUserReview(selectedReview._id));
                 toast.success('Review deleted successfully');
+                setOpenDeleteModal(false);
+
+                await dispatch(getUserReviews(user.id));
             } catch (err) {
                 console.error('Failed to delete review:', err.message);
-            } finally {
-                setOpenDeleteModal(false);
-                setLoadingOverlay(false);
+                toast.error('Failed to delete review');
             }
         }
     };
@@ -120,7 +90,7 @@ const Reviews = () => {
     };
 
     const applyMargin = () => {
-        return (filteredReviews.length === 1 || currentPageItems.length === 1) ? 'mb-32' : '';
+        return (filteredReviews.length === 1 || currentPageItems.length === 1) ? 'mb-40' : '';
     };
 
     const pageCount = calculatePageCount(filteredReviews, itemsPerPage);
@@ -130,7 +100,6 @@ const Reviews = () => {
         <>
             <Navbar />
             <ProfileLayout>
-
                 <Header
                     title='Reviews'
                     searchTerm={searchTerm}
@@ -172,7 +141,6 @@ const Reviews = () => {
                 )}
             </ProfileLayout>
 
-            {filteredReviews.length === 1 && <div className='mb-44' />}
             <Footer />
 
             <CustomMenu

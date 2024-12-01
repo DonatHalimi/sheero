@@ -1,47 +1,28 @@
 import { KeyboardArrowDown } from '@mui/icons-material';
 import { CircularProgress, Typography } from '@mui/material';
-import axios from 'axios';
 import React, { useEffect, useState } from 'react';
 import { useInView } from 'react-intersection-observer';
+import { useDispatch, useSelector } from 'react-redux';
 import { BrownButton, ProductGrid } from '../../assets/CustomComponents';
-import { getApiUrl } from '../../config';
+import { getProducts } from '../../store/actions/productActions';
 
-const initalItems = 49;
+const initialItems = 49;
 
 const ProductList = () => {
-    const [products, setProducts] = useState([]);
-    const [loading, setLoading] = useState(false);
-    const [totalProducts, setTotalProducts] = useState(0);
-    const [visibleProducts, setVisibleProducts] = useState(initalItems);
+    const { products, loading } = useSelector((state) => state.products);
+    const dispatch = useDispatch();
+
+    const [visibleProducts, setVisibleProducts] = useState(initialItems);
     const [autoLoadEnabled, setAutoLoadEnabled] = useState(false);
 
     const { ref: loadMoreRef, inView } = useInView({ threshold: 1 });
 
     useEffect(() => {
-        const fetchProducts = async () => {
-            setLoading(true);
-            try {
-                const response = await axios.get(getApiUrl('/products/get'));
-                setProducts(response.data.products);
-                setTotalProducts(response.data.products.length);
-            } catch (error) {
-                console.error('Error fetching products:', error);
-            } finally {
-                setLoading(false);
-            }
-        };
-
-        fetchProducts();
-    }, []);
-
-    useEffect(() => {
-        if (inView && autoLoadEnabled && visibleProducts < totalProducts) {
-            handleLoadMore();
-        }
-    }, [inView]);
+        dispatch(getProducts());
+    }, [dispatch]);
 
     const handleLoadMore = () => {
-        setVisibleProducts((prev) => Math.min(prev + initalItems, totalProducts));
+        setVisibleProducts((prev) => Math.min(prev + initialItems, products.length));
     };
 
     const enableAutoLoad = () => {
@@ -49,17 +30,17 @@ const ProductList = () => {
         handleLoadMore();
     };
 
+    useEffect(() => {
+        if (inView && autoLoadEnabled && visibleProducts < products.length) {
+            handleLoadMore();
+        }
+    }, [inView, autoLoadEnabled, visibleProducts, products.length]);
+
     return (
-        <div id="product-grid" className="container mx-auto p-4 pr-6 mb-16 bg-gray-50">
+        <div className="container mx-auto p-4 pr-6 mb-16 bg-gray-50">
             <ProductGrid loading={loading} currentPageItems={products.slice(0, visibleProducts)} isMainPage={true} />
 
-            {loading && (
-                <div className="flex justify-center mt-6">
-                    <CircularProgress />
-                </div>
-            )}
-
-            {!loading && visibleProducts < totalProducts && (
+            {!loading && visibleProducts < products.length && (
                 <div ref={loadMoreRef} className="flex justify-center mt-6">
                     {!autoLoadEnabled ? (
                         <BrownButton
@@ -75,7 +56,7 @@ const ProductList = () => {
                 </div>
             )}
 
-            {!loading && visibleProducts >= totalProducts && (
+            {!loading && visibleProducts >= products.length && (
                 <div className="flex justify-center mt-6">
                     <Typography variant="body1" color="textSecondary">
                         End of Results

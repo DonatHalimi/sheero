@@ -1,8 +1,8 @@
 import { HomeOutlined, StarBorderOutlined } from '@mui/icons-material';
 import { List, Typography } from '@mui/material';
 import React, { useEffect, useState } from 'react';
+import { useSelector } from 'react-redux';
 import { useLocation, useNavigate } from 'react-router-dom';
-import { toast } from 'react-toastify';
 import {
     ActiveListItem,
     CustomAddressIcon,
@@ -11,37 +11,19 @@ import {
     CustomReturnIcon,
     CustomReviewsIcon,
     CustomWishlistIcon,
-    LoadingProfile,
     SidebarLayout,
     StyledFavoriteIcon,
     StyledInboxIcon,
     StyledMoveToInboxIcon,
     StyledPersonIcon
 } from '../../assets/CustomComponents';
-import useAxios from '../../axiosInstance';
 
 const ProfileSidebar = () => {
+    const { user, loading } = useSelector((state) => state.auth);
+
     const navigate = useNavigate();
     const location = useLocation();
     const [activeItem, setActiveItem] = useState('');
-    const [firstName, setFirstName] = useState('');
-    const [loading, setLoading] = useState(true);
-    const axiosInstance = useAxios();
-
-    useEffect(() => {
-        const fetchUserData = async () => {
-            try {
-                const response = await axiosInstance.get('/auth/me');
-                setFirstName(response.data.firstName);
-            } catch (error) {
-                console.error('Failed to fetch user data:', error);
-                toast.error('Failed to load profile data');
-            } finally {
-                setLoading(false);
-            }
-        };
-        fetchUserData();
-    }, []);
 
     useEffect(() => {
         const path = location.pathname.split('/')[2];
@@ -54,8 +36,8 @@ const ProfileSidebar = () => {
     };
 
     const greetingTime = new Date().getHours() < 12 ? "morning" : (new Date().getHours() < 18 ? "afternoon" : "evening");
-    const greetingH = `Good ${greetingTime}, ${firstName}.`;
-    const greetingM = 'Thank you for being part of sheero';
+    const greetingHeader = `Good ${greetingTime}, ${user?.firstName || 'User'}.`;
+    const greetingMessage = 'Thank you for being part of sheero';
 
     const items = [
         { key: 'me', label: 'Profile', icon: <CustomProfileIcon isActive={true} />, inactiveIcon: <StyledPersonIcon />, },
@@ -73,9 +55,9 @@ const ProfileSidebar = () => {
             ) : (
                 <>
                     <Typography variant="h5" gutterBottom className="!text-gray-800 !font-semilight">
-                        {greetingH}
+                        {greetingHeader}
                     </Typography>
-                    <span className="text-md">{greetingM}</span>
+                    <span className="text-md">{greetingMessage}</span>
                 </>
             )}
             <div className="border-t border-stone-200 mt-4 mb-2" />

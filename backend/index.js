@@ -4,15 +4,19 @@ const dotenv = require('dotenv');
 const cors = require('cors');
 const path = require('path');
 const routes = require('./routes');
+const cookieParser = require('cookie-parser');
 
 dotenv.config();
 
 const app = express();
 app.use(express.json());
+app.use(cookieParser());
 
 const corsOptions = {
     origin: process.env.NODE_ENV === 'production' ? 'https://sheero.onrender.com' : 'http://localhost:3000',
     credentials: true,
+    methods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS'],
+    allowedHeaders: ['Content-Type', 'Authorization'],
 };
 
 app.use(cors(corsOptions));

@@ -1,9 +1,8 @@
 import { InputLabel, MenuItem, Select } from '@mui/material';
-import React, { useContext, useEffect, useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import { toast } from 'react-toastify';
 import { BrownButton, BrownOutlinedTextField, CustomBox, CustomModal, CustomTypography, OutlinedBrownFormControl } from '../../../assets/CustomComponents';
 import useAxios from '../../../axiosInstance';
-import { AuthContext } from '../../../context/AuthContext';
 
 const EditCityModal = ({ open, onClose, city, onEditSuccess }) => {
     const [name, setName] = useState('');
@@ -11,8 +10,7 @@ const EditCityModal = ({ open, onClose, city, onEditSuccess }) => {
     const [zipCode, setZipCode] = useState('');
     const [countries, setCountries] = useState([]);
 
-    const { refreshToken } = useContext(AuthContext);
-    const axiosInstance = useAxios(refreshToken);
+    const axiosInstance = useAxios();
 
     useEffect(() => {
         if (city) {

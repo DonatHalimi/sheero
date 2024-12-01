@@ -1,11 +1,10 @@
 import UploadIcon from '@mui/icons-material/Upload';
 import { InputLabel, MenuItem, Select } from '@mui/material';
-import React, { useContext, useEffect, useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import { toast } from 'react-toastify';
 import { BrownButton, BrownOutlinedTextField, CustomBox, CustomModal, CustomTypography, OutlinedBrownButton, OutlinedBrownFormControl, VisuallyHiddenInput } from '../../../assets/CustomComponents';
 import useAxios from '../../../axiosInstance';
 import { getImageUrl } from '../../../config';
-import { AuthContext } from '../../../context/AuthContext';
 
 const EditSubcategoryModal = ({ open, onClose, subcategory, onEditSuccess }) => {
     const [name, setName] = useState('');
@@ -14,8 +13,7 @@ const EditSubcategoryModal = ({ open, onClose, subcategory, onEditSuccess }) => 
     const [category, setCategory] = useState('');
     const [categories, setCategories] = useState([]);
 
-    const { refreshToken } = useContext(AuthContext);
-    const axiosInstance = useAxios(refreshToken);
+    const axiosInstance = useAxios();
 
     useEffect(() => {
         if (subcategory) {

@@ -1,29 +1,17 @@
 import { Splide } from '@splidejs/react-splide';
-import axios from 'axios';
-import React, { useEffect, useRef, useState } from 'react';
+import React, { useEffect, useRef } from 'react';
+import { useDispatch, useSelector } from 'react-redux';
 import { ImageSlide, LoadingSlideshow, splideOptions } from '../../assets/CustomComponents';
-import { getApiUrl } from '../../config';
+import { getImages } from '../../store/actions/slideshowActions';
 
 const Slideshow = () => {
-    const [images, setImages] = useState([]);
-    const [loading, setLoading] = useState(true);
-
+    const { images, loading } = useSelector((state) => state.slideshow);
     const splideRef = useRef(null);
+    const dispatch = useDispatch();
 
     useEffect(() => {
-        const fetchImages = async () => {
-            try {
-                const { data } = await axios.get(getApiUrl('/slideshow/get'));
-                setImages(data);
-            } catch (error) {
-                console.error('Error fetching images:', error);
-            } finally {
-                setLoading(false);
-            }
-        };
-
-        fetchImages();
-    }, []);
+        dispatch(getImages());
+    }, [dispatch]);
 
     useEffect(() => {
         if (images.length > 0 && splideRef.current) {

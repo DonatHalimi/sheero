@@ -2,6 +2,7 @@ const bcrypt = require('bcryptjs');
 const jwt = require('jsonwebtoken');
 const User = require('../models/User');
 const Role = require('../models/Role');
+const cookieConfig = require('../config/cookie.config');
 
 const generateAccessToken = (user) => {
     return jwt.sign({ userId: user._id, role: user.role }, process.env.JWT_SECRET, { expiresIn: '7d' });
@@ -15,10 +16,17 @@ const registerUser = async (req, res) => {
     try {
         const user = new User({ firstName, lastName, email, password: hashedPassword, role: validRole._id });
         await user.save();
-
-        const accessToken = generateAccessToken(user);
-
-        res.status(201).json({ message: 'User registered successfully', accessToken });
+        
+        res.status(201).json({
+            message: 'User registered successfully. Please log in.',
+            user: {
+                id: user._id,
+                firstName: user.firstName,
+                lastName: user.lastName,
+                email: user.email,
+                role: validRole.name
+            }
+        });
     } catch (error) {
         res.status(500).json({ message: 'Server error', error: error.message });
     }
@@ -32,9 +40,16 @@ const loginUser = async (req, res) => {
 
         const accessToken = generateAccessToken(user);
 
+        res.cookie('accessToken', accessToken, cookieConfig);
+
         res.json({
-            accessToken,
-            role: user.role.name,
+            user: {
+                id: user._id,
+                firstName: user.firstName,
+                lastName: user.lastName,
+                email: user.email,
+                role: user.role.name
+            }
         });
     } catch (error) {
         res.status(500).json({ message: 'Server error' });
@@ -79,8 +94,13 @@ const updateUserProfile = async (req, res) => {
         if (newPassword) { user.password = await bcrypt.hash(newPassword, 10); }
 
         await user.save();
-
         await user.populate('role');
+
+        // Generate new token if email changed
+        if (email) {
+            const accessToken = generateAccessToken(user);
+            res.cookie('accessToken', accessToken, cookieConfig);
+        }
 
         res.json({
             firstName: user.firstName,
@@ -94,6 +114,11 @@ const updateUserProfile = async (req, res) => {
 };
 
 const logoutUser = (req, res) => {
+    res.clearCookie('accessToken', {
+        ...cookieConfig,
+        maxAge: 0
+    });
+
     res.json({ message: 'Logout successful' });
 };
 

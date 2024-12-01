@@ -1,60 +1,43 @@
-import React, { useEffect, useMemo, useState } from 'react';
+import React, { useEffect, useState } from 'react';
+import { useDispatch, useSelector } from 'react-redux';
 import { calculatePageCount, CustomPagination, EmptyState, getPaginatedItems, handlePageChange, Header, LoadingOrderItem, ProfileLayout } from '../../assets/CustomComponents';
 import emptyReturnsImage from '../../assets/img/empty/orders.png';
-import useAxios from '../../axiosInstance';
 import Navbar from '../../components/Navbar/Navbar';
 import ReturnItem from '../../components/Product/Items/ReturnItem';
 import Footer from '../../components/Utils/Footer';
+import { getUserReturns } from '../../store/actions/returnActions';
 
 const itemsPerPage = 4;
 
 const Returns = () => {
-    const axiosInstance = useMemo(() => useAxios(), []);
+    const { user } = useSelector((state) => state.auth);
+    const { returns, loading } = useSelector((state) => state.returns);
+    const dispatch = useDispatch();
 
-    const [returns, setReturns] = useState([]);
-    const [loading, setLoading] = useState(true);
     const [currentPage, setCurrentPage] = useState(1);
     const [searchTerm, setSearchTerm] = useState('');
     const [statusFilter, setStatusFilter] = useState('All');
 
+    useEffect(() => { window.scrollTo(0, 0) }, []);
+
     useEffect(() => {
-        const fetchReturns = async () => {
-            setLoading(true);
-            try {
-                const { data } = await axiosInstance.get('/auth/me');
-                const userId = data.id;
-                const returnsResponse = await axiosInstance.get(`/returns/user/${userId}`);
-                setReturns(returnsResponse.data);
-            } catch (error) {
-                console.error('Error fetching returns:', error.message);
-            } finally {
-                setLoading(false);
-            }
-        };
-
-        fetchReturns();
-    }, [axiosInstance]);
-
-    useEffect(() => { window.scrollTo(0, 0); }, []);
+        if (user?.id) {
+            dispatch(getUserReturns(user.id));
+        }
+    }, [dispatch, user]);
 
     useEffect(() => {
         setCurrentPage(1);
     }, [searchTerm, statusFilter]);
 
-    const filteredReturns = Array.isArray(returns) ? returns.filter(returnRequest => {
-        const matchesSearchTerm = [
-            returnRequest._id || '',
-            returnRequest.reason || '',
-            returnRequest.status || '',
-            ...(Array.isArray(returnRequest.products)
-                ? returnRequest.products.map(product => product?.name?.toLowerCase() || '')
-                : [returnRequest.products?.name?.toLowerCase() || ''])
-        ].some(field => field.toLowerCase().includes(searchTerm.toLowerCase()));
+    const filteredReturns = Array.isArray(returns)
+        ? returns.filter(({ _id, reason, status, products }) => {
+            const fields = [_id, reason, status, ...(Array.isArray(products) ? products.map(({ name }) => name?.toLowerCase()) : [products?.name?.toLowerCase()])];
 
-        const matchesStatusFilter = statusFilter === 'All' || returnRequest.status === statusFilter;
-
-        return matchesSearchTerm && matchesStatusFilter;
-    }) : [];
+            const matchesSearchTerm = fields.some(field => field?.toLowerCase().includes(searchTerm.toLowerCase()));
+            const matchesStatusFilter = statusFilter === 'All' || status === statusFilter;
+            return matchesSearchTerm && matchesStatusFilter;
+        }) : [];
 
     const statusClasses = {
         pending: 'text-yellow-500',

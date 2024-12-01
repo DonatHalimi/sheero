@@ -1,8 +1,9 @@
 import { Rating, TextField } from '@mui/material';
 import React, { useEffect, useState } from 'react';
+import { useDispatch } from 'react-redux';
 import { toast } from 'react-toastify';
 import { BrownButton, BrownOutlinedTextField, CustomBox, CustomModal, CustomTypography } from '../../../assets/CustomComponents';
-import useAxios from '../../../axiosInstance';
+import { editUserReview } from '../../../store/actions/reviewActions';
 
 const EditReviewModal = ({ open, onClose, review, onEditSuccess }) => {
     const [title, setTitle] = useState('');
@@ -11,7 +12,7 @@ const EditReviewModal = ({ open, onClose, review, onEditSuccess }) => {
     const [titleValid, setTitleValid] = useState(true);
     const [commentValid, setCommentValid] = useState(true);
     const [focusedField, setFocusedField] = useState(null);
-    const axiosInstance = useAxios();
+    const dispatch = useDispatch();
 
     const validateTitle = (v) => /^[A-Z][\Wa-zA-Z\s]{2,40}$/.test(v);
     const validateComment = (v) => /^[A-Z][\Wa-zA-z\s]{3,500}$/.test(v);
@@ -37,6 +38,11 @@ const EditReviewModal = ({ open, onClose, review, onEditSuccess }) => {
     };
 
     const handleEditReview = async () => {
+        if (!review || !review._id) {
+            toast.error('Invalid review ID');
+            return;
+        }
+
         const updatedData = {
             title,
             rating,
@@ -44,9 +50,9 @@ const EditReviewModal = ({ open, onClose, review, onEditSuccess }) => {
         };
 
         try {
-            const response = await axiosInstance.put(`/reviews/update/${review._id}`, updatedData);
-            toast.success(response.data.message);
-            onEditSuccess(response.data);
+            await dispatch(editUserReview(review._id, updatedData));
+            toast.success('Review updated successfully');
+            onEditSuccess(updatedData);
             onClose();
         } catch (error) {
             console.error('Error editing review', error);

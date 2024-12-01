@@ -1,11 +1,10 @@
 import VisibilityIcon from '@mui/icons-material/Visibility';
 import VisibilityOffIcon from '@mui/icons-material/VisibilityOff';
 import { IconButton, InputAdornment, InputLabel, MenuItem, Select } from '@mui/material';
-import React, { useContext, useEffect, useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import { toast } from 'react-toastify';
 import { BrownButton, BrownOutlinedTextField, CustomBox, CustomModal, CustomTypography, OutlinedBrownFormControl } from '../../../assets/CustomComponents';
 import useAxios from '../../../axiosInstance';
-import { AuthContext } from '../../../context/AuthContext';
 
 const EditUserModal = ({ open, onClose, user, onEditSuccess }) => {
     const [firstName, setFirstName] = useState('');
@@ -17,8 +16,7 @@ const EditUserModal = ({ open, onClose, user, onEditSuccess }) => {
     const [role, setRole] = useState('');
     const [roles, setRoles] = useState([]);
 
-    const { refreshToken } = useContext(AuthContext);
-    const axiosInstance = useAxios(refreshToken);
+    const axiosInstance = useAxios();
 
     useEffect(() => {
         const fetchRoles = async () => {

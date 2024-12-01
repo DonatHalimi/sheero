@@ -1,15 +1,13 @@
 import { MenuItem, Select, Typography } from '@mui/material';
-import React, { useContext, useEffect, useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import { toast } from 'react-toastify';
 import { BrownButton, CustomBox, CustomModal } from '../../../assets/CustomComponents';
 import useAxios from '../../../axiosInstance';
-import { AuthContext } from '../../../context/AuthContext';
 
 const EditReturnRequestModal = ({ open, onClose, returnRequest, onEditSuccess }) => {
     const [status, setStatus] = useState(returnRequest ? returnRequest.status : 'pending');
 
-    const { refreshToken } = useContext(AuthContext);
-    const axiosInstance = useAxios(refreshToken);
+    const axiosInstance = useAxios();
 
     useEffect(() => {
         if (returnRequest) {

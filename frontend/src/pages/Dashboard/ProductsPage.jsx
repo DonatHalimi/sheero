@@ -1,16 +1,18 @@
-import React, { useContext, useEffect, useState } from 'react';
+import React, { useEffect, useState } from 'react';
+import { useDispatch, useSelector } from 'react-redux';
 import { DashboardHeader } from '../../assets/CustomComponents';
-import useAxios from '../../axiosInstance';
 import DashboardTable from '../../components/Dashboard/DashboardTable';
 import DeleteModal from '../../components/Modal/DeleteModal';
 import ImagePreviewModal from '../../components/Modal/ImagePreviewModal';
 import AddProductModal from '../../components/Modal/Product/AddProductModal';
 import EditProductModal from '../../components/Modal/Product/EditProductModal';
 import { getImageUrl } from '../../config';
-import { AuthContext } from '../../context/AuthContext';
+import { getProducts } from '../../store/actions/productActions';
 
 const ProductsPage = () => {
-    const [products, setProducts] = useState([]);
+    const { products } = useSelector((state) => state.products);
+    const dispatch = useDispatch();
+
     const [selectedProduct, setSelectedProduct] = useState(null);
     const [selectedProducts, setSelectedProducts] = useState([]);
     const [addProductOpen, setAddProductOpen] = useState(false);
@@ -20,21 +22,9 @@ const ProductsPage = () => {
     const [currentPage, setCurrentPage] = useState(0);
     const itemsPerPage = 6;
 
-    const { refreshToken } = useContext(AuthContext);
-    const axiosInstance = useAxios(refreshToken);
-
     useEffect(() => {
-        fetchProducts();
-    }, [addProductOpen, editProductOpen, deleteProductOpen, currentPage, axiosInstance]);
-
-    const fetchProducts = async () => {
-        try {
-            const response = await axiosInstance.get(`/products/get?page=${currentPage}&limit=${itemsPerPage}`);
-            setProducts(response.data.products);
-        } catch (error) {
-            console.error('Error fetching products', error);
-        }
-    };
+        dispatch(getProducts());
+    }, [dispatch]);
 
     const handleSelectProduct = (productId) => {
         const id = Array.isArray(productId) ? productId[0] : productId;
@@ -127,13 +117,13 @@ const ProductsPage = () => {
                     containerClassName="max-w-full"
                 />
 
-                <AddProductModal open={addProductOpen} onClose={() => setAddProductOpen(false)} onAddSuccess={fetchProducts} />
-                <EditProductModal open={editProductOpen} onClose={() => setEditProductOpen(false)} product={selectedProduct} onEditSuccess={fetchProducts} />
+                <AddProductModal open={addProductOpen} onClose={() => setAddProductOpen(false)} onAddSuccess={() => dispatch(getProducts())} />
+                <EditProductModal open={editProductOpen} onClose={() => setEditProductOpen(false)} product={selectedProduct} onEditSuccess={() => dispatch(getProducts())} />
                 <DeleteModal
                     open={deleteProductOpen}
                     onClose={() => setDeleteProductOpen(false)}
                     items={selectedProducts.map(id => products.find(product => product._id === id)).filter(product => product)}
-                    onDeleteSuccess={fetchProducts}
+                    onDeleteSuccess={() => dispatch(getProducts())}
                     endpoint="/products/delete-bulk"
                     title="Delete Products"
                     message="Are you sure you want to delete the selected products?"

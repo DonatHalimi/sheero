@@ -1,82 +1,49 @@
-import React, { useContext, useEffect, useMemo, useState } from 'react';
+import React, { useEffect, useState } from 'react';
+import { useDispatch, useSelector } from 'react-redux';
 import { toast } from 'react-toastify';
 import { calculatePageCount, CustomDeleteModal, CustomPagination, EmptyState, getPaginatedItems, handlePageChange, Header, LoadingProductItem, ProfileLayout } from '../../assets/CustomComponents';
 import emptyWishlistImage from '../../assets/img/empty/wishlist.png';
-import useAxios from '../../axiosInstance';
 import Navbar from '../../components/Navbar/Navbar';
 import WishlistItem from '../../components/Product/Items/WishlistItem';
 import Footer from '../../components/Utils/Footer';
-import { AuthContext } from '../../context/AuthContext';
+import { clearWishlist, getWishlistItems, removeFromWishlist } from '../../store/actions/wishlistActions';
 
 const itemsPerPage = 6;
 
 const Wishlist = () => {
-    const { auth } = useContext(AuthContext);
-    const axiosInstance = useMemo(() => useAxios(), []);
+    const { user, isAuthenticated } = useSelector(state => state.auth);
+    const { wishlistItems, loading } = useSelector(state => state.wishlist);
+    const dispatch = useDispatch();
 
-    const [wishlistItems, setWishlistItems] = useState([]);
-    const [loading, setLoading] = useState(true);
     const [isModalOpen, setIsModalOpen] = useState(false);
     const [currentPage, setCurrentPage] = useState(1);
-    const [userId, setUserId] = useState('');
+
+    useEffect(() => { window.scrollTo(0, 0) }, [])
 
     useEffect(() => {
-        window.scrollTo(0, 0);
-
-        const fetchData = async () => {
-            try {
-                const userResponse = await axiosInstance.get('/auth/me');
-                setUserId(userResponse.data.id);
-
-                const wishlistResponse = await axiosInstance.get('/wishlist');
-                setWishlistItems(wishlistResponse.data.items);
-            } catch (error) {
-                console.error('Error fetching data:', error);
-            } finally {
-                setLoading(false);
-            }
-        };
-
-        fetchData();
-    }, [auth.accessToken]);
-
-    const handleRemoveFromWishlist = async (productId) => {
-        try {
-            await axiosInstance.delete(`/wishlist/remove`, {
-                data: { productId },
-            });
-            setWishlistItems((items) => items.filter(item => item.product._id !== productId));
-            toast.success('Product removed from wishlist');
-        } catch (error) {
-            console.error('Error removing product from wishlist:', error);
-            toast.error('Failed to remove product from wishlist.');
+        if (isAuthenticated) {
+            dispatch(getWishlistItems());
         }
+    }, [isAuthenticated, dispatch]);
+
+    const handleRemoveFromWishlist = (productId) => {
+        dispatch(removeFromWishlist(productId));
+        toast.success('Product removed from wishlist');
     };
 
-    const handleClearWishlist = async () => {
-        try {
-            await axiosInstance.delete('/wishlist/clear');
-            setWishlistItems([]);
-            toast.success('Wishlist cleared successfully');
-        } catch (error) {
-            console.error('Error clearing wishlist:', error);
-            toast.error('Failed to clear wishlist.');
-        } finally {
-            setIsModalOpen(false);
-        }
+    const handleClearWishlist = () => {
+        dispatch(clearWishlist(() => setIsModalOpen(false)));
+        toast.success('Wishlist cleared successfully');
     };
 
     const handleShareWishlist = () => {
-        const shareUrl = `${window.location.origin}/wishlist/${userId}`;
+        const shareUrl = `${window.location.origin}/wishlist/${user.id}`;
 
         navigator.clipboard.writeText(shareUrl)
             .then(() => {
                 toast.success(
                     <div>Wishlist link copied to clipboard! Click here to open it!</div>,
-                    {
-                        onClick: () => window.open(shareUrl, '_blank'),
-                        className: 'cursor-pointer'
-                    }
+                    { onClick: () => window.open(shareUrl, '_blank'), className: 'cursor-pointer' }
                 );
             })
             .catch(() => {

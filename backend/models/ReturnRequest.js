@@ -17,7 +17,7 @@ function generateCustomId() {
 
 const returnRequestSchema = new mongoose.Schema({
     _id: { type: String, default: generateCustomId },
-    order: { type: String, required: true },
+    order: { type: String, required: true }, // not order reference since order id format is custom
     products: [{ type: mongoose.Schema.Types.ObjectId, ref: 'Product', required: true }],
     user: { type: mongoose.Schema.Types.ObjectId, ref: 'User', required: true },
     reason: { type: String, enum: reasons, required: true },

@@ -1,18 +1,16 @@
 import UploadIcon from '@mui/icons-material/Upload';
-import React, { useContext, useEffect, useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import { toast } from 'react-toastify';
 import { BrownButton, BrownOutlinedTextField, CustomBox, CustomModal, CustomTypography, OutlinedBrownButton, VisuallyHiddenInput } from '../../../assets/CustomComponents';
 import useAxios from '../../../axiosInstance';
 import { getImageUrl } from '../../../config';
-import { AuthContext } from '../../../context/AuthContext';
 
 const EditCategoryModal = ({ open, onClose, category, onEditSuccess }) => {
     const [name, setName] = useState('');
     const [image, setImage] = useState(null);
     const [imagePreview, setImagePreview] = useState('');
 
-    const { refreshToken } = useContext(AuthContext);
-    const axiosInstance = useAxios(refreshToken);
+    const axiosInstance = useAxios();
 
     useEffect(() => {
         if (category) {

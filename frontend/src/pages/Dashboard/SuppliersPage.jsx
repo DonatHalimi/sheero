@@ -1,14 +1,16 @@
-import React, { useContext, useEffect, useState } from 'react';
+import React, { useEffect, useState } from 'react';
+import { useDispatch, useSelector } from 'react-redux';
 import { DashboardHeader } from '../../assets/CustomComponents';
-import useAxios from '../../axiosInstance';
 import DashboardTable from '../../components/Dashboard/DashboardTable';
 import DeleteModal from '../../components/Modal/DeleteModal';
 import AddSupplierModal from '../../components/Modal/Supplier/AddSupplierModal';
 import EditSupplierModal from '../../components/Modal/Supplier/EditSupplierModal';
-import { AuthContext } from '../../context/AuthContext';
+import { getSuppliers } from '../../store/actions/dashboardActions';
 
 const SupplierPage = () => {
-    const [suppliers, setSuppliers] = useState([]);
+    const { suppliers } = useSelector((state) => state.dashboard);
+    const dispatch = useDispatch();
+
     const [selectedSupplier, setSelectedSupplier] = useState(null);
     const [selectedSuppliers, setSelectedSuppliers] = useState([]);
     const [addSupplierOpen, setAddSupplierOpen] = useState(false);
@@ -17,21 +19,9 @@ const SupplierPage = () => {
     const [currentPage, setCurrentPage] = useState(0);
     const itemsPerPage = 5;
 
-    const { refreshToken } = useContext(AuthContext);
-    const axiosInstance = useAxios(refreshToken);
-
     useEffect(() => {
-        fetchSuppliers();
-    }, [addSupplierOpen, editSupplierOpen, deleteSupplierOpen, axiosInstance]);
-
-    const fetchSuppliers = async () => {
-        try {
-            const response = await axiosInstance.get('/suppliers/get');
-            setSuppliers(response.data);
-        } catch (error) {
-            console.error('Error fetching suppliers', error);
-        }
-    };
+        dispatch(getSuppliers());
+    }, [dispatch]);
 
     const handleSelectSupplier = (supplierId) => {
         const id = Array.isArray(supplierId) ? supplierId[0] : supplierId;
@@ -90,13 +80,13 @@ const SupplierPage = () => {
                     onEdit={handleEdit}
                 />
 
-                <AddSupplierModal open={addSupplierOpen} onClose={() => setAddSupplierOpen(false)} onAddSuccess={fetchSuppliers} />
-                <EditSupplierModal open={editSupplierOpen} onClose={() => setEditSupplierOpen(false)} supplier={selectedSupplier} onEditSuccess={fetchSuppliers} />
+                <AddSupplierModal open={addSupplierOpen} onClose={() => setAddSupplierOpen(false)} onAddSuccess={() => dispatch(getSuppliers())} />
+                <EditSupplierModal open={editSupplierOpen} onClose={() => setEditSupplierOpen(false)} supplier={selectedSupplier} onEditSuccess={() => dispatch(getSuppliers())} />
                 <DeleteModal
                     open={deleteSupplierOpen}
                     onClose={() => setDeleteSupplierOpen(false)}
                     items={selectedSuppliers.map(id => suppliers.find(supplier => supplier._id === id)).filter(supplier => supplier)}
-                    onDeleteSuccess={fetchSuppliers}
+                    onDeleteSuccess={() => dispatch(getSuppliers())}
                     endpoint="/suppliers/delete-bulk"
                     title="Delete Suppliers"
                     message="Are you sure you want to delete the selected suppliers?"

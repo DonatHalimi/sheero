@@ -1,14 +1,16 @@
-import React, { useContext, useEffect, useState } from 'react';
+import React, { useEffect, useState } from 'react';
+import { useDispatch, useSelector } from 'react-redux';
 import { DashboardHeader } from '../../assets/CustomComponents';
-import useAxios from '../../axiosInstance';
 import DashboardTable from '../../components/Dashboard/DashboardTable';
 import DeleteModal from '../../components/Modal/DeleteModal';
 import AddFAQModal from '../../components/Modal/FAQ/AddFAQModal';
 import EditFAQModal from '../../components/Modal/FAQ/EditFAQModal';
-import { AuthContext } from '../../context/AuthContext';
+import { getFAQs } from '../../store/actions/dashboardActions';
 
 const FAQPage = () => {
-    const [faqs, setFaqs] = useState([]);
+    const { faqs } = useSelector((state) => state.dashboard);
+    const dispatch = useDispatch();
+
     const [selectedFaq, setSelectedFaq] = useState(null);
     const [selectedFaqs, setSelectedFaqs] = useState([]);
     const [addFaqOpen, setAddFaqOpen] = useState(false);
@@ -17,21 +19,9 @@ const FAQPage = () => {
     const [currentPage, setCurrentPage] = useState(0);
     const itemsPerPage = 5;
 
-    const { refreshToken } = useContext(AuthContext);
-    const axiosInstance = useAxios(refreshToken);
-
     useEffect(() => {
-        fetchFAQs();
-    }, [addFaqOpen, editFaqOpen, deleteFaqOpen, axiosInstance]);
-
-    const fetchFAQs = async () => {
-        try {
-            const response = await axiosInstance.get('/faqs/get');
-            setFaqs(response.data);
-        } catch (error) {
-            console.error('Error fetching FAQ items', error);
-        }
-    };
+        dispatch(getFAQs());
+    }, [dispatch]);
 
     const handleSelectFaq = (faqId) => {
         const id = Array.isArray(faqId) ? faqId[0] : faqId;
@@ -85,13 +75,13 @@ const FAQPage = () => {
                     onEdit={handleEdit}
                 />
 
-                <AddFAQModal open={addFaqOpen} onClose={() => setAddFaqOpen(false)} onAddSuccess={fetchFAQs} />
-                <EditFAQModal open={editFaqOpen} onClose={() => setEditFaqOpen(false)} faq={selectedFaq} onEditSuccess={fetchFAQs} />
+                <AddFAQModal open={addFaqOpen} onClose={() => setAddFaqOpen(false)} onAddSuccess={() => dispatch(getFAQs())} />
+                <EditFAQModal open={editFaqOpen} onClose={() => setEditFaqOpen(false)} faq={selectedFaq} onEditSuccess={() => dispatch(getFAQs())} />
                 <DeleteModal
                     open={deleteFaqOpen}
                     onClose={() => setDeleteFaqOpen(false)}
                     items={selectedFaqs.map(id => faqs.find(faq => faq._id === id)).filter(faq => faq)}
-                    onDeleteSuccess={fetchFAQs}
+                    onDeleteSuccess={() => dispatch(getFAQs())}
                     endpoint="/faqs/delete-bulk"
                     title="Delete FAQs"
                     message="Are you sure you want to delete the FAQ items?"

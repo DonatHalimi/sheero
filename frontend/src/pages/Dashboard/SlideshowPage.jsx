@@ -1,16 +1,18 @@
-import React, { useContext, useEffect, useState } from 'react';
+import React, { useEffect, useState } from 'react';
+import { useDispatch, useSelector } from 'react-redux';
 import { DashboardHeader } from '../../assets/CustomComponents';
-import useAxios from '../../axiosInstance';
 import DashboardTable from '../../components/Dashboard/DashboardTable';
 import DeleteModal from '../../components/Modal/DeleteModal';
 import ImagePreviewModal from '../../components/Modal/ImagePreviewModal';
 import AddSlideshowModal from '../../components/Modal/Slideshow/AddSlideshowModal';
 import EditSlideshowModal from '../../components/Modal/Slideshow/EditSlideshowModal';
 import { getImageUrl } from '../../config';
-import { AuthContext } from '../../context/AuthContext';
+import { getImages } from '../../store/actions/slideshowActions';
 
 const SlideshowPage = () => {
-    const [images, setImages] = useState([]);
+    const { images } = useSelector((state) => state.slideshow);
+    const dispatch = useDispatch();
+
     const [selectedImage, setSelectedImage] = useState(null);
     const [selectedImages, setSelectedImages] = useState([]);
     const [addImageOpen, setAddImageOpen] = useState(false);
@@ -20,21 +22,9 @@ const SlideshowPage = () => {
     const [currentPage, setCurrentPage] = useState(0);
     const itemsPerPage = 5;
 
-    const { refreshToken } = useContext(AuthContext);
-    const axiosInstance = useAxios(refreshToken);
-
     useEffect(() => {
-        fetchImages();
-    }, [addImageOpen, editImageOpen, deleteImageOpen, axiosInstance]);
-
-    const fetchImages = async () => {
-        try {
-            const response = await axiosInstance.get('/slideshow/get');
-            setImages(response.data);
-        } catch (error) {
-            console.error('Error fetching images', error);
-        }
-    };
+        dispatch(getImages())
+    }, [dispatch]);
 
     const handleSelectImage = (imageId) => {
         const id = Array.isArray(imageId) ? imageId[0] : imageId;
@@ -108,13 +98,13 @@ const SlideshowPage = () => {
                     containerClassName='max-w-screen-2xl mx-auto'
                 />
 
-                <AddSlideshowModal open={addImageOpen} onClose={() => setAddImageOpen(false)} onAddSuccess={fetchImages} />
-                <EditSlideshowModal open={editImageOpen} onClose={() => setEditImageOpen(false)} image={selectedImage} onEditSuccess={fetchImages} />
+                <AddSlideshowModal open={addImageOpen} onClose={() => setAddImageOpen(false)} onAddSuccess={() => dispatch(getImages())} />
+                <EditSlideshowModal open={editImageOpen} onClose={() => setEditImageOpen(false)} image={selectedImage} onEditSuccess={() => dispatch(getImages())} />
                 <DeleteModal
                     open={deleteImageOpen}
                     onClose={() => setDeleteImageOpen(false)}
                     items={selectedImages.map(id => images.find(image => image._id === id)).filter(image => image)}
-                    onDeleteSuccess={fetchImages}
+                    onDeleteSuccess={() => dispatch(getImages())}
                     endpoint="/slideshow/delete-bulk"
                     title="Delete Images"
                     message="Are you sure you want to delete the selected images?"

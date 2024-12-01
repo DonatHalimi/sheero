@@ -1,14 +1,16 @@
-import React, { useContext, useEffect, useState } from 'react';
+import React, { useEffect, useState } from 'react';
+import { useDispatch, useSelector } from 'react-redux';
 import { DashboardHeader } from '../../assets/CustomComponents';
-import useAxios from '../../axiosInstance';
 import DashboardTable from '../../components/Dashboard/DashboardTable';
 import DeleteModal from '../../components/Modal/DeleteModal';
 import AddSubSubcategoryModal from '../../components/Modal/SubSubcategory/AddSubSubcategoryModal';
 import EditSubSubcategoryModal from '../../components/Modal/SubSubcategory/EditSubSubcategoryModal';
-import { AuthContext } from '../../context/AuthContext';
+import { getSubSubcategories } from '../../store/actions/dashboardActions';
 
 const SubSubcategoriesPage = () => {
-    const [subSubcategories, setSubSubcategories] = useState([]);
+    const { subSubcategories } = useSelector((state) => state.dashboard);
+    const dispatch = useDispatch();
+
     const [selectedSubSubcategory, setSelectedSubSubcategory] = useState(null);
     const [selectedSubSubcategories, setSelectedSubSubcategories] = useState([]);
     const [addSubSubcategoryOpen, setAddSubSubcategoryOpen] = useState(false);
@@ -17,21 +19,9 @@ const SubSubcategoriesPage = () => {
     const [currentPage, setCurrentPage] = useState(0);
     const itemsPerPage = 5;
 
-    const { refreshToken } = useContext(AuthContext);
-    const axiosInstance = useAxios(refreshToken);
-
     useEffect(() => {
-        fetchSubSubcategories();
-    }, [addSubSubcategoryOpen, editSubSubcategoryOpen, deleteSubSubcategoryOpen, axiosInstance]);
-
-    const fetchSubSubcategories = async () => {
-        try {
-            const response = await axiosInstance.get('/subsubcategories/get');
-            setSubSubcategories(response.data);
-        } catch (error) {
-            console.error('Error fetching subsubcategories', error);
-        }
-    };
+        dispatch(getSubSubcategories());
+    }, [dispatch]);
 
     const handleSelectSubSubcategory = (subsubcategoryId) => {
         const id = Array.isArray(subsubcategoryId) ? subsubcategoryId[0] : subsubcategoryId;
@@ -85,13 +75,13 @@ const SubSubcategoriesPage = () => {
                     onEdit={handleEdit}
                 />
 
-                <AddSubSubcategoryModal open={addSubSubcategoryOpen} onClose={() => setAddSubSubcategoryOpen(false)} onAddSuccess={fetchSubSubcategories} />
-                <EditSubSubcategoryModal open={editSubSubcategoryOpen} onClose={() => setEditSubSubcategoryOpen(false)} subSubcategory={selectedSubSubcategory} onEditSuccess={fetchSubSubcategories} />
+                <AddSubSubcategoryModal open={addSubSubcategoryOpen} onClose={() => setAddSubSubcategoryOpen(false)} onAddSuccess={() => dispatch(getSubSubcategories())} />
+                <EditSubSubcategoryModal open={editSubSubcategoryOpen} onClose={() => setEditSubSubcategoryOpen(false)} subSubcategory={selectedSubSubcategory} onEditSuccess={() => dispatch(getSubSubcategories())} />
                 <DeleteModal
                     open={deleteSubSubcategoryOpen}
                     onClose={() => setDeleteSubSubcategoryOpen(false)}
                     items={selectedSubSubcategories.map(id => subSubcategories.find(subsubcategory => subsubcategory._id === id)).filter(subsubcategory => subsubcategory)}
-                    onDeleteSuccess={fetchSubSubcategories}
+                    onDeleteSuccess={() => dispatch(getSubSubcategories())}
                     endpoint="/subsubcategories/delete-bulk"
                     title="Delete SubSubcategories"
                     message="Are you sure you want to delete the selected subsubcategories?"

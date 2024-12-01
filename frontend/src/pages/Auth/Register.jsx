@@ -1,16 +1,17 @@
 import VisibilityIcon from '@mui/icons-material/Visibility';
 import VisibilityOffIcon from '@mui/icons-material/VisibilityOff';
 import { Box, Container, IconButton, InputAdornment, Typography } from '@mui/material';
-import React, { useContext, useEffect, useState } from 'react';
+import React, { useEffect, useState } from 'react';
+import { useDispatch } from 'react-redux';
 import { useNavigate } from 'react-router-dom';
 import { toast } from 'react-toastify';
 import { BrownButton, BrownOutlinedTextField, knownEmailProviders } from '../../assets/CustomComponents';
-import Footer from '../../components/Utils/Footer';
 import Navbar from '../../components/Navbar/Navbar';
-import { AuthContext } from '../../context/AuthContext';
+import Footer from '../../components/Utils/Footer';
+import { registerUser } from '../../store/actions/authActions';
 
 const Register = () => {
-    const { register } = useContext(AuthContext);
+    const dispatch = useDispatch();
     const navigate = useNavigate();
 
     const [firstName, setFirstName] = useState('');
@@ -35,8 +36,7 @@ const Register = () => {
     const validatePassword = password => /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[@$!%*?&])[A-Za-z\d@$!%*?&]{8,}$/.test(password);
 
     const validateEmail = (email) => {
-        const providerPattern = knownEmailProviders.join('|');
-        const regex = new RegExp(`^[a-zA-Z0-9._%+-]+@(${providerPattern})$`, 'i');
+        const regex = new RegExp(`^[a-zA-Z0-9._%+-]+@(${knownEmailProviders.join('|')})$`, 'i');
         return regex.test(email);
     };
 
@@ -66,37 +66,46 @@ const Register = () => {
 
     const handleSubmit = async (e) => {
         e.preventDefault();
+
+        const userData = {
+            firstName,
+            lastName,
+            email,
+            password
+        };
+
         if (!firstName || !lastName || !email || !password) {
             return toast.error('Please fill in all fields');
         }
+
         if (!firstNameValid || !lastNameValid) {
             return toast.error('First name or last name format is incorrect');
         }
+
         if (!emailValid) {
             return toast.error('Invalid email format');
         }
+
         if (!validatePassword(password)) {
             return toast.error('Password must be at least 8 characters long, with one uppercase letter, one lowercase letter, one number, and one special character');
         }
-    
-        const response = await register(firstName, lastName, email, password);
-    
+
         try {
-            if (response.success) {
-                toast.success('Registration successful');
-                if (response.loginResponse?.success) {
-                    toast.success('Login successful');
-                }
-            } else if (response.errors) {
-                response.errors.forEach((error) => toast.error(`${error.message}`));
-            } else {
-                toast.error(response.message);
+            const response = await dispatch(registerUser(userData));
+
+            if (response?.success) {
+                toast.success('Registration successful, please log in');
+                navigate('/login');
+            } else if (response?.errors) {
+                response.errors.forEach(err => {
+                    toast.info(`${err.message}`);
+                });
             }
         } catch (error) {
-            toast.error('An error occurred during registration');
             console.error('Registration error:', error);
+            toast.error('An error occurred during registration');
         }
-    };    
+    }
 
     const isFormValid = firstNameValid && lastNameValid && emailValid && passwordValid && firstName && lastName && email && password;
 
@@ -105,7 +114,7 @@ const Register = () => {
             <Navbar />
             <Container component="main" maxWidth="xs" className='flex flex-1 flex-col align-left mt-20 mb-20'>
                 <div className='bg-white flex flex-col align-left rounded-md shadow-md p-6'>
-                    <Typography variant="h4" align='left' className='mb-2 font-extrabold text-stone-600'>
+                    <Typography variant="h5" align='left' className='mb-2 font-extrabold text-stone-600'>
                         Join Us
                     </Typography>
                     <Box component="form" onSubmit={handleSubmit} noValidate className='w-full'>

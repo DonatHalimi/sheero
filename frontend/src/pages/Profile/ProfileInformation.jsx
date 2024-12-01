@@ -1,20 +1,18 @@
 import VisibilityIcon from '@mui/icons-material/Visibility';
 import VisibilityOffIcon from '@mui/icons-material/VisibilityOff';
-import { Box, Button, IconButton, InputAdornment, TextField } from '@mui/material';
-import React, { useContext, useEffect, useMemo, useState } from 'react';
+import { Box, IconButton, InputAdornment, TextField } from '@mui/material';
+import React, { useEffect, useState } from 'react';
+import { useDispatch, useSelector } from 'react-redux';
 import { toast } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
 import { BrownButton, BrownOutlinedTextField, Header, knownEmailProviders, LoadingInformation, ProfileLayout } from '../../assets/CustomComponents';
-import useAxios from '../../axiosInstance';
 import Navbar from '../../components/Navbar/Navbar';
 import Footer from '../../components/Utils/Footer';
-import { AuthContext } from '../../context/AuthContext';
+import { updateUserProfile } from '../../store/actions/authActions';
 
 const ProfileInformation = () => {
-    const { auth, setAuth } = useContext(AuthContext);
-
-    // Memoize axiosInstance to prevent unnecessary re-renders
-    const axiosInstance = useMemo(() => useAxios(), []);
+    const { user, loading } = useSelector(state => state.auth);
+    const dispatch = useDispatch();
 
     const [initialData, setInitialData] = useState({ firstName: '', lastName: '', email: '' });
     const [firstName, setFirstName] = useState('');
@@ -22,7 +20,6 @@ const ProfileInformation = () => {
     const [email, setEmail] = useState('');
     const [password, setPassword] = useState('');
     const [newPassword, setNewPassword] = useState('');
-    const [loading, setLoading] = useState(false);
     const [showPassword, setShowPassword] = useState(false);
     const [showNewPassword, setShowNewPassword] = useState(false);
 
@@ -34,7 +31,20 @@ const ProfileInformation = () => {
 
     const [focusedField, setFocusedField] = useState(null);
 
-    useEffect(() => window.scrollTo(0, 0), [])
+    useEffect(() => window.scrollTo(0, 0), []);
+
+    useEffect(() => {
+        if (user) {
+            setInitialData({
+                firstName: user.firstName,
+                lastName: user.lastName,
+                email: user.email
+            });
+            setFirstName(user.firstName);
+            setLastName(user.lastName);
+            setEmail(user.email);
+        }
+    }, [user]);
 
     const handleClickShowPassword = () => setShowPassword(!showPassword);
     const handleClickShowNewPassword = () => setShowNewPassword(!showNewPassword);
@@ -44,8 +54,7 @@ const ProfileInformation = () => {
     const validateLastName = (name) => /^[A-Z][a-zA-Z]{1,9}$/.test(name);
     const validatePassword = password => /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[@$!%*?&])[A-Za-z\d@$!%*?&]{8,}$/.test(password);
     const validateEmail = (email) => {
-        const providerPattern = knownEmailProviders.join('|');
-        const regex = new RegExp(`^[a-zA-Z0-9._%+-]+@(${providerPattern})$`, 'i');
+        const regex = new RegExp(`^[a-zA-Z0-9._%+-]+@(${knownEmailProviders.join('|')})$`, 'i');
         return regex.test(email);
     };
 
@@ -79,71 +88,33 @@ const ProfileInformation = () => {
         setNewPasswordValid(validatePassword(value));
     };
 
-    useEffect(() => {
-        const fetchUserData = async () => {
-            try {
-                setLoading(true);
-                const response = await axiosInstance.get('/auth/me');
-                const userData = response.data;
-
-                const userFirstName = userData.firstName || '';
-                const userLastName = userData.lastName || '';
-                const userEmail = userData.email || '';
-
-                setInitialData({ firstName: userFirstName, lastName: userLastName, email: userEmail });
-                setFirstName(userFirstName);
-                setLastName(userLastName);
-                setEmail(userEmail);
-            } catch (error) {
-                toast.error('Failed to load profile data');
-            } finally {
-                setLoading(false);
-            }
-        };
-
-        fetchUserData();
-    }, [axiosInstance]);
-
     const handleSubmit = async (e) => {
         e.preventDefault();
-        setLoading(true);
-        try {
-            const updatedData = {};
-            if (firstName !== auth.firstName) updatedData.firstName = firstName;
-            if (lastName !== auth.lastName) updatedData.lastName = lastName;
-            if (email !== auth.email) updatedData.email = email;
-            if (newPassword) updatedData.newPassword = newPassword;
 
-            if (Object.keys(updatedData).length > 0) {
-                updatedData.password = password;
-            } else {
-                toast.info('No changes detected');
-                setLoading(false);
-                return;
-            }
+        const updatedData = {};
+        if (firstName !== initialData.firstName) updatedData.firstName = firstName;
+        if (lastName !== initialData.lastName) updatedData.lastName = lastName;
+        if (email !== initialData.email) updatedData.email = email;
+        if (newPassword) updatedData.newPassword = newPassword;
+        if (password) updatedData.password = password;
 
-            const response = await axiosInstance.put('/auth/profile', updatedData);
-
-            const newAuth = {
-                ...auth,
-                accessToken: response.data.accessToken || auth.accessToken,
-            };
-            setAuth(newAuth);
-
-            window.location.reload();
-
-            toast.success('Profile updated successfully!');
-        } catch (error) {
-            if (error.response) {
-                toast.error(error.response.data.message || 'Profile update failed');
-            } else if (error.request) {
-                toast.error('No response received from server');
-            } else {
-                toast.error('Error occurred while updating profile');
-            }
+        if (Object.keys(updatedData).length === 0) {
+            toast.info('No changes detected');
+            return;
         }
 
-        setLoading(false);
+        try {
+            const result = await dispatch(updateUserProfile(updatedData));
+
+            if (result.success) {
+                toast.success('Profile updated successfully!');
+            } else {
+                toast.error(result.error || 'Profile update failed');
+            }
+        } catch (error) {
+            console.error('Error updating profile:', error);
+            toast.error('Profile update failed');
+        }
     };
 
     const isFormValid = (

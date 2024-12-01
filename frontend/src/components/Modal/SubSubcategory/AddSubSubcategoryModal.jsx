@@ -1,17 +1,15 @@
 import { Autocomplete, TextField } from '@mui/material';
-import React, { useContext, useEffect, useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import { toast } from 'react-toastify';
 import { BrownButton, BrownOutlinedTextField, CustomBox, CustomModal, CustomPaper, CustomTypography } from '../../../assets/CustomComponents';
 import useAxios from '../../../axiosInstance';
-import { AuthContext } from '../../../context/AuthContext';
 
 const AddSubSubcategoryModal = ({ open, onClose, onAddSuccess }) => {
     const [name, setName] = useState('');
     const [subcategory, setSubcategory] = useState(null);
     const [subcategories, setSubcategories] = useState([]);
 
-    const { refreshToken } = useContext(AuthContext);
-    const axiosInstance = useAxios(refreshToken);
+    const axiosInstance = useAxios();
 
     useEffect(() => {
         const fetchSubcategories = async () => {

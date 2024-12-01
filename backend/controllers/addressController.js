@@ -2,6 +2,7 @@ const Address = require('../models/Address');
 
 const createAddress = async (req, res) => {
     const { name, street, city, country, phoneNumber, comment } = req.body;
+
     try {
         const address = new Address({
             user: req.user.userId,

@@ -1,11 +1,10 @@
 import UploadIcon from '@mui/icons-material/Upload';
 import { TextField } from '@mui/material';
 import Autocomplete from '@mui/material/Autocomplete';
-import React, { useContext, useEffect, useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import { toast } from 'react-toastify';
 import { BrownButton, BrownOutlinedTextField, CustomBox, CustomModal, CustomPaper, CustomTypography, OutlinedBrownButton, VisuallyHiddenInput } from '../../../assets/CustomComponents';
 import useAxios from '../../../axiosInstance';
-import { AuthContext } from '../../../context/AuthContext';
 
 const AddSubcategoryModal = ({ open, onClose, onAddSuccess }) => {
     const [name, setName] = useState('');
@@ -14,8 +13,7 @@ const AddSubcategoryModal = ({ open, onClose, onAddSuccess }) => {
     const [category, setCategory] = useState(null);
     const [categories, setCategories] = useState([]);
 
-    const { refreshToken } = useContext(AuthContext);
-    const axiosInstance = useAxios(refreshToken);
+    const axiosInstance = useAxios();
 
     useEffect(() => {
         const fetchCategories = async () => {

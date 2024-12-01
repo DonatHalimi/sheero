@@ -1,70 +1,64 @@
-import React, { useEffect, useMemo, useState } from 'react';
+import React, { useEffect, useState } from 'react';
+import { useDispatch, useSelector } from 'react-redux';
 import { Link } from 'react-router-dom';
 import { calculatePageCount, CustomPagination, EmptyState, getPaginatedItems, handlePageChange, Header, LoadingOrderItem, ProfileLayout } from '../../assets/CustomComponents';
 import emptyOrdersImage from '../../assets/img/empty/orders.png';
 import { paginationSx } from '../../assets/sx';
-import useAxios from '../../axiosInstance';
 import Navbar from '../../components/Navbar/Navbar';
 import OrderItem from '../../components/Product/Items/OrderItem';
 import Footer from '../../components/Utils/Footer';
 import { getImageUrl } from '../../config';
+import { getUserOrders } from '../../store/actions/orderActions';
 
 const itemsPerPage = 5;
 
 const Orders = () => {
-    const axiosInstance = useMemo(() => useAxios(), []);
+    const { user } = useSelector((state) => state.auth);
+    const { orders, loading } = useSelector((state) => state.orders);
+    const dispatch = useDispatch();
 
-    const [orders, setOrders] = useState([]);
-    const [loading, setLoading] = useState(true);
     const [currentPage, setCurrentPage] = useState(1);
     const [searchTerm, setSearchTerm] = useState('');
     const [statusFilter, setStatusFilter] = useState('All');
 
-    useEffect(() => {
-        const fetchOrders = async () => {
-            setLoading(true);
-            try {
-                const { data } = await axiosInstance.get('/auth/me');
-                const userId = data.id;
-                const ordersResponse = await axiosInstance.get(`/orders/user/${userId}`);
-                setOrders(ordersResponse.data);
-            } catch (error) {
-                console.error('Error fetching orders:', error.message);
-            } finally {
-                setLoading(false);
-            }
-        };
-
-        fetchOrders();
-    }, [axiosInstance]);
+    useEffect(() => { window.scrollTo(0, 0) }, []);
 
     useEffect(() => {
-        window.scrollTo(0, 0);
-    }, []);
+        if (user?.id) {
+            dispatch(getUserOrders(user.id));
+        }
+    }, [dispatch, user]);
 
     useEffect(() => {
         setCurrentPage(1);
     }, [searchTerm, statusFilter]);
 
-    const filteredOrders = Array.isArray(orders) ? orders.filter(order => {
-        const matchesSearchTerm = [
-            order._id || '',
-            order.paymentStatus || '',
-            order.paymentMethod || '',
-            order.totalAmount?.toString() || '',
-            order.paymentIntentId || '',
-            order.status || '',
-            ...order.products.flatMap(product => [
-                product.product?.name?.toLowerCase() || '',
-                product.quantity?.toString() || '',
-                product.price?.toString() || ''
-            ])
-        ].some(field => field.toLowerCase().includes(searchTerm.toLowerCase()));
+    const filteredOrders = Array.isArray(orders)
+        ? orders.filter(
+            ({ _id, paymentStatus, paymentMethod, totalAmount, paymentIntentId, status, products }) => {
+                const fields = [
+                    _id,
+                    paymentStatus,
+                    paymentMethod,
+                    totalAmount?.toString(),
+                    paymentIntentId,
+                    status,
+                    ...products.flatMap(({ product }) => [
+                        product?.name?.toLowerCase(),
+                        product?.quantity?.toString(),
+                        product?.price?.toString(),
+                    ]),
+                ];
 
-        const matchesStatusFilter = statusFilter === 'All' || order.status === statusFilter;
+                const matchesSearchTerm = fields.some((field) =>
+                    field?.toLowerCase().includes(searchTerm.toLowerCase())
+                );
 
-        return matchesSearchTerm && matchesStatusFilter;
-    }) : [];
+                const matchesStatusFilter = statusFilter === 'All' || status === statusFilter;
+
+                return matchesSearchTerm && matchesStatusFilter;
+            }
+        ) : [];
 
     const renderProductImages = (products) => {
         if (!Array.isArray(products)) return null;

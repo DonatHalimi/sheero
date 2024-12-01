@@ -1,17 +1,15 @@
 import { InputLabel, MenuItem, Select } from '@mui/material';
-import React, { useContext, useEffect, useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import { toast } from 'react-toastify';
 import { BrownButton, BrownOutlinedTextField, CustomBox, CustomModal, CustomTypography, OutlinedBrownFormControl } from '../../../assets/CustomComponents';
 import useAxios from '../../../axiosInstance';
-import { AuthContext } from '../../../context/AuthContext';
 
 const EditSubSubcategoryModal = ({ open, onClose, subSubcategory, onEditSuccess }) => {
     const [name, setName] = useState('');
     const [subcategory, setSubcategory] = useState('');
     const [subcategories, setSubcategories] = useState([]);
 
-    const { refreshToken } = useContext(AuthContext);
-    const axiosInstance = useAxios(refreshToken);
+    const axiosInstance = useAxios();
 
     useEffect(() => {
         if (subSubcategory) {

@@ -2,16 +2,10 @@ const jwt = require('jsonwebtoken');
 const User = require('../models/User');
 
 const authenticateToken = (req, res, next) => {
-    const authHeader = req.header('Authorization');
-
-    if (!authHeader) {
-        return res.status(401).json({ message: 'No token provided' });
-    }
-
-    const token = authHeader.split(' ')[1];
+    const token = req.cookies.accessToken;
 
     if (!token) {
-        return res.status(401).json({ message: 'No token provided' });
+        return res.status(401).json({ message: 'Authentication required' });
     }
 
     jwt.verify(token, process.env.JWT_SECRET, (err, user) => {
@@ -96,7 +90,6 @@ const requireOwnershipOrAdmin = (Model) => {
 
             next();
         } catch (error) {
-            console.error('Error checking ownership:', error);
             res.status(500).json({ message: 'Server error' });
         }
     };

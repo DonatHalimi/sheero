@@ -1,14 +1,14 @@
-import React, { useContext, useState } from 'react';
+import React, { useState } from 'react';
+import { useSelector } from 'react-redux';
 import { useNavigate } from 'react-router-dom';
 import { toast } from 'react-toastify';
 import { CartWishlistButtons, DiscountPercentage, formatPrice, LoadingOverlay, OutOfStock } from '../../../assets/CustomComponents';
 import NoImage from '../../../assets/img/errors/product-not-found.png';
 import useAxios from '../../../axiosInstance';
 import { getApiUrl, getImageUrl } from '../../../config';
-import { AuthContext } from '../../../context/AuthContext';
 
 const ProductItem = ({ product }) => {
-    const { auth } = useContext(AuthContext);
+    const { isAuthenticated } = useSelector(state => state.auth) || {};
     const axiosInstance = useAxios();
     const navigate = useNavigate();
 
@@ -26,8 +26,8 @@ const ProductItem = ({ product }) => {
 
     const handleAction = (action) => async (e) => {
         e.stopPropagation();
-        if (!auth.accessToken) {
-            toast.error('You need to log in first.');
+        if (!isAuthenticated) {
+            toast.error('You need to log in first');
             navigate('/login');
             return;
         }
@@ -52,7 +52,7 @@ const ProductItem = ({ product }) => {
             if (error.response?.data?.errors && Array.isArray(error.response.data.errors)) {
                 error.response.data.errors.forEach((err) => {
                     toast.info(`${err.message}`, {
-                        onClick: () => navigate(`/${action === 'wishlist' ? 'profile/wishlist' : 'cart'}`)
+                        onClick: () => navigate(`/${action === 'wishlist' ? 'profile/wishlist' : 'cart'}`),
                     });
                 });
             } else {

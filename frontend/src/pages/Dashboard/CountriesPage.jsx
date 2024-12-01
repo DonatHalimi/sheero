@@ -1,14 +1,16 @@
-import React, { useContext, useEffect, useState } from 'react';
+import React, { useEffect, useState } from 'react';
+import { useDispatch, useSelector } from "react-redux";
 import { DashboardHeader } from '../../assets/CustomComponents.jsx';
-import useAxios from '../../axiosInstance.js';
 import DashboardTable from '../../components/Dashboard/DashboardTable';
 import AddCountryModal from '../../components/Modal/Country/AddCountryModal.jsx';
 import EditCountryModal from '../../components/Modal/Country/EditCountryModal.jsx';
 import DeleteModal from '../../components/Modal/DeleteModal.jsx';
-import { AuthContext } from '../../context/AuthContext.jsx';
+import { getCountries } from '../../store/actions/addressActions.js';
 
 const CountriesPage = () => {
-    const [countries, setCountries] = useState([]);
+    const { countries } = useSelector((state) => state.address);
+    const dispatch = useDispatch();
+
     const [selectedCountry, setSelectedCountry] = useState(null);
     const [selectedCountries, setSelectedCountries] = useState([]);
     const [addCountryOpen, setAddCountryOpen] = useState(false);
@@ -17,21 +19,9 @@ const CountriesPage = () => {
     const [currentPage, setCurrentPage] = useState(0);
     const itemsPerPage = 5;
 
-    const { refreshToken } = useContext(AuthContext);
-    const axiosInstance = useAxios(refreshToken);
-
     useEffect(() => {
-        fetchCountries();
-    }, [addCountryOpen, editCountryOpen, deleteCountryOpen, axiosInstance]);
-
-    const fetchCountries = async () => {
-        try {
-            const response = await axiosInstance.get('/countries/get');
-            setCountries(response.data);
-        } catch (error) {
-            console.error('Error fetching countries', error);
-        }
-    };
+        dispatch(getCountries());
+    }, [dispatch]);
 
     const handleSelectCountry = (countryId) => {
         const id = Array.isArray(countryId) ? countryId[0] : countryId;
@@ -84,13 +74,13 @@ const CountriesPage = () => {
                     onEdit={handleEdit}
                 />
 
-                <AddCountryModal open={addCountryOpen} onClose={() => setAddCountryOpen(false)} onAddSuccess={fetchCountries} />
-                <EditCountryModal open={editCountryOpen} onClose={() => setEditCountryOpen(false)} country={selectedCountry} onEditSuccess={fetchCountries} />
+                <AddCountryModal open={addCountryOpen} onClose={() => setAddCountryOpen(false)} onAddSuccess={() => dispatch(getCountries())} />
+                <EditCountryModal open={editCountryOpen} onClose={() => setEditCountryOpen(false)} country={selectedCountry} onEditSuccess={() => dispatch(getCountries())} />
                 <DeleteModal
                     open={deleteCountryOpen}
                     onClose={() => setDeleteCountryOpen(false)}
                     items={selectedCountries.map(id => countries.find(country => country._id === id)).filter(country => country)}
-                    onDeleteSuccess={fetchCountries}
+                    onDeleteSuccess={() => dispatch(getCountries())}
                     endpoint="/countries/delete-bulk"
                     title="Delete Countries"
                     message="Are you sure you want to delete the selected countries?"

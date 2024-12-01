@@ -1,14 +1,16 @@
-import React, { useContext, useEffect, useState } from 'react';
+import React, { useEffect, useState } from 'react';
+import { useDispatch, useSelector } from 'react-redux';
 import { DashboardHeader, RatingStars } from '../../assets/CustomComponents';
-import useAxios from '../../axiosInstance';
 import DashboardTable from '../../components/Dashboard/DashboardTable';
 import DeleteModal from '../../components/Modal/DeleteModal';
 import AddReviewModal from '../../components/Modal/Review/AddReviewModal';
 import EditReviewModal from '../../components/Modal/Review/EditReviewModal';
-import { AuthContext } from '../../context/AuthContext';
+import { getReviews } from '../../store/actions/dashboardActions';
 
 const ReviewsPage = () => {
-    const [reviews, setReviews] = useState([]);
+    const { reviews } = useSelector((state) => state.dashboard);
+    const dispatch = useDispatch();
+
     const [selectedReview, setSelectedReview] = useState(null);
     const [selectedReviews, setSelectedReviews] = useState([]);
     const [addReviewOpen, setAddReviewOpen] = useState(false);
@@ -17,21 +19,9 @@ const ReviewsPage = () => {
     const [currentPage, setCurrentPage] = useState(0);
     const itemsPerPage = 5;
 
-    const { refreshToken } = useContext(AuthContext);
-    const axiosInstance = useAxios(refreshToken);
-
     useEffect(() => {
-        fetchReviews();
-    }, [addReviewOpen, editReviewOpen, deleteReviewOpen, axiosInstance]);
-
-    const fetchReviews = async () => {
-        try {
-            const response = await axiosInstance.get('/reviews/get');
-            setReviews(response.data);
-        } catch (error) {
-            console.error('Error fetching reviews', error);
-        }
-    };
+        dispatch(getReviews());
+    }, [dispatch]);
 
     const handleSelectReview = (reviewId) => {
         const id = Array.isArray(reviewId) ? reviewId[0] : reviewId;
@@ -103,13 +93,13 @@ const ReviewsPage = () => {
                     onEdit={handleEdit}
                 />
 
-                <AddReviewModal open={addReviewOpen} onClose={() => setAddReviewOpen(false)} onAddSuccess={fetchReviews} />
-                <EditReviewModal open={editReviewOpen} onClose={() => setEditReviewOpen(false)} review={selectedReview} onEditSuccess={fetchReviews} />
+                <AddReviewModal open={addReviewOpen} onClose={() => setAddReviewOpen(false)} onAddSuccess={() => dispatch(getReviews())} />
+                <EditReviewModal open={editReviewOpen} onClose={() => setEditReviewOpen(false)} review={selectedReview} onEditSuccess={() => dispatch(getReviews())} />
                 <DeleteModal
                     open={deleteReviewOpen}
                     onClose={() => setDeleteReviewOpen(false)}
                     items={selectedReviews.map(id => reviews.find(review => review._id === id)).filter(review => review)}
-                    onDeleteSuccess={fetchReviews}
+                    onDeleteSuccess={() => dispatch(getReviews())}
                     endpoint="/reviews/delete-bulk"
                     title="Delete Reviews"
                     message="Are you sure you want to delete the selected reviews?"

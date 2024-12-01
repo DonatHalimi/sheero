@@ -1,14 +1,16 @@
-import React, { useContext, useEffect, useState } from 'react';
+import React, { useEffect, useState } from 'react';
+import { useDispatch, useSelector } from 'react-redux';
 import { DashboardHeader } from '../../assets/CustomComponents.jsx';
-import useAxios from '../../axiosInstance.js';
 import DashboardTable from '../../components/Dashboard/DashboardTable';
 import DeleteModal from '../../components/Modal/DeleteModal.jsx';
 import AddRoleModal from '../../components/Modal/Role/AddRoleModal.jsx';
 import EditRoleModal from '../../components/Modal/Role/EditRoleModal.jsx';
-import { AuthContext } from '../../context/AuthContext.jsx';
+import { getRoles } from '../../store/actions/dashboardActions.js';
 
 const RolesPage = () => {
-    const [roles, setRoles] = useState([]);
+    const { roles } = useSelector((state) => state.dashboard);
+    const dispatch = useDispatch();
+
     const [selectedRole, setSelectedRole] = useState(null);
     const [selectedRoles, setSelectedRoles] = useState([]);
     const [addRoleOpen, setAddRoleOpen] = useState(false);
@@ -17,21 +19,9 @@ const RolesPage = () => {
     const [currentPage, setCurrentPage] = useState(0);
     const itemsPerPage = 5;
 
-    const { refreshToken } = useContext(AuthContext);
-    const axiosInstance = useAxios(refreshToken);
-
     useEffect(() => {
-        fetchRoles();
-    }, [addRoleOpen, editRoleOpen, deleteRoleOpen, axiosInstance]);
-
-    const fetchRoles = async () => {
-        try {
-            const response = await axiosInstance.get('/roles/get');
-            setRoles(response.data);
-        } catch (error) {
-            console.error('Error fetching roles', error);
-        }
-    };
+        dispatch(getRoles());
+    }, [dispatch]);
 
     const handleSelectRole = (roleId) => {
         const id = Array.isArray(roleId) ? roleId[0] : roleId;
@@ -84,22 +74,13 @@ const RolesPage = () => {
                     onEdit={handleEdit}
                 />
 
-                <AddRoleModal
-                    open={addRoleOpen}
-                    onClose={() => setAddRoleOpen(false)}
-                    onAddSuccess={fetchRoles}
-                />
-                <EditRoleModal
-                    open={editRoleOpen}
-                    onClose={() => setEditRoleOpen(false)}
-                    role={selectedRole}
-                    onEditSuccess={fetchRoles}
-                />
+                <AddRoleModal open={addRoleOpen} onClose={() => setAddRoleOpen(false)} onAddSuccess={() => dispatch(getRoles())} />
+                <EditRoleModal open={editRoleOpen} onClose={() => setEditRoleOpen(false)} role={selectedRole} onEditSuccess={() => dispatch(getRoles())} />
                 <DeleteModal
                     open={deleteRoleOpen}
                     onClose={() => setDeleteRoleOpen(false)}
                     items={selectedRoles.map(id => roles.find(role => role._id === id)).filter(role => role)}
-                    onDeleteSuccess={fetchRoles}
+                    onDeleteSuccess={() => dispatch(getRoles())}
                     endpoint="/roles/delete-bulk"
                     title="Delete Roles"
                     message="Are you sure you want to delete the selected roles?"

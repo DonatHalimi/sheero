@@ -1,9 +1,8 @@
 import { Autocomplete, TextField } from '@mui/material';
-import React, { useContext, useEffect, useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import { toast } from 'react-toastify';
 import { BrownButton, BrownOutlinedTextField, CustomBox, CustomModal, CustomPaper, CustomTypography } from '../../../assets/CustomComponents';
 import useAxios from '../../../axiosInstance';
-import { AuthContext } from '../../../context/AuthContext';
 
 const AddCityModal = ({ open, onClose, onAddSuccess }) => {
     const [name, setName] = useState('');
@@ -11,8 +10,7 @@ const AddCityModal = ({ open, onClose, onAddSuccess }) => {
     const [zipCode, setZipCode] = useState('');
     const [countries, setCountries] = useState([]);
 
-    const { refreshToken } = useContext(AuthContext);
-    const axiosInstance = useAxios(refreshToken);
+    const axiosInstance = useAxios();
 
     useEffect(() => {
         const fetchCountries = async () => {

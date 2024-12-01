@@ -88,7 +88,7 @@ const getReviewsByUser = async (req, res) => {
     const userId = req.params.userId;
 
     try {
-        const reviews = await populateR(Review.find({ user: userId }));
+        const reviews = await populateR(Review.find({ user: userId }).sort({ createdAt: -1 }));
         res.status(200).json(reviews);
     } catch (error) {
         res.status(500).json({ message: 'Server error', error: error.message });
@@ -136,7 +136,7 @@ const deleteReviews = async (req, res) => {
         const reviews = await Review.find({ _id: { $in: ids } });
 
         const productIds = reviews.map(review => review.product);
-        
+
         await Review.deleteMany({ _id: { $in: ids } });
 
         await Product.updateMany(

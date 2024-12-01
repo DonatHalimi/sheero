@@ -1,42 +1,24 @@
 import { LinearProgress, Table, TableBody, TableCell, TableContainer, TableHead, TableRow } from '@mui/material';
-import React, { useEffect, useState } from 'react';
-import { Link, useNavigate, useParams } from 'react-router-dom';
+import React, { useEffect } from 'react';
+import { useDispatch, useSelector } from 'react-redux';
+import { Link, useParams } from 'react-router-dom';
 import { EmptyState, formatDate, Header, LoadingOrderDetails, ProfileLayout } from '../../assets/CustomComponents';
 import emptyReturnsImage from '../../assets/img/empty/orders.png';
-import useAxios from '../../axiosInstance';
 import Navbar from '../../components/Navbar/Navbar';
 import Footer from '../../components/Utils/Footer';
 import { getImageUrl } from '../../config';
+import { getReturnDetails } from '../../store/actions/returnActions';
 
 const ReturnDetails = () => {
     const { returnId } = useParams();
-    const axiosInstance = useAxios();
-    const navigate = useNavigate();
+    const { returnDetails: returnRequest, loading } = useSelector((state) => state.returns);
+    const dispatch = useDispatch();
 
-    const [returnRequest, setReturnRequest] = useState(null);
-    const [loading, setLoading] = useState(true);
+    useEffect(() => { window.scrollTo(0, 0) }, []);
 
     useEffect(() => {
-        window.scrollTo(0, 0);
-        fetchReturnDetails();
-    }, [returnId]);
-
-    const fetchReturnDetails = async () => {
-        try {
-            const response = await axiosInstance.get(`/returns/${returnId}`);
-            console.log(Object.keys(response.data.data));
-            if (response.data.success) {
-                setReturnRequest(response.data.data);
-            } else {
-                console.log('Return request not found or access denied.');
-            }
-        } catch (error) {
-            console.error('Error fetching return details:', error);
-            navigate('/');
-        } finally {
-            setLoading(false);
-        }
-    };
+        dispatch(getReturnDetails(returnId));
+    }, [returnId, dispatch]);
 
     const displayReason = returnRequest
         ? (returnRequest.reason === 'Other'

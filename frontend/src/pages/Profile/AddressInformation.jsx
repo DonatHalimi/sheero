@@ -1,27 +1,28 @@
 import { Box, FormControl, InputLabel, MenuItem, Select, TextField } from '@mui/material';
-import React, { useEffect, useMemo, useState } from 'react';
+import React, { useEffect, useState } from 'react';
+import { useDispatch, useSelector } from 'react-redux';
 import { toast } from 'react-toastify';
 import { BrownButton, Header, LoadingInformation, ProfileLayout } from '../../assets/CustomComponents';
-import useAxios from '../../axiosInstance';
 import Navbar from '../../components/Navbar/Navbar';
 import Footer from '../../components/Utils/Footer';
+import { addAddress, getAddressByUser, getCities, getCountries, updateAddress } from '../../store/actions/addressActions';
 
 const AddressInformation = () => {
-    const axiosInstance = useMemo(() => useAxios(), []);
+    const { user } = useSelector((state) => state.auth);
+    const { address, countries, cities, loading } = useSelector((state) => state.address);
+    const dispatch = useDispatch();
 
-    const [name, setName] = useState('');
-    const [street, setStreet] = useState('');
-    const [phoneNumber, setPhoneNumber] = useState('');
-    const [city, setCity] = useState('');
-    const [country, setCountry] = useState('');
-    const [comment, setComment] = useState('');
+    const [initialData, setInitialData] = useState({
+        name: '',
+        street: '',
+        phoneNumber: '',
+        city: '',
+        country: '',
+        comment: '',
+    });
+
     const [existingAddress, setExistingAddress] = useState(null);
-    const [cities, setCities] = useState([]);
-    const [countries, setCountries] = useState([]);
     const [isSubmitted, setIsSubmitted] = useState(false);
-
-    const [loading, setLoading] = useState(true);
-
     const [nameValid, setNameValid] = useState(true);
     const [streetValid, setStreetValid] = useState(true);
     const [phoneNumberValid, setPhoneNumberValid] = useState(true);
@@ -31,82 +32,77 @@ const AddressInformation = () => {
     useEffect(() => window.scrollTo(0, 0), []);
 
     useEffect(() => {
-        const fetchUserData = async () => {
-            try {
-                const response = await axiosInstance.get('/auth/me');
-                const userId = response.data.id;
-                fetchAddress(userId);
-            } catch (error) {
-                console.error('Error fetching user data:', error.message);
-            }
-        };
-
-        fetchUserData();
-    }, [axiosInstance]);
-
-    const fetchAddress = async (userId) => {
-        try {
-            setLoading(true);
-            const response = await axiosInstance.get(`/addresses/user/${userId}`);
-            const address = response.data;
-            if (address) {
-                setName(address.name || '');
-                setStreet(address.street || '');
-                setPhoneNumber(address.phoneNumber || '');
-                setCity(address.city?._id || '');
-                setCountry(address.country?._id || '');
-                setComment(address.comment || '');
-                setExistingAddress(address);
-            }
-        } catch (error) {
-            console.error('Error fetching address:', error.message);
-        } finally {
-            setLoading(false);
+        if (user && user.id) {
+            dispatch(getAddressByUser(user.id));
         }
-    };
+        dispatch(getCountries());
+    }, [dispatch, user]);
 
     useEffect(() => {
-        const fetchCountries = async () => {
-            try {
-                const response = await axiosInstance.get('/countries/get');
-                if (response.data && Array.isArray(response.data)) {
-                    setCountries(response.data);
-                }
-            } catch (error) {
-                console.error('Error fetching countries:', error);
-            }
-        };
-
-        fetchCountries();
-    }, [axiosInstance]);
+        if (initialData.country) {
+            dispatch(getCities(initialData.country));
+        }
+    }, [dispatch, initialData.country]);
 
     useEffect(() => {
-        if (country && !cities.length) {
-            const fetchCities = async () => {
-                try {
-                    const response = await axiosInstance.get(`/cities/country/${country}`);
-                    if (response.data && Array.isArray(response.data)) {
-                        setCities(response.data);
-                    }
-                } catch (error) {
-                    console.error('Error fetching cities:', error);
-                }
-            };
-
-            fetchCities();
+        if (address) {
+            setExistingAddress(true);
+            setInitialData({
+                name: address.name || '',
+                street: address.street || '',
+                phoneNumber: address.phoneNumber || '',
+                city: address.city?._id || '',
+                country: address.country?._id || '',
+                comment: address.comment || '',
+            });
+        } else {
+            setExistingAddress(false);
         }
-    }, [country, cities.length, axiosInstance]);
+    }, [address]);
 
     const handleCountryChange = (e) => {
         const selectedCountryId = e.target.value;
-        setCountry(selectedCountryId);
-        setCity('');
-        setCities([]);
+        setInitialData((prevData) => ({
+            ...prevData,
+            country: selectedCountryId,
+            city: '',
+        }));
     };
 
     const handleCityChange = (e) => {
         const selectedCityId = e.target.value;
-        setCity(selectedCityId);
+        setInitialData((prevData) => ({
+            ...prevData,
+            city: selectedCityId,
+        }));
+    };
+
+    const handleSaveAddress = async (e) => {
+        e.preventDefault();
+
+        if (!initialData.name || !initialData.street || !initialData.phoneNumber || !initialData.city || !initialData.country) {
+            toast.error('Please fill in all the fields correctly');
+            return;
+        }
+
+        const updatedAddress = { ...initialData };
+
+        try {
+            if (address) {
+                await dispatch(updateAddress(address._id, updatedAddress));
+                toast.success('Address updated successfully');
+
+                dispatch(getAddressByUser(user.id));
+            } else {
+                await dispatch(addAddress(updatedAddress));
+                toast.success('Address added successfully');
+
+                dispatch(getAddressByUser(user.id));
+            }
+            setIsSubmitted(true);
+        } catch (error) {
+            toast.error('Error saving address');
+        }
     };
 
     const validateName = (name) => /^[A-Z][a-zA-Z]{1,9}$/.test(name);
@@ -116,84 +112,48 @@ const AddressInformation = () => {
 
     const handleNameChange = (e) => {
         const value = e.target.value;
-        setName(value);
+        setInitialData((prevData) => ({
+            ...prevData,
+            name: value,
+        }));
         setNameValid(validateName(value));
     };
 
     const handleStreetChange = (e) => {
         const value = e.target.value;
-        setStreet(value);
+        setInitialData((prevData) => ({
+            ...prevData,
+            street: value,
+        }));
         setStreetValid(validateStreet(value));
     };
 
     const handlePhoneNumberChange = (e) => {
         const value = e.target.value;
-        setPhoneNumber(value);
+        setInitialData((prevData) => ({
+            ...prevData,
+            phoneNumber: value,
+        }));
         setPhoneNumberValid(validatePhoneNumber(value));
     };
 
     const handleCommentChange = (e) => {
         const value = e.target.value;
-        setComment(value);
+        setInitialData((prevData) => ({
+            ...prevData,
+            comment: value,
+        }));
         setCommentValid(validateComment(value));
     };
 
-    const handleSaveAddress = async (e) => {
-        e.preventDefault();
-        if (!validateName(name) || !validateStreet(street) || !validatePhoneNumber(phoneNumber) || !city || !country) {
-            toast.error('Please fill in all the fields correctly');
-            setNameValid(validateName(name));
-            setStreetValid(validateStreet(street));
-            setPhoneNumberValid(validatePhoneNumber(phoneNumber));
-            setCommentValid(validate(comment));
-            return;
-        }
-
-        const updatedAddress = {
-            name,
-            street,
-            phoneNumber,
-            city,
-            country,
-            comment,
-        };
-
-        try {
-            let response;
-            if (existingAddress) {
-                response = await axiosInstance.put(`/addresses/update/${existingAddress._id}`, updatedAddress);
-            } else {
-                response = await axiosInstance.post(`/addresses/create`, updatedAddress);
-            }
-
-            if (response.status === 200 || response.status === 201) {
-                toast.success(existingAddress ? 'Address updated successfully' : 'Address added successfully');
-                setExistingAddress(response.data);
-                setIsSubmitted(true);
-            } else {
-                toast.error('Unexpected response from server');
-            }
-        } catch (error) {
-            if (error.response?.data?.errors) {
-                const mappedErrors = error.response.data.errors.map((err) => ({
-                    message: err.message,
-                }));
-                mappedErrors.forEach((err) => toast.error(err.message));
-            } else {
-                toast.error('Error saving address');
-            }
-        }
-    };
-
-    const isFormValid = nameValid && streetValid && phoneNumberValid && commentValid && city && country;
-
-    const isFormUnchanged = existingAddress &&
-        name === existingAddress.name &&
-        street === existingAddress.street &&
-        phoneNumber === existingAddress.phoneNumber &&
-        city === existingAddress.city?._id &&
-        country === existingAddress.country?._id &&
-        comment === existingAddress.comment;
+    const isFormValid = nameValid && streetValid && phoneNumberValid && commentValid && initialData.city && initialData.country;
+    const isFormUnchanged = address &&
+        initialData.name === address.name &&
+        initialData.street === address.street &&
+        initialData.phoneNumber === address.phoneNumber &&
+        initialData.city === address.city?._id &&
+        initialData.country === address.country?._id &&
+        initialData.comment === address.comment;
 
     return (
         <>
@@ -218,7 +178,7 @@ const AddressInformation = () => {
                                         variant="outlined"
                                         required
                                         name="name"
-                                        value={name}
+                                        value={initialData.name}
                                         onChange={handleNameChange}
                                         onFocus={() => setFocusedField('name')}
                                         onBlur={() => setFocusedField(null)}
@@ -241,7 +201,7 @@ const AddressInformation = () => {
                                         variant="outlined"
                                         required
                                         name="street"
-                                        value={street}
+                                        value={initialData.street}
                                         onChange={handleStreetChange}
                                         onFocus={() => setFocusedField('street')}
                                         onBlur={() => setFocusedField(null)}
@@ -265,7 +225,7 @@ const AddressInformation = () => {
                                         variant="outlined"
                                         required
                                         name="phoneNumber"
-                                        value={phoneNumber}
+                                        value={initialData.phoneNumber}
                                         onChange={handlePhoneNumberChange}
                                         onFocus={() => setFocusedField('phoneNumber')}
                                         onBlur={() => setFocusedField(null)}
@@ -289,7 +249,7 @@ const AddressInformation = () => {
                                     <InputLabel>Country</InputLabel>
                                     <Select
                                         name="country"
-                                        value={country}
+                                        value={initialData.country}
                                         onChange={handleCountryChange}
                                         label="Country"
                                         MenuProps={{
@@ -308,10 +268,10 @@ const AddressInformation = () => {
                                     <InputLabel>City</InputLabel>
                                     <Select
                                         name="city"
-                                        value={city}
+                                        value={initialData.city}
                                         onChange={handleCityChange}
                                         label="City"
-                                        disabled={!country}
+                                        disabled={!initialData.country}
                                         MenuProps={{
                                             disableScrollLock: true,
                                         }}
@@ -331,7 +291,7 @@ const AddressInformation = () => {
                                     label="Comment"
                                     variant="outlined"
                                     name="comment"
-                                    value={comment}
+                                    value={initialData.comment}
                                     onChange={handleCommentChange}
                                     onFocus={() => setFocusedField('comment')}
                                     onBlur={() => setFocusedField(null)}

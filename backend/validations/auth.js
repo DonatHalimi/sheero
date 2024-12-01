@@ -3,7 +3,7 @@ const User = require('../models/User');
 const Role = require('../models/Role');
 const bcrypt = require('bcryptjs');
 
-const isValidName = (v) => /^[A-Z][a-zA-Z\s]{2,10}$/.test(v);
+const isValidName = (v) => /^[A-Z][a-zA-Z\s]{1,9}$/.test(v);
 const isValidPassword = (v) => /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[@$!%*?&])[A-Za-z\d@$!%*?&]{8,}$/.test(v);
 
 const registerSchema = yup.object({

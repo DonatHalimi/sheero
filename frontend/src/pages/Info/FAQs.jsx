@@ -1,29 +1,17 @@
-import React, { useEffect, useState } from 'react';
+import React, { useEffect } from 'react';
+import { useDispatch, useSelector } from 'react-redux';
 import { FAQItem, GoBackButton, LoadingFaq } from '../../assets/CustomComponents';
-import useAxios from '../../axiosInstance';
 import Navbar from '../../components/Navbar/Navbar';
 import Footer from '../../components/Utils/Footer';
+import { getFAQs } from '../../store/actions/dashboardActions';
 
 const FAQs = () => {
-    const [faqData, setFaqData] = useState([]);
-    const [loading, setLoading] = useState(true);
-
-    const axiosInstance = useAxios();
+    const { faqs, loading } = useSelector((state) => state.dashboard);
+    const dispatch = useDispatch();
 
     useEffect(() => {
-        const fetchFAQs = async () => {
-            try {
-                const response = await axiosInstance.get('/faqs/get');
-                setFaqData(response.data);
-            } catch (error) {
-                console.error('Error fetching FAQs:', error);
-            } finally {
-                setLoading(false);
-            }
-        };
-
-        fetchFAQs();
-    }, []);
+        dispatch(getFAQs())
+    }, [dispatch])
 
     return (
         <>
@@ -38,7 +26,7 @@ const FAQs = () => {
                 <div>
                     {loading ?
                         <LoadingFaq />
-                        : faqData.map((faq, index) => (
+                        : faqs.map((faq, index) => (
                             <FAQItem key={index} question={faq.question} answer={faq.answer} />
                         ))
                     }

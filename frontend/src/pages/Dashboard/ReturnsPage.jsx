@@ -1,14 +1,16 @@
-import React, { useContext, useEffect, useState } from 'react';
-import { DashboardHeader } from '../../assets/CustomComponents';
-import useAxios from '../../axiosInstance';
+import React, { useEffect, useState } from 'react';
+import { useDispatch, useSelector } from 'react-redux';
+import { DashboardHeader, formatDate } from '../../assets/CustomComponents';
 import DashboardTable from '../../components/Dashboard/DashboardTable';
 import DeleteModal from '../../components/Modal/DeleteModal';
 import AddReturnRequestModal from '../../components/Modal/ReturnRequest/AddReturnRequestModal';
 import EditReturnRequestModal from '../../components/Modal/ReturnRequest/EditReturnRequestModal';
-import { AuthContext } from '../../context/AuthContext';
+import { getReturnRequests } from '../../store/actions/dashboardActions';
 
 const ReturnsPage = () => {
-    const [returnRequests, setReturnRequests] = useState([]);
+    const { returnRequests } = useSelector((state) => state.dashboard);
+    const dispatch = useDispatch();
+
     const [selectedReturnRequest, setSelectedReturnRequest] = useState(null);
     const [selectedReturnRequests, setSelectedReturnRequests] = useState([]);
     const [addReturnRequestOpen, setAddReturnRequestOpen] = useState(false);
@@ -17,21 +19,9 @@ const ReturnsPage = () => {
     const [currentPage, setCurrentPage] = useState(0);
     const itemsPerPage = 5;
 
-    const { refreshToken } = useContext(AuthContext);
-    const axiosInstance = useAxios(refreshToken);
-
     useEffect(() => {
-        fetchReturnRequests();
-    }, [editReturnRequestOpen, deleteReturnRequestOpen, axiosInstance]);
-
-    const fetchReturnRequests = async () => {
-        try {
-            const response = await axiosInstance.get('/returns/get');
-            setReturnRequests(response.data.returnRequests);
-        } catch (error) {
-            console.error('Error fetching return requests', error);
-        }
-    };
+        dispatch(getReturnRequests());
+    }, [dispatch]);
 
     const handleSelectReturnRequest = (requestId) => {
         const id = Array.isArray(requestId) ? requestId[0] : requestId;
@@ -60,12 +50,23 @@ const ReturnsPage = () => {
     };
 
     const columns = [
-        { label: 'Order ID', key: 'order' },
-        { label: 'Products', key: 'products' },
-        { label: 'User', key: 'user.email' },
-        { label: 'Reason', key: 'reason' },
-        { label: 'Status', key: 'status' },
-        { label: 'Actions', key: 'actions' }
+        { key: 'order', label: 'Order ID' },
+        { key: 'user.email', label: 'User' },
+        { key: 'products', label: 'Products' },
+        { key: 'reason', label: 'Reason' },
+        {
+            key: 'createdAt',
+            label: 'Created At',
+            render: (returnData) => {
+                const date = returnData.createdAt ? new Date(returnData.createdAt) : null;
+                if (date) {
+                    return formatDate(date);
+                }
+                return 'N/A';
+            }
+        },
+        { key: 'status', label: 'Status' },
+        { key: 'actions', label: 'Actions' }
     ];
 
     const renderProducts = (products) => {
@@ -97,13 +98,13 @@ const ReturnsPage = () => {
                     onEdit={handleEdit}
                 />
 
-                <AddReturnRequestModal open={addReturnRequestOpen} onClose={() => setAddReturnRequestOpen(false)} onAddSuccess={fetchReturnRequests} />
-                <EditReturnRequestModal open={editReturnRequestOpen} onClose={() => setEditReturnRequestOpen(false)} returnRequest={selectedReturnRequest} onEditSuccess={fetchReturnRequests} />
+                <AddReturnRequestModal open={addReturnRequestOpen} onClose={() => setAddReturnRequestOpen(false)} onAddSuccess={() => dispatch(getReturnRequests())} />
+                <EditReturnRequestModal open={editReturnRequestOpen} onClose={() => setEditReturnRequestOpen(false)} returnRequest={selectedReturnRequest} onEditSuccess={() => dispatch(getReturnRequests())} />
                 <DeleteModal
                     open={deleteReturnRequestOpen}
                     onClose={() => setDeleteReturnRequestOpen(false)}
                     items={selectedReturnRequests.map(id => returnRequests.find(request => request._id === id)).filter(request => request)}
-                    onDeleteSuccess={fetchReturnRequests}
+                    onDeleteSuccess={() => dispatch(getReturnRequests())}
                     endpoint="/returns/delete-bulk"
                     title="Delete Return Requests"
                     message="Are you sure you want to delete the selected return requests?"

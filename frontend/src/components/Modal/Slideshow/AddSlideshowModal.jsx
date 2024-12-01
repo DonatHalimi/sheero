@@ -1,9 +1,8 @@
 import UploadIcon from '@mui/icons-material/Upload';
-import React, { useContext, useState } from 'react';
+import React, { useState } from 'react';
 import { toast } from 'react-toastify';
 import { BrownButton, BrownOutlinedTextField, CustomBox, CustomModal, CustomTypography, OutlinedBrownButton, VisuallyHiddenInput } from '../../../assets/CustomComponents';
 import useAxios from '../../../axiosInstance';
-import { AuthContext } from '../../../context/AuthContext';
 
 const AddSlideshowModal = ({ open, onClose, onAddSuccess }) => {
     const [title, setTitle] = useState('');
@@ -11,8 +10,7 @@ const AddSlideshowModal = ({ open, onClose, onAddSuccess }) => {
     const [image, setImage] = useState(null);
     const [imagePreview, setImagePreview] = useState(null);
 
-    const { refreshToken } = useContext(AuthContext);
-    const axiosInstance = useAxios(refreshToken);
+    const axiosInstance = useAxios();
 
     const handleAddImage = async () => {
         if (!title || !image) {

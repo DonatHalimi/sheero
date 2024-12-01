@@ -1,16 +1,18 @@
-import React, { useContext, useEffect, useState } from 'react';
+import React, { useEffect, useState } from 'react';
+import { useDispatch, useSelector } from 'react-redux';
 import { DashboardHeader } from '../../assets/CustomComponents';
-import useAxios from '../../axiosInstance';
 import DashboardTable from '../../components/Dashboard/DashboardTable';
 import AddCategoryModal from '../../components/Modal/Category/AddCategoryModal';
 import EditCategoryModal from '../../components/Modal/Category/EditCategoryModal';
 import DeleteModal from '../../components/Modal/DeleteModal';
 import ImagePreviewModal from '../../components/Modal/ImagePreviewModal';
 import { getImageUrl } from '../../config';
-import { AuthContext } from '../../context/AuthContext';
+import { getCategories } from '../../store/actions/categoryActions';
 
 const CategoriesPage = () => {
-    const [categories, setCategories] = useState([]);
+    const { categories } = useSelector((state) => state.categories);
+    const dispatch = useDispatch();
+
     const [selectedCategory, setSelectedCategory] = useState(null);
     const [selectedCategories, setSelectedCategories] = useState([]);
     const [addCategoryOpen, setAddCategoryOpen] = useState(false);
@@ -20,21 +22,9 @@ const CategoriesPage = () => {
     const [currentPage, setCurrentPage] = useState(0);
     const itemsPerPage = 5;
 
-    const { refreshToken } = useContext(AuthContext);
-    const axiosInstance = useAxios(refreshToken);
-
     useEffect(() => {
-        fetchCategories();
-    }, [addCategoryOpen, editCategoryOpen, deleteCategoryOpen, axiosInstance]);
-
-    const fetchCategories = async () => {
-        try {
-            const response = await axiosInstance.get('/categories/get');
-            setCategories(response.data);
-        } catch (error) {
-            console.error('Error fetching categories', error);
-        }
-    };
+        dispatch(getCategories());
+    }, [dispatch]);
 
     const handleSelectCategory = (categoryId) => {
         const id = Array.isArray(categoryId) ? categoryId[0] : categoryId;
@@ -106,13 +96,13 @@ const CategoriesPage = () => {
                     onEdit={handleEdit}
                 />
 
-                <AddCategoryModal open={addCategoryOpen} onClose={() => setAddCategoryOpen(false)} onAddSuccess={fetchCategories} />
-                <EditCategoryModal open={editCategoryOpen} onClose={() => setEditCategoryOpen(false)} category={selectedCategory} onEditSuccess={fetchCategories} />
+                <AddCategoryModal open={addCategoryOpen} onClose={() => setAddCategoryOpen(false)} onAddSuccess={() => dispatch(getCategories())} />
+                <EditCategoryModal open={editCategoryOpen} onClose={() => setEditCategoryOpen(false)} category={selectedCategory} onEditSuccess={() => dispatch(getCategories())} />
                 <DeleteModal
                     open={deleteCategoryOpen}
                     onClose={() => setDeleteCategoryOpen(false)}
                     items={selectedCategories.map(id => categories.find(category => category._id === id)).filter(category => category)}
-                    onDeleteSuccess={fetchCategories}
+                    onDeleteSuccess={() => dispatch(getCategories())}
                     endpoint="/categories/delete-bulk"
                     title="Delete Categories"
                     message="Are you sure you want to delete the selected categories?"

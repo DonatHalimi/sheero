@@ -1,5 +1,6 @@
 import { Menu as MenuIcon } from '@mui/icons-material';
-import React, { useContext, useEffect, useState } from 'react';
+import React, { useEffect, useState } from 'react';
+import { useDispatch, useSelector } from 'react-redux';
 import { useLocation, useNavigate } from 'react-router-dom';
 import { toast } from 'react-toastify';
 import {
@@ -13,28 +14,28 @@ import {
     WishlistIcon,
 } from '../../assets/CustomComponents';
 import useAxios from '../../axiosInstance';
-import { AuthContext } from '../../context/AuthContext';
+import { logoutUser, selectIsAdmin } from '../../store/actions/authActions';
 import CategoryNavbar from './CategoryNavbar';
 import SearchBar from './SearchBar';
 
 const Navbar = () => {
-    const { auth, isAdmin, logout } = useContext(AuthContext);
+    const { isAuthenticated } = useSelector((state) => state.auth);
+
+    const isAdmin = useSelector(selectIsAdmin);
+    const dispatch = useDispatch();
+    const location = useLocation();
+    const axiosInstance = useAxios();
+    const navigate = useNavigate();
 
     const [cartItems, setCartItems] = useState([]);
     const [cartTotal, setCartTotal] = useState(0);
     const [isProfileDropdownOpen, setIsProfileDropdownOpen] = useState(false);
     const [isCartDropdownOpen, setIsCartDropdownOpen] = useState(false);
     const [isSidebarOpen, setIsSidebarOpen] = useState(false);
-    const location = useLocation();
-
     const [isLoading, setIsLoading] = useState(false);
     const [isFetchingCart, setIsFetchingCart] = useState(false);
 
-    const axiosInstance = useAxios();
-    const navigate = useNavigate();
-
     const fetchCartData = async () => {
-        if (!auth.accessToken) return;
         setIsFetchingCart(true);
         try {
             const { data: cart } = await axiosInstance.get('/cart');
@@ -45,7 +46,7 @@ const Navbar = () => {
             }, 0);
             setCartTotal(total);
         } catch (error) {
-            console.log('Error fetching cart data:', error);
+            console.error('Error fetching cart data:', error);
         } finally {
             setIsFetchingCart(false);
         }
@@ -53,10 +54,10 @@ const Navbar = () => {
 
     const toggleDropdown = (type) => {
         if (type === 'profile') {
-            setIsProfileDropdownOpen(prev => !prev);
+            setIsProfileDropdownOpen((prev) => !prev);
             setIsCartDropdownOpen(false);
         } else if (type === 'cart') {
-            setIsCartDropdownOpen(prev => !prev);
+            setIsCartDropdownOpen((prev) => !prev);
             setIsProfileDropdownOpen(false);
         }
     };
@@ -70,10 +71,7 @@ const Navbar = () => {
             await fetchCartData();
 
             window.dispatchEvent(new Event('cartUpdate'));
-
-            if (cartItems.length === 1) {
-                setIsCartDropdownOpen(false);
-            }
+            if (cartItems.length === 1) setIsCartDropdownOpen(false);
         } catch (error) {
             console.error('Error removing item from cart:', error);
             toast.error('Failed to remove item from cart');
@@ -83,7 +81,7 @@ const Navbar = () => {
     };
 
     const handleLogout = () => {
-        logout();
+        dispatch(logoutUser());
         setIsProfileDropdownOpen(false);
     };
 
@@ -100,31 +98,21 @@ const Navbar = () => {
 
     const toggleSidebar = () => {
         setIsSidebarOpen(!isSidebarOpen);
-        if (!isSidebarOpen) {
-            document.body.style.overflow = 'hidden';
-        } else {
-            document.body.style.overflow = 'unset';
-        }
+        document.body.style.overflow = isSidebarOpen ? 'unset' : 'hidden';
     };
 
     useEffect(() => {
         const handleCartUpdate = () => {
             fetchCartData();
-            if (location.pathname !== '/cart') {
-                setIsCartDropdownOpen(true);
-            }
+            if (location.pathname !== '/cart') setIsCartDropdownOpen(true);
         };
 
-        if (auth.accessToken) {
-            fetchCartData();
-        }
-
+        if (isAuthenticated) fetchCartData();
         document.addEventListener('cartUpdated', handleCartUpdate);
-
         return () => {
             document.removeEventListener('cartUpdated', handleCartUpdate);
         };
-    }, [auth.accessToken]);
+    }, [isAuthenticated]);
 
     const totalQuantity = cartItems.reduce((acc, item) => acc + item.quantity, 0);
 
@@ -152,7 +140,7 @@ const Navbar = () => {
                                 </div>
 
                                 <div className="flex items-center space-x-2">
-                                    {auth.accessToken ? (
+                                    {isAuthenticated ? (
                                         <>
                                             <div className="relative z-[1000]">
                                                 <ProfileIcon
@@ -162,7 +150,7 @@ const Navbar = () => {
                                                 {isProfileDropdownOpen && (
                                                     <ProfileDropdown
                                                         isOpen={isProfileDropdownOpen}
-                                                        isAdmin={isAdmin()}
+                                                        isAdmin={isAdmin}
                                                         handleLogout={handleLogout}
                                                     />
                                                 )}

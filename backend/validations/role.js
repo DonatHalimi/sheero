@@ -26,8 +26,8 @@ const updateSchema = yup.object({
         .string()
         .test('id-validation', 'Role not found', async function (value) {
             if (!value) return false;
-            const Role = await Role.findById(value);
-            return !!Role;
+            const role = await Role.findById(value);
+            return !!role;
         }),
     name: yup
         .string()

@@ -1,24 +1,20 @@
 import { ChevronRight, Person } from '@mui/icons-material';
 import { Skeleton } from '@mui/material';
-import React, { useContext, useEffect, useRef, useState } from 'react';
+import React, { useEffect, useRef, useState } from 'react';
+import { useDispatch, useSelector } from 'react-redux';
 import { useLocation, useNavigate } from 'react-router-dom';
 import { useSwipeable } from 'react-swipeable';
 import { CartIcon, CategoryDropdown, HomeIcon, WishlistIcon } from '../../assets/CustomComponents';
-import useAxios from '../../axiosInstance';
 import { getImageUrl } from '../../config';
-import { AuthContext } from '../../context/AuthContext';
+import { getCategories, getSubcategoriesAndSubsubcategories } from '../../store/actions/categoryActions';
 
 const CategoryNavbar = ({ isSidebarOpen, toggleSidebar }) => {
-    const { auth } = useContext(AuthContext);
-    const axiosInstance = useAxios();
+    const { categories, subcategories, subsubcategories, loading } = useSelector((state) => state.categories);
+    const { isAuthenticated } = useSelector(state => state.auth) || {};
+    const dispatch = useDispatch();
 
-    const [categories, setCategories] = useState([]);
-    const [subcategories, setSubcategories] = useState({});
-    const [subsubcategories, setSubsubcategories] = useState({});
     const [openCategory, setOpenCategory] = useState(null);
     const [activeCategory, setActiveCategory] = useState('');
-
-    const [loading, setLoading] = useState(!categories.length);
     const [dropdownLoading, setDropdownLoading] = useState(true);
 
     const categoryListRef = useRef(null);
@@ -26,49 +22,21 @@ const CategoryNavbar = ({ isSidebarOpen, toggleSidebar }) => {
     const location = useLocation();
 
     useEffect(() => {
-        if (!categories.length) {
-            const fetchCategories = async () => {
-                setLoading(true);
-                try {
-                    const { data } = await axiosInstance.get('/categories/get');
-                    setCategories(data);
-                } catch (error) {
-                    console.error('Error fetching categories:', error);
-                } finally {
-                    setLoading(false);
-                }
-            };
-            fetchCategories();
-        }
-    }, [axiosInstance, categories.length]);
+        dispatch(getCategories());
+    }, [dispatch]);
 
-    const fetchSubcategories = async (categoryId) => {
-        if (!subcategories[categoryId]) {
-            try {
-                const { data } = await axiosInstance.get(`/subcategories/get-by-category/${categoryId}`);
-                setSubcategories(prev => ({ ...prev, [categoryId]: data }));
-                data.forEach(subcategory => fetchSubsubcategories(subcategory._id));
-            } catch (error) {
-                console.error('Error fetching subcategories:', error);
-            }
+    useEffect(() => {
+        if (activeCategory) {
+            setDropdownLoading(true);
+            dispatch(getSubcategoriesAndSubsubcategories(activeCategory))
+                .finally(() => setDropdownLoading(false));
         }
-    };
-
-    const fetchSubsubcategories = async (subcategoryId) => {
-        if (!subsubcategories[subcategoryId]) {
-            try {
-                const { data } = await axiosInstance.get(`/subsubcategories/get-by-subCategory/${subcategoryId}`);
-                setSubsubcategories(prev => ({ ...prev, [subcategoryId]: data }));
-            } catch (error) {
-                console.error('Error fetching subsubcategories:', error);
-            }
-        }
-    };
+    }, [activeCategory, dispatch]);
 
     const handleCategoryHover = async (categoryId) => {
         setOpenCategory(categoryId);
         setDropdownLoading(true);
-        await fetchSubcategories(categoryId);
+        await dispatch(getSubcategoriesAndSubsubcategories(categoryId));
         setDropdownLoading(false);
     };
 
@@ -94,7 +62,7 @@ const CategoryNavbar = ({ isSidebarOpen, toggleSidebar }) => {
     const toggleSubcategories = (categoryId, event) => {
         event.stopPropagation();
         setOpenCategory(openCategory === categoryId ? null : categoryId);
-        fetchSubcategories(categoryId);
+        dispatch(getSubcategoriesAndSubsubcategories(categoryId))
     };
 
     const calculateDropdownStyle = () => {
@@ -197,7 +165,7 @@ const CategoryNavbar = ({ isSidebarOpen, toggleSidebar }) => {
                         </h1>
                         <div className="flex items-center pr-3">
                             <button onClick={() => navigate('/profile/me')} className="text-white hover:opacity-80 mr-1">
-                                {auth.accessToken ? (
+                                {isAuthenticated ? (
                                     <Person />
                                 ) : null}
                             </button>

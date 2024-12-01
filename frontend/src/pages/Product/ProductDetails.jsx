@@ -1,6 +1,7 @@
 import { LocalAtm, Payment } from '@mui/icons-material';
 import axios from 'axios';
-import React, { useContext, useEffect, useState } from 'react';
+import React, { useEffect, useState } from 'react';
+import { useSelector } from 'react-redux';
 import { useNavigate, useParams } from 'react-router-dom';
 import { toast } from 'react-toastify';
 import {
@@ -18,10 +19,9 @@ import AddReviewModal from '../../components/Product/Modals/AddReviewModal';
 import ProductDetailsTabs from '../../components/Product/Utils/ProductDetailsTabs';
 import Footer from '../../components/Utils/Footer';
 import { getApiUrl, getImageUrl } from '../../config';
-import { AuthContext } from '../../context/AuthContext';
 
 const ProductDetails = () => {
-    const { auth } = useContext(AuthContext);
+    const { isAuthenticated } = useSelector((state) => state.auth);
     const axiosInstance = useAxios();
     const { id } = useParams();
     const navigate = useNavigate();
@@ -63,8 +63,8 @@ const ProductDetails = () => {
     }, [id]);
 
     const openReviewModal = () => {
-        if (!auth.accessToken) {
-            toast.error('You need to log in first.');
+        if (!isAuthenticated) {
+            toast.error('You need to log in first');
             navigate('/login');
             return;
         }
@@ -89,39 +89,45 @@ const ProductDetails = () => {
 
     const handleAction = (action) => async (e) => {
         e.stopPropagation();
-        if (!auth.accessToken) {
-            toast.error('You need to log in first.');
+        if (!isAuthenticated) {
+            toast.error('You need to log in first');
             navigate('/login');
             return;
         }
-
+    
         const endpoint = action === 'cart' ? 'cart/add' : 'wishlist/add';
         const payload = { productId: product._id, ...(action === 'cart' && { quantity }) };
         const setLoadingState = action === 'cart' ? setIsCartLoading : setIsWishlistLoading;
-
+    
         setLoadingState(true);
         try {
             await axiosInstance.post(getApiUrl(`/${endpoint}`), payload);
-
+    
             toast.success(`Product added to ${action === 'cart' ? 'cart' : 'wishlist'}!`, {
                 onClick: () => navigate(`/${action === 'wishlist' ? 'profile/wishlist' : 'cart'}`),
             });
-
+    
             if (action === 'cart') {
                 document.dispatchEvent(new CustomEvent('cartUpdated', { detail: product._id }));
             }
-
+    
             if (action === 'cart' && quantity > product.inventoryCount) {
                 toast.error(`Cannot add more than ${product.inventoryCount} items to cart.`);
                 return;
             }
         } catch (error) {
-            const errorMsg = error.response?.data?.message || `Failed to add product to ${action}.`;
-            toast.info(errorMsg, { onClick: () => navigate(`/${action === 'wishlist' ? 'profile/wishlist' : 'cart'}`) });
+            if (error.response && error.response.data.errors) {
+                error.response.data.errors.forEach((err) => {
+                    toast.error(err.message || `Error: ${err}`);
+                });
+            } else {
+                const errorMsg = error.response?.data?.message || `Failed to add product to ${action}.`;
+                toast.info(errorMsg, { onClick: () => navigate(`/${action === 'wishlist' ? 'profile/wishlist' : 'cart'}`) });
+            }
         } finally {
             setLoadingState(false);
         }
-    };
+    };    
 
     return (
         <>

@@ -1,13 +1,15 @@
-import React, { useContext, useEffect, useState } from 'react';
+import React, { useEffect, useState } from 'react';
+import { useDispatch, useSelector } from 'react-redux';
 import { DashboardHeader } from '../../assets/CustomComponents';
-import useAxios from '../../axiosInstance';
 import DashboardTable from '../../components/Dashboard/DashboardTable';
 import AddContactModal from '../../components/Modal/Contact/AddContactModal';
 import DeleteModal from '../../components/Modal/DeleteModal';
-import { AuthContext } from '../../context/AuthContext';
+import { getContacts } from '../../store/actions/dashboardActions';
 
 const ContactPage = () => {
-    const [contacts, setContacts] = useState([]);
+    const { contacts } = useSelector((state) => state.dashboard);
+    const dispatch = useDispatch();
+
     const [selectedContact, setSelectedContact] = useState(null);
     const [selectedContacts, setSelectedContacts] = useState([]);
     const [addContactOpen, setAddContactOpen] = useState(false);
@@ -16,21 +18,9 @@ const ContactPage = () => {
     const [currentPage, setCurrentPage] = useState(0);
     const itemsPerPage = 5;
 
-    const { refreshToken } = useContext(AuthContext);
-    const axiosInstance = useAxios(refreshToken);
-
     useEffect(() => {
-        fetchContacts();
-    }, [addContactOpen, editContactOpen, deleteContactOpen, axiosInstance]);
-
-    const fetchContacts = async () => {
-        try {
-            const response = await axiosInstance.get('/contact/get');
-            setContacts(response.data);
-        } catch (error) {
-            console.error('Error fetching contacts', error);
-        }
-    };
+        dispatch(getContacts());
+    }, [dispatch]);
 
     const handleSelectContact = (contactId) => {
         const id = Array.isArray(contactId) ? contactId[0] : contactId;
@@ -79,12 +69,12 @@ const ContactPage = () => {
                     onPageChange={handlePageClick}
                 />
 
-                <AddContactModal open={addContactOpen} onClose={() => setAddContactOpen(false)} onAddSuccess={fetchContacts} />
+                <AddContactModal open={addContactOpen} onClose={() => setAddContactOpen(false)} onAddSuccess={() => dispatch(getContacts())} />
                 <DeleteModal
                     open={deleteContactOpen}
                     onClose={() => setDeleteContactOpen(false)}
                     items={selectedContacts.map(id => contacts.find(contact => contact._id === id)).filter(contact => contact)}
-                    onDeleteSuccess={fetchContacts}
+                    onDeleteSuccess={() => dispatch(getContacts())}
                     endpoint="/contact/delete-bulk"
                     title="Delete Contacts"
                     message="Are you sure you want to delete the selected contacts?"

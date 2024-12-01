@@ -1,14 +1,16 @@
-import React, { useContext, useEffect, useState } from 'react';
+import React, { useEffect, useState } from 'react';
+import { useDispatch, useSelector } from 'react-redux';
 import { DashboardHeader } from '../../assets/CustomComponents';
-import useAxios from '../../axiosInstance';
 import DashboardTable from '../../components/Dashboard/DashboardTable';
 import AddAddressModal from '../../components/Modal/Address/AddAddressModal';
 import EditAddressModal from '../../components/Modal/Address/EditAddressModal';
 import DeleteModal from '../../components/Modal/DeleteModal';
-import { AuthContext } from '../../context/AuthContext';
+import { getAddresses } from '../../store/actions/dashboardActions';
 
 const AddressesPage = () => {
-    const [addresses, setAddresses] = useState([]);
+    const { addresses } = useSelector((state) => state.dashboard);
+    const dispatch = useDispatch();
+
     const [selectedAddress, setSelectedAddress] = useState(null);
     const [selectedAddresses, setSelectedAddresses] = useState([]);
     const [addAddressOpen, setAddAddressOpen] = useState(false);
@@ -17,21 +19,9 @@ const AddressesPage = () => {
     const [currentPage, setCurrentPage] = useState(0);
     const itemsPerPage = 5;
 
-    const { refreshToken } = useContext(AuthContext);
-    const axiosInstance = useAxios(refreshToken);
-
     useEffect(() => {
-        fetchAddresses();
-    }, [addAddressOpen, editAddressOpen, deleteAddressOpen, axiosInstance]);
-
-    const fetchAddresses = async () => {
-        try {
-            const response = await axiosInstance.get('/addresses/get');
-            setAddresses(response.data)
-        } catch (error) {
-            console.error('Error fetching addresses', error);
-        }
-    };
+        dispatch(getAddresses());
+    }, [dispatch]);
 
     const handleSelectAddress = (addressId) => {
         const id = Array.isArray(addressId) ? addressId[0] : addressId;
@@ -89,13 +79,13 @@ const AddressesPage = () => {
                     onEdit={handleEdit}
                 />
 
-                <AddAddressModal open={addAddressOpen} onClose={() => setAddAddressOpen(false)} onAddSuccess={fetchAddresses} />
-                <EditAddressModal open={editAddressOpen} onClose={() => setEditAddressOpen(false)} address={selectedAddress} onEditSuccess={fetchAddresses} />
+                <AddAddressModal open={addAddressOpen} onClose={() => setAddAddressOpen(false)} onAddSuccess={() => dispatch(getAddresses())} />
+                <EditAddressModal open={editAddressOpen} onClose={() => setEditAddressOpen(false)} address={selectedAddress} onEditSuccess={() => dispatch(getAddresses())} />
                 <DeleteModal
                     open={deleteAddressOpen}
                     onClose={() => setDeleteAddressOpen(false)}
                     items={selectedAddresses.map(id => addresses.find(address => address._id === id)).filter(address => address)}
-                    onDeleteSuccess={fetchAddresses}
+                    onDeleteSuccess={() => dispatch(getAddresses())}
                     endpoint="/addresses/delete-bulk"
                     title="Delete Addresses"
                     message="Are you sure you want to delete the selected addresses?"

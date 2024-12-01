@@ -1,14 +1,16 @@
-import React, { useContext, useEffect, useState } from 'react';
+import React, { useEffect, useState } from 'react';
+import { useDispatch, useSelector } from 'react-redux';
 import { DashboardHeader } from '../../assets/CustomComponents';
-import useAxios from '../../axiosInstance';
 import DashboardTable from '../../components/Dashboard/DashboardTable';
 import AddCityModal from '../../components/Modal/City/AddCityModal';
 import EditCityModal from '../../components/Modal/City/EditCityModal';
 import DeleteModal from '../../components/Modal/DeleteModal';
-import { AuthContext } from '../../context/AuthContext';
+import { getCities } from '../../store/actions/dashboardActions';
 
 const CitiesPage = () => {
-    const [cities, setCities] = useState([]);
+    const { cities } = useSelector((state) => state.dashboard);
+    const dispatch = useDispatch();
+
     const [selectedCity, setSelectedCity] = useState(null);
     const [selectedCities, setSelectedCities] = useState([]);
     const [addCityOpen, setAddCityOpen] = useState(false);
@@ -17,21 +19,9 @@ const CitiesPage = () => {
     const [currentPage, setCurrentPage] = useState(0);
     const itemsPerPage = 5;
 
-    const { refreshToken } = useContext(AuthContext);
-    const axiosInstance = useAxios(refreshToken);
-
     useEffect(() => {
-        fetchCities();
-    }, [addCityOpen, editCityOpen, deleteCityOpen, axiosInstance]);
-
-    const fetchCities = async () => {
-        try {
-            const response = await axiosInstance.get('/cities/get');
-            setCities(response.data);
-        } catch (error) {
-            console.error('Error fetching cities', error);
-        }
-    };
+        dispatch(getCities());
+    }, [dispatch]);
 
     const handleSelectCity = (cityId) => {
         const id = Array.isArray(cityId) ? cityId[0] : cityId;
@@ -86,13 +76,13 @@ const CitiesPage = () => {
                     onEdit={handleEdit}
                 />
 
-                <AddCityModal open={addCityOpen} onClose={() => setAddCityOpen(false)} onAddSuccess={fetchCities} />
-                <EditCityModal open={editCityOpen} onClose={() => setEditCityOpen(false)} city={selectedCity} onEditSuccess={fetchCities} />
+                <AddCityModal open={addCityOpen} onClose={() => setAddCityOpen(false)} onAddSuccess={() => dispatch(getCities())} />
+                <EditCityModal open={editCityOpen} onClose={() => setEditCityOpen(false)} city={selectedCity} onEditSuccess={() => dispatch(getCities())} />
                 <DeleteModal
                     open={deleteCityOpen}
                     onClose={() => setDeleteCityOpen(false)}
                     items={selectedCities.map(id => cities.find(city => city._id === id)).filter(city => city)}
-                    onDeleteSuccess={fetchCities}
+                    onDeleteSuccess={() => dispatch(getCities())}
                     endpoint="/cities/delete-bulk"
                     title="Delete Cities"
                     message="Are you sure you want to delete the selected cities?"

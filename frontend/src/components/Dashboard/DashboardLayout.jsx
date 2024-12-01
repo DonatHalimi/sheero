@@ -3,10 +3,11 @@ import Divider from '@mui/material/Divider';
 import List from '@mui/material/List';
 import { ThemeProvider } from '@mui/material/styles';
 import Toolbar from '@mui/material/Toolbar';
-import React, { useContext, useState } from 'react';
+import React, { useState } from 'react';
+import { useDispatch, useSelector } from 'react-redux';
 import { Outlet } from 'react-router-dom';
 import { DashboardCollapse, DashboardNavbar, Drawer } from '../../assets/CustomComponents';
-import { AuthContext } from '../../context/AuthContext';
+import { logoutUser, selectIsAdmin } from '../../store/actions/authActions';
 import theme from '../../theme';
 import { mainListItems, secondaryListItems } from './listItems';
 
@@ -18,8 +19,11 @@ import { mainListItems, secondaryListItems } from './listItems';
  * @return {JSX.Element} The JSX element representing the dashboard layout.
  */
 const DashboardLayout = () => {
+    const { isAuthenticated } = useSelector((state) => state.auth);
+    const isAdmin = useSelector(selectIsAdmin);
+    const dispatch = useDispatch();
+
     const [open, setOpen] = useState(true);
-    const { auth, isAdmin, logout } = useContext(AuthContext);
     const [isDropdownOpen, setIsDropdownOpen] = useState(false);
 
     const toggleDrawer = () => {
@@ -31,7 +35,7 @@ const DashboardLayout = () => {
     };
 
     const handleLogout = () => {
-        logout();
+        dispatch(logoutUser());
         setIsDropdownOpen(false);
     };
 
@@ -42,7 +46,7 @@ const DashboardLayout = () => {
                 <DashboardNavbar
                     open={open}
                     toggleDrawer={toggleDrawer}
-                    auth={auth}
+                    auth={isAuthenticated}
                     isDropdownOpen={isDropdownOpen}
                     handleProfileDropdownToggle={handleProfileDropdownToggle}
                     handleLogout={handleLogout}

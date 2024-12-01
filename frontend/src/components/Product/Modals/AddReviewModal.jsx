@@ -1,13 +1,13 @@
 import { Rating, TextField } from '@mui/material';
-import React, { useContext, useEffect, useState } from 'react';
+import React, { useEffect, useState } from 'react';
+import { useSelector } from 'react-redux';
 import { useNavigate } from 'react-router-dom';
 import { toast } from 'react-toastify';
 import { BrownButton, BrownOutlinedTextField, CustomBox, CustomModal, CustomTypography } from '../../../assets/CustomComponents';
 import useAxios from '../../../axiosInstance';
-import { AuthContext } from '../../../context/AuthContext';
 
 const AddReviewModal = ({ open, onClose, product, onReviewSuccess }) => {
-    const { auth } = useContext(AuthContext);
+    const { isAuthenticated } = useSelector((state) => state.auth);
     const [title, setTitle] = useState('');
     const [rating, setRating] = useState(null);
     const [comment, setComment] = useState('');
@@ -25,7 +25,7 @@ const AddReviewModal = ({ open, onClose, product, onReviewSuccess }) => {
 
     useEffect(() => {
         const checkIfCanReview = async () => {
-            if (!auth.accessToken) {
+            if (!isAuthenticated) {
                 toast.error('You need to log in first.');
                 navigate('/login');
                 return;
@@ -42,7 +42,7 @@ const AddReviewModal = ({ open, onClose, product, onReviewSuccess }) => {
         if (open) {
             checkIfCanReview();
         }
-    }, [open, product, auth.accessToken, axiosInstance]);
+    }, [open, product, isAuthenticated, axiosInstance]);
 
     const handleTitleChange = (event) => {
         const value = event.target.value;
@@ -57,7 +57,7 @@ const AddReviewModal = ({ open, onClose, product, onReviewSuccess }) => {
     };
 
     const handleAddReview = async () => {
-        if (!auth.accessToken) {
+        if (!isAuthenticated) {
             toast.info('You need to be logged in to add a review');
             return;
         }

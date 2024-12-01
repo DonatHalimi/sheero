@@ -1,50 +1,29 @@
 import { LinearProgress, Table, TableBody, TableCell, TableContainer, TableHead, TableRow, Typography } from '@mui/material';
 import React, { useEffect, useState } from 'react';
-import { Link, useNavigate, useParams } from 'react-router-dom';
+import { useDispatch, useSelector } from 'react-redux';
+import { Link, useParams } from 'react-router-dom';
 import 'react-toastify/dist/ReactToastify.css';
 import { EmptyState, formatDate, formatPrice, Header, LoadingOrderDetails, ProfileLayout } from '../../assets/CustomComponents';
 import emptyOrdersImage from '../../assets/img/empty/orders.png';
-import useAxios from '../../axiosInstance';
 import Navbar from '../../components/Navbar/Navbar';
 import ReturnModal from '../../components/Product/Modals/ReturnModal';
 import Footer from '../../components/Utils/Footer';
 import { getImageUrl } from '../../config';
+import { getOrderDetails } from '../../store/actions/orderActions';
 
 const OrderDetails = () => {
     const { orderId } = useParams();
-    const axiosInstance = useAxios();
-    const navigate = useNavigate();
+    const { orderDetails: order, loading } = useSelector((state) => state.orders);
+    const dispatch = useDispatch();
 
-    const [order, setOrder] = useState(null);
-    const [isReturnModalOpen, setIsReturnModalOpen] = useState(false);
-    const [loading, setLoading] = useState(true);
+    useEffect(() => { window.scrollTo(0, 0) }, []);
 
     useEffect(() => {
-        window.scrollTo(0, 0);
-        fetchOrderDetails();
-    }, [orderId]);
-
-    const fetchOrderDetails = async () => {
-        try {
-            const response = await axiosInstance.get(`/orders/${orderId}`);
-            if (response.data.success) {
-                setOrder(response.data.data);
-            } else {
-                console.log('Order not found or access denied.');
-            }
-        } catch (error) {
-            if (error.response && (error.response.status === 403 || error.response.status === 401)) {
-                console.log('Access denied. You are not authorized to view this order.');
-                navigate('/');
-            } else {
-                console.error('Error fetching order details:', error);
-            }
-        } finally {
-            setLoading(false);
-        }
-    };
+        dispatch(getOrderDetails(orderId));
+    }, [orderId, dispatch]);
 
     const openReturnModal = () => setIsReturnModalOpen(true);
+    const [isReturnModalOpen, setIsReturnModalOpen] = useState(false);
 
     const getStatusProgress = (status) => {
         switch (status) {
@@ -68,7 +47,7 @@ const OrderDetails = () => {
                 <Header
                     title="Order:"
                     orderId={orderId}
-                    isOrderDetails={order?.status === "delivered"}
+                    isOrderDetails={order?.status === 'delivered'}
                     openReturnModal={openReturnModal}
                 />
 
@@ -314,13 +293,11 @@ const OrderDetails = () => {
                     />
                 )}
             </ProfileLayout>
-
             <ReturnModal
                 open={isReturnModalOpen}
                 onClose={() => setIsReturnModalOpen(false)}
                 products={order ? order.products : []}
             />
-
             <Footer />
         </>
     );

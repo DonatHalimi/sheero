@@ -1,14 +1,16 @@
-import React, { useContext, useEffect, useState } from 'react';
+import React, { useEffect, useState } from 'react';
+import { useDispatch, useSelector } from 'react-redux';
 import { DashboardHeader } from '../../assets/CustomComponents';
-import useAxios from '../../axiosInstance';
 import DashboardTable from '../../components/Dashboard/DashboardTable';
 import DeleteModal from '../../components/Modal/DeleteModal';
 import AddUserModal from '../../components/Modal/User/AddUserModal';
 import EditUserModal from '../../components/Modal/User/EditUserModal';
-import { AuthContext } from '../../context/AuthContext';
+import { getUsers } from '../../store/actions/dashboardActions';
 
 const UsersPage = () => {
-    const [users, setUsers] = useState([]);
+    const { users } = useSelector((state) => state.dashboard);
+    const dispatch = useDispatch();
+
     const [selectedUser, setSelectedUser] = useState(null);
     const [selectedUsers, setSelectedUsers] = useState([]);
     const [addUserOpen, setAddUserOpen] = useState(false);
@@ -17,23 +19,11 @@ const UsersPage = () => {
     const [currentPage, setCurrentPage] = useState(0);
     const itemsPerPage = 5;
 
-    const { refreshToken } = useContext(AuthContext);
-    const axiosInstance = useAxios(refreshToken);
-
-    useEffect(() => { window.scrollTo(0, 0); }, []);
+    useEffect(() => { window.scrollTo(0, 0) }, []);
 
     useEffect(() => {
-        fetchUsers();
-    }, [addUserOpen, editUserOpen, deleteUserOpen, currentPage, axiosInstance]);
-
-    const fetchUsers = async () => {
-        try {
-            const response = await axiosInstance.get('/users/get');
-            setUsers(response.data.users);
-        } catch (error) {
-            console.error('Error fetching users', error);
-        }
-    };
+        dispatch(getUsers());
+    }, [dispatch]);
 
     const handleSelectUser = (userId) => {
         const id = Array.isArray(userId) ? userId[0] : userId;
@@ -97,13 +87,13 @@ const UsersPage = () => {
                     containerClassName='user'
                 />
 
-                <AddUserModal open={addUserOpen} onClose={() => setAddUserOpen(false)} onAddSuccess={fetchUsers} />
-                <EditUserModal open={editUserOpen} onClose={() => setEditUserOpen(false)} user={selectedUser} onEditSuccess={fetchUsers} />
+                <AddUserModal open={addUserOpen} onClose={() => setAddUserOpen(false)} onAddSuccess={() => dispatch(getUsers())} />
+                <EditUserModal open={editUserOpen} onClose={() => setEditUserOpen(false)} user={selectedUser} onEditSuccess={() => dispatch(getUsers())} />
                 <DeleteModal
                     open={deleteUserOpen}
                     onClose={() => setDeleteUserOpen(false)}
                     items={selectedUsers.map(id => users.find(user => user._id === id)).filter(user => user)}
-                    onDeleteSuccess={fetchUsers}
+                    onDeleteSuccess={() => dispatch(getUsers())}
                     endpoint="/users/delete-bulk"
                     title="Delete Users"
                     message="Are you sure you want to delete the selected users?"

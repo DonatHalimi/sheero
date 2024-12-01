@@ -1,13 +1,15 @@
-import React, { useContext, useEffect, useState } from 'react';
-import { DashboardHeader } from '../../assets/CustomComponents';
-import useAxios from '../../axiosInstance';
+import React, { useEffect, useState } from 'react';
+import { useDispatch, useSelector } from 'react-redux';
+import { DashboardHeader, formatDate } from '../../assets/CustomComponents';
 import DashboardTable from '../../components/Dashboard/DashboardTable';
 import DeleteModal from '../../components/Modal/DeleteModal';
 import EditOrderModal from '../../components/Modal/Order/EditOrderModal';
-import { AuthContext } from '../../context/AuthContext';
+import { getOrders } from '../../store/actions/dashboardActions';
 
 const OrdersPage = () => {
-    const [orders, setOrders] = useState([]);
+    const { orders } = useSelector((state) => state.dashboard);
+    const dispatch = useDispatch();
+
     const [selectedOrder, setSelectedOrder] = useState(null);
     const [selectedOrders, setSelectedOrders] = useState([]);
     const [editOrderOpen, setEditOrderOpen] = useState(false);
@@ -15,21 +17,9 @@ const OrdersPage = () => {
     const [currentPage, setCurrentPage] = useState(0);
     const itemsPerPage = 10;
 
-    const { refreshToken } = useContext(AuthContext);
-    const axiosInstance = useAxios(refreshToken);
-
     useEffect(() => {
-        fetchOrders();
-    }, [editOrderOpen, deleteOrderOpen, axiosInstance]);
-
-    const fetchOrders = async () => {
-        try {
-            const response = await axiosInstance.get('/orders/get');
-            setOrders(response.data);
-        } catch (error) {
-            console.error('Error fetching orders', error);
-        }
-    };
+        dispatch(getOrders());
+    }, [dispatch]);
 
     const handleSelectOrder = (orderId) => {
         const id = Array.isArray(orderId) ? orderId[0] : orderId;
@@ -70,23 +60,19 @@ const OrdersPage = () => {
         { key: 'totalAmount', label: 'Total Amount' },
         { key: 'paymentMethod', label: 'Payment Method' },
         { key: 'paymentStatus', label: 'Payment Status' },
-        { key: 'status', label: 'Delivery Status' },
         {
             key: 'arrivalDateRange',
             label: 'Delivery Date',
             render: (order) => {
-                const startDate = order.arrivalDateRange.start
-                    ? new Date(order.arrivalDateRange.start).toLocaleDateString()
-                    : 'N/A';
-                const endDate = order.arrivalDateRange.end
-                    ? new Date(order.arrivalDateRange.end).toLocaleDateString()
-                    : 'N/A';
+                const startDate = formatDate(order.arrivalDateRange.start);
+                const endDate = formatDate(order.arrivalDateRange.end);
+
                 return `${startDate} - ${endDate}`;
             }
         },
+        { key: 'status', label: 'Delivery Status' },
         { key: 'actions', label: 'Actions' }
     ];
-
 
     return (
         <div className='container mx-auto max-w-screen-2xl px-4 mt-20'>
@@ -111,18 +97,12 @@ const OrdersPage = () => {
                     containerClassName="max-w-full"
                 />
 
-                <EditOrderModal
-                    open={editOrderOpen}
-                    onClose={() => setEditOrderOpen(false)}
-                    order={selectedOrder}
-                    onEditSuccess={fetchOrders}
-                />
-
+                <EditOrderModal open={editOrderOpen} onClose={() => setEditOrderOpen(false)} order={selectedOrder} onEditSuccess={() => dispatch(getOrders())} />
                 <DeleteModal
                     open={deleteOrderOpen}
                     onClose={() => setDeleteOrderOpen(false)}
                     items={selectedOrders.map(id => orders.find(order => order._id === id)).filter(order => order)}
-                    onDeleteSuccess={fetchOrders}
+                    onDeleteSuccess={() => dispatch(getOrders())}
                     endpoint="/orders/delete-bulk"
                     title="Delete Orders"
                     message="Are you sure you want to delete the selected orders?"

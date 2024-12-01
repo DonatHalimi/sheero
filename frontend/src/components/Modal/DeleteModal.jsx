@@ -1,12 +1,10 @@
-import React, { useContext } from 'react';
+import React from 'react';
 import { toast } from 'react-toastify';
 import { CustomDeleteModal } from '../../assets/CustomComponents';
 import useAxios from '../../axiosInstance';
-import { AuthContext } from '../../context/AuthContext';
 
 const DeleteModal = ({ open, onClose, items, onDeleteSuccess, endpoint, title, message }) => {
-    const { refreshToken } = useContext(AuthContext);
-    const axiosInstance = useAxios(refreshToken);
+    const axiosInstance = useAxios();
 
     const handleDelete = async () => {
         const idsToDelete = items.map(item => item._id).filter(id => id);

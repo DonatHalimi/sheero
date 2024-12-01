@@ -1,14 +1,15 @@
-import React, { useContext, useState } from 'react';
+import React, { useState } from 'react';
+import { useSelector } from 'react-redux';
 import { useNavigate } from 'react-router-dom';
 import { toast } from 'react-toastify';
 import { CartDeleteButtons, DiscountPercentage, formatPrice, LoadingOverlay, OutOfStock } from '../../../assets/CustomComponents';
 import NoImage from '../../../assets/img/errors/product-not-found.png';
 import useAxios from '../../../axiosInstance';
 import { getImageUrl } from '../../../config';
-import { AuthContext } from '../../../context/AuthContext';
 
 const WishlistItem = ({ product, onRemove }) => {
-    const { auth } = useContext(AuthContext);
+    const { isAuthenticated } = useSelector(state => state.auth);
+
     const axiosInstance = useAxios();
     const navigate = useNavigate();
 
@@ -26,8 +27,8 @@ const WishlistItem = ({ product, onRemove }) => {
 
     const handleAddToCart = async (e) => {
         e.stopPropagation();
-        if (!auth.accessToken) {
-            toast.error("You need to log in first.");
+        if (!isAuthenticated) {
+            toast.error("You need to log in first");
             navigate('/login');
             return;
         }
@@ -71,8 +72,8 @@ const WishlistItem = ({ product, onRemove }) => {
                     <img
                         src={imageUrl}
                         alt={name}
-                        className="w-full h-32 sm:h-48 object-contain rounded"
                         onError={(e) => { e.target.onerror = null; e.target.src = NoImage; }}
+                        className="w-full h-32 sm:h-48 object-contain rounded"
                     />
                     <div className="absolute inset-0 rounded transition-opacity duration-300 hover:opacity-20 opacity-0 bg-white" />
 

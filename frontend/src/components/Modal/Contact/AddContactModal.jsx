@@ -1,8 +1,7 @@
-import React, { useContext, useState } from 'react';
+import React, { useState } from 'react';
 import { toast } from 'react-toastify';
 import { BrownButton, BrownOutlinedTextField, CustomBox, CustomModal, CustomTypography } from '../../../assets/CustomComponents';
 import useAxios from '../../../axiosInstance';
-import { AuthContext } from '../../../context/AuthContext';
 
 const AddContactModal = ({ open, onClose, onAddSuccess }) => {
     const [formData, setFormData] = useState({
@@ -12,8 +11,7 @@ const AddContactModal = ({ open, onClose, onAddSuccess }) => {
         message: ''
     });
 
-    const { refreshToken } = useContext(AuthContext);
-    const axiosInstance = useAxios(refreshToken);
+    const axiosInstance = useAxios();
 
     const handleAddContact = async () => {
         const { name, email, subject, message } = formData;

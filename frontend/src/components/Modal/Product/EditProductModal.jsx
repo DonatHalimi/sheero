@@ -1,12 +1,11 @@
 import { ArrowBack } from '@mui/icons-material';
 import UploadIcon from '@mui/icons-material/Upload';
 import { Autocomplete, Box, MenuItem, Modal, TextField, Typography } from '@mui/material';
-import React, { useContext, useEffect, useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import { toast } from 'react-toastify';
 import { BrownButton, BrownOutlinedTextField, CustomPaper, OutlinedBrownButton, OutlinedBrownFormControl, VisuallyHiddenInput } from '../../../assets/CustomComponents';
 import useAxios from '../../../axiosInstance';
 import { getImageUrl } from '../../../config';
-import { AuthContext } from '../../../context/AuthContext';
 
 const EditProductModal = ({ open, onClose, product, onEditSuccess }) => {
     const [step, setStep] = useState(1);
@@ -37,8 +36,7 @@ const EditProductModal = ({ open, onClose, product, onEditSuccess }) => {
     const [packageSize, setPackageSize] = useState('medium');
     const [details, setDetails] = useState([{ attribute: '', value: '' }]);
 
-    const { refreshToken } = useContext(AuthContext);
-    const axiosInstance = useAxios(refreshToken);
+    const axiosInstance = useAxios();
 
     useEffect(() => {
         if (product) {
