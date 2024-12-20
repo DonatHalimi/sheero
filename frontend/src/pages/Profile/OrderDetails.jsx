@@ -1,29 +1,41 @@
 import { LinearProgress, Table, TableBody, TableCell, TableContainer, TableHead, TableRow, Typography } from '@mui/material';
 import React, { useEffect, useState } from 'react';
-import { useDispatch, useSelector } from 'react-redux';
 import { Link, useParams } from 'react-router-dom';
 import 'react-toastify/dist/ReactToastify.css';
-import { EmptyState, formatDate, formatPrice, Header, LoadingOrderDetails, ProfileLayout } from '../../assets/CustomComponents';
+import { EmptyState, formatDate, formatPrice, generateOrderPDF, Header, LoadingOrderDetails, ProfileLayout } from '../../assets/CustomComponents';
 import emptyOrdersImage from '../../assets/img/empty/orders.png';
+import useAxios from '../../axiosInstance';
 import Navbar from '../../components/Navbar/Navbar';
 import ReturnModal from '../../components/Product/Modals/ReturnModal';
 import Footer from '../../components/Utils/Footer';
 import { getImageUrl } from '../../config';
-import { getOrderDetails } from '../../store/actions/orderActions';
 
 const OrderDetails = () => {
     const { orderId } = useParams();
-    const { orderDetails: order, loading } = useSelector((state) => state.orders);
-    const dispatch = useDispatch();
+    const axiosInstance = useAxios();
 
-    useEffect(() => { window.scrollTo(0, 0) }, []);
+    const [order, setOrder] = useState(null);
+    const [isReturnModalOpen, setIsReturnModalOpen] = useState(false);
+    const openReturnModal = () => setIsReturnModalOpen(true);
+    const [loading, setLoading] = useState(true);
+    const isOrderDelivered = order && order.status === 'delivered';
 
     useEffect(() => {
-        dispatch(getOrderDetails(orderId));
-    }, [orderId, dispatch]);
+        if (orderId) {
+            fetchOrderDetails();
+        }
+    }, [orderId]);
 
-    const openReturnModal = () => setIsReturnModalOpen(true);
-    const [isReturnModalOpen, setIsReturnModalOpen] = useState(false);
+    const fetchOrderDetails = async () => {
+        try {
+            const response = await axiosInstance.get(`/orders/${orderId}`);
+            setOrder(response.data.data);
+        } catch (error) {
+            console.error('Error fetching order details:', error);
+        } finally {
+            setLoading(false);
+        }
+    };
 
     const getStatusProgress = (status) => {
         switch (status) {
@@ -40,6 +52,12 @@ const OrderDetails = () => {
         }
     };
 
+    const handleDownloadOrder = () => {
+        if (order) {
+            generateOrderPDF(order);
+        }
+    };
+
     return (
         <>
             <Navbar />
@@ -47,8 +65,9 @@ const OrderDetails = () => {
                 <Header
                     title="Order:"
                     orderId={orderId}
-                    isOrderDetails={order?.status === 'delivered'}
+                    isOrderDetails={isOrderDelivered}
                     openReturnModal={openReturnModal}
+                    onDownloadOrder={handleDownloadOrder}
                 />
 
                 {loading ? (
@@ -89,9 +108,9 @@ const OrderDetails = () => {
                                         <span className="text-center font-semibold bg-stone-100 rounded-md px-1">Canceled</span>
                                     ) : (
                                         <>
-                                            <span className={`text-center ${order.status === 'pending' ? 'font-semibold bg-stone-100 rounded-md px-1' : ''}`}>Pending</span>
-                                            <span className={`text-center ${order.status === 'shipped' ? 'font-semibold bg-stone-100 rounded-md px-1' : ''}`}>Shipped</span>
-                                            <span className={`text-center ${order.status === 'delivered' ? 'font-semibold bg-stone-100 rounded-md px-1' : ''}`}>Delivered</span>
+                                            <span className={`text - center ${order.status === 'pending' ? 'font-semibold bg-stone-100 rounded-md px-1' : ''} `}>Pending</span>
+                                            <span className={`text - center ${order.status === 'shipped' ? 'font-semibold bg-stone-100 rounded-md px-1' : ''} `}>Shipped</span>
+                                            <span className={`text - center ${order.status === 'delivered' ? 'font-semibold bg-stone-100 rounded-md px-1' : ''} `}>Delivered</span>
                                         </>
                                     )}
                                 </div>
@@ -245,7 +264,7 @@ const OrderDetails = () => {
                                                         <TableCell>
                                                             <div className="flex justify-between">
                                                                 <span className="font-semibold">Comment:</span>
-                                                                <span>{order.address?.comment || 'No comment provided'}</span>
+                                                                <span>{order.address?.comment || 'N/A'}</span>
                                                             </div>
                                                         </TableCell>
                                                     </TableRow>

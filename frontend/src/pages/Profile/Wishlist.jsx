@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 import { toast } from 'react-toastify';
-import { calculatePageCount, CustomDeleteModal, CustomPagination, EmptyState, getPaginatedItems, handlePageChange, Header, LoadingProductItem, ProfileLayout } from '../../assets/CustomComponents';
+import { calculatePageCount, CustomDeleteModal, CustomPagination, getPaginatedItems, handlePageChange, Header, LoadingProductItem, NotFound, ProfileLayout } from '../../assets/CustomComponents';
 import emptyWishlistImage from '../../assets/img/empty/wishlist.png';
 import Navbar from '../../components/Navbar/Navbar';
 import WishlistItem from '../../components/Product/Items/WishlistItem';
@@ -11,14 +11,12 @@ import { clearWishlist, getWishlistItems, removeFromWishlist } from '../../store
 const itemsPerPage = 6;
 
 const Wishlist = () => {
-    const { user, isAuthenticated } = useSelector(state => state.auth);
-    const { wishlistItems, loading } = useSelector(state => state.wishlist);
+    const { user, isAuthenticated } = useSelector((state) => state.auth);
+    const { wishlistItems, loading } = useSelector((state) => state.wishlist);
     const dispatch = useDispatch();
 
     const [isModalOpen, setIsModalOpen] = useState(false);
     const [currentPage, setCurrentPage] = useState(1);
-
-    useEffect(() => { window.scrollTo(0, 0) }, [])
 
     useEffect(() => {
         if (isAuthenticated) {
@@ -70,7 +68,7 @@ const Wishlist = () => {
                         <LoadingProductItem count={6} />
                     </div>
                 ) : !wishlistItems.length ? (
-                    <EmptyState
+                    <NotFound
                         imageSrc={emptyWishlistImage}
                         message="Your wishlist is empty!"
                     />

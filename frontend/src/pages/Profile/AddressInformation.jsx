@@ -2,7 +2,7 @@ import { Box, FormControl, InputLabel, MenuItem, Select, TextField } from '@mui/
 import React, { useEffect, useState } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 import { toast } from 'react-toastify';
-import { BrownButton, Header, LoadingInformation, ProfileLayout } from '../../assets/CustomComponents';
+import { BrownButton, downloadAddress, Header, LoadingInformation, ProfileLayout } from '../../assets/CustomComponents';
 import Navbar from '../../components/Navbar/Navbar';
 import Footer from '../../components/Utils/Footer';
 import { addAddress, getAddressByUser, getCities, getCountries, updateAddress } from '../../store/actions/addressActions';
@@ -28,8 +28,6 @@ const AddressInformation = () => {
     const [phoneNumberValid, setPhoneNumberValid] = useState(true);
     const [commentValid, setCommentValid] = useState(true);
     const [focusedField, setFocusedField] = useState(null);
-
-    useEffect(() => window.scrollTo(0, 0), []);
 
     useEffect(() => {
         if (user && user.id) {
@@ -91,12 +89,10 @@ const AddressInformation = () => {
             if (address) {
                 await dispatch(updateAddress(address._id, updatedAddress));
                 toast.success('Address updated successfully');
-
                 dispatch(getAddressByUser(user.id));
             } else {
                 await dispatch(addAddress(updatedAddress));
                 toast.success('Address added successfully');
-
                 dispatch(getAddressByUser(user.id));
             }
             setIsSubmitted(true);
@@ -143,7 +139,7 @@ const AddressInformation = () => {
             ...prevData,
             comment: value,
         }));
-        setCommentValid(validateComment(value));
+        setCommentValid(value === '' || validateComment(value));
     };
 
     const isFormValid = nameValid && streetValid && phoneNumberValid && commentValid && initialData.city && initialData.country;
@@ -155,11 +151,21 @@ const AddressInformation = () => {
         initialData.country === address.country?._id &&
         initialData.comment === address.comment;
 
+    const handleDownloadAddress = () => {
+        if (address) {
+            downloadAddress(address);
+        }
+    };
+
     return (
         <>
             <Navbar />
             <ProfileLayout>
-                <Header title="Address" />
+                <Header
+                    title="Address"
+                    hasAddress={existingAddress}
+                    onDownloadAddress={handleDownloadAddress}
+                />
 
                 <Box className='bg-white rounded-md shadow-sm mb-3'
                     sx={{

@@ -26,7 +26,7 @@ const createReview = async (req, res) => {
         await review.save();
         await Product.findByIdAndUpdate(productId, { $push: { reviews: review._id } });
 
-        res.status(201).json({ message: 'Review created succesfully', review });
+        res.status(201).json({ message: 'Review created successfully', review });
     } catch (error) {
         console.error('Error creating review:', error);
         res.status(500).json({ message: 'Server error', error: error.message, stack: error.stack });

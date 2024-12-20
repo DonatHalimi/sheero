@@ -24,8 +24,6 @@ const ProductsBySubcategory = () => {
 
     const navigate = useNavigate();
 
-    useEffect(() => window.scrollTo(0, 0), [id])
-
     const fetchSubSubcategories = async (subcategoryId) => {
         setLoadingSubSubcategories(true);
         if (!subsubcategories[subcategoryId]) {
@@ -78,7 +76,12 @@ const ProductsBySubcategory = () => {
     const handleSortChange = (event) => {
         const order = event.target.value;
         setSortOrder(order);
-        setFilteredProducts(sortProducts(filteredProducts, order));
+
+        if (order === 'relevancy') {
+            setFilteredProducts(products);
+        } else {
+            setFilteredProducts(sortProducts(filteredProducts, order));
+        }
         setCurrentPage(1);
     };
 

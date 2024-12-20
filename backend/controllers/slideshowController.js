@@ -8,7 +8,7 @@ const createImage = async (req, res) => {
     try {
         const slideshowImage = new SlideshowImage({ title, image, description });
         await slideshowImage.save();
-        res.status(201).json({ message: 'Slideshow image created succesfully', slideshowImage });
+        res.status(201).json({ message: 'Slideshow image created successfully', slideshowImage });
     } catch (error) {
         res.status(500).json({ message: 'Server error' });
     }
@@ -60,7 +60,7 @@ const updateImage = async (req, res) => {
             { title, image, description, updatedAt: Date.now() },
             { new: true }
         );
-        res.status(200).json({ message: 'Slideshow image updated succesfully', updatedImage });
+        res.status(200).json({ message: 'Slideshow image updated successfully', updatedImage });
     } catch (error) {
         res.status(500).json({ message: 'Server error' });
     }
@@ -77,7 +77,7 @@ const deleteImage = async (req, res) => {
         }
 
         await SlideshowImage.findByIdAndDelete(req.params.id);
-        res.status(200).json({ message: 'Image deleted succesfully' });
+        res.status(200).json({ message: 'Image deleted successfully' });
     } catch (error) {
         res.status(500).json({ message: 'Server error' });
     }

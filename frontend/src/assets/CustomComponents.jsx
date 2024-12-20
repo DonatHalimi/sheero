@@ -3,16 +3,20 @@ import {
     ArrowBackIosNew,
     ArrowForwardIos,
     ChevronLeft,
+    ChevronRight,
     Close,
     CreateOutlined,
     DashboardOutlined,
     Delete,
     DeleteOutline,
     DeleteOutlined,
+    Download,
     ExpandLess,
     ExpandMore,
     Favorite,
     FavoriteBorderOutlined,
+    Fullscreen,
+    FullscreenExit,
     Home,
     HomeOutlined,
     Inbox,
@@ -26,13 +30,16 @@ import {
     Person,
     PersonOutlined,
     QuestionAnswerOutlined,
+    Replay,
     Search,
     Settings,
     Share,
     ShoppingCart,
     ShoppingCartOutlined,
     Star,
-    StarBorder
+    StarBorder,
+    ZoomIn,
+    ZoomOut
 } from '@mui/icons-material';
 import {
     Badge,
@@ -41,6 +48,7 @@ import {
     Button,
     CircularProgress,
     Collapse,
+    Divider,
     FormControl,
     IconButton,
     InputAdornment,
@@ -82,9 +90,7 @@ import { Splide, SplideSlide } from '@splidejs/react-splide';
 import { AnimatePresence, motion } from 'framer-motion';
 import PropTypes from 'prop-types';
 import React, { forwardRef, useEffect, useRef, useState } from 'react';
-import { Link as RouterLink, useNavigate } from 'react-router-dom';
-import { toast } from 'react-toastify';
-import useAxios from '../axiosInstance';
+import { Link as RouterLink, useLocation, useNavigate } from 'react-router-dom';
 import Navbar from '../components/Navbar/Navbar';
 import { getImageUrl } from '../config';
 import logo from './img/brand/logo.png';
@@ -114,12 +120,21 @@ import {
     sidebarLayoutStyling,
     slideShowSkeletonStyling
 } from './sx';
-import { useDispatch, useSelector } from 'react-redux';
-import { loadUser } from '../store/actions/authActions';
+import { useSelector } from 'react-redux';
 const ProductItem = React.lazy(() => import('../components/Product/Items/ProductItem'));
 const FilterSidebar = React.lazy(() => import('../components/Product/Utils/FilterSidebar'));
 const Footer = React.lazy(() => import('../components/Utils/Footer'));
 const ProfileSidebar = React.lazy(() => import('../pages/Profile/ProfileSidebar'));
+import { jsPDF } from "jspdf";
+import "jspdf-autotable";
+
+/**
+ * @file CustomComponents.jsx
+ * @description A collection of custom Material-UI (MUI) components designed for use within React components and pages.
+ * These components enhance the UI with reusable, styled elements built on top of MUI's component library.
+ * 
+ * @module CustomComponents
+ */
 
 export const BrownOutlinedTextField = styled(TextField)({
     '& .MuiOutlinedInput-root': {
@@ -808,7 +823,7 @@ export const LoadingOrderDetails = ({ isOrder = true }) => {
                 </div>
                 <Box className="flex justify-center gap-20">
                     {Array.from({ length: 3 }).map((_, index) => (
-                        <WaveSkeleton variant="text" width="10%" height={20} />
+                        <WaveSkeleton key={index} variant="text" width="10%" height={20} />
                     ))}
                 </Box>
             </Box>
@@ -1163,7 +1178,7 @@ export const CustomToolbar = () => {
             <div className="flex justify-end px-4">
                 <GridToolbar />
             </div>
-            <hr className="border-t border-gray-200 my-2" />
+            <Divider />
         </>
     );
 };
@@ -1253,7 +1268,7 @@ export const CustomBox = (props) => (
 );
 
 export const CustomTypography = (props) => (
-    <Typography className="!text-xl !font-bold !mb-4" {...props} />
+    <Typography className="!text-xl !font-bold !mb-2" {...props} />
 );
 
 export const CustomDeleteModal = ({ open, onClose, onDelete, title, message }) => (
@@ -1338,40 +1353,70 @@ export const Breadcrumb = ({ type, data }) => {
     const navigate = useNavigate();
 
     const crumbs = [
-        <BreadcrumbLink key="home" onClick={(e) => { e.preventDefault(); navigate('/'); }}>
+        <BreadcrumbLink
+            key="home"
+            onClick={(e) => {
+                e.preventDefault();
+                navigate('/');
+            }}
+        >
             <HomeBreadCrumb className="text-stone-500 hover:text-[#5C504B] transition-colors duration-300" />
         </BreadcrumbLink>
     ];
 
     if (type === 'category') {
-        crumbs.push(<BreadcrumbSeparator />, <BreadcrumbText key="category">{data.name}</BreadcrumbText>);
+        crumbs.push(
+            <BreadcrumbSeparator key="separator-category" />,
+            <BreadcrumbText key="category">{data.name}</BreadcrumbText>
+        );
     } else if (type === 'subcategory' && data.category) {
         crumbs.push(
-            <BreadcrumbSeparator />,
-            <BreadcrumbLink key="category" onClick={(e) => { e.preventDefault(); navigate(`/category/${data.category._id}`); }}>
+            <BreadcrumbSeparator key="separator-category" />,
+            <BreadcrumbLink
+                key="category"
+                onClick={(e) => {
+                    e.preventDefault();
+                    navigate(`/category/${data.category._id}`);
+                }}
+            >
                 {data.category.name}
             </BreadcrumbLink>,
-            <BreadcrumbSeparator />,
+            <BreadcrumbSeparator key="separator-subcategory" />,
             <BreadcrumbText key="subcategory">{data.name}</BreadcrumbText>
         );
     } else if (type === 'subSubcategory') {
         if (data.category) {
             crumbs.push(
-                <BreadcrumbSeparator />,
-                <BreadcrumbLink key="category" onClick={(e) => { e.preventDefault(); navigate(`/category/${data.category._id}`); }}>
+                <BreadcrumbSeparator key="separator-category" />,
+                <BreadcrumbLink
+                    key="category"
+                    onClick={(e) => {
+                        e.preventDefault();
+                        navigate(`/category/${data.category._id}`);
+                    }}
+                >
                     {data.category.name}
                 </BreadcrumbLink>
             );
         }
         if (data.subcategory) {
             crumbs.push(
-                <BreadcrumbSeparator />,
-                <BreadcrumbLink key="subcategory" onClick={(e) => { e.preventDefault(); navigate(`/subcategory/${data.subcategory._id}`); }}>
+                <BreadcrumbSeparator key="separator-subcategory" />,
+                <BreadcrumbLink
+                    key="subcategory"
+                    onClick={(e) => {
+                        e.preventDefault();
+                        navigate(`/subcategory/${data.subcategory._id}`);
+                    }}
+                >
                     {data.subcategory.name}
                 </BreadcrumbLink>
             );
         }
-        crumbs.push(<BreadcrumbSeparator />, <BreadcrumbText key="subSubcategory">{data.name}</BreadcrumbText>);
+        crumbs.push(
+            <BreadcrumbSeparator key="separator-subSubcategory" />,
+            <BreadcrumbText key="subSubcategory">{data.name}</BreadcrumbText>
+        );
     }
 
     return <nav className="flex items-center space-x-1 mt-6 md:mt-0">{crumbs}</nav>;
@@ -1394,7 +1439,7 @@ export const GoBackHome = () => {
     );
 };
 
-export const ErrorPageComponent = ({ errorType, imageSrc }) => {
+export const ErrorPage = ({ errorType, imageSrc }) => {
     const errorMessages = {
         403: {
             title: "403",
@@ -1587,17 +1632,22 @@ export const CustomPagination = ({ count, page, onChange, size = 'large', sx = {
         </Stack>
     );
 };
-
-export const FAQItem = ({ question, answer }) => {
+export const FAQItem = ({ question, answer, shouldCollapse, expandAll }) => {
     const [isOpen, setIsOpen] = useState(false);
+
+    useEffect(() => {
+        if (shouldCollapse) {
+            setIsOpen(expandAll);
+        }
+    }, [shouldCollapse, expandAll]);
 
     return (
         <div className="mb-4">
             <motion.button
-                className="flex justify-between items-center w-full py-4 px-6 text-left bg-white rounded-md shadow-md hover:shadow-lg transition-shadow duration-200"
                 onClick={() => setIsOpen(!isOpen)}
                 whileHover={isOpen ? {} : { scale: 1.02 }}
                 whileTap={isOpen ? {} : { scale: 0.98 }}
+                className={`flex justify-between items-center w-full p-4 text-left bg-white rounded-md transition-shadow duration-200 ${isOpen ? 'shadow' : 'shadow hover:shadow-lg'}`}
             >
                 <span className="flex items-center text-brown-800 font-semibold">
                     <QuestionAnswerOutlined className="mr-2 text-brown-600" />
@@ -1610,12 +1660,37 @@ export const FAQItem = ({ question, answer }) => {
             <AnimatePresence>
                 {isOpen && (
                     <motion.div {...getMotionDivProps(isOpen)}>
-                        <div className="p-6 text-brown-700">
+                        <div className="p-4 text-brown-700">
                             <p>{answer}</p>
                         </div>
                     </motion.div>
                 )}
             </AnimatePresence>
+        </div>
+    );
+};
+
+export const ZOOM_FACTOR = 0.65;
+export const MAX_ZOOM_LEVEL = 1 + 2 * ZOOM_FACTOR;
+
+export const ImagePreviewControls = ({ scale, setScale, isFullscreen, adjustZoom, toggleFullscreen, resetAndClose }) => {
+    return (
+        <div onClick={(e) => e.stopPropagation()} className="absolute top-2 right-2 flex gap-2 p-1 bg-white rounded">
+            <IconButton onClick={() => adjustZoom('in')} disabled={scale >= MAX_ZOOM_LEVEL} className="text-gray-600 disabled:text-gray-400">
+                <ZoomIn />
+            </IconButton>
+            <IconButton onClick={() => adjustZoom('out')} disabled={scale <= 1} className="text-gray-600 disabled:text-gray-400">
+                <ZoomOut />
+            </IconButton>
+            <IconButton onClick={() => setScale(1)} disabled={scale === 1} className={`text-gray-600 ${scale === 1 ? 'disabled:text-gray-400' : ''}`}>
+                <Replay />
+            </IconButton>
+            <IconButton onClick={toggleFullscreen} className={`text-${isFullscreen ? 'blue-500' : 'gray-600'}`}>
+                {isFullscreen ? <FullscreenExit /> : <Fullscreen />}
+            </IconButton>
+            <IconButton onClick={resetAndClose} className="text-gray-600">
+                <Close />
+            </IconButton>
         </div>
     );
 };
@@ -1689,7 +1764,208 @@ export const CategoryDropdown = ({ category, subcategories, subsubcategories, na
     </div>
 );
 
+export const SidebarHeader = ({ navigate, isAuthenticated }) => (
+    <div className="p-2 border-b flex flex-col items-start">
+        <div className='-mx-0 h-12 bg-stone-500 flex items-center justify-between w-full rounded-md mb-2 !p-0'>
+            <h1
+                onClick={() => navigate('/')}
+                className="text-white font-bold text-lg pl-3 cursor-pointer"
+            >
+                sheero
+            </h1>
+            <div className="flex items-center pr-3">
+                <IconButton
+                    onClick={() => navigate('/profile/me')}
+                    className="text-white hover:opacity-80 mr-1"
+                >
+                    {isAuthenticated ? <Person className='text-white' /> : null}
+                </IconButton>
+            </div>
+        </div>
+
+        <div
+            onClick={() => navigate('/')}
+            className="flex items-center rounded w-full text-left mb-2 cursor-pointer"
+        >
+            <HomeIcon color="primary" />
+            <p className="ml-2">Home</p>
+        </div>
+
+        <div
+            onClick={() => navigate('/cart')}
+            className="flex items-center rounded w-full text-left mb-2 cursor-pointer"
+        >
+            <CartIcon color="primary" />
+            <p className="ml-2">Cart</p>
+        </div>
+
+        <div
+            onClick={() => navigate('/profile/wishlist')}
+            className="flex items-center rounded w-full text-left cursor-pointer"
+        >
+            <WishlistIcon color="primary" />
+            <p className="ml-2">Wishlist</p>
+        </div>
+    </div>
+);
+
+export const CategoryList = ({
+    loading,
+    categories,
+    subcategories,
+    subsubcategories,
+    activeCategory,
+    openCategory,
+    toggleSubcategories,
+    handleNavigation,
+}) => (
+    <ul className="p-4">
+        {loading ? (
+            Array(10).fill().map((_, index) => (
+                <li key={index} className="mb-4">
+                    <Skeleton variant="text" animation="wave" height={40} />
+                </li>
+            ))
+        ) : (
+            categories.map((category, index) => (
+                <li
+                    key={category._id}
+                    className={`mb-4 ${index === categories.length - 1 ? 'mb-[2px]' : ''}`}
+                >
+                    <div className="flex items-center justify-between">
+                        <div className='border-t bg-gray-50' />
+                        <img
+                            src={getImageUrl(category.image)}
+                            alt=""
+                            className='object-contain w-6 h-6'
+                        />
+                        <button
+                            onClick={() => handleNavigation(`/category/${category._id}`, category._id)}
+                            className={`flex-grow text-left p-2 ml-2 ${activeCategory === category._id ? 'bg-gray-100' : ''}`}
+                        >
+                            {category.name}
+                        </button>
+                        <button
+                            onClick={(e) => toggleSubcategories(category._id, e)}
+                            className={`p-2 text-gray-500 hover:bg-gray-100 rounded-lg transition duration-200 ${openCategory === category._id ? 'rotate-90' : ''}`}
+                        >
+                            <ChevronRight />
+                        </button>
+                    </div>
+                    <AnimatePresence initial={false}>
+                        {openCategory === category._id && (
+                            <motion.ul
+                                initial={{ height: 0, opacity: 0 }}
+                                animate={{ height: 'auto', opacity: 1 }}
+                                exit={{ height: 0, opacity: 0 }}
+                                transition={{ duration: 0.3 }}
+                                className="ml-2 overflow-hidden"
+                            >
+                                {subcategories[category._id]?.map((subcategory) => (
+                                    <li key={subcategory._id} className='mb-2 ml-3'>
+                                        <div className="flex items-center">
+                                            <img
+                                                src={getImageUrl(subcategory.image)}
+                                                alt=""
+                                                className='object-contain w-6 h-6'
+                                            />
+                                            <button
+                                                onClick={() => handleNavigation(`/subcategory/${subcategory._id}`, category._id)}
+                                                className="block py-1 px-2 mt-[2px] text-gray-700 hover:bg-gray-100"
+                                            >
+                                                {subcategory.name}
+                                            </button>
+                                        </div>
+                                        <AnimatePresence initial={false}>
+                                            {subsubcategories[subcategory._id]?.length > 0 && (
+                                                <motion.ul
+                                                    initial={{ height: 0, opacity: 0 }}
+                                                    animate={{ height: 'auto', opacity: 1 }}
+                                                    exit={{ height: 0, opacity: 0 }}
+                                                    transition={{ duration: 0.3 }}
+                                                    className="pl-4 overflow-hidden"
+                                                >
+                                                    {subsubcategories[subcategory._id].map((subsubcategory) => (
+                                                        <div key={subsubcategory._id} className="flex items-center mb-1">
+                                                            <div className="rounded-md mr-9" />
+                                                            <button
+                                                                onClick={() => handleNavigation(`/subSubcategory/${subsubcategory._id}`, category._id)}
+                                                                className="block py-1 text-gray-500 hover:bg-gray-100"
+                                                            >
+                                                                {subsubcategory.name}
+                                                            </button>
+                                                        </div>
+                                                    ))}
+                                                </motion.ul>
+                                            )}
+                                        </AnimatePresence>
+                                    </li>
+                                ))}
+                            </motion.ul>
+                        )}
+                    </AnimatePresence>
+                </li>
+            ))
+        )}
+    </ul>
+);
+
+export const SidebarFooter = () => {
+    const navigate = useNavigate();
+
+    return (
+        <div className="flex flex-col text-gray-400 gap-3">
+            <span
+                onClick={() => navigate('/faqs')}
+                className="text-sm ml-4 underline"
+            >
+                Frequently Asked Questions
+            </span>
+            <span
+                onClick={() => navigate('/contact-us')}
+                className="text-sm ml-4 underline">Contact us:</span>
+            <span className="text-sm ml-4">Email: support@sheero.com</span>
+            <span className="text-sm ml-4 mb-10">Tel.: 044888999</span>
+        </div>
+    );
+}
+
+const getEmptyStateMessage = (context, items, searchTerm, statusFilter) => {
+    const entity = context === 'reviews' ? 'reviews'
+        : context === 'orders' ? 'orders'
+            : 'returns';
+
+    if (items.length === 0 && !searchTerm) return `No ${entity} found!`;
+    if (items.length === 0 && searchTerm) return `No ${entity} match your search term!`;
+
+    if (items.length === 0) return `You haven't placed any ${entity} yet!`;
+    if (searchTerm && statusFilter !== 'All') return `No ${entity} match your search and selected filters.`;
+    if (searchTerm) return `No ${entity} match your search term.`;
+    if (statusFilter !== 'All') return `No ${entity} match the selected filters.`;
+    return `No ${entity} found!`;
+};
+
 export const EmptyState = ({
+    imageSrc,
+    context = 'reviews',
+    items = [],
+    searchTerm = '',
+    statusFilter = 'All',
+    containerClass = 'p-8',
+    imageClass = 'w-60 h-60',
+}) => {
+    const navigate = useNavigate();
+    const message = getEmptyStateMessage(context, items, searchTerm, statusFilter);
+
+    return (
+        <div className={`flex flex-col items-center justify-center bg-white rounded-sm shadow-sm ${containerClass}`}>
+            <img src={imageSrc} alt={message} className={`${imageClass} object-contain mb-4`} />
+            <p className="text-sm font-semibold mb-2">{message}</p>
+        </div>
+    );
+};
+
+export const NotFound = ({
     imageSrc,
     message,
     subMessage = '',
@@ -1743,6 +2019,24 @@ export const CenteredMoreVertIcon = ({ onClick, ...props }) => (
         </IconButton>
     </Box>
 );
+
+export const ErrorTooltip = ({ field, focusedField, isValid, message, value }) =>
+    focusedField === field && value.trim() && !isValid && (
+        <div className="absolute left-0 top-full bg-white text-red-500 text-sm p-2 rounded-lg shadow-md w-full z-10">
+            <span className="block text-xs font-semibold mb-1">{message.title}</span>
+            {message.details}
+        </div>
+    );
+
+export const ScrollToTop = () => {
+    const location = useLocation();
+
+    useEffect(() => {
+        window.scrollTo(0, 0);
+    }, [location]);
+
+    return null;
+};
 
 export const CustomMenu = ({
     anchorEl,
@@ -1835,10 +2129,17 @@ export const Header = ({
     placeholder,
     filterType = 'orders',
     isOrderDetails = false,
+    isUserData = false,
+    isReturnDetails = false,
+    hasAddress = false,
     openReturnModal,
+    onDownloadOrder,
+    onDownloadUserData,
+    onDownloadReturn,
+    onDownloadAddress,
 }) => {
-    const isSharedWishlist = fullName.trim() !== '';
     const { open, menuRef, menuProps, menuHandlers } = useScrollAwayMenu();
+    const isSharedWishlist = fullName.trim() !== '';
 
     const getStatusOptions = () => {
         if (filterType === 'orders') {
@@ -1847,7 +2148,7 @@ export const Header = ({
                 { value: 'pending', label: 'Pending' },
                 { value: 'shipped', label: 'Shipped' },
                 { value: 'delivered', label: 'Delivered' },
-                { value: 'canceled', label: 'Canceled' }
+                { value: 'canceled', label: 'Canceled' },
             ];
         } else if (filterType === 'returns') {
             return [
@@ -1855,7 +2156,16 @@ export const Header = ({
                 { value: 'pending', label: 'Pending' },
                 { value: 'approved', label: 'Approved' },
                 { value: 'processed', label: 'Processed' },
-                { value: 'rejected', label: 'Rejected' }
+                { value: 'rejected', label: 'Rejected' },
+            ];
+        } else if (filterType === 'reviews') {
+            return [
+                { value: 'All', label: 'All' },
+                { value: '1', label: '1+' },
+                { value: '2', label: '2+' },
+                { value: '3', label: '3+' },
+                { value: '4', label: '4+' },
+                { value: '5', label: '5' },
             ];
         }
         return [];
@@ -1907,9 +2217,47 @@ export const Header = ({
                     </div>
                 )}
                 {isOrderDetails && (
-                    <Button variant="outlined" onClick={openReturnModal}>
-                        Request Return
-                    </Button>
+                    <>
+                        <OutlinedBrownButton
+                            onClick={onDownloadOrder}
+                            startIcon={<Download />}
+                        >
+                            Download Order
+                        </OutlinedBrownButton>
+                        <BrownButton variant="contained" onClick={openReturnModal}>
+                            Request Return
+                        </BrownButton>
+                    </>
+                )}
+                {isUserData && (
+                    <>
+                        <OutlinedBrownButton
+                            onClick={onDownloadUserData}
+                            startIcon={<Download />}
+                        >
+                            Download Data
+                        </OutlinedBrownButton>
+                    </>
+                )}
+                {isReturnDetails && (
+                    <>
+                        <OutlinedBrownButton
+                            onClick={onDownloadReturn}
+                            startIcon={<Download />}
+                        >
+                            Download Return
+                        </OutlinedBrownButton>
+                    </>
+                )}
+                {hasAddress && (
+                    <>
+                        <OutlinedBrownButton
+                            onClick={onDownloadAddress}
+                            startIcon={<Download />}
+                        >
+                            Download Address
+                        </OutlinedBrownButton>
+                    </>
                 )}
                 {wishlistItems !== undefined && !isSharedWishlist && wishlistItems.length > 0 && (
                     <>
@@ -1920,6 +2268,268 @@ export const Header = ({
             </div>
         </div>
     );
+};
+
+export const generateOrderPDF = async (order) => {
+    if (!order) return;
+
+    const doc = new jsPDF();
+
+    const pagePadding = 10;
+    const lineSpacing = 7;
+
+    // Header
+    const pageWidth = doc.internal.pageSize.width;
+    const headerStartY = 15;
+    doc.setFillColor(87, 83, 78);
+    doc.rect(pagePadding, headerStartY, pageWidth - pagePadding * 2, 20, 'F');
+    doc.setTextColor(255, 255, 255);
+    doc.setFontSize(16);
+    doc.text("sheero", pagePadding + 5, headerStartY + 13);
+
+    doc.setFontSize(12);
+    const orderText = `Order #${order._id}`;
+    const orderTextWidth = doc.getStringUnitWidth(orderText) * doc.internal.getFontSize() / doc.internal.scaleFactor;
+    doc.text(orderText, pageWidth - pagePadding - orderTextWidth - 5, headerStartY + 13);
+
+    // Company Info
+    const companyStartY = headerStartY + 30;
+    const valueOffset = 65;
+    const drawCompanyLine = (label, value, yPosition) => {
+        doc.text(`${label}:`, pagePadding, yPosition);
+        doc.text(value || 'N/A', pagePadding + valueOffset, yPosition);
+    };
+
+    doc.setTextColor(0, 0, 0);
+    doc.setFontSize(10);
+    doc.text("sheero KS", pagePadding, companyStartY);
+    doc.text("Vëllezërit Gërvalla 201 - Ferizaj, Kosovë", pagePadding, companyStartY + lineSpacing);
+
+    const blankSpace = companyStartY + lineSpacing * 3;
+
+    // Draw other company info with the adjusted Y position
+    drawCompanyLine("Phone", '044221112', blankSpace);
+    drawCompanyLine("Email", 'support@sheero.com', blankSpace + lineSpacing);
+    drawCompanyLine("Website", 'www.sheero.onrender.com', blankSpace + lineSpacing * 2);
+
+    // Order Info      
+    const formatDate = (date) => {
+        const options = { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' };
+        return new Date(date)
+            .toLocaleDateString('en-GB', options)
+            .replace(/^(.*?)(\s\d)/, '$1,$2');
+    };
+    const paymentInfo = () => order.paymentMethod === 'stripe' ? 'Stripe Payment' : 'Cash on delivery';
+
+    const rightColumnX = pageWidth - pagePadding - 70;
+    doc.text(`Order date: ${formatDate(order.createdAt)}`, rightColumnX, companyStartY);
+    doc.text(`Payment: ${paymentInfo()}`, rightColumnX, companyStartY + lineSpacing);
+
+    // Shipping Address
+    const dividerY = companyStartY + lineSpacing * 6 - 1;
+    doc.setLineWidth(0.2);
+    doc.setDrawColor(224, 224, 224);
+    doc.line(pagePadding, dividerY, pageWidth - pagePadding, dividerY);
+
+    const addressStartY = dividerY + 8;
+    var tableStartY = addressStartY + lineSpacing * 6;
+    const drawAddressLine = (label, value, yPosition) => {
+        doc.text(`${label}:`, pagePadding, yPosition);
+        doc.text(value || 'N/A', pagePadding + valueOffset, yPosition);
+    };
+    drawAddressLine("Name", order.address?.name, addressStartY);
+    drawAddressLine("Street", order.address?.street, addressStartY + lineSpacing);
+    drawAddressLine("City", order.address?.city?.name, addressStartY + lineSpacing * 2);
+    drawAddressLine("Country", order.address?.country?.name, addressStartY + lineSpacing * 3);
+    drawAddressLine("Phone", order.address?.phoneNumber, addressStartY + lineSpacing * 4);
+
+    if (order.address?.comment) {
+        drawAddressLine("Comment", order.address?.comment, addressStartY + lineSpacing * 5);
+        tableStartY = addressStartY + lineSpacing * 6;
+    } else {
+        tableStartY = addressStartY + lineSpacing * 5;
+    }
+
+    doc.autoTable({
+        head: [['Product', 'Quantity', 'Price', 'Subtotal']],
+        body: order.products.map(({ product, quantity, price, discount = 0 }) => [
+            product.name,
+            quantity,
+            `€${price.toFixed(2)}`,
+            `€${(quantity * price - discount).toFixed(2)}`
+        ]),
+        startY: tableStartY,
+        theme: 'grid',
+        headStyles: {
+            fillColor: [87, 83, 78],
+            textColor: [255, 255, 255],
+            fontSize: 10
+        },
+        styles: {
+            fontSize: 9,
+            cellPadding: 3,
+        },
+        margin: { left: pagePadding, right: pagePadding }
+    });
+
+    // Totals
+    const finalY = doc.lastAutoTable.finalY + 10;
+    const totalsLabelX = pageWidth - pagePadding - 70;
+    const totalsValueX = pageWidth - pagePadding - 20;
+
+    doc.text("Subtotal:", totalsLabelX, finalY);
+    const subtotal = order.products.reduce((total, { price, quantity }) => total + price * quantity, 0);
+    doc.text(`€${subtotal.toFixed(2)}`, totalsValueX, finalY);
+
+    doc.text("Transport:", totalsLabelX, finalY + lineSpacing);
+    doc.text(`€${order.shipping?.toFixed(2) || '2.00'}`, totalsValueX, finalY + lineSpacing);
+
+    // Totals Divider Line
+    doc.setDrawColor(224, 224, 224);
+    doc.line(pagePadding + 120, finalY + lineSpacing * 2, pageWidth - pagePadding, finalY + lineSpacing * 2);
+
+    doc.text("Total:", totalsLabelX, finalY + lineSpacing * 3);
+    doc.text(`€${order.totalAmount?.toFixed(2) || '0.00'}`, totalsValueX, finalY + lineSpacing * 3);
+
+    // Save PDF
+    doc.save(`order_${order._id}.pdf`);
+};
+
+export const downloadUserData = (user) => {
+    if (!user) return;
+
+    const formatDate = (date) =>
+        `${date.getDate()}-${date.getMonth() + 1}-${date.getFullYear()}`;
+
+    const createDownloadLink = (data, fileName) => {
+        const link = document.createElement('a');
+        link.href = `data:text/json;charset=utf-8,${encodeURIComponent(data)}`;
+        link.download = fileName;
+        document.body.appendChild(link);
+        link.click();
+        document.body.removeChild(link);
+    };
+
+    const date = formatDate(new Date());
+    const fileName = `${user.firstName}_${user.lastName}_PersonalData_${date}.json`;
+    const data = JSON.stringify(user, null, 2);
+
+    createDownloadLink(data, fileName);
+};
+
+export const generateReturnPDF = (returnRequest) => {
+    if (!returnRequest || !returnRequest.products) return;
+
+    const doc = new jsPDF();
+
+    const pagePadding = 10;
+    const lineSpacing = 7;
+
+    // Header
+    const pageWidth = doc.internal.pageSize.width;
+    const headerStartY = 15;
+    doc.setFillColor(87, 83, 78);
+    doc.rect(pagePadding, headerStartY, pageWidth - pagePadding * 2, 20, 'F');
+    doc.setTextColor(255, 255, 255);
+    doc.setFontSize(16);
+    doc.text("sheero", pagePadding + 5, headerStartY + 13);
+
+    doc.setFontSize(12);
+    const returnText = `Return #${returnRequest._id}`;
+    const returnTextWidth = doc.getStringUnitWidth(returnText) * doc.internal.getFontSize() / doc.internal.scaleFactor;
+    doc.text(returnText, pageWidth - pagePadding - returnTextWidth - 5, headerStartY + 13);
+
+    // Company Info
+    const companyStartY = headerStartY + 30;
+    const valueOffset = 65;
+    const drawCompanyLine = (label, value, yPosition) => {
+        doc.text(`${label}:`, pagePadding, yPosition);
+        doc.text(value || 'N/A', pagePadding + valueOffset, yPosition);
+    };
+
+    doc.setTextColor(0, 0, 0);
+    doc.setFontSize(10);
+    doc.text("sheero KS", pagePadding, companyStartY);
+    doc.text("Vëllezërit Gërvalla 201 - Ferizaj, Kosovë", pagePadding, companyStartY + lineSpacing);
+
+    const blankSpace = companyStartY + lineSpacing * 3;
+
+    // Draw other company info with the adjusted Y position
+    drawCompanyLine("Phone", '044221112', blankSpace);
+    drawCompanyLine("Email", 'support@sheero.com', blankSpace + lineSpacing);
+    drawCompanyLine("Website", 'www.sheero.onrender.com', blankSpace + lineSpacing * 2);
+
+    // Divider line after company info
+    const dividerY = blankSpace + lineSpacing * 4 - 4;
+    doc.setLineWidth(0.2);
+    doc.setDrawColor(224, 224, 224);
+    doc.line(pagePadding, dividerY, pageWidth - pagePadding, dividerY);
+
+    const formatDate = (date) => {
+        const options = { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' };
+        return new Date(date)
+            .toLocaleDateString('en-GB', options)
+            .replace(/^(.*?)(\s\d)/, '$1,$2');
+    };
+
+    const rightColumnX = pageWidth - pagePadding - 70;
+    doc.text(`Return date: ${formatDate(returnRequest.createdAt)}`, rightColumnX, companyStartY);
+    doc.text(`Return reason: ${returnRequest.reason}`, rightColumnX, companyStartY + lineSpacing);
+
+    // Reason Info
+    if (returnRequest.reason === 'Other' && returnRequest.customReason) {
+        const rightColumnX = pageWidth - pagePadding - 70;
+        doc.text(`Custom Reason: ${returnRequest.customReason}`, rightColumnX, companyStartY + lineSpacing * 2);
+    }
+
+    const tableStartY = blankSpace + lineSpacing * 5;
+
+    const tableBody = returnRequest.products.map((product) => [
+        product.name || 'Unknown',
+        '1'
+    ]);
+
+    doc.autoTable({
+        head: [['Product', 'Quantity']],
+        body: tableBody,
+        startY: tableStartY,
+        theme: 'grid',
+        headStyles: {
+            fillColor: [87, 83, 78],
+            textColor: [255, 255, 255],
+            fontSize: 10
+        },
+        styles: {
+            fontSize: 9,
+            cellPadding: 3,
+        },
+        margin: { left: pagePadding, right: pagePadding }
+    });
+
+    // Save PDF
+    doc.save(`return_${returnRequest._id}.pdf`);
+};
+
+export const downloadAddress = (address) => {
+    if (!address) return;
+
+    const formatDate = (date) =>
+        `${date.getDate()}-${date.getMonth() + 1}-${date.getFullYear()}`;
+
+    const createDownloadLink = (data, fileName) => {
+        const link = document.createElement('a');
+        link.href = `data:text/json;charset=utf-8,${encodeURIComponent(data)}`;
+        link.download = fileName;
+        document.body.appendChild(link);
+        link.click();
+        document.body.removeChild(link);
+    };
+
+    const date = formatDate(new Date());
+    const fileName = `Address_${address.name}_${date}.json`;
+    const data = JSON.stringify(address, null, 2);
+
+    createDownloadLink(data, fileName);
 };
 
 export const pluralize = (word, count) => {
@@ -2047,7 +2657,7 @@ export const ProfileDropdown = ({ isOpen, isAdmin, handleLogout }) => {
                             <StyledDashboardIcon className="mr-2" />
                             Dashboard
                         </button>
-                        <hr className='border-stone-200 mb-2' />
+                        <Divider className='!mb-2' />
                     </>
                 )}
                 <button
@@ -2071,7 +2681,7 @@ export const ProfileDropdown = ({ isOpen, isAdmin, handleLogout }) => {
                     <StyledFavoriteIcon className="mr-2" />
                     Wishlist
                 </button>
-                <hr className='border-stone-200 mb-2' />
+                <Divider className='!mb-2' />
                 <button
                     onClick={handleLogout}
                     className="flex items-center w-full px-2 py-2 text-stone-700 hover:bg-stone-100 text-left"
@@ -2134,7 +2744,7 @@ export const CartDropdown = ({
                                 </li>
                             ))}
                         </ul>
-                        <hr className="border-stone-200" />
+                        <Divider />
                         <div className="flex justify-between items-center mt-4 mb-4">
                             <div className="flex justify-start items-center space-x-1">
                                 <span className="font-semibold">Total:</span>
@@ -2176,7 +2786,7 @@ export const NavbarLogo = ({ dashboardStyling }) => {
         }}>
             <Tooltip title="Home" arrow>
                 <div className={`flex items-center cursor-pointer ${dashboardStyling || ''}`}>
-                    <img src={logo} alt="Logo" className="w-32 md:w-auto h-9" />
+                    <img src={logo} alt="logo" className="w-[132px] md:w-auto h-9" />
                 </div>
             </Tooltip>
         </a>
@@ -2727,7 +3337,7 @@ export const FilterLayout = ({
                     <Breadcrumb type={breadcrumbType} data={breadcrumbData} />
                 </div>
             ) : (
-                <EmptyState
+                <NotFound
                     imageSrc={noProducts}
                     message="No products found for"
                     dynamicValue={breadcrumbData?.name}

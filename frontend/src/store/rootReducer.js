@@ -1,14 +1,14 @@
 import { combineReducers } from '@reduxjs/toolkit';
-import authReducer from './reducers/authReducer';
 import addressReducer from './reducers/addressReducer';
-import orderReducer from './reducers/orderReducer';
-import returnReducer from './reducers/returnReducer';
-import wishlistReducer from './reducers/wishlistReducer';
-import reviewReducer from './reducers/reviewReducer';
-import productReducer from './reducers/productReducer';
+import authReducer from './reducers/authReducer';
 import categoryReducer from './reducers/categoryReducer';
-import slideshowReducer from './reducers/slideshowReducer';
 import dashboardReducer from './reducers/dashboardReducer';
+import orderReducer from './reducers/orderReducer';
+import productReducer from './reducers/productReducer';
+import returnReducer from './reducers/returnReducer';
+import reviewReducer from './reducers/reviewReducer';
+import slideshowReducer from './reducers/slideshowReducer';
+import wishlistReducer from './reducers/wishlistReducer';
 import { LOGOUT } from './types';
 
 const rootReducer = (state, action) => {

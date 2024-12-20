@@ -1,55 +1,56 @@
 import { DeleteOutline } from '@mui/icons-material';
 import { Table, TableBody, TableCell, TableContainer, TableHead, TableRow, Tooltip } from '@mui/material';
 import React, { useEffect, useState } from 'react';
+import { useDispatch, useSelector } from 'react-redux';
 import { useNavigate } from 'react-router-dom';
 import { toast } from 'react-toastify';
-import { CheckoutButton, CustomDeleteModal, EmptyState, LoadingCart, LoadingOverlay, RoundIconButton, formatPrice, truncateText } from '../../assets/CustomComponents';
+import { CheckoutButton, CustomDeleteModal, LoadingCart, LoadingOverlay, NotFound, RoundIconButton, formatPrice, truncateText } from '../../assets/CustomComponents';
 import emptyCartImage from '../../assets/img/empty/cart.png';
 import useAxios from '../../axiosInstance';
 import Navbar from '../../components/Navbar/Navbar';
 import PaymentModal from '../../components/Product/Modals/PaymentModal';
 import Footer from '../../components/Utils/Footer';
 import { getImageUrl } from '../../config';
+import { getAddressByUser } from '../../store/actions/addressActions';
 
 const Cart = () => {
+    const { address } = useSelector((state) => state.address);
+    const { user } = useSelector((state) => state.auth);
+
+    const dispatch = useDispatch();
+    const navigate = useNavigate();
+    const axiosInstance = useAxios();
+
     const [cart, setCart] = useState({ items: [] });
-    const [address, setAddress] = useState(null);
-    const [user, setUser] = useState(null);
     const [loading, setLoading] = useState(true);
     const [openModal, setOpenModal] = useState(false);
     const [showPaymentModal, setShowPaymentModal] = useState(false);
     const [actionLoading, setActionLoading] = useState(false);
-    const axiosInstance = useAxios();
-    const navigate = useNavigate();
 
-    useEffect(() => { window.scrollTo(0, 0) }, [])
+    const shippingCost = 2;
+
+    const calculateTotalPrice = () =>
+        (cart?.items || []).reduce((total, item) => total + item.quantity * (item.product.salePrice || item.product.price), 0);
+
+    const subtotal = calculateTotalPrice();
+    const total = subtotal + shippingCost;
+    const productLabel = cart?.items?.length > 1 ? 'Products' : 'Product';
+
+    const handleProductClick = (productId) => navigate(`/product/${productId}`);
+
+    const fetchCart = async () => {
+        try {
+            const { data } = await axiosInstance.get('/cart');
+            setCart(data);
+        } catch (error) {
+            console.error('Failed to fetch cart:', error?.response?.data?.message || error.message);
+            setCart({ items: [] });
+        } finally {
+            setLoading(false);
+        }
+    };
 
     useEffect(() => {
-        const fetchCurrentUser = async () => {
-            try {
-                const { data } = await axiosInstance.get('/auth/me');
-                setUser(data);
-            } catch (error) {
-                console.error('Failed to fetch user:', error.message);
-            }
-        };
-
-        fetchCurrentUser();
-    }, []);
-
-    useEffect(() => {
-        const fetchCart = async () => {
-            try {
-                const { data } = await axiosInstance.get('/cart');
-                setCart(data);
-            } catch (error) {
-                console.error('Failed to fetch cart:', error?.response?.data?.message || error.message);
-                setCart({ items: [] });
-            } finally {
-                setLoading(false);
-            }
-        };
-
         if (user) {
             fetchCart();
         }
@@ -61,15 +62,12 @@ const Cart = () => {
         };
 
         window.addEventListener('cartUpdate', handleCartUpdate);
-
-        return () => {
-            window.removeEventListener('cartUpdate', handleCartUpdate);
-        };
+        return () => window.removeEventListener('cartUpdate', handleCartUpdate);
     }, [user]);
 
     const updateQuantity = async (productId, quantityChange) => {
         try {
-            const { data } = await axiosInstance.put(`/cart/quantity/update`, { productId, quantityChange });
+            const { data } = await axiosInstance.put('/cart/quantity/update', { productId, quantityChange });
             setCart(data);
             document.dispatchEvent(new CustomEvent('cartUpdated', { detail: data }));
         } catch (error) {
@@ -80,27 +78,18 @@ const Cart = () => {
     const handleRemove = async (productId) => {
         setActionLoading(true);
         try {
-            const { data } = await axiosInstance.delete('/cart/remove', {
-                data: { productId }
-            });
+            const { data } = await axiosInstance.delete('/cart/remove', { data: { productId } });
 
-            if (data && Array.isArray(data.items)) {
+            if (data?.items) {
                 setCart(data);
-                document.dispatchEvent(new CustomEvent('cartUpdated', { detail: data }));
             } else {
                 const response = await axiosInstance.get('/cart');
                 setCart(response.data);
-                document.dispatchEvent(new CustomEvent('cartUpdated', { detail: response.data }));
             }
+
+            document.dispatchEvent(new CustomEvent('cartUpdated', { detail: data }));
         } catch (error) {
-            console.error('Failed to remove product from cart:', error?.response?.data?.message || error.message);
-            try {
-                const { data } = await axiosInstance.get('/cart');
-                setCart(data);
-                document.dispatchEvent(new CustomEvent('cartUpdated', { detail: data }));
-            } catch (fetchError) {
-                console.error('Failed to fetch updated cart:', fetchError);
-            }
+            console.error('Failed to remove product:', error?.response?.data?.message || error.message);
         } finally {
             setActionLoading(false);
         }
@@ -112,6 +101,8 @@ const Cart = () => {
             const { data } = await axiosInstance.delete('/cart/clear');
             setCart(data);
             document.dispatchEvent(new CustomEvent('cartUpdated', { detail: data }));
+
+            toast.success('Cart cleared successfully!');
         } catch (error) {
             console.error('Failed to clear cart:', error?.response?.data?.message || error.message);
         } finally {
@@ -122,37 +113,9 @@ const Cart = () => {
 
     useEffect(() => {
         if (user) {
-            fetchAddress();
+            dispatch(getAddressByUser(user.id));
         }
     }, [user]);
-
-    const fetchAddress = async () => {
-        try {
-            const response = await axiosInstance.get(`/addresses/user/${user.id}`);
-            setAddress(response.data);
-        } catch (error) {
-            console.error('Error fetching address:', error.message);
-        }
-    };
-
-    const handleStripePayment = async () => {
-        try {
-            const { data } = await axiosInstance.post('/orders/payment/stripe', {
-                cartId: cart._id,
-                addressId: address._id,
-                userId: user.id,
-                email: user.email,
-            });
-
-            await axiosInstance.delete('/cart/clear');
-
-            setShowPaymentModal(false);
-            window.location.href = data.url;
-        } catch (error) {
-            console.error('Error during Stripe checkout:', error.message);
-            toast.error("Failed to initiate checkout. Please try again.");
-        }
-    };
 
     const handleShowModal = () => {
         if (!address) {
@@ -165,6 +128,24 @@ const Cart = () => {
         setShowPaymentModal(true);
     };
 
+    const handleStripePayment = async () => {
+        try {
+            const { data } = await axiosInstance.post('/orders/payment/stripe', {
+                cartId: cart._id,
+                addressId: address._id,
+                userId: user.id,
+                email: user.email,
+            });
+
+            await axiosInstance.delete('/cart/clear');
+            setShowPaymentModal(false);
+            window.location.href = data.url;
+        } catch (error) {
+            console.error('Error during Stripe checkout:', error.message);
+            toast.error("Failed to initiate checkout. Please try again.");
+        }
+    };
+
     const handleCashPayment = async () => {
         try {
             const { data } = await axiosInstance.post('/orders/payment/cash', {
@@ -174,7 +155,6 @@ const Cart = () => {
             });
 
             await axiosInstance.delete('/cart/clear');
-
             toast.success(data.message || "Order placed successfully. Please pay with cash upon delivery.");
             setShowPaymentModal(false);
             navigate('/profile/orders');
@@ -185,18 +165,7 @@ const Cart = () => {
         }
     };
 
-    const handleProductClick = (productId) => navigate(`/product/${productId}`);
-
     if (loading) return <LoadingCart />;
-
-    const calculateTotalPrice = () =>
-        (cart?.items || []).reduce((total, item) => total + item.quantity * (item.product.salePrice || item.product.price), 0);
-
-    const shippingCost = 2;
-    const subtotal = calculateTotalPrice();
-    const total = subtotal + shippingCost;
-
-    const productLabel = cart?.items?.length > 1 ? 'Products' : 'Product';
 
     return (
         <>
@@ -252,19 +221,21 @@ const Cart = () => {
                                                 <TableRow key={item.product._id}>
                                                     <TableCell component="th" scope="row">
                                                         <div className="flex items-center">
-                                                            <img
-                                                                src={getImageUrl(item.product.image)}
-                                                                alt={item.product.name}
-                                                                className="w-20 h-20 object-contain cursor-pointer rounded mr-4"
-                                                                onClick={() => handleProductClick(item.product._id)}
-                                                            />
+                                                            <a href={`/product/${item.product._id}`} rel="noopener noreferrer">
+                                                                <img
+                                                                    src={getImageUrl(item.product.image)}
+                                                                    alt={item.product.name}
+                                                                    className="w-20 h-20 object-contain cursor-pointer rounded mr-4"
+                                                                />
+                                                            </a>
                                                             <div>
-                                                                <h2
+                                                                <a
+                                                                    href={`/product/${item.product._id}`}
+                                                                    rel="noopener noreferrer"
                                                                     className="text-base font-normal cursor-pointer hover:underline"
-                                                                    onClick={() => handleProductClick(item.product._id)}
                                                                 >
                                                                     {truncateText(item.product.name, 25)}
-                                                                </h2>
+                                                                </a>
                                                             </div>
                                                         </div>
                                                     </TableCell>
@@ -432,7 +403,7 @@ const Cart = () => {
                         </div>
                     </div>
                 ) : (
-                    <EmptyState imageSrc={emptyCartImage} message="Your cart is empty!" />
+                    <NotFound imageSrc={emptyCartImage} message="Your cart is empty!" />
                 )}
             </div>
 

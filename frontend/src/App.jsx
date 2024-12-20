@@ -1,5 +1,5 @@
 import React, { Suspense } from 'react';
-import { LoadingOverlay } from './assets/CustomComponents';
+import { LoadingOverlay, ScrollToTop } from './assets/CustomComponents';
 import pages from './assets/dashboardPages';
 import {
   AboutUs,
@@ -38,6 +38,7 @@ import {
 
 const App = () => (
   <Router>
+    <ScrollToTop />
     <Suspense fallback={<LoadingOverlay />}>
       <Routes>
         {/* Public Routes */}

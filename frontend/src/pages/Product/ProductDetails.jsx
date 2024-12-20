@@ -4,14 +4,7 @@ import React, { useEffect, useState } from 'react';
 import { useSelector } from 'react-redux';
 import { useNavigate, useParams } from 'react-router-dom';
 import { toast } from 'react-toastify';
-import {
-    DetailsBreadcrumbs,
-    DetailsCartWishlistButtons,
-    formatPrice,
-    LoadingOverlay,
-    LoadingProductDetails,
-    OutOfStock
-} from '../../assets/CustomComponents';
+import { DetailsBreadcrumbs, DetailsCartWishlistButtons, formatPrice, LoadingOverlay, LoadingProductDetails, OutOfStock } from '../../assets/CustomComponents';
 import useAxios from '../../axiosInstance';
 import ImagePreviewModal from '../../components/Modal/ImagePreviewModal';
 import Navbar from '../../components/Navbar/Navbar';
@@ -40,12 +33,7 @@ const ProductDetails = () => {
     const discountPercentage = discount?.value || 0;
     const discountedPrice = salePrice || originalPrice;
     const finalPrice = salePrice > 0 ? salePrice : price;
-
-    const inventoryText = inventoryCount > 10
-        ? "More than 10 articles"
-        : `${inventoryCount} article${inventoryCount !== 1 ? 's' : ''} left`;
-
-    useEffect(() => { window.scrollTo(0, 0); }, []);
+    const inventoryText = inventoryCount > 10 ? "More than 10 articles" : `${inventoryCount} article${inventoryCount !== 1 ? 's' : ''} left`;
 
     useEffect(() => {
         const fetchProduct = async () => {
@@ -94,23 +82,23 @@ const ProductDetails = () => {
             navigate('/login');
             return;
         }
-    
+
         const endpoint = action === 'cart' ? 'cart/add' : 'wishlist/add';
         const payload = { productId: product._id, ...(action === 'cart' && { quantity }) };
         const setLoadingState = action === 'cart' ? setIsCartLoading : setIsWishlistLoading;
-    
+
         setLoadingState(true);
         try {
             await axiosInstance.post(getApiUrl(`/${endpoint}`), payload);
-    
+
             toast.success(`Product added to ${action === 'cart' ? 'cart' : 'wishlist'}!`, {
                 onClick: () => navigate(`/${action === 'wishlist' ? 'profile/wishlist' : 'cart'}`),
             });
-    
+
             if (action === 'cart') {
                 document.dispatchEvent(new CustomEvent('cartUpdated', { detail: product._id }));
             }
-    
+
             if (action === 'cart' && quantity > product.inventoryCount) {
                 toast.error(`Cannot add more than ${product.inventoryCount} items to cart.`);
                 return;
@@ -118,7 +106,9 @@ const ProductDetails = () => {
         } catch (error) {
             if (error.response && error.response.data.errors) {
                 error.response.data.errors.forEach((err) => {
-                    toast.error(err.message || `Error: ${err}`);
+                    toast.info(err.message || `Error: ${err}`, {
+                        onClick: () => navigate(`/${action === 'wishlist' ? 'profile/wishlist' : 'cart'}`),
+                    });
                 });
             } else {
                 const errorMsg = error.response?.data?.message || `Failed to add product to ${action}.`;
@@ -127,7 +117,7 @@ const ProductDetails = () => {
         } finally {
             setLoadingState(false);
         }
-    };    
+    };
 
     return (
         <>

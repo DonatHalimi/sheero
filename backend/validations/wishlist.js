@@ -2,11 +2,6 @@ const yup = require('yup');
 const Product = require('../models/Product');
 const Wishlist = require('../models/Wishlist');
 
-//        const wishlist = await Wishlist.findOne({ user: userId }).populate('items.product');
-//if (!wishlist) {
-//    return res.status(404).json({ message: 'Wishlist not found' });
-//}
-
 const addSchema = yup.object({
     productId: yup
         .string()

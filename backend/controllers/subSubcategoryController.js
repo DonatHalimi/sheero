@@ -7,7 +7,7 @@ const createSubSubcategory = async (req, res) => {
     try {
         const subSubcategory = new SubSubcategory({ name, subcategory });
         await subSubcategory.save();
-        res.status(201).json({ message: 'SubSubcategory created succesfully', subSubcategory });
+        res.status(201).json({ message: 'SubSubcategory created successfully', subSubcategory });
     } catch (error) {
         res.status(500).json({ message: 'Server error' });
     }
@@ -34,7 +34,7 @@ const getSubSubcategoryById = async (req, res) => {
 const getSubSubcategoriesBySubcategory = async (req, res) => {
     try {
         const subSubcategories = await SubSubcategory.find({ subcategory: req.params.subcategoryId });
-        if (!subSubcategories || subSubcategories.length === 0) return res.status(404).json({ message: 'Subsubcategory not found' });
+        if (!subSubcategories || subSubcategories.length === 0) return res.status(404).json({ message: 'SubSubcategory not found' });
         res.status(200).json(subSubcategories);
     } catch (error) {
         res.status(500).json({ message: 'Server error' });
@@ -50,7 +50,7 @@ const updateSubSubcategory = async (req, res) => {
             { name, subcategory, updatedAt: Date.now() },
             { new: true }
         );
-        res.status(201).json({ message: 'SubSubcategory updated succesfully', subSubcategory });
+        res.status(201).json({ message: 'SubSubcategory updated successfully', subSubcategory });
     } catch (error) {
         res.status(500).json({ message: 'Server error' });
     }

@@ -21,8 +21,6 @@ const Orders = () => {
     const [searchTerm, setSearchTerm] = useState('');
     const [statusFilter, setStatusFilter] = useState('All');
 
-    useEffect(() => { window.scrollTo(0, 0) }, []);
-
     useEffect(() => {
         if (user?.id) {
             dispatch(getUserOrders(user.id));
@@ -111,7 +109,10 @@ const Orders = () => {
                 ) : filteredOrders.length === 0 ? (
                     <EmptyState
                         imageSrc={emptyOrdersImage}
-                        message={searchTerm ? "No orders found matching your search" : "No orders found!"}
+                        context="orders"
+                        items={orders}
+                        searchTerm={searchTerm}
+                        statusFilter={statusFilter}
                     />
                 ) : (
                     <div className="flex flex-col">

@@ -31,7 +31,7 @@ const getRoleById = async (req, res) => {
 const updateRole = async (req, res) => {
     try {
         const role = await Role.findByIdAndUpdate(req.params.id, req.body, { new: true, runValidators: true });
-        res.status(200).json({ message: 'Role updated succesfully', role });
+        res.status(200).json({ message: 'Role updated successfully', role });
     } catch (error) {
         res.status(400).send(error);
     }

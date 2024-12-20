@@ -25,11 +25,9 @@ import { useNavigate } from 'react-router-dom';
 import { ActiveListItem, CollapsibleListItem, StyledInboxIcon, StyledMoveToInboxIcon } from '../../assets/CustomComponents';
 
 /**
- * Renders the main list items for the CRUD dashboard.
- *
- * @param {Object} props - The properties for the component.
- * @param {Function} props.setCurrentView - The function to set the current view.
- * @return {React.ReactNode} The rendered main list items.
+ * Returns a list of main menu items for the dashboard.
+ * @param {object} props An object containing the setCurrentView function.
+ * @returns {React.ReactElement} A list of main menu items for the dashboard.
  */
 export const mainListItems = ({ setCurrentView }) => {
   const [crudOpen, setCrudOpen] = useState(true);

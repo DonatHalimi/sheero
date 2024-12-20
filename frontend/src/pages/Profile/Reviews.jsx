@@ -28,17 +28,23 @@ const Reviews = () => {
     const [searchTerm, setSearchTerm] = useState('');
     const [loadingOverlay, setLoadingOverlay] = useState(false);
     const [currentPage, setCurrentPage] = useState(1);
-
-    useEffect(() => { window.scrollTo(0, 0) }, []);
+    const [statusFilter, setStatusFilter] = useState('All');
 
     useEffect(() => {
         dispatch(getUserReviews(user.id));
     }, [dispatch, user.id]);
 
-    const filteredReviews = reviews.filter(({ product: { name }, title, rating, comment }) =>
-        [name, title, rating, comment]
-            .some(field => field?.toString().toLowerCase().includes(searchTerm.toLowerCase()))
-    );
+    const filteredReviews = Array.isArray(reviews)
+        ? reviews.filter(({ product: { name }, title, rating, comment }) => {
+            const fields = [name, title, rating?.toString(), comment];
+            const matchesSearchTerm = fields.some(field =>
+                field?.toLowerCase().includes(searchTerm.toLowerCase())
+            );
+            const matchesStatusFilter =
+                statusFilter === 'All' || (rating && rating >= parseInt(statusFilter));
+            return matchesSearchTerm && matchesStatusFilter;
+        })
+        : [];
 
     const handleMenuClick = (event, review) => {
         event.stopPropagation();
@@ -101,18 +107,25 @@ const Reviews = () => {
             <Navbar />
             <ProfileLayout>
                 <Header
-                    title='Reviews'
+                    title="Reviews"
                     searchTerm={searchTerm}
                     setSearchTerm={setSearchTerm}
                     showSearch={reviews.length > 0}
-                    placeholder='Search reviews...'
+                    showFilter={reviews.length > 0}
+                    statusFilter={statusFilter}
+                    setStatusFilter={setStatusFilter}
+                    placeholder="Search reviews..."
+                    filterType="reviews"
                 />
                 {loading ? (
                     <LoadingReviewItem />
                 ) : filteredReviews.length === 0 ? (
                     <EmptyState
                         imageSrc={emptyReviewsImage}
-                        message={searchTerm ? "No review found matching your search" : "No review found!"}
+                        context="reviews"
+                        items={reviews}
+                        searchTerm={searchTerm}
+                        statusFilter={statusFilter}
                     />
                 ) : (
                     <div className={`flex flex-col ${applyMargin()}`}>

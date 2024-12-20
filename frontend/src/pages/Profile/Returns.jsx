@@ -18,8 +18,6 @@ const Returns = () => {
     const [searchTerm, setSearchTerm] = useState('');
     const [statusFilter, setStatusFilter] = useState('All');
 
-    useEffect(() => { window.scrollTo(0, 0) }, []);
-
     useEffect(() => {
         if (user?.id) {
             dispatch(getUserReturns(user.id));
@@ -78,7 +76,10 @@ const Returns = () => {
                 ) : filteredReturns.length === 0 ? (
                     <EmptyState
                         imageSrc={emptyReturnsImage}
-                        message={searchTerm ? "No returns found matching your search" : "No returns found!"}
+                        context="returns"
+                        items={returns}
+                        searchTerm={searchTerm}
+                        statusFilter={statusFilter}
                     />
                 ) : (
                     <div className={`flex flex-col ${applyMargin()}`}>

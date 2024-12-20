@@ -20,7 +20,7 @@ const Slideshow = () => {
     }, [images]);
 
     return (
-        <div className="w-full mx-auto mb-14">
+        <div className="w-full mx-auto mb-9">
             {loading ? (
                 <LoadingSlideshow />
             ) : (

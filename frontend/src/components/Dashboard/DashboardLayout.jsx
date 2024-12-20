@@ -12,11 +12,19 @@ import theme from '../../theme';
 import { mainListItems, secondaryListItems } from './listItems';
 
 /**
- * A functional component representing the layout of the dashboard.
- * It handles the state of the drawer, dropdown, and logout functionality.
- * It also renders the necessary components for the dashboard layout.
+ * A layout component for the dashboard pages. It provides a
+ * navigation bar on the left and a main content area for the
+ * pages. It also handles the user authentication and provides
+ * a logout button in the navigation bar.
  *
- * @return {JSX.Element} The JSX element representing the dashboard layout.
+ * The component expects the following props:
+ *
+ * - `isAuthenticated`: a boolean indicating whether the user is
+ *   authenticated or not.
+ * - `isAdmin`: a boolean indicating whether the user is an admin
+ *   or not.
+ *
+ * The component returns a JSX element that renders the layout.
  */
 const DashboardLayout = () => {
     const { isAuthenticated } = useSelector((state) => state.auth);

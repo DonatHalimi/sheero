@@ -48,7 +48,8 @@ const loginUser = async (req, res) => {
                 firstName: user.firstName,
                 lastName: user.lastName,
                 email: user.email,
-                role: user.role.name
+                role: user.role.name,
+                accessToken: accessToken
             }
         });
     } catch (error) {
@@ -95,12 +96,6 @@ const updateUserProfile = async (req, res) => {
 
         await user.save();
         await user.populate('role');
-
-        // Generate new token if email changed
-        if (email) {
-            const accessToken = generateAccessToken(user);
-            res.cookie('accessToken', accessToken, cookieConfig);
-        }
 
         res.json({
             firstName: user.firstName,

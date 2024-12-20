@@ -67,7 +67,6 @@ const ProductItem = ({ product }) => {
     return (
         <>
             {(isLoading.cart || isLoading.wishlist) && <LoadingOverlay />}
-
             <div onClick={handleClick} className="bg-white rounded-md shadow-sm p-4 flex flex-col cursor-pointer transition-shadow duration-300 hover:shadow-md" >
                 <div className="relative mb-2">
                     <img

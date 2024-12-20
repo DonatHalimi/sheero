@@ -19,8 +19,6 @@ const UsersPage = () => {
     const [currentPage, setCurrentPage] = useState(0);
     const itemsPerPage = 5;
 
-    useEffect(() => { window.scrollTo(0, 0) }, []);
-
     useEffect(() => {
         dispatch(getUsers());
     }, [dispatch]);

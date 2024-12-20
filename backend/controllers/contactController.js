@@ -2,11 +2,12 @@ const Contact = require('../models/Contact');
 
 const createContact = async (req, res) => {
     const { name, email, subject, message } = req.body;
+    const userId = req.user.userId;
 
     try {
-        const contact = new Contact({ name, email, subject, message });
+        const contact = new Contact({ name, email, subject, message, userId });
         await contact.save();
-        res.status(201).json({ message: 'Message sent succesfully', contact });
+        res.status(201).json({ message: 'Message sent successfully ', contact });
     } catch (error) {
         res.status(500).json({ message: 'Server error', error: error.message });
     }

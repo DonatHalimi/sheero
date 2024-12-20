@@ -1,24 +1,37 @@
 import { LinearProgress, Table, TableBody, TableCell, TableContainer, TableHead, TableRow } from '@mui/material';
-import React, { useEffect } from 'react';
-import { useDispatch, useSelector } from 'react-redux';
+import React, { useEffect, useState } from 'react';
 import { Link, useParams } from 'react-router-dom';
-import { EmptyState, formatDate, Header, LoadingOrderDetails, ProfileLayout } from '../../assets/CustomComponents';
+import { EmptyState, formatDate, generateReturnPDF, Header, LoadingOrderDetails, ProfileLayout } from '../../assets/CustomComponents';
 import emptyReturnsImage from '../../assets/img/empty/orders.png';
 import Navbar from '../../components/Navbar/Navbar';
 import Footer from '../../components/Utils/Footer';
 import { getImageUrl } from '../../config';
-import { getReturnDetails } from '../../store/actions/returnActions';
+import useAxios from '../../axiosInstance';
 
 const ReturnDetails = () => {
     const { returnId } = useParams();
-    const { returnDetails: returnRequest, loading } = useSelector((state) => state.returns);
-    const dispatch = useDispatch();
+    const axiosInstance = useAxios();
 
-    useEffect(() => { window.scrollTo(0, 0) }, []);
+    const [returnRequest, setReturnRequest] = useState(null);
+    const [loading, setLoading] = useState(true);
+    const isReturnProcessed = returnRequest && returnRequest.status === 'processed';
+
+    const fetchReturnDetails = async () => {
+        try {
+            const response = await axiosInstance.get(`/returns/${returnId}`);
+            setReturnRequest(response.data.data);
+        } catch (error) {
+            console.error('Error fetching return details:', error);
+        } finally {
+            setLoading(false);
+        }
+    };
 
     useEffect(() => {
-        dispatch(getReturnDetails(returnId));
-    }, [returnId, dispatch]);
+        if (returnId) {
+            fetchReturnDetails();
+        }
+    }, [returnId]);
 
     const displayReason = returnRequest
         ? (returnRequest.reason === 'Other'
@@ -36,11 +49,22 @@ const ReturnDetails = () => {
         }
     };
 
+    const handleDownloadReturn = () => {
+        if (returnRequest) {
+            generateReturnPDF(returnRequest);
+        }
+    };
+
     return (
         <>
             <Navbar />
             <ProfileLayout>
-                <Header title="Return:" returnId={returnId} />
+                <Header
+                    title="Return:"
+                    returnId={returnId}
+                    isReturnDetails={isReturnProcessed}
+                    onDownloadReturn={handleDownloadReturn}
+                />
 
                 {loading ? (
                     <LoadingOrderDetails isOrder={false} />
@@ -108,7 +132,6 @@ const ReturnDetails = () => {
                                 </TableContainer>
                             </div>
                         </div>
-
                     </>
                 ) : (
                     <EmptyState imageSrc={emptyReturnsImage} message="No return request found!" />

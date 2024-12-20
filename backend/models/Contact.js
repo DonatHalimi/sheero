@@ -5,6 +5,7 @@ const contactSchema = new mongoose.Schema({
     email: { type: String, required: true },
     subject: { type: String, required: true },
     message: { type: String, required: true },
+    userId: { type: mongoose.Schema.Types.ObjectId, ref: 'User', required: false },
     createdAt: { type: Date, default: Date.now }
 });
 

@@ -37,7 +37,12 @@ if (process.env.NODE_ENV === 'production') {
 
 mongoose.connect(process.env.MONGO_URI)
     .then(() => console.log('Connected to MongoDB'))
-    .catch(err => console.log(err));
+    .catch(err => console.error('Connection to MongoDB failed:', err));
+
+app.use((req, res, next) => {
+    console.log('Request Cookies:', req.cookies);
+    next();
+});
 
 const PORT = process.env.BACKEND_PORT || 5000;
-app.listen(PORT, () => console.log(`Server running on port ${PORT}`));
+app.listen(PORT, () => console.log(`Server is running at \x1b[4mhttp://localhost:${PORT}\x1b[0m`));

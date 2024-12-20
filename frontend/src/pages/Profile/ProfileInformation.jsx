@@ -5,7 +5,7 @@ import React, { useEffect, useState } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 import { toast } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
-import { BrownButton, BrownOutlinedTextField, Header, knownEmailProviders, LoadingInformation, ProfileLayout } from '../../assets/CustomComponents';
+import { BrownButton, BrownOutlinedTextField, downloadUserData, Header, knownEmailProviders, LoadingInformation, ProfileLayout } from '../../assets/CustomComponents';
 import Navbar from '../../components/Navbar/Navbar';
 import Footer from '../../components/Utils/Footer';
 import { updateUserProfile } from '../../store/actions/authActions';
@@ -30,8 +30,6 @@ const ProfileInformation = () => {
     const [newPasswordValid, setNewPasswordValid] = useState(true);
 
     const [focusedField, setFocusedField] = useState(null);
-
-    useEffect(() => window.scrollTo(0, 0), []);
 
     useEffect(() => {
         if (user) {
@@ -131,12 +129,22 @@ const ProfileInformation = () => {
         !password
     );
 
+    const handleDownloadUserData = () => {
+        if (user) {
+            downloadUserData(user);
+        }
+    };
+
     return (
         <>
             <Navbar />
             <ProfileLayout>
 
-                <Header title="Profile Information" />
+                <Header
+                    title="Profile Information"
+                    isUserData={true}
+                    onDownloadUserData={handleDownloadUserData}
+                />
 
                 <Box className='bg-white rounded-md shadow-sm mb-24'
                     sx={{

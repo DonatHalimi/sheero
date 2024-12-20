@@ -1,7 +1,7 @@
 import { Typography } from '@mui/material';
 import React, { useEffect, useState } from 'react';
 import { useLocation } from 'react-router-dom';
-import { calculatePageCount, CustomPagination, EmptyState, getPaginatedItems, GoBackButton, handlePageChange } from '../../assets/CustomComponents';
+import { calculatePageCount, CustomPagination, getPaginatedItems, GoBackButton, handlePageChange, NotFound } from '../../assets/CustomComponents';
 import noResultsImage from '../../assets/img/empty/search-results.png';
 import useAxios from '../../axiosInstance';
 import Navbar from '../../components/Navbar/Navbar';
@@ -19,8 +19,6 @@ const SearchResults = () => {
     const location = useLocation();
 
     const query = new URLSearchParams(location.search).get('query');
-
-    useEffect(() => { window.scrollTo(0, 0); }, []);
 
     useEffect(() => {
         const fetchSearchResults = async () => {
@@ -83,7 +81,7 @@ const SearchResults = () => {
                         />
                     </>
                 ) : (
-                    <EmptyState
+                    <NotFound
                         imageSrc={noResultsImage}
                         message="No results found for"
                         dynamicValue={`"${query}"`}

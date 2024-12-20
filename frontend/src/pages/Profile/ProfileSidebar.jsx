@@ -1,5 +1,5 @@
 import { HomeOutlined, StarBorderOutlined } from '@mui/icons-material';
-import { List, Typography } from '@mui/material';
+import { Divider, List, Typography } from '@mui/material';
 import React, { useEffect, useState } from 'react';
 import { useSelector } from 'react-redux';
 import { useLocation, useNavigate } from 'react-router-dom';
@@ -60,7 +60,7 @@ const ProfileSidebar = () => {
                     <span className="text-md">{greetingMessage}</span>
                 </>
             )}
-            <div className="border-t border-stone-200 mt-4 mb-2" />
+            <Divider className='!mt-4 !mb-2' />
             <List component="nav">
                 {items.map(({ key, label, icon, inactiveIcon }) => (
                     <ActiveListItem

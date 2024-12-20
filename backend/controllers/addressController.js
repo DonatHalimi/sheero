@@ -27,6 +27,7 @@ const getAddresses = async (req, res) => {
             .populate('user', 'firstName lastName email')
             .populate('city', 'name zipCode')
             .populate('country', 'name');
+
         res.status(200).json(addresses);
     } catch (error) {
         res.status(500).json({ message: 'Server error' });

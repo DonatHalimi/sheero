@@ -22,7 +22,7 @@ const addToCart = async (req, res) => {
         await cart.calculateTotalPrice();
 
         await cart.save();
-        res.status(201).json({ message: 'Cart created succesfully', cart });
+        res.status(201).json({ message: 'Cart created successfully', cart });
     } catch (err) {
         console.error('Error adding to cart:', err);
         res.status(500).json({ message: 'Server Error', error: err.message });
@@ -86,7 +86,7 @@ const removeFromCart = async (req, res) => {
         cart.calculateTotalPrice();
         await cart.save();
 
-        res.status(200).json({ message: 'Product removed from cart succesfully', cart });
+        res.status(200).json({ message: 'Product removed from cart successfully', cart });
     } catch (err) {
         res.status(500).json({ message: 'Server Error', error: err.message });
     }
@@ -103,7 +103,7 @@ const clearCart = async (req, res) => {
 
         await cart.save();
 
-        res.status(200).json({ message: 'Cart cleared succesfully', cart });
+        res.status(200).json({ message: 'Cart cleared successfully', cart });
     } catch (err) {
         res.status(500).json({ message: 'Server Error', error: err.message });
     }

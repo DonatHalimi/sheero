@@ -21,8 +21,6 @@ const ProductsBySubSubCategory = () => {
     const [priceFilter, setPriceFilter] = useState({ min: '', max: '' });
     const [sortOrder, setSortOrder] = useState('relevancy');
 
-    useEffect(() => window.scrollTo(0, 0), [id])
-
     useEffect(() => {
         const fetchData = async () => {
             setLoading(true);
@@ -61,7 +59,12 @@ const ProductsBySubSubCategory = () => {
     const handleSortChange = (event) => {
         const order = event.target.value;
         setSortOrder(order);
-        setFilteredProducts(sortProducts(filteredProducts, order));
+
+        if (order === 'relevancy') {
+            setFilteredProducts(products);
+        } else {
+            setFilteredProducts(sortProducts(filteredProducts, order));
+        }
         setCurrentPage(1);
     };
 

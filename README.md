@@ -42,15 +42,15 @@ To set up the project locally, follow these steps:
    **Backend (`backend/.env`)**
    ```bash
    BACKEND_PORT=5000
-   MONGO_URI=<your-mongodb-uri>
-   JWT_SECRET=<your-jwt-secret>
-   STRIPE_SECRET_KEY=<your-stripe-secret-key>
+   MONGO_URI=<your_mongodb_uri>
+   JWT_SECRET=<your_jwt_secret>
+   JWT_REFRESH_SECRET=<your_jwt_refresh_secret>
+   STRIPE_SECRET_KEY=<your_stripe_secret_key>
    NODE_ENV=development
    ```
 
    **Frontend (`client/.env`)**
    ```bash
-   VITE_CRYPTOJS_SECRET_KEY=<your-cryptojs-secret-key>
    NODE_ENV=development
    ```
 
@@ -78,14 +78,15 @@ Once the application is running, you can access it in your web browser at `http:
 
 ## Features
 
-- User authentication and authorization
+- User authentication and authorization with accessToken through cookies
+- State management with Redux for handling application state
 - Address management for shipping
 - Product management with categories
 - Wishlist for saving favorite products
 - Shopping cart functionality
 - Simple payment options with Stripe or cash
 - Real-time order tracking for updates on your purchases
-- Users can make a return request for specific product(s) from an order if the status is marked as `Delivered`
+- Users can submit return requests for specific product(s) from an order if the status is marked as `Delivered`
 - Reviews and ratings for products
 
 ### Technologies Used
@@ -103,7 +104,7 @@ The frontend is built with modern web technologies that focus on UI/UX, routing,
   "type": "module",
   "scripts": {
     "dev": "vite --port 3000 --open",
-    "build": "vite build",
+    "build": "vite build && cp public/_redirects dist/",
     "lint": "eslint . --ext js,jsx --report-unused-disable-directives --max-warnings 0",
     "preview": "vite preview"
   },
@@ -111,15 +112,19 @@ The frontend is built with modern web technologies that focus on UI/UX, routing,
     "@mui/icons-material": "^5.16.1",
     "@mui/material": "^5.16.1",
     "@mui/x-data-grid": "^7.14.0",
+    "@reduxjs/toolkit": "^2.3.0",
     "@splidejs/react-splide": "^0.7.12",
     "@tailwindcss/aspect-ratio": "^0.4.2",
     "axios": "^1.7.2",
-    "crypto-js": "^4.2.0",
     "framer-motion": "^11.3.12",
     "react": "^18.3.1",
     "react-dom": "^18.3.1",
+    "react-intersection-observer": "^9.13.1",
+    "react-redux": "^9.1.2",
     "react-router-dom": "^6.24.1",
-    "react-toastify": "^10.0.5"
+    "react-swipeable": "^7.0.1",
+    "react-toastify": "^10.0.5",
+    "redux": "^5.0.1"
   },
   "devDependencies": {
     "@types/react": "^18.3.3",
@@ -139,6 +144,8 @@ The frontend is built with modern web technologies that focus on UI/UX, routing,
 - [**Material UI**](https://mui.com): Provides prebuilt components for React, including icons, buttons, and grids.
 - [**Axios**](https://www.npmjs.com/package/axios): Simplifies HTTP requests, making it easier to fetch data from the backend.
 - [**React Router DOM**](https://www.npmjs.com/package/react-router-dom): Enables routing between different pages in the app.
+- [**React Redux**](https://www.npmjs.com/package/react-redux): A library that provides bindings for Redux, allowing you to manage application state and pass it to React components efficiently using hooks like `useDispatch` and `useSelector`.  
+- [**React Intersection Observer**](https://www.npmjs.com/package/react-intersection-observer): A React wrapper used to detect when products in home page are visible in the viewport, enabling the load more feature functionality.
 - [**Tailwind CSS**](https://tailwindcss.com): Utility-first CSS framework for rapid UI development.
 - [**Framer Motion**](https://www.npmjs.com/package/framer-motion): Provides animation capabilities for enhanced user experience.
 - [**Vite**](https://vite.dev/guide/): A fast frontend build tool, replacing Webpack for development and build processes.
@@ -161,6 +168,7 @@ The backend is a Node.js API server designed to handle requests, manage authenti
   },
   "dependencies": {
     "bcryptjs": "^2.4.3",
+    "cookie-parser": "^1.4.7",
     "cors": "^2.8.5",
     "dotenv": "^16.4.5",
     "express": "^4.19.2",
@@ -178,15 +186,17 @@ The backend is a Node.js API server designed to handle requests, manage authenti
   "license": "ISC"
 }
 ```
-- [**Express.js**](https://www.npmjs.com/package/express): A minimalist web framework for Node.js, making it easy to set up routes and middleware.
-- [**Mongoose**](https://www.npmjs.com/package/mongoose): A library for interacting with MongoDB, providing an object data modeling (ODM) solution.- 
-- [**Nodemon**](https://www.npmjs.com/package/nodemon): Automatically restarts the server on file changes, speeding up development.
-- [**JWT (jsonwebtoken)**](https://jwt.io/introduction): Used for secure authentication and authorization via tokens.
 - [**Bcrypt.js**](https://www.npmjs.com/package/bcryptjs): A hashing library for securely storing and comparing user passwords.
-- [**Stripe**](https://www.npmjs.com/package/stripe): For securely processing payments online with ease, with out-of-the-box integration.
-- [**Multer**](https://www.npmjs.com/package/multer): A middleware for handling multipart form data, in this case used for uploading images.
-- [**Yup**](https://www.npmjs.com/package/yup): A JavaScript schema builder for value parsing and validation, in this case used for data validation.
+
+- [**Cookie Parser**](https://www.npmjs.com/package/cookie-parser): Middleware for parsing cookies in HTTP requests, making it easier to work with cookies in a Node.js application, especially for handling session data or authentication tokens
 - [**CORS**](https://www.npmjs.com/package/cors): Middleware for enabling Cross-Origin Resource Sharing, allowing frontend access from different domains.
+- [**Express.js**](https://www.npmjs.com/package/express): A minimalist web framework for Node.js, making it easy to set up routes and middleware.
+- [**JWT (jsonwebtoken)**](https://jwt.io/introduction): Used for secure authentication and authorization via tokens.
+- [**Mongoose**](https://www.npmjs.com/package/mongoose): A library for interacting with MongoDB, providing an object data modeling (ODM) solution.
+- [**Multer**](https://www.npmjs.com/package/multer): A middleware for handling multipart form data, in this case used for uploading images. 
+- [**Nodemon**](https://www.npmjs.com/package/nodemon): Automatically restarts the server on file changes, speeding up development.
+- [**Stripe**](https://www.npmjs.com/package/stripe): For securely processing payments online with ease, with out-of-the-box integration.
+- [**Yup**](https://www.npmjs.com/package/yup): A JavaScript schema builder for value parsing and validation, in this case used for data validation.
 
 ## Stripe Payment Testing
 

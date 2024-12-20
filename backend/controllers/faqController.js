@@ -6,7 +6,7 @@ const createFAQ = async (req, res) => {
     try {
         const faq = new FAQ({ question, answer });
         await faq.save();
-        res.status(201).json({ message: 'FAQ item created succesfully', faq });
+        res.status(201).json({ message: 'FAQ item created successfully', faq });
     } catch (error) {
         res.status(500).json({ message: 'Server error' });
     }
@@ -39,7 +39,7 @@ const updateFAQ = async (req, res) => {
             { question, answer, updatedAt: Date.now() },
             { new: true }
         );
-        res.status(200).json({ message: 'FAQ item updated succesfully', faq });
+        res.status(200).json({ message: 'FAQ item updated successfully', faq });
     } catch (error) {
         res.status(500).json({ message: 'Server error' });
     }

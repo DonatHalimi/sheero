@@ -20,8 +20,8 @@ import SearchBar from './SearchBar';
 
 const Navbar = () => {
     const { isAuthenticated } = useSelector((state) => state.auth);
-
     const isAdmin = useSelector(selectIsAdmin);
+
     const dispatch = useDispatch();
     const location = useLocation();
     const axiosInstance = useAxios();

@@ -8,7 +8,7 @@ const createCategory = async (req, res) => {
     try {
         const category = new Category({ name, image });
         await category.save();
-        res.status(201).json({ message: 'Category created succesfully', category });
+        res.status(201).json({ message: 'Category created successfully', category });
     } catch (error) {
         res.status(500).json({ message: 'Server error' });
     }
@@ -61,7 +61,7 @@ const updateCategory = async (req, res) => {
             { name, image, updatedAt: Date.now() },
             { new: true }
         );
-        res.status(200).json({ message: 'Category updated succesfully', category });
+        res.status(200).json({ message: 'Category updated successfully', category });
     } catch (error) {
         res.status(500).json({ message: 'Server error' });
     }
@@ -78,7 +78,7 @@ const deleteCategory = async (req, res) => {
         }
 
         await Category.findByIdAndDelete(req.params.id);
-        res.status(200).json({ message: 'Category deleted succesfully' });
+        res.status(200).json({ message: 'Category deleted successfully' });
     } catch (error) {
         res.status(500).json({ message: 'Server error' });
     }

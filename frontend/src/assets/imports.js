@@ -10,9 +10,9 @@ export { ToastContainer } from 'react-toastify';
 export { default as ProtectedRoute } from '../components/Route/ProtectedRoute';
 export { default as PublicRoute } from '../components/Route/PublicRoute';
 export { default as ToTop } from '../components/Utils/ToTop';
+export { default as Home } from '../pages/Info/Home';
 
 // Lazy-loaded components
-export const Home = React.lazy(() => import('../pages/Info/Home'));
 export const Login = React.lazy(() => import('../pages/Auth/Login'));
 export const Register = React.lazy(() => import('../pages/Auth/Register'));
 export const FAQs = React.lazy(() => import('../pages/Info/FAQs'));

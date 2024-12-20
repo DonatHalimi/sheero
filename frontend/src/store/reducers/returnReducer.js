@@ -1,8 +1,7 @@
-import { GET_RETURN_DETAILS, GET_RETURN_DETAILS_ERROR, GET_USER_RETURNS, GET_USER_RETURNS_ERROR } from '../types';
+import { GET_USER_RETURNS, GET_USER_RETURNS_ERROR } from '../types';
 
 const initialState = {
     returns: [],
-    returnDetails: null,
     loading: true,
     error: null,
 };
@@ -17,16 +16,7 @@ export default function (state = initialState, action) {
                 error: null,
             };
 
-        case GET_RETURN_DETAILS:
-            return {
-                ...state,
-                returnDetails: action.payload,
-                loading: false,
-                error: null,
-            };
-
         case GET_USER_RETURNS_ERROR:
-        case GET_RETURN_DETAILS_ERROR:
             return {
                 ...state,
                 loading: false,

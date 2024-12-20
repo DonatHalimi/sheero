@@ -7,7 +7,7 @@ const createCountry = async (req, res) => {
     try {
         const country = new Country({ name });
         await country.save();
-        res.status(201).json({ message: 'Country created succesfully', country });
+        res.status(201).json({ message: 'Country created successfully', country });
     } catch (error) {
         res.status(500).json({ message: 'Server error' });
     }
@@ -40,7 +40,7 @@ const updateCountry = async (req, res) => {
             { name, updatedAt: Date.now() },
             { new: true }
         );
-        res.status(200).json({ message: 'Country updated succesfully', country });
+        res.status(200).json({ message: 'Country updated successfully', country });
     } catch (error) {
         res.status(500).json({ message: 'Server error' });
     }

@@ -19,7 +19,7 @@ const createSupplier = async (req, res) => {
     try {
         const supplier = new Supplier({ name, contactInfo });
         await supplier.save();
-        res.status(201).json({ message: 'Supplier created succesfully', supplier });
+        res.status(201).json({ message: 'Supplier created successfully', supplier });
     } catch (error) {
         console.error('Error creating supplier:', error);
         if (error.name === 'ValidationError') {
@@ -59,7 +59,7 @@ const updateSupplier = async (req, res) => {
             { new: true, runValidators: true }
         );
         if (!supplier) return res.status(404).json({ message: 'Supplier not found' });
-        res.status(200).json({ message: 'Supplier updated succesfully', supplier });
+        res.status(200).json({ message: 'Supplier updated successfully', supplier });
     } catch (error) {
         console.error('Error updating supplier:', error);
         res.status(500).json({ message: 'Server error', error: error.message });
