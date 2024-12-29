@@ -1,5 +1,5 @@
 import { Menu as MenuIcon } from '@mui/icons-material';
-import React, { useEffect, useState } from 'react';
+import React, { useEffect, useRef, useState } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 import { useLocation, useNavigate } from 'react-router-dom';
 import { toast } from 'react-toastify';
@@ -34,6 +34,9 @@ const Navbar = () => {
     const [isSidebarOpen, setIsSidebarOpen] = useState(false);
     const [isLoading, setIsLoading] = useState(false);
     const [isFetchingCart, setIsFetchingCart] = useState(false);
+
+    const profileRef = useRef(null);
+    const cartRef = useRef(null);
 
     const fetchCartData = async () => {
         setIsFetchingCart(true);
@@ -80,6 +83,35 @@ const Navbar = () => {
         }
     };
 
+    const handleClickOutside = (event) => {
+        if (profileRef.current && !profileRef.current.contains(event.target)) {
+            setIsProfileDropdownOpen(false);
+        }
+        if (cartRef.current && !cartRef.current.contains(event.target)) {
+            setIsCartDropdownOpen(false);
+        }
+    };
+
+    useEffect(() => {
+        document.addEventListener('click', handleClickOutside);
+        return () => {
+            document.removeEventListener('click', handleClickOutside);
+        };
+    }, []);
+
+    useEffect(() => {
+        const handleCartUpdate = () => {
+            fetchCartData();
+            if (location.pathname !== '/cart') setIsCartDropdownOpen(true);
+        };
+
+        if (isAuthenticated) fetchCartData();
+        document.addEventListener('cartUpdated', handleCartUpdate);
+        return () => {
+            document.removeEventListener('cartUpdated', handleCartUpdate);
+        };
+    }, [isAuthenticated]);
+
     const handleLogout = () => {
         dispatch(logoutUser());
         setIsProfileDropdownOpen(false);
@@ -100,19 +132,6 @@ const Navbar = () => {
         setIsSidebarOpen(!isSidebarOpen);
         document.body.style.overflow = isSidebarOpen ? 'unset' : 'hidden';
     };
-
-    useEffect(() => {
-        const handleCartUpdate = () => {
-            fetchCartData();
-            if (location.pathname !== '/cart') setIsCartDropdownOpen(true);
-        };
-
-        if (isAuthenticated) fetchCartData();
-        document.addEventListener('cartUpdated', handleCartUpdate);
-        return () => {
-            document.removeEventListener('cartUpdated', handleCartUpdate);
-        };
-    }, [isAuthenticated]);
 
     const totalQuantity = cartItems.reduce((acc, item) => acc + item.quantity, 0);
 
@@ -139,10 +158,10 @@ const Navbar = () => {
                                     <SearchBar />
                                 </div>
 
-                                <div className="flex items-center space-x-2">
+                                <div className="flex items-center space-x-1">
                                     {isAuthenticated ? (
                                         <>
-                                            <div className="relative z-[1000]">
+                                            <div ref={profileRef} className="relative z-[1000]">
                                                 <ProfileIcon
                                                     handleProfileDropdownToggle={() => toggleDropdown('profile')}
                                                     isDropdownOpen={isProfileDropdownOpen}
@@ -158,7 +177,7 @@ const Navbar = () => {
 
                                             <WishlistIcon />
 
-                                            <div className="relative z-[1000]">
+                                            <div ref={cartRef} className="relative z-[1000]">
                                                 <CartIcon
                                                     handleCartDropdownToggle={() => toggleDropdown('cart')}
                                                     totalQuantity={totalQuantity}

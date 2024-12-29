@@ -403,7 +403,7 @@ const Cart = () => {
                         </div>
                     </div>
                 ) : (
-                    <NotFound imageSrc={emptyCartImage} message="Your cart is empty!" />
+                    <NotFound imageSrc={emptyCartImage} message="Your cart is empty." />
                 )}
             </div>
 

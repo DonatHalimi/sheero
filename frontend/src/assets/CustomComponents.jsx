@@ -427,7 +427,7 @@ export const RoundIconButton = styled(IconButton)(({ theme }) => ({
     height: '40px',
 }));
 
-export const ProfileButton = styled(IconButton)(({ theme }) => ({
+export const ProfileButton = styled(IconButton)(({ theme, isDropdownOpen }) => ({
     color: 'black',
     width: '100px',
     height: '40px',
@@ -435,6 +435,7 @@ export const ProfileButton = styled(IconButton)(({ theme }) => ({
     alignItems: 'center',
     justifyContent: 'flex-start',
     borderRadius: '6px',
+    backgroundColor: isDropdownOpen ? theme.palette.action.hover : 'transparent',
     '&:hover': {
         backgroundColor: theme.palette.action.hover,
     },
@@ -1931,18 +1932,16 @@ export const SidebarFooter = () => {
 }
 
 const getEmptyStateMessage = (context, items, searchTerm, statusFilter) => {
-    const entity = context === 'reviews' ? 'reviews'
-        : context === 'orders' ? 'orders'
-            : 'returns';
+    const entity = context === 'reviews' ? 'reviews' : context === 'orders' ? 'orders' : context === 'wishlist' ? 'wishlist item' : 'returns';
 
-    if (items.length === 0 && !searchTerm) return `No ${entity} found!`;
+    if (items.length === 0 && !searchTerm) return context === 'wishlist' ? "Your wishlist is empty." : `No ${entity} found.`;
     if (items.length === 0 && searchTerm) return `No ${entity} match your search term!`;
 
     if (items.length === 0) return `You haven't placed any ${entity} yet!`;
     if (searchTerm && statusFilter !== 'All') return `No ${entity} match your search and selected filters.`;
     if (searchTerm) return `No ${entity} match your search term.`;
     if (statusFilter !== 'All') return `No ${entity} match the selected filters.`;
-    return `No ${entity} found!`;
+    return `No ${entity} found.`;
 };
 
 export const EmptyState = ({
@@ -1954,13 +1953,12 @@ export const EmptyState = ({
     containerClass = 'p-8',
     imageClass = 'w-60 h-60',
 }) => {
-    const navigate = useNavigate();
     const message = getEmptyStateMessage(context, items, searchTerm, statusFilter);
 
     return (
         <div className={`flex flex-col items-center justify-center bg-white rounded-sm shadow-sm ${containerClass}`}>
             <img src={imageSrc} alt={message} className={`${imageClass} object-contain mb-4`} />
-            <p className="text-sm font-semibold mb-2">{message}</p>
+            <p className="text-base font-semibold mb-2">{message}</p>
         </div>
     );
 };
@@ -2801,14 +2799,25 @@ export const ProfileIcon = ({ handleProfileDropdownToggle, isDropdownOpen }) => 
             <div className="flex items-center">
                 <ProfileButton
                     onMouseDown={handleProfileDropdownToggle}
-                    className="flex items-center space-x-2 rounded-sm"
+                    isDropdownOpen={isDropdownOpen}
+                    centerRipple={false}
                 >
-                    {isDropdownOpen ? <StyledPersonIcon component={Person} /> : <StyledPersonIcon component={PersonOutlined} />}
                     {loading ? (
-                        <WaveSkeleton variant="text" width={80} height={20} className="ml-1" />
+                        <WaveSkeleton variant="circle" width={40} height={40} className="mr-2" />
+                    ) : (
+                        <img
+                            src={user?.profilePicture}
+                            alt={`${user?.firstName}'s profile`}
+                            className="w-[26px] h-[26px] rounded-full object-cover"
+                        />
+                    )}
+                    {loading ? (
+                        <WaveSkeleton variant="text" width={80} height={20} className="ml-2" />
                     ) : (
                         user?.firstName && (
-                            <span className="ml-2 text-sm overflow-hidden text-ellipsis">{user.firstName}</span>
+                            <span className="text-sm overflow-hidden text-ellipsis ml-2 ">
+                                {user.firstName}
+                            </span>
                         )
                     )}
                 </ProfileButton>

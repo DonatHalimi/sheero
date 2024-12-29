@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 import { toast } from 'react-toastify';
-import { calculatePageCount, CustomDeleteModal, CustomPagination, getPaginatedItems, handlePageChange, Header, LoadingProductItem, NotFound, ProfileLayout } from '../../assets/CustomComponents';
+import { calculatePageCount, CustomDeleteModal, CustomPagination, EmptyState, getPaginatedItems, handlePageChange, Header, LoadingProductItem, ProfileLayout } from '../../assets/CustomComponents';
 import emptyWishlistImage from '../../assets/img/empty/wishlist.png';
 import Navbar from '../../components/Navbar/Navbar';
 import WishlistItem from '../../components/Product/Items/WishlistItem';
@@ -68,9 +68,9 @@ const Wishlist = () => {
                         <LoadingProductItem count={6} />
                     </div>
                 ) : !wishlistItems.length ? (
-                    <NotFound
+                    <EmptyState
                         imageSrc={emptyWishlistImage}
-                        message="Your wishlist is empty!"
+                        context="wishlist"
                     />
                 ) : (
                     <>

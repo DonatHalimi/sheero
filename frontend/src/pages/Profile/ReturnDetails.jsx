@@ -3,10 +3,10 @@ import React, { useEffect, useState } from 'react';
 import { Link, useParams } from 'react-router-dom';
 import { EmptyState, formatDate, generateReturnPDF, Header, LoadingOrderDetails, ProfileLayout } from '../../assets/CustomComponents';
 import emptyReturnsImage from '../../assets/img/empty/orders.png';
+import useAxios from '../../axiosInstance';
 import Navbar from '../../components/Navbar/Navbar';
 import Footer from '../../components/Utils/Footer';
 import { getImageUrl } from '../../config';
-import useAxios from '../../axiosInstance';
 
 const ReturnDetails = () => {
     const { returnId } = useParams();

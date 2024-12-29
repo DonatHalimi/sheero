@@ -69,6 +69,7 @@ const getCurrentUser = async (req, res) => {
             lastName: user.lastName,
             email: user.email,
             role: user.role.name,
+            profilePicture: user.profilePicture,
         });
     } catch (error) {
         res.status(500).json({ message: 'Server error' });

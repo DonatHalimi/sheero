@@ -233,6 +233,7 @@ const ProfileInformation = () => {
                                         fullWidth
                                         name="password"
                                         label="Current Password"
+                                        placeholder='Required to save changes'
                                         type={showPassword ? 'text' : 'password'}
                                         id="password"
                                         autoComplete="current-password"
@@ -271,6 +272,7 @@ const ProfileInformation = () => {
                                         fullWidth
                                         name="newPassword"
                                         label="New Password"
+                                        placeholder='Leave blank to keep current password'
                                         type={showNewPassword ? 'text' : 'password'}
                                         id="new-password"
                                         value={newPassword}

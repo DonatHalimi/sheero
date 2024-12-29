@@ -6,6 +6,19 @@ const userSchema = new mongoose.Schema({
     email: { type: String, required: true, unique: true },
     password: { type: String, required: true },
     role: { type: mongoose.Schema.Types.ObjectId, ref: 'Role', required: true },
+    profilePicture: {
+        type: String,
+        default: function () {
+            const color = '#7C7164';
+            const letter = this.firstName.charAt(0).toUpperCase();
+            return `https://dummyimage.com/100x100/${color.slice(1)}/ffffff&text=${letter}`;
+        }
+    }
 });
+
+userSchema.methods.updateProfilePicture = async function (newPictureUrl) {
+    this.profilePicture = newPictureUrl;
+    await this.save();
+};
 
 module.exports = mongoose.model('User', userSchema);

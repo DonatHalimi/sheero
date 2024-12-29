@@ -60,6 +60,7 @@ export const loginUser = (email, password) => async dispatch => {
             payload: res.data.user
         });
 
+        dispatch(loadUser());
         return { success: true, data: res.data };
     } catch (error) {
         dispatch({
