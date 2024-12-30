@@ -83,6 +83,42 @@ const Navbar = () => {
         }
     };
 
+    const handleClearCart = async () => {
+        try {
+            await axiosInstance.delete('/cart/clear');
+            toast.success('Cart cleared successfully');
+            await fetchCartData();
+            window.dispatchEvent(new Event('cartUpdate'));
+            setIsCartDropdownOpen(false);
+        } catch (error) {
+            console.error('Error clearing cart:', error);
+            toast.error('Failed to clear cart');
+        }
+    };
+
+    const handleUpdateQuantity = async (productId, quantityChange) => {
+        setIsLoading(true);
+        try {
+            const { data } = await axiosInstance.put('/cart/quantity/update', {
+                productId,
+                quantityChange
+            });
+
+            setCartItems(data.items);
+            setCartTotal(data.items.reduce((sum, item) => {
+                const price = item.product.salePrice > 0 ? item.product.salePrice : item.product.price;
+                return sum + price * item.quantity;
+            }, 0));
+            toast.success('Quantity updated successfully');
+            window.dispatchEvent(new Event('cartUpdate'));
+        } catch (error) {
+            console.error('Error updating quantity:', error);
+            toast.error('Failed to update quantity');
+        } finally {
+            setIsLoading(false);
+        }
+    };
+
     const handleClickOutside = (event) => {
         if (profileRef.current && !profileRef.current.contains(event.target)) {
             setIsProfileDropdownOpen(false);
@@ -189,6 +225,8 @@ const Navbar = () => {
                                                         cartItems={cartItems}
                                                         cartTotal={cartTotal}
                                                         handleRemoveItem={handleRemoveItem}
+                                                        handleClearCart={handleClearCart}
+                                                        handleUpdateQuantity={handleUpdateQuantity}
                                                         handleGoToCart={handleGoToCart}
                                                         isLoading={isFetchingCart}
                                                         handleProductClick={handleProductClick}

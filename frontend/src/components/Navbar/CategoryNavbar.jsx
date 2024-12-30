@@ -31,11 +31,17 @@ const CategoryNavbar = ({ isSidebarOpen, toggleSidebar }) => {
         }
     }, [activeCategory, dispatch]);
 
-    const handleCategoryHover = async (categoryId) => {
+    const handleCategoryHover = (categoryId) => {
         setOpenCategory(categoryId);
-        setDropdownLoading(true);
-        await dispatch(getSubcategoriesAndSubsubcategories(categoryId));
-        setDropdownLoading(false);
+
+        const categoryData = subcategories[categoryId];
+        if (!categoryData) {
+            setDropdownLoading(true);
+            dispatch(getSubcategoriesAndSubsubcategories(categoryId))
+                .finally(() => setDropdownLoading(false));
+        } else {
+            setDropdownLoading(false);
+        }
     };
 
     const handleCategoryLeave = () => {

@@ -1,4 +1,5 @@
 import {
+    Add,
     ArrowBack,
     ArrowBackIosNew,
     ArrowForwardIos,
@@ -30,6 +31,7 @@ import {
     Person,
     PersonOutlined,
     QuestionAnswerOutlined,
+    Remove,
     Replay,
     Search,
     Settings,
@@ -646,7 +648,7 @@ export const LoadingCart = () => {
                                             <TableCell align="center"><WaveSkeleton variant="circular" width={32} height={32} /></TableCell>
                                         </TableRow>
                                     </TableHead>
-                                    <TableBody>
+                                    <TableBody className="[&>tr:last-child>td]:border-b-0 [&>tr:last-child>th]:border-b-0">
                                         {Array.from(new Array(3)).map((_, index) => (
                                             <TableRow key={index}>
                                                 <TableCell>
@@ -2699,7 +2701,9 @@ export const CartDropdown = ({
     handleRemoveItem,
     handleGoToCart,
     isLoading,
-    handleProductClick
+    handleProductClick,
+    handleClearCart,
+    handleUpdateQuantity
 }) => {
     return (
         <div tabIndex="0" className="absolute right-0 mt-1 w-96 bg-white border shadow-lg rounded-lg p-4">
@@ -2710,11 +2714,23 @@ export const CartDropdown = ({
                     <div className="text-sm text-left">You have no products in your cart</div>
                 ) : (
                     <>
-                        <ul className="mt-2 mb-2 overflow-y-auto max-h-60">
+                        <div className="flex justify-between items-center mb-3">
+                            <span className="text-sm font-medium">
+                                {cartItems.length} {cartItems.length === 1 ? 'Product' : 'Products'}
+                            </span>
+                            <button
+                                onClick={handleClearCart}
+                                disabled={isLoading}
+                                className="text-sm text-gray-500 hover:text-gray-700 hover:underline"
+                            >
+                                Clear Cart
+                            </button>
+                        </div>
+                        <ul className='overflow-y-auto max-h-60 mb-2'>
                             {cartItems.map(item => (
                                 <li
                                     key={`${item.product._id}-${item.quantity}`}
-                                    className="flex justify-between items-center mb-4"
+                                    className="flex justify-between items-center mb-3"
                                 >
                                     <img
                                         src={getImageUrl(item.product.image)}
@@ -2722,16 +2738,47 @@ export const CartDropdown = ({
                                         onClick={() => handleProductClick(item.product._id)}
                                         className="w-12 h-12 object-contain rounded cursor-pointer"
                                     />
-                                    <div className="ml-2 flex-grow">
+                                    <div className="ml-4 flex-grow">
                                         <span
                                             onClick={() => handleProductClick(item.product._id)}
                                             className="block font-semibold cursor-pointer hover:underline truncate max-w-[calc(22ch)]"
                                         >
                                             {item.product.name}
                                         </span>
-                                        <span className="block text-sm text-gray-500">
-                                            {item.quantity} x {item.product.salePrice > 0 ? formatPrice(item.product.salePrice) : formatPrice(item.product.price)} €
+                                        <span className="block text-sm text-gray-500 mt-1">
+                                            Item Price: {' '}
+                                            <span className="font-semibold">
+                                                {item.product.salePrice > 0
+                                                    ? formatPrice(item.product.salePrice)
+                                                    : formatPrice(item.product.price)}{' '}
+                                                €
+                                            </span>
                                         </span>
+                                        <div className="flex items-center mt-1">
+                                            <IconButton
+                                                onClick={() =>
+                                                    item.quantity > 1
+                                                        ? handleUpdateQuantity(item.product._id, -1)
+                                                        : handleRemoveItem(item.product._id)
+                                                }
+                                                disabled={isLoading}
+                                                size="small"
+                                                className="bg-gray-100 hover:bg-gray-200 text-gray-600"
+                                            >
+                                                <Remove fontSize="small" />
+                                            </IconButton>
+                                            <span className="px-2 py-0.5 text-sm">
+                                                {item.quantity}
+                                            </span>
+                                            <IconButton
+                                                onClick={() => handleUpdateQuantity(item.product._id, 1)}
+                                                disabled={isLoading}
+                                                size="small"
+                                                className="bg-gray-100 hover:bg-gray-200 text-gray-600"
+                                            >
+                                                <Add fontSize="small" />
+                                            </IconButton>
+                                        </div>
                                     </div>
                                     <RoundIconButton
                                         onClick={() => handleRemoveItem(item.product._id)}

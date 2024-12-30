@@ -1,4 +1,4 @@
-import { LocalAtm, Payment } from '@mui/icons-material';
+import { Add, LocalAtm, Payment, Remove } from '@mui/icons-material';
 import axios from 'axios';
 import React, { useEffect, useState } from 'react';
 import { useSelector } from 'react-redux';
@@ -12,6 +12,7 @@ import AddReviewModal from '../../components/Product/Modals/AddReviewModal';
 import ProductDetailsTabs from '../../components/Product/Utils/ProductDetailsTabs';
 import Footer from '../../components/Utils/Footer';
 import { getApiUrl, getImageUrl } from '../../config';
+import { IconButton } from '@mui/material';
 
 const ProductDetails = () => {
     const { isAuthenticated } = useSelector((state) => state.auth);
@@ -182,21 +183,25 @@ const ProductDetails = () => {
 
                                 <div className="mt-2 flex items-center">
                                     <div className="flex items-center mr-4">
-                                        <button
+                                        <IconButton
                                             onClick={() => handleQuantityChange(-1)}
                                             disabled={quantity <= 1}
-                                            className="px-3 py-1 border rounded-l"
+                                            size="small"
+                                            centerRipple={false}
+                                            className="px-3 py-1 bg-gray-100 hover:bg-gray-200 text-gray-600"
                                         >
-                                            -
-                                        </button>
-                                        <span className="px-4 py-1 border-t border-b">{quantity}</span>
-                                        <button
+                                            <Remove fontSize="small" />
+                                        </IconButton>
+                                        <span className="px-3 py-1">{quantity}</span>
+                                        <IconButton
                                             onClick={() => handleQuantityChange(1)}
                                             disabled={quantity >= product.inventoryCount}
+                                            size="small"
+                                            centerRipple={false}
                                             className={`px-3 py-1 border rounded-r ${quantity >= product.inventoryCount ? 'opacity-50' : ''}`}
                                         >
-                                            +
-                                        </button>
+                                            <Add fontSize="small" />
+                                        </IconButton>
                                     </div>
                                     <span className="text-sm font-semibold text-stone-600 bg-stone-100 rounded-md px-2">
                                         {inventoryText}

@@ -1,5 +1,5 @@
-import { DeleteOutline } from '@mui/icons-material';
-import { Table, TableBody, TableCell, TableContainer, TableHead, TableRow, Tooltip } from '@mui/material';
+import { Add, DeleteOutline, Remove } from '@mui/icons-material';
+import { IconButton, Table, TableBody, TableCell, TableContainer, TableHead, TableRow, Tooltip } from '@mui/material';
 import React, { useEffect, useState } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 import { useNavigate } from 'react-router-dom';
@@ -216,7 +216,7 @@ const Cart = () => {
                                                 </TableCell>
                                             </TableRow>
                                         </TableHead>
-                                        <TableBody>
+                                        <TableBody className="[&>tr:last-child>td]:border-b-0 [&>tr:last-child>th]:border-b-0">
                                             {cart.items.map(item => (
                                                 <TableRow key={item.product._id}>
                                                     <TableCell component="th" scope="row">
@@ -258,20 +258,23 @@ const Cart = () => {
                                                     </TableCell>
                                                     <TableCell align="center">
                                                         <div className="flex justify-center items-center">
-                                                            <button
+                                                            <IconButton
                                                                 onClick={() => updateQuantity(item.product._id, -1)}
-                                                                className="border rounded-sm px-3 py-1"
+                                                                // disabled={isLoading}
+                                                                size="small"
+                                                                className="bg-gray-100 hover:bg-gray-200 text-gray-600"
                                                             >
-                                                                -
-                                                            </button>
-                                                            <span className="px-4 py-1 border">{item.quantity}</span>
-                                                            <button
+                                                                <Remove fontSize="small" />
+                                                            </IconButton>
+                                                            <span className="px-3 py-1">{item.quantity}</span>
+                                                            <IconButton
                                                                 onClick={() => updateQuantity(item.product._id, 1)}
                                                                 disabled={item.quantity >= item.product.inventoryCount}
+                                                                size="small"
                                                                 className={`border rounded-sm px-3 py-1 ${item.quantity >= item.product.inventoryCount ? 'opacity-50 cursor-not-allowed' : ''}`}
                                                             >
-                                                                +
-                                                            </button>
+                                                                <Add fontSize="small" />
+                                                            </IconButton>
                                                         </div>
                                                     </TableCell>
                                                     <TableCell align="center">
