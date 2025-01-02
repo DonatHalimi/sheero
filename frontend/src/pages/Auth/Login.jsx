@@ -84,7 +84,7 @@ const Login = () => {
         }
 
         try {
-            const response = await dispatch(loginUser(email, password));
+            const response = dispatch(loginUser(email, password));
 
             if (response?.success) {
                 toast.success('Login successful');

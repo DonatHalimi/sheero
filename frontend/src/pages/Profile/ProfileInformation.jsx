@@ -102,7 +102,7 @@ const ProfileInformation = () => {
         }
 
         try {
-            const result = await dispatch(updateUserProfile(updatedData));
+            const result = dispatch(updateUserProfile(updatedData));
 
             if (result.success) {
                 toast.success('Profile updated successfully!');

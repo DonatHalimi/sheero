@@ -74,11 +74,11 @@ const Reviews = () => {
     const handleDeleteConfirm = async () => {
         if (selectedReview) {
             try {
-                await dispatch(deleteUserReview(selectedReview._id));
+                dispatch(deleteUserReview(selectedReview._id));
                 toast.success('Review deleted successfully');
                 setOpenDeleteModal(false);
 
-                await dispatch(getUserReviews(user.id));
+                dispatch(getUserReviews(user.id));
             } catch (err) {
                 console.error('Failed to delete review:', err.message);
                 toast.error('Failed to delete review');

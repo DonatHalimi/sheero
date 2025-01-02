@@ -25,8 +25,12 @@ const Wishlist = () => {
     }, [isAuthenticated, dispatch]);
 
     const handleRemoveFromWishlist = (productId) => {
-        dispatch(removeFromWishlist(productId));
-        toast.success('Product removed from wishlist');
+        try {
+            dispatch(removeFromWishlist(productId));
+            toast.success('Product removed from wishlist');
+        } catch (error) {
+            toast.error('Failed to remove from wishlist');
+        }
     };
 
     const handleClearWishlist = () => {

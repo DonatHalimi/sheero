@@ -50,7 +50,7 @@ const EditReviewModal = ({ open, onClose, review, onEditSuccess }) => {
         };
 
         try {
-            await dispatch(editUserReview(review._id, updatedData));
+            dispatch(editUserReview(review._id, updatedData));
             toast.success('Review updated successfully');
             onEditSuccess(updatedData);
             onClose();

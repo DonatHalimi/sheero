@@ -74,7 +74,7 @@ const Register = () => {
         }
 
         try {
-            const response = await dispatch(registerUser(formData));
+            const response = dispatch(registerUser(formData));
             if (response?.success) {
                 toast.success('Registration successful, please log in');
                 navigate('/login');
