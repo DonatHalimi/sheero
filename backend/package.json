@@ -4,8 +4,9 @@
   "description": "Node.js backend for role-based JWT authentication for an e-commerce website with access tokens",
   "main": "index.js",
   "scripts": {
-    "start": "node index.js",
-    "dev": "nodemon index.js"
+    "check-env": "node ./config/checkEnv.js",
+    "start": "npm run check-env && node index.js",
+    "dev": "npm run check-env && nodemon index.js"
   },
   "dependencies": {
     "bcryptjs": "^2.4.3",

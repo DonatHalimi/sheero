@@ -3,7 +3,7 @@ const User = require('../models/User');
 const Role = require('../models/Role');
 
 const isValidName = (v) => /^[A-Z][a-zA-Z\s]{2,10}$/.test(v);
-const isValidPassword = (v) => /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[@$!%*?&])[A-Za-z\d@$!%*?&]{8,}$/.test(v);
+const isValidPassword = (v) => /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[@$!%*?&\(\)_\+\-.])[A-Za-z\d@$!%*?&\(\)_\+\-.]{8,}$/.test(v);
 
 const createSchema = yup.object({
     firstName: yup
@@ -17,28 +17,14 @@ const createSchema = yup.object({
     email: yup
         .string()
         .required('Email is required')
-        .email('Must be a valid email address')
-        .test('email-exists', 'Email already exists', async function (value) {
-            if (!value) return false;
-            const existingEmail = await User.findOne({ email: value });
-            return !existingEmail;
-        }),
+        .email('Must be a valid email address'),
     password: yup
         .string()
         .required('Password is required')
-        .test('is-valid-password', 'Password must be at least 8 characters long, include at least one uppercase letter, one lowercase letter, one number, and one special character (@$!%*?&)', isValidPassword),
+        .test('is-valid-password', 'Password must be at least 8 characters long, include at least one uppercase letter, one lowercase letter, one number, and one special character (@$!%*?()&)', isValidPassword),
     role: yup
         .string()
         .optional()
-        .test('role-exists', 'Role does not exist', async function (value) {
-            if (!value) return true;
-            const validRole = value ? await Role.findById(value) : await Role.findOne({ name: 'user' });
-            if (!validRole) {
-                throw this.createError({
-                    message: 'Role does not exist',
-                });
-            }
-        }),
 });
 
 const getByIdSchema = yup.object({
@@ -82,12 +68,7 @@ const updateSchema = yup.object({
     email: yup
         .string()
         .notRequired()
-        .email('Must be a valid email address')
-        .test('email-exists', 'Email already exists', async function (value) {
-            if (!value) return true;
-            const existingEmail = await User.findOne({ email: value });
-            return !existingEmail;
-        }),
+        .email('Must be a valid email address'),
     role: yup
         .string()
         .notRequired()

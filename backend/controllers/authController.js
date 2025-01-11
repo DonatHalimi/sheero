@@ -2,10 +2,14 @@ const bcrypt = require('bcryptjs');
 const jwt = require('jsonwebtoken');
 const User = require('../models/User');
 const Role = require('../models/Role');
-const cookieConfig = require('../config/cookie.config');
+const cookieConfig = require('../config/cookie');
+const { JWT_SECRET } = require('../config/dotenv');
 
 const generateAccessToken = (user) => {
-    return jwt.sign({ userId: user._id, role: user.role }, process.env.JWT_SECRET, { expiresIn: '7d' });
+    return jwt.sign({
+        userId: user._id,
+        role: user.role
+    }, JWT_SECRET, { expiresIn: '7d' });
 };
 
 const registerUser = async (req, res) => {
@@ -16,7 +20,7 @@ const registerUser = async (req, res) => {
     try {
         const user = new User({ firstName, lastName, email, password: hashedPassword, role: validRole._id });
         await user.save();
-        
+
         res.status(201).json({
             message: 'User registered successfully. Please log in.',
             user: {

@@ -1,12 +1,17 @@
 import React, { useEffect, useState } from 'react';
 import { toast } from 'react-toastify';
-import { BrownButton, BrownOutlinedTextField, CustomBox, CustomModal, CustomTypography } from '../../../assets/CustomComponents';
-import useAxios from '../../../axiosInstance';
+import { BrownButton, BrownOutlinedTextField, CustomBox, CustomModal, CustomTypography, handleApiError } from '../../../assets/CustomComponents';
+import useAxios from '../../../utils/axiosInstance';
 
 const EditRoleModal = ({ open, onClose, role, onEditSuccess }) => {
     const [name, setName] = useState('');
+    const [isValidName, setIsValidName] = useState(true);
 
     const axiosInstance = useAxios();
+
+    const validateName = (v) => /^[a-zA-Z\s]{2,10}$/.test(v);
+
+    const isValidForm = name && isValidName;
 
     useEffect(() => {
         if (role) {
@@ -30,12 +35,7 @@ const EditRoleModal = ({ open, onClose, role, onEditSuccess }) => {
             onEditSuccess(response.data);
             onClose();
         } catch (error) {
-            if (error.response && error.response.status === 403) {
-                toast.error('You do not have permission to perform this action');
-            } else {
-                toast.error('Error updating role');
-            }
-            console.error('Error updating role', error);
+            handleApiError(error, 'Error updating role');
         }
     };
 
@@ -49,7 +49,12 @@ const EditRoleModal = ({ open, onClose, role, onEditSuccess }) => {
                     required
                     label="Role Name"
                     value={name}
-                    onChange={(e) => setName(e.target.value)}
+                    onChange={(e) => {
+                        setName(e.target.value)
+                        setIsValidName(validateName(e.target.value));
+                    }}
+                    error={!isValidName}
+                    helperText={!isValidName ? 'Role name must be 2-10 characters long' : ''}
                     className="!mb-4"
                 />
 
@@ -57,6 +62,7 @@ const EditRoleModal = ({ open, onClose, role, onEditSuccess }) => {
                     onClick={handleEditRole}
                     variant="contained"
                     color="primary"
+                    disabled={!isValidForm}
                     className="w-full"
                 >
                     Save

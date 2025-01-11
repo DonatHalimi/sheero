@@ -5,6 +5,7 @@ const initialState = {
     subcategories: {},
     subsubcategories: {},
     loading: true,
+    loadingCategories: true,
     error: null,
 };
 
@@ -15,6 +16,7 @@ export default function (state = initialState, action) {
                 ...state,
                 categories: action.payload,
                 loading: false,
+                loadingCategories: false,
                 error: null,
             };
 

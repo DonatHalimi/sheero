@@ -38,7 +38,18 @@ const initialState = {
     cities: [],
     addresses: [],
     suppliers: [],
-    loading: true,
+    loadingUsers: true,
+    loadingRoles: true,
+    loadingReviews: true,
+    loadingOrders: true,
+    loadingReturns: true,
+    loadingFaqs: true,
+    loadingContacts: true,
+    loadingSubcategories: true,
+    loadingSubSubcategories: true,
+    loadingCities: true,
+    loadingAddresses: true,
+    loadingSuppliers: true,
     error: null,
 };
 
@@ -48,7 +59,7 @@ export default function (state = initialState, action) {
             return {
                 ...state,
                 users: Array.isArray(action.payload) ? action.payload : [],
-                loading: false,
+                loadingUsers: false,
                 error: null,
             };
 
@@ -56,7 +67,7 @@ export default function (state = initialState, action) {
             return {
                 ...state,
                 roles: action.payload,
-                loading: false,
+                loadingRoles: false,
                 error: null,
             };
 
@@ -64,7 +75,7 @@ export default function (state = initialState, action) {
             return {
                 ...state,
                 reviews: action.payload,
-                loading: false,
+                loadingReviews: false,
                 error: null,
             };
 
@@ -72,7 +83,7 @@ export default function (state = initialState, action) {
             return {
                 ...state,
                 orders: action.payload,
-                loading: false,
+                loadingOrders: false,
                 error: null,
             };
 
@@ -80,7 +91,7 @@ export default function (state = initialState, action) {
             return {
                 ...state,
                 returnRequests: action.payload,
-                loading: false,
+                loadingReturns: false,
                 error: null,
             };
 
@@ -88,7 +99,7 @@ export default function (state = initialState, action) {
             return {
                 ...state,
                 faqs: action.payload,
-                loading: false,
+                loadingFaqs: false,
                 error: null,
             };
 
@@ -96,15 +107,15 @@ export default function (state = initialState, action) {
             return {
                 ...state,
                 contacts: action.payload,
-                loading: false,
+                loadingContacts: false,
                 error: null,
-            }
+            };
 
         case GET_SUBCATEGORIES:
             return {
                 ...state,
                 subcategories: action.payload,
-                loading: false,
+                loadingSubcategories: false,
                 error: null,
             };
 
@@ -112,7 +123,7 @@ export default function (state = initialState, action) {
             return {
                 ...state,
                 subSubcategories: action.payload,
-                loading: false,
+                loadingSubSubcategories: false,
                 error: null,
             };
 
@@ -120,7 +131,7 @@ export default function (state = initialState, action) {
             return {
                 ...state,
                 cities: action.payload,
-                loading: false,
+                loadingCities: false,
                 error: null,
             };
 
@@ -128,7 +139,7 @@ export default function (state = initialState, action) {
             return {
                 ...state,
                 addresses: action.payload,
-                loading: false,
+                loadingAddresses: false,
                 error: null,
             };
 
@@ -136,7 +147,7 @@ export default function (state = initialState, action) {
             return {
                 ...state,
                 suppliers: action.payload,
-                loading: false,
+                loadingSuppliers: false,
                 error: null,
             };
 
@@ -154,7 +165,18 @@ export default function (state = initialState, action) {
         case GET_SUPPLIERS_ERROR:
             return {
                 ...state,
-                loading: false,
+                loadingUsers: false,
+                loadingRoles: false,
+                loadingReviews: false,
+                loadingOrders: false,
+                loadingReturns: false,
+                loadingFaqs: false,
+                loadingContacts: false,
+                loadingSubcategories: false,
+                loadingSubSubcategories: false,
+                loadingCities: false,
+                loadingAddresses: false,
+                loadingSuppliers: false,
                 error: action.payload,
             };
         default:

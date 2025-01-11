@@ -1,16 +1,16 @@
 import React, { useEffect, useState } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
-import { DashboardHeader } from '../../assets/CustomComponents';
+import { DashboardHeader, LoadingDataGrid } from '../../assets/CustomComponents';
 import DashboardTable from '../../components/Dashboard/DashboardTable';
 import DeleteModal from '../../components/Modal/DeleteModal';
 import ImagePreviewModal from '../../components/Modal/ImagePreviewModal';
 import AddProductModal from '../../components/Modal/Product/AddProductModal';
 import EditProductModal from '../../components/Modal/Product/EditProductModal';
-import { getImageUrl } from '../../config';
+import { getImageUrl } from '../../utils/config';
 import { getProducts } from '../../store/actions/productActions';
 
 const ProductsPage = () => {
-    const { products } = useSelector((state) => state.products);
+    const { products, loading } = useSelector((state) => state.products);
     const dispatch = useDispatch();
 
     const [selectedProduct, setSelectedProduct] = useState(null);
@@ -64,7 +64,7 @@ const ProductsPage = () => {
     const columns = [
         { key: 'name', label: 'Name' },
         { key: 'description', label: 'Description' },
-        { key: 'details', label: 'Details', render: (item) => truncateItems(item.details.map(detail => `${detail.attribute}: ${detail.value}`)).join(', ') },
+        { key: 'details', label: 'Details', render: (item) => truncateItems(item.details.map(detail => `${detail.attribute}: ${detail.value}`)).join(', ') || 'N/A' },
         { key: 'price', label: 'Price' },
         { key: 'salePrice', label: 'Sale Price', render: (item) => item.salePrice ? item.salePrice : 'N/A' },
         { key: 'discount', label: 'Discount', render: (item) => item.discount ? `${item.discount.value}${item.discount.type === 'percentage' ? '%' : ''}` : 'N/A' },
@@ -96,26 +96,32 @@ const ProductsPage = () => {
     return (
         <div className='container mx-auto max-w-full mt-20'>
             <div className='w-full px-4'>
-                <DashboardHeader
-                    title="Products"
-                    selectedItems={selectedProducts}
-                    setAddItemOpen={setAddProductOpen}
-                    setDeleteItemOpen={setDeleteProductOpen}
-                    itemName="Product"
-                />
+                {loading ? (
+                    <LoadingDataGrid />
+                ) : (
+                    <>
+                        <DashboardHeader
+                            title="Products"
+                            selectedItems={selectedProducts}
+                            setAddItemOpen={setAddProductOpen}
+                            setDeleteItemOpen={setDeleteProductOpen}
+                            itemName="Product"
+                        />
 
-                <DashboardTable
-                    columns={columns}
-                    data={products}
-                    selectedItems={selectedProducts}
-                    onSelectItem={handleSelectProduct}
-                    onSelectAll={handleSelectAll}
-                    itemsPerPage={itemsPerPage}
-                    currentPage={currentPage}
-                    onPageChange={handlePageClick}
-                    onEdit={handleEdit}
-                    containerClassName="max-w-full"
-                />
+                        <DashboardTable
+                            columns={columns}
+                            data={products}
+                            selectedItems={selectedProducts}
+                            onSelectItem={handleSelectProduct}
+                            onSelectAll={handleSelectAll}
+                            itemsPerPage={itemsPerPage}
+                            currentPage={currentPage}
+                            onPageChange={handlePageClick}
+                            onEdit={handleEdit}
+                            containerClassName="max-w-full"
+                        />
+                    </>
+                )}
 
                 <AddProductModal open={addProductOpen} onClose={() => setAddProductOpen(false)} onAddSuccess={() => dispatch(getProducts())} />
                 <EditProductModal open={editProductOpen} onClose={() => setEditProductOpen(false)} product={selectedProduct} onEditSuccess={() => dispatch(getProducts())} />
@@ -123,7 +129,10 @@ const ProductsPage = () => {
                     open={deleteProductOpen}
                     onClose={() => setDeleteProductOpen(false)}
                     items={selectedProducts.map(id => products.find(product => product._id === id)).filter(product => product)}
-                    onDeleteSuccess={() => dispatch(getProducts())}
+                    onDeleteSuccess={() => {
+                        dispatch(getProducts())
+                        setSelectedProducts([])
+                    }}
                     endpoint="/products/delete-bulk"
                     title="Delete Products"
                     message="Are you sure you want to delete the selected products?"

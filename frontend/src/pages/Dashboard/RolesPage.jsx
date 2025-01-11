@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
-import { DashboardHeader } from '../../assets/CustomComponents.jsx';
+import { DashboardHeader, LoadingDataGrid } from '../../assets/CustomComponents.jsx';
 import DashboardTable from '../../components/Dashboard/DashboardTable';
 import DeleteModal from '../../components/Modal/DeleteModal.jsx';
 import AddRoleModal from '../../components/Modal/Role/AddRoleModal.jsx';
@@ -8,7 +8,7 @@ import EditRoleModal from '../../components/Modal/Role/EditRoleModal.jsx';
 import { getRoles } from '../../store/actions/dashboardActions.js';
 
 const RolesPage = () => {
-    const { roles } = useSelector((state) => state.dashboard);
+    const { roles, loadingRoles } = useSelector((state) => state.dashboard);
     const dispatch = useDispatch();
 
     const [selectedRole, setSelectedRole] = useState(null);
@@ -54,25 +54,31 @@ const RolesPage = () => {
     return (
         <div className='container mx-auto max-w-screen-2xl px-4 mt-20'>
             <div className='flex flex-col items-center justify-center'>
-                <DashboardHeader
-                    title="Roles"
-                    selectedItems={selectedRoles}
-                    setAddItemOpen={setAddRoleOpen}
-                    setDeleteItemOpen={setDeleteRoleOpen}
-                    itemName="Role"
-                />
+                {loadingRoles ? (
+                    <LoadingDataGrid />
+                ) : (
+                    <>
+                        <DashboardHeader
+                            title="Roles"
+                            selectedItems={selectedRoles}
+                            setAddItemOpen={setAddRoleOpen}
+                            setDeleteItemOpen={setDeleteRoleOpen}
+                            itemName="Role"
+                        />
 
-                <DashboardTable
-                    columns={columns}
-                    data={roles}
-                    selectedItems={selectedRoles}
-                    onSelectItem={handleSelectRole}
-                    onSelectAll={handleSelectAll}
-                    itemsPerPage={itemsPerPage}
-                    currentPage={currentPage}
-                    onPageChange={handlePageClick}
-                    onEdit={handleEdit}
-                />
+                        <DashboardTable
+                            columns={columns}
+                            data={roles}
+                            selectedItems={selectedRoles}
+                            onSelectItem={handleSelectRole}
+                            onSelectAll={handleSelectAll}
+                            itemsPerPage={itemsPerPage}
+                            currentPage={currentPage}
+                            onPageChange={handlePageClick}
+                            onEdit={handleEdit}
+                        />
+                    </>
+                )}
 
                 <AddRoleModal open={addRoleOpen} onClose={() => setAddRoleOpen(false)} onAddSuccess={() => dispatch(getRoles())} />
                 <EditRoleModal open={editRoleOpen} onClose={() => setEditRoleOpen(false)} role={selectedRole} onEditSuccess={() => dispatch(getRoles())} />
@@ -80,7 +86,10 @@ const RolesPage = () => {
                     open={deleteRoleOpen}
                     onClose={() => setDeleteRoleOpen(false)}
                     items={selectedRoles.map(id => roles.find(role => role._id === id)).filter(role => role)}
-                    onDeleteSuccess={() => dispatch(getRoles())}
+                    onDeleteSuccess={() => {
+                        dispatch(getRoles())
+                        setSelectedRoles([])
+                    }}
                     endpoint="/roles/delete-bulk"
                     title="Delete Roles"
                     message="Are you sure you want to delete the selected roles?"

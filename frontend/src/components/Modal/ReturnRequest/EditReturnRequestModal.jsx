@@ -1,8 +1,8 @@
 import { MenuItem, Select, Typography } from '@mui/material';
 import React, { useEffect, useState } from 'react';
 import { toast } from 'react-toastify';
-import { BrownButton, CustomBox, CustomModal } from '../../../assets/CustomComponents';
-import useAxios from '../../../axiosInstance';
+import { BrownButton, CustomBox, CustomModal, handleApiError } from '../../../assets/CustomComponents';
+import useAxios from '../../../utils/axiosInstance';
 
 const EditReturnRequestModal = ({ open, onClose, returnRequest, onEditSuccess }) => {
     const [status, setStatus] = useState(returnRequest ? returnRequest.status : 'pending');
@@ -30,8 +30,7 @@ const EditReturnRequestModal = ({ open, onClose, returnRequest, onEditSuccess })
             onEditSuccess(response.data);
             onClose();
         } catch (error) {
-            console.error('Error updating return request status', error);
-            toast.error('Error updating return request status');
+            handleApiError(error, 'Error updating return request');
         }
     };
 

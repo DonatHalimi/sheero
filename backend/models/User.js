@@ -16,6 +16,16 @@ const userSchema = new mongoose.Schema({
     }
 });
 
+// Change profilePicture text on first name change
+userSchema.pre('save', function (next) {
+    if (this.isModified('firstName')) {
+        const color = '#7C7164';
+        const letter = this.firstName.charAt(0).toUpperCase();
+        this.profilePicture = `https://dummyimage.com/100x100/${color.slice(1)}/ffffff&text=${letter}`;
+    }
+    next();
+});
+
 userSchema.methods.updateProfilePicture = async function (newPictureUrl) {
     this.profilePicture = newPictureUrl;
     await this.save();

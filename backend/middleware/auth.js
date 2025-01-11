@@ -1,5 +1,6 @@
 const jwt = require('jsonwebtoken');
 const User = require('../models/User');
+const { JWT_SECRET, JWT_REFRESH_SECRET } = require('../config/dotenv');
 
 const authenticateToken = (req, res, next) => {
     const token = req.cookies.accessToken;
@@ -8,7 +9,7 @@ const authenticateToken = (req, res, next) => {
         return res.status(401).json({ message: 'Authentication required' });
     }
 
-    jwt.verify(token, process.env.JWT_SECRET, (err, user) => {
+    jwt.verify(token, JWT_SECRET, (err, user) => {
         if (err) {
             if (err.name === 'TokenExpiredError') {
                 return res.status(401).json({ message: 'Access token expired' });
@@ -38,14 +39,14 @@ const refreshAccessToken = (req, res) => {
         return res.status(401).json({ message: 'Refresh token required' });
     }
 
-    jwt.verify(refreshToken, process.env.JWT_REFRESH_SECRET, (err, user) => {
+    jwt.verify(refreshToken, JWT_REFRESH_SECRET, (err, user) => {
         if (err) {
             return res.status(403).json({ message: 'Invalid refresh token' });
         }
 
         const newAccessToken = jwt.sign(
             { userId: user.userId, role: user.role },
-            process.env.JWT_SECRET,
+            JWT_SECRET,
             { expiresIn: '1h' }
         );
 

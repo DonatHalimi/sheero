@@ -3,8 +3,8 @@ import React, { useEffect, useState } from 'react';
 import { useNavigate, useParams } from 'react-router-dom';
 import { toast } from 'react-toastify';
 import { BrownButton, CustomBox, CustomModal, LoadingReturn } from '../../../assets/CustomComponents';
-import useAxios from '../../../axiosInstance';
-import { getImageUrl } from '../../../config';
+import useAxios from '../../../utils/axiosInstance';
+import { getImageUrl } from '../../../utils/config';
 
 const ReturnModal = ({ open, onClose }) => {
     const { orderId } = useParams();

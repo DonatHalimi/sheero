@@ -1,11 +1,17 @@
 import React, { useEffect, useState } from 'react';
 import { toast } from 'react-toastify';
-import { BrownButton, BrownOutlinedTextField, CustomBox, CustomModal, CustomTypography } from '../../../assets/CustomComponents';
-import useAxios from '../../../axiosInstance';
+import { BrownButton, BrownOutlinedTextField, CustomBox, CustomModal, CustomTypography, handleApiError } from '../../../assets/CustomComponents';
+import useAxios from '../../../utils/axiosInstance';
 
 const EditCountryModal = ({ open, onClose, country, onEditSuccess }) => {
     const [name, setName] = useState('');
+    const [isValidName, setIsValidName] = useState(true);
+
     const axiosInstance = useAxios();
+
+    const validateName = (v) => /^[A-Z][a-zA-Z\s]{3,15}$/.test(v);
+
+    const isValidForm = isValidName;
 
     useEffect(() => {
         if (country) {
@@ -29,8 +35,7 @@ const EditCountryModal = ({ open, onClose, country, onEditSuccess }) => {
             onEditSuccess(response.data);
             onClose();
         } catch (error) {
-            toast.error('Error updating country');
-            console.error('Error updating country', error);
+            handleApiError(error, 'Error updating country');
         }
     };
 
@@ -44,7 +49,12 @@ const EditCountryModal = ({ open, onClose, country, onEditSuccess }) => {
                     required
                     label="Name"
                     value={name}
-                    onChange={(e) => setName(e.target.value)}
+                    onChange={(e) => {
+                        setName(e.target.value)
+                        setIsValidName(validateName(e.target.value))
+                    }}
+                    error={!isValidName}
+                    helperText={!isValidName ? 'Name must start with a capital letter and be 3-15 characters long' : ''}
                     className="!mb-4"
                 />
 
@@ -52,6 +62,7 @@ const EditCountryModal = ({ open, onClose, country, onEditSuccess }) => {
                     onClick={handleEditCountry}
                     variant="contained"
                     color="primary"
+                    disabled={!isValidForm}
                     className="w-full"
                 >
                     Save

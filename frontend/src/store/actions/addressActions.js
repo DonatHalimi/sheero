@@ -1,5 +1,5 @@
 import axios from 'axios';
-import { getApiUrl } from '../../config';
+import { getApiUrl } from '../../utils/config';
 import { ADD_ADDRESS, ADDRESS_ERROR, GET_ADDRESS, GET_CITIES_BY_COUNTRY, GET_COUNTRIES, UPDATE_ADDRESS } from '../types';
 
 export const getAddress = (addressId) => async (dispatch) => {

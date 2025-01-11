@@ -2,7 +2,7 @@ const yup = require('yup');
 const Country = require('../models/Country');
 const City = require('../models/City');
 
-const isValidName = (v) => /^[A-Z][a-zA-Z\s]{3,15}$/.test(v);
+const isValidName = (v) => /^[A-Z][a-zA-Z\s]{2,15}$/.test(v);
 const isValidZipCode = (v) => /^[0-9]{4,5}$/.test(v);
 
 const createSchema = yup.object({

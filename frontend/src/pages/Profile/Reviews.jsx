@@ -64,6 +64,7 @@ const Reviews = () => {
     const handleEditSuccess = () => {
         setLoadingOverlay(false);
         dispatch(getUserReviews(user.id));
+        window.location.reload();
     };
 
     const handleDeleteClick = () => {
@@ -78,7 +79,7 @@ const Reviews = () => {
                 toast.success('Review deleted successfully');
                 setOpenDeleteModal(false);
 
-                dispatch(getUserReviews(user.id));
+                await dispatch(getUserReviews(user.id));
             } catch (err) {
                 console.error('Failed to delete review:', err.message);
                 toast.error('Failed to delete review');

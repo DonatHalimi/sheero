@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
 import { toast } from 'react-toastify';
-import { BrownButton, BrownOutlinedTextField, CustomBox, CustomModal, CustomTypography } from '../../../assets/CustomComponents';
-import useAxios from '../../../axiosInstance';
+import { BrownButton, BrownOutlinedTextField, CustomBox, CustomModal, CustomTypography, handleApiError, knownEmailProviders } from '../../../assets/CustomComponents';
+import useAxios from '../../../utils/axiosInstance';
 
 const AddContactModal = ({ open, onClose, onAddSuccess }) => {
     const [formData, setFormData] = useState({
@@ -11,7 +11,27 @@ const AddContactModal = ({ open, onClose, onAddSuccess }) => {
         message: ''
     });
 
+    const [isValidName, setIsValidName] = useState(true);
+    const [isValidEmail, setIsValidEmail] = useState(true);
+    const [isValidSubject, setIsValidSubject] = useState(true);
+    const [isValidMessage, setIsValidMessage] = useState(true);
+
     const axiosInstance = useAxios();
+
+    const validateName = (v) => /^[A-Z][\sa-zA-Z\W]{3,15}$/.test(v);
+    const validateEmail = (v) => new RegExp(`^[a-zA-Z0-9._%+-]+@(${knownEmailProviders.join('|')})$`, 'i').test(v);
+    const validateSubject = (v) => /^[A-Z][\sa-zA-Z\W]{5,50}$/.test(v);
+    const validateMessage = (v) => /^[A-Z][\sa-zA-Z\W]{10,200}$/.test(v);
+
+    const isValidForm = 
+        formData.name &&
+        formData.email &&
+        formData.subject &&
+        formData.message &&
+        isValidName &&
+        isValidEmail &&
+        isValidSubject &&
+        isValidMessage;
 
     const handleAddContact = async () => {
         const { name, email, subject, message } = formData;
@@ -27,14 +47,18 @@ const AddContactModal = ({ open, onClose, onAddSuccess }) => {
             onAddSuccess(response.data);
             onClose();
         } catch (error) {
-            toast.error(error.response?.data?.message || 'Error sending message');
-            console.error('Error adding contact message', error);
+            handleApiError(error, 'Error adding contact');
         }
     };
 
     const handleChange = (e) => {
         const { name, value } = e.target;
         setFormData({ ...formData, [name]: value });
+
+        if (name === 'name') setIsValidName(validateName(value));
+        if (name === 'email') setIsValidEmail(validateEmail(value));
+        if (name === 'subject') setIsValidSubject(validateSubject(value));
+        if (name === 'message') setIsValidMessage(validateMessage(value));
     };
 
     return (
@@ -49,6 +73,8 @@ const AddContactModal = ({ open, onClose, onAddSuccess }) => {
                     name="name"
                     value={formData.name}
                     onChange={handleChange}
+                    error={!isValidName}
+                    helperText={!isValidName ? 'Name must start with a capital letter and be 3-15 characters long' : ''}
                     className="!mb-4"
                 />
                 <BrownOutlinedTextField
@@ -58,6 +84,8 @@ const AddContactModal = ({ open, onClose, onAddSuccess }) => {
                     name="email"
                     value={formData.email}
                     onChange={handleChange}
+                    error={!isValidEmail}
+                    helperText={!isValidEmail ? 'Please provide a valid email address' : ''}
                     className="!mb-4"
                 />
                 <BrownOutlinedTextField
@@ -67,6 +95,8 @@ const AddContactModal = ({ open, onClose, onAddSuccess }) => {
                     name="subject"
                     value={formData.subject}
                     onChange={handleChange}
+                    error={!isValidSubject}
+                    helperText={!isValidSubject ? 'Subject must start with a capital letter and be 5-50 characters long' : ''}
                     className="!mb-4"
                 />
                 <BrownOutlinedTextField
@@ -78,12 +108,15 @@ const AddContactModal = ({ open, onClose, onAddSuccess }) => {
                     rows={4}
                     value={formData.message}
                     onChange={handleChange}
+                    error={!isValidMessage}
+                    helperText={!isValidMessage ? 'Message must start with a capital letter and be 10-200 characters long' : ''}
                     className="!mb-4"
                 />
                 <BrownButton
                     onClick={handleAddContact}
                     variant="contained"
                     color="primary"
+                    disabled={!isValidForm}
                     className="w-full"
                 >
                     Add

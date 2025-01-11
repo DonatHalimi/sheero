@@ -1,15 +1,20 @@
 import { InputLabel, MenuItem, Select } from '@mui/material';
 import React, { useEffect, useState } from 'react';
 import { toast } from 'react-toastify';
-import { BrownButton, BrownOutlinedTextField, CustomBox, CustomModal, CustomTypography, OutlinedBrownFormControl } from '../../../assets/CustomComponents';
-import useAxios from '../../../axiosInstance';
+import { BrownButton, BrownOutlinedTextField, CustomBox, CustomModal, CustomTypography, handleApiError, OutlinedBrownFormControl } from '../../../assets/CustomComponents';
+import useAxios from '../../../utils/axiosInstance';
 
 const EditSubSubcategoryModal = ({ open, onClose, subSubcategory, onEditSuccess }) => {
     const [name, setName] = useState('');
+    const [isValidName, setIsValidName] = useState(true);
     const [subcategory, setSubcategory] = useState('');
     const [subcategories, setSubcategories] = useState([]);
 
     const axiosInstance = useAxios();
+
+    const validateName = (v) => /^[A-Z][\sa-zA-Z\W]{3,27}$/.test(v);
+
+    const isValidForm = name && isValidName && subcategory;
 
     useEffect(() => {
         if (subSubcategory) {
@@ -42,8 +47,7 @@ const EditSubSubcategoryModal = ({ open, onClose, subSubcategory, onEditSuccess 
             onEditSuccess(response.data);
             onClose();
         } catch (error) {
-            console.error('Error updating subsubcategory', error);
-            toast.error('Error updating subsubcategory');
+            handleApiError(error, 'Error updating subsubcategory');
         }
     };
 
@@ -55,9 +59,15 @@ const EditSubSubcategoryModal = ({ open, onClose, subSubcategory, onEditSuccess 
                 <BrownOutlinedTextField
                     label="Name"
                     value={name}
-                    onChange={(e) => setName(e.target.value)}
                     fullWidth
+                    onChange={(e) => {
+                        setName(e.target.value);
+                        setIsValidName(validateName(e.target.value));
+                    }}
+                    error={!isValidName}
+                    helperText={!isValidName ? 'Name must start with a capital letter and be 3-27 characters long' : ''}
                 />
+
                 <OutlinedBrownFormControl fullWidth margin="normal">
                     <InputLabel>Subcategory</InputLabel>
                     <Select
@@ -75,6 +85,7 @@ const EditSubSubcategoryModal = ({ open, onClose, subSubcategory, onEditSuccess 
                     onClick={handleEditSubSubcategory}
                     variant="contained"
                     color="primary"
+                    disabled={!isValidForm}
                     className="w-full"
                 >
                     Save Changes

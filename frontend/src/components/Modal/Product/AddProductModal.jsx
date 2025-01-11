@@ -4,7 +4,7 @@ import React, { useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { toast } from 'react-toastify';
 import { BrownButton, BrownOutlinedTextField, CustomPaper, OutlinedBrownButton, OutlinedBrownFormControl, VisuallyHiddenInput } from '../../../assets/CustomComponents';
-import useAxios from '../../../axiosInstance';
+import useAxios from '../../../utils/axiosInstance';
 
 const AddProductModal = ({ open, onClose, onAddSuccess }) => {
     const [step, setStep] = useState(1);
@@ -80,7 +80,7 @@ const AddProductModal = ({ open, onClose, onAddSuccess }) => {
         return () => {
             clearTimeout(debounceTimeout);
         };
-    }, [axiosInstance]);
+    }, []);
 
     const handleImageChange = (e) => {
         const file = e.target.files[0];

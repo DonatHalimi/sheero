@@ -1,12 +1,17 @@
 import React, { useState } from 'react';
 import { toast } from 'react-toastify';
-import { BrownButton, BrownOutlinedTextField, CustomBox, CustomModal, CustomTypography } from '../../../assets/CustomComponents';
-import useAxios from '../../../axiosInstance';
+import { BrownButton, BrownOutlinedTextField, CustomBox, CustomModal, CustomTypography, handleApiError } from '../../../assets/CustomComponents';
+import useAxios from '../../../utils/axiosInstance';
 
 const AddCountryModal = ({ open, onClose, onAddSuccess }) => {
     const [name, setName] = useState('');
+    const [isValidName, setIsValidName] = useState(true);
 
     const axiosInstance = useAxios();
+
+    const validateName = (v) => /^[A-Z][a-zA-Z\s]{3,15}$/.test(v);
+
+    const isValidForm = isValidName;
 
     const handleAddCountry = async () => {
         if (!name) {
@@ -24,12 +29,7 @@ const AddCountryModal = ({ open, onClose, onAddSuccess }) => {
             onAddSuccess(response.data);
             onClose();
         } catch (error) {
-            if (error.response && error.response.status === 403) {
-                toast.error('You do not have permission to perform this action');
-            } else {
-                toast.error('Error adding country');
-            }
-            console.error('Error adding country', error);
+            handleApiError(error, 'Error adding country');
         }
     };
 
@@ -43,13 +43,19 @@ const AddCountryModal = ({ open, onClose, onAddSuccess }) => {
                     required
                     label="Name"
                     value={name}
-                    onChange={(e) => setName(e.target.value)}
+                    onChange={(e) => {
+                        setName(e.target.value)
+                        setIsValidName(validateName(e.target.value));
+                    }}
+                    error={!isValidName}
+                    helperText={!isValidName ? 'Name must start with a capital letter and be 3-15 characters long' : ''}
                     className="!mb-4"
                 />
                 <BrownButton
                     onClick={handleAddCountry}
                     variant="contained"
                     color="primary"
+                    disabled={!isValidForm}
                     className="w-full"
                 >
                     Add

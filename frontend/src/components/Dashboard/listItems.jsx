@@ -1,40 +1,186 @@
 import {
+  AllInbox,
   AllInboxOutlined,
+  Apartment,
   ApartmentOutlined,
+  Category,
   CategoryOutlined,
+  Collections,
   CollectionsOutlined,
+  Contacts,
   ContactsOutlined,
+  Dashboard,
+  DashboardCustomize,
   DashboardCustomizeOutlined,
   DashboardOutlined,
+  DryCleaning,
+  DryCleaningOutlined,
+  Explore,
   ExploreOutlined,
+  Flag,
   FlagOutlined,
+  Help,
   HelpOutlineOutlined,
+  Inbox,
   InboxOutlined,
+  Inventory,
   Inventory2Outlined,
-  InventoryOutlined,
-  PeopleOutline,
+  MoveToInbox,
+  People,
   PeopleOutlineOutlined,
+  Person,
   PersonOutline,
+  PrecisionManufacturing,
   PrecisionManufacturingOutlined,
+  Room,
   RoomOutlined,
+  Star,
   StarHalf,
-  WidgetsOutlined,
+  Widgets,
+  WidgetsOutlined
 } from '@mui/icons-material';
 import React, { useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { ActiveListItem, CollapsibleListItem, StyledInboxIcon, StyledMoveToInboxIcon } from '../../assets/CustomComponents';
+import { ActiveListItem, CollapsibleListItem, getLocalStorageState, saveLocalStorageState, StyledInboxIcon, StyledMoveToInboxIcon } from '../../assets/CustomComponents';
 
-/**
- * Returns a list of main menu items for the dashboard.
- * @param {object} props An object containing the setCurrentView function.
- * @returns {React.ReactElement} A list of main menu items for the dashboard.
- */
-export const mainListItems = ({ setCurrentView }) => {
-  const [crudOpen, setCrudOpen] = useState(true);
-  const [usersOpen, setUsersOpen] = useState(true);
-  const [productsOpen, setProductsOpen] = useState(true);
-  const [addressesOpen, setAddressesOpen] = useState(true);
-  const [categoriesOpen, setCategoriesOpen] = useState(true);
+// User related pages
+const userMenuItems = [
+  {
+    id: 'users',
+    icon: { active: Person, inactive: PersonOutline },
+    label: 'Users'
+  },
+  {
+    id: 'roles',
+    icon: { active: People, inactive: PeopleOutlineOutlined },
+    label: 'Roles'
+  },
+  {
+    id: 'reviews',
+    icon: { active: Star, inactive: StarHalf },
+    label: 'Reviews'
+  },
+  {
+    id: 'orders',
+    icon: { active: Inbox, inactive: StyledInboxIcon },
+    label: 'Orders'
+  },
+  {
+    id: 'returns',
+    icon: { active: MoveToInbox, inactive: StyledMoveToInboxIcon },
+    label: 'Returns'
+  },
+];
+
+// Product related pages
+const productMenuItems = [
+  {
+    id: 'products',
+    icon: { active: DryCleaning, inactive: DryCleaningOutlined },
+    label: 'Products'
+  },
+  {
+    id: 'images',
+    icon: { active: Collections, inactive: CollectionsOutlined },
+    label: 'Images'
+  },
+  {
+    id: 'faqs',
+    icon: { active: Help, inactive: HelpOutlineOutlined },
+    label: 'FAQs'
+  },
+  {
+    id: 'contacts',
+    icon: { active: Contacts, inactive: ContactsOutlined },
+    label: 'Contacts'
+  },
+];
+
+// Category related pages
+const categoryMenuItems = [
+  {
+    id: 'categories',
+    icon: { active: Inbox, inactive: InboxOutlined },
+    label: 'Categories'
+  },
+  {
+    id: 'subcategories',
+    icon: { active: Widgets, inactive: WidgetsOutlined },
+    label: 'Subcategories'
+  },
+  {
+    id: 'subsubcategories',
+    icon: { active: Category, inactive: CategoryOutlined },
+    label: 'Subsubcategories'
+  },
+];
+
+// Address related pages
+const addressMenuItems = [
+  {
+    id: 'countries',
+    icon: { active: Flag, inactive: FlagOutlined },
+    label: 'Countries'
+  },
+  {
+    id: 'cities',
+    icon: { active: Apartment, inactive: ApartmentOutlined },
+    label: 'Cities'
+  },
+  {
+    id: 'addresses',
+    icon: { active: Room, inactive: RoomOutlined },
+    label: 'Addresses'
+  },
+  {
+    id: 'suppliers',
+    icon: { active: PrecisionManufacturing, inactive: PrecisionManufacturingOutlined },
+    label: 'Suppliers'
+  },
+];
+
+// Collapsible sections
+const mainSections = [
+  {
+    id: 'users',
+    icon: { active: People, inactive: PeopleOutlineOutlined },
+    label: 'User',
+    items: userMenuItems,
+    stateKey: 'usersOpen'
+  },
+  {
+    id: 'products',
+    icon: { active: Inventory, inactive: Inventory2Outlined },
+    label: 'Product',
+    items: productMenuItems,
+    stateKey: 'productsOpen'
+  },
+  {
+    id: 'categories',
+    icon: { active: AllInbox, inactive: AllInboxOutlined },
+    label: 'Category',
+    items: categoryMenuItems,
+    stateKey: 'categoriesOpen'
+  },
+  {
+    id: 'addresses',
+    icon: { active: Explore, inactive: ExploreOutlined },
+    label: 'Address',
+    items: addressMenuItems,
+    stateKey: 'addressesOpen'
+  },
+];
+
+export const mainListItems = ({ setCurrentView, collapsed }) => {
+  const defaultState = {
+    crudOpen: true,
+    usersOpen: true,
+    productsOpen: true,
+    addressesOpen: true,
+    categoriesOpen: true,
+  };
+
+  const [menuState, setMenuState] = useState(getLocalStorageState('menuState', defaultState));
   const [activeItem, setActiveItem] = useState('');
   const navigate = useNavigate();
 
@@ -44,185 +190,54 @@ export const mainListItems = ({ setCurrentView }) => {
     navigate(`/dashboard/${view}`);
   };
 
+  const toggleStateAndSave = (key) => {
+    const updatedState = { ...menuState, [key]: !menuState[key] };
+    setMenuState(updatedState);
+    saveLocalStorageState('menuState', updatedState);
+  };
+
   useEffect(() => {
     const path = window.location.pathname.split('/')[2];
-    if (path) {
-      setActiveItem(path);
-    } else {
-      setActiveItem('users');
-    }
+    setActiveItem(path || 'users');
   }, []);
+
+  const renderMenuItem = ({ id, icon, label }) => (
+    <ActiveListItem
+      key={id}
+      handleClick={() => handleItemClick(id)}
+      selected={activeItem === id}
+      icon={activeItem === id ? <icon.active /> : <icon.inactive />}
+      primary={!collapsed ? label : ""}
+    />
+  );
 
   return (
     <>
       <ActiveListItem
-        icon={<DashboardOutlined />}
-        primary="Dashboard"
+        icon={activeItem === 'main' ? <Dashboard /> : <DashboardOutlined />}
+        primary={!collapsed ? "Dashboard" : ""}
         handleClick={() => handleItemClick('main')}
         selected={activeItem === 'main'}
+        isMainPage={true}
       />
 
       <CollapsibleListItem
-        open={crudOpen}
-        handleClick={() => setCrudOpen(!crudOpen)}
-        icon={<DashboardCustomizeOutlined />}
-        primary="CRUDs"
+        open={menuState.crudOpen}
+        handleClick={() => toggleStateAndSave('crudOpen')}
+        icon={menuState.crudOpen ? <DashboardCustomize /> : <DashboardCustomizeOutlined />}
+        primary={!collapsed ? "CRUDs" : ""}
       >
-        <CollapsibleListItem
-          open={usersOpen}
-          handleClick={() => setUsersOpen(!usersOpen)}
-          icon={<PeopleOutline />}
-          primary="User"
-        >
-          <ActiveListItem
-            sx={{ pl: 4 }}
-            handleClick={() => handleItemClick('users')}
-            selected={activeItem === 'users'}
-            icon={<PersonOutline />}
-            primary="Users"
-          />
-
-          <ActiveListItem
-            sx={{ pl: 4 }}
-            handleClick={() => handleItemClick('roles')}
-            selected={activeItem === 'roles'}
-            icon={<PeopleOutlineOutlined />}
-            primary="Roles"
-          />
-
-          <ActiveListItem
-            sx={{ pl: 4 }}
-            handleClick={() => handleItemClick('reviews')}
-            selected={activeItem === 'reviews'}
-            icon={<StarHalf />}
-            primary="Reviews"
-          />
-
-          <ActiveListItem
-            sx={{ pl: 4 }}
-            handleClick={() => handleItemClick('orders')}
-            selected={activeItem === 'orders'}
-            icon={<StyledInboxIcon />}
-            primary="Orders"
-          />
-
-          <ActiveListItem
-            sx={{ pl: 4 }}
-            handleClick={() => handleItemClick('returns')}
-            selected={activeItem === 'returns'}
-            icon={<StyledMoveToInboxIcon />}
-            primary="Returns"
-          />
-        </CollapsibleListItem>
-
-        <CollapsibleListItem
-          open={productsOpen}
-          handleClick={() => setProductsOpen(!productsOpen)}
-          icon={<InventoryOutlined />}
-          primary="Product"
-        >
-          <ActiveListItem
-            sx={{ pl: 4 }}
-            handleClick={() => handleItemClick('products')}
-            selected={activeItem === 'products'}
-            icon={<Inventory2Outlined />}
-            primary="Products"
-          />
-
-          <ActiveListItem
-            sx={{ pl: 4 }}
-            handleClick={() => handleItemClick('images')}
-            selected={activeItem === 'images'}
-            icon={<CollectionsOutlined />}
-            primary="Images"
-          />
-
-          <ActiveListItem
-            sx={{ pl: 4 }}
-            handleClick={() => handleItemClick('faqs')}
-            selected={activeItem === 'faqs'}
-            icon={<HelpOutlineOutlined />}
-            primary="FAQs"
-          />
-
-          <ActiveListItem
-            sx={{ pl: 4 }}
-            handleClick={() => handleItemClick('contacts')}
-            selected={activeItem === 'contacts'}
-            icon={<ContactsOutlined />}
-            primary="Contacts"
-          />
-
+        {mainSections.map(section => (
           <CollapsibleListItem
-            open={categoriesOpen}
-            handleClick={() => setCategoriesOpen(!categoriesOpen)}
-            icon={<AllInboxOutlined />}
-            primary="Category"
+            key={section.id}
+            open={menuState[section.stateKey]}
+            handleClick={() => toggleStateAndSave(section.stateKey)}
+            icon={menuState[section.stateKey] ? <section.icon.active /> : <section.icon.inactive />}
+            primary={!collapsed ? section.label : ""}
           >
-            <ActiveListItem
-              sx={{ pl: 6 }}
-              handleClick={() => handleItemClick('categories')}
-              selected={activeItem === 'categories'}
-              icon={<InboxOutlined />}
-              primary="Categories"
-            />
-
-            <ActiveListItem
-              sx={{ pl: 6 }}
-              handleClick={() => handleItemClick('subcategories')}
-              selected={activeItem === 'subcategories'}
-              icon={<WidgetsOutlined />}
-              primary="Subcategories"
-            />
-
-            <ActiveListItem
-              sx={{ pl: 6 }}
-              handleClick={() => handleItemClick('subsubcategories')}
-              selected={activeItem === 'subsubcategories'}
-              icon={<CategoryOutlined />}
-              primary="SubSubcategories"
-            />
+            {section.items.map(renderMenuItem)}
           </CollapsibleListItem>
-
-          <CollapsibleListItem
-            open={addressesOpen}
-            handleClick={() => setAddressesOpen(!addressesOpen)}
-            icon={<ExploreOutlined />}
-            primary="Address"
-          >
-            <ActiveListItem
-              sx={{ pl: 6 }}
-              handleClick={() => handleItemClick('countries')}
-              selected={activeItem === 'countries'}
-              icon={<FlagOutlined />}
-              primary="Countries"
-            />
-
-            <ActiveListItem
-              sx={{ pl: 6 }}
-              handleClick={() => handleItemClick('cities')}
-              selected={activeItem === 'cities'}
-              icon={<ApartmentOutlined />}
-              primary="Cities"
-            />
-
-            <ActiveListItem
-              sx={{ pl: 6 }}
-              handleClick={() => handleItemClick('addresses')}
-              selected={activeItem === 'addresses'}
-              icon={<RoomOutlined />}
-              primary="Addresses"
-            />
-
-            <ActiveListItem
-              sx={{ pl: 6 }}
-              handleClick={() => handleItemClick('suppliers')}
-              selected={activeItem === 'suppliers'}
-              icon={<PrecisionManufacturingOutlined />}
-              primary="Suppliers"
-            />
-          </CollapsibleListItem>
-        </CollapsibleListItem>
+        ))}
       </CollapsibleListItem>
     </>
   );

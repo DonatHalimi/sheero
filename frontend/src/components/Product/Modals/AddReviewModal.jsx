@@ -4,7 +4,7 @@ import { useSelector } from 'react-redux';
 import { useNavigate } from 'react-router-dom';
 import { toast } from 'react-toastify';
 import { BrownButton, BrownOutlinedTextField, CustomBox, CustomModal, CustomTypography } from '../../../assets/CustomComponents';
-import useAxios from '../../../axiosInstance';
+import useAxios from '../../../utils/axiosInstance';
 
 const AddReviewModal = ({ open, onClose, product, onReviewSuccess }) => {
     const { isAuthenticated } = useSelector((state) => state.auth);
@@ -103,7 +103,7 @@ const AddReviewModal = ({ open, onClose, product, onReviewSuccess }) => {
         }
     };
 
-    const isDisabled = !canReview || !title || !rating || !comment || !titleValid || !commentValid;
+    const isDisabled = !title || !rating || !comment || !titleValid || !commentValid;
 
     return (
         <CustomModal open={open} onClose={onClose}>
@@ -114,7 +114,7 @@ const AddReviewModal = ({ open, onClose, product, onReviewSuccess }) => {
 
                 {canReview === false && (
                     <CustomTypography variant="body2" className="!text-red-600">
-                        Product can only be reviewed after buying it.
+                        Product can only be reviewed after buying it
                     </CustomTypography>
                 )}
 

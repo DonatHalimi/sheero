@@ -1,16 +1,16 @@
 import React, { useEffect, useState } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
-import { DashboardHeader } from '../../assets/CustomComponents';
+import { DashboardHeader, LoadingDataGrid } from '../../assets/CustomComponents';
 import DashboardTable from '../../components/Dashboard/DashboardTable';
 import DeleteModal from '../../components/Modal/DeleteModal';
 import ImagePreviewModal from '../../components/Modal/ImagePreviewModal';
 import AddSlideshowModal from '../../components/Modal/Slideshow/AddSlideshowModal';
 import EditSlideshowModal from '../../components/Modal/Slideshow/EditSlideshowModal';
-import { getImageUrl } from '../../config';
+import { getImageUrl } from '../../utils/config';
 import { getImages } from '../../store/actions/slideshowActions';
 
 const SlideshowPage = () => {
-    const { images } = useSelector((state) => state.slideshow);
+    const { images, loading } = useSelector((state) => state.slideshow);
     const dispatch = useDispatch();
 
     const [selectedImage, setSelectedImage] = useState(null);
@@ -77,26 +77,32 @@ const SlideshowPage = () => {
     return (
         <div className='container mx-auto max-w-screen-2xl px-4 mt-20'>
             <div className='flex flex-col items-center justify-center'>
-                <DashboardHeader
-                    title="Slideshow Images"
-                    selectedItems={selectedImages}
-                    setAddItemOpen={setAddImageOpen}
-                    setDeleteItemOpen={setDeleteImageOpen}
-                    itemName="Image"
-                />
+                {loading ? (
+                    <LoadingDataGrid />
+                ) : (
+                    <>
+                        <DashboardHeader
+                            title="Slideshow Images"
+                            selectedItems={selectedImages}
+                            setAddItemOpen={setAddImageOpen}
+                            setDeleteItemOpen={setDeleteImageOpen}
+                            itemName="Image"
+                        />
 
-                <DashboardTable
-                    columns={columns}
-                    data={images}
-                    selectedItems={selectedImages}
-                    onSelectItem={handleSelectImage}
-                    onSelectAll={handleSelectAll}
-                    itemsPerPage={itemsPerPage}
-                    currentPage={currentPage}
-                    onPageChange={(event) => setCurrentPage(event.selected)}
-                    onEdit={handleEdit}
-                    containerClassName='max-w-screen-2xl mx-auto'
-                />
+                        <DashboardTable
+                            columns={columns}
+                            data={images}
+                            selectedItems={selectedImages}
+                            onSelectItem={handleSelectImage}
+                            onSelectAll={handleSelectAll}
+                            itemsPerPage={itemsPerPage}
+                            currentPage={currentPage}
+                            onPageChange={(event) => setCurrentPage(event.selected)}
+                            onEdit={handleEdit}
+                            containerClassName='max-w-screen-2xl mx-auto'
+                        />
+                    </>
+                )}
 
                 <AddSlideshowModal open={addImageOpen} onClose={() => setAddImageOpen(false)} onAddSuccess={() => dispatch(getImages())} />
                 <EditSlideshowModal open={editImageOpen} onClose={() => setEditImageOpen(false)} image={selectedImage} onEditSuccess={() => dispatch(getImages())} />
@@ -104,7 +110,10 @@ const SlideshowPage = () => {
                     open={deleteImageOpen}
                     onClose={() => setDeleteImageOpen(false)}
                     items={selectedImages.map(id => images.find(image => image._id === id)).filter(image => image)}
-                    onDeleteSuccess={() => dispatch(getImages())}
+                    onDeleteSuccess={() => {
+                        dispatch(getImages())
+                        setSelectedImages([])
+                    }}
                     endpoint="/slideshow/delete-bulk"
                     title="Delete Images"
                     message="Are you sure you want to delete the selected images?"

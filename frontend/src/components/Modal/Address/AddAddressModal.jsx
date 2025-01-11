@@ -1,20 +1,37 @@
 import { Autocomplete, TextField } from '@mui/material';
 import React, { useEffect, useState } from 'react';
 import { toast } from 'react-toastify';
-import { BrownButton, BrownOutlinedTextField, CustomBox, CustomModal, CustomPaper, CustomTypography } from '../../../assets/CustomComponents';
-import useAxios from '../../../axiosInstance';
+import { BrownButton, BrownOutlinedTextField, CustomBox, CustomModal, CustomPaper, CustomTypography, handleApiError } from '../../../assets/CustomComponents';
+import useAxios from '../../../utils/axiosInstance';
 
 const AddAddressModal = ({ open, onClose, onAddSuccess }) => {
     const [name, setName] = useState('');
+    const [isValidName, setIsValidName] = useState(true);
     const [street, setStreet] = useState('');
+    const [isValidStreet, setIsValidStreet] = useState(true);
     const [phoneNumber, setPhoneNumber] = useState('');
+    const [isValidPhoneNumber, setIsValidPhoneNumber] = useState(true);
     const [comment, setComment] = useState('');
+    const [isValidComment, setIsValidComment] = useState(true);
     const [city, setCity] = useState(null);
     const [country, setCountry] = useState(null);
     const [cities, setCities] = useState([]);
     const [countries, setCountries] = useState([]);
 
     const axiosInstance = useAxios();
+
+    const validateName = (v) => /^[A-Z][a-zA-Z]{2,10}$/.test(v);
+    const validatePhoneNumber = (v) => /^0(44|45|48|49)\d{6}$/.test(v);
+    const validateStreet = (v) => /^[A-Z][a-zA-Z0-9\s]{2,27}$/.test(v);
+    const validateComment = (v) => /^[a-zA-Z0-9\s]{2,25}$/.test(v);
+
+    const isFormValid =
+        isValidName &&
+        isValidStreet &&
+        isValidPhoneNumber &&
+        isValidComment &&
+        city &&
+        country;
 
     useEffect(() => {
         const fetchCountries = async () => {
@@ -31,7 +48,7 @@ const AddAddressModal = ({ open, onClose, onAddSuccess }) => {
         };
 
         fetchCountries();
-    }, [axiosInstance]);
+    }, []);
 
     const handleCountryChange = async (event, newValue) => {
         setCountry(newValue);
@@ -73,12 +90,7 @@ const AddAddressModal = ({ open, onClose, onAddSuccess }) => {
             onAddSuccess();
             onClose();
         } catch (error) {
-            if (error.response && error.response.status === 403) {
-                toast.error('You do not have permission to perform this action');
-            } else {
-                toast.error('Error adding address');
-            }
-            console.error('Error adding address', error);
+            handleApiError(error, 'Error adding address');
         }
     };
 
@@ -92,7 +104,12 @@ const AddAddressModal = ({ open, onClose, onAddSuccess }) => {
                     required
                     label="Name"
                     value={name}
-                    onChange={(e) => setName(e.target.value)}
+                    onChange={(e) => {
+                        setName(e.target.value);
+                        setIsValidName(validateName(e.target.value));
+                    }}
+                    error={!isValidName}
+                    helperText={!isValidName ? "Name must start with a capital letter and be 2-10 characters long" : ""}
                     className="!mb-4"
                 />
 
@@ -101,7 +118,12 @@ const AddAddressModal = ({ open, onClose, onAddSuccess }) => {
                     required
                     label="Street"
                     value={street}
-                    onChange={(e) => setStreet(e.target.value)}
+                    onChange={(e) => {
+                        setStreet(e.target.value);
+                        setIsValidStreet(validateStreet(e.target.value));
+                    }}
+                    error={!isValidStreet}
+                    helperText={!isValidStreet ? "Street must start with a capital letter and be 2-27 characters long" : ""}
                     className="!mb-4"
                 />
 
@@ -110,8 +132,13 @@ const AddAddressModal = ({ open, onClose, onAddSuccess }) => {
                     required
                     label="Phone Number"
                     value={phoneNumber}
-                    onChange={(e) => setPhoneNumber(e.target.value)}
+                    onChange={(e) => {
+                        setPhoneNumber(e.target.value)
+                        setIsValidPhoneNumber(validatePhoneNumber(e.target.value));
+                    }}
                     placeholder="044/45/48 XXXXXX"
+                    error={!isValidPhoneNumber}
+                    helperText={!isValidPhoneNumber ? "Phone number must start with 044, 045, 048 or 049 followed by 6 digits" : ""}
                     className="!mb-4"
                 />
 
@@ -120,7 +147,12 @@ const AddAddressModal = ({ open, onClose, onAddSuccess }) => {
                     required
                     label="Comment"
                     value={comment}
-                    onChange={(e) => setComment(e.target.value)}
+                    onChange={(e) => {
+                        setComment(e.target.value)
+                        setIsValidComment(validateComment(e.target.value));
+                    }}
+                    error={!isValidComment}
+                    helperText={!isValidComment ? "Comment must be 2-25 characters long" : ""}
                     className="!mb-4"
                 />
 
@@ -155,6 +187,7 @@ const AddAddressModal = ({ open, onClose, onAddSuccess }) => {
                     onClick={handleAddAddress}
                     variant="contained"
                     color="primary"
+                    disabled={!isFormValid}
                     className="w-full"
                 >
                     Add

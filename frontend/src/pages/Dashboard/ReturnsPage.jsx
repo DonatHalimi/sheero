@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
-import { DashboardHeader, formatDate } from '../../assets/CustomComponents';
+import { DashboardHeader, formatDate, LoadingDataGrid } from '../../assets/CustomComponents';
 import DashboardTable from '../../components/Dashboard/DashboardTable';
 import DeleteModal from '../../components/Modal/DeleteModal';
 import AddReturnRequestModal from '../../components/Modal/ReturnRequest/AddReturnRequestModal';
@@ -8,7 +8,7 @@ import EditReturnRequestModal from '../../components/Modal/ReturnRequest/EditRet
 import { getReturnRequests } from '../../store/actions/dashboardActions';
 
 const ReturnsPage = () => {
-    const { returnRequests } = useSelector((state) => state.dashboard);
+    const { returnRequests, loadingReturns } = useSelector((state) => state.dashboard);
     const dispatch = useDispatch();
 
     const [selectedReturnRequest, setSelectedReturnRequest] = useState(null);
@@ -76,27 +76,34 @@ const ReturnsPage = () => {
     return (
         <div className='container mx-auto max-w-screen-2xl px-4 mt-20'>
             <div className='flex flex-col items-center justify-center'>
-                <DashboardHeader
-                    title="Return Requests"
-                    selectedItems={selectedReturnRequests}
-                    setDeleteItemOpen={setDeleteReturnRequestOpen}
-                    itemName="Return Request"
-                />
+                {loadingReturns ? (
+                    <LoadingDataGrid />
+                ) : (
+                    <>
+                        <DashboardHeader
+                            title="Return Requests"
+                            selectedItems={selectedReturnRequests}
+                            setAddItemOpen={setAddReturnRequestOpen}
+                            setDeleteItemOpen={setDeleteReturnRequestOpen}
+                            itemName="Return Request"
+                        />
 
-                <DashboardTable
-                    columns={columns}
-                    data={returnRequests.map(request => ({
-                        ...request,
-                        products: renderProducts(request.products),
-                    }))}
-                    selectedItems={selectedReturnRequests}
-                    onSelectItem={handleSelectReturnRequest}
-                    onSelectAll={handleSelectAll}
-                    itemsPerPage={itemsPerPage}
-                    currentPage={currentPage}
-                    onPageChange={handlePageClick}
-                    onEdit={handleEdit}
-                />
+                        <DashboardTable
+                            columns={columns}
+                            data={returnRequests.map(request => ({
+                                ...request,
+                                products: renderProducts(request.products),
+                            }))}
+                            selectedItems={selectedReturnRequests}
+                            onSelectItem={handleSelectReturnRequest}
+                            onSelectAll={handleSelectAll}
+                            itemsPerPage={itemsPerPage}
+                            currentPage={currentPage}
+                            onPageChange={handlePageClick}
+                            onEdit={handleEdit}
+                        />
+                    </>
+                )}
 
                 <AddReturnRequestModal open={addReturnRequestOpen} onClose={() => setAddReturnRequestOpen(false)} onAddSuccess={() => dispatch(getReturnRequests())} />
                 <EditReturnRequestModal open={editReturnRequestOpen} onClose={() => setEditReturnRequestOpen(false)} returnRequest={selectedReturnRequest} onEditSuccess={() => dispatch(getReturnRequests())} />
@@ -104,7 +111,10 @@ const ReturnsPage = () => {
                     open={deleteReturnRequestOpen}
                     onClose={() => setDeleteReturnRequestOpen(false)}
                     items={selectedReturnRequests.map(id => returnRequests.find(request => request._id === id)).filter(request => request)}
-                    onDeleteSuccess={() => dispatch(getReturnRequests())}
+                    onDeleteSuccess={() => {
+                        dispatch(getReturnRequests())
+                        setSelectedReturnRequests([])
+                    }}
                     endpoint="/returns/delete-bulk"
                     title="Delete Return Requests"
                     message="Are you sure you want to delete the selected return requests?"

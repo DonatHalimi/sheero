@@ -8,7 +8,7 @@ import App from './App';
 import './index.css';
 import { loadUser } from './store/actions/authActions';
 import store from './store/store';
-import theme from './theme';
+import theme from './utils/theme';
 
 const Main = () => {
   const dispatch = useDispatch();

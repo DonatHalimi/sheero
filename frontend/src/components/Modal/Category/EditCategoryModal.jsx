@@ -1,16 +1,21 @@
 import UploadIcon from '@mui/icons-material/Upload';
 import React, { useEffect, useState } from 'react';
 import { toast } from 'react-toastify';
-import { BrownButton, BrownOutlinedTextField, CustomBox, CustomModal, CustomTypography, OutlinedBrownButton, VisuallyHiddenInput } from '../../../assets/CustomComponents';
-import useAxios from '../../../axiosInstance';
-import { getImageUrl } from '../../../config';
+import { BrownButton, BrownOutlinedTextField, CustomBox, CustomModal, CustomTypography, handleApiError, OutlinedBrownButton, VisuallyHiddenInput } from '../../../assets/CustomComponents';
+import useAxios from '../../../utils/axiosInstance';
+import { getImageUrl } from '../../../utils/config';
 
 const EditCategoryModal = ({ open, onClose, category, onEditSuccess }) => {
     const [name, setName] = useState('');
+    const [isValidName, setIsValidName] = useState(true);
     const [image, setImage] = useState(null);
     const [imagePreview, setImagePreview] = useState('');
 
     const axiosInstance = useAxios();
+
+    const validateName = (v) => /^[A-Z][\sa-zA-Z\W]{3,28}$/.test(v);
+
+    const isValidForm = isValidName && name || image;
 
     useEffect(() => {
         if (category) {
@@ -36,20 +41,25 @@ const EditCategoryModal = ({ open, onClose, category, onEditSuccess }) => {
             onEditSuccess(response.data);
             onClose();
         } catch (error) {
-            console.error('Error updating category', error);
-            toast.error('Error updating category');
+            handleApiError(error, 'Error updating category');
         }
     };
 
     const handleImageChange = (e) => {
         const file = e.target.files[0];
-        setImage(file);
         if (file) {
-            const reader = new FileReader();
-            reader.onloadend = () => {
-                setImagePreview(reader.result);
-            };
-            reader.readAsDataURL(file);
+            const validTypes = ['image/jpeg', 'image/jpg', 'image/png'];
+            if (validTypes.includes(file.type)) {
+                setImage(file);
+                const reader = new FileReader();
+                reader.onloadend = () => {
+                    setImagePreview(reader.result);
+                };
+                reader.readAsDataURL(file);
+            } else {
+                toast.error('Invalid file type. Please upload an image (jpeg, jpg or png)');
+                console.error('Invalid file type. Please upload an image (jpeg, jpg or png)');
+            }
         }
     };
 
@@ -61,9 +71,14 @@ const EditCategoryModal = ({ open, onClose, category, onEditSuccess }) => {
                 <BrownOutlinedTextField
                     label="Name"
                     value={name}
-                    onChange={(e) => setName(e.target.value)}
+                    onChange={(e) => {
+                        setName(e.target.value)
+                        setIsValidName(validateName(e.target.value));
+                    }}
                     fullWidth
                     margin="normal"
+                    error={!isValidName}
+                    helperText={!isValidName ? 'Name must start with a capital letter and be 3-28 characters long' : ''}
                     className='!mb-4'
                 />
                 <OutlinedBrownButton
@@ -86,6 +101,7 @@ const EditCategoryModal = ({ open, onClose, category, onEditSuccess }) => {
                     onClick={handleEditCategory}
                     variant="contained"
                     color="primary"
+                    disabled={!isValidForm}
                     className="w-full"
                 >
                     Update

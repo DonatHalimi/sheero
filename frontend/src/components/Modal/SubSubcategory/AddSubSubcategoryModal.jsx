@@ -1,15 +1,20 @@
 import { Autocomplete, TextField } from '@mui/material';
 import React, { useEffect, useState } from 'react';
 import { toast } from 'react-toastify';
-import { BrownButton, BrownOutlinedTextField, CustomBox, CustomModal, CustomPaper, CustomTypography } from '../../../assets/CustomComponents';
-import useAxios from '../../../axiosInstance';
+import { BrownButton, BrownOutlinedTextField, CustomBox, CustomModal, CustomPaper, CustomTypography, handleApiError } from '../../../assets/CustomComponents';
+import useAxios from '../../../utils/axiosInstance';
 
 const AddSubSubcategoryModal = ({ open, onClose, onAddSuccess }) => {
     const [name, setName] = useState('');
+    const [isValidName, setIsValidName] = useState(true);
     const [subcategory, setSubcategory] = useState(null);
     const [subcategories, setSubcategories] = useState([]);
 
     const axiosInstance = useAxios();
+
+    const validateName = (v) => /^[A-Z][\sa-zA-Z\W]{3,27}$/.test(v);
+
+    const isValidForm = name && isValidName && subcategory;
 
     useEffect(() => {
         const fetchSubcategories = async () => {
@@ -28,7 +33,7 @@ const AddSubSubcategoryModal = ({ open, onClose, onAddSuccess }) => {
         };
 
         fetchSubcategories();
-    }, [axiosInstance]);
+    }, []);
 
     const handleAddSubSubcategory = async () => {
         if (!name || !subcategory) {
@@ -47,8 +52,7 @@ const AddSubSubcategoryModal = ({ open, onClose, onAddSuccess }) => {
             onAddSuccess(response.data);
             onClose();
         } catch (error) {
-            console.error('Error adding subsubcategory', error);
-            toast.error('Error adding subsubcategory');
+            handleApiError(error, 'Error updating subsubcategory');
         }
     };
 
@@ -60,8 +64,13 @@ const AddSubSubcategoryModal = ({ open, onClose, onAddSuccess }) => {
                 <BrownOutlinedTextField
                     label="Name"
                     value={name}
-                    onChange={(e) => setName(e.target.value)}
                     fullWidth
+                    onChange={(e) => {
+                        setName(e.target.value)
+                        setIsValidName(validateName(e.target.value))
+                    }}
+                    error={!isValidName}
+                    helperText={!isValidName ? 'Name must start with a capital letter and be 3-27 characters long' : ''}
                     className='!mb-4'
                 />
                 <Autocomplete
@@ -80,6 +89,7 @@ const AddSubSubcategoryModal = ({ open, onClose, onAddSuccess }) => {
                     onClick={handleAddSubSubcategory}
                     variant="contained"
                     color="primary"
+                    disabled={!isValidForm}
                     className="w-full"
                 >
                     Add

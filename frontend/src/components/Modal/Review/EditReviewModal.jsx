@@ -1,17 +1,24 @@
 import { InputLabel, MenuItem, Rating, Select, TextField } from '@mui/material';
 import React, { useEffect, useState } from 'react';
 import { toast } from 'react-toastify';
-import { BrownButton, BrownOutlinedTextField, CustomBox, CustomModal, CustomTypography, OutlinedBrownFormControl } from '../../../assets/CustomComponents';
-import useAxios from '../../../axiosInstance';
+import { BrownButton, BrownOutlinedTextField, CustomBox, CustomModal, CustomTypography, handleApiError, OutlinedBrownFormControl } from '../../../assets/CustomComponents';
+import useAxios from '../../../utils/axiosInstance';
 
 const EditReviewModal = ({ open, onClose, review, onEditSuccess }) => {
     const [title, setTitle] = useState('');
+    const [isValidTitle, setIsValidTitle] = useState(true);
     const [rating, setRating] = useState(null);
     const [comment, setComment] = useState('');
+    const [isValidComment, setIsValidComment] = useState(true);
     const [product, setProduct] = useState('');
     const [products, setProducts] = useState([]);
 
     const axiosInstance = useAxios();
+
+    const validateTitle = (v) => /^[A-Z][\Wa-zA-Z\s]{2,40}$/.test(v);
+    const validateComment = (v) => /^[A-Z][\Wa-zA-Z\s]{3,500}$/.test(v);
+
+    const isValidForm = isValidTitle && isValidComment && rating && product;
 
     useEffect(() => {
         const fetchProducts = async () => {
@@ -24,7 +31,7 @@ const EditReviewModal = ({ open, onClose, review, onEditSuccess }) => {
         };
 
         fetchProducts();
-    }, [axiosInstance]);
+    }, []);
 
     useEffect(() => {
         if (review) {
@@ -49,12 +56,7 @@ const EditReviewModal = ({ open, onClose, review, onEditSuccess }) => {
             onEditSuccess(response.data);
             onClose();
         } catch (error) {
-            console.error('Error editing review', error);
-            if (error.response && error.response.data.message) {
-                toast.error(error.response.data.message);
-            } else {
-                toast.error('Error editing review');
-            }
+            handleApiError(error, 'Error updating review');
         }
     };
 
@@ -79,11 +81,16 @@ const EditReviewModal = ({ open, onClose, review, onEditSuccess }) => {
                     </Select>
                 </OutlinedBrownFormControl>
 
-                <TextField
+                <BrownOutlinedTextField
                     label="Title"
                     value={title}
-                    onChange={(e) => setTitle(e.target.value)}
                     fullWidth
+                    onChange={(e) => {
+                        setTitle(e.target.value)
+                        setIsValidTitle(validateTitle(e.target.value))
+                    }}
+                    error={!isValidTitle}
+                    helperText={!isValidTitle ? 'Title must start with a capital letter and be 2-40 characters long' : ''}
                     className='!mb-4'
                 />
 
@@ -102,16 +109,22 @@ const EditReviewModal = ({ open, onClose, review, onEditSuccess }) => {
                 <BrownOutlinedTextField
                     label="Comment"
                     value={comment}
-                    onChange={(e) => setComment(e.target.value)}
                     multiline
                     rows={4}
                     fullWidth
+                    onChange={(e) => {
+                        setComment(e.target.value)
+                        setIsValidComment(validateComment(e.target.value))
+                    }}
+                    error={!isValidComment}
+                    helperText={!isValidComment ? 'Comment must start with a capital letter and be 3-500 characters long' : ''}
                     className='!mb-4'
                 />
 
                 <BrownButton
                     onClick={handleEditReview}
                     fullWidth
+                    disabled={!isValidForm}
                 >
                     Save Changes
                 </BrownButton>

@@ -3,19 +3,29 @@ import VisibilityOffIcon from '@mui/icons-material/VisibilityOff';
 import { IconButton, InputAdornment, InputLabel, MenuItem, Select } from '@mui/material';
 import React, { useEffect, useState } from 'react';
 import { toast } from 'react-toastify';
-import { BrownButton, BrownOutlinedTextField, CustomBox, CustomModal, CustomTypography, OutlinedBrownFormControl } from '../../../assets/CustomComponents';
-import useAxios from '../../../axiosInstance';
+import { BrownButton, BrownOutlinedTextField, CustomBox, CustomModal, CustomTypography, handleApiError, knownEmailProviders, OutlinedBrownFormControl } from '../../../assets/CustomComponents';
+import useAxios from '../../../utils/axiosInstance';
 
 const AddUserModal = ({ open, onClose, onAddSuccess }) => {
     const [firstName, setFirstName] = useState('');
+    const [isValidFirstName, setIsValidFirstName] = useState(true);
     const [lastName, setLastName] = useState('');
+    const [isValidLastName, setIsValidLastName] = useState(true);
     const [email, setEmail] = useState('');
+    const [isValidEmail, setIsValidEmail] = useState(true);
     const [password, setPassword] = useState('');
+    const [isValidPassword, setIsValidPassword] = useState(true);
     const [showPassword, setShowPassword] = useState(false);
     const [role, setRole] = useState('');
     const [roles, setRoles] = useState([]);
 
     const axiosInstance = useAxios();
+
+    const validateName = (v) => /^[A-Z][a-zA-Z\s]{2,10}$/.test(v);
+    const validateEmail = (v) => new RegExp(`^[a-zA-Z0-9._%+-]+@(${knownEmailProviders.join('|')})$`, 'i').test(v);
+    const validatePassword = (v) => /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[@$!%*?&\(\)_\+\-.])[A-Za-z\d@$!%*?&\(\)_\+\-.]{8,}$/.test(v);
+
+    const isValidForm = firstName && isValidFirstName && lastName && isValidLastName && email && isValidEmail && password && isValidPassword && role;
 
     useEffect(() => {
         const fetchRoles = async () => {
@@ -28,20 +38,10 @@ const AddUserModal = ({ open, onClose, onAddSuccess }) => {
         };
 
         fetchRoles();
-    }, [axiosInstance]);
+    }, []);
 
     const handleClickShowPassword = () => setShowPassword(!showPassword);
     const handleMouseDownPassword = () => setShowPassword(!showPassword);
-
-    const validatePassword = (password) => {
-        const passwordRegex = /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[@$!%*?&])[A-Za-z\d@$!%*?&]{8,}$/;
-        return passwordRegex.test(password);
-    };
-
-    const validateEmail = (email) => {
-        const re = /^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$/;
-        return re.test(String(email).toLowerCase());
-    };
 
     const handleAddUser = async () => {
         if (!firstName || !lastName || !email || !password || !role) {
@@ -73,8 +73,7 @@ const AddUserModal = ({ open, onClose, onAddSuccess }) => {
             onAddSuccess(response.data);
             onClose();
         } catch (error) {
-            console.error('Error adding user', error);
-            toast.error(error.response?.data?.message || 'Error adding user');
+            handleApiError(error, 'Error adding user');
         }
     };
 
@@ -86,31 +85,44 @@ const AddUserModal = ({ open, onClose, onAddSuccess }) => {
                 <BrownOutlinedTextField
                     label="First Name"
                     value={firstName}
-                    onChange={(e) => setFirstName(e.target.value)}
                     fullWidth
+                    onChange={(e) => {
+                        setFirstName(e.target.value)
+                        setIsValidFirstName(validateName(e.target.value))
+                    }}
+                    error={!isValidFirstName}
+                    helperText={!isValidFirstName ? 'First Name must start with a capital letter and be 2-10 characters long' : ''}
                     className="!mb-4"
                 />
                 <BrownOutlinedTextField
                     label="Last Name"
                     value={lastName}
-                    onChange={(e) => setLastName(e.target.value)}
                     fullWidth
+                    onChange={(e) => {
+                        setLastName(e.target.value)
+                        setIsValidLastName(validateName(e.target.value))
+                    }}
+                    error={!isValidLastName}
+                    helperText={!isValidLastName ? 'Last Name must start with a capital letter and be 2-10 characters long' : ''}
                     className="!mb-4"
                 />
                 <BrownOutlinedTextField
                     label="Email"
                     value={email}
-                    onChange={(e) => setEmail(e.target.value)}
                     fullWidth
-                    className='!mb-4'
                     type='email'
+                    onChange={(e) => {
+                        setEmail(e.target.value)
+                        setIsValidEmail(validateEmail(e.target.value))
+                    }}
+                    error={!isValidEmail}
+                    helperText={!isValidEmail ? 'Please enter a valid email address' : ''}
+                    className='!mb-4'
                 />
                 <BrownOutlinedTextField
                     label="Password"
                     value={password}
-                    onChange={(e) => setPassword(e.target.value)}
                     fullWidth
-                    className="!mb-4"
                     type={showPassword ? "text" : "password"}
                     InputProps={{
                         endAdornment: (
@@ -125,6 +137,13 @@ const AddUserModal = ({ open, onClose, onAddSuccess }) => {
                             </InputAdornment>
                         ),
                     }}
+                    onChange={(e) => {
+                        setPassword(e.target.value)
+                        setIsValidPassword(validatePassword(e.target.value))
+                    }}
+                    error={!isValidPassword}
+                    helperText={!isValidPassword ? 'Password must be at least 8 characters long, include at least one uppercase letter, one lowercase letter, one number, and one special character (@$!%*?()&)' : ''}
+                    className="!mb-4"
                 />
                 <OutlinedBrownFormControl fullWidth className="!mb-4">
                     <InputLabel>Role</InputLabel>
@@ -134,7 +153,7 @@ const AddUserModal = ({ open, onClose, onAddSuccess }) => {
                         onChange={(e) => setRole(e.target.value)}
                     >
                         {roles.map((role) => (
-                            <MenuItem key={role._id} value={role._id}>
+                            <MenuItem key={role._id} value={role._id.toString()}>
                                 {role.name}
                             </MenuItem>
                         ))}
@@ -145,6 +164,7 @@ const AddUserModal = ({ open, onClose, onAddSuccess }) => {
                     onClick={handleAddUser}
                     variant="contained"
                     color="primary"
+                    disabled={!isValidForm}
                     className="w-full"
                 >
                     Add

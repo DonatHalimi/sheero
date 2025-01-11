@@ -4,8 +4,9 @@
   "version": "0.0.0",
   "type": "module",
   "scripts": {
-    "dev": "vite --port 3000 --open",
-    "build": "vite build && cp public/_redirects dist/",
+    "check-env": "node ./src/utils/checkEnv.js",
+    "dev": "npm run check-env && vite --port 3000 --open",
+    "build": "npm run check-env && vite build && cp public/_redirects dist/",
     "lint": "eslint . --ext js,jsx --report-unused-disable-directives --max-warnings 0",
     "preview": "vite preview"
   },
@@ -18,7 +19,6 @@
     "@tailwindcss/aspect-ratio": "^0.4.2",
     "axios": "^1.7.2",
     "framer-motion": "^11.3.12",
-    "install": "^0.13.0",
     "jspdf": "^2.5.2",
     "jspdf-autotable": "^3.8.4",
     "npm": "^11.0.0",

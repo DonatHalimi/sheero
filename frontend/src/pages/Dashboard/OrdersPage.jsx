@@ -1,13 +1,13 @@
 import React, { useEffect, useState } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
-import { DashboardHeader, formatDate } from '../../assets/CustomComponents';
+import { DashboardHeader, formatDate, LoadingDataGrid } from '../../assets/CustomComponents';
 import DashboardTable from '../../components/Dashboard/DashboardTable';
 import DeleteModal from '../../components/Modal/DeleteModal';
 import EditOrderModal from '../../components/Modal/Order/EditOrderModal';
 import { getOrders } from '../../store/actions/dashboardActions';
 
 const OrdersPage = () => {
-    const { orders } = useSelector((state) => state.dashboard);
+    const { orders, loadingOrders } = useSelector((state) => state.dashboard);
     const dispatch = useDispatch();
 
     const [selectedOrder, setSelectedOrder] = useState(null);
@@ -60,6 +60,7 @@ const OrdersPage = () => {
         { key: 'totalAmount', label: 'Total Amount' },
         { key: 'paymentMethod', label: 'Payment Method' },
         { key: 'paymentStatus', label: 'Payment Status' },
+        { key: 'status', label: 'Delivery Status' },
         {
             key: 'arrivalDateRange',
             label: 'Delivery Date',
@@ -70,39 +71,47 @@ const OrdersPage = () => {
                 return `${startDate} - ${endDate}`;
             }
         },
-        { key: 'status', label: 'Delivery Status' },
         { key: 'actions', label: 'Actions' }
     ];
 
     return (
         <div className='container mx-auto max-w-screen-2xl px-4 mt-20'>
             <div className='flex flex-col items-center justify-center'>
-                <DashboardHeader
-                    title="Orders"
-                    selectedItems={selectedOrders}
-                    setDeleteItemOpen={setDeleteOrderOpen}
-                    itemName="Order"
-                />
+                {loadingOrders ? (
+                    <LoadingDataGrid />
+                ) : (
+                    <>
+                        <DashboardHeader
+                            title="Orders"
+                            selectedItems={selectedOrders}
+                            setDeleteItemOpen={setDeleteOrderOpen}
+                            itemName="Order"
+                        />
 
-                <DashboardTable
-                    columns={columns}
-                    data={orders}
-                    selectedItems={selectedOrders}
-                    onSelectItem={handleSelectOrder}
-                    onSelectAll={handleSelectAll}
-                    itemsPerPage={itemsPerPage}
-                    currentPage={currentPage}
-                    onPageChange={handlePageClick}
-                    onEdit={handleEdit}
-                    containerClassName="max-w-full"
-                />
+                        <DashboardTable
+                            columns={columns}
+                            data={orders}
+                            selectedItems={selectedOrders}
+                            onSelectItem={handleSelectOrder}
+                            onSelectAll={handleSelectAll}
+                            itemsPerPage={itemsPerPage}
+                            currentPage={currentPage}
+                            onPageChange={handlePageClick}
+                            onEdit={handleEdit}
+                            containerClassName="max-w-full"
+                        />
+                    </>
+                )}
 
                 <EditOrderModal open={editOrderOpen} onClose={() => setEditOrderOpen(false)} order={selectedOrder} onEditSuccess={() => dispatch(getOrders())} />
                 <DeleteModal
                     open={deleteOrderOpen}
                     onClose={() => setDeleteOrderOpen(false)}
                     items={selectedOrders.map(id => orders.find(order => order._id === id)).filter(order => order)}
-                    onDeleteSuccess={() => dispatch(getOrders())}
+                    onDeleteSuccess={() => {
+                        dispatch(getOrders())
+                        setSelectedOrders([])
+                    }}
                     endpoint="/orders/delete-bulk"
                     title="Delete Orders"
                     message="Are you sure you want to delete the selected orders?"

@@ -1,7 +1,8 @@
 import { Paper } from '@mui/material';
 import { DataGrid } from '@mui/x-data-grid';
 import React from 'react';
-import { ActionButton, BrownCreateOutlinedIcon, CustomNoRowsOverlay, CustomToolbar, DashboardTableStyling } from '../../assets/CustomComponents';
+import { ActionButton, BrownCreateOutlinedIcon, CustomNoRowsOverlay, CustomToolbar } from '../../assets/CustomComponents';
+import { dashboardTableSx } from '../../assets/sx';
 
 const getNestedValue = (obj, path) => {
     return path.split('.').reduce((acc, part) => acc && acc[part], obj);
@@ -81,8 +82,8 @@ const DashboardTable = ({
         <>
             {renderTableActions && renderTableActions()}
             <Paper
-                className={containerClassName || 'max-w-screen-2xl mx-auto'}
                 style={{ height: 'auto', width: '100%', boxShadow: '0 1px 2px 0 rgb(0 0 0 / 0.05)' }}
+                className={`${containerClassName || 'max-w-screen-2xl mx-auto'} mb-20`}
             >
                 <DataGrid
                     rows={gridRows}
@@ -106,7 +107,7 @@ const DashboardTable = ({
                         noRowsOverlay: CustomNoRowsOverlay,
                     }}
                     sx={{
-                        ...DashboardTableStyling,
+                        ...dashboardTableSx,
                     }}
                 />
             </Paper>

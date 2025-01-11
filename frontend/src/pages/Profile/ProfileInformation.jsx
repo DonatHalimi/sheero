@@ -50,7 +50,7 @@ const ProfileInformation = () => {
 
     const validateFirstName = (name) => /^[A-Z][a-zA-Z]{1,9}$/.test(name);
     const validateLastName = (name) => /^[A-Z][a-zA-Z]{1,9}$/.test(name);
-    const validatePassword = password => /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[@$!%*?&])[A-Za-z\d@$!%*?&]{8,}$/.test(password);
+    const validatePassword = (v) => /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[@$!%*?&\(\)_\+\-.])[A-Za-z\d@$!%*?&\(\)_\+\-.]{8,}$/.test(v);
     const validateEmail = (email) => {
         const regex = new RegExp(`^[a-zA-Z0-9._%+-]+@(${knownEmailProviders.join('|')})$`, 'i');
         return regex.test(email);
@@ -102,10 +102,11 @@ const ProfileInformation = () => {
         }
 
         try {
-            const result = dispatch(updateUserProfile(updatedData));
+            const result = await dispatch(updateUserProfile(updatedData));
 
             if (result.success) {
                 toast.success('Profile updated successfully!');
+                window.location.reload();
             } else {
                 toast.error(result.error || 'Profile update failed');
             }

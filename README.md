@@ -21,8 +21,8 @@ To set up the project locally, follow these steps:
 
 1. Clone the repository:
    ```bash
-   git clone <repository-url>
-   cd <project-directory>
+   git clone repository_url
+   cd project_directory
    ```
 
 2. Install the backend dependencies:
@@ -33,26 +33,39 @@ To set up the project locally, follow these steps:
 
 3. Install the frontend dependencies:
    ```bash
-   cd client
+   cd frontend
    npm i
    ```
 
-4. Create a `.env` file in both the `server` and `client` directories to store environment variables:
+4. Create a `.env` file in both the `server` and `frontend` directories to store environment variables:
 
    **Backend (`backend/.env`)**
    ```bash
    BACKEND_PORT=5000
-   MONGO_URI=<your_mongodb_uri>
-   JWT_SECRET=<your_jwt_secret>
-   JWT_REFRESH_SECRET=<your_jwt_refresh_secret>
-   STRIPE_SECRET_KEY=<your_stripe_secret_key>
+   MONGO_URI=your_mongodb_uri
+   JWT_SECRET=your_jwt_secret
+   STRIPE_SECRET_KEY=sk_test_XXXXXXXXXXXXXXXX
    NODE_ENV=development
+   SEED_DB=true
+   ADMIN_FIRST_NAME=Admin
+   ADMIN_LAST_NAME=User
+   ADMIN_EMAIL=admin@gmail.com
+   ADMIN_PASSWORD=WqFpq%!QLsQt4
    ```
 
-   **Frontend (`client/.env`)**
+   **Frontend (`frontend/.env`)**
    ```bash
    NODE_ENV=development
    ```
+
+   ### ``.env`` explanations
+  - **BACKEND_PORT**: The port on which the backend server will run (e.g., 5000).
+  - **MONGO_URI**: The connection string for your MongoDB database.
+  - **JWT_SECRET**: A secret key used for signing JSON Web Tokens.
+  - **STRIPE_SECRET_KEY**: Your Stripe API secret key for payment processing.
+  - **NODE_ENV**: The environment in which the app is running (`development` or `production`).
+  - **SEED_DB**: Set to `true` to enable initial database seeding (e.g., creating the default roles and the admin user). Useful for the first-time setup or resetting the database. Leave it empty or set to `false` to skip seeding.
+  - **ADMIN_FIRST_NAME**, **ADMIN_LAST_NAME**, **ADMIN_EMAIL**, **ADMIN_PASSWORD**: Credentials for the default admin user to be created during database seeding.
 
 5. Start the backend server:
    ```bash
@@ -62,7 +75,7 @@ To set up the project locally, follow these steps:
 
 6. Start the frontend application:
    ```bash
-   cd client
+   cd frontend
    npm run dev
    ```
 
@@ -71,6 +84,30 @@ To set up the project locally, follow these steps:
    npm i
    npm start
    ```
+
+The root `package.json` should look like this:
+
+```json
+{
+  "name": "sheero",
+  "version": "1.0.0",
+  "description": "",
+  "main": "index.js",
+  "scripts": {
+    "start": "concurrently --kill-others \"npm run start-frontend\" \"npm run start-backend\"",
+    "start-frontend": "cd frontend && npm run dev",
+    "start-backend": "cd backend && npm run dev"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "dependencies": {
+    "concurrently": "^9.1.0"
+  }
+}
+``` 
+
+After running ``npm start`` in the backend directory, the application will automatically seed the database with default roles and an admin user (using the credentials from the ``.env`` file) based on the SEED_DB environment variable, ensuring a quick and easy setup for initial use.
 
 ## Usage
 
@@ -82,12 +119,11 @@ Once the application is running, you can access it in your web browser at `http:
 - State management with Redux for handling application state
 - Address management for shipping
 - Product management with categories
-- Wishlist for saving favorite products
+- Wishlist for saving your favorite products
 - Shopping cart functionality
 - Simple payment options with Stripe or cash
 - Real-time order tracking for updates on your purchases
-- Users can submit return requests for specific product(s) from an order if the status is marked as `Delivered`
-- Reviews and ratings for products
+- Users can submit reviews and request returns for products in orders with the status marked as ``Delivered``
 
 ### Technologies Used
 
@@ -117,6 +153,9 @@ The frontend is built with modern web technologies that focus on UI/UX, routing,
     "@tailwindcss/aspect-ratio": "^0.4.2",
     "axios": "^1.7.2",
     "framer-motion": "^11.3.12",
+    "jspdf": "^2.5.2",
+    "jspdf-autotable": "^3.8.4",
+    "npm": "^11.0.0",
     "react": "^18.3.1",
     "react-dom": "^18.3.1",
     "react-intersection-observer": "^9.13.1",
@@ -187,7 +226,6 @@ The backend is a Node.js API server designed to handle requests, manage authenti
 }
 ```
 - [**Bcrypt.js**](https://www.npmjs.com/package/bcryptjs): A hashing library for securely storing and comparing user passwords.
-
 - [**Cookie Parser**](https://www.npmjs.com/package/cookie-parser): Middleware for parsing cookies in HTTP requests, making it easier to work with cookies in a Node.js application, especially for handling session data or authentication tokens
 - [**CORS**](https://www.npmjs.com/package/cors): Middleware for enabling Cross-Origin Resource Sharing, allowing frontend access from different domains.
 - [**Express.js**](https://www.npmjs.com/package/express): A minimalist web framework for Node.js, making it easy to set up routes and middleware.

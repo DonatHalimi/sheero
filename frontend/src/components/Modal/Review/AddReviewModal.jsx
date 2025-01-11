@@ -1,18 +1,25 @@
 import { FormControl, InputLabel, MenuItem, Rating, Select, TextField } from '@mui/material';
 import React, { useEffect, useState } from 'react';
 import { toast } from 'react-toastify';
-import { BrownButton, BrownOutlinedTextField, CustomBox, CustomModal, CustomTypography } from '../../../assets/CustomComponents';
-import useAxios from '../../../axiosInstance';
+import { BrownButton, BrownOutlinedTextField, CustomBox, CustomModal, CustomTypography, handleApiError } from '../../../assets/CustomComponents';
+import useAxios from '../../../utils/axiosInstance';
 
 const AddReviewModal = ({ open, onClose, onAddSuccess }) => {
     const [title, setTitle] = useState('');
+    const [isValidTitle, setIsValidTitle] = useState(true);
     const [rating, setRating] = useState(0);
     const [comment, setComment] = useState('');
+    const [isValidComment, setIsValidComment] = useState(true);
     const [productId, setProductId] = useState(null);
     const [products, setProducts] = useState([]);
     const [userReviews, setUserReviews] = useState([]);
 
     const axiosInstance = useAxios();
+
+    const validateTitle = (v) => /^[A-Z][\Wa-zA-Z\s]{2,40}$/.test(v);
+    const validateComment = (v) => /^[A-Z][\Wa-zA-Z\s]{3,500}$/.test(v);
+
+    const isValidForm = isValidTitle && rating && isValidComment && productId;
 
     useEffect(() => {
         const fetchProducts = async () => {
@@ -35,7 +42,7 @@ const AddReviewModal = ({ open, onClose, onAddSuccess }) => {
 
         fetchProducts();
         fetchUserReviews();
-    }, [axiosInstance]);
+    }, []);
 
     const handleAddReview = async () => {
         if (!title || rating < 1 || rating > 5 || !productId) {
@@ -63,8 +70,7 @@ const AddReviewModal = ({ open, onClose, onAddSuccess }) => {
             onAddSuccess(response.data);
             onClose();
         } catch (error) {
-            console.error('Error adding review', error);
-            toast.error('Error adding review');
+            handleApiError(error, 'Error adding review');
         }
     };
 
@@ -89,11 +95,16 @@ const AddReviewModal = ({ open, onClose, onAddSuccess }) => {
                     </Select>
                 </FormControl>
 
-                <TextField
+                <BrownOutlinedTextField
                     label="Title"
                     value={title}
-                    onChange={(e) => setTitle(e.target.value)}
                     fullWidth
+                    onChange={(e) => {
+                        setTitle(e.target.value)
+                        setIsValidTitle(validateTitle(e.target.value));
+                    }}
+                    error={!isValidTitle}
+                    helperText={!isValidTitle ? 'Title must start with a capital letter and contain at least 3 characters' : ''}
                     className='!mb-4'
                 />
 
@@ -112,10 +123,15 @@ const AddReviewModal = ({ open, onClose, onAddSuccess }) => {
                 <BrownOutlinedTextField
                     label="Comment"
                     value={comment}
-                    onChange={(e) => setComment(e.target.value)}
                     multiline
                     rows={4}
                     fullWidth
+                    onChange={(e) => {
+                        setComment(e.target.value)
+                        setIsValidComment(validateComment(e.target.value));
+                    }}
+                    error={!isValidComment}
+                    helperText={!isValidComment ? 'Comment must start with a capital letter and be 3-500 characters long' : ''}
                     className='!mb-4'
                 />
 
@@ -123,6 +139,7 @@ const AddReviewModal = ({ open, onClose, onAddSuccess }) => {
                     onClick={handleAddReview}
                     variant="contained"
                     color="primary"
+                    disabled={!isValidForm}
                     className="w-full"
                 >
                     Add

@@ -1,17 +1,23 @@
 import UploadIcon from '@mui/icons-material/Upload';
 import React, { useEffect, useState } from 'react';
 import { toast } from 'react-toastify';
-import { BrownButton, BrownOutlinedTextField, CustomBox, CustomModal, CustomTypography, OutlinedBrownButton, VisuallyHiddenInput } from '../../../assets/CustomComponents';
-import useAxios from '../../../axiosInstance';
-import { getImageUrl } from '../../../config';
+import { BrownButton, BrownOutlinedTextField, CustomBox, CustomModal, CustomTypography, handleApiError, OutlinedBrownButton, VisuallyHiddenInput } from '../../../assets/CustomComponents';
+import useAxios from '../../../utils/axiosInstance';
+import { getImageUrl } from '../../../utils/config';
 
 const EditSlideshowModal = ({ open, onClose, image, onEditSuccess }) => {
     const [title, setTitle] = useState('');
+    const [isValidTitle, setIsValidTitle] = useState(true);
     const [description, setDescription] = useState('');
+    const [isValidDescription, setIsValidDescription] = useState(true);
     const [newImage, setNewImage] = useState(null);
     const [imagePreview, setImagePreview] = useState('');
 
     const axiosInstance = useAxios();
+
+    const isValid = (v) => /^[A-Z][\sa-zA-Z\W]{3,15}$/.test(v);
+
+    const isValidForm = title && isValidTitle && description && isValidDescription && (newImage || image.image);
 
     useEffect(() => {
         if (image) {
@@ -43,20 +49,25 @@ const EditSlideshowModal = ({ open, onClose, image, onEditSuccess }) => {
             onEditSuccess(response.data);
             onClose();
         } catch (error) {
-            console.error('Error updating slideshow image', error);
-            toast.error('Error updating slideshow image');
+            handleApiError(error, 'Error updating image');
         }
     };
 
     const handleImageChange = (e) => {
         const file = e.target.files[0];
-        setNewImage(file);
         if (file) {
-            const reader = new FileReader();
-            reader.onloadend = () => {
-                setImagePreview(reader.result);
-            };
-            reader.readAsDataURL(file);
+            const validTypes = ['image/jpeg', 'image/jpg', 'image/png'];
+            if (validTypes.includes(file.type)) {
+                setNewImage(file);
+                const reader = new FileReader();
+                reader.onloadend = () => {
+                    setImagePreview(reader.result);
+                };
+                reader.readAsDataURL(file);
+            } else {
+                toast.error('Invalid file type. Please upload an image (jpeg, jpg, or png)');
+                console.error('Invalid file type. Please upload an image (jpeg, jpg, or png)');
+            }
         }
     };
 
@@ -68,17 +79,27 @@ const EditSlideshowModal = ({ open, onClose, image, onEditSuccess }) => {
                 <BrownOutlinedTextField
                     label="Title"
                     value={title}
-                    onChange={(e) => setTitle(e.target.value)}
                     fullWidth
                     margin="normal"
+                    onChange={(e) => {
+                        setTitle(e.target.value);
+                        setIsValidTitle(isValid(e.target.value));
+                    }}
+                    error={!isValidTitle}
+                    helperText={!isValidTitle ? 'Title must start with a capital letter and be 3-15 characters long' : ''}
                     className='!mb-4'
                 />
                 <BrownOutlinedTextField
                     label="Description"
                     value={description}
-                    onChange={(e) => setDescription(e.target.value)}
                     fullWidth
                     margin="normal"
+                    onChange={(e) => {
+                        setDescription(e.target.value);
+                        setIsValidDescription(isValid(e.target.value));
+                    }}
+                    error={!isValidDescription}
+                    helperText={!isValidDescription ? 'Description must start with a capital letter and be 3-15 characters long' : ''}
                     className='!mb-4'
                 />
                 <OutlinedBrownButton
@@ -101,6 +122,7 @@ const EditSlideshowModal = ({ open, onClose, image, onEditSuccess }) => {
                     onClick={handleEditImage}
                     variant="contained"
                     color="primary"
+                    disabled={!isValidForm}
                     className="w-full"
                 >
                     Update

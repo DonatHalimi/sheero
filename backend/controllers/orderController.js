@@ -1,14 +1,12 @@
 const Address = require('../models/Address');
 const Order = require('../models/Order');
-const dotenv = require('dotenv');
 const Stripe = require('stripe');
 const Cart = require('../models/Cart');
+const { STRIPE_SECRET_KEY, NODE_ENV } = require('../config/dotenv');
 
-dotenv.config();
+const stripe = Stripe(STRIPE_SECRET_KEY);
 
-const stripe = Stripe(process.env.STRIPE_SECRET_KEY);
-
-const frontendUrl = process.env.NODE_ENV === 'production' ? 'https://sheero.onrender.com' : 'http://localhost:3000';
+const frontendUrl = NODE_ENV === 'production' ? 'https://sheero.onrender.com' : 'http://localhost:3000';
 
 const payWithStripe = async (req, res) => {
     try {
@@ -133,7 +131,7 @@ const verifyOrder = async (req, res) => {
 
 const payWithCash = async (req, res) => {
     const { cartId, addressId, userId } = req.body;
-    
+
     try {
         const cart = await Cart.findById(cartId).populate('items.product');
         const address = await Address.findById(addressId)
@@ -187,7 +185,8 @@ const getAllOrders = async (req, res) => {
         const orders = await Order.find()
             .populate('user', 'firstName lastName email')
             .populate('products.product', 'name price')
-            .populate('address', 'name street phoneNumber city country');
+            .populate('address', 'name street phoneNumber city country')
+            .sort({ createdAt: -1 });
 
         res.json(orders);
     } catch (error) {
@@ -198,7 +197,7 @@ const getAllOrders = async (req, res) => {
 
 const getUserOrders = async (req, res) => {
     const userId = req.params.userId;
-    
+
     try {
         const orders = await Order.find({ user: userId })
             .populate('products.product', 'name price image')
@@ -219,7 +218,7 @@ const getUserOrders = async (req, res) => {
 
 const getOrderById = async (req, res) => {
     const { orderId } = req.params;
-    
+
     try {
         const order = await Order.findById(orderId)
             .populate('products.product', 'name price image')
@@ -245,7 +244,7 @@ const getOrderById = async (req, res) => {
 
 const updateDeliveryStatus = async (req, res) => {
     const { orderId, status, paymentStatus } = req.body;
-    
+
     try {
         if (!orderId || !status) {
             return res.status(400).json({ success: false, message: 'orderId and status are required.' });

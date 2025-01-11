@@ -38,7 +38,7 @@ const Login = () => {
     const validateField = (name, value) => {
         const rules = {
             email: new RegExp(`^[a-zA-Z0-9._%+-]+@(${knownEmailProviders.join('|')})$`, 'i'),
-            password: /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[@$!%*?&])[A-Za-z\d@$!%*?&]{8,}$/,
+            password: /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[@$!%*?&\(\)_\+\-.])[A-Za-z\d@$!%*?&\(\)_\+\-.]{8,}$/,
         };
         return rules[name]?.test(value);
     };
@@ -84,7 +84,7 @@ const Login = () => {
         }
 
         try {
-            const response = dispatch(loginUser(email, password));
+            const response = await dispatch(loginUser(email, password));
 
             if (response?.success) {
                 toast.success('Login successful');

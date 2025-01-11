@@ -68,6 +68,18 @@
     background-color: #FFFFFF;
 }
 
+.custom-scrollbar {
+    overflow-x: hidden;
+}
+
+.custom-scrollbar::-webkit-scrollbar:horizontal {
+    height: 0px;
+}
+
+.custom-scrollbar::-webkit-scrollbar {
+    width: 0px;
+}
+
 img {
     user-select: none;
 }

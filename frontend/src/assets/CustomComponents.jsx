@@ -90,45 +90,47 @@ import { styled } from '@mui/material/styles';
 import { GridToolbar } from '@mui/x-data-grid';
 import { Splide, SplideSlide } from '@splidejs/react-splide';
 import { AnimatePresence, motion } from 'framer-motion';
+import { jsPDF } from "jspdf";
+import "jspdf-autotable";
 import PropTypes from 'prop-types';
 import React, { forwardRef, useEffect, useRef, useState } from 'react';
+import { useSelector } from 'react-redux';
 import { Link as RouterLink, useLocation, useNavigate } from 'react-router-dom';
+import { toast } from 'react-toastify';
 import Navbar from '../components/Navbar/Navbar';
-import { getImageUrl } from '../config';
+import ProductItem from '../components/Product/Items/ProductItem';
+import Footer from '../components/Utils/Footer';
+import { getImageUrl } from '../utils/config';
 import logo from './img/brand/logo.png';
 import {
     customMenuProps,
-    filterLayoutStyling,
+    dashboardTitleSx,
+    filterLayoutSx,
     getExpandIconProps,
     getMotionDivProps,
-    goBackButtonStyling,
-    headerFilterStyling,
-    headerSearchStyling,
-    layoutContainerStyle,
-    paginationStackStyling,
+    goBackButtonSx,
+    headerFilterSx,
+    headerSearchSx,
+    layoutContainerSx,
+    paginationStackSx,
     paginationStyling,
-    profileLayoutStyling,
-    reviewCommentStyling,
-    reviewContainerStyling,
-    reviewContentStyling,
-    reviewImageStyling,
-    reviewTextAreaStyling,
-    reviewTitleContainerStyling,
-    reviewTitleStyling,
-    searchBarInputStyling,
-    searchDropdownImageStyling,
-    searchDropdownItemStyling,
-    searchDropdownStyling,
-    sidebarLayoutStyling,
-    slideShowSkeletonStyling
+    profileLayoutSx,
+    reviewCommentSx,
+    reviewContainerSx,
+    reviewContentSx,
+    reviewImageSx,
+    reviewTextAreaSx,
+    reviewTitleContainerSx,
+    reviewTitleSx,
+    searchBarInputSx,
+    searchDropdownImageSx,
+    searchDropdownItemSx,
+    searchDropdownSx,
+    sidebarLayoutSx,
+    slideShowSkeletonSx
 } from './sx';
-import { useSelector } from 'react-redux';
-const ProductItem = React.lazy(() => import('../components/Product/Items/ProductItem'));
 const FilterSidebar = React.lazy(() => import('../components/Product/Utils/FilterSidebar'));
-const Footer = React.lazy(() => import('../components/Utils/Footer'));
 const ProfileSidebar = React.lazy(() => import('../pages/Profile/ProfileSidebar'));
-import { jsPDF } from "jspdf";
-import "jspdf-autotable";
 
 /**
  * @file CustomComponents.jsx
@@ -138,7 +140,18 @@ import "jspdf-autotable";
  * @module CustomComponents
  */
 
-export const BrownOutlinedTextField = styled(TextField)({
+export const BrownOutlinedTextField = styled((props) => (
+    <TextField
+        {...props}
+        FormHelperTextProps={{
+            sx: {
+                marginLeft: 0,
+                ...(props?.FormHelperTextProps?.sx || {}),
+            },
+            ...props.FormHelperTextProps,
+        }}
+    />
+))({
     '& .MuiOutlinedInput-root': {
         '&.Mui-focused fieldset': {
             borderColor: '#7C7164',
@@ -222,7 +235,7 @@ export const OutlinedBrownFormControl = styled(FormControl)({
     },
 });
 
-const drawerWidth = 240;
+export const drawerWidth = 250;
 
 export const AppBar = styled(MuiAppBar, {
     shouldForwardProp: (prop) => prop !== 'open',
@@ -269,11 +282,12 @@ export const Drawer = styled(MuiDrawer, { shouldForwardProp: (prop) => prop !== 
     })
 );
 
-export const ActiveListItemButton = styled(ListItemButton)(({ selected }) => ({
+export const ActiveListItemButton = styled(ListItemButton, { shouldForwardProp: (prop) => prop !== 'isMainPage' })(({ selected, isMainPage = false }) => ({
     backgroundColor: selected ? '#7C7164' : 'white',
     color: selected ? 'black' : 'inherit',
     borderRight: selected ? '4px solid #7C7164' : '',
     borderRadius: '6px',
+    paddingLeft: isMainPage ? '16px !important' : '28px',
     '&:hover': {
         backgroundColor: selected ? '#7C7164' : '#F8F8F8',
     },
@@ -429,7 +443,7 @@ export const RoundIconButton = styled(IconButton)(({ theme }) => ({
     height: '40px',
 }));
 
-export const ProfileButton = styled(IconButton)(({ theme, isDropdownOpen }) => ({
+export const ProfileButton = styled(IconButton, { shouldForwardProp: (prop) => prop !== 'isDropdownOpen', })(({ theme, isDropdownOpen }) => ({
     color: 'black',
     width: '100px',
     height: '40px',
@@ -502,26 +516,6 @@ export const CustomReturnIcon = ({ isActive }) => <MoveToInbox style={{ color: i
 export const CustomWishlistIcon = ({ isActive }) => <Favorite style={{ color: isActive ? activeColor : 'inherit' }} />;
 export const CustomReviewsIcon = ({ isActive }) => <Star style={{ color: isActive ? activeColor : 'inherit' }} />;
 
-export const DashboardTableStyling = {
-    border: 'none',
-    '& .MuiDataGrid-main': {
-        border: 'none',
-    },
-    '& .MuiDataGrid-columnHeader:focus': {
-        outline: 'none',
-    },
-    '& .MuiDataGrid-columnHeader:focus-within': {
-        outline: 'none',
-    },
-    '& .MuiDataGrid-cell:focus': {
-        outline: 'none',
-    },
-    '& .MuiDataGrid-cell:focus-within': {
-        outline: 'none',
-    },
-    '--DataGrid-overlayHeight': '300px',
-};
-
 export const WaveSkeleton = (props) => <Skeleton animation="wave" {...props} />;
 
 // Loading skeletons start
@@ -585,9 +579,9 @@ export const LoadingSlideshow = () => (
     <Box className="relative w-full mx-auto mb-14 flex justify-center items-center">
         <WaveSkeleton variant="rectangular" width="100%" height="800px" sx={{ maxWidth: '1920px', maxHeight: '500px', borderRadius: '8px' }} />
 
-        <WaveSkeleton variant="circular" width={50} height={50} sx={{ ...slideShowSkeletonStyling, left: '20px' }} />
+        <WaveSkeleton variant="circular" width={50} height={50} sx={{ ...slideShowSkeletonSx, left: '20px' }} />
 
-        <WaveSkeleton variant="circular" width={50} height={50} sx={{ ...slideShowSkeletonStyling, right: '20px', left: 'auto' }} />
+        <WaveSkeleton variant="circular" width={50} height={50} sx={{ ...slideShowSkeletonSx, right: '20px', left: 'auto' }} />
     </Box>
 );
 
@@ -942,6 +936,66 @@ export const LoadingCategoryDropdown = () => (
     </div>
 );
 
+export const LoadingDataGrid = () => {
+    const rows = Array(10).fill(null);
+    const columns = Array(6).fill({ width: [280, 220, 280, 220, 280, 110] });
+
+    return (
+        <>
+            {/* Actions Header */}
+            <div className="bg-white p-4 flex items-center justify-between w-full mb-4 rounded-md">
+                <WaveSkeleton variant="text" width="10%" height={25} />
+                <WaveSkeleton variant="rectangular" width="6%" height={25} className="rounded-md mr-3" />
+            </div>
+
+            <div className="bg-white p-4 rounded-md">
+                {/* Table Header */}
+                <div className="flex justify-end items-center pb-4 border-b gap-3">
+                    {[...Array(4)].map((_, i) => (
+                        <WaveSkeleton
+                            key={`header-${i}`}
+                            variant="rectangular"
+                            width={60}
+                            height={25}
+                            className="rounded-md"
+                        />
+                    ))}
+                </div>
+
+                {/* Table Rows */}
+                {rows.map((_, rowIdx) => (
+                    <div key={rowIdx} className="flex gap-4 border-b py-3">
+                        {columns[0].width.map((width, colIdx) => (
+                            <WaveSkeleton
+                                key={`row-${rowIdx}-col-${colIdx}`}
+                                variant="rectangular"
+                                width={width}
+                                height={25}
+                                className="rounded-md"
+                            />
+                        ))}
+                    </div>
+                ))}
+
+                {/* Footer */}
+                <div className="flex justify-end items-center mt-1 pt-4 gap-3">
+                    <WaveSkeleton variant="rectangular" width={150} height={25} className="rounded" />
+                    <WaveSkeleton variant="rectangular" width={50} height={25} className="rounded" />
+                    {[...Array(2)].map((_, i) => (
+                        <WaveSkeleton
+                            key={`footer-${i}`}
+                            variant="circular"
+                            width={25}
+                            height={25}
+                            className="rounded"
+                        />
+                    ))}
+                </div>
+            </div>
+        </>
+    );
+};
+
 export const LoadingInformation = ({ showAdditionalField }) => {
     return (
         <Box className='space-y-0'>
@@ -1026,8 +1080,13 @@ export const CollapsibleListItem = ({ open, handleClick, icon, primary, children
     </>
 );
 
-export const ActiveListItem = ({ icon, primary, handleClick, selected, sx }) => (
-    <ActiveListItemButton onClick={handleClick} selected={selected} sx={sx}>
+export const ActiveListItem = ({ icon, primary, handleClick, selected, sx, isMainPage = false }) => (
+    <ActiveListItemButton
+        onClick={handleClick}
+        selected={selected}
+        isMainPage={isMainPage}
+        sx={sx}
+    >
         <ListItemIcon>{icon}</ListItemIcon>
         <ListItemText primary={primary} />
     </ActiveListItemButton>
@@ -1138,7 +1197,7 @@ export const DiscountPercentage = ({ discountPercentage }) => {
     }
 
     return null;
-}
+};
 
 export const RatingStars = ({ rating }) => {
     const stars = Array(5).fill(false).map((_, index) => index < rating);
@@ -1157,7 +1216,7 @@ export function HomeBreadCrumb(props) {
             <path d="M10 20v-6h4v6h5v-8h3L12 3 2 12h3v8z" />
         </SvgIcon>
     );
-}
+};
 
 export const HomeIcon = () => {
     const navigate = useNavigate();
@@ -1217,25 +1276,22 @@ export function CustomNoRowsOverlay() {
             <Box className='mt-4 font-bold text-stone-500'>No rows found</Box>
         </StyledGridOverlay>
     );
-}
+};
 
 export const BounceAnimation = forwardRef(({ children }, ref) => (
     <motion.div
         ref={ref}
         initial={{
             y: "100%",
-            opacity: 0,
-            filter: "blur(10px)"
+            opacity: 0
         }}
         animate={{
             y: 0,
-            opacity: 1,
-            filter: "blur(0px)"
+            opacity: 1
         }}
         exit={{
             y: "100%",
-            opacity: 0,
-            filter: "blur(10px)"
+            opacity: 0
         }}
         transition={{
             type: "spring",
@@ -1271,7 +1327,7 @@ export const CustomBox = (props) => (
 );
 
 export const CustomTypography = (props) => (
-    <Typography className="!text-xl !font-bold !mb-2" {...props} />
+    <Typography className="!text-xl !font-bold !mb-3" {...props} />
 );
 
 export const CustomDeleteModal = ({ open, onClose, onDelete, title, message }) => (
@@ -1432,7 +1488,7 @@ export const GoBackHome = () => {
             to="/"
             variant="contained"
             color="primary"
-            sx={goBackButtonStyling}
+            sx={goBackButtonSx}
         >
             <ArrowBack />
             <Typography variant="button" sx={{ color: 'white' }}>
@@ -1440,6 +1496,14 @@ export const GoBackHome = () => {
             </Typography>
         </BrownButton>
     );
+};
+
+export const handleApiError = (error, defaultMessage) => {
+    if (error.response?.data?.errors) {
+        error.response.data.errors.forEach(err => toast.error(err.message));
+    } else {
+        toast.error(defaultMessage);
+    }
 };
 
 export const ErrorPage = ({ errorType, imageSrc }) => {
@@ -1507,10 +1571,10 @@ export const ReviewsList = ({ reviews, openModal }) => {
                             </p>
                             <RatingStars rating={review.rating} />
                         </Box>
-                        <p style={reviewTitleStyling}>
+                        <p style={reviewTitleSx}>
                             {review.title}
                         </p>
-                        <p style={reviewCommentStyling}>
+                        <p style={reviewCommentSx}>
                             {review.comment}
                         </p>
                         <Typography variant="caption" color="text.secondary">
@@ -1533,10 +1597,10 @@ export const ReviewModal = ({ open, handleClose, selectedReview, onImageClick })
             aria-labelledby="review-modal-title"
             aria-describedby="review-modal-description"
         >
-            <Box sx={reviewContainerStyling}>
+            <Box sx={reviewContainerSx}>
                 {selectedReview && selectedReview.user && (
                     <Box sx={{ display: 'flex', flex: 1, flexDirection: { xs: 'column', sm: 'row' } }}>
-                        <Box sx={reviewImageStyling}>
+                        <Box sx={reviewImageSx}>
                             <img
                                 src={getImageUrl(selectedReview.product.image)}
                                 alt={selectedReview.product.name}
@@ -1546,7 +1610,7 @@ export const ReviewModal = ({ open, handleClose, selectedReview, onImageClick })
                             />
                         </Box>
 
-                        <Box sx={reviewContentStyling}>
+                        <Box sx={reviewContentSx}>
                             <Box sx={{ display: 'flex', alignItems: 'flex-end', mb: 2 }}>
                                 <Box sx={{ flexGrow: 1 }}>
                                     <Typography id="review-modal-title" variant="h6" component="h2" mb={1} sx={{ fontSize: { xs: '1rem', sm: '1.25rem' }, textAlign: 'justify' }}>
@@ -1563,14 +1627,14 @@ export const ReviewModal = ({ open, handleClose, selectedReview, onImageClick })
                                         </span>
                                     </Typography>
 
-                                    <Box sx={reviewTitleContainerStyling}>
+                                    <Box sx={reviewTitleContainerSx}>
                                         {selectedReview.title}
                                     </Box>
 
                                     <textarea
                                         value={selectedReview.comment}
                                         readOnly
-                                        style={reviewTextAreaStyling}
+                                        style={reviewTextAreaSx}
                                         onFocus={(e) => e.target.style.border = 'none'}
                                         className="custom-textarea break-words"
                                     />
@@ -1613,7 +1677,7 @@ export const CustomPagination = ({ count, page, onChange, size = 'large', sx = {
     if (!paginationEnabled) return null;
 
     return (
-        <Stack spacing={2} sx={paginationStackStyling(sx)}>
+        <Stack spacing={2} sx={paginationStackSx(sx)}>
             <Pagination
                 count={count}
                 page={page}
@@ -1635,6 +1699,7 @@ export const CustomPagination = ({ count, page, onChange, size = 'large', sx = {
         </Stack>
     );
 };
+
 export const FAQItem = ({ question, answer, shouldCollapse, expandAll }) => {
     const [isOpen, setIsOpen] = useState(false);
 
@@ -1662,7 +1727,7 @@ export const FAQItem = ({ question, answer, shouldCollapse, expandAll }) => {
             </motion.button>
             <AnimatePresence>
                 {isOpen && (
-                    <motion.div {...getMotionDivProps(isOpen)}>
+                    <motion.div {...getMotionDivProps(isOpen)} className='bg-white rounded-b-md shadow-md mt-1 overflow-hidden'>
                         <div className="p-4 text-brown-700">
                             <p>{answer}</p>
                         </div>
@@ -1679,11 +1744,11 @@ export const MAX_ZOOM_LEVEL = 1 + 2 * ZOOM_FACTOR;
 export const ImagePreviewControls = ({ scale, setScale, isFullscreen, adjustZoom, toggleFullscreen, resetAndClose }) => {
     return (
         <div onClick={(e) => e.stopPropagation()} className="absolute top-2 right-2 flex gap-2 p-1 bg-white rounded">
-            <IconButton onClick={() => adjustZoom('in')} disabled={scale >= MAX_ZOOM_LEVEL} className="text-gray-600 disabled:text-gray-400">
-                <ZoomIn />
-            </IconButton>
             <IconButton onClick={() => adjustZoom('out')} disabled={scale <= 1} className="text-gray-600 disabled:text-gray-400">
                 <ZoomOut />
+            </IconButton>
+            <IconButton onClick={() => adjustZoom('in')} disabled={scale >= MAX_ZOOM_LEVEL} className="text-gray-600 disabled:text-gray-400">
+                <ZoomIn />
             </IconButton>
             <IconButton onClick={() => setScale(1)} disabled={scale === 1} className={`text-gray-600 ${scale === 1 ? 'disabled:text-gray-400' : ''}`}>
                 <Replay />
@@ -1703,15 +1768,15 @@ export const GoBackArrow = () => {
         <div className="flex justify-start">
             <ChevronLeft className="text-stone-600" />
         </div>
-    )
-}
+    );
+};
 
 export const GoBackButton = () => {
     const navigate = useNavigate();
 
     const goBack = () => {
         navigate(-1);
-    }
+    };
 
     return (
         <div className="flex justify-left mb-4">
@@ -1722,8 +1787,8 @@ export const GoBackButton = () => {
                 <GoBackArrow />
             </RoundIconButton>
         </div>
-    )
-}
+    );
+};
 
 export const CategoryDropdown = ({ category, subcategories, subsubcategories, navigate, dropdownStyle, loading }) => (
     <div style={dropdownStyle()} className="fixed bg-white shadow-xl rounded-md p-4 z-50">
@@ -1931,7 +1996,7 @@ export const SidebarFooter = () => {
             <span className="text-sm ml-4 mb-10">Tel.: 044888999</span>
         </div>
     );
-}
+};
 
 const getEmptyStateMessage = (context, items, searchTerm, statusFilter) => {
     const entity = context === 'reviews' ? 'reviews' : context === 'orders' ? 'orders' : context === 'wishlist' ? 'wishlist item' : 'returns';
@@ -2040,7 +2105,6 @@ export const ScrollToTop = () => {
 
 export const CustomMenu = ({
     anchorEl,
-    open,
     handleMenuClose,
     handleEditClick,
     handleDeleteClick,
@@ -2067,7 +2131,7 @@ export const SearchBarInput = ({ searchTerm, handleInputChange, handleSubmit }) 
             placeholder='Search products...'
             variant="outlined"
             autoComplete="off"
-            sx={searchBarInputStyling}
+            sx={searchBarInputSx}
             InputProps={{
                 endAdornment: (
                     <InputAdornment position="end">
@@ -2094,8 +2158,8 @@ export const ShareWishlist = ({ handleShareWishlist, loading }) => {
         >
             Share Wishlist
         </Button>
-    )
-}
+    );
+};
 
 export const ClearWishlist = ({ setIsModalOpen, loading }) => {
     return (
@@ -2108,8 +2172,8 @@ export const ClearWishlist = ({ setIsModalOpen, loading }) => {
                 <DeleteOutline color="primary" />
             </RoundIconButton>
         </Tooltip>
-    )
-}
+    );
+};
 
 export const Header = ({
     title,
@@ -2190,7 +2254,7 @@ export const Header = ({
                         placeholder={placeholder}
                         variant="outlined"
                         size="small"
-                        sx={headerSearchStyling}
+                        sx={headerSearchSx}
                         InputProps={{
                             endAdornment: <Search className="text-gray-400 ml-1" />
                         }}
@@ -2205,7 +2269,7 @@ export const Header = ({
                             onChange={(e) => setStatusFilter(e.target.value)}
                             variant="outlined"
                             size="small"
-                            sx={headerFilterStyling}
+                            sx={headerFilterSx}
                             MenuProps={menuProps}
                         >
                             {getStatusOptions().map((option) => (
@@ -2269,6 +2333,8 @@ export const Header = ({
         </div>
     );
 };
+
+// Download link start
 
 export const generateOrderPDF = async (order) => {
     if (!order) return;
@@ -2532,6 +2598,8 @@ export const downloadAddress = (address) => {
     createDownloadLink(data, fileName);
 };
 
+// Download link end
+
 export const pluralize = (word, count) => {
     if (count === 1) return word;
     return word.endsWith('y') ? `${word.slice(0, -1)}ies` : `${word}s`;
@@ -2539,7 +2607,7 @@ export const pluralize = (word, count) => {
 
 export const DashboardHeader = ({
     title,
-    selectedItems,
+    selectedItems = [],
     setAddItemOpen,
     setDeleteItemOpen,
     itemName
@@ -2547,9 +2615,26 @@ export const DashboardHeader = ({
     const isMultipleSelected = selectedItems.length > 1;
     const itemNamePlural = pluralize(itemName, selectedItems.length);
 
+    const handleScrollToTop = () => {
+        const mainContent = document.querySelector('[role="main"]');
+        if (mainContent) {
+            mainContent.scrollTo({
+                top: 0,
+                behavior: 'smooth'
+            });
+        }
+    };
+
     return (
-        <div className='bg-white p-4 flex items-center justify-between w-full mb-4 rounded-md'>
-            <Typography variant='h5'>{title}</Typography>
+        <div className="bg-white sticky top-16 z-50 p-4 flex items-center justify-between w-full mb-4 rounded-md shadow-sm border-b">
+            <Tooltip title="Scroll to top" arrow>
+                <Button
+                    onClick={handleScrollToTop}
+                    sx={dashboardTitleSx}
+                >
+                    {title}
+                </Button>
+            </Tooltip>
             <div>
                 <OutlinedBrownButton onClick={() => setAddItemOpen(true)} className='!mr-4'>
                     Add {itemName}
@@ -2557,7 +2642,6 @@ export const DashboardHeader = ({
                 {selectedItems.length > 0 && (
                     <OutlinedBrownButton
                         onClick={() => setDeleteItemOpen(true)}
-                        disabled={selectedItems.length === 0}
                     >
                         {isMultipleSelected ? `Delete ${itemNamePlural}` : `Delete ${itemName}`}
                     </OutlinedBrownButton>
@@ -2575,18 +2659,18 @@ export const SearchDropdown = ({ results, onClickSuggestion }) => {
     };
 
     return (
-        <List sx={searchDropdownStyling}>
+        <List sx={searchDropdownSx}>
             {results.map((result) => (
                 <ListItem
                     key={result._id}
                     button
                     onClick={() => onClickSuggestion(result._id)}
-                    sx={searchDropdownItemStyling}
+                    sx={searchDropdownItemSx}
                 >
                     <img
                         src={getImageUrl(result.image)}
                         alt={result.name}
-                        style={searchDropdownImageStyling}
+                        style={searchDropdownImageSx}
                     />
                     <ListItemText
                         primary={truncateText(result.name, maxTitleLength)}
@@ -2818,8 +2902,8 @@ export const LoginButton = () => {
                 <Login />
             </RoundIconButton>
         </>
-    )
-}
+    );
+};
 
 export const NavbarLogo = ({ dashboardStyling }) => {
     const navigate = useNavigate();
@@ -2836,7 +2920,7 @@ export const NavbarLogo = ({ dashboardStyling }) => {
             </Tooltip>
         </a>
     );
-}
+};
 
 export const ProfileIcon = ({ handleProfileDropdownToggle, isDropdownOpen }) => {
     const { user, loading } = useSelector((state) => state.auth);
@@ -2918,7 +3002,7 @@ export const CollapseIcon = ({ toggleDrawer }) => {
             </IconButton>
         </Tooltip>
     );
-}
+};
 
 export const ExtendIcon = ({ toggleDrawer, open }) => {
     return (
@@ -2934,16 +3018,16 @@ export const ExtendIcon = ({ toggleDrawer, open }) => {
                 <MenuIcon />
             </IconButton>
         </Tooltip>
-    )
-}
+    );
+};
 
 export const DashboardCollapse = ({ toggleDrawer }) => {
     return (
         <Toolbar sx={{ display: 'flex', alignItems: 'center', justifyContent: 'flex-end', px: [1] }}>
             <CollapseIcon toggleDrawer={toggleDrawer} />
         </Toolbar>
-    )
-}
+    );
+};
 
 export const ImageSlide = ({ image, onLoad }) => (
     <SplideSlide>
@@ -3275,6 +3359,15 @@ export const DropdownMenu = ({ auth, isAdmin, onLogout }) => {
     );
 };
 
+export const getLocalStorageState = (key, defaultValue) => {
+    const savedState = localStorage.getItem(key);
+    return savedState !== null ? JSON.parse(savedState) : defaultValue;
+};
+
+export const saveLocalStorageState = (key, value) => {
+    localStorage.setItem(key, JSON.stringify(value));
+};
+
 export const AuthActions = ({
     auth,
     isDropdownOpen,
@@ -3326,7 +3419,7 @@ export const DashboardToolbar = ({ children }) => {
             {children}
         </Toolbar>
     )
-}
+};
 
 export const DashboardNavbar = ({ open, toggleDrawer, auth, isDropdownOpen, handleProfileDropdownToggle, handleLogout, isAdmin }) => {
     return (
@@ -3334,9 +3427,9 @@ export const DashboardNavbar = ({ open, toggleDrawer, auth, isDropdownOpen, hand
             <DashboardToolbar>
                 <ExtendIcon toggleDrawer={toggleDrawer} open={open} />
 
-                <div className="flex justify-between items-center top-0 left-0 right-0 z-50 mx-auto-xl px-20 w-full">
+                <div className="flex justify-between items-center top-0 left-0 right-0 z-50 mx-auto-xl px-12 w-full">
                     <div className="flex items-center mb-5">
-                        <NavbarLogo dashboardStyling={'relative top-2'} />
+                        <NavbarLogo dashboardStyling={'relative top-2 w-24 h-11 md:w-full md:h-full'} />
                     </div>
 
                     <AuthActions
@@ -3349,24 +3442,24 @@ export const DashboardNavbar = ({ open, toggleDrawer, auth, isDropdownOpen, hand
                 </div>
             </DashboardToolbar>
         </DashboardAppBar>
-    )
-}
+    );
+};
 
 export const SidebarLayout = ({ children }) => {
     return (
-        <Box sx={sidebarLayoutStyling}>
+        <Box sx={sidebarLayoutSx}>
             {children}
         </Box>
-    )
-}
+    );
+};
 
 export const ProfileLayout = ({ children }) => {
     return (
-        <Box sx={profileLayoutStyling}>
+        <Box sx={profileLayoutSx}>
             <ProfileSidebar />
             <Box
                 component="main"
-                sx={layoutContainerStyle}
+                sx={layoutContainerSx}
             >
                 {children}
             </Box>
@@ -3384,7 +3477,7 @@ export const FilterLayout = ({
     onApplyPriceFilter,
     onSaleToggle = false,
 }) => (
-    <Box sx={filterLayoutStyling}>
+    <Box sx={filterLayoutSx}>
         <div className="absolute top-0 z-10 pb-4 bg-gray-50">
             {loading ? (
                 <WaveSkeleton variant="text" width={250} height={20} />
@@ -3405,7 +3498,7 @@ export const FilterLayout = ({
         <FilterSidebar onApplyPriceFilter={onApplyPriceFilter} onSaleToggle={onSaleToggle} />
         <Box
             component="main"
-            sx={layoutContainerStyle}
+            sx={layoutContainerSx}
         >
             {children}
         </Box>

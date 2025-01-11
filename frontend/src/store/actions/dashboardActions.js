@@ -1,5 +1,5 @@
 import axios from 'axios';
-import { getApiUrl } from '../../config';
+import { getApiUrl } from '../../utils/config';
 import {
     GET_ADDRESSES,
     GET_ADDRESSES_ERROR,
@@ -142,7 +142,6 @@ export const getContacts = () => async (dispatch) => {
 export const getSubcategories = () => async (dispatch) => {
     try {
         const res = await axios.get(getApiUrl('/subcategories/get'), { withCredentials: true });
-        console.log(res.data)
 
         dispatch({
             type: GET_SUBCATEGORIES,

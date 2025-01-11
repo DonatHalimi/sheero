@@ -3,6 +3,7 @@ import { ADD_ADDRESS, ADDRESS_ERROR, DELETE_ADDRESS, GET_ADDRESS, GET_CITIES_BY_
 const initialState = {
     address: null,
     loading: true,
+    loadingCountries: true,
     error: null,
     countries: [],
     cities: [],
@@ -53,7 +54,7 @@ export default function (state = initialState, action) {
             return {
                 ...state,
                 countries: action.payload,
-                loading: false,
+                loadingCountries: false,
                 error: null,
             };
 

@@ -7,6 +7,10 @@ const createUser = async (req, res) => {
     const hashedPassword = await bcrypt.hash(password, 10);
     const validRole = role ? await Role.findById(role) : await Role.findOne({ name: 'user' });
 
+    if (!validRole) {
+        return res.status(400).json({ message: 'Role does not exist' });
+    }
+
     try {
         const newUser = new User({
             firstName,
@@ -44,15 +48,33 @@ const getUserById = async (req, res) => {
 };
 
 const updateUser = async (req, res) => {
+    const { firstName, lastName, email, password, role } = req.body;
+
     try {
-        if (req.body.password) {
-            req.body.password = await bcrypt.hash(req.body.password, 10);
+        const user = await User.findById(req.user.userId);
+        if (!user) {
+            return res.status(404).json({ message: 'User not found' });
         }
-        const updatedUser = await User.findByIdAndUpdate(req.params.id, req.body, { new: true });
-        res.status(200).json({ message: 'User updated successfully', updatedUser });
+
+        if (email) {
+            const existingUser = await User.findOne({ email, _id: { $ne: req.params.id } });
+            if (existingUser) {
+                return res.status(400).json({ message: 'Email already exists' });
+            }
+        }
+
+        if (firstName) user.firstName = firstName;
+        if (lastName) user.lastName = lastName;
+        if (email) user.email = email;
+        if (password) user.password = await bcrypt.hash(password, 10);
+        if (role) user.role = role;
+
+        await user.save();
+        await user.populate('role');
+
+        res.status(200).json({ message: 'User updated successfully', updatedUser: user });
     } catch (error) {
-        console.error('Error updating user:', error);
-        res.status(500).json({ message: 'Server error', error: error.message });
+        res.status(500).json({ message: 'Server error' });
     }
 };
 

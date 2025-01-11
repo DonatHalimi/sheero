@@ -1,5 +1,5 @@
 import axios from 'axios';
-import { getApiUrl } from '../../config';
+import { getApiUrl } from '../../utils/config';
 import { CLEAR_WISHLIST, GET_WISHLIST_ITEMS, GET_WISHLIST_ITEMS_ERROR, REMOVE_FROM_WISHLIST } from '../types';
 
 export const getWishlistItems = () => async (dispatch) => {

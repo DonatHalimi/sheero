@@ -1,13 +1,18 @@
 import React, { useState } from 'react';
 import { toast } from 'react-toastify';
-import { BrownButton, BrownOutlinedTextField, CustomBox, CustomModal, CustomTypography } from '../../../assets/CustomComponents';
-import useAxios from '../../../axiosInstance';
+import { BrownButton, BrownOutlinedTextField, CustomBox, CustomModal, CustomTypography, handleApiError } from '../../../assets/CustomComponents';
+import useAxios from '../../../utils/axiosInstance';
 
 const AddFAQModal = ({ open, onClose, onAddSuccess }) => {
     const [question, setQuestion] = useState('');
+    const [isValidQuestion, setIsValidQuestion] = useState(true);
     const [answer, setAnswer] = useState('');
+    const [isValidAnswer, setIsValidAnswer] = useState(true);
 
     const axiosInstance = useAxios();
+
+    const validateFAQ = (v) => /^[A-Z][a-zA-Z\s]{10,50}$/.test(v);
+    const isValidForm = isValidQuestion && isValidAnswer;
 
     const handleAddFAQ = async () => {
         if (!question || !answer) {
@@ -26,8 +31,7 @@ const AddFAQModal = ({ open, onClose, onAddSuccess }) => {
             onAddSuccess(response.data);
             onClose();
         } catch (error) {
-            toast.error('Error adding FAQ item');
-            console.error('Error adding FAQ item', error);
+            handleApiError(error, 'Error adding faq');
         }
     };
 
@@ -43,7 +47,12 @@ const AddFAQModal = ({ open, onClose, onAddSuccess }) => {
                     value={question}
                     multiline
                     rows={2}
-                    onChange={(e) => setQuestion(e.target.value)}
+                    onChange={(e) => {
+                        setQuestion(e.target.value)
+                        setIsValidQuestion(validateFAQ(e.target.value));
+                    }}
+                    error={!isValidQuestion}
+                    helperText={!isValidQuestion ? 'Question must start with a capital letter and be between 10 and 50 characters long' : ''}
                     className="!mb-4"
                 />
 
@@ -52,15 +61,21 @@ const AddFAQModal = ({ open, onClose, onAddSuccess }) => {
                     required
                     label="Answer"
                     value={answer}
-                    onChange={(e) => setAnswer(e.target.value)}
                     multiline
                     rows={4}
+                    onChange={(e) => {
+                        setAnswer(e.target.value);
+                        setIsValidAnswer(validateFAQ(e.target.value));
+                    }}
+                    error={!isValidAnswer}
+                    helperText={!isValidAnswer ? 'Answer must start with a capital letter and be between 10 and 50 characters long' : ''}
                     className="!mb-4"
                 />
                 <BrownButton
                     onClick={handleAddFAQ}
                     variant="contained"
                     color="primary"
+                    disabled={!isValidForm}
                     className="w-full"
                 >
                     Add

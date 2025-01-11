@@ -5,7 +5,7 @@ import { calculatePageCount, CustomPagination, FilterLayout, filterProductsByPri
 import noProducts from '../../assets/img/products/no-products.png';
 import Navbar from '../../components/Navbar/Navbar';
 import Footer from '../../components/Utils/Footer';
-import { getApiUrl } from '../../config';
+import { getApiUrl } from '../../utils/config';
 
 const itemsPerPage = 40;
 

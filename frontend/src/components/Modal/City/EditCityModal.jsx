@@ -1,16 +1,23 @@
 import { InputLabel, MenuItem, Select } from '@mui/material';
 import React, { useEffect, useState } from 'react';
 import { toast } from 'react-toastify';
-import { BrownButton, BrownOutlinedTextField, CustomBox, CustomModal, CustomTypography, OutlinedBrownFormControl } from '../../../assets/CustomComponents';
-import useAxios from '../../../axiosInstance';
+import { BrownButton, BrownOutlinedTextField, CustomBox, CustomModal, CustomTypography, handleApiError, OutlinedBrownFormControl } from '../../../assets/CustomComponents';
+import useAxios from '../../../utils/axiosInstance';
 
 const EditCityModal = ({ open, onClose, city, onEditSuccess }) => {
     const [name, setName] = useState('');
+    const [isValidName, setIsValidName] = useState(true);
     const [country, setCountry] = useState('');
     const [zipCode, setZipCode] = useState('');
+    const [isValidZipCode, setIsValidZipCode] = useState(true);
     const [countries, setCountries] = useState([]);
 
     const axiosInstance = useAxios();
+
+    const validateName = (v) => /^[A-Z][a-zA-Z\s]{2,15}$/.test(v);
+    const validateZipCode = (v) => /^[0-9]{4,5}$/.test(v);
+
+    const isValidForm = isValidName && country && isValidZipCode;
 
     useEffect(() => {
         if (city) {
@@ -44,8 +51,7 @@ const EditCityModal = ({ open, onClose, city, onEditSuccess }) => {
             onEditSuccess(response.data);
             onClose();
         } catch (error) {
-            toast.error('Error updating city');
-            console.error('Error updating city', error);
+            handleApiError(error, 'Error updating city');
         }
     };
 
@@ -59,7 +65,12 @@ const EditCityModal = ({ open, onClose, city, onEditSuccess }) => {
                     required
                     label="Name"
                     value={name}
-                    onChange={(e) => setName(e.target.value)}
+                    onChange={(e) => {
+                        setName(e.target.value)
+                        setIsValidName(validateName(e.target.value));
+                    }}
+                    error={!isValidName}
+                    helperText={!isValidName ? 'Name must start with a capital letter and be 3-15 characters long' : ''}
                     className="!mb-4"
                 />
                 <OutlinedBrownFormControl fullWidth className="!mb-4">
@@ -81,13 +92,19 @@ const EditCityModal = ({ open, onClose, city, onEditSuccess }) => {
                     required
                     label="Zip Code"
                     value={zipCode}
-                    onChange={(e) => setZipCode(e.target.value)}
+                    onChange={(e) => {
+                        setZipCode(e.target.value);
+                        setIsValidZipCode(validateZipCode(e.target.value));
+                    }}
+                    error={!isValidZipCode}
+                    helperText={!isValidZipCode ? 'Zip code must be 4-5 digits long' : ''}
                     className="!mb-4"
                 />
                 <BrownButton
                     onClick={handleEditCity}
                     variant="contained"
                     color="primary"
+                    disabled={!isValidForm}
                     className="w-full"
                 >
                     Save

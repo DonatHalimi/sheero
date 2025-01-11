@@ -1,5 +1,5 @@
 import axios from 'axios';
-import { getApiUrl } from '../../config';
+import { getApiUrl } from '../../utils/config';
 import { GET_CATEGORIES, GET_CATEGORIES_ERROR, GET_SUBCATEGORIES_BY_CATEGORY, GET_SUBCATEGORIES_BY_CATEGORY_ERROR, GET_SUBSUBCATEGORIES_BY_SUBCATEGORY, GET_SUBSUBCATEGORIES_BY_SUBCATEGORY_ERROR } from '../types';
 
 export const getCategories = () => async (dispatch) => {

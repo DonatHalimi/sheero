@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
-import { DashboardHeader } from '../../assets/CustomComponents';
+import { DashboardHeader, LoadingDataGrid } from '../../assets/CustomComponents';
 import DashboardTable from '../../components/Dashboard/DashboardTable';
 import AddAddressModal from '../../components/Modal/Address/AddAddressModal';
 import EditAddressModal from '../../components/Modal/Address/EditAddressModal';
@@ -8,7 +8,7 @@ import DeleteModal from '../../components/Modal/DeleteModal';
 import { getAddresses } from '../../store/actions/dashboardActions';
 
 const AddressesPage = () => {
-    const { addresses } = useSelector((state) => state.dashboard);
+    const { addresses, loadingAddresses } = useSelector((state) => state.dashboard);
     const dispatch = useDispatch();
 
     const [selectedAddress, setSelectedAddress] = useState(null);
@@ -49,7 +49,7 @@ const AddressesPage = () => {
         { key: 'name', label: 'Name' },
         { key: 'street', label: 'Street' },
         { key: 'phoneNumber', label: 'Phone Number' },
-        { key: 'comment', label: 'Comment' },
+        { key: 'comment', label: 'Comment', render: (row) => row.comment || 'N/A' },
         { key: 'country.name', label: 'Country' },
         { key: 'city.name', label: 'City' },
         { key: 'city.zipCode', label: 'Zip Code' },
@@ -59,25 +59,31 @@ const AddressesPage = () => {
     return (
         <div className='container mx-auto max-w-screen-2xl px-4 mt-20'>
             <div className='flex flex-col items-center justify-center'>
-                <DashboardHeader
-                    title="Addresses"
-                    selectedItems={selectedAddresses}
-                    setAddItemOpen={setAddAddressOpen}
-                    setDeleteItemOpen={setDeleteAddressOpen}
-                    itemName="Address"
-                />
+                {loadingAddresses ? (
+                    <LoadingDataGrid />
+                ) : (
+                    <>
+                        <DashboardHeader
+                            title="Addresses"
+                            selectedItems={selectedAddresses}
+                            setAddItemOpen={setAddAddressOpen}
+                            setDeleteItemOpen={setDeleteAddressOpen}
+                            itemName="Address"
+                        />
 
-                <DashboardTable
-                    columns={columns}
-                    data={addresses}
-                    selectedItems={selectedAddresses}
-                    onSelectItem={handleSelectAddress}
-                    onSelectAll={handleSelectAll}
-                    itemsPerPage={itemsPerPage}
-                    currentPage={currentPage}
-                    onPageChange={(event) => setCurrentPage(event.selected)}
-                    onEdit={handleEdit}
-                />
+                        <DashboardTable
+                            columns={columns}
+                            data={addresses}
+                            selectedItems={selectedAddresses}
+                            onSelectItem={handleSelectAddress}
+                            onSelectAll={handleSelectAll}
+                            itemsPerPage={itemsPerPage}
+                            currentPage={currentPage}
+                            onPageChange={(event) => setCurrentPage(event.selected)}
+                            onEdit={handleEdit}
+                        />
+                    </>
+                )}
 
                 <AddAddressModal open={addAddressOpen} onClose={() => setAddAddressOpen(false)} onAddSuccess={() => dispatch(getAddresses())} />
                 <EditAddressModal open={editAddressOpen} onClose={() => setEditAddressOpen(false)} address={selectedAddress} onEditSuccess={() => dispatch(getAddresses())} />
@@ -85,7 +91,10 @@ const AddressesPage = () => {
                     open={deleteAddressOpen}
                     onClose={() => setDeleteAddressOpen(false)}
                     items={selectedAddresses.map(id => addresses.find(address => address._id === id)).filter(address => address)}
-                    onDeleteSuccess={() => dispatch(getAddresses())}
+                    onDeleteSuccess={() => {
+                        dispatch(getAddresses())
+                        setSelectedAddresses([])
+                    }}
                     endpoint="/addresses/delete-bulk"
                     title="Delete Addresses"
                     message="Are you sure you want to delete the selected addresses?"

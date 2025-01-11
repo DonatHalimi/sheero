@@ -13,7 +13,7 @@ import {
     ProfileIcon,
     WishlistIcon,
 } from '../../assets/CustomComponents';
-import useAxios from '../../axiosInstance';
+import useAxios from '../../utils/axiosInstance';
 import { logoutUser, selectIsAdmin } from '../../store/actions/authActions';
 import CategoryNavbar from './CategoryNavbar';
 import SearchBar from './SearchBar';

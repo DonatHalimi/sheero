@@ -87,13 +87,13 @@ const AddressInformation = () => {
 
         try {
             if (address) {
-                dispatch(updateAddress(address._id, updatedAddress));
+                await dispatch(updateAddress(address._id, updatedAddress));
                 toast.success('Address updated successfully');
-                dispatch(getAddressByUser(user.id));
+                await dispatch(getAddressByUser(user.id));
             } else {
-                dispatch(addAddress(updatedAddress));
+                await dispatch(addAddress(updatedAddress));
                 toast.success('Address added successfully');
-                dispatch(getAddressByUser(user.id));
+                await dispatch(getAddressByUser(user.id));
             }
             setIsSubmitted(true);
         } catch (error) {

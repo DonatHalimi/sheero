@@ -4,8 +4,8 @@ import { useNavigate } from 'react-router-dom';
 import { toast } from 'react-toastify';
 import { CartWishlistButtons, DiscountPercentage, formatPrice, LoadingOverlay, OutOfStock } from '../../../assets/CustomComponents';
 import NoImage from '../../../assets/img/errors/product-not-found.png';
-import useAxios from '../../../axiosInstance';
-import { getApiUrl, getImageUrl } from '../../../config';
+import useAxios from '../../../utils/axiosInstance';
+import { getApiUrl, getImageUrl } from '../../../utils/config';
 
 const ProductItem = ({ product }) => {
     const { isAuthenticated } = useSelector(state => state.auth) || {};

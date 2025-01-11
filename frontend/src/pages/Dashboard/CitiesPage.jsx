@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
-import { DashboardHeader } from '../../assets/CustomComponents';
+import { DashboardHeader, LoadingDataGrid } from '../../assets/CustomComponents';
 import DashboardTable from '../../components/Dashboard/DashboardTable';
 import AddCityModal from '../../components/Modal/City/AddCityModal';
 import EditCityModal from '../../components/Modal/City/EditCityModal';
@@ -8,7 +8,7 @@ import DeleteModal from '../../components/Modal/DeleteModal';
 import { getCities } from '../../store/actions/dashboardActions';
 
 const CitiesPage = () => {
-    const { cities } = useSelector((state) => state.dashboard);
+    const { cities, loadingCities } = useSelector((state) => state.dashboard);
     const dispatch = useDispatch();
 
     const [selectedCity, setSelectedCity] = useState(null);
@@ -25,7 +25,6 @@ const CitiesPage = () => {
 
     const handleSelectCity = (cityId) => {
         const id = Array.isArray(cityId) ? cityId[0] : cityId;
-
         setSelectedCities((prevSelected) =>
             prevSelected.includes(id)
                 ? prevSelected.filter((selectedId) => selectedId !== id)
@@ -56,25 +55,31 @@ const CitiesPage = () => {
     return (
         <div className='container mx-auto max-w-screen-2xl px-4 mt-20'>
             <div className='flex flex-col items-center justify-center'>
-                <DashboardHeader
-                    title="Cities"
-                    selectedItems={selectedCities}
-                    setAddItemOpen={setAddCityOpen}
-                    setDeleteItemOpen={setDeleteCityOpen}
-                    itemName="City"
-                />
+                {loadingCities ? (
+                    <LoadingDataGrid />
+                ) : (
+                    <>
+                        <DashboardHeader
+                            title="Cities"
+                            selectedItems={selectedCities}
+                            setAddItemOpen={setAddCityOpen}
+                            setDeleteItemOpen={setDeleteCityOpen}
+                            itemName="City"
+                        />
 
-                <DashboardTable
-                    columns={columns}
-                    data={cities}
-                    selectedItems={selectedCities}
-                    onSelectItem={handleSelectCity}
-                    onSelectAll={handleSelectAll}
-                    itemsPerPage={itemsPerPage}
-                    currentPage={currentPage}
-                    onPageChange={handlePageClick}
-                    onEdit={handleEdit}
-                />
+                        <DashboardTable
+                            columns={columns}
+                            data={cities}
+                            selectedItems={selectedCities}
+                            onSelectItem={handleSelectCity}
+                            onSelectAll={handleSelectAll}
+                            itemsPerPage={itemsPerPage}
+                            currentPage={currentPage}
+                            onPageChange={handlePageClick}
+                            onEdit={handleEdit}
+                        />
+                    </>
+                )}
 
                 <AddCityModal open={addCityOpen} onClose={() => setAddCityOpen(false)} onAddSuccess={() => dispatch(getCities())} />
                 <EditCityModal open={editCityOpen} onClose={() => setEditCityOpen(false)} city={selectedCity} onEditSuccess={() => dispatch(getCities())} />
@@ -82,7 +87,10 @@ const CitiesPage = () => {
                     open={deleteCityOpen}
                     onClose={() => setDeleteCityOpen(false)}
                     items={selectedCities.map(id => cities.find(city => city._id === id)).filter(city => city)}
-                    onDeleteSuccess={() => dispatch(getCities())}
+                    onDeleteSuccess={() => {
+                        dispatch(getCities())
+                        setSelectedCities([])
+                    }}
                     endpoint="/cities/delete-bulk"
                     title="Delete Cities"
                     message="Are you sure you want to delete the selected cities?"

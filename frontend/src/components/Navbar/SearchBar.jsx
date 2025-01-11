@@ -1,7 +1,7 @@
 import React, { useEffect, useRef, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { SearchBarInput, SearchDropdown } from '../../assets/CustomComponents';
-import useAxios from '../../axiosInstance';
+import useAxios from '../../utils/axiosInstance';
 
 const SearchBar = () => {
     const [searchTerm, setSearchTerm] = useState('');

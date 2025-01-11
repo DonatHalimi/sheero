@@ -1,16 +1,16 @@
 import React, { useEffect, useState } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
-import { DashboardHeader } from '../../assets/CustomComponents';
+import { DashboardHeader, LoadingDataGrid } from '../../assets/CustomComponents';
 import DashboardTable from '../../components/Dashboard/DashboardTable';
 import DeleteModal from '../../components/Modal/DeleteModal';
 import ImagePreviewModal from '../../components/Modal/ImagePreviewModal';
 import AddSubcategoryModal from '../../components/Modal/Subcategory/AddSubcategoryModal';
 import EditSubcategoryModal from '../../components/Modal/Subcategory/EditSubcategoryModal';
-import { getImageUrl } from '../../config';
+import { getImageUrl } from '../../utils/config';
 import { getSubcategories } from '../../store/actions/dashboardActions';
 
 const SubcategoriesPage = () => {
-    const { subcategories } = useSelector((state) => state.dashboard);
+    const { subcategories, loadingSubcategories } = useSelector((state) => state.dashboard);
     const dispatch = useDispatch();
 
     const [selectedSubcategory, setSelectedSubcategory] = useState(null);
@@ -81,33 +81,43 @@ const SubcategoriesPage = () => {
     return (
         <div className='container mx-auto max-w-screen-2xl px-4 mt-20'>
             <div className='container mx-auto max-w-screen-2xl px-4 mt-20'>
-                <DashboardHeader
-                    title="Subcategories"
-                    selectedItems={selectedSubcategories}
-                    setAddItemOpen={setAddSubcategoryOpen}
-                    setDeleteItemOpen={setDeleteSubcategoryOpen}
-                    itemName="Subcategory"
-                />
+                {loadingSubcategories ? (
+                    <LoadingDataGrid />
+                ) : (
+                    <>
+                        <DashboardHeader
+                            title="Subcategories"
+                            selectedItems={selectedSubcategories}
+                            setAddItemOpen={setAddSubcategoryOpen}
+                            setDeleteItemOpen={setDeleteSubcategoryOpen}
+                            itemName="Subcategory"
+                        />
 
-                <DashboardTable
-                    columns={columns}
-                    data={subcategories}
-                    selectedItems={selectedSubcategories}
-                    onSelectItem={handleSelectSubcategory}
-                    onSelectAll={handleSelectAll}
-                    itemsPerPage={itemsPerPage}
-                    currentPage={currentPage}
-                    onPageChange={handlePageClick}
-                    onEdit={handleEdit}
-                    containerClassName="max-w-screen-2xl mx-auto"
-                />
+                        <DashboardTable
+                            columns={columns}
+                            data={subcategories}
+                            selectedItems={selectedSubcategories}
+                            onSelectItem={handleSelectSubcategory}
+                            onSelectAll={handleSelectAll}
+                            itemsPerPage={itemsPerPage}
+                            currentPage={currentPage}
+                            onPageChange={handlePageClick}
+                            onEdit={handleEdit}
+                            containerClassName="max-w-screen-2xl mx-auto"
+                        />
+                    </>
+                )}
+
                 <AddSubcategoryModal open={addSubcategoryOpen} onClose={() => setAddSubcategoryOpen(false)} onAddSuccess={() => dispatch(getSubcategories())} />
                 <EditSubcategoryModal open={editSubcategoryOpen} onClose={() => setEditSubcategoryOpen(false)} subcategory={selectedSubcategory} onEditSuccess={() => dispatch(getSubcategories())} />
                 <DeleteModal
                     open={deleteSubcategoryOpen}
                     onClose={() => setDeleteSubcategoryOpen(false)}
                     items={selectedSubcategories.map(id => subcategories.find(subcategory => subcategory._id === id)).filter(subcategory => subcategory)}
-                    onDeleteSuccess={() => dispatch(getSubcategories())}
+                    onDeleteSuccess={() => {
+                        dispatch(getSubcategories())
+                        setSelectedSubcategories([])
+                    }}
                     endpoint="/subcategories/delete-bulk"
                     title="Delete Subcategories"
                     message="Are you sure you want to delete the selected subcategories?"

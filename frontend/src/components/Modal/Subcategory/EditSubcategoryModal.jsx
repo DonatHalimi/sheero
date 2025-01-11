@@ -2,18 +2,23 @@ import UploadIcon from '@mui/icons-material/Upload';
 import { InputLabel, MenuItem, Select } from '@mui/material';
 import React, { useEffect, useState } from 'react';
 import { toast } from 'react-toastify';
-import { BrownButton, BrownOutlinedTextField, CustomBox, CustomModal, CustomTypography, OutlinedBrownButton, OutlinedBrownFormControl, VisuallyHiddenInput } from '../../../assets/CustomComponents';
-import useAxios from '../../../axiosInstance';
-import { getImageUrl } from '../../../config';
+import { BrownButton, BrownOutlinedTextField, CustomBox, CustomModal, CustomTypography, handleApiError, OutlinedBrownButton, OutlinedBrownFormControl, VisuallyHiddenInput } from '../../../assets/CustomComponents';
+import useAxios from '../../../utils/axiosInstance';
+import { getImageUrl } from '../../../utils/config';
 
 const EditSubcategoryModal = ({ open, onClose, subcategory, onEditSuccess }) => {
     const [name, setName] = useState('');
+    const [isValidName, setIsValidName] = useState(true);
     const [image, setImage] = useState(null);
     const [imagePreview, setImagePreview] = useState('');
     const [category, setCategory] = useState('');
     const [categories, setCategories] = useState([]);
 
     const axiosInstance = useAxios();
+
+    const validateName = (v) => /^[A-Z][\sa-zA-Z\W]{3,27}$/.test(v);
+
+    const isValidForm = name && isValidName && category;
 
     useEffect(() => {
         if (subcategory) {
@@ -35,7 +40,7 @@ const EditSubcategoryModal = ({ open, onClose, subcategory, onEditSuccess }) => 
         };
 
         fetchCategories();
-    }, [axiosInstance]);
+    }, []);
 
     const handleEditSubcategory = async () => {
         const formData = new FormData();
@@ -55,20 +60,25 @@ const EditSubcategoryModal = ({ open, onClose, subcategory, onEditSuccess }) => 
             onEditSuccess(response.data);
             onClose();
         } catch (error) {
-            console.error('Error updating subcategory', error);
-            toast.error('Error updating subcategory');
+            handleApiError(error, 'Error updating subcategory');
         }
     };
 
     const handleImageChange = (e) => {
         const file = e.target.files[0];
-        setImage(file);
         if (file) {
-            const reader = new FileReader();
-            reader.onloadend = () => {
-                setImagePreview(reader.result);
-            };
-            reader.readAsDataURL(file);
+            const validTypes = ['image/jpeg', 'image/jpg', 'image/png'];
+            if (validTypes.includes(file.type)) {
+                setNewImage(file);
+                const reader = new FileReader();
+                reader.onloadend = () => {
+                    setImagePreview(reader.result);
+                };
+                reader.readAsDataURL(file);
+            } else {
+                toast.error('Invalid file type. Please upload an image (jpeg, jpg, or png)');
+                console.error('Invalid file type. Please upload an image (jpeg, jpg, or png)');
+            }
         }
     };
 
@@ -80,8 +90,13 @@ const EditSubcategoryModal = ({ open, onClose, subcategory, onEditSuccess }) => 
                 <BrownOutlinedTextField
                     label="Name"
                     value={name}
-                    onChange={(e) => setName(e.target.value)}
                     fullWidth
+                    onChange={(e) => {
+                        setName(e.target.value)
+                        setIsValidName(validateName(e.target.value));
+                    }}
+                    error={!isValidName}
+                    helperText={!isValidName ? 'Name must start with a capital letter and be 3-27 characters long' : ''}
                     className="!mb-4"
                 />
                 <OutlinedBrownFormControl fullWidth margin="normal">
@@ -113,7 +128,12 @@ const EditSubcategoryModal = ({ open, onClose, subcategory, onEditSuccess }) => 
                         <img src={imagePreview} alt="Preview" className="max-w-full h-auto mx-auto rounded-md" />
                     </div>
                 )}
-                <BrownButton onClick={handleEditSubcategory} variant="contained" color="primary" className="w-full">
+                <BrownButton
+                    onClick={handleEditSubcategory}
+                    variant="contained"
+                    color="primary"
+                    disabled={!isValidForm}
+                    className="w-full">
                     Save Changes
                 </BrownButton>
             </CustomBox>

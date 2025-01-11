@@ -1,14 +1,13 @@
 import Box from '@mui/material/Box';
 import Divider from '@mui/material/Divider';
 import List from '@mui/material/List';
-import { ThemeProvider } from '@mui/material/styles';
 import Toolbar from '@mui/material/Toolbar';
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 import { Outlet } from 'react-router-dom';
 import { DashboardCollapse, DashboardNavbar, Drawer } from '../../assets/CustomComponents';
+import { dashboardBoxSx, dashboardDrawerSx } from '../../assets/sx';
 import { logoutUser, selectIsAdmin } from '../../store/actions/authActions';
-import theme from '../../theme';
 import { mainListItems, secondaryListItems } from './listItems';
 
 /**
@@ -31,62 +30,64 @@ const DashboardLayout = () => {
     const isAdmin = useSelector(selectIsAdmin);
     const dispatch = useDispatch();
 
-    const [open, setOpen] = useState(true);
+    const [open, setOpen] = useState(() => {
+        const savedState = localStorage.getItem('openSidebar');
+        return savedState ? JSON.parse(savedState) : true;
+    });
+
     const [isDropdownOpen, setIsDropdownOpen] = useState(false);
 
     const toggleDrawer = () => {
-        setOpen(!open);
+        const newState = !open;
+        setOpen(newState);
+        localStorage.setItem('openSidebar', JSON.stringify(newState));
     };
 
-    const handleProfileDropdownToggle = () => {
-        setIsDropdownOpen(prev => !prev);
-    };
-
+    const handleProfileDropdownToggle = () => setIsDropdownOpen((prev) => !prev);
     const handleLogout = () => {
         dispatch(logoutUser());
         setIsDropdownOpen(false);
     };
 
+    useEffect(() => {
+        const savedState = localStorage.getItem('openSidebar');
+        if (savedState !== null) setOpen(JSON.parse(savedState));
+    }, []);
+
     return (
-        <ThemeProvider theme={theme}>
-            <Box sx={{ display: 'flex', bgcolor: '#F5F5F5' }}>
-                <DashboardNavbar
-                    open={open}
-                    toggleDrawer={toggleDrawer}
-                    auth={isAuthenticated}
-                    isDropdownOpen={isDropdownOpen}
-                    handleProfileDropdownToggle={handleProfileDropdownToggle}
-                    handleLogout={handleLogout}
-                    isAdmin={isAdmin}
-                />
-                <Drawer variant="permanent" open={open}>
-                    <DashboardCollapse toggleDrawer={toggleDrawer} />
-
-                    <Divider />
-
+        <Box className="flex h-screen overflow-hidden bg-[#F5F5F5]">
+            <DashboardNavbar
+                open={open}
+                toggleDrawer={toggleDrawer}
+                auth={isAuthenticated}
+                isDropdownOpen={isDropdownOpen}
+                handleProfileDropdownToggle={handleProfileDropdownToggle}
+                handleLogout={handleLogout}
+                isAdmin={isAdmin}
+            />
+            <Drawer
+                variant="permanent"
+                open={open}
+                sx={dashboardDrawerSx(open)}
+            >
+                <DashboardCollapse toggleDrawer={toggleDrawer} />
+                <Divider />
+                <div className="custom-scrollbar">
                     <List component="nav">
-                        {mainListItems({ setCurrentView: () => { } })}
-                        {/* <Divider sx={{ my: 1 }} /> */}
+                        {mainListItems({ setCurrentView: () => { }, collapsed: !open })}
                         {secondaryListItems}
                     </List>
-                </Drawer>
-                <Box
-                    component="main"
-                    sx={{
-                        backgroundColor: (theme) =>
-                            theme.palette.mode === 'light'
-                                ? theme.palette.grey[100]
-                                : theme.palette.grey[900],
-                        flexGrow: 1,
-                        height: '105vh',
-                        overflow: 'auto',
-                    }}
-                >
-                    <Toolbar />
-                    <Outlet />
-                </Box>
+                </div>
+            </Drawer>
+            <Box
+                component="main"
+                role="main"
+                sx={dashboardBoxSx}
+            >
+                <Toolbar />
+                <Outlet />
             </Box>
-        </ThemeProvider >
+        </Box>
     );
 };
 

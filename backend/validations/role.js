@@ -1,7 +1,7 @@
 const yup = require('yup');
 const Role = require('../models/Role');
 
-const isValid = (v) => /^[a-z\s]{2,10}$/.test(v);
+const isValid = (v) => /^[a-zA-Z\s]{2,10}$/.test(v);
 
 const createSchema = yup.object({
     name: yup

@@ -1,16 +1,16 @@
 import React, { useEffect, useState } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
-import { DashboardHeader } from '../../assets/CustomComponents';
+import { DashboardHeader, LoadingDataGrid } from '../../assets/CustomComponents';
 import DashboardTable from '../../components/Dashboard/DashboardTable';
 import AddCategoryModal from '../../components/Modal/Category/AddCategoryModal';
 import EditCategoryModal from '../../components/Modal/Category/EditCategoryModal';
 import DeleteModal from '../../components/Modal/DeleteModal';
 import ImagePreviewModal from '../../components/Modal/ImagePreviewModal';
-import { getImageUrl } from '../../config';
+import { getImageUrl } from '../../utils/config';
 import { getCategories } from '../../store/actions/categoryActions';
 
 const CategoriesPage = () => {
-    const { categories } = useSelector((state) => state.categories);
+    const { categories, loadingCategories } = useSelector((state) => state.categories);
     const dispatch = useDispatch();
 
     const [selectedCategory, setSelectedCategory] = useState(null);
@@ -76,25 +76,31 @@ const CategoriesPage = () => {
     return (
         <div className='container mx-auto max-w-screen-2xl px-4 mt-20'>
             <div className='flex flex-col items-center justify-center'>
-                <DashboardHeader
-                    title="Categories"
-                    selectedItems={selectedCategories}
-                    setAddItemOpen={setAddCategoryOpen}
-                    setDeleteItemOpen={setDeleteCategoryOpen}
-                    itemName="Category"
-                />
+                {loadingCategories ? (
+                    <LoadingDataGrid />
+                ) : (
+                    <>
+                        <DashboardHeader
+                            title="Categories"
+                            selectedItems={selectedCategories}
+                            setAddItemOpen={setAddCategoryOpen}
+                            setDeleteItemOpen={setDeleteCategoryOpen}
+                            itemName="Category"
+                        />
 
-                <DashboardTable
-                    columns={columns}
-                    data={categories}
-                    selectedItems={selectedCategories}
-                    onSelectItem={handleSelectCategory}
-                    onSelectAll={handleSelectAll}
-                    itemsPerPage={itemsPerPage}
-                    currentPage={currentPage}
-                    onPageChange={handlePageClick}
-                    onEdit={handleEdit}
-                />
+                        <DashboardTable
+                            columns={columns}
+                            data={categories}
+                            selectedItems={selectedCategories}
+                            onSelectItem={handleSelectCategory}
+                            onSelectAll={handleSelectAll}
+                            itemsPerPage={itemsPerPage}
+                            currentPage={currentPage}
+                            onPageChange={handlePageClick}
+                            onEdit={handleEdit}
+                        />
+                    </>
+                )}
 
                 <AddCategoryModal open={addCategoryOpen} onClose={() => setAddCategoryOpen(false)} onAddSuccess={() => dispatch(getCategories())} />
                 <EditCategoryModal open={editCategoryOpen} onClose={() => setEditCategoryOpen(false)} category={selectedCategory} onEditSuccess={() => dispatch(getCategories())} />
@@ -102,7 +108,10 @@ const CategoriesPage = () => {
                     open={deleteCategoryOpen}
                     onClose={() => setDeleteCategoryOpen(false)}
                     items={selectedCategories.map(id => categories.find(category => category._id === id)).filter(category => category)}
-                    onDeleteSuccess={() => dispatch(getCategories())}
+                    onDeleteSuccess={() => {
+                        dispatch(getCategories())
+                        setSelectedCategories([])
+                    }}
                     endpoint="/categories/delete-bulk"
                     title="Delete Categories"
                     message="Are you sure you want to delete the selected categories?"

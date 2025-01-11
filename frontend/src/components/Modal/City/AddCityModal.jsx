@@ -1,16 +1,23 @@
 import { Autocomplete, TextField } from '@mui/material';
 import React, { useEffect, useState } from 'react';
 import { toast } from 'react-toastify';
-import { BrownButton, BrownOutlinedTextField, CustomBox, CustomModal, CustomPaper, CustomTypography } from '../../../assets/CustomComponents';
-import useAxios from '../../../axiosInstance';
+import { BrownButton, BrownOutlinedTextField, CustomBox, CustomModal, CustomPaper, CustomTypography, handleApiError } from '../../../assets/CustomComponents';
+import useAxios from '../../../utils/axiosInstance';
 
 const AddCityModal = ({ open, onClose, onAddSuccess }) => {
     const [name, setName] = useState('');
+    const [isValidName, setIsValidName] = useState(true);
     const [country, setCountry] = useState(null);
     const [zipCode, setZipCode] = useState('');
+    const [isValidZipCode, setIsValidZipCode] = useState(true);
     const [countries, setCountries] = useState([]);
 
     const axiosInstance = useAxios();
+
+    const validateName = (v) => /^[A-Z][a-zA-Z\s]{2,15}$/.test(v);
+    const validateZipCode = (v) => /^[0-9]{4,5}$/.test(v);
+
+    const isValidForm = isValidName && country && isValidZipCode;
 
     useEffect(() => {
         const fetchCountries = async () => {
@@ -21,13 +28,14 @@ const AddCityModal = ({ open, onClose, onAddSuccess }) => {
                     firstLetter: country.name[0].toUpperCase()
                 }));
                 setCountries(countriesWithGroups);
+                console.log(countriesWithGroups);
             } catch (error) {
                 console.error('Error fetching countries', error);
             }
         };
 
         fetchCountries();
-    }, [axiosInstance]);
+    }, []);
 
     const handleAddCity = async () => {
         if (!name || !country || !zipCode) {
@@ -37,9 +45,10 @@ const AddCityModal = ({ open, onClose, onAddSuccess }) => {
 
         const data = {
             name,
-            country,
+            country: country._id,
             zipCode
         }
+        console.log('Data being sent:', data);
 
         try {
             const response = await axiosInstance.post('/cities/create', data);
@@ -47,8 +56,7 @@ const AddCityModal = ({ open, onClose, onAddSuccess }) => {
             onAddSuccess(response.data);
             onClose();
         } catch (error) {
-            toast.error('Error adding city');
-            console.error('Error adding city', error);
+            handleApiError(error, 'Error adding city');
         }
     };
 
@@ -62,7 +70,12 @@ const AddCityModal = ({ open, onClose, onAddSuccess }) => {
                     required
                     label="Name"
                     value={name}
-                    onChange={(e) => setName(e.target.value)}
+                    onChange={(e) => {
+                        setName(e.target.value)
+                        setIsValidName(validateName(e.target.value));
+                    }}
+                    error={!isValidName}
+                    helperText={!isValidName ? 'Name must start with a capital letter and be 3-15 characters long' : ''}
                     className="!mb-4"
                 />
                 <Autocomplete
@@ -82,13 +95,19 @@ const AddCityModal = ({ open, onClose, onAddSuccess }) => {
                     required
                     label="Zip Code"
                     value={zipCode}
-                    onChange={(e) => setZipCode(e.target.value)}
+                    onChange={(e) => {
+                        setZipCode(e.target.value)
+                        setIsValidZipCode(validateZipCode(e.target.value));
+                    }}
+                    error={!isValidZipCode}
+                    helperText={!isValidZipCode ? 'Zip code must be 4-5 digits long' : ''}
                     className="!mb-4"
                 />
                 <BrownButton
                     onClick={handleAddCity}
                     variant="contained"
                     color="primary"
+                    disabled={!isValidForm}
                     className="w-full"
                 >
                     Add

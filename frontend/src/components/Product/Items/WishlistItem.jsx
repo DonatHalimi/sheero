@@ -4,8 +4,8 @@ import { useNavigate } from 'react-router-dom';
 import { toast } from 'react-toastify';
 import { CartDeleteButtons, DiscountPercentage, formatPrice, LoadingOverlay, OutOfStock } from '../../../assets/CustomComponents';
 import NoImage from '../../../assets/img/errors/product-not-found.png';
-import useAxios from '../../../axiosInstance';
-import { getImageUrl } from '../../../config';
+import useAxios from '../../../utils/axiosInstance';
+import { getImageUrl } from '../../../utils/config';
 
 const WishlistItem = ({ product, onRemove }) => {
     const { isAuthenticated } = useSelector(state => state.auth);

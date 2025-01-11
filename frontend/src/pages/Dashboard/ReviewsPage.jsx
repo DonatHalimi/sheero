@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
-import { DashboardHeader, RatingStars } from '../../assets/CustomComponents';
+import { DashboardHeader, LoadingDataGrid, RatingStars } from '../../assets/CustomComponents';
 import DashboardTable from '../../components/Dashboard/DashboardTable';
 import DeleteModal from '../../components/Modal/DeleteModal';
 import AddReviewModal from '../../components/Modal/Review/AddReviewModal';
@@ -8,7 +8,7 @@ import EditReviewModal from '../../components/Modal/Review/EditReviewModal';
 import { getReviews } from '../../store/actions/dashboardActions';
 
 const ReviewsPage = () => {
-    const { reviews } = useSelector((state) => state.dashboard);
+    const { reviews, loadingReviews } = useSelector((state) => state.dashboard);
     const dispatch = useDispatch();
 
     const [selectedReview, setSelectedReview] = useState(null);
@@ -73,25 +73,31 @@ const ReviewsPage = () => {
     return (
         <div className='container mx-auto max-w-screen-2xl px-4 mt-20'>
             <div className='flex flex-col items-center justify-center'>
-                <DashboardHeader
-                    title="Reviews"
-                    selectedItems={selectedReviews}
-                    setAddItemOpen={setAddReviewOpen}
-                    setDeleteItemOpen={setDeleteReviewOpen}
-                    itemName="Review"
-                />
+                {loadingReviews ? (
+                    <LoadingDataGrid />
+                ) : (
+                    <>
+                        <DashboardHeader
+                            title="Reviews"
+                            selectedItems={selectedReviews}
+                            setAddItemOpen={setAddReviewOpen}
+                            setDeleteItemOpen={setDeleteReviewOpen}
+                            itemName="Review"
+                        />
 
-                <DashboardTable
-                    columns={columns}
-                    data={reviews}
-                    selectedItems={selectedReviews}
-                    onSelectItem={handleSelectReview}
-                    onSelectAll={handleSelectAll}
-                    itemsPerPage={itemsPerPage}
-                    currentPage={currentPage}
-                    onPageChange={handlePageClick}
-                    onEdit={handleEdit}
-                />
+                        <DashboardTable
+                            columns={columns}
+                            data={reviews}
+                            selectedItems={selectedReviews}
+                            onSelectItem={handleSelectReview}
+                            onSelectAll={handleSelectAll}
+                            itemsPerPage={itemsPerPage}
+                            currentPage={currentPage}
+                            onPageChange={handlePageClick}
+                            onEdit={handleEdit}
+                        />
+                    </>
+                )}
 
                 <AddReviewModal open={addReviewOpen} onClose={() => setAddReviewOpen(false)} onAddSuccess={() => dispatch(getReviews())} />
                 <EditReviewModal open={editReviewOpen} onClose={() => setEditReviewOpen(false)} review={selectedReview} onEditSuccess={() => dispatch(getReviews())} />
@@ -99,7 +105,10 @@ const ReviewsPage = () => {
                     open={deleteReviewOpen}
                     onClose={() => setDeleteReviewOpen(false)}
                     items={selectedReviews.map(id => reviews.find(review => review._id === id)).filter(review => review)}
-                    onDeleteSuccess={() => dispatch(getReviews())}
+                    onDeleteSuccess={() => {
+                        dispatch(getReviews())
+                        setSelectedReviews([])
+                    }}
                     endpoint="/reviews/delete-bulk"
                     title="Delete Reviews"
                     message="Are you sure you want to delete the selected reviews?"

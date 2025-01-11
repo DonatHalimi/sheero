@@ -1,5 +1,5 @@
 import axios from 'axios';
-import { getApiUrl } from '../../config';
+import { getApiUrl } from '../../utils/config';
 import { AUTH_ERROR, AUTH_LOADING, LOGIN_SUCCESS, LOGOUT, REGISTER_SUCCESS, SET_USER } from '../types';
 
 export const selectIsAdmin = (state) => {
@@ -28,7 +28,7 @@ export const loadUser = () => async dispatch => {
 export const registerUser = (userData) => async (dispatch) => {
     try {
         const res = await axios.post(getApiUrl('/auth/register'), userData, { withCredentials: true, });
-
+        console.log(res);
         dispatch({
             type: REGISTER_SUCCESS,
             payload: res.data,

@@ -39,7 +39,9 @@ const getAllReturnRequests = async (req, res) => {
     try {
         const returnRequests = await ReturnRequest.find()
             .populate('products', 'name')
-            .populate('user', 'email');
+            .populate('user', 'email')
+            .sort({ createdAt: -1 });
+
         res.json({ returnRequests });
     } catch (error) {
         res.status(500).json({ message: 'Server error', error: error.message });

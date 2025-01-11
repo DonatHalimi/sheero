@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
-import { DashboardHeader } from '../../assets/CustomComponents';
+import { DashboardHeader, LoadingDataGrid } from '../../assets/CustomComponents';
 import DashboardTable from '../../components/Dashboard/DashboardTable';
 import DeleteModal from '../../components/Modal/DeleteModal';
 import AddFAQModal from '../../components/Modal/FAQ/AddFAQModal';
@@ -8,7 +8,7 @@ import EditFAQModal from '../../components/Modal/FAQ/EditFAQModal';
 import { getFAQs } from '../../store/actions/dashboardActions';
 
 const FAQPage = () => {
-    const { faqs } = useSelector((state) => state.dashboard);
+    const { faqs, loadingFaqs } = useSelector((state) => state.dashboard);
     const dispatch = useDispatch();
 
     const [selectedFaq, setSelectedFaq] = useState(null);
@@ -55,25 +55,31 @@ const FAQPage = () => {
     return (
         <div className='container mx-auto max-w-screen-2xl px-4 mt-20'>
             <div className='flex flex-col items-center justify-center'>
-                <DashboardHeader
-                    title="FAQs"
-                    selectedItems={selectedFaqs}
-                    setAddItemOpen={setAddFaqOpen}
-                    setDeleteItemOpen={setDeleteFaqOpen}
-                    itemName="FAQ"
-                />
+                {loadingFaqs ? (
+                    <LoadingDataGrid />
+                ) : (
+                    <>
+                        <DashboardHeader
+                            title="FAQs"
+                            selectedItems={selectedFaqs}
+                            setAddItemOpen={setAddFaqOpen}
+                            setDeleteItemOpen={setDeleteFaqOpen}
+                            itemName="FAQ"
+                        />
 
-                <DashboardTable
-                    columns={columns}
-                    data={faqs}
-                    selectedItems={selectedFaqs}
-                    onSelectItem={handleSelectFaq}
-                    onSelectAll={handleSelectAll}
-                    itemsPerPage={itemsPerPage}
-                    currentPage={currentPage}
-                    onPageChange={handlePageClick}
-                    onEdit={handleEdit}
-                />
+                        <DashboardTable
+                            columns={columns}
+                            data={faqs}
+                            selectedItems={selectedFaqs}
+                            onSelectItem={handleSelectFaq}
+                            onSelectAll={handleSelectAll}
+                            itemsPerPage={itemsPerPage}
+                            currentPage={currentPage}
+                            onPageChange={handlePageClick}
+                            onEdit={handleEdit}
+                        />
+                    </>
+                )}
 
                 <AddFAQModal open={addFaqOpen} onClose={() => setAddFaqOpen(false)} onAddSuccess={() => dispatch(getFAQs())} />
                 <EditFAQModal open={editFaqOpen} onClose={() => setEditFaqOpen(false)} faq={selectedFaq} onEditSuccess={() => dispatch(getFAQs())} />
@@ -81,7 +87,10 @@ const FAQPage = () => {
                     open={deleteFaqOpen}
                     onClose={() => setDeleteFaqOpen(false)}
                     items={selectedFaqs.map(id => faqs.find(faq => faq._id === id)).filter(faq => faq)}
-                    onDeleteSuccess={() => dispatch(getFAQs())}
+                    onDeleteSuccess={() => {
+                        dispatch(getFAQs())
+                        setSelectedFaqs([])
+                    }}
                     endpoint="/faqs/delete-bulk"
                     title="Delete FAQs"
                     message="Are you sure you want to delete the FAQ items?"

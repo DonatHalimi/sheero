@@ -1,18 +1,18 @@
 import { Add, LocalAtm, Payment, Remove } from '@mui/icons-material';
+import { IconButton } from '@mui/material';
 import axios from 'axios';
 import React, { useEffect, useState } from 'react';
 import { useSelector } from 'react-redux';
 import { useNavigate, useParams } from 'react-router-dom';
 import { toast } from 'react-toastify';
 import { DetailsBreadcrumbs, DetailsCartWishlistButtons, formatPrice, LoadingOverlay, LoadingProductDetails, OutOfStock } from '../../assets/CustomComponents';
-import useAxios from '../../axiosInstance';
+import useAxios from '../../utils/axiosInstance';
 import ImagePreviewModal from '../../components/Modal/ImagePreviewModal';
 import Navbar from '../../components/Navbar/Navbar';
 import AddReviewModal from '../../components/Product/Modals/AddReviewModal';
 import ProductDetailsTabs from '../../components/Product/Utils/ProductDetailsTabs';
 import Footer from '../../components/Utils/Footer';
-import { getApiUrl, getImageUrl } from '../../config';
-import { IconButton } from '@mui/material';
+import { getApiUrl, getImageUrl } from '../../utils/config';
 
 const ProductDetails = () => {
     const { isAuthenticated } = useSelector((state) => state.auth);

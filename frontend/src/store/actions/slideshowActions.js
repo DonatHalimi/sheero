@@ -1,5 +1,5 @@
 import axios from 'axios';
-import { getApiUrl } from '../../config';
+import { getApiUrl } from '../../utils/config';
 import { GET_SLIDESHOWS, GET_SLIDESHOWS_ERROR } from '../types';
 
 export const getImages = () => async (dispatch) => {

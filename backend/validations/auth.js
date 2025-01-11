@@ -4,7 +4,7 @@ const Role = require('../models/Role');
 const bcrypt = require('bcryptjs');
 
 const isValidName = (v) => /^[A-Z][a-zA-Z\s]{1,9}$/.test(v);
-const isValidPassword = (v) => /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[@$!%*?&])[A-Za-z\d@$!%*?&]{8,}$/.test(v);
+const isValidPassword = (v) => /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[@$!%*?&\(\)_\+\-.])[A-Za-z\d@$!%*?&\(\)_\+\-.]{8,}$/.test(v);
 
 const registerSchema = yup.object({
     firstName: yup
@@ -27,7 +27,7 @@ const registerSchema = yup.object({
     password: yup
         .string()
         .required('Password is required')
-        .test('is-valid-password', 'Password must be at least 8 characters long, include at least one uppercase letter, one lowercase letter, one number, and one special character (@$!%*?&)', isValidPassword),
+        .test('is-valid-password', 'Password must be at least 8 characters long, include at least one uppercase letter, one lowercase letter, one number, and one special character (@$!%*()?&)', isValidPassword),
     role: yup
         .string()
         .optional()

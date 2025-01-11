@@ -69,7 +69,7 @@ const deleteCities = async (req, res) => {
 
 const getCitiesByCountry = async (req, res) => {
     const { countryId } = req.params;
-    
+
     try {
         const cities = await City.find({ country: countryId }).populate('country');
         res.status(200).json(cities);

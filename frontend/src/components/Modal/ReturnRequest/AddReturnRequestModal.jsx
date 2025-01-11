@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
 import { toast } from 'react-toastify';
-import { BrownButton, BrownOutlinedTextField, CustomBox, CustomModal, CustomTypography } from '../../../assets/CustomComponents';
-import useAxios from '../../../axiosInstance';
+import { BrownButton, BrownOutlinedTextField, CustomBox, CustomModal, CustomTypography, handleApiError } from '../../../assets/CustomComponents';
+import useAxios from '../../../utils/axiosInstance';
 
 const AddReturnRequestModal = ({ open, onClose, onAddSuccess }) => {
     const [order, setOrder] = useState('');
@@ -11,6 +11,8 @@ const AddReturnRequestModal = ({ open, onClose, onAddSuccess }) => {
     const [isValidOrder, setIsValidOrder] = useState(true);
 
     const axiosInstance = useAxios();
+
+    const validateOrder = (id) => /^\d{9}$/.test(id);
 
     const handleAddReturnRequest = async () => {
         if (!order || !product || !user || !reason) {
@@ -31,13 +33,8 @@ const AddReturnRequestModal = ({ open, onClose, onAddSuccess }) => {
             onAddSuccess(response.data);
             onClose();
         } catch (error) {
-            console.error('Error adding return request', error);
-            toast.error('Error adding return request');
+            handleApiError(error, 'Error adding return request');
         }
-    };
-
-    const validateOrder = (order) => {
-        return order.trim().length > 0;
     };
 
     return (
@@ -54,9 +51,9 @@ const AddReturnRequestModal = ({ open, onClose, onAddSuccess }) => {
                     }}
                     fullWidth
                     required
-                    className='!mb-4'
                     error={!isValidOrder}
                     helperText={!isValidOrder ? "Please enter a valid order ID" : ""}
+                    className='!mb-4'
                 />
                 <BrownOutlinedTextField
                     label="Product"

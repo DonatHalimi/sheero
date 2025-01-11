@@ -4,8 +4,8 @@ import { Autocomplete, Box, MenuItem, Modal, TextField, Typography } from '@mui/
 import React, { useEffect, useState } from 'react';
 import { toast } from 'react-toastify';
 import { BrownButton, BrownOutlinedTextField, CustomPaper, OutlinedBrownButton, OutlinedBrownFormControl, VisuallyHiddenInput } from '../../../assets/CustomComponents';
-import useAxios from '../../../axiosInstance';
-import { getImageUrl } from '../../../config';
+import useAxios from '../../../utils/axiosInstance';
+import { getImageUrl } from '../../../utils/config';
 
 const EditProductModal = ({ open, onClose, product, onEditSuccess }) => {
     const [step, setStep] = useState(1);
@@ -115,7 +115,7 @@ const EditProductModal = ({ open, onClose, product, onEditSuccess }) => {
         };
 
         fetchData();
-    }, [axiosInstance]);
+    }, []);
 
     const handleImageChange = (e) => {
         const file = e.target.files[0];

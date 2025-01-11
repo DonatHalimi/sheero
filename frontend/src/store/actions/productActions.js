@@ -1,5 +1,5 @@
 import axios from 'axios';
-import { getApiUrl } from '../../config';
+import { getApiUrl } from '../../utils/config';
 import { GET_PRODUCTS, GET_PRODUCTS_ERROR } from '../types';
 
 export const getProducts = () => async (dispatch) => {

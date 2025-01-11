@@ -3,7 +3,7 @@ const Product = require('../models/Product');
 
 const createSubSubcategory = async (req, res) => {
     const { name, subcategory } = req.body;
-    
+
     try {
         const subSubcategory = new SubSubcategory({ name, subcategory });
         await subSubcategory.save();
@@ -58,8 +58,6 @@ const updateSubSubcategory = async (req, res) => {
 
 const deleteSubSubcategory = async (req, res) => {
     try {
-        const subSubcategory = await SubSubcategory.findById(req.params.id);
-
         const products = await Product.find({ subSubcategory: req.params.id });
         if (products.length > 0) {
             return res.status(400).json({ message: 'Cannot delete sub-subcategory with existing products' });

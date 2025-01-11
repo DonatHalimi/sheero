@@ -31,7 +31,7 @@ const Register = () => {
             firstName: /^[A-Z][a-zA-Z]{1,9}$/,
             lastName: /^[A-Z][a-zA-Z]{1,9}$/,
             email: new RegExp(`^[a-zA-Z0-9._%+-]+@(${knownEmailProviders.join('|')})$`, 'i'),
-            password: /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[@$!%*?&])[A-Za-z\d@$!%*?&]{8,}$/
+            password: /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[@$!%*?&\(\)_\+\-.])[A-Za-z\d@$!%*?&\(\)_\+\-.]{8,}$/,
         };
         return rules[name]?.test(value);
     };
@@ -74,7 +74,7 @@ const Register = () => {
         }
 
         try {
-            const response = dispatch(registerUser(formData));
+            const response = await dispatch(registerUser(formData));
             if (response?.success) {
                 toast.success('Registration successful, please log in');
                 navigate('/login');

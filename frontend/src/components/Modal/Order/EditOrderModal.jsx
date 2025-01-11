@@ -1,14 +1,8 @@
 import { MenuItem } from '@mui/material';
 import React, { useEffect, useState } from 'react';
 import { toast } from 'react-toastify';
-import {
-    BrownButton,
-    BrownOutlinedTextField,
-    CustomBox,
-    CustomModal,
-    CustomTypography
-} from '../../../assets/CustomComponents';
-import useAxios from '../../../axiosInstance';
+import { BrownButton, BrownOutlinedTextField, CustomBox, CustomModal, CustomTypography } from '../../../assets/CustomComponents';
+import useAxios from '../../../utils/axiosInstance';
 
 const EditOrderModal = ({ open, onClose, order, onEditSuccess }) => {
     const [newStatus, setNewStatus] = useState(order?.status || '');
@@ -50,8 +44,7 @@ const EditOrderModal = ({ open, onClose, order, onEditSuccess }) => {
             onEditSuccess(response.data);
             onClose();
         } catch (error) {
-            toast.error('Error updating order');
-            console.error('Error updating order', error);
+            handleApiError(error, 'Error updating order status');
         }
     };
 

@@ -1,4 +1,4 @@
-export const slideShowSkeletonStyling = {
+export const slideShowSkeletonSx = {
     position: 'absolute',
     top: '50%',
     left: '20px',
@@ -6,7 +6,7 @@ export const slideShowSkeletonStyling = {
     zIndex: 10
 }
 
-export const goBackButtonStyling = {
+export const goBackButtonSx = {
     display: 'flex',
     alignItems: 'center',
     gap: 1,
@@ -22,7 +22,7 @@ export const goBackButtonStyling = {
     margin: '0 auto',
 }
 
-export const reviewTitleStyling = {
+export const reviewTitleSx = {
     maxWidth: '200px',
     overflow: 'hidden',
     textOverflow: 'ellipsis',
@@ -30,14 +30,14 @@ export const reviewTitleStyling = {
     fontWeight: 600
 }
 
-export const reviewCommentStyling = {
+export const reviewCommentSx = {
     maxWidth: '200px',
     overflow: 'hidden',
     textOverflow: 'ellipsis',
     whiteSpace: 'nowrap',
 }
 
-export const reviewContainerStyling = {
+export const reviewContainerSx = {
     position: 'relative',
     top: '50%',
     left: '50%',
@@ -53,7 +53,7 @@ export const reviewContainerStyling = {
     outline: 'none',
 }
 
-export const reviewImageStyling = {
+export const reviewImageSx = {
     width: { xs: '100%', sm: '40%' },
     flexShrink: 0,
     mr: { sm: 2 },
@@ -63,7 +63,7 @@ export const reviewImageStyling = {
     justifyContent: 'center'
 }
 
-export const reviewContentStyling = {
+export const reviewContentSx = {
     flexGrow: 1,
     display: 'flex',
     flexDirection: 'column',
@@ -71,7 +71,7 @@ export const reviewContentStyling = {
     textAlign: 'justify'
 }
 
-export const reviewTitleContainerStyling = {
+export const reviewTitleContainerSx = {
     textAlign: 'justify',
     overflow: 'hidden',
     textOverflow: 'ellipsis',
@@ -82,7 +82,7 @@ export const reviewTitleContainerStyling = {
     overflowWrap: 'break-word'
 }
 
-export const reviewTextAreaStyling = {
+export const reviewTextAreaSx = {
     width: '90%',
     height: 'auto',
     minHeight: '150px',
@@ -99,7 +99,7 @@ export const reviewTextAreaStyling = {
     textAlign: 'left'
 }
 
-export const paginationStackStyling = (customSx = {}) => ({
+export const paginationStackSx = (customSx = {}) => ({
     marginTop: 1,
     alignItems: 'center',
     justifyContent: 'center',
@@ -125,7 +125,7 @@ export const paginationStyling = (customSx = {}) => ({
     ...customSx
 });
 
-export const searchBarInputStyling = {
+export const searchBarInputSx = {
     width: {
         xs: '350px',
         sm: '400px',
@@ -144,7 +144,7 @@ export const searchBarInputStyling = {
     },
 }
 
-export const headerSearchStyling = {
+export const headerSearchSx = {
     '& .MuiOutlinedInput-root': {
         '& fieldset': {
             borderColor: 'rgba(0, 0, 0, 0.23)',
@@ -158,7 +158,7 @@ export const headerSearchStyling = {
     },
 }
 
-export const headerFilterStyling = {
+export const headerFilterSx = {
     width: 120,
     '& .MuiOutlinedInput-notchedOutline': {
         borderColor: 'rgba(0, 0, 0, 0.23)',
@@ -171,7 +171,7 @@ export const headerFilterStyling = {
     },
 }
 
-export const searchDropdownStyling = {
+export const searchDropdownSx = {
     position: 'absolute',
     width: {
         xs: '350px',
@@ -188,7 +188,7 @@ export const searchDropdownStyling = {
     padding: '9px',
 }
 
-export const searchDropdownItemStyling = {
+export const searchDropdownItemSx = {
     bgcolor: 'white',
     borderRadius: 1,
     boxShadow: '0px 1px 3px rgba(0, 0, 0, 0.1)',
@@ -201,7 +201,7 @@ export const searchDropdownItemStyling = {
     transition: 'border-color 0.2s ease',
 }
 
-export const searchDropdownImageStyling = {
+export const searchDropdownImageSx = {
     width: '40px',
     height: '40px',
     marginLeft: '-10px',
@@ -209,7 +209,7 @@ export const searchDropdownImageStyling = {
     objectFit: 'contain',
 }
 
-export const sidebarLayoutStyling = {
+export const sidebarLayoutSx = {
     position: { xs: 'static', md: 'absolute' },
     top: { md: '24px' },
     left: { md: '10' },
@@ -238,7 +238,7 @@ export const customMenuProps = {
     },
 };
 
-export const profileLayoutStyling = {
+export const profileLayoutSx = {
     maxWidth: '1250px',
     mx: 'auto',
     px: { xs: 2, md: 3 },
@@ -250,9 +250,9 @@ export const profileLayoutStyling = {
     mt: 5
 }
 
-export const layoutContainerStyle = { flex: 1, ml: { md: '332px' }, width: '100%', mt: { xs: 4, md: 5 }, }
+export const layoutContainerSx = { flex: 1, ml: { md: '332px' }, width: '100%', mt: { xs: 4, md: 5 }, }
 
-export const filterLayoutStyling = {
+export const filterLayoutSx = {
     maxWidth: '1250px',
     mx: 'auto',
     px: { xs: 2, md: 3 },
@@ -269,7 +269,6 @@ export const getMotionDivProps = (isOpen) => ({
     animate: { opacity: 1, height: 'auto' },
     exit: { opacity: 0, height: 0 },
     transition: { duration: 0.3 },
-    className: 'bg-white rounded-b-md shadow-md mt-1 overflow-hidden',
 });
 
 export const getExpandIconProps = (isOpen) => ({
@@ -284,3 +283,54 @@ export const paginationSx = {
         justifyContent: 'flex-start',
     },
 }
+
+export const dashboardDrawerSx = (open) => ({
+    width: open ? 250 : 78,
+    transition: 'width 0.4s ease-in-out',
+    height: '100vh',
+    overflow: 'hidden',
+    '& .custom-scrollbar': {
+        height: '100%',
+        overflowY: 'auto',
+    },
+    '& .MuiDrawer-paper': {
+        width: open ? 250 : 78,
+        transition: 'width 0.4s ease-in-out',
+    },
+});
+
+export const dashboardBoxSx = {
+    backgroundColor: (theme) =>
+        theme.palette.mode === 'light'
+            ? theme.palette.grey[100]
+            : theme.palette.grey[900],
+    flexGrow: 1,
+    height: '100vh',
+    overflow: 'auto',
+};
+
+export const dashboardTitleSx = {
+    fontSize: '1.3rem',
+    fontWeight: 500,
+    padding: '4px 10px',
+}
+
+export const dashboardTableSx = {
+    border: 'none',
+    '& .MuiDataGrid-main': {
+        border: 'none',
+    },
+    '& .MuiDataGrid-columnHeader:focus': {
+        outline: 'none',
+    },
+    '& .MuiDataGrid-columnHeader:focus-within': {
+        outline: 'none',
+    },
+    '& .MuiDataGrid-cell:focus': {
+        outline: 'none',
+    },
+    '& .MuiDataGrid-cell:focus-within': {
+        outline: 'none',
+    },
+    '--DataGrid-overlayHeight': '300px',
+};

@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
-import { DashboardHeader } from '../../assets/CustomComponents';
+import { DashboardHeader, LoadingDataGrid } from '../../assets/CustomComponents';
 import DashboardTable from '../../components/Dashboard/DashboardTable';
 import DeleteModal from '../../components/Modal/DeleteModal';
 import AddSupplierModal from '../../components/Modal/Supplier/AddSupplierModal';
@@ -8,7 +8,7 @@ import EditSupplierModal from '../../components/Modal/Supplier/EditSupplierModal
 import { getSuppliers } from '../../store/actions/dashboardActions';
 
 const SupplierPage = () => {
-    const { suppliers } = useSelector((state) => state.dashboard);
+    const { suppliers, loadingSuppliers } = useSelector((state) => state.dashboard);
     const dispatch = useDispatch();
 
     const [selectedSupplier, setSelectedSupplier] = useState(null);
@@ -60,25 +60,32 @@ const SupplierPage = () => {
     return (
         <div className='container mx-auto max-w-screen-2xl px-4 mt-20'>
             <div className='flex flex-col items-center justify-center'>
-                <DashboardHeader
-                    title="Suppliers"
-                    selectedItems={selectedSuppliers}
-                    setAddItemOpen={setAddSupplierOpen}
-                    setDeleteItemOpen={setDeleteSupplierOpen}
-                    itemName="Supplier"
-                />
+                {loadingSuppliers ? (
+                    <LoadingDataGrid />
+                ) : (
+                    <>
+                        <DashboardHeader
+                            title="Suppliers"
+                            selectedItems={selectedSuppliers}
+                            setAddItemOpen={setAddSupplierOpen}
+                            setDeleteItemOpen={setDeleteSupplierOpen}
+                            itemName="Supplier"
+                        />
 
-                <DashboardTable
-                    columns={columns}
-                    data={suppliers}
-                    selectedItems={selectedSuppliers}
-                    onSelectItem={handleSelectSupplier}
-                    onSelectAll={handleSelectAll}
-                    itemsPerPage={itemsPerPage}
-                    currentPage={currentPage}
-                    onPageChange={handlePageClick}
-                    onEdit={handleEdit}
-                />
+                        <DashboardTable
+                            columns={columns}
+                            data={suppliers}
+                            selectedItems={selectedSuppliers}
+                            onSelectItem={handleSelectSupplier}
+                            onSelectAll={handleSelectAll}
+                            itemsPerPage={itemsPerPage}
+                            currentPage={currentPage}
+                            onPageChange={handlePageClick}
+                            onEdit={handleEdit}
+                        />
+                    </>
+
+                )}
 
                 <AddSupplierModal open={addSupplierOpen} onClose={() => setAddSupplierOpen(false)} onAddSuccess={() => dispatch(getSuppliers())} />
                 <EditSupplierModal open={editSupplierOpen} onClose={() => setEditSupplierOpen(false)} supplier={selectedSupplier} onEditSuccess={() => dispatch(getSuppliers())} />
@@ -86,7 +93,10 @@ const SupplierPage = () => {
                     open={deleteSupplierOpen}
                     onClose={() => setDeleteSupplierOpen(false)}
                     items={selectedSuppliers.map(id => suppliers.find(supplier => supplier._id === id)).filter(supplier => supplier)}
-                    onDeleteSuccess={() => dispatch(getSuppliers())}
+                    onDeleteSuccess={() => {
+                        dispatch(getSuppliers())
+                        setSelectedSuppliers([])
+                    }}
                     endpoint="/suppliers/delete-bulk"
                     title="Delete Suppliers"
                     message="Are you sure you want to delete the selected suppliers?"
