@@ -42,7 +42,7 @@ To set up the project locally, follow these steps:
    **Backend (`backend/.env`)**
    ```bash
    BACKEND_PORT=5000
-   MONGO_URI=your_mongodb_uri
+   MONGODB_URI=your_mongodb_uri
    JWT_SECRET=your_jwt_secret
    STRIPE_SECRET_KEY=sk_test_XXXXXXXXXXXXXXXX
    NODE_ENV=development
@@ -60,7 +60,7 @@ To set up the project locally, follow these steps:
 
    ### ``.env`` explanations
   - **BACKEND_PORT**: The port on which the backend server will run (e.g., 5000).
-  - **MONGO_URI**: The connection string for your MongoDB database.
+  - **MONGODB_URI**: The connection string for your MongoDB database.
   - **JWT_SECRET**: A secret key used for signing JSON Web Tokens.
   - **STRIPE_SECRET_KEY**: Your Stripe API secret key for payment processing.
   - **NODE_ENV**: The environment in which the app is running (`development` or `production`).
