@@ -8,6 +8,11 @@ const __dirname = path.dirname(__filename);
 
 const envFilePath = path.resolve(__dirname, '../../.env');
 
+if (process.env.NODE_ENV === 'production') {
+    console.log('Skipping environment check in production.');
+    process.exit(0);
+}
+
 if (!fs.existsSync(envFilePath)) {
     console.error(`⚠️  .env file not found at: ${envFilePath}`);
     console.error('Please create the .env file with the required environment variables.');

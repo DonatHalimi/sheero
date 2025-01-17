@@ -1,5 +1,6 @@
 import { Menu as MenuIcon } from '@mui/icons-material';
-import React, { useEffect, useRef, useState } from 'react';
+import { ClickAwayListener } from '@mui/material';
+import React, { useEffect, useState } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 import { useLocation, useNavigate } from 'react-router-dom';
 import { toast } from 'react-toastify';
@@ -13,8 +14,8 @@ import {
     ProfileIcon,
     WishlistIcon,
 } from '../../assets/CustomComponents';
-import useAxios from '../../utils/axiosInstance';
 import { logoutUser, selectIsAdmin } from '../../store/actions/authActions';
+import useAxios from '../../utils/axiosInstance';
 import CategoryNavbar from './CategoryNavbar';
 import SearchBar from './SearchBar';
 
@@ -34,9 +35,6 @@ const Navbar = () => {
     const [isSidebarOpen, setIsSidebarOpen] = useState(false);
     const [isLoading, setIsLoading] = useState(false);
     const [isFetchingCart, setIsFetchingCart] = useState(false);
-
-    const profileRef = useRef(null);
-    const cartRef = useRef(null);
 
     const fetchCartData = async () => {
         setIsFetchingCart(true);
@@ -119,22 +117,6 @@ const Navbar = () => {
         }
     };
 
-    const handleClickOutside = (event) => {
-        if (profileRef.current && !profileRef.current.contains(event.target)) {
-            setIsProfileDropdownOpen(false);
-        }
-        if (cartRef.current && !cartRef.current.contains(event.target)) {
-            setIsCartDropdownOpen(false);
-        }
-    };
-
-    useEffect(() => {
-        document.addEventListener('click', handleClickOutside);
-        return () => {
-            document.removeEventListener('click', handleClickOutside);
-        };
-    }, []);
-
     useEffect(() => {
         const handleCartUpdate = () => {
             fetchCartData();
@@ -197,42 +179,46 @@ const Navbar = () => {
                                 <div className="flex items-center space-x-1">
                                     {isAuthenticated ? (
                                         <>
-                                            <div ref={profileRef} className="relative z-[1000]">
-                                                <ProfileIcon
-                                                    handleProfileDropdownToggle={() => toggleDropdown('profile')}
-                                                    isDropdownOpen={isProfileDropdownOpen}
-                                                />
-                                                {isProfileDropdownOpen && (
-                                                    <ProfileDropdown
-                                                        isOpen={isProfileDropdownOpen}
-                                                        isAdmin={isAdmin}
-                                                        handleLogout={handleLogout}
+                                            <ClickAwayListener onClickAway={() => setIsProfileDropdownOpen(false)}>
+                                                <div className="relative z-[1000]">
+                                                    <ProfileIcon
+                                                        handleProfileDropdownToggle={() => toggleDropdown('profile')}
+                                                        isDropdownOpen={isProfileDropdownOpen}
                                                     />
-                                                )}
-                                            </div>
+                                                    {isProfileDropdownOpen && (
+                                                        <ProfileDropdown
+                                                            isOpen={isProfileDropdownOpen}
+                                                            isAdmin={isAdmin}
+                                                            handleLogout={handleLogout}
+                                                        />
+                                                    )}
+                                                </div>
+                                            </ClickAwayListener>
 
                                             <WishlistIcon />
 
-                                            <div ref={cartRef} className="relative z-[1000]">
-                                                <CartIcon
-                                                    handleCartDropdownToggle={() => toggleDropdown('cart')}
-                                                    totalQuantity={totalQuantity}
-                                                    isDropdownOpen={isCartDropdownOpen}
-                                                />
-                                                {isCartDropdownOpen && (
-                                                    <CartDropdown
-                                                        isOpen={isCartDropdownOpen}
-                                                        cartItems={cartItems}
-                                                        cartTotal={cartTotal}
-                                                        handleRemoveItem={handleRemoveItem}
-                                                        handleClearCart={handleClearCart}
-                                                        handleUpdateQuantity={handleUpdateQuantity}
-                                                        handleGoToCart={handleGoToCart}
-                                                        isLoading={isFetchingCart}
-                                                        handleProductClick={handleProductClick}
+                                            <ClickAwayListener onClickAway={() => setIsCartDropdownOpen(false)}>
+                                                <div className="relative z-[1000]">
+                                                    <CartIcon
+                                                        handleCartDropdownToggle={() => toggleDropdown('cart')}
+                                                        totalQuantity={totalQuantity}
+                                                        isDropdownOpen={isCartDropdownOpen}
                                                     />
-                                                )}
-                                            </div>
+                                                    {isCartDropdownOpen && (
+                                                        <CartDropdown
+                                                            isOpen={isCartDropdownOpen}
+                                                            cartItems={cartItems}
+                                                            cartTotal={cartTotal}
+                                                            handleRemoveItem={handleRemoveItem}
+                                                            handleClearCart={handleClearCart}
+                                                            handleUpdateQuantity={handleUpdateQuantity}
+                                                            handleGoToCart={handleGoToCart}
+                                                            isLoading={isFetchingCart}
+                                                            handleProductClick={handleProductClick}
+                                                        />
+                                                    )}
+                                                </div>
+                                            </ClickAwayListener>
                                         </>
                                     ) : (
                                         <LoginButton />

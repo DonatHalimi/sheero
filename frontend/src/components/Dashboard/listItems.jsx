@@ -41,7 +41,7 @@ import {
 } from '@mui/icons-material';
 import React, { useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { ActiveListItem, CollapsibleListItem, getLocalStorageState, saveLocalStorageState, StyledInboxIcon, StyledMoveToInboxIcon } from '../../assets/CustomComponents';
+import { ActiveListItem, CollapsibleListItem, DashboardSearchBar, getLocalStorageState, saveLocalStorageState, StyledInboxIcon, StyledMoveToInboxIcon } from '../../assets/CustomComponents';
 
 // User related pages
 const userMenuItems = [
@@ -178,6 +178,7 @@ export const mainListItems = ({ setCurrentView, collapsed }) => {
     productsOpen: true,
     addressesOpen: true,
     categoriesOpen: true,
+    reportsOpen: true
   };
 
   const [menuState, setMenuState] = useState(getLocalStorageState('menuState', defaultState));
@@ -211,8 +212,29 @@ export const mainListItems = ({ setCurrentView, collapsed }) => {
     />
   );
 
+  const getAllMenuItems = () => {
+    const allItems = [];
+    mainSections.forEach(section => {
+      section.items.forEach(item => {
+        allItems.push({
+          id: item.id,
+          label: item.label,
+          icon: item.icon,
+          parentId: section.id
+        });
+      });
+    });
+    return allItems;
+  };
+
   return (
     <>
+      <DashboardSearchBar
+        collapsed={collapsed}
+        onMenuItemClick={handleItemClick}
+        getAllMenuItems={getAllMenuItems}
+      />
+
       <ActiveListItem
         icon={activeItem === 'main' ? <Dashboard /> : <DashboardOutlined />}
         primary={!collapsed ? "Dashboard" : ""}

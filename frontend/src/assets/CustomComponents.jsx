@@ -5,6 +5,7 @@ import {
     ArrowForwardIos,
     ChevronLeft,
     ChevronRight,
+    Clear,
     Close,
     CreateOutlined,
     DashboardOutlined,
@@ -49,6 +50,7 @@ import {
     Breadcrumbs,
     Button,
     CircularProgress,
+    ClickAwayListener,
     Collapse,
     Divider,
     FormControl,
@@ -237,9 +239,7 @@ export const OutlinedBrownFormControl = styled(FormControl)({
 
 export const drawerWidth = 250;
 
-export const AppBar = styled(MuiAppBar, {
-    shouldForwardProp: (prop) => prop !== 'open',
-})(({ theme, open }) => ({
+export const AppBar = styled(MuiAppBar, { shouldForwardProp: (prop) => prop !== 'open', })(({ theme, open }) => ({
     backgroundColor: 'white',
     zIndex: theme.zIndex.drawer + 1,
     transition: theme.transitions.create(['width', 'margin'], {
@@ -256,30 +256,29 @@ export const AppBar = styled(MuiAppBar, {
     }),
 }));
 
-export const Drawer = styled(MuiDrawer, { shouldForwardProp: (prop) => prop !== 'open' })(
-    ({ theme, open }) => ({
-        '& .MuiDrawer-paper': {
-            position: 'relative',
-            whiteSpace: 'nowrap',
-            width: drawerWidth,
+export const Drawer = styled(MuiDrawer, { shouldForwardProp: (prop) => prop !== 'open' })(({ theme, open }) => ({
+    '& .MuiDrawer-paper': {
+        position: 'relative',
+        whiteSpace: 'nowrap',
+        width: drawerWidth,
+        transition: theme.transitions.create('width', {
+            easing: theme.transitions.easing.sharp,
+            duration: theme.transitions.duration.enteringScreen,
+        }),
+        boxSizing: 'border-box',
+        ...(!open && {
+            overflowX: 'hidden',
             transition: theme.transitions.create('width', {
                 easing: theme.transitions.easing.sharp,
-                duration: theme.transitions.duration.enteringScreen,
+                duration: theme.transitions.duration.leavingScreen,
             }),
-            boxSizing: 'border-box',
-            ...(!open && {
-                overflowX: 'hidden',
-                transition: theme.transitions.create('width', {
-                    easing: theme.transitions.easing.sharp,
-                    duration: theme.transitions.duration.leavingScreen,
-                }),
-                width: theme.spacing(7),
-                [theme.breakpoints.up('sm')]: {
-                    width: theme.spacing(9),
-                },
-            }),
-        },
-    })
+            width: theme.spacing(7),
+            [theme.breakpoints.up('sm')]: {
+                width: theme.spacing(9),
+            },
+        }),
+    },
+})
 );
 
 export const ActiveListItemButton = styled(ListItemButton, { shouldForwardProp: (prop) => prop !== 'isMainPage' })(({ selected, isMainPage = false }) => ({
@@ -3293,72 +3292,6 @@ export const SplideList = ({
     );
 };
 
-export const DropdownMenu = ({ auth, isAdmin, onLogout }) => {
-    const [isDropdownOpen, setIsDropdownOpen] = useState(false);
-    const dropdownRef = useRef(null);
-
-    const handleDropdownToggle = () => {
-        setIsDropdownOpen(prev => !prev);
-    };
-
-    const handleClickOutside = (event) => {
-        if (dropdownRef.current && !dropdownRef.current.contains(event.target)) {
-            setIsDropdownOpen(false);
-        }
-    };
-
-    useEffect(() => {
-        document.addEventListener('mousedown', handleClickOutside);
-        return () => {
-            document.removeEventListener('mousedown', handleClickOutside);
-        };
-    }, []);
-
-    return (
-        <div className="relative ml-4" ref={dropdownRef}>
-            <Tooltip title="Profile" arrow>
-                <div onClick={handleDropdownToggle} className="flex items-center cursor-pointer">
-                    <StyledPersonIcon />
-                    {auth.firstName && (
-                        <span className="ml-2 text-sm">{auth.firstName}</span>
-                    )}
-                </div>
-            </Tooltip>
-
-            {isDropdownOpen && (
-                <div className="absolute right-0 mt-1 w-48 bg-white border shadow-lg rounded-lg p-2">
-                    {isAdmin() && (
-                        <>
-                            <Link to="/dashboard/users" className="flex items-center px-2 py-2 mb-2 text-stone-700 hover:bg-stone-100">
-                                <StyledDashboardIcon className="mr-2" />
-                                Dashboard
-                            </Link>
-                            <div className="border-t border-stone-200 mb-2"></div>
-                        </>
-                    )}
-                    <Link to="/profile" className="flex items-center px-2 py-2 text-stone-700 hover:bg-stone-100">
-                        <StyledPersonIcon className="mr-2" />
-                        Profile
-                    </Link>
-                    <Link to="/orders" className="flex items-center px-2 py-2 text-stone-700 hover:bg-stone-100">
-                        <StyledInboxIcon className="mr-2" />
-                        Orders
-                    </Link>
-                    <Link to="/wishlist" className="flex items-center px-2 py-2 mb-2 text-stone-700 hover:bg-stone-100">
-                        <StyledFavoriteIcon className="mr-2" />
-                        Wishlist
-                    </Link>
-                    <div className="border-t border-stone-200 mb-2"></div>
-                    <button onClick={onLogout} className="flex items-center w-full px-2 py-2 text-stone-700 hover:bg-stone-100 text-left">
-                        <StyledLogoutIcon className="mr-2" />
-                        Log Out
-                    </button>
-                </div>
-            )}
-        </div>
-    );
-};
-
 export const getLocalStorageState = (key, defaultValue) => {
     const savedState = localStorage.getItem(key);
     return savedState !== null ? JSON.parse(savedState) : defaultValue;
@@ -3371,33 +3304,231 @@ export const saveLocalStorageState = (key, value) => {
 export const AuthActions = ({
     auth,
     isDropdownOpen,
-    handleProfileDropdownToggle,
+    setIsProfileDropdownOpen,
     handleLogout,
     isAdmin
 }) => {
+    const handleClickAway = () => {
+        if (isDropdownOpen) {
+            setIsProfileDropdownOpen(false);
+        }
+    };
+
     return (
         <div className="flex items-center space-x-6">
             <div className="flex items-center space-x-4">
                 {auth ? (
-                    <div className="relative ml-4">
-                        <ProfileIcon
-                            handleProfileDropdownToggle={handleProfileDropdownToggle}
-                            isDropdownOpen={isDropdownOpen}
-                            auth={auth}
-                        />
-                        {isDropdownOpen && (
-                            <ProfileDropdown
-                                isOpen={isDropdownOpen}
-                                isAdmin={isAdmin}
-                                handleLogout={handleLogout}
+                    <ClickAwayListener onClickAway={handleClickAway}>
+                        <div className="relative ml-4">
+                            <ProfileIcon
+                                handleProfileDropdownToggle={() => {
+                                    setIsProfileDropdownOpen((prev) => !prev);
+                                }}
+                                isDropdownOpen={isDropdownOpen}
+                                auth={auth}
                             />
-                        )}
-                    </div>
+                            {isDropdownOpen && (
+                                <ProfileDropdown
+                                    isOpen={isDropdownOpen}
+                                    isAdmin={isAdmin}
+                                    handleLogout={handleLogout}
+                                />
+                            )}
+                        </div>
+                    </ClickAwayListener>
                 ) : (
                     <LoginButton />
                 )}
             </div>
         </div>
+    );
+};
+
+export const DashboardSearchInput = ({ searchTerm, setSearchTerm, handleFocus, handleKeyDown, clearSearch }) => {
+    return (
+        <TextField
+            size="small"
+            fullWidth
+            placeholder="Search items..."
+            value={searchTerm}
+            onChange={(e) => setSearchTerm(e.target.value)}
+            onFocus={handleFocus}
+            onKeyDown={handleKeyDown}
+            InputProps={{
+                startAdornment: (
+                    <InputAdornment position="start">
+                        <Search color='primary' />
+                    </InputAdornment>
+                ),
+                endAdornment: (
+                    searchTerm && (
+                        <InputAdornment position="end">
+                            <IconButton
+                                onClick={clearSearch}
+                                sx={{
+                                    width: '24px',
+                                    height: '24px',
+                                }}
+                            >
+                                <Clear className="text-stone-500" sx={{ fontSize: '16px' }} />
+                            </IconButton>
+                        </InputAdornment>
+                    )
+                ),
+            }}
+        />
+    )
+}
+
+export const DashboardSearchSuggestions = ({ suggestionsRef, suggestions, selectedIndex, handleSuggestionClick, searchTerm }) => {
+    return (
+        <div
+            ref={suggestionsRef}
+            className="absolute left-2 right-2 mt-1 max-h-72 overflow-y-auto z-50 mb-2 border border-gray-200 rounded-md bg-white shadow"
+        >
+            {searchTerm && suggestions.length === 0 ? (
+                <div className="px-4 py-2 text-gray-500">No items found</div>
+            ) : (
+                suggestions.map((item, index) => (
+                    <div
+                        key={item.id}
+                        onClick={() => handleSuggestionClick(item)}
+                        className={`px-4 pt-[10px] pb-[10px] hover:bg-gray-100 cursor-pointer flex items-center gap-4 transition duration-150 ease-in-out ${index === selectedIndex ? 'bg-gray-200' : ''}`}
+                    >
+                        {item.icon?.inactive && (
+                            <item.icon.inactive className="w-5 h-5 text-stone-500" />
+                        )}
+                        <span className="text-stone-800">{item.label}</span>
+                    </div>
+                ))
+            )}
+        </div>
+    );
+};
+
+export const DashboardSearchBar = ({ collapsed, onMenuItemClick, getAllMenuItems }) => {
+    const [searchTerm, setSearchTerm] = useState('');
+    const [showSuggestions, setShowSuggestions] = useState(false);
+    const [suggestions, setSuggestions] = useState([]);
+    const [selectedIndex, setSelectedIndex] = useState(-1);
+    const location = useLocation();
+    const suggestionsRef = useRef(null);
+
+    // Filter suggestions based on the search term
+    useEffect(() => {
+        const allItems = getAllMenuItems();
+        if (!searchTerm) {
+            setSuggestions([]);
+            return;
+        }
+
+        const searchLower = searchTerm.toLowerCase();
+        const matchingItems = allItems.filter(item =>
+            item.id.toLowerCase().includes(searchLower) ||
+            item.label.toLowerCase().includes(searchLower)
+        );
+
+        setSuggestions(matchingItems);
+        setSelectedIndex(-1);
+    }, [searchTerm, getAllMenuItems]);
+
+    // Clear search term and suggestions when the location changes
+    useEffect(() => {
+        setSearchTerm('');
+        setShowSuggestions(false);
+        setSelectedIndex(-1);
+    }, [location]);
+
+    const handleSuggestionClick = (item) => {
+        onMenuItemClick(item.id);
+        setSearchTerm('');
+        setShowSuggestions(false);
+        setSelectedIndex(-1);
+    };
+
+    // Handle keyboard events (arrow keys to navigate, enter to select, and escape to close)
+    const handleKeyDown = (e) => {
+        if (!showSuggestions || suggestions.length === 0) return;
+
+        switch (e.key) {
+            case 'ArrowDown':
+                e.preventDefault();
+                setSelectedIndex((prevIndex) => {
+                    const nextIndex = Math.min(prevIndex + 1, suggestions.length - 1);
+                    scrollToSuggestion(nextIndex);
+                    return nextIndex;
+                });
+                break;
+            case 'ArrowUp':
+                e.preventDefault();
+                setSelectedIndex((prevIndex) => {
+                    const nextIndex = Math.max(prevIndex - 1, 0);
+                    scrollToSuggestion(nextIndex);
+                    return nextIndex;
+                });
+                break;
+            case 'Enter':
+                e.preventDefault();
+                if (selectedIndex >= 0 && selectedIndex < suggestions.length) {
+                    handleSuggestionClick(suggestions[selectedIndex]);
+                }
+                break;
+            case 'Escape':
+                setShowSuggestions(false);
+                setSelectedIndex(-1);
+                break;
+            default:
+                break;
+        }
+    };
+
+    // Scroll to the selected suggestion on arrow key navigation
+    const scrollToSuggestion = (index) => {
+        if (suggestionsRef.current) {
+            const suggestionElement = suggestionsRef.current.children[index];
+            if (suggestionElement) {
+                suggestionElement.scrollIntoView({
+                    block: 'nearest',
+                });
+            }
+        }
+    };
+
+    const handleFocus = () => {
+        setShowSuggestions(true);
+    };
+
+    if (collapsed) return null;
+
+    const clearSearch = () => {
+        setSearchTerm('');
+        setShowSuggestions(false);
+    };
+
+    return (
+        <ClickAwayListener onClickAway={() => {
+            setShowSuggestions(false);
+            setSelectedIndex(-1);
+        }}>
+            <div className="relative px-3 py-2">
+                <DashboardSearchInput
+                    searchTerm={searchTerm}
+                    setSearchTerm={setSearchTerm}
+                    handleFocus={handleFocus}
+                    handleKeyDown={handleKeyDown}
+                    clearSearch={clearSearch}
+                />
+                {searchTerm && showSuggestions && (
+                    <DashboardSearchSuggestions
+                        suggestionsRef={suggestionsRef}
+                        suggestions={suggestions}
+                        selectedIndex={selectedIndex}
+                        handleSuggestionClick={handleSuggestionClick}
+                        searchTerm={searchTerm}
+                    />
+                )}
+            </div>
+        </ClickAwayListener>
     );
 };
 
@@ -3421,7 +3552,16 @@ export const DashboardToolbar = ({ children }) => {
     )
 };
 
-export const DashboardNavbar = ({ open, toggleDrawer, auth, isDropdownOpen, handleProfileDropdownToggle, handleLogout, isAdmin }) => {
+export const DashboardNavbar = ({
+    open,
+    toggleDrawer,
+    auth,
+    handleProfileDropdownToggle,
+    handleLogout,
+    isAdmin
+}) => {
+    const [isProfileDropdownOpen, setIsProfileDropdownOpen] = useState(false);
+
     return (
         <DashboardAppBar open={open}>
             <DashboardToolbar>
@@ -3434,7 +3574,8 @@ export const DashboardNavbar = ({ open, toggleDrawer, auth, isDropdownOpen, hand
 
                     <AuthActions
                         auth={auth}
-                        isDropdownOpen={isDropdownOpen}
+                        isDropdownOpen={isProfileDropdownOpen}
+                        setIsProfileDropdownOpen={setIsProfileDropdownOpen}
                         handleProfileDropdownToggle={handleProfileDropdownToggle}
                         handleLogout={handleLogout}
                         isAdmin={isAdmin}

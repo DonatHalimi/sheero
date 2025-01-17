@@ -44,6 +44,7 @@ const DashboardLayout = () => {
     };
 
     const handleProfileDropdownToggle = () => setIsDropdownOpen((prev) => !prev);
+
     const handleLogout = () => {
         dispatch(logoutUser());
         setIsDropdownOpen(false);
@@ -53,6 +54,20 @@ const DashboardLayout = () => {
         const savedState = localStorage.getItem('openSidebar');
         if (savedState !== null) setOpen(JSON.parse(savedState));
     }, []);
+
+    useEffect(() => {
+        const handleKeyPress = (event) => {
+            if (event.key === '[') {
+                toggleDrawer();
+            }
+        };
+
+        window.addEventListener('keydown', handleKeyPress);
+
+        return () => {
+            window.removeEventListener('keydown', handleKeyPress);
+        };
+    }, [open]);
 
     return (
         <Box className="flex h-screen overflow-hidden bg-[#F5F5F5]">

@@ -68,6 +68,11 @@ class EnvValidator {
 
     validate() {
         try {
+            if (process.env.NODE_ENV === 'production') {
+                console.log('Skipping environment validation in production.');
+                return;
+            }
+
             this.loadEnvFile();
 
             let missingVars = [];
