@@ -3,15 +3,15 @@ import { fileURLToPath } from 'url';
 import dotenv from 'dotenv';
 import fs from 'fs';
 
-const __filename = fileURLToPath(import.meta.url);
-const __dirname = path.dirname(__filename);
-
-const envFilePath = path.resolve(__dirname, '../../.env');
-
 if (process.env.NODE_ENV === 'production') {
     console.log('Skipping environment check in production.');
     process.exit(0);
 }
+
+const __filename = fileURLToPath(import.meta.url);
+const __dirname = path.dirname(__filename);
+
+const envFilePath = path.resolve(__dirname, '../../.env');
 
 if (!fs.existsSync(envFilePath)) {
     console.error(`⚠️  .env file not found at: ${envFilePath}`);
