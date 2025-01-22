@@ -1,19 +1,27 @@
 # sheero
 
+## Table of Contents
+
+- [Overview](#overview)  
+- [Table of Contents](#table-of-contents)  
+- [Installation](#installation)  
+  - [.env explanations](#env-explanations)  
+  - [Setting up Google and Facebook OAuth](#setting-up-google-and-facebook-oauth)  
+    - [Google Client ID and Client Secret](#google-client-id-and-client-secret)  
+    - [Facebook App ID and App Secret](#facebook-app-id-and-app-secret)  
+- [Usage](#usage)  
+- [Features](#features)  
+- [Technologies Used](#technologies-used)  
+  - [Frontend](#frontend)  
+  - [Backend](#backend)  
+- [Stripe Payment Testing](#stripe-payment-testing)  
+- [API Documentation](#api-documentation)  
+
 ## Overview
 
 This is a full-stack e-commerce platform built using the MERN (MongoDB, Express.js, React.js, Node.js) stack. The project provides a user-friendly interface for shopping, managing products, and interacting with the platform efficiently.
 
 You can check out the live demo of sheero [here](https://sheero.onrender.com).
-
-## Table of Contents
-
-- [Installation](#installation)
-- [Usage](#usage)
-- [Features](#features)
-- [Technologies Used](#technologies-used)
-- [Stripe Payment Testing](#stripe-payment-testing)
-- [API Documentation](#api-documentation)
 
 ## Installation
 
@@ -51,6 +59,11 @@ To set up the project locally, follow these steps:
    ADMIN_LAST_NAME=User
    ADMIN_EMAIL=admin@gmail.com
    ADMIN_PASSWORD=WqFpq%!QLsQt4
+   SESSION_SECRET=your_session_secret
+   GOOGLE_CLIENT_ID=your_google_client_id
+   GOOGLE_CLIENT_SECRET=your_google_client_secret
+   FACEBOOK_CLIENT_ID=your_facebook_client_id
+   FACEBOOK_CLIENT_SECRET=your_facebook_client_secret
    ```
 
    **Frontend (`frontend/.env`)**
@@ -66,6 +79,90 @@ To set up the project locally, follow these steps:
   - **NODE_ENV**: The environment in which the app is running (`development` or `production`).
   - **SEED_DB**: Set to `true` to enable initial database seeding (e.g., creating the default roles and the admin user). Useful for the first-time setup or resetting the database. Leave it empty or set to `false` to skip seeding.
   - **ADMIN_FIRST_NAME**, **ADMIN_LAST_NAME**, **ADMIN_EMAIL**, **ADMIN_PASSWORD**: Credentials for the default admin user to be created during database seeding.
+  - **SESSION_SECRET**: A secret key used for signing session cookies.
+  - **GOOGLE_CLIENT_ID**, **GOOGLE_CLIENT_SECRET**: Client IDs and secrets for Google OAuth integration.
+  - **FACEBOOK_CLIENT_ID**, **FACEBOOK_CLIENT_SECRET**: Client IDs and secrets for Facebook OAuth integration.
+
+## Setting up Google and Facebook OAuth
+
+### **Google Client ID and Client Secret Setup**
+
+Google's OAuth credentials are required for integrating Google login into your application. Follow these steps:
+
+1. **Go to Google Cloud Console:**
+   - Visit [Google Cloud Console](https://console.cloud.google.com/).
+
+2. **Create a new project:**
+   - Click the dropdown menu at the top, then select **New Project**.
+   - Provide a name for the project and click **Create**.
+
+3. **Set Up OAuth Consent Screen:**
+   - Navigate to **API & Services** > **OAuth consent screen**.
+   - Select **External** as the user type.
+   - Provide the following details:
+     - **App Name**: Your application's name.
+     - **User Support Email**: Email to contact for support.
+     - **App Logo**: Upload your app logo (optional but recommended).
+     - **App Domains**: Add the domain where the frontend is hosted.
+     - **Authorized Domains**: Add domains for both the frontend and backend (e.g., `frontend.example.com`, `api.example.com`).
+     - **Developer Contact Info**: Provide one or more email addresses for developers.
+   - Add the following **scopes**:
+     - `https://www.googleapis.com/auth/userinfo.email` – See your primary Google Account email address.
+     - `https://www.googleapis.com/auth/userinfo.profile` – See your personal info, including any publicly available info.
+     - `openid` – Associate you with your personal info on Google.
+   - Save and continue.
+   - Add **Test Users** under the "Test Users" section (e.g., email addresses of those who will test the app during development).
+   - Finish setting up the consent screen.
+
+4. **Create OAuth Credentials:**
+   - Go to **API & Services** > **Credentials**.
+   - Click **Create Credentials** and select **OAuth 2.0 Client IDs**.
+   - Choose **Web application** as the application type.
+   - Add **Authorized Redirect URIs** (e.g., `http://localhost:5000/api/auth/google/callback`).
+   - Click **Create** to generate your **Client ID** and **Client Secret** and save them in the backend `.env` file.
+
+5. **Official Guide:** Refer to the [Google OAuth Setup Documentation](https://developers.google.com/identity/protocols/oauth2) for more details.
+
+---
+
+### **Facebook App ID and App Secret**
+
+Facebook credentials are needed for enabling Facebook login in your app. Follow these steps.
+
+1. **Go to Meta for Developers:**
+   - Visit [Meta for Developers](https://developers.facebook.com/).
+
+2. **Create a New App:**
+   - Log in and click **Get Started**.
+   - Go to the **My Apps** section and click **Create App**.
+   - Choose **Consumer** as the app type and click **Next**.
+   - Provide an **App Name**, **Contact Email**, and click **Create App**.
+
+3. **Add Facebook Login to Your App:**
+   - In the app dashboard, click **Add Product** in the left sidebar.
+   - Select **Facebook Login** and choose **Web** as the platform.
+   - Follow the setup instructions to configure Facebook Login for your app, including adding the domain where your frontend or backend is hosted.
+
+4. **Configure Basic Settings:**
+   - Go to **Settings** > **Basic**, and fill in the following:
+     - **App Domains**: Add domains where the frontend and backend are hosted (e.g., `frontend.example.com`, `api.example.com`).
+     - **Privacy Policy URL**: Provide a valid link to your app's privacy policy.
+     - **Terms of Service URL**: Optionally add a terms of service URL.
+     - **App Icon**: Add an icon for your app (optional but recommended).
+     - **Category**: Select a relevant category for your app.
+     - Save the changes and note down your **App ID** and **App Secret** in the backend `.env` file.
+
+5. **Set Up OAuth and Redirect URIs:**
+   - Under **Facebook Login Settings**:
+     - Add your **Valid OAuth Redirect URI** (e.g., `http://localhost:5000/api/auth/facebook/callback`).
+
+6. **Add Permissions and Scopes:**
+   - Go to **Use Cases** > **Authenticate and Request Data from Users with Facebook Login**.
+   - Under **Customize**, click **Permissions** and add the **email** permission. This is necessary to access the user's email address during authentication.
+
+7. **Official Guide:** Refer to the [Facebook Login Setup Documentation](https://developers.facebook.com/docs/facebook-login) for further guidance.
+
+---
 
 5. Start the backend server:
    ```bash
@@ -111,11 +208,12 @@ After running ``npm start`` in the backend directory, the application will autom
 
 ## Usage
 
-Once the application is running, you can access it in your web browser at `http://localhost:3000`. You can register a new account, browse products, add an address, add items to your cart, and make purchases.
+Once the application is running, you can access it in your web browser at `http://localhost:3000`. You can register a new account, browse products, add an address, add items to your cart and make purchases.
 
 ## Features
 
 - User authentication and authorization with accessToken through cookies
+- Google and Facebook login options for seamless authentication
 - State management with Redux for handling application state
 - Address management for shipping
 - Product management with categories
@@ -128,113 +226,12 @@ Once the application is running, you can access it in your web browser at `http:
 ### Technologies Used
 
 #### Frontend
-The frontend is built with modern web technologies that focus on UI/UX, routing, and handling API requests efficiently.
-
-## `package.json` in Frontend
-
-```json
-{
-  "name": "frontend",
-  "private": true,
-  "version": "0.0.0",
-  "type": "module",
-  "scripts": {
-    "dev": "vite --port 3000 --open",
-    "build": "vite build && cp public/_redirects dist/",
-    "lint": "eslint . --ext js,jsx --report-unused-disable-directives --max-warnings 0",
-    "preview": "vite preview"
-  },
-  "dependencies": {
-    "@mui/icons-material": "^5.16.1",
-    "@mui/material": "^5.16.1",
-    "@mui/x-data-grid": "^7.14.0",
-    "@reduxjs/toolkit": "^2.3.0",
-    "@splidejs/react-splide": "^0.7.12",
-    "@tailwindcss/aspect-ratio": "^0.4.2",
-    "axios": "^1.7.2",
-    "framer-motion": "^11.3.12",
-    "jspdf": "^2.5.2",
-    "jspdf-autotable": "^3.8.4",
-    "npm": "^11.0.0",
-    "react": "^18.3.1",
-    "react-dom": "^18.3.1",
-    "react-intersection-observer": "^9.13.1",
-    "react-redux": "^9.1.2",
-    "react-router-dom": "^6.24.1",
-    "react-swipeable": "^7.0.1",
-    "react-toastify": "^10.0.5",
-    "redux": "^5.0.1"
-  },
-  "devDependencies": {
-    "@types/react": "^18.3.3",
-    "@types/react-dom": "^18.3.0",
-    "@vitejs/plugin-react": "^4.3.1",
-    "autoprefixer": "^10.4.19",
-    "eslint": "^8.57.0",
-    "eslint-plugin-react": "^7.34.2",
-    "eslint-plugin-react-hooks": "^4.6.2",
-    "eslint-plugin-react-refresh": "^0.4.7",
-    "postcss": "^8.4.39",
-    "tailwindcss": "^3.4.4",
-    "vite": "^5.3.1"
-  }
-}
-```
-- [**Material UI**](https://mui.com): Provides prebuilt components for React, including icons, buttons, and grids.
-- [**Axios**](https://www.npmjs.com/package/axios): Simplifies HTTP requests, making it easier to fetch data from the backend.
-- [**React Router DOM**](https://www.npmjs.com/package/react-router-dom): Enables routing between different pages in the app.
-- [**React Redux**](https://www.npmjs.com/package/react-redux): A library that provides bindings for Redux, allowing you to manage application state and pass it to React components efficiently using hooks like `useDispatch` and `useSelector`.  
-- [**React Intersection Observer**](https://www.npmjs.com/package/react-intersection-observer): A React wrapper used to detect when products in home page are visible in the viewport, enabling the load more feature functionality.
-- [**Tailwind CSS**](https://tailwindcss.com): Utility-first CSS framework for rapid UI development.
-- [**Framer Motion**](https://www.npmjs.com/package/framer-motion): Provides animation capabilities for enhanced user experience.
-- [**Vite**](https://vite.dev/guide/): A fast frontend build tool, replacing Webpack for development and build processes.
-- [**React Toastify**](https://www.npmjs.com/package/react-toastify): A package for showing customizable notifications in the app.
+The frontend is built with modern web technologies that focus on UI/UX, routing, and handling API requests efficiently.  
+Follow the instructions in the [frontend/README.md](frontend/README.md) file to learn more about the structure of the frontend directory and `package.json`.
 
 #### Backend
-The backend is a Node.js API server designed to handle requests, manage authentication, and interact with the MongoDB database. It uses JWT tokens for secure access and authorization, along with Stripe for payment integration.
-
-## `package.json` in Backend
-
-```json
-{
-  "name": "backend",
-  "version": "1.0.0",
-  "description": "Node.js backend for role-based JWT authentication for an e-commerce website with access tokens",
-  "main": "index.js",
-  "scripts": {
-    "start": "node index.js",
-    "dev": "nodemon index.js"
-  },
-  "dependencies": {
-    "bcryptjs": "^2.4.3",
-    "cookie-parser": "^1.4.7",
-    "cors": "^2.8.5",
-    "dotenv": "^16.4.5",
-    "express": "^4.19.2",
-    "jsonwebtoken": "^9.0.2",
-    "mongoose": "^8.5.1",
-    "multer": "^1.4.5-lts.1",
-    "stripe": "^16.12.0",
-    "yup": "^1.4.0"
-  },
-  "devDependencies": {
-    "nodemon": "^3.1.4"
-  },
-  "keywords": [],
-  "author": "",
-  "license": "ISC"
-}
-```
-- [**Bcrypt.js**](https://www.npmjs.com/package/bcryptjs): A hashing library for securely storing and comparing user passwords.
-- [**Cookie Parser**](https://www.npmjs.com/package/cookie-parser): Middleware for parsing cookies in HTTP requests, making it easier to work with cookies in a Node.js application, especially for handling session data or authentication tokens
-- [**CORS**](https://www.npmjs.com/package/cors): Middleware for enabling Cross-Origin Resource Sharing, allowing frontend access from different domains.
-- [**Express.js**](https://www.npmjs.com/package/express): A minimalist web framework for Node.js, making it easy to set up routes and middleware.
-- [**JWT (jsonwebtoken)**](https://jwt.io/introduction): Used for secure authentication and authorization via tokens.
-- [**Mongoose**](https://www.npmjs.com/package/mongoose): A library for interacting with MongoDB, providing an object data modeling (ODM) solution.
-- [**Multer**](https://www.npmjs.com/package/multer): A middleware for handling multipart form data, in this case used for uploading images. 
-- [**Nodemon**](https://www.npmjs.com/package/nodemon): Automatically restarts the server on file changes, speeding up development.
-- [**Stripe**](https://www.npmjs.com/package/stripe): For securely processing payments online with ease, with out-of-the-box integration.
-- [**Yup**](https://www.npmjs.com/package/yup): A JavaScript schema builder for value parsing and validation, in this case used for data validation.
+The backend is a Node.js API server designed to handle requests, manage authentication, and interact with the MongoDB database. It uses JWT tokens for secure access and authorization, along with Stripe for payment integration.  
+Follow the instructions in the [backend/README.md](backend/README.md) file to learn more about the structure of the backend directory and `package.json`.
 
 ## Stripe Payment Testing
 

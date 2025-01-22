@@ -46,6 +46,17 @@ const ReviewsPage = () => {
         setEditReviewOpen(true);
     };
 
+    const getSelectedReviews = () => {
+        return selectedReviews
+            .map((id) => reviews.find((review) => review._id === id))
+            .filter((review) => review);
+    };
+
+    const handleDeleteSuccess = () => {
+        dispatch(getReviews());
+        setSelectedReviews([]);
+    };
+
     const columns = [
         { key: 'user.firstName', label: 'First Name' },
         { key: 'user.lastName', label: 'Last Name' },
@@ -104,11 +115,8 @@ const ReviewsPage = () => {
                 <DeleteModal
                     open={deleteReviewOpen}
                     onClose={() => setDeleteReviewOpen(false)}
-                    items={selectedReviews.map(id => reviews.find(review => review._id === id)).filter(review => review)}
-                    onDeleteSuccess={() => {
-                        dispatch(getReviews())
-                        setSelectedReviews([])
-                    }}
+                    items={getSelectedReviews()}
+                    onDeleteSuccess={handleDeleteSuccess}
                     endpoint="/reviews/delete-bulk"
                     title="Delete Reviews"
                     message="Are you sure you want to delete the selected reviews?"

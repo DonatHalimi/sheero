@@ -1,7 +1,7 @@
-import { InputLabel, MenuItem, Select } from '@mui/material';
+import { Autocomplete, TextField } from '@mui/material';
 import React, { useEffect, useState } from 'react';
 import { toast } from 'react-toastify';
-import { BrownButton, BrownOutlinedTextField, CustomBox, CustomModal, CustomTypography, handleApiError, OutlinedBrownFormControl } from '../../../assets/CustomComponents';
+import { BrownButton, BrownOutlinedTextField, CustomBox, CustomModal, CustomTypography, handleApiError, DashboardCountryFlag, CustomPaper } from '../../../assets/CustomComponents';
 import useAxios from '../../../utils/axiosInstance';
 
 const EditCityModal = ({ open, onClose, city, onEditSuccess }) => {
@@ -10,7 +10,7 @@ const EditCityModal = ({ open, onClose, city, onEditSuccess }) => {
     const [country, setCountry] = useState('');
     const [zipCode, setZipCode] = useState('');
     const [isValidZipCode, setIsValidZipCode] = useState(true);
-    const [countries, setCountries] = useState([]);
+    const [countriesWithGroups, setCountriesWithGroups] = useState([]);
 
     const axiosInstance = useAxios();
 
@@ -29,7 +29,11 @@ const EditCityModal = ({ open, onClose, city, onEditSuccess }) => {
         const fetchCountries = async () => {
             try {
                 const response = await axiosInstance.get('/countries/get');
-                setCountries(response.data);
+                const countriesWithGroups = response.data.map(country => ({
+                    ...country,
+                    firstLetter: country.name[0].toUpperCase()
+                }));
+                setCountriesWithGroups(countriesWithGroups);
             } catch (error) {
                 console.error('Error fetching countries', error);
             }
@@ -73,20 +77,25 @@ const EditCityModal = ({ open, onClose, city, onEditSuccess }) => {
                     helperText={!isValidName ? 'Name must start with a capital letter and be 3-15 characters long' : ''}
                     className="!mb-4"
                 />
-                <OutlinedBrownFormControl fullWidth className="!mb-4">
-                    <InputLabel>Country</InputLabel>
-                    <Select
-                        value={country}
-                        onChange={(e) => setCountry(e.target.value)}
-                        label="Country"
-                    >
-                        {countries.map((country) => (
-                            <MenuItem key={country._id} value={country._id}>
-                                {country.name}
-                            </MenuItem>
-                        ))}
-                    </Select>
-                </OutlinedBrownFormControl>
+
+                <Autocomplete
+                    id="country-autocomplete"
+                    options={countriesWithGroups}
+                    groupBy={(option) => option.firstLetter}
+                    getOptionLabel={(option) => option.name}
+                    value={countriesWithGroups.find(c => c._id === country) || null}
+                    onChange={(event, newValue) => setCountry(newValue ? newValue._id : '')}
+                    PaperComponent={CustomPaper}
+                    fullWidth
+                    renderOption={(props, option) => (
+                        <li {...props} style={{ display: 'flex', alignItems: 'center' }}>
+                            <DashboardCountryFlag countryCode={option.countryCode} name={option.name} />
+                        </li>
+                    )}
+                    renderInput={(params) => <TextField {...params} label="Country" variant="outlined" />}
+                    className='!mb-4'
+                />
+
                 <BrownOutlinedTextField
                     fullWidth
                     required

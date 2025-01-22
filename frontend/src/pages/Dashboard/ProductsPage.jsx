@@ -1,12 +1,11 @@
 import React, { useEffect, useState } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
-import { DashboardHeader, LoadingDataGrid } from '../../assets/CustomComponents';
+import { DashboardHeader, DashboardImage, LoadingDataGrid } from '../../assets/CustomComponents';
 import DashboardTable from '../../components/Dashboard/DashboardTable';
 import DeleteModal from '../../components/Modal/DeleteModal';
 import ImagePreviewModal from '../../components/Modal/ImagePreviewModal';
 import AddProductModal from '../../components/Modal/Product/AddProductModal';
 import EditProductModal from '../../components/Modal/Product/EditProductModal';
-import { getImageUrl } from '../../utils/config';
 import { getProducts } from '../../store/actions/productActions';
 
 const ProductsPage = () => {
@@ -61,8 +60,24 @@ const ProductsPage = () => {
         setEditProductOpen(true);
     };
 
+    const getSelectedProducts = () => {
+        return selectedProducts
+            .map((id) => products.find((product) => product._id === id))
+            .filter((product) => product);
+    };
+
+    const handleDeleteSuccess = () => {
+        dispatch(getProducts());
+        setSelectedProducts([]);
+    };
+
     const columns = [
         { key: 'name', label: 'Name' },
+        {
+            key: 'image',
+            label: 'Image',
+            render: (item) => <DashboardImage item={item} handleImageClick={handleImageClick} />
+        },
         { key: 'description', label: 'Description' },
         { key: 'details', label: 'Details', render: (item) => truncateItems(item.details.map(detail => `${detail.attribute}: ${detail.value}`)).join(', ') || 'N/A' },
         { key: 'price', label: 'Price' },
@@ -76,20 +91,6 @@ const ProductsPage = () => {
         { key: 'variants', label: 'Variants', render: (item) => truncateItems(item.variants.map(variant => `Color: ${variant.color}, Size: ${variant.size}`)).join(', ') },
         { key: 'supplier.name', label: 'Supplier' },
         { key: 'shipping', label: 'Shipping', render: (item) => item.shipping ? `${item.shipping.weight} kg, ${item.shipping.cost}€, ${item.shipping.packageSize}` : 'None' },
-        {
-            key: 'image',
-            label: 'Image',
-            render: (item) => (
-                <img
-                    className='rounded-md cursor-pointer'
-                    src={getImageUrl(item.image)}
-                    alt=""
-                    width={70}
-                    style={{ position: 'relative', top: '7px' }}
-                    onClick={() => handleImageClick(getImageUrl(item.image))}
-                />
-            )
-        },
         { key: 'actions', label: 'Actions' }
     ];
 
@@ -128,11 +129,8 @@ const ProductsPage = () => {
                 <DeleteModal
                     open={deleteProductOpen}
                     onClose={() => setDeleteProductOpen(false)}
-                    items={selectedProducts.map(id => products.find(product => product._id === id)).filter(product => product)}
-                    onDeleteSuccess={() => {
-                        dispatch(getProducts())
-                        setSelectedProducts([])
-                    }}
+                    items={getSelectedProducts()}
+                    onDeleteSuccess={handleDeleteSuccess}
                     endpoint="/products/delete-bulk"
                     title="Delete Products"
                     message="Are you sure you want to delete the selected products?"

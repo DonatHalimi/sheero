@@ -2,14 +2,14 @@ const Country = require('../models/Country');
 const City = require('../models/City');
 
 const createCountry = async (req, res) => {
-    const { name } = req.body;
+    const { name, countryCode } = req.body;
 
     try {
-        const country = new Country({ name });
+        const country = new Country({ name, countryCode });
         await country.save();
         res.status(201).json({ message: 'Country created successfully', country });
     } catch (error) {
-        res.status(500).json({ message: 'Server error' });
+        res.status(500).json({ message: 'Server error', error: error.message });
     }
 };
 
@@ -18,7 +18,7 @@ const getCountries = async (req, res) => {
         const countries = await Country.find();
         res.status(200).json(countries);
     } catch (error) {
-        res.status(500).json({ message: 'Server error' });
+        res.status(500).json({ message: 'Server error', error: error.message });
     }
 };
 
@@ -27,22 +27,22 @@ const getCountryById = async (req, res) => {
         const country = await Country.findById(req.params.id);
         res.status(200).json(country);
     } catch (error) {
-        res.status(500).json({ message: 'Server error' });
+        res.status(500).json({ message: 'Server error', error: error.message });
     }
 };
 
 const updateCountry = async (req, res) => {
-    const { name } = req.body;
+    const { name, countryCode } = req.body;
 
     try {
         const country = await Country.findByIdAndUpdate(
             req.params.id,
-            { name, updatedAt: Date.now() },
+            { name, countryCode, updatedAt: Date.now() },
             { new: true }
         );
         res.status(200).json({ message: 'Country updated successfully', country });
     } catch (error) {
-        res.status(500).json({ message: 'Server error' });
+        res.status(500).json({ message: 'Server error', error: error.message });
     }
 };
 
@@ -62,12 +62,16 @@ const deleteCountries = async (req, res) => {
         const countries = await Country.find({ _id: { $in: ids } });
 
         for (const country of countries) {
-            await City.deleteMany({ country: country._id });
+            const cities = await City.find({ country: country._id });
+            
+            if (cities.length > 0) {
+                return res.status(400).json({ message: `Cannot delete country '${country.name}' as it has associated cities` });
+            }
         }
 
         await Country.deleteMany({ _id: { $in: ids } });
 
-        res.status(200).json({ message: 'Countries and associated cities deleted successfully' });
+        res.status(200).json({ message: 'Countries deleted successfully' });
     } catch (error) {
         res.status(500).json({ message: 'Server error', error: error.message });
     }

@@ -1,5 +1,4 @@
-import VisibilityIcon from '@mui/icons-material/Visibility';
-import VisibilityOffIcon from '@mui/icons-material/VisibilityOff';
+import { Visibility, VisibilityOff } from '@mui/icons-material';
 import { IconButton, InputAdornment, InputLabel, MenuItem, Select } from '@mui/material';
 import React, { useEffect, useState } from 'react';
 import { toast } from 'react-toastify';
@@ -69,6 +68,7 @@ const EditUserModal = ({ open, onClose, user, onEditSuccess }) => {
             if (password && password.trim()) {
                 updatedData.password = password;
             }
+
             const response = await axiosInstance.put(`/users/update/${user._id}`, updatedData);
             toast.success(response.data.message);
             onEditSuccess(response.data);
@@ -134,7 +134,7 @@ const EditUserModal = ({ open, onClose, user, onEditSuccess }) => {
                                     onClick={handleClickShowPassword}
                                     onMouseDown={handleMouseDownPassword}
                                 >
-                                    {showPassword ? <VisibilityIcon /> : <VisibilityOffIcon />}
+                                    {showPassword ? <Visibility /> : <VisibilityOff />}
                                 </IconButton>
                             </InputAdornment>
                         ),

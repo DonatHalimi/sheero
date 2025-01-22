@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from 'react';
 import { useDispatch, useSelector } from "react-redux";
-import { DashboardHeader, LoadingDataGrid } from '../../assets/CustomComponents.jsx';
+import { DashboardCountryFlag, DashboardHeader, LoadingDataGrid } from '../../assets/CustomComponents.jsx';
 import DashboardTable from '../../components/Dashboard/DashboardTable';
 import AddCountryModal from '../../components/Modal/Country/AddCountryModal.jsx';
 import EditCountryModal from '../../components/Modal/Country/EditCountryModal.jsx';
@@ -46,8 +46,24 @@ const CountriesPage = () => {
         setEditCountryOpen(true);
     };
 
+    const getSelectedCountries = () => {
+        return selectedCountries
+            .map((id) => countries.find((country) => country._id === id))
+            .filter((country) => country);
+    };
+
+    const handleDeleteSuccess = () => {
+        dispatch(getCountries());
+        setSelectedCountries([]);
+    };
+
     const columns = [
-        { key: 'name', label: 'Name' },
+        { key: 'countryCode', label: 'Code' },
+        {
+            key: 'name',
+            label: 'Name',
+            render: (country) => <DashboardCountryFlag countryCode={country.countryCode} name={country.name} />,
+        },
         { key: 'actions', label: 'Actions' }
     ];
 
@@ -59,7 +75,6 @@ const CountriesPage = () => {
                 ) : (
                     <>
                         <DashboardHeader
-
                             title="Countries"
                             selectedItems={selectedCountries}
                             setAddItemOpen={setAddCountryOpen}
@@ -86,11 +101,8 @@ const CountriesPage = () => {
                 <DeleteModal
                     open={deleteCountryOpen}
                     onClose={() => setDeleteCountryOpen(false)}
-                    items={selectedCountries.map(id => countries.find(country => country._id === id)).filter(country => country)}
-                    onDeleteSuccess={() => {
-                        dispatch(getCountries())
-                        setSelectedCountries([])
-                    }}
+                    items={getSelectedCountries()}
+                    onDeleteSuccess={handleDeleteSuccess}
                     endpoint="/countries/delete-bulk"
                     title="Delete Countries"
                     message="Are you sure you want to delete the selected countries?"

@@ -1,7 +1,7 @@
 import { Autocomplete, TextField } from '@mui/material';
 import React, { useEffect, useState } from 'react';
 import { toast } from 'react-toastify';
-import { BrownButton, BrownOutlinedTextField, CustomBox, CustomModal, CustomPaper, CustomTypography, handleApiError } from '../../../assets/CustomComponents';
+import { BrownButton, BrownOutlinedTextField, CustomBox, CustomModal, CustomPaper, CustomTypography, handleApiError, DashboardCountryFlag } from '../../../assets/CustomComponents';
 import useAxios from '../../../utils/axiosInstance';
 
 const AddCityModal = ({ open, onClose, onAddSuccess }) => {
@@ -10,7 +10,7 @@ const AddCityModal = ({ open, onClose, onAddSuccess }) => {
     const [country, setCountry] = useState(null);
     const [zipCode, setZipCode] = useState('');
     const [isValidZipCode, setIsValidZipCode] = useState(true);
-    const [countries, setCountries] = useState([]);
+    const [countriesWithGroups, setCountriesWithGroups] = useState([]);
 
     const axiosInstance = useAxios();
 
@@ -27,8 +27,7 @@ const AddCityModal = ({ open, onClose, onAddSuccess }) => {
                     ...country,
                     firstLetter: country.name[0].toUpperCase()
                 }));
-                setCountries(countriesWithGroups);
-                console.log(countriesWithGroups);
+                setCountriesWithGroups(countriesWithGroups);
             } catch (error) {
                 console.error('Error fetching countries', error);
             }
@@ -48,7 +47,6 @@ const AddCityModal = ({ open, onClose, onAddSuccess }) => {
             country: country._id,
             zipCode
         }
-        console.log('Data being sent:', data);
 
         try {
             const response = await axiosInstance.post('/cities/create', data);
@@ -78,15 +76,21 @@ const AddCityModal = ({ open, onClose, onAddSuccess }) => {
                     helperText={!isValidName ? 'Name must start with a capital letter and be 3-15 characters long' : ''}
                     className="!mb-4"
                 />
+
                 <Autocomplete
                     id="country-autocomplete"
-                    options={countries.sort((a, b) => -b.firstLetter.localeCompare(a.firstLetter))}
+                    options={countriesWithGroups}
                     groupBy={(option) => option.firstLetter}
                     getOptionLabel={(option) => option.name}
-                    value={country}
+                    value={countriesWithGroups.find(c => c._id === country) || null}
                     onChange={(event, newValue) => setCountry(newValue)}
                     PaperComponent={CustomPaper}
                     fullWidth
+                    renderOption={(props, option) => (
+                        <li {...props} style={{ display: 'flex', alignItems: 'center' }}>
+                            <DashboardCountryFlag countryCode={option.countryCode} name={option.name} />
+                        </li>
+                    )}
                     renderInput={(params) => <TextField {...params} label="Country" variant="outlined" />}
                     className='!mb-4'
                 />

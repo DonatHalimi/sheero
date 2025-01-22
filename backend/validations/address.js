@@ -51,7 +51,7 @@ const createSchema = yup.object({
         }),
     comment: yup
         .string()
-        .optional()
+        .nullable()
         .test('is-valid-comment', 'Comment must be 2-25 characters long and contain only alphanumeric characters and spaces', function (value) {
             if (value && !isValidComment(value)) {
                 return this.createError({
@@ -179,6 +179,7 @@ const updateSchema = yup.object({
         }),
     comment: yup
         .string()
+        .nullable()
         .test('is-valid-comment', 'Comment must be 2-25 characters long', function (value) {
             if (value) {
                 return isValidComment(value);

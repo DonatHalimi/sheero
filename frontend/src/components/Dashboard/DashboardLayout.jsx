@@ -5,7 +5,7 @@ import Toolbar from '@mui/material/Toolbar';
 import React, { useEffect, useState } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 import { Outlet } from 'react-router-dom';
-import { DashboardCollapse, DashboardNavbar, Drawer } from '../../assets/CustomComponents';
+import { DashboardCollapse, DashboardNavbar, Drawer, getLocalStorageState, saveLocalStorageState } from '../../assets/CustomComponents';
 import { dashboardBoxSx, dashboardDrawerSx } from '../../assets/sx';
 import { logoutUser, selectIsAdmin } from '../../store/actions/authActions';
 import { mainListItems, secondaryListItems } from './listItems';
@@ -30,17 +30,13 @@ const DashboardLayout = () => {
     const isAdmin = useSelector(selectIsAdmin);
     const dispatch = useDispatch();
 
-    const [open, setOpen] = useState(() => {
-        const savedState = localStorage.getItem('openSidebar');
-        return savedState ? JSON.parse(savedState) : true;
-    });
-
+    const [open, setOpen] = useState(() => getLocalStorageState('openSidebar', true));
     const [isDropdownOpen, setIsDropdownOpen] = useState(false);
 
     const toggleDrawer = () => {
         const newState = !open;
         setOpen(newState);
-        localStorage.setItem('openSidebar', JSON.stringify(newState));
+        saveLocalStorageState('openSidebar', newState);
     };
 
     const handleProfileDropdownToggle = () => setIsDropdownOpen((prev) => !prev);
@@ -49,11 +45,6 @@ const DashboardLayout = () => {
         dispatch(logoutUser());
         setIsDropdownOpen(false);
     };
-
-    useEffect(() => {
-        const savedState = localStorage.getItem('openSidebar');
-        if (savedState !== null) setOpen(JSON.parse(savedState));
-    }, []);
 
     useEffect(() => {
         const handleKeyPress = (event) => {

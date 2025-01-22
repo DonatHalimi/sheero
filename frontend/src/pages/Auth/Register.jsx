@@ -1,11 +1,10 @@
-import VisibilityIcon from '@mui/icons-material/Visibility';
-import VisibilityOffIcon from '@mui/icons-material/VisibilityOff';
-import { Box, Container, IconButton, InputAdornment, Typography } from '@mui/material';
+import { Facebook, Google, Visibility, VisibilityOff } from '@mui/icons-material';
+import { Box, Container, Divider, IconButton, InputAdornment, Typography } from '@mui/material';
 import React, { useState } from 'react';
 import { useDispatch } from 'react-redux';
 import { useNavigate } from 'react-router-dom';
 import { toast } from 'react-toastify';
-import { BrownButton, BrownOutlinedTextField, ErrorTooltip, knownEmailProviders } from '../../assets/CustomComponents';
+import { BrownButton, BrownOutlinedTextField, ErrorTooltip, handleFacebookLogin, handleGoogleLogin, knownEmailProviders, SocialLoginButtons } from '../../assets/CustomComponents';
 import Navbar from '../../components/Navbar/Navbar';
 import Footer from '../../components/Utils/Footer';
 import { registerUser } from '../../store/actions/authActions';
@@ -97,6 +96,13 @@ const Register = () => {
                     <Typography variant="h5" align="left" className="!mb-4 font-extrabold text-stone-600">
                         Join Us
                     </Typography>
+
+                    <SocialLoginButtons
+                        handleGoogleLogin={handleGoogleLogin}
+                        handleFacebookLogin={handleFacebookLogin}
+                        isRegisterPage={true}
+                    />
+
                     <Box component="form" onSubmit={handleSubmit} noValidate className="w-full">
                         {Object.entries(formData).map(([name, value]) => (
                             <div key={name} className="relative mb-5">
@@ -129,11 +135,7 @@ const Register = () => {
                                                             onClick={handleClickShowPassword}
                                                             onMouseDown={handleMouseDownPassword}
                                                         >
-                                                            {showPassword ? (
-                                                                <VisibilityIcon />
-                                                            ) : (
-                                                                <VisibilityOffIcon />
-                                                            )}
+                                                            {showPassword ? <Visibility /> : <VisibilityOff />}
                                                         </IconButton>
                                                     </InputAdornment>
                                                 )

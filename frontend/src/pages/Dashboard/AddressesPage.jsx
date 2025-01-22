@@ -42,6 +42,17 @@ const AddressesPage = () => {
         setEditAddressOpen(true);
     };
 
+    const getSelectedAddresses = () => {
+        return selectedAddresses
+            .map((id) => addresses.find((address) => address._id === id))
+            .filter((address) => address);
+    };
+
+    const handleDeleteSuccess = () => {
+        dispatch(getAddresses());
+        setSelectedAddresses([]);
+    };
+
     const columns = [
         { key: 'user.firstName', label: 'First Name' },
         { key: 'user.lastName', label: 'Last Name' },
@@ -90,11 +101,8 @@ const AddressesPage = () => {
                 <DeleteModal
                     open={deleteAddressOpen}
                     onClose={() => setDeleteAddressOpen(false)}
-                    items={selectedAddresses.map(id => addresses.find(address => address._id === id)).filter(address => address)}
-                    onDeleteSuccess={() => {
-                        dispatch(getAddresses())
-                        setSelectedAddresses([])
-                    }}
+                    items={getSelectedAddresses()}
+                    onDeleteSuccess={handleDeleteSuccess}
                     endpoint="/addresses/delete-bulk"
                     title="Delete Addresses"
                     message="Are you sure you want to delete the selected addresses?"

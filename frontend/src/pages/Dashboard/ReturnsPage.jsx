@@ -49,6 +49,17 @@ const ReturnsPage = () => {
         setEditReturnRequestOpen(true);
     };
 
+    const getSelectedReturnRequests = () => {
+        return selectedReturnRequests
+            .map((id) => returnRequests.find((returnRequest) => returnRequest._id === id))
+            .filter((returnRequest) => returnRequest);
+    };
+
+    const handleDeleteSuccess = () => {
+        dispatch(getReturnRequests());
+        setSelectedReturnRequests([]);
+    };
+
     const columns = [
         { key: 'order', label: 'Order ID' },
         { key: 'user.email', label: 'User' },
@@ -110,11 +121,8 @@ const ReturnsPage = () => {
                 <DeleteModal
                     open={deleteReturnRequestOpen}
                     onClose={() => setDeleteReturnRequestOpen(false)}
-                    items={selectedReturnRequests.map(id => returnRequests.find(request => request._id === id)).filter(request => request)}
-                    onDeleteSuccess={() => {
-                        dispatch(getReturnRequests())
-                        setSelectedReturnRequests([])
-                    }}
+                    items={getSelectedReturnRequests()}
+                    onDeleteSuccess={handleDeleteSuccess}
                     endpoint="/returns/delete-bulk"
                     title="Delete Return Requests"
                     message="Are you sure you want to delete the selected return requests?"

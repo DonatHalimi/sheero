@@ -46,6 +46,17 @@ const RolesPage = () => {
         setEditRoleOpen(true);
     };
 
+    const getSelectedRoles = () => {
+        return selectedRoles
+            .map((id) => roles.find((role) => role._id === id))
+            .filter((role) => role);
+    };
+
+    const handleDeleteSuccess = () => {
+        dispatch(getRoles());
+        setSelectedRoles([]);
+    };
+
     const columns = [
         { key: 'name', label: 'Name' },
         { key: 'actions', label: 'Actions' }
@@ -85,11 +96,8 @@ const RolesPage = () => {
                 <DeleteModal
                     open={deleteRoleOpen}
                     onClose={() => setDeleteRoleOpen(false)}
-                    items={selectedRoles.map(id => roles.find(role => role._id === id)).filter(role => role)}
-                    onDeleteSuccess={() => {
-                        dispatch(getRoles())
-                        setSelectedRoles([])
-                    }}
+                    items={getSelectedRoles()}
+                    onDeleteSuccess={handleDeleteSuccess}
                     endpoint="/roles/delete-bulk"
                     title="Delete Roles"
                     message="Are you sure you want to delete the selected roles?"

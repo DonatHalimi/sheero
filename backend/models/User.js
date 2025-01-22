@@ -1,8 +1,11 @@
 const mongoose = require('mongoose');
+const { JWT_SECRET } = require('../config/dotenv');
 
 const userSchema = new mongoose.Schema({
+    googleId: { type: String, unique: true, sparse: true },
+    facebookId: { type: String, unique: true, sparse: true },
     firstName: { type: String, required: true },
-    lastName: { type: String, required: true },
+    lastName: { type: String, required: false },
     email: { type: String, required: true, unique: true },
     password: { type: String, required: true },
     role: { type: mongoose.Schema.Types.ObjectId, ref: 'Role', required: true },
@@ -29,6 +32,15 @@ userSchema.pre('save', function (next) {
 userSchema.methods.updateProfilePicture = async function (newPictureUrl) {
     this.profilePicture = newPictureUrl;
     await this.save();
+};
+
+// function for generateAccessToken to work in routes/auth.js
+userSchema.methods.generateAccessToken = function () {
+    const jwt = require('jsonwebtoken');
+    return jwt.sign({
+        userId: this._id,
+        role: this.role,
+    }, JWT_SECRET, { expiresIn: '7d' });
 };
 
 module.exports = mongoose.model('User', userSchema);

@@ -28,7 +28,7 @@ export const loadUser = () => async dispatch => {
 export const registerUser = (userData) => async (dispatch) => {
     try {
         const res = await axios.post(getApiUrl('/auth/register'), userData, { withCredentials: true, });
-        console.log(res);
+
         dispatch({
             type: REGISTER_SUCCESS,
             payload: res.data,

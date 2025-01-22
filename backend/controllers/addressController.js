@@ -53,7 +53,7 @@ const getAddressByUser = async (req, res) => {
     try {
         const address = await Address.findOne({ user: userId })
             .populate('city', 'name zipCode')
-            .populate('country', 'name');
+            .populate('country', 'name countryCode');
 
         res.status(200).json(address);
     } catch (error) {

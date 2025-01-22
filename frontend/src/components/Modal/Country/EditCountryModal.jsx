@@ -6,27 +6,32 @@ import useAxios from '../../../utils/axiosInstance';
 const EditCountryModal = ({ open, onClose, country, onEditSuccess }) => {
     const [name, setName] = useState('');
     const [isValidName, setIsValidName] = useState(true);
+    const [countryCode, setCountryCode] = useState('');
+    const [isValidCode, setIsValidCode] = useState(true);
 
     const axiosInstance = useAxios();
 
     const validateName = (v) => /^[A-Z][a-zA-Z\s]{3,15}$/.test(v);
+    const validateCountryCode = (v) => /^[A-Z]{2,3}$/.test(v);
 
-    const isValidForm = isValidName;
+    const isValidForm = isValidName && isValidCode;
 
     useEffect(() => {
         if (country) {
             setName(country.name);
+            setCountryCode(country.countryCode || '');
         }
     }, [country]);
 
     const handleEditCountry = async () => {
-        if (!name) {
-            toast.error('Please fill in the country name', { closeOnClick: true });
+        if (!name || !countryCode) {
+            toast.error('Please fill in all required fields', { closeOnClick: true });
             return;
         }
 
         const updatedData = {
-            name
+            name,
+            countryCode,
         }
 
         try {
@@ -56,6 +61,20 @@ const EditCountryModal = ({ open, onClose, country, onEditSuccess }) => {
                     error={!isValidName}
                     helperText={!isValidName ? 'Name must start with a capital letter and be 3-15 characters long' : ''}
                     className="!mb-4"
+                />
+
+                <BrownOutlinedTextField
+                    fullWidth
+                    required
+                    label="Country Code"
+                    value={countryCode}
+                    onChange={(e) => {
+                        setCountryCode(e.target.value);
+                        setIsValidCode(validateCountryCode(e.target.value));
+                    }}
+                    error={!isValidCode}
+                    helperText={!isValidCode ? 'Country Code must be capitalized and 2-3 capital letters' : ''}
+                    className='!mb-4'
                 />
 
                 <BrownButton

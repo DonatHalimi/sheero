@@ -23,7 +23,7 @@ const AddAddressModal = ({ open, onClose, onAddSuccess }) => {
     const validateName = (v) => /^[A-Z][a-zA-Z]{2,10}$/.test(v);
     const validatePhoneNumber = (v) => /^0(44|45|48|49)\d{6}$/.test(v);
     const validateStreet = (v) => /^[A-Z][a-zA-Z0-9\s]{2,27}$/.test(v);
-    const validateComment = (v) => /^[a-zA-Z0-9\s]{2,25}$/.test(v);
+    const validateComment = (v) => !v || /^[a-zA-Z0-9\s]{2,25}$/.test(v);
 
     const isFormValid =
         isValidName &&
@@ -70,7 +70,7 @@ const AddAddressModal = ({ open, onClose, onAddSuccess }) => {
     };
 
     const handleAddAddress = async () => {
-        if (!name || !street || !phoneNumber || !comment || !city || !country) {
+        if (!name || !street || !phoneNumber || !city || !country) {
             toast.error('Please fill in all the fields');
             return;
         }
@@ -79,7 +79,7 @@ const AddAddressModal = ({ open, onClose, onAddSuccess }) => {
             name,
             street,
             phoneNumber,
-            comment,
+            comment: comment || null,
             city: city?._id,
             country: country?._id
         };

@@ -46,6 +46,17 @@ const SubSubcategoriesPage = () => {
         setEditSubSubcategoryOpen(true);
     };
 
+    const getSelectedSubSubcategories = () => {
+        return selectedSubSubcategories
+            .map((id) => subSubcategories.find((subSubcategory) => subSubcategory._id === id))
+            .filter((subSubcategory) => subSubcategory);
+    };
+
+    const handleDeleteSuccess = () => {
+        dispatch(getSubSubcategories());
+        setSelectedSubSubcategories([]);
+    };
+
     const columns = [
         { label: 'Name', key: 'name' },
         { label: 'Subcategory', key: 'subcategory.name' },
@@ -86,11 +97,8 @@ const SubSubcategoriesPage = () => {
                 <DeleteModal
                     open={deleteSubSubcategoryOpen}
                     onClose={() => setDeleteSubSubcategoryOpen(false)}
-                    items={selectedSubSubcategories.map(id => subSubcategories.find(subsubcategory => subsubcategory._id === id)).filter(subsubcategory => subsubcategory)}
-                    onDeleteSuccess={() => {
-                        dispatch(getSubSubcategories())
-                        setSelectedSubSubcategories([])
-                    }}
+                    items={getSelectedSubSubcategories()}
+                    onDeleteSuccess={handleDeleteSuccess}
                     endpoint="/subsubcategories/delete-bulk"
                     title="Delete SubSubcategories"
                     message="Are you sure you want to delete the selected subsubcategories?"

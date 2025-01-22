@@ -50,6 +50,17 @@ const SupplierPage = () => {
         setEditSupplierOpen(true);
     };
 
+    const getSelectedSuppliers = () => {
+        return selectedSuppliers
+            .map((id) => suppliers.find((supplier) => supplier._id === id))
+            .filter((supplier) => supplier);
+    };
+
+    const handleDeleteSuccess = () => {
+        dispatch(getSuppliers());
+        setSelectedSuppliers([]);
+    };
+
     const columns = [
         { label: 'Name', key: 'name' },
         { label: 'Email', key: 'contactInfo.email' },
@@ -92,11 +103,8 @@ const SupplierPage = () => {
                 <DeleteModal
                     open={deleteSupplierOpen}
                     onClose={() => setDeleteSupplierOpen(false)}
-                    items={selectedSuppliers.map(id => suppliers.find(supplier => supplier._id === id)).filter(supplier => supplier)}
-                    onDeleteSuccess={() => {
-                        dispatch(getSuppliers())
-                        setSelectedSuppliers([])
-                    }}
+                    items={getSelectedSuppliers()}
+                    onDeleteSuccess={handleDeleteSuccess}
                     endpoint="/suppliers/delete-bulk"
                     title="Delete Suppliers"
                     message="Are you sure you want to delete the selected suppliers?"

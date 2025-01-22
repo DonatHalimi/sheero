@@ -52,6 +52,17 @@ const UsersPage = () => {
         setEditUserOpen(true);
     };
 
+    const handleDeleteSuccess = () => {
+        dispatch(getUsers());
+        setSelectedUsers([]);
+    };
+
+    const getSelectedUsers = () => {
+        return selectedUsers
+            .map((id) => users.find((user) => user._id === id))
+            .filter((user) => user);
+    };
+
     const columns = [
         { key: 'firstName', label: 'First Name' },
         { key: 'lastName', label: 'Last Name' },
@@ -96,11 +107,8 @@ const UsersPage = () => {
                 <DeleteModal
                     open={deleteUserOpen}
                     onClose={() => setDeleteUserOpen(false)}
-                    items={selectedUsers.map(id => users.find(user => user._id === id)).filter(user => user)}
-                    onDeleteSuccess={() => {
-                        dispatch(getUsers())
-                        setSelectedUsers([])
-                    }}
+                    items={getSelectedUsers()}
+                    onDeleteSuccess={handleDeleteSuccess}
                     endpoint="/users/delete-bulk"
                     title="Delete Users"
                     message="Are you sure you want to delete the selected users?"

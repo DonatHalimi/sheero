@@ -1,12 +1,11 @@
 import React, { useEffect, useState } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
-import { DashboardHeader, LoadingDataGrid } from '../../assets/CustomComponents';
+import { DashboardHeader, DashboardImage, LoadingDataGrid } from '../../assets/CustomComponents';
 import DashboardTable from '../../components/Dashboard/DashboardTable';
 import AddCategoryModal from '../../components/Modal/Category/AddCategoryModal';
 import EditCategoryModal from '../../components/Modal/Category/EditCategoryModal';
 import DeleteModal from '../../components/Modal/DeleteModal';
 import ImagePreviewModal from '../../components/Modal/ImagePreviewModal';
-import { getImageUrl } from '../../utils/config';
 import { getCategories } from '../../store/actions/categoryActions';
 
 const CategoriesPage = () => {
@@ -54,21 +53,23 @@ const CategoriesPage = () => {
         setEditCategoryOpen(true);
     };
 
+    const getSelectedCategories = () => {
+        return selectedCategories
+            .map((id) => categories.find((category) => category._id === id))
+            .filter((category) => category);
+    };
+
+    const handleDeleteSuccess = () => {
+        dispatch(getCategories());
+        setSelectedCategories([]);
+    };
+
     const columns = [
         { key: 'name', label: 'Name' },
         {
             key: 'image',
             label: 'Image',
-            render: (item) => (
-                <img
-                    className='rounded-md cursor-pointer'
-                    src={getImageUrl(item.image)}
-                    alt=""
-                    width={70}
-                    style={{ position: 'relative', top: '3px' }}
-                    onClick={() => handleImageClick(getImageUrl(item.image))}
-                />
-            )
+            render: (item) => <DashboardImage item={item} handleImageClick={handleImageClick} />
         },
         { key: 'actions', label: 'Actions' }
     ];
@@ -107,11 +108,8 @@ const CategoriesPage = () => {
                 <DeleteModal
                     open={deleteCategoryOpen}
                     onClose={() => setDeleteCategoryOpen(false)}
-                    items={selectedCategories.map(id => categories.find(category => category._id === id)).filter(category => category)}
-                    onDeleteSuccess={() => {
-                        dispatch(getCategories())
-                        setSelectedCategories([])
-                    }}
+                    items={getSelectedCategories()}
+                    onDeleteSuccess={handleDeleteSuccess}
                     endpoint="/categories/delete-bulk"
                     title="Delete Categories"
                     message="Are you sure you want to delete the selected categories?"

@@ -1,5 +1,4 @@
-import VisibilityIcon from '@mui/icons-material/Visibility';
-import VisibilityOffIcon from '@mui/icons-material/VisibilityOff';
+import { Visibility, VisibilityOff } from '@mui/icons-material';
 import { IconButton, InputAdornment, InputLabel, MenuItem, Select } from '@mui/material';
 import React, { useEffect, useState } from 'react';
 import { toast } from 'react-toastify';
@@ -132,7 +131,7 @@ const AddUserModal = ({ open, onClose, onAddSuccess }) => {
                                     onClick={handleClickShowPassword}
                                     onMouseDown={handleMouseDownPassword}
                                 >
-                                    {showPassword ? <VisibilityIcon /> : <VisibilityOffIcon />}
+                                    {showPassword ? <Visibility /> : <VisibilityOff />}
                                 </IconButton>
                             </InputAdornment>
                         ),

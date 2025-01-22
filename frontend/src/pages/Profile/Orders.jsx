@@ -7,8 +7,8 @@ import { paginationSx } from '../../assets/sx';
 import Navbar from '../../components/Navbar/Navbar';
 import OrderItem from '../../components/Product/Items/OrderItem';
 import Footer from '../../components/Utils/Footer';
-import { getImageUrl } from '../../utils/config';
 import { getUserOrders } from '../../store/actions/orderActions';
+import { getImageUrl } from '../../utils/config';
 
 const itemsPerPage = 5;
 

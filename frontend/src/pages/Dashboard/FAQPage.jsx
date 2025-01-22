@@ -46,6 +46,17 @@ const FAQPage = () => {
         setEditFaqOpen(true);
     };
 
+    const getSelectedFaqs = () => {
+        return selectedFaqs
+            .map((id) => faqs.find((faq) => faq._id === id))
+            .filter((faq) => faq);
+    };
+
+    const handleDeleteSuccess = () => {
+        dispatch(getFAQs());
+        setSelectedFaqs([]);
+    };
+
     const columns = [
         { key: 'question', label: 'Question' },
         { key: 'answer', label: 'Answer' },
@@ -86,11 +97,8 @@ const FAQPage = () => {
                 <DeleteModal
                     open={deleteFaqOpen}
                     onClose={() => setDeleteFaqOpen(false)}
-                    items={selectedFaqs.map(id => faqs.find(faq => faq._id === id)).filter(faq => faq)}
-                    onDeleteSuccess={() => {
-                        dispatch(getFAQs())
-                        setSelectedFaqs([])
-                    }}
+                    items={getSelectedFaqs()}
+                    onDeleteSuccess={handleDeleteSuccess}
                     endpoint="/faqs/delete-bulk"
                     title="Delete FAQs"
                     message="Are you sure you want to delete the FAQ items?"

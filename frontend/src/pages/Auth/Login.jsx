@@ -1,11 +1,10 @@
-import VisibilityIcon from '@mui/icons-material/Visibility';
-import VisibilityOffIcon from '@mui/icons-material/VisibilityOff';
-import { Box, Container, IconButton, InputAdornment, Typography } from '@mui/material';
+import { Facebook, Google, Visibility, VisibilityOff } from '@mui/icons-material';
+import { Box, Container, Divider, IconButton, InputAdornment, Typography } from '@mui/material';
 import React, { useEffect, useState } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 import { useNavigate } from 'react-router-dom';
 import { toast } from 'react-toastify';
-import { BrownButton, BrownOutlinedTextField, ErrorTooltip, knownEmailProviders } from '../../assets/CustomComponents';
+import { BrownButton, BrownOutlinedTextField, ErrorTooltip, handleFacebookLogin, handleGoogleLogin, knownEmailProviders, SocialLoginButtons } from '../../assets/CustomComponents';
 import Navbar from '../../components/Navbar/Navbar';
 import Footer from '../../components/Utils/Footer';
 import { loginUser } from '../../store/actions/authActions';
@@ -106,9 +105,15 @@ const Login = () => {
             <Navbar />
             <Container component="main" maxWidth="xs" className="flex flex-1 flex-col align-left mt-20 mb-20">
                 <div className="bg-white flex flex-col align-left rounded-md shadow-md p-6">
-                    <Typography variant="h5" align="left" className="mb-2 font-extrabold text-stone-600">
+                    <Typography variant="h5" align="left" className="!mb-4 font-extrabold text-stone-600">
                         Welcome Back
                     </Typography>
+
+                    <SocialLoginButtons
+                        handleGoogleLogin={handleGoogleLogin}
+                        handleFacebookLogin={handleFacebookLogin}
+                    />
+
                     <Box component="form" onSubmit={handleSubmit} noValidate className="w-full">
                         {Object.entries(formData).map(([name, value]) => {
                             if (name === 'email' || name === 'password') {
@@ -136,7 +141,7 @@ const Login = () => {
                                                             onClick={handleClickShowPassword}
                                                             onMouseDown={handleMouseDownPassword}
                                                         >
-                                                            {showPassword ? <VisibilityIcon /> : <VisibilityOffIcon />}
+                                                            {showPassword ? <Visibility /> : <VisibilityOff />}
                                                         </IconButton>
                                                     </InputAdornment>
                                                 ),

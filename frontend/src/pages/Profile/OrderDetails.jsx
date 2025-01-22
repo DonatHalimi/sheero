@@ -4,10 +4,10 @@ import { Link, useParams } from 'react-router-dom';
 import 'react-toastify/dist/ReactToastify.css';
 import { EmptyState, formatDate, formatPrice, generateOrderPDF, Header, LoadingOrderDetails, ProfileLayout } from '../../assets/CustomComponents';
 import emptyOrdersImage from '../../assets/img/empty/orders.png';
-import useAxios from '../../utils/axiosInstance';
 import Navbar from '../../components/Navbar/Navbar';
 import ReturnModal from '../../components/Product/Modals/ReturnModal';
 import Footer from '../../components/Utils/Footer';
+import useAxios from '../../utils/axiosInstance';
 import { getImageUrl } from '../../utils/config';
 
 const OrderDetails = () => {

@@ -1,12 +1,11 @@
 import React, { useEffect, useState } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
-import { DashboardHeader, LoadingDataGrid } from '../../assets/CustomComponents';
+import { DashboardHeader, DashboardImage, LoadingDataGrid } from '../../assets/CustomComponents';
 import DashboardTable from '../../components/Dashboard/DashboardTable';
 import DeleteModal from '../../components/Modal/DeleteModal';
 import ImagePreviewModal from '../../components/Modal/ImagePreviewModal';
 import AddSubcategoryModal from '../../components/Modal/Subcategory/AddSubcategoryModal';
 import EditSubcategoryModal from '../../components/Modal/Subcategory/EditSubcategoryModal';
-import { getImageUrl } from '../../utils/config';
 import { getSubcategories } from '../../store/actions/dashboardActions';
 
 const SubcategoriesPage = () => {
@@ -58,21 +57,23 @@ const SubcategoriesPage = () => {
         setEditSubcategoryOpen(true);
     };
 
+    const getSelectedSubcategories = () => {
+        return selectedSubcategories
+            .map((id) => subcategories.find((subcategory) => subcategory._id === id))
+            .filter((subcategory) => subcategory);
+    };
+
+    const handleDeleteSuccess = () => {
+        dispatch(getSubcategories());
+        setSelectedSubcategories([]);
+    };
+
     const columns = [
         { label: 'Name', key: 'name' },
         {
             key: 'image',
             label: 'Image',
-            render: (item) => (
-                <img
-                    className='rounded-md cursor-pointer'
-                    src={getImageUrl(item.image)}
-                    alt=""
-                    width={70}
-                    style={{ position: 'relative', top: '3px' }}
-                    onClick={() => handleImageClick(getImageUrl(item.image))}
-                />
-            )
+            render: (item) => <DashboardImage item={item} handleImageClick={handleImageClick} />
         },
         { label: 'Category', key: 'category.name' },
         { label: 'Actions', key: 'actions' }
@@ -113,11 +114,8 @@ const SubcategoriesPage = () => {
                 <DeleteModal
                     open={deleteSubcategoryOpen}
                     onClose={() => setDeleteSubcategoryOpen(false)}
-                    items={selectedSubcategories.map(id => subcategories.find(subcategory => subcategory._id === id)).filter(subcategory => subcategory)}
-                    onDeleteSuccess={() => {
-                        dispatch(getSubcategories())
-                        setSelectedSubcategories([])
-                    }}
+                    items={getSelectedSubcategories()}
+                    onDeleteSuccess={handleDeleteSuccess}
                     endpoint="/subcategories/delete-bulk"
                     title="Delete Subcategories"
                     message="Are you sure you want to delete the selected subcategories?"

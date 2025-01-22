@@ -44,6 +44,17 @@ const OrdersPage = () => {
         setEditOrderOpen(true);
     };
 
+    const getSelectedOrders = () => {
+        return selectedOrders
+            .map((id) => orders.find((order) => order._id === id))
+            .filter((order) => order);
+    };
+
+    const handleDeleteSuccess = () => {
+        dispatch(getOrders());
+        setSelectedOrders([]);
+    };
+
     const columns = [
         { key: '_id', label: 'Order ID' },
         { key: 'user.email', label: 'User' },
@@ -53,8 +64,8 @@ const OrdersPage = () => {
             render: (order) => order.products.map((item) => item.product.name).join(', ')
         },
         {
-            key: 'quantities',
-            label: 'Quantities',
+            key: 'quantity',
+            label: 'Quantity',
             render: (order) => order.products.map((item) => item.quantity).join(', ')
         },
         { key: 'totalAmount', label: 'Total Amount' },
@@ -107,11 +118,8 @@ const OrdersPage = () => {
                 <DeleteModal
                     open={deleteOrderOpen}
                     onClose={() => setDeleteOrderOpen(false)}
-                    items={selectedOrders.map(id => orders.find(order => order._id === id)).filter(order => order)}
-                    onDeleteSuccess={() => {
-                        dispatch(getOrders())
-                        setSelectedOrders([])
-                    }}
+                    items={getSelectedOrders()}
+                    onDeleteSuccess={handleDeleteSuccess}
                     endpoint="/orders/delete-bulk"
                     title="Delete Orders"
                     message="Are you sure you want to delete the selected orders?"

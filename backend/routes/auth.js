@@ -1,4 +1,6 @@
 const express = require('express');
+const cookieConfig = require('../config/cookie');
+const passport = require('passport');
 const { registerUser, loginUser, getCurrentUser, updateUserProfile, logoutUser } = require('../controllers/authController.js');
 const { registerSchema, loginSchema } = require('../validations/auth');
 const { requireAuth } = require('../middleware/auth.js');
@@ -11,5 +13,83 @@ router.post('/login', validate(loginSchema), loginUser);
 router.post('/logout', logoutUser);
 router.get('/me', requireAuth, getCurrentUser);
 router.put('/profile', requireAuth, updateUserProfile);
+
+// Google OAuth routes
+router.get('/google', passport.authenticate('google', { scope: ['profile', 'email'] }));
+
+router.get(
+    '/google/callback',
+    passport.authenticate('google', { failureRedirect: '/login' }),
+    (req, res) => {
+        try {
+            const accessToken = req.user.generateAccessToken();
+            res.cookie('accessToken', accessToken, cookieConfig);
+
+            const redirectScript = `
+                if (window.opener) {
+                    window.opener.postMessage(
+                        { type: 'GOOGLE_AUTH_SUCCESS' },
+                        'http://localhost:3000'
+                    );
+                    window.close();
+                } else {
+                    window.location.href = 'http://localhost:3000';
+                }
+            `;
+
+            res.send(`
+                <script>
+                    ${redirectScript}
+                </script>
+            `);
+        } catch (error) {
+            res.status(500).send(`
+                <script>
+                    alert('Authentication Failed. Please try again.');
+                    window.close();
+                </script>
+            `);
+        }
+    }
+);
+
+// Facebook auth routes
+router.get('/facebook', passport.authenticate('facebook', { scope: ['email'] }));
+
+router.get(
+    '/facebook/callback',
+    passport.authenticate('facebook', { failureRedirect: '/login' }),
+    (req, res) => {
+        try {
+            const accessToken = req.user.generateAccessToken();
+            res.cookie('accessToken', accessToken, cookieConfig);
+
+            const redirectScript = `
+                if (window.opener) {
+                    window.opener.postMessage(
+                        { type: 'FACEBOOK_AUTH_SUCCESS' },
+                        'http://localhost:3000'
+                    );
+                    window.close();
+                } else {
+                    window.location.href = 'http://localhost:3000';
+                }
+            `;
+
+            res.send(`
+                <script>
+                    ${redirectScript}
+                </script>
+            `);
+        } catch (error) {
+            res.status(500).send(`
+                <script>
+                    alert('Authentication Failed. Please try again.');
+                    window.close();
+                </script>
+            `);
+        }
+    }
+);
 
 module.exports = router;

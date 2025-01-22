@@ -1,4 +1,4 @@
-import ArrowUpwardIcon from '@mui/icons-material/ArrowUpward';
+import { ArrowUpward } from '@mui/icons-material';
 import React, { useEffect, useState } from 'react';
 
 const ToTop = () => {
@@ -29,7 +29,7 @@ const ToTop = () => {
             aria-label="Scroll to top"
             className={`to-top-button ${isVisible ? 'visible' : 'hidden'}`}
         >
-            <ArrowUpwardIcon className="to-top-arrow" />
+            <ArrowUpward className="to-top-arrow" />
         </button>
     );
 };

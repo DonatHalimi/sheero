@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
-import { DashboardHeader, LoadingDataGrid } from '../../assets/CustomComponents';
+import { DashboardCountryFlag, DashboardHeader, LoadingDataGrid } from '../../assets/CustomComponents';
 import DashboardTable from '../../components/Dashboard/DashboardTable';
 import AddCityModal from '../../components/Modal/City/AddCityModal';
 import EditCityModal from '../../components/Modal/City/EditCityModal';
@@ -45,11 +45,26 @@ const CitiesPage = () => {
         setEditCityOpen(true);
     };
 
+    const getSelectedCities = () => {
+        return selectedCities
+            .map((id) => cities.find((city) => city._id === id))
+            .filter((city) => city);
+    };
+
+    const handleDeleteSuccess = () => {
+        dispatch(getCities());
+        setSelectedCities([]);
+    };
+
     const columns = [
         { key: 'name', label: 'Name' },
-        { key: 'country.name', label: 'Country' },
+        {
+            key: 'country.name',
+            label: 'Country',
+            render: (row) => <DashboardCountryFlag countryCode={row.country.countryCode} name={row.country.name} />
+        },
         { key: 'zipCode', label: 'Zip Code' },
-        { key: 'actions', label: 'Actions' }
+        { key: 'actions', label: 'Actions' },
     ];
 
     return (
@@ -86,11 +101,8 @@ const CitiesPage = () => {
                 <DeleteModal
                     open={deleteCityOpen}
                     onClose={() => setDeleteCityOpen(false)}
-                    items={selectedCities.map(id => cities.find(city => city._id === id)).filter(city => city)}
-                    onDeleteSuccess={() => {
-                        dispatch(getCities())
-                        setSelectedCities([])
-                    }}
+                    items={getSelectedCities()}
+                    onDeleteSuccess={handleDeleteSuccess}
                     endpoint="/cities/delete-bulk"
                     title="Delete Cities"
                     message="Are you sure you want to delete the selected cities?"

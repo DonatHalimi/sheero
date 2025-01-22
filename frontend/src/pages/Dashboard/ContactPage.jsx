@@ -38,6 +38,17 @@ const ContactPage = () => {
         setCurrentPage(event.selected);
     };
 
+    const getSelectedContacts = () => {
+        return selectedContacts
+            .map((id) => contacts.find((contact) => contact._id === id))
+            .filter((contact) => contact);
+    };
+
+    const handleDeleteSuccess = () => {
+        dispatch(getContacts());
+        setSelectedContacts([]);
+    };
+
     const columns = [
         { key: 'name', label: 'Name' },
         { key: 'email', label: 'Email' },
@@ -77,11 +88,8 @@ const ContactPage = () => {
                 <DeleteModal
                     open={deleteContactOpen}
                     onClose={() => setDeleteContactOpen(false)}
-                    items={selectedContacts.map(id => contacts.find(contact => contact._id === id)).filter(contact => contact)}
-                    onDeleteSuccess={() => {
-                        dispatch(getContacts())
-                        setSelectedContacts([])
-                    }}
+                    items={getSelectedContacts()}
+                    onDeleteSuccess={handleDeleteSuccess}
                     endpoint="/contact/delete-bulk"
                     title="Delete Contacts"
                     message="Are you sure you want to delete the selected contacts?"

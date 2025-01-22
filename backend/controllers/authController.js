@@ -74,6 +74,8 @@ const getCurrentUser = async (req, res) => {
             email: user.email,
             role: user.role.name,
             profilePicture: user.profilePicture,
+            googleId: user.googleId,
+            facebookId: user.facebookId,
         });
     } catch (error) {
         res.status(500).json({ message: 'Server error' });
@@ -118,6 +120,11 @@ const logoutUser = (req, res) => {
         ...cookieConfig,
         maxAge: 0
     });
+
+    res.clearCookie('connect.sid'), {
+        ...cookieConfig,
+        maxAge: 0
+    };
 
     res.json({ message: 'Logout successful' });
 };

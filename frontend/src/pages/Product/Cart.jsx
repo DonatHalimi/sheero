@@ -66,12 +66,15 @@ const Cart = () => {
     }, [user]);
 
     const updateQuantity = async (productId, quantityChange) => {
+        setActionLoading(true);
         try {
             const { data } = await axiosInstance.put('/cart/quantity/update', { productId, quantityChange });
             setCart(data);
             document.dispatchEvent(new CustomEvent('cartUpdated', { detail: data }));
         } catch (error) {
             console.error('Failed to update quantity:', error?.response?.data?.message || error.message);
+        } finally {
+            setActionLoading(false);
         }
     };
 
@@ -102,7 +105,9 @@ const Cart = () => {
             setCart(data);
             document.dispatchEvent(new CustomEvent('cartUpdated', { detail: data }));
 
-            toast.success('Cart cleared successfully!');
+            toast.success('Cart cleared successfully!', {
+                onClick: () => navigate('/'),
+            });
         } catch (error) {
             console.error('Failed to clear cart:', error?.response?.data?.message || error.message);
         } finally {
@@ -196,7 +201,7 @@ const Cart = () => {
                         <div className="flex-1">
                             {/* Desktop Table View */}
                             <div className="hidden lg:block">
-                                <TableContainer className="bg-white rounded-lg">
+                                <TableContainer className="bg-white rounded-lg shadow">
                                     <Table>
                                         <TableHead>
                                             <TableRow>
@@ -260,7 +265,6 @@ const Cart = () => {
                                                         <div className="flex justify-center items-center">
                                                             <IconButton
                                                                 onClick={() => updateQuantity(item.product._id, -1)}
-                                                                // disabled={isLoading}
                                                                 size="small"
                                                                 className="bg-gray-100 hover:bg-gray-200 text-gray-600"
                                                             >

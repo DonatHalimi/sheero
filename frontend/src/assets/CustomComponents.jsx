@@ -15,10 +15,12 @@ import {
     Download,
     ExpandLess,
     ExpandMore,
+    Facebook,
     Favorite,
     FavoriteBorderOutlined,
     Fullscreen,
     FullscreenExit,
+    Google,
     Home,
     HomeOutlined,
     Inbox,
@@ -35,6 +37,7 @@ import {
     Remove,
     Replay,
     Search,
+    SearchOff,
     Settings,
     Share,
     ShoppingCart,
@@ -102,7 +105,7 @@ import { toast } from 'react-toastify';
 import Navbar from '../components/Navbar/Navbar';
 import ProductItem from '../components/Product/Items/ProductItem';
 import Footer from '../components/Utils/Footer';
-import { getImageUrl } from '../utils/config';
+import { getApiUrl, getImageUrl } from '../utils/config';
 import logo from './img/brand/logo.png';
 import {
     customMenuProps,
@@ -616,7 +619,7 @@ export const LoadingCart = () => {
             <Navbar />
             <div className="container mx-auto px-4 lg:px-24 py-2 mb-16 bg-gray-50 mt-10">
                 {/* Mobile-only header */}
-                <div className="bg-white p-4 rounded-md shadow-sm mb-3 flex justify-between items-center px-2 md:hidden mt-[72px]">
+                <div className="bg-white p-4 rounded-md shadow mb-3 flex justify-between items-center px-2 md:hidden mt-[72px]">
                     <h1 className="text-2xl font-semilight ml-2">Cart</h1>
                     <WaveSkeleton variant="circular" width={32} height={32} />
                 </div>
@@ -630,7 +633,7 @@ export const LoadingCart = () => {
                     <div className="flex-1">
                         {/* Desktop Table View */}
                         <div className="hidden lg:block">
-                            <TableContainer className="bg-white rounded-lg">
+                            <TableContainer className="bg-white rounded-lg shadow">
                                 <Table>
                                     <TableHead>
                                         <TableRow>
@@ -673,7 +676,7 @@ export const LoadingCart = () => {
                         </div>
 
                         {/* Mobile Card View */}
-                        <div className="lg:hidden space-y-4">
+                        <div className="lg:hidden space-y-4 shadow">
                             {Array.from(new Array(3)).map((_, index) => (
                                 <div key={index} className="bg-white rounded-lg p-4">
                                     <div className="flex gap-4">
@@ -700,7 +703,7 @@ export const LoadingCart = () => {
 
                     {/* Cart Summary Section */}
                     <div className="lg:w-80 w-full">
-                        <div className="bg-white p-4">
+                        <div className="bg-white p-4 rounded-lg shadow">
                             <WaveSkeleton variant="text" width={140} height={32} className="mb-4" />
                             <div className="space-y-3">
                                 <div className="flex justify-between py-2 border-b">
@@ -1069,7 +1072,7 @@ export const CollapsibleListItem = ({ open, handleClick, icon, primary, children
         <ListItemButton onClick={handleClick}>
             <ListItemIcon>{icon}</ListItemIcon>
             <ListItemText primary={primary} />
-            {open ? <ExpandLess /> : <ExpandMore />}
+            {open ? <ExpandLess className='text-stone-500' /> : <ExpandMore className='text-stone-500' />}
         </ListItemButton>
         <Collapse in={open} timeout="auto" unmountOnExit>
             <List component="div" disablePadding>
@@ -2599,6 +2602,106 @@ export const downloadAddress = (address) => {
 
 // Download link end
 
+export const handleGoogleLogin = async () => {
+    try {
+        const width = 500;
+        const height = 600;
+        const left = window.screenX + (window.outerWidth - width) / 2;
+        const top = window.screenY + (window.outerHeight - height) / 2;
+
+        const googleWindow = window.open(
+            `${getApiUrl('/auth/google')}`,
+            'Google Sign In',
+            `width=${width},height=${height},left=${left},top=${top},toolbar=0,scrollbars=0,status=0,resizable=0,location=0,menuBar=0`
+        );
+
+        const handleMessage = async (event) => {
+            if (event.origin !== 'http://localhost:5000') return;
+
+            if (event.data.type === 'GOOGLE_AUTH_SUCCESS') {
+                if (googleWindow) googleWindow.close();
+                window.removeEventListener('message', handleMessage);
+
+                toast.success('Successfully logged in using Google!');
+
+                window.location.href = '/';
+            }
+        };
+
+        window.addEventListener('message', handleMessage);
+    } catch (error) {
+        console.error('Google authentication error:', error);
+        toast.error('Failed to authenticate with Google');
+    }
+};
+
+export const handleFacebookLogin = async () => {
+    try {
+        const width = 500;
+        const height = 600;
+        const left = window.screenX + (window.outerWidth - width) / 2;
+        const top = window.screenY + (window.outerHeight - height) / 2;
+
+        const facebookWindow = window.open(
+            `${getApiUrl('/auth/facebook')}`,
+            'Facebook Sign In',
+            `width=${width},height=${height},left=${left},top=${top},toolbar=0,scrollbars=0,status=0,resizable=0,location=0,menuBar=0`
+        );
+
+        const handleMessage = async (event) => {
+            if (event.origin !== 'http://localhost:5000') return;
+
+            if (event.data.type === 'FACEBOOK_AUTH_SUCCESS') {
+                if (facebookWindow) facebookWindow.close();
+                window.removeEventListener('message', handleMessage);
+
+                toast.success('Successfully logged in using Facebook!');
+
+                window.location.href = '/';
+            }
+        };
+
+        window.addEventListener('message', handleMessage);
+    } catch (error) {
+        console.error('Facebook authentication error:', error);
+        toast.error('Failed to authenticate with Facebook');
+    }
+};
+
+export const SocialLoginButtons = ({ handleGoogleLogin, handleFacebookLogin, isRegisterPage = false }) => {
+    return (
+        <>
+            <BrownButton
+                fullWidth
+                variant="outlined"
+                onClick={handleGoogleLogin}
+                startIcon={<Google />}
+                className="!mb-4"
+            >
+                Continue with Google
+            </BrownButton>
+
+            <BrownButton
+                fullWidth
+                variant="outlined"
+                onClick={handleFacebookLogin}
+                startIcon={<Facebook />}
+                className="!mb-4"
+            >
+                Continue with Facebook
+            </BrownButton>
+
+            <div className={`flex items-center ${isRegisterPage ? '!mb-6' : '!mb-2'}`}>
+                <Divider className="flex-1" />
+                <Typography variant="body2" className="!mx-2 text-gray-500">
+                    or
+                </Typography>
+                <Divider className="flex-1" />
+            </div>
+        </>
+    );
+};
+
 export const pluralize = (word, count) => {
     if (count === 1) return word;
     return word.endsWith('y') ? `${word.slice(0, -1)}ies` : `${word}s`;
@@ -3014,7 +3117,7 @@ export const ExtendIcon = ({ toggleDrawer, open }) => {
                 sx={{ ...(open && { display: 'none' }) }}
                 className='mr-36'
             >
-                <MenuIcon />
+                <MenuIcon className="text-stone-500" />
             </IconButton>
         </Tooltip>
     );
@@ -3023,7 +3126,7 @@ export const ExtendIcon = ({ toggleDrawer, open }) => {
 export const DashboardCollapse = ({ toggleDrawer }) => {
     return (
         <Toolbar sx={{ display: 'flex', alignItems: 'center', justifyContent: 'flex-end', px: [1] }}>
-            <CollapseIcon toggleDrawer={toggleDrawer} />
+            <CollapseIcon toggleDrawer={toggleDrawer} className="text-stone-500" />
         </Toolbar>
     );
 };
@@ -3380,14 +3483,23 @@ export const DashboardSearchInput = ({ searchTerm, setSearchTerm, handleFocus, h
     )
 }
 
-export const DashboardSearchSuggestions = ({ suggestionsRef, suggestions, selectedIndex, handleSuggestionClick, searchTerm }) => {
+export const DashboardSearchSuggestions = ({
+    suggestionsRef,
+    suggestions,
+    selectedIndex,
+    handleSuggestionClick,
+    searchTerm,
+}) => {
     return (
         <div
             ref={suggestionsRef}
             className="absolute left-2 right-2 mt-1 max-h-72 overflow-y-auto z-50 mb-2 border border-gray-200 rounded-md bg-white shadow"
         >
             {searchTerm && suggestions.length === 0 ? (
-                <div className="px-4 py-2 text-gray-500">No items found</div>
+                <div className="px-4 py-2 text-stone-500 flex items-center gap-2">
+                    <SearchOff className="w-5 h-5 text-stone-500" />
+                    No items found
+                </div>
             ) : (
                 suggestions.map((item, index) => (
                     <div
@@ -3530,6 +3642,45 @@ export const DashboardSearchBar = ({ collapsed, onMenuItemClick, getAllMenuItems
             </div>
         </ClickAwayListener>
     );
+};
+
+export const getFlagURL = (countryCode) => `https://flagcdn.com/w80/${countryCode.toLowerCase()}.png`;
+
+export const DashboardCountryFlag = ({ countryCode, name }) => {
+    const handleImageClick = () => {
+        const searchURL = `https://www.google.com/search?q=${name}+${countryCode}`;
+        window.open(searchURL, '_blank');
+    };
+
+    return (
+        <div className='flex items-center'>
+            <Tooltip title={`Click to search '${name} ${countryCode}' in Google`} placement='left' arrow>
+                <img
+                    src={getFlagURL(countryCode)}
+                    alt={`${name} flag`}
+                    onClick={handleImageClick}
+                    onError={(e) => (e.target.style.display = 'none')}
+                    className="w-9 h-6 mr-2 inline cursor-pointer"
+                />
+            </Tooltip>
+            {name}
+        </div>
+    );
+};
+
+export const DashboardImage = ({ item, handleImageClick }) => {
+    return (
+        <Tooltip title='Click to preview' placement='left' arrow>
+            <img
+                src={getImageUrl(item.image)}
+                alt={item.name}
+                width={70}
+                style={{ position: 'relative', top: '3px' }}
+                onClick={() => handleImageClick(getImageUrl(item.image))}
+                className='rounded-md cursor-pointer'
+            />
+        </Tooltip>
+    )
 };
 
 export const DashboardAppBar = ({ open, children }) => {

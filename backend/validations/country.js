@@ -2,12 +2,17 @@ const yup = require('yup');
 const Country = require('../models/Country');
 
 const isValidName = (v) => /^[A-Z][a-zA-Z\s]{3,15}$/.test(v);
+const isValidCountryCode = (v) => /^[A-Z]{2,3}$/.test(v);
 
 const createSchema = yup.object({
     name: yup
         .string()
         .required('Name is required')
         .test('is-valid-name', 'Name must start with a capital letter and be 3-15 characters long', isValidName),
+    countryCode: yup
+        .string()
+        .required('Country code is required')
+        .test('is-valid-country-code', 'Country code must be 2-3 uppercase letters', isValidCountryCode)
 });
 
 const getByIdSchema = yup.object({
@@ -34,6 +39,12 @@ const updateSchema = yup.object({
         .test('is-valid-name', 'Name must start with a capital letter and be 3-15 characters long', value => {
             if (!value) return true;
             return isValidName(value);
+        }),
+    countryCode: yup
+        .string()
+        .test('is-valid-country-code', 'Country code must be 2-3 uppercase letters', value => {
+            if (!value) return true;
+            return isValidCountryCode(value);
         })
 });
 
@@ -54,7 +65,7 @@ const deleteBulkSchema = yup.object({
         .of(yup.string().required('ID is required'))
         .min(1, 'At least one ID is required')
         .required('IDs are required')
-        .test('addresses-exist', 'One or more countries not found', async function (ids) {
+        .test('countries-exist', 'One or more countries not found', async function (ids) {
             const countries = await Country.find({ _id: { $in: ids } });
             return countries.length === ids.length;
         }),

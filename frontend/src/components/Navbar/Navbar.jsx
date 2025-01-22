@@ -36,7 +36,7 @@ const Navbar = () => {
     const [isLoading, setIsLoading] = useState(false);
     const [isFetchingCart, setIsFetchingCart] = useState(false);
 
-    const fetchCartData = async () => {
+    const fetchCart = async () => {
         setIsFetchingCart(true);
         try {
             const { data: cart } = await axiosInstance.get('/cart');
@@ -69,7 +69,7 @@ const Navbar = () => {
             await axiosInstance.delete('/cart/remove', { data: { productId } });
             toast.success('Product removed from cart');
 
-            await fetchCartData();
+            await fetchCart();
 
             window.dispatchEvent(new Event('cartUpdate'));
             if (cartItems.length === 1) setIsCartDropdownOpen(false);
@@ -85,7 +85,7 @@ const Navbar = () => {
         try {
             await axiosInstance.delete('/cart/clear');
             toast.success('Cart cleared successfully');
-            await fetchCartData();
+            await fetchCart();
             window.dispatchEvent(new Event('cartUpdate'));
             setIsCartDropdownOpen(false);
         } catch (error) {
@@ -119,11 +119,11 @@ const Navbar = () => {
 
     useEffect(() => {
         const handleCartUpdate = () => {
-            fetchCartData();
+            fetchCart();
             if (location.pathname !== '/cart') setIsCartDropdownOpen(true);
         };
 
-        if (isAuthenticated) fetchCartData();
+        if (isAuthenticated) fetchCart();
         document.addEventListener('cartUpdated', handleCartUpdate);
         return () => {
             document.removeEventListener('cartUpdated', handleCartUpdate);

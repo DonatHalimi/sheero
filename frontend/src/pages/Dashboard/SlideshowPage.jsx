@@ -1,12 +1,11 @@
 import React, { useEffect, useState } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
-import { DashboardHeader, LoadingDataGrid } from '../../assets/CustomComponents';
+import { DashboardHeader, DashboardImage, LoadingDataGrid } from '../../assets/CustomComponents';
 import DashboardTable from '../../components/Dashboard/DashboardTable';
 import DeleteModal from '../../components/Modal/DeleteModal';
 import ImagePreviewModal from '../../components/Modal/ImagePreviewModal';
 import AddSlideshowModal from '../../components/Modal/Slideshow/AddSlideshowModal';
 import EditSlideshowModal from '../../components/Modal/Slideshow/EditSlideshowModal';
-import { getImageUrl } from '../../utils/config';
 import { getImages } from '../../store/actions/slideshowActions';
 
 const SlideshowPage = () => {
@@ -54,21 +53,23 @@ const SlideshowPage = () => {
         setEditImageOpen(true);
     };
 
+    const getSelectedImages = () => {
+        return selectedImages
+            .map((id) => images.find((image) => image._id === id))
+            .filter((image) => image);
+    };
+
+    const handleDeleteSuccess = () => {
+        dispatch(getImages());
+        setSelectedImages([]);
+    };
+
     const columns = [
         { key: 'title', label: 'Title' },
         {
             key: 'image',
             label: 'Image',
-            render: (item) => (
-                <img
-                    className='rounded-md cursor-pointer'
-                    src={getImageUrl(item.image)}
-                    alt=""
-                    width={70}
-                    style={{ position: 'relative', top: '8px' }}
-                    onClick={() => handleImageClick(getImageUrl(item.image))}
-                />
-            )
+            render: (item) => <DashboardImage item={item} handleImageClick={handleImageClick} />
         },
         { key: 'description', label: 'Description' },
         { key: 'actions', label: 'Actions' }
@@ -109,11 +110,8 @@ const SlideshowPage = () => {
                 <DeleteModal
                     open={deleteImageOpen}
                     onClose={() => setDeleteImageOpen(false)}
-                    items={selectedImages.map(id => images.find(image => image._id === id)).filter(image => image)}
-                    onDeleteSuccess={() => {
-                        dispatch(getImages())
-                        setSelectedImages([])
-                    }}
+                    items={getSelectedImages()}
+                    onDeleteSuccess={handleDeleteSuccess}
                     endpoint="/slideshow/delete-bulk"
                     title="Delete Images"
                     message="Are you sure you want to delete the selected images?"
