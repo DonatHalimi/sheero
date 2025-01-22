@@ -2,12 +2,12 @@ import { Box, FormControl, InputLabel, MenuItem, Select, TextField } from '@mui/
 import React, { useEffect, useState } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 import { toast } from 'react-toastify';
-import { BrownButton, downloadAddress, Header, LoadingInformation, ProfileLayout } from '../../assets/CustomComponents';
+import { BrownButton, downloadAddress, Header, LoadingDetails, ProfileLayout } from '../../assets/CustomComponents';
 import Navbar from '../../components/Navbar/Navbar';
 import Footer from '../../components/Utils/Footer';
 import { addAddress, getAddressByUser, getCities, getCountries, updateAddress } from '../../store/actions/addressActions';
 
-const AddressInformation = () => {
+const AddressDetails = () => {
     const { user } = useSelector((state) => state.auth);
     const { address, countries, cities, loading } = useSelector((state) => state.address);
     const dispatch = useDispatch();
@@ -162,7 +162,7 @@ const AddressInformation = () => {
             <Navbar />
             <ProfileLayout>
                 <Header
-                    title="Address"
+                    title="Address Details"
                     hasAddress={existingAddress}
                     onDownloadAddress={handleDownloadAddress}
                 />
@@ -173,7 +173,7 @@ const AddressInformation = () => {
                     }}
                 >
                     {loading ? (
-                        <LoadingInformation showAdditionalField={true} />
+                        <LoadingDetails showAdditionalField={true} />
                     ) : (
                         <form onSubmit={handleSaveAddress} className="space-y-5">
                             <Box sx={{ display: 'flex', flexDirection: { xs: 'column', md: 'row' }, gap: { xs: 3, md: 2 } }}>
@@ -329,4 +329,4 @@ const AddressInformation = () => {
     );
 };
 
-export default AddressInformation;
+export default AddressDetails;

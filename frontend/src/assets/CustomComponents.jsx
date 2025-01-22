@@ -1000,7 +1000,7 @@ export const LoadingDataGrid = () => {
     );
 };
 
-export const LoadingInformation = ({ showAdditionalField }) => {
+export const LoadingDetails = ({ showAdditionalField }) => {
     return (
         <Box className='space-y-0'>
             <Box sx={{ display: 'flex', flexDirection: { xs: 'column', md: 'row' }, gap: { xs: 3, md: 2 } }}>

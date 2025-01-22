@@ -4,12 +4,12 @@ import React, { useEffect, useState } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 import { toast } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
-import { BrownButton, BrownOutlinedTextField, downloadUserData, Header, knownEmailProviders, LoadingInformation, ProfileLayout } from '../../assets/CustomComponents';
+import { BrownButton, BrownOutlinedTextField, downloadUserData, Header, knownEmailProviders, LoadingDetails, ProfileLayout } from '../../assets/CustomComponents';
 import Navbar from '../../components/Navbar/Navbar';
 import Footer from '../../components/Utils/Footer';
 import { updateUserProfile } from '../../store/actions/authActions';
 
-const ProfileInformation = () => {
+const ProfileDetails = () => {
     const { user, loading } = useSelector(state => state.auth);
     const dispatch = useDispatch();
 
@@ -135,15 +135,17 @@ const ProfileInformation = () => {
         }
     };
 
-    const isGoogleLogin = user?.googleId;
-    const isFacebookLogin = user?.facebookId;
-    const isDisabled = !isGoogleLogin || !isFacebookLogin || (isGoogleLogin && isFacebookLogin);
+    const isGoogleLogin = Boolean(user?.googleId);
+    const isFacebookLogin = Boolean(user?.facebookId);
+    const isDisabled = isGoogleLogin || isFacebookLogin;
 
     const provider = isGoogleLogin && isFacebookLogin
         ? 'Google or Facebook'
         : isGoogleLogin
             ? 'Google'
-            : 'Facebook';
+            : isFacebookLogin
+                ? 'Facebook'
+                : '';
 
     const title = isDisabled
         ? `Profile details cannot be changed because you've logged in using ${provider}.`
@@ -155,7 +157,7 @@ const ProfileInformation = () => {
             <ProfileLayout>
 
                 <Header
-                    title="Profile Information"
+                    title="Profile Details"
                     isUserData={true}
                     onDownloadUserData={handleDownloadUserData}
                 />
@@ -168,7 +170,7 @@ const ProfileInformation = () => {
                         className="bg-white rounded-md shadow-sm mb-24"
                     >
                         {loading ? (
-                            <LoadingInformation />
+                            <LoadingDetails />
                         ) : (
                             <form onSubmit={handleSubmit} className="space-y-1">
                                 <Box sx={{ display: 'flex', flexDirection: { xs: 'column', md: 'row' }, gap: { xs: 3, md: 2 } }}>
@@ -344,4 +346,4 @@ const ProfileInformation = () => {
     );
 };
 
-export default ProfileInformation;
+export default ProfileDetails;

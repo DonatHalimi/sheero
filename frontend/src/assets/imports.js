@@ -28,8 +28,8 @@ export const SearchResults = React.lazy(() => import('../pages/Product/SearchRes
 export const SharedWishlist = React.lazy(() => import('../components/Product/Utils/SharedWishlist'));
 export const DashboardLayout = React.lazy(() => import('../components/Dashboard/DashboardLayout'));
 export const Cart = React.lazy(() => import('../pages/Product/Cart'));
-export const Profile = React.lazy(() => import('../pages/Profile/ProfileInformation'));
-export const Addresses = React.lazy(() => import('../pages/Profile/AddressInformation'));
+export const Profile = React.lazy(() => import('../pages/Profile/ProfileDetails'));
+export const Addresses = React.lazy(() => import('../pages/Profile/AddressDetails'));
 export const Orders = React.lazy(() => import('../pages/Profile/Orders'));
 export const OrderDetails = React.lazy(() => import('../pages/Profile/OrderDetails'));
 export const Returns = React.lazy(() => import('../pages/Profile/Returns'));
