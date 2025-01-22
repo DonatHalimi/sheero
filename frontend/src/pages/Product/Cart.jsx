@@ -6,12 +6,12 @@ import { useNavigate } from 'react-router-dom';
 import { toast } from 'react-toastify';
 import { CheckoutButton, CustomDeleteModal, LoadingCart, LoadingOverlay, NotFound, RoundIconButton, formatPrice, truncateText } from '../../assets/CustomComponents';
 import emptyCartImage from '../../assets/img/empty/cart.png';
-import useAxios from '../../utils/axiosInstance';
 import Navbar from '../../components/Navbar/Navbar';
 import PaymentModal from '../../components/Product/Modals/PaymentModal';
 import Footer from '../../components/Utils/Footer';
-import { getImageUrl } from '../../utils/config';
 import { getAddressByUser } from '../../store/actions/addressActions';
+import useAxios from '../../utils/axiosInstance';
+import { getImageUrl } from '../../utils/config';
 
 const Cart = () => {
     const { address } = useSelector((state) => state.address);

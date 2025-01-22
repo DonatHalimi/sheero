@@ -3,6 +3,7 @@ import {
     ArrowBack,
     ArrowBackIosNew,
     ArrowForwardIos,
+    Check,
     ChevronLeft,
     ChevronRight,
     Clear,
@@ -91,6 +92,7 @@ import {
     Typography,
     useMediaQuery
 } from '@mui/material';
+import { green, red } from '@mui/material/colors';
 import { styled } from '@mui/material/styles';
 import { GridToolbar } from '@mui/x-data-grid';
 import { Splide, SplideSlide } from '@splidejs/react-splide';
@@ -2602,6 +2604,11 @@ export const downloadAddress = (address) => {
 
 // Download link end
 
+const BACKEND_URL =
+    process.env.NODE_ENV === 'production'
+        ? 'https://sheero-backend.onrender.com'
+        : 'http://localhost:5000';
+
 export const handleGoogleLogin = async () => {
     try {
         const width = 500;
@@ -2616,7 +2623,7 @@ export const handleGoogleLogin = async () => {
         );
 
         const handleMessage = async (event) => {
-            if (event.origin !== 'http://localhost:5000') return;
+            if (event.origin !== BACKEND_URL) return;
 
             if (event.data.type === 'GOOGLE_AUTH_SUCCESS') {
                 if (googleWindow) googleWindow.close();
@@ -2649,7 +2656,7 @@ export const handleFacebookLogin = async () => {
         );
 
         const handleMessage = async (event) => {
-            if (event.origin !== 'http://localhost:5000') return;
+            if (event.origin !== BACKEND_URL) return;
 
             if (event.data.type === 'FACEBOOK_AUTH_SUCCESS') {
                 if (facebookWindow) facebookWindow.close();
@@ -2666,6 +2673,20 @@ export const handleFacebookLogin = async () => {
         console.error('Facebook authentication error:', error);
         toast.error('Failed to authenticate with Facebook');
     }
+};
+
+export const AccountLinkStatusIcon = ({ hasId, platform }) => {
+    return (
+        <>
+            {hasId ? (
+                <Tooltip title={`Logged in via ${platform}`} placement="left" arrow>
+                    <Check style={{ color: green[500] }} />
+                </Tooltip>
+            ) : (
+                <Clear style={{ color: red[500] }} />
+            )}
+        </>
+    );
 };
 
 export const SocialLoginButtons = ({ handleGoogleLogin, handleFacebookLogin, isRegisterPage = false }) => {

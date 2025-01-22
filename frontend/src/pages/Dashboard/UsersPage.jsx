@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
-import { DashboardHeader, LoadingDataGrid } from '../../assets/CustomComponents';
+import { AccountLinkStatusIcon, DashboardHeader, LoadingDataGrid } from '../../assets/CustomComponents';
 import DashboardTable from '../../components/Dashboard/DashboardTable';
 import DeleteModal from '../../components/Modal/DeleteModal';
 import AddUserModal from '../../components/Modal/User/AddUserModal';
@@ -69,6 +69,16 @@ const UsersPage = () => {
         { key: 'email', label: 'Email' },
         { key: 'password', label: 'Password' },
         { key: 'role', label: 'Role', render: (user) => user.role.name },
+        {
+            key: 'googleId',
+            label: 'Google Id',
+            render: (user) => <AccountLinkStatusIcon hasId={user.googleId} platform="Google" />
+        },
+        {
+            key: 'facebookId',
+            label: 'Facebook Id',
+            render: (user) => <AccountLinkStatusIcon hasId={user.facebookId} platform="Facebook" />
+        },
         { key: 'actions', label: 'Actions' }
     ];
 

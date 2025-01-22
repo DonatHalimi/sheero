@@ -1,7 +1,7 @@
-import path from 'path';
-import { fileURLToPath } from 'url';
 import dotenv from 'dotenv';
 import fs from 'fs';
+import path from 'path';
+import { fileURLToPath } from 'url';
 
 if (process.env.NODE_ENV === 'production') {
     console.log('Skipping environment check in production.');

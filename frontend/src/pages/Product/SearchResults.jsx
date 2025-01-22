@@ -3,10 +3,10 @@ import React, { useEffect, useState } from 'react';
 import { useLocation } from 'react-router-dom';
 import { calculatePageCount, CustomPagination, getPaginatedItems, GoBackButton, handlePageChange, NotFound } from '../../assets/CustomComponents';
 import noResultsImage from '../../assets/img/empty/search-results.png';
-import useAxios from '../../utils/axiosInstance';
 import Navbar from '../../components/Navbar/Navbar';
 import ProductItem from '../../components/Product/Items/ProductItem';
 import Footer from '../../components/Utils/Footer';
+import useAxios from '../../utils/axiosInstance';
 
 const itemsPerPage = 40;
 

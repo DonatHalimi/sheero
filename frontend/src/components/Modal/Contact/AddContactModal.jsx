@@ -23,7 +23,7 @@ const AddContactModal = ({ open, onClose, onAddSuccess }) => {
     const validateSubject = (v) => /^[A-Z][\sa-zA-Z\W]{5,50}$/.test(v);
     const validateMessage = (v) => /^[A-Z][\sa-zA-Z\W]{10,200}$/.test(v);
 
-    const isValidForm = 
+    const isValidForm =
         formData.name &&
         formData.email &&
         formData.subject &&

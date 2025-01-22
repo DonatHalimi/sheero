@@ -5,8 +5,13 @@ const { registerUser, loginUser, getCurrentUser, updateUserProfile, logoutUser }
 const { registerSchema, loginSchema } = require('../validations/auth');
 const { requireAuth } = require('../middleware/auth.js');
 const validate = require('../middleware/validation');
+const { NODE_ENV } = require('../config/dotenv.js');
 
 const router = express.Router();
+
+const redirectUrl = NODE_ENV === 'production'
+    ? 'https://sheero.onrender.com'
+    : 'http://localhost:3000';
 
 router.post('/register', validate(registerSchema), registerUser);
 router.post('/login', validate(loginSchema), loginUser);
@@ -29,11 +34,11 @@ router.get(
                 if (window.opener) {
                     window.opener.postMessage(
                         { type: 'GOOGLE_AUTH_SUCCESS' },
-                        'http://localhost:3000'
+                        '${redirectUrl}'
                     );
                     window.close();
                 } else {
-                    window.location.href = 'http://localhost:3000';
+                    window.location.href = '${redirectUrl}';
                 }
             `;
 
@@ -68,11 +73,11 @@ router.get(
                 if (window.opener) {
                     window.opener.postMessage(
                         { type: 'FACEBOOK_AUTH_SUCCESS' },
-                        'http://localhost:3000'
+                        '${redirectUrl}'
                     );
                     window.close();
                 } else {
-                    window.location.href = 'http://localhost:3000';
+                    window.location.href = '${redirectUrl}';
                 }
             `;
 

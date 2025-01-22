@@ -3,7 +3,14 @@ const GoogleStrategy = require('passport-google-oauth20').Strategy;
 const FacebookStrategy = require('passport-facebook').Strategy;
 const User = require('../models/User');
 const Role = require('../models/Role');
-const { GOOGLE_CLIENT_ID, GOOGLE_CLIENT_SECRET, FACEBOOK_CLIENT_ID, FACEBOOK_CLIENT_SECRET } = require('./dotenv');
+const { GOOGLE_CLIENT_ID, GOOGLE_CLIENT_SECRET, FACEBOOK_CLIENT_ID, FACEBOOK_CLIENT_SECRET, NODE_ENV } = require('./dotenv');
+
+const getCallbackUrl = (service) => {
+    const baseUrl = NODE_ENV === 'production'
+        ? 'https://sheero-backend.onrender.com'
+        : 'http://localhost:5000';
+    return `${baseUrl}/api/auth/${service}/callback`;
+};
 
 // Google login strategy
 passport.use(
@@ -11,7 +18,7 @@ passport.use(
         {
             clientID: GOOGLE_CLIENT_ID,
             clientSecret: GOOGLE_CLIENT_SECRET,
-            callbackURL: 'http://localhost:5000/api/auth/google/callback',
+            callbackURL: getCallbackUrl('google'),
         },
         async (accessToken, _, profile, done) => {
             try {
@@ -21,7 +28,6 @@ passport.use(
                 let user = await User.findOne({ email });
 
                 if (user) {
-                    // If Google ID is not already linked, add the googleId
                     if (!user.googleId) {
                         user.googleId = id;
                         await user.save();
@@ -53,7 +59,7 @@ passport.use(
         {
             clientID: FACEBOOK_CLIENT_ID,
             clientSecret: FACEBOOK_CLIENT_SECRET,
-            callbackURL: 'http://localhost:5000/api/auth/facebook/callback',
+            callbackURL: getCallbackUrl('facebook'),
             profileFields: ['id', 'emails', 'name'],
         },
         async (accessToken, _, profile, done) => {
@@ -64,7 +70,6 @@ passport.use(
                 let user = await User.findOne({ email });
 
                 if (user) {
-                    // If Facebook ID is not already linked, add the facebookId
                     if (!user.facebookId) {
                         user.facebookId = id;
                         await user.save();

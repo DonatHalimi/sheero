@@ -3,9 +3,9 @@ import React, { useEffect, useRef, useState } from 'react';
 import { useSelector } from 'react-redux';
 import { toast } from 'react-toastify';
 import { ErrorTooltip } from '../../assets/CustomComponents';
-import useAxios from '../../utils/axiosInstance';
 import Navbar from '../../components/Navbar/Navbar';
 import Footer from '../../components/Utils/Footer';
+import useAxios from '../../utils/axiosInstance';
 
 const ContactUs = () => {
     const { user } = useSelector((state) => state.auth);

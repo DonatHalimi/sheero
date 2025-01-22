@@ -1,5 +1,5 @@
-import { Facebook, Google, Visibility, VisibilityOff } from '@mui/icons-material';
-import { Box, Container, Divider, IconButton, InputAdornment, Typography } from '@mui/material';
+import { Visibility, VisibilityOff } from '@mui/icons-material';
+import { Box, Container, IconButton, InputAdornment, Typography } from '@mui/material';
 import React, { useEffect, useState } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 import { useNavigate } from 'react-router-dom';
