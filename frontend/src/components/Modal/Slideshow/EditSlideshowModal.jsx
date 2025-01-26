@@ -1,11 +1,11 @@
-import UploadIcon from '@mui/icons-material/Upload';
+import { Upload } from '@mui/icons-material';
 import React, { useEffect, useState } from 'react';
 import { toast } from 'react-toastify';
-import { BrownButton, BrownOutlinedTextField, CustomBox, CustomModal, CustomTypography, handleApiError, OutlinedBrownButton, VisuallyHiddenInput } from '../../../assets/CustomComponents';
+import { ActionButtons, BrownOutlinedTextField, CustomBox, CustomModal, CustomTypography, handleApiError, OutlinedBrownButton, VisuallyHiddenInput } from '../../../assets/CustomComponents';
 import useAxios from '../../../utils/axiosInstance';
 import { getImageUrl } from '../../../utils/config';
 
-const EditSlideshowModal = ({ open, onClose, image, onEditSuccess }) => {
+const EditSlideshowModal = ({ open, onClose, image, onViewDetails, onEditSuccess }) => {
     const [title, setTitle] = useState('');
     const [isValidTitle, setIsValidTitle] = useState(true);
     const [description, setDescription] = useState('');
@@ -17,7 +17,7 @@ const EditSlideshowModal = ({ open, onClose, image, onEditSuccess }) => {
 
     const isValid = (v) => /^[A-Z][\sa-zA-Z\W]{3,15}$/.test(v);
 
-    const isValidForm = title && isValidTitle && description && isValidDescription && (newImage || image.image);
+    const isValidForm = title && isValidTitle && description && isValidDescription && (newImage || image?.image);
 
     useEffect(() => {
         if (image) {
@@ -80,7 +80,6 @@ const EditSlideshowModal = ({ open, onClose, image, onEditSuccess }) => {
                     label="Title"
                     value={title}
                     fullWidth
-                    margin="normal"
                     onChange={(e) => {
                         setTitle(e.target.value);
                         setIsValidTitle(isValid(e.target.value));
@@ -93,7 +92,6 @@ const EditSlideshowModal = ({ open, onClose, image, onEditSuccess }) => {
                     label="Description"
                     value={description}
                     fullWidth
-                    margin="normal"
                     onChange={(e) => {
                         setDescription(e.target.value);
                         setIsValidDescription(isValid(e.target.value));
@@ -107,7 +105,7 @@ const EditSlideshowModal = ({ open, onClose, image, onEditSuccess }) => {
                     role={undefined}
                     variant="contained"
                     tabIndex={-1}
-                    startIcon={<UploadIcon />}
+                    startIcon={<Upload />}
                     className="w-full !mb-6"
                 >
                     Upload image
@@ -118,15 +116,19 @@ const EditSlideshowModal = ({ open, onClose, image, onEditSuccess }) => {
                         <img src={imagePreview} alt="Preview" className="max-w-full h-auto mx-auto rounded-md" />
                     </div>
                 )}
-                <BrownButton
-                    onClick={handleEditImage}
-                    variant="contained"
-                    color="primary"
-                    disabled={!isValidForm}
-                    className="w-full"
-                >
-                    Update
-                </BrownButton>
+
+                <ActionButtons
+                    primaryButtonLabel="Save"
+                    secondaryButtonLabel="View Details"
+                    onPrimaryClick={handleEditImage}
+                    onSecondaryClick={() => {
+                        onViewDetails(image);
+                        onClose();
+                    }}
+                    primaryButtonProps={{
+                        disabled: !isValidForm
+                    }}
+                />
             </CustomBox>
         </CustomModal>
     );

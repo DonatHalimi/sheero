@@ -5,6 +5,7 @@ import DashboardTable from '../../components/Dashboard/DashboardTable';
 import DeleteModal from '../../components/Modal/DeleteModal';
 import AddUserModal from '../../components/Modal/User/AddUserModal';
 import EditUserModal from '../../components/Modal/User/EditUserModal';
+import UserDetailsDrawer from '../../components/Modal/User/UserDetailsDrawer';
 import { getUsers } from '../../store/actions/dashboardActions';
 
 const UsersPage = () => {
@@ -17,11 +18,26 @@ const UsersPage = () => {
     const [editUserOpen, setEditUserOpen] = useState(false);
     const [deleteUserOpen, setDeleteUserOpen] = useState(false);
     const [currentPage, setCurrentPage] = useState(0);
+    const [viewDetailsOpen, setViewDetailsOpen] = useState(false);
+
     const itemsPerPage = 5;
 
     useEffect(() => {
         dispatch(getUsers());
     }, [dispatch]);
+
+    useEffect(() => {
+        const handleKeydown = (e) => {
+            if (e.altKey && e.key === 'a') {
+                setAddUserOpen(prev => !prev);
+            }
+        };
+
+        window.addEventListener('keydown', handleKeydown);
+        return () => {
+            window.removeEventListener('keydown', handleKeydown);
+        };
+    }, [users]);
 
     const handleSelectUser = (userId) => {
         const id = Array.isArray(userId) ? userId[0] : userId;
@@ -52,9 +68,25 @@ const UsersPage = () => {
         setEditUserOpen(true);
     };
 
+    const handleEditFromDrawer = (user) => {
+        setViewDetailsOpen(false);
+        setSelectedUser(user);
+        setEditUserOpen(true);
+    };
+
     const handleDeleteSuccess = () => {
         dispatch(getUsers());
         setSelectedUsers([]);
+    };
+
+    const handleViewDetails = (user) => {
+        setSelectedUser(user);
+        setViewDetailsOpen(true);
+    };
+
+    const closeDrawer = () => {
+        setViewDetailsOpen(false);
+        setSelectedUser(null);
     };
 
     const getSelectedUsers = () => {
@@ -71,12 +103,12 @@ const UsersPage = () => {
         { key: 'role', label: 'Role', render: (user) => user.role.name },
         {
             key: 'googleId',
-            label: 'Google Id',
+            label: 'Linked With Google',
             render: (user) => <AccountLinkStatusIcon hasId={user.googleId} platform="Google" />
         },
         {
             key: 'facebookId',
-            label: 'Facebook Id',
+            label: 'Linked With Facebook',
             render: (user) => <AccountLinkStatusIcon hasId={user.facebookId} platform="Facebook" />
         },
         { key: 'actions', label: 'Actions' }
@@ -108,12 +140,14 @@ const UsersPage = () => {
                             onPageChange={handlePageClick}
                             onEdit={handleEdit}
                             containerClassName='user'
+                            onViewDetails={handleViewDetails}
                         />
                     </>
                 )}
 
                 <AddUserModal open={addUserOpen} onClose={() => setAddUserOpen(false)} onAddSuccess={() => dispatch(getUsers())} />
-                <EditUserModal open={editUserOpen} onClose={() => setEditUserOpen(false)} user={selectedUser} onEditSuccess={() => dispatch(getUsers())} />
+                <EditUserModal open={editUserOpen} onClose={() => setEditUserOpen(false)} user={selectedUser} onViewDetails={handleViewDetails} onEditSuccess={() => dispatch(getUsers())} />
+                <UserDetailsDrawer open={viewDetailsOpen} onClose={closeDrawer} user={selectedUser} onEdit={handleEditFromDrawer} />
                 <DeleteModal
                     open={deleteUserOpen}
                     onClose={() => setDeleteUserOpen(false)}

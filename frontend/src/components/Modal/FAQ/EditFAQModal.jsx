@@ -1,9 +1,9 @@
 import React, { useEffect, useState } from 'react';
 import { toast } from 'react-toastify';
-import { BrownButton, BrownOutlinedTextField, CustomBox, CustomModal, CustomTypography } from '../../../assets/CustomComponents';
+import { ActionButtons, BrownOutlinedTextField, CustomBox, CustomModal, CustomTypography } from '../../../assets/CustomComponents';
 import useAxios from '../../../utils/axiosInstance';
 
-const EditFAQModal = ({ open, onClose, faq, onEditSuccess }) => {
+const EditFAQModal = ({ open, onClose, faq, onViewDetails, onEditSuccess }) => {
     const [question, setQuestion] = useState('');
     const [isValidQuestion, setIsValidQuestion] = useState(true);
     const [answer, setAnswer] = useState('');
@@ -11,7 +11,7 @@ const EditFAQModal = ({ open, onClose, faq, onEditSuccess }) => {
 
     const axiosInstance = useAxios();
 
-    const validateFAQ = (v) => /^[A-Z][a-zA-Z\s]{10,50}$/.test(v);
+    const validateFAQ = (v) => /^[A-Z][\s\S]{10,50}$/.test(v);
     const isValidForm = isValidQuestion && isValidAnswer;
 
     useEffect(() => {
@@ -72,15 +72,19 @@ const EditFAQModal = ({ open, onClose, faq, onEditSuccess }) => {
                     helperText={!isValidAnswer ? 'Answer must start with a capital letter and be between 10 and 50 characters long' : ''}
                     className="!mb-4"
                 />
-                <BrownButton
-                    onClick={handleEditFAQ}
-                    variant="contained"
-                    color="primary"
-                    disabled={!isValidForm}
-                    className="w-full"
-                >
-                    Save
-                </BrownButton>
+
+                <ActionButtons
+                    primaryButtonLabel="Save"
+                    secondaryButtonLabel="View Details"
+                    onPrimaryClick={handleEditFAQ}
+                    onSecondaryClick={() => {
+                        onViewDetails(faq);
+                        onClose();
+                    }}
+                    primaryButtonProps={{
+                        disabled: !isValidForm
+                    }}
+                />
             </CustomBox>
         </CustomModal>
     );

@@ -1,9 +1,9 @@
 import React, { useEffect, useState } from 'react';
 import { toast } from 'react-toastify';
-import { BrownButton, BrownOutlinedTextField, CustomBox, CustomModal, CustomTypography, handleApiError } from '../../../assets/CustomComponents';
+import { ActionButtons, BrownOutlinedTextField, CustomBox, CustomModal, CustomTypography, handleApiError } from '../../../assets/CustomComponents';
 import useAxios from '../../../utils/axiosInstance';
 
-const EditCountryModal = ({ open, onClose, country, onEditSuccess }) => {
+const EditCountryModal = ({ open, onClose, country, onViewDetails, onEditSuccess }) => {
     const [name, setName] = useState('');
     const [isValidName, setIsValidName] = useState(true);
     const [countryCode, setCountryCode] = useState('');
@@ -11,7 +11,7 @@ const EditCountryModal = ({ open, onClose, country, onEditSuccess }) => {
 
     const axiosInstance = useAxios();
 
-    const validateName = (v) => /^[A-Z][a-zA-Z\s]{3,15}$/.test(v);
+    const validateName = (v) => /^[A-ZÇ][a-zA-ZëËçÇ\s]{3,35}$/.test(v);
     const validateCountryCode = (v) => /^[A-Z]{2,3}$/.test(v);
 
     const isValidForm = isValidName && isValidCode;
@@ -59,7 +59,7 @@ const EditCountryModal = ({ open, onClose, country, onEditSuccess }) => {
                         setIsValidName(validateName(e.target.value))
                     }}
                     error={!isValidName}
-                    helperText={!isValidName ? 'Name must start with a capital letter and be 3-15 characters long' : ''}
+                    helperText={!isValidName ? 'Name must start with a capital letter and be 3-35 characters long' : ''}
                     className="!mb-4"
                 />
 
@@ -77,15 +77,18 @@ const EditCountryModal = ({ open, onClose, country, onEditSuccess }) => {
                     className='!mb-4'
                 />
 
-                <BrownButton
-                    onClick={handleEditCountry}
-                    variant="contained"
-                    color="primary"
-                    disabled={!isValidForm}
-                    className="w-full"
-                >
-                    Save
-                </BrownButton>
+                <ActionButtons
+                    primaryButtonLabel="Save"
+                    secondaryButtonLabel="View Details"
+                    onPrimaryClick={handleEditCountry}
+                    onSecondaryClick={() => {
+                        onViewDetails(country);
+                        onClose();
+                    }}
+                    primaryButtonProps={{
+                        disabled: !isValidForm
+                    }}
+                />
             </CustomBox>
         </CustomModal>
     );

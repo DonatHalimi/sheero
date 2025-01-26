@@ -1,12 +1,12 @@
-import UploadIcon from '@mui/icons-material/Upload';
+import { Upload } from '@mui/icons-material';
 import { InputLabel, MenuItem, Select } from '@mui/material';
 import React, { useEffect, useState } from 'react';
 import { toast } from 'react-toastify';
-import { BrownButton, BrownOutlinedTextField, CustomBox, CustomModal, CustomTypography, handleApiError, OutlinedBrownButton, OutlinedBrownFormControl, VisuallyHiddenInput } from '../../../assets/CustomComponents';
+import { ActionButtons, BrownOutlinedTextField, CustomBox, CustomModal, CustomTypography, handleApiError, OutlinedBrownButton, OutlinedBrownFormControl, VisuallyHiddenInput } from '../../../assets/CustomComponents';
 import useAxios from '../../../utils/axiosInstance';
 import { getImageUrl } from '../../../utils/config';
 
-const EditSubcategoryModal = ({ open, onClose, subcategory, onEditSuccess }) => {
+const EditSubcategoryModal = ({ open, onClose, subcategory, onViewDetails, onEditSuccess }) => {
     const [name, setName] = useState('');
     const [isValidName, setIsValidName] = useState(true);
     const [image, setImage] = useState(null);
@@ -16,7 +16,7 @@ const EditSubcategoryModal = ({ open, onClose, subcategory, onEditSuccess }) => 
 
     const axiosInstance = useAxios();
 
-    const validateName = (v) => /^[A-Z][\sa-zA-Z\W]{3,27}$/.test(v);
+    const validateName = (v) => /^[A-ZÇ][\sa-zA-ZëËçÇ\W]{3,27}$/.test(v);
 
     const isValidForm = name && isValidName && category;
 
@@ -69,7 +69,7 @@ const EditSubcategoryModal = ({ open, onClose, subcategory, onEditSuccess }) => 
         if (file) {
             const validTypes = ['image/jpeg', 'image/jpg', 'image/png'];
             if (validTypes.includes(file.type)) {
-                setNewImage(file);
+                setImage(file);
                 const reader = new FileReader();
                 reader.onloadend = () => {
                     setImagePreview(reader.result);
@@ -99,7 +99,7 @@ const EditSubcategoryModal = ({ open, onClose, subcategory, onEditSuccess }) => 
                     helperText={!isValidName ? 'Name must start with a capital letter and be 3-27 characters long' : ''}
                     className="!mb-4"
                 />
-                <OutlinedBrownFormControl fullWidth margin="normal">
+                <OutlinedBrownFormControl fullWidth>
                     <InputLabel>Category</InputLabel>
                     <Select
                         label="Category"
@@ -117,7 +117,7 @@ const EditSubcategoryModal = ({ open, onClose, subcategory, onEditSuccess }) => 
                 <OutlinedBrownButton
                     component="label"
                     variant="contained"
-                    startIcon={<UploadIcon />}
+                    startIcon={<Upload />}
                     className="w-full !mb-6"
                 >
                     Upload image
@@ -128,14 +128,19 @@ const EditSubcategoryModal = ({ open, onClose, subcategory, onEditSuccess }) => 
                         <img src={imagePreview} alt="Preview" className="max-w-full h-auto mx-auto rounded-md" />
                     </div>
                 )}
-                <BrownButton
-                    onClick={handleEditSubcategory}
-                    variant="contained"
-                    color="primary"
-                    disabled={!isValidForm}
-                    className="w-full">
-                    Save Changes
-                </BrownButton>
+
+                <ActionButtons
+                    primaryButtonLabel="Save"
+                    secondaryButtonLabel="View Details"
+                    onPrimaryClick={handleEditSubcategory}
+                    onSecondaryClick={() => {
+                        onViewDetails(subcategory);
+                        onClose();
+                    }}
+                    primaryButtonProps={{
+                        disabled: !isValidForm
+                    }}
+                />
             </CustomBox>
         </CustomModal>
     );

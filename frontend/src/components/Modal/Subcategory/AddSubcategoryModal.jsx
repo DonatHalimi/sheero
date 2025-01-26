@@ -1,4 +1,4 @@
-import UploadIcon from '@mui/icons-material/Upload';
+import { Upload } from '@mui/icons-material';
 import { TextField } from '@mui/material';
 import Autocomplete from '@mui/material/Autocomplete';
 import React, { useEffect, useState } from 'react';
@@ -16,7 +16,7 @@ const AddSubcategoryModal = ({ open, onClose, onAddSuccess }) => {
 
     const axiosInstance = useAxios();
 
-    const validateName = (v) => /^[A-Z][\sa-zA-Z\W]{3,27}$/.test(v);
+    const validateName = (v) => /^[A-ZÇ][\sa-zA-ZëËçÇ\W]{3,27}$/.test(v);
 
     const isValidForm = name && isValidName && image && category;
 
@@ -115,7 +115,7 @@ const AddSubcategoryModal = ({ open, onClose, onAddSuccess }) => {
                     role={undefined}
                     variant="contained"
                     tabIndex={-1}
-                    startIcon={<UploadIcon />}
+                    startIcon={<Upload />}
                     className="w-full !mb-6"
                 >
                     Upload image

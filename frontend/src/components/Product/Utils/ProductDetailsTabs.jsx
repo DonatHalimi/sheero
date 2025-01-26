@@ -1,6 +1,6 @@
 import { Typography } from '@mui/material';
 import React, { useEffect, useState } from 'react';
-import { DetailsBox, ProductTabs, ReviewModal, ReviewsList, TabPanel } from '../../../assets/CustomComponents';
+import { ProductDetailsBox, ProductTabs, ReviewModal, ReviewsList, TabPanel } from '../../../assets/CustomComponents';
 import useAxios from '../../../utils/axiosInstance';
 
 const ProductDetailsTabs = ({ product }) => {
@@ -39,7 +39,7 @@ const ProductDetailsTabs = ({ product }) => {
   const noDetailsMessage = 'The details are being processed. In the meantime, you can view the technical specifications. Thank you for your patience.';
 
   return (
-    <DetailsBox>
+    <ProductDetailsBox>
       <ProductTabs value={value} handleChange={handleChange} />
 
       <TabPanel value={value} index={0}>
@@ -66,7 +66,7 @@ const ProductDetailsTabs = ({ product }) => {
       </TabPanel>
 
       <ReviewModal open={open} handleClose={handleCloseModal} selectedReview={selectedReview} />
-    </DetailsBox>
+    </ProductDetailsBox>
   );
 };
 

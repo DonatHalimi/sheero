@@ -3,6 +3,7 @@ import { useDispatch, useSelector } from 'react-redux';
 import { DashboardHeader, LoadingDataGrid } from '../../assets/CustomComponents';
 import DashboardTable from '../../components/Dashboard/DashboardTable';
 import AddContactModal from '../../components/Modal/Contact/AddContactModal';
+import ContactDetailsDrawer from '../../components/Modal/Contact/ContactDetailsDrawer';
 import DeleteModal from '../../components/Modal/DeleteModal';
 import { getContacts } from '../../store/actions/dashboardActions';
 
@@ -11,14 +12,30 @@ const ContactPage = () => {
     const dispatch = useDispatch();
 
     const [selectedContacts, setSelectedContacts] = useState([]);
+    const [selectedContact, setSelectedContact] = useState(null);
     const [addContactOpen, setAddContactOpen] = useState(false);
     const [deleteContactOpen, setDeleteContactOpen] = useState(false);
     const [currentPage, setCurrentPage] = useState(0);
+    const [viewDetailsOpen, setViewDetailsOpen] = useState(false);
+
     const itemsPerPage = 5;
 
     useEffect(() => {
         dispatch(getContacts());
     }, [dispatch]);
+
+    useEffect(() => {
+        const handleKeydown = (e) => {
+            if (e.altKey && e.key === 'a') {
+                setAddContactOpen(prev => !prev);
+            }
+        };
+
+        window.addEventListener('keydown', handleKeydown);
+        return () => {
+            window.removeEventListener('keydown', handleKeydown);
+        };
+    }, [contacts]);
 
     const handleSelectContact = (contactId) => {
         const id = Array.isArray(contactId) ? contactId[0] : contactId;
@@ -49,11 +66,22 @@ const ContactPage = () => {
         setSelectedContacts([]);
     };
 
+    const handleViewDetails = (contact) => {
+        setSelectedContact(contact);
+        setViewDetailsOpen(true);
+    };
+
+    const closeDrawer = () => {
+        setViewDetailsOpen(false);
+        setSelectedContact(null);
+    };
+
     const columns = [
         { key: 'name', label: 'Name' },
         { key: 'email', label: 'Email' },
         { key: 'subject', label: 'Subject' },
         { key: 'message', label: 'Message' },
+        { key: 'actions', label: 'Actions' }
     ];
 
     return (
@@ -80,11 +108,13 @@ const ContactPage = () => {
                             itemsPerPage={itemsPerPage}
                             currentPage={currentPage}
                             onPageChange={handlePageClick}
+                            onViewDetails={handleViewDetails}
                         />
                     </>
                 )}
 
                 <AddContactModal open={addContactOpen} onClose={() => setAddContactOpen(false)} onAddSuccess={() => dispatch(getContacts())} />
+                <ContactDetailsDrawer open={viewDetailsOpen} onClose={closeDrawer} contact={selectedContact} />
                 <DeleteModal
                     open={deleteContactOpen}
                     onClose={() => setDeleteContactOpen(false)}

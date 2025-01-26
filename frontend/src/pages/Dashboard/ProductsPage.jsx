@@ -6,6 +6,7 @@ import DeleteModal from '../../components/Modal/DeleteModal';
 import ImagePreviewModal from '../../components/Modal/ImagePreviewModal';
 import AddProductModal from '../../components/Modal/Product/AddProductModal';
 import EditProductModal from '../../components/Modal/Product/EditProductModal';
+import ProductDetailsDrawer from '../../components/Modal/Product/ProductDetailsDrawer';
 import { getProducts } from '../../store/actions/productActions';
 
 const ProductsPage = () => {
@@ -19,11 +20,27 @@ const ProductsPage = () => {
     const [deleteProductOpen, setDeleteProductOpen] = useState(false);
     const [imagePreviewOpen, setImagePreviewOpen] = useState(false);
     const [currentPage, setCurrentPage] = useState(0);
+    const [viewDetailsOpen, setViewDetailsOpen] = useState(false);
+
     const itemsPerPage = 6;
 
     useEffect(() => {
         dispatch(getProducts());
     }, [dispatch]);
+
+    useEffect(() => {
+        const handleKeydown = (e) => {
+            if (e.altKey && e.key === 'a') {
+                setAddProductOpen(prev => !prev);
+            }
+        };
+
+        window.addEventListener('keydown', handleKeydown);
+        return () => {
+            window.removeEventListener('keydown', handleKeydown);
+        };
+    }, [products]);
+
 
     const handleSelectProduct = (productId) => {
         const id = Array.isArray(productId) ? productId[0] : productId;
@@ -60,6 +77,12 @@ const ProductsPage = () => {
         setEditProductOpen(true);
     };
 
+    const handleEditFromDrawer = (product) => {
+        setViewDetailsOpen(false);
+        setSelectedProduct(product);
+        setEditProductOpen(true);
+    };
+
     const getSelectedProducts = () => {
         return selectedProducts
             .map((id) => products.find((product) => product._id === id))
@@ -71,6 +94,16 @@ const ProductsPage = () => {
         setSelectedProducts([]);
     };
 
+    const handleViewDetails = (product) => {
+        setSelectedProduct(product);
+        setViewDetailsOpen(true);
+    };
+
+    const closeDrawer = () => {
+        setViewDetailsOpen(false);
+        setSelectedProduct(null);
+    };
+
     const columns = [
         { key: 'name', label: 'Name' },
         {
@@ -79,18 +112,12 @@ const ProductsPage = () => {
             render: (item) => <DashboardImage item={item} handleImageClick={handleImageClick} />
         },
         { key: 'description', label: 'Description' },
-        { key: 'details', label: 'Details', render: (item) => truncateItems(item.details.map(detail => `${detail.attribute}: ${detail.value}`)).join(', ') || 'N/A' },
         { key: 'price', label: 'Price' },
         { key: 'salePrice', label: 'Sale Price', render: (item) => item.salePrice ? item.salePrice : 'N/A' },
-        { key: 'discount', label: 'Discount', render: (item) => item.discount ? `${item.discount.value}${item.discount.type === 'percentage' ? '%' : ''}` : 'N/A' },
         { key: 'category.name', label: 'Category' },
         { key: 'subcategory.name', label: 'Subcategory' },
         { key: 'subSubcategory.name', label: 'SubSubcategory' },
         { key: 'inventoryCount', label: 'Inventory Count' },
-        { key: 'dimensions', label: 'Dimensions', render: (item) => item.dimensions ? `${item.dimensions.length} x ${item.dimensions.width} x ${item.dimensions.height} ${item.dimensions.unit}` : 'N/A' },
-        { key: 'variants', label: 'Variants', render: (item) => truncateItems(item.variants.map(variant => `Color: ${variant.color}, Size: ${variant.size}`)).join(', ') },
-        { key: 'supplier.name', label: 'Supplier' },
-        { key: 'shipping', label: 'Shipping', render: (item) => item.shipping ? `${item.shipping.weight} kg, ${item.shipping.cost}€, ${item.shipping.packageSize}` : 'None' },
         { key: 'actions', label: 'Actions' }
     ];
 
@@ -120,12 +147,14 @@ const ProductsPage = () => {
                             onPageChange={handlePageClick}
                             onEdit={handleEdit}
                             containerClassName="max-w-full"
+                            onViewDetails={handleViewDetails}
                         />
                     </>
                 )}
 
                 <AddProductModal open={addProductOpen} onClose={() => setAddProductOpen(false)} onAddSuccess={() => dispatch(getProducts())} />
-                <EditProductModal open={editProductOpen} onClose={() => setEditProductOpen(false)} product={selectedProduct} onEditSuccess={() => dispatch(getProducts())} />
+                <EditProductModal open={editProductOpen} onClose={() => setEditProductOpen(false)} product={selectedProduct} onViewDetails={handleViewDetails} onEditSuccess={() => dispatch(getProducts())} />
+                <ProductDetailsDrawer open={viewDetailsOpen} onClose={closeDrawer} product={selectedProduct} onEdit={handleEditFromDrawer} />
                 <DeleteModal
                     open={deleteProductOpen}
                     onClose={() => setDeleteProductOpen(false)}

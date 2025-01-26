@@ -14,7 +14,7 @@ const AddCityModal = ({ open, onClose, onAddSuccess }) => {
 
     const axiosInstance = useAxios();
 
-    const validateName = (v) => /^[A-Z][a-zA-Z\s]{2,15}$/.test(v);
+    const validateName = (v) => /^[A-ZÇ][a-zA-ZëËçÇ\s]{2,15}$/.test(v);
     const validateZipCode = (v) => /^[0-9]{4,5}$/.test(v);
 
     const isValidForm = isValidName && country && isValidZipCode;

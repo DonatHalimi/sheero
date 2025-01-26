@@ -26,10 +26,16 @@ const manageReturnRequest = async (req, res) => {
     try {
         const returnRequest = await ReturnRequest.findById(requestId);
 
+        const previousStatus = returnRequest.status;
+
         returnRequest.status = status;
         await returnRequest.save();
 
-        res.json({ message: `Return request ${status} successfully`, returnRequest });
+        res.json({
+            success: true,
+            message: `The status of Return Request #${requestId} has been successfully updated from '${previousStatus}' to '${status}'. Click to copy the return request ID.`,
+            returnRequest,
+        });
     } catch (error) {
         res.status(500).json({ message: 'Server error', error: error.message });
     }
@@ -38,8 +44,8 @@ const manageReturnRequest = async (req, res) => {
 const getAllReturnRequests = async (req, res) => {
     try {
         const returnRequests = await ReturnRequest.find()
-            .populate('products', 'name')
-            .populate('user', 'email')
+            .populate('products', '_id name')
+            .populate('user', '_id email firstName lastName')
             .sort({ createdAt: -1 });
 
         res.json({ returnRequests });

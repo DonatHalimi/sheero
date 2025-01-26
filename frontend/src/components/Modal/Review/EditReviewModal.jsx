@@ -1,10 +1,10 @@
 import { InputLabel, MenuItem, Rating, Select } from '@mui/material';
 import React, { useEffect, useState } from 'react';
 import { toast } from 'react-toastify';
-import { BrownButton, BrownOutlinedTextField, CustomBox, CustomModal, CustomTypography, handleApiError, OutlinedBrownFormControl } from '../../../assets/CustomComponents';
+import { ActionButtons, BrownOutlinedTextField, CustomBox, CustomModal, CustomTypography, handleApiError, OutlinedBrownFormControl, ReadOnlyTextField } from '../../../assets/CustomComponents';
 import useAxios from '../../../utils/axiosInstance';
 
-const EditReviewModal = ({ open, onClose, review, onEditSuccess }) => {
+const EditReviewModal = ({ open, onClose, review, onViewDetails, onEditSuccess }) => {
     const [title, setTitle] = useState('');
     const [isValidTitle, setIsValidTitle] = useState(true);
     const [rating, setRating] = useState(null);
@@ -19,6 +19,8 @@ const EditReviewModal = ({ open, onClose, review, onEditSuccess }) => {
     const validateComment = (v) => /^[A-Z][\Wa-zA-Z\s]{3,500}$/.test(v);
 
     const isValidForm = isValidTitle && isValidComment && rating && product;
+
+    const user = review?.user.firstName + ' ' + review?.user.lastName + ' - ' + review?.user.email
 
     useEffect(() => {
         const fetchProducts = async () => {
@@ -81,6 +83,12 @@ const EditReviewModal = ({ open, onClose, review, onEditSuccess }) => {
                     </Select>
                 </OutlinedBrownFormControl>
 
+                <ReadOnlyTextField
+                    label="User"
+                    value={user}
+                    className='!mb-4'
+                />
+
                 <BrownOutlinedTextField
                     label="Title"
                     value={title}
@@ -121,13 +129,18 @@ const EditReviewModal = ({ open, onClose, review, onEditSuccess }) => {
                     className='!mb-4'
                 />
 
-                <BrownButton
-                    onClick={handleEditReview}
-                    fullWidth
-                    disabled={!isValidForm}
-                >
-                    Save Changes
-                </BrownButton>
+                <ActionButtons
+                    primaryButtonLabel="Save"
+                    secondaryButtonLabel="View Details"
+                    onPrimaryClick={handleEditReview}
+                    onSecondaryClick={() => {
+                        onViewDetails(review);
+                        onClose();
+                    }}
+                    primaryButtonProps={{
+                        disabled: !isValidForm
+                    }}
+                />
             </CustomBox>
         </CustomModal>
     );

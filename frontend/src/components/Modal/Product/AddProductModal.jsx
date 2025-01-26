@@ -1,4 +1,4 @@
-import UploadIcon from '@mui/icons-material/Upload';
+import { Upload } from '@mui/icons-material';
 import { Autocomplete, Box, InputLabel, MenuItem, Modal, Select, TextField, Typography } from '@mui/material';
 import React, { useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
@@ -341,7 +341,7 @@ const AddProductModal = ({ open, onClose, onAddSuccess }) => {
                             role={undefined}
                             variant="contained"
                             tabIndex={-1}
-                            startIcon={<UploadIcon />}
+                            startIcon={<Upload />}
                             className="w-full !mb-6"
                         >
                             Upload image

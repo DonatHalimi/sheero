@@ -2,10 +2,10 @@ import { Visibility, VisibilityOff } from '@mui/icons-material';
 import { IconButton, InputAdornment, InputLabel, MenuItem, Select } from '@mui/material';
 import React, { useEffect, useState } from 'react';
 import { toast } from 'react-toastify';
-import { BrownButton, BrownOutlinedTextField, CustomBox, CustomModal, CustomTypography, handleApiError, knownEmailProviders, OutlinedBrownFormControl } from '../../../assets/CustomComponents';
+import { ActionButtons, BrownOutlinedTextField, CustomBox, CustomModal, CustomTypography, handleApiError, knownEmailProviders, OutlinedBrownFormControl } from '../../../assets/CustomComponents';
 import useAxios from '../../../utils/axiosInstance';
 
-const EditUserModal = ({ open, onClose, user, onEditSuccess }) => {
+const EditUserModal = ({ open, onClose, user, onViewDetails, onEditSuccess }) => {
     const [firstName, setFirstName] = useState('');
     const [isValidFirstName, setIsValidFirstName] = useState(true);
     const [lastName, setLastName] = useState('');
@@ -20,7 +20,7 @@ const EditUserModal = ({ open, onClose, user, onEditSuccess }) => {
 
     const axiosInstance = useAxios();
 
-    const validateName = (v) => /^[A-Z][a-zA-Z\s]{2,10}$/.test(v);
+    const validateName = (v) => /^[A-ZÇ][\sa-zA-ZëËçÇ\W]{2,10}$/.test(v);
     const validateEmail = (v) => new RegExp(`^[a-zA-Z0-9._%+-]+@(${knownEmailProviders.join('|')})$`, 'i').test(v);
     const validatePassword = (v) => /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[@$!%*?&\(\)_\+\-.])[A-Za-z\d@$!%*?&\(\)_\+\-.]{8,}$/.test(v);
 
@@ -161,15 +161,19 @@ const EditUserModal = ({ open, onClose, user, onEditSuccess }) => {
                         ))}
                     </Select>
                 </OutlinedBrownFormControl>
-                <BrownButton
-                    onClick={handleEditUser}
-                    variant="contained"
-                    color="primary"
-                    disabled={!isValidForm}
-                    className="w-full"
-                >
-                    Save Changes
-                </BrownButton>
+
+                <ActionButtons
+                    primaryButtonLabel="Save"
+                    secondaryButtonLabel="View Details"
+                    onPrimaryClick={handleEditUser}
+                    onSecondaryClick={() => {
+                        onViewDetails(user);
+                        onClose();
+                    }}
+                    primaryButtonProps={{
+                        disabled: !isValidForm
+                    }}
+                />
             </CustomBox>
         </CustomModal>
     );

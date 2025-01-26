@@ -1,10 +1,10 @@
 import { Autocomplete, TextField } from '@mui/material';
 import React, { useEffect, useState } from 'react';
 import { toast } from 'react-toastify';
-import { BrownButton, BrownOutlinedTextField, CustomBox, CustomModal, CustomPaper, CustomTypography, DashboardCountryFlag, handleApiError } from '../../../assets/CustomComponents';
+import { ActionButtons, BrownOutlinedTextField, CustomBox, CustomModal, CustomPaper, CustomTypography, DashboardCountryFlag, handleApiError } from '../../../assets/CustomComponents';
 import useAxios from '../../../utils/axiosInstance';
 
-const EditCityModal = ({ open, onClose, city, onEditSuccess }) => {
+const EditCityModal = ({ open, onClose, city, onViewDetails, onEditSuccess }) => {
     const [name, setName] = useState('');
     const [isValidName, setIsValidName] = useState(true);
     const [country, setCountry] = useState('');
@@ -14,7 +14,7 @@ const EditCityModal = ({ open, onClose, city, onEditSuccess }) => {
 
     const axiosInstance = useAxios();
 
-    const validateName = (v) => /^[A-Z][a-zA-Z\s]{2,15}$/.test(v);
+    const validateName = (v) => /^[A-ZÇ][a-zA-ZëËçÇ\s]{2,15}$/.test(v);
     const validateZipCode = (v) => /^[0-9]{4,5}$/.test(v);
 
     const isValidForm = isValidName && country && isValidZipCode;
@@ -109,15 +109,19 @@ const EditCityModal = ({ open, onClose, city, onEditSuccess }) => {
                     helperText={!isValidZipCode ? 'Zip code must be 4-5 digits long' : ''}
                     className="!mb-4"
                 />
-                <BrownButton
-                    onClick={handleEditCity}
-                    variant="contained"
-                    color="primary"
-                    disabled={!isValidForm}
-                    className="w-full"
-                >
-                    Save
-                </BrownButton>
+
+                <ActionButtons
+                    primaryButtonLabel="Save"
+                    secondaryButtonLabel="View Details"
+                    onPrimaryClick={handleEditCity}
+                    onSecondaryClick={() => {
+                        onViewDetails(city);
+                        onClose();
+                    }}
+                    primaryButtonProps={{
+                        disabled: !isValidForm
+                    }}
+                />
             </CustomBox>
         </CustomModal>
     );

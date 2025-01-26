@@ -101,7 +101,7 @@ const AddressDetails = () => {
         }
     };
 
-    const validateName = (name) => /^[A-Z][a-zA-Z]{1,9}$/.test(name);
+    const validateName = (name) => /^[A-ZÇ][a-zA-ZëËçÇ]{1,9}$/.test(name);
     const validateStreet = (street) => /^[A-Z][a-zA-Z0-9\s\-\.]{1,26}$/.test(street);
     const validatePhoneNumber = (phoneNumber) => /^0(44|45|48)\d{6}$/.test(phoneNumber);
     const validateComment = (comment) => /^[a-zA-Z0-9\s]{2,25}$/.test(comment);

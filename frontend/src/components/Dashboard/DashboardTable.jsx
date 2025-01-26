@@ -1,3 +1,4 @@
+import { Visibility } from '@mui/icons-material';
 import { Paper } from '@mui/material';
 import { DataGrid } from '@mui/x-data-grid';
 import React from 'react';
@@ -36,6 +37,7 @@ const DashboardTable = ({
     renderTableActions,
     onEdit,
     containerClassName,
+    onViewDetails
 }) => {
     const gridColumns = columns.map((column) => ({
         field: column.key,
@@ -48,6 +50,9 @@ const DashboardTable = ({
                     <div onClick={(e) => e.stopPropagation()}>
                         <ActionButton onClick={() => onEdit(params.row)}>
                             <BrownCreateOutlinedIcon />
+                        </ActionButton>
+                        <ActionButton onClick={() => onViewDetails(params.row)}>
+                            <Visibility />
                         </ActionButton>
                     </div>
                 );

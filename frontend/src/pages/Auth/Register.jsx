@@ -97,12 +97,6 @@ const Register = () => {
                         Join Us
                     </Typography>
 
-                    <SocialLoginButtons
-                        handleGoogleLogin={handleGoogleLogin}
-                        handleFacebookLogin={handleFacebookLogin}
-                        isRegisterPage={true}
-                    />
-
                     <Box component="form" onSubmit={handleSubmit} noValidate className="w-full">
                         {Object.entries(formData).map(([name, value]) => (
                             <div key={name} className="relative mb-5">
@@ -156,8 +150,8 @@ const Register = () => {
                             type="submit"
                             fullWidth
                             variant="contained"
-                            sx={{ mb: 2 }}
                             disabled={!isFormValid}
+                            sx={{ mb: 2 }}
                         >
                             Register
                         </BrownButton>
@@ -171,6 +165,12 @@ const Register = () => {
                                 Log In
                             </span>
                         </Typography>
+
+                        <SocialLoginButtons
+                            handleGoogleLogin={handleGoogleLogin}
+                            handleFacebookLogin={handleFacebookLogin}
+                            isRegisterPage={true}
+                        />
                     </Box>
                 </div>
             </Container>

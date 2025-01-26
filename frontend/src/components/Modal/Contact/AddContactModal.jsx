@@ -18,7 +18,7 @@ const AddContactModal = ({ open, onClose, onAddSuccess }) => {
 
     const axiosInstance = useAxios();
 
-    const validateName = (v) => /^[A-Z][\sa-zA-Z\W]{3,15}$/.test(v);
+    const validateName = (v) => /^[A-ZÇ][a-zA-ZëËçÇ\s]{3,15}$/.test(v);
     const validateEmail = (v) => new RegExp(`^[a-zA-Z0-9._%+-]+@(${knownEmailProviders.join('|')})$`, 'i').test(v);
     const validateSubject = (v) => /^[A-Z][\sa-zA-Z\W]{5,50}$/.test(v);
     const validateMessage = (v) => /^[A-Z][\sa-zA-Z\W]{10,200}$/.test(v);

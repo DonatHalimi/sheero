@@ -3,6 +3,7 @@ import { useDispatch, useSelector } from 'react-redux';
 import { DashboardCountryFlag, DashboardHeader, LoadingDataGrid } from '../../assets/CustomComponents';
 import DashboardTable from '../../components/Dashboard/DashboardTable';
 import AddCityModal from '../../components/Modal/City/AddCityModal';
+import CityDetailsDrawer from '../../components/Modal/City/CityDetailsDrawer';
 import EditCityModal from '../../components/Modal/City/EditCityModal';
 import DeleteModal from '../../components/Modal/DeleteModal';
 import { getCities } from '../../store/actions/dashboardActions';
@@ -17,11 +18,26 @@ const CitiesPage = () => {
     const [editCityOpen, setEditCityOpen] = useState(false);
     const [deleteCityOpen, setDeleteCityOpen] = useState(false);
     const [currentPage, setCurrentPage] = useState(0);
+    const [viewDetailsOpen, setViewDetailsOpen] = useState(false);
+
     const itemsPerPage = 5;
 
     useEffect(() => {
         dispatch(getCities());
     }, [dispatch]);
+
+    useEffect(() => {
+        const handleKeydown = (e) => {
+            if (e.altKey && e.key === 'a') {
+                setAddCityOpen(prev => !prev);
+            }
+        };
+
+        window.addEventListener('keydown', handleKeydown);
+        return () => {
+            window.removeEventListener('keydown', handleKeydown);
+        };
+    }, [cities]);
 
     const handleSelectCity = (cityId) => {
         const id = Array.isArray(cityId) ? cityId[0] : cityId;
@@ -45,6 +61,12 @@ const CitiesPage = () => {
         setEditCityOpen(true);
     };
 
+    const handleEditFromDrawer = (city) => {
+        setViewDetailsOpen(false);
+        setSelectedCity(city);
+        setEditCityOpen(true);
+    };
+
     const getSelectedCities = () => {
         return selectedCities
             .map((id) => cities.find((city) => city._id === id))
@@ -54,6 +76,16 @@ const CitiesPage = () => {
     const handleDeleteSuccess = () => {
         dispatch(getCities());
         setSelectedCities([]);
+    };
+
+    const handleViewDetails = (city) => {
+        setSelectedCity(city);
+        setViewDetailsOpen(true);
+    };
+
+    const closeDrawer = () => {
+        setViewDetailsOpen(false);
+        setSelectedCity(null);
     };
 
     const columns = [
@@ -92,12 +124,14 @@ const CitiesPage = () => {
                             currentPage={currentPage}
                             onPageChange={handlePageClick}
                             onEdit={handleEdit}
+                            onViewDetails={handleViewDetails}
                         />
                     </>
                 )}
 
                 <AddCityModal open={addCityOpen} onClose={() => setAddCityOpen(false)} onAddSuccess={() => dispatch(getCities())} />
-                <EditCityModal open={editCityOpen} onClose={() => setEditCityOpen(false)} city={selectedCity} onEditSuccess={() => dispatch(getCities())} />
+                <EditCityModal open={editCityOpen} onClose={() => setEditCityOpen(false)} city={selectedCity} onViewDetails={handleViewDetails} onEditSuccess={() => dispatch(getCities())} />
+                <CityDetailsDrawer open={viewDetailsOpen} onClose={closeDrawer} city={selectedCity} onEdit={handleEditFromDrawer} />
                 <DeleteModal
                     open={deleteCityOpen}
                     onClose={() => setDeleteCityOpen(false)}

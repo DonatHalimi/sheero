@@ -11,7 +11,7 @@ const AddFAQModal = ({ open, onClose, onAddSuccess }) => {
 
     const axiosInstance = useAxios();
 
-    const validateFAQ = (v) => /^[A-Z][a-zA-Z\s]{10,50}$/.test(v);
+    const validateFAQ = (v) => /^[A-Z][\s\S]{10,50}$/.test(v);
     const isValidForm = isValidQuestion && isValidAnswer;
 
     const handleAddFAQ = async () => {

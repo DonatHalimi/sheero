@@ -4,6 +4,7 @@ import { DashboardHeader, formatDate, LoadingDataGrid } from '../../assets/Custo
 import DashboardTable from '../../components/Dashboard/DashboardTable';
 import DeleteModal from '../../components/Modal/DeleteModal';
 import EditOrderModal from '../../components/Modal/Order/EditOrderModal';
+import OrderDetailsDrawer from '../../components/Modal/Order/OrderDetailsDrawer';
 import { getOrders } from '../../store/actions/dashboardActions';
 
 const OrdersPage = () => {
@@ -15,6 +16,8 @@ const OrdersPage = () => {
     const [editOrderOpen, setEditOrderOpen] = useState(false);
     const [deleteOrderOpen, setDeleteOrderOpen] = useState(false);
     const [currentPage, setCurrentPage] = useState(0);
+    const [viewDetailsOpen, setViewDetailsOpen] = useState(false);
+
     const itemsPerPage = 10;
 
     useEffect(() => {
@@ -44,6 +47,12 @@ const OrdersPage = () => {
         setEditOrderOpen(true);
     };
 
+    const handleEditFromDrawer = (order) => {
+        setViewDetailsOpen(false);
+        setSelectedOrder(order);
+        setEditOrderOpen(true);
+    };
+
     const getSelectedOrders = () => {
         return selectedOrders
             .map((id) => orders.find((order) => order._id === id))
@@ -53,6 +62,16 @@ const OrdersPage = () => {
     const handleDeleteSuccess = () => {
         dispatch(getOrders());
         setSelectedOrders([]);
+    };
+
+    const handleViewDetails = (order) => {
+        setSelectedOrder(order);
+        setViewDetailsOpen(true);
+    };
+
+    const closeDrawer = () => {
+        setViewDetailsOpen(false);
+        setSelectedOrder(null);
     };
 
     const columns = [
@@ -69,19 +88,25 @@ const OrdersPage = () => {
             render: (order) => order.products.map((item) => item.quantity).join(', ')
         },
         { key: 'totalAmount', label: 'Total Amount' },
-        { key: 'paymentMethod', label: 'Payment Method' },
-        { key: 'paymentStatus', label: 'Payment Status' },
-        { key: 'status', label: 'Delivery Status' },
+        {
+            key: 'paymentInfo',
+            label: 'Payment Info',
+            render: (order) => {
+                const paymentMethod = order.paymentMethod || 'N/A';
+                const paymentStatus = order.paymentStatus || 'N/A';
+                return `${paymentMethod} - ${paymentStatus}`;
+            }
+        },
         {
             key: 'arrivalDateRange',
             label: 'Delivery Date',
             render: (order) => {
                 const startDate = formatDate(order.arrivalDateRange.start);
                 const endDate = formatDate(order.arrivalDateRange.end);
-
                 return `${startDate} - ${endDate}`;
             }
         },
+        { key: 'status', label: 'Delivery Status' },
         { key: 'actions', label: 'Actions' }
     ];
 
@@ -109,12 +134,13 @@ const OrdersPage = () => {
                             currentPage={currentPage}
                             onPageChange={handlePageClick}
                             onEdit={handleEdit}
-                            containerClassName="max-w-full"
+                            onViewDetails={handleViewDetails}
                         />
                     </>
                 )}
 
-                <EditOrderModal open={editOrderOpen} onClose={() => setEditOrderOpen(false)} order={selectedOrder} onEditSuccess={() => dispatch(getOrders())} />
+                <EditOrderModal open={editOrderOpen} onClose={() => setEditOrderOpen(false)} order={selectedOrder} onViewDetails={handleViewDetails} onEditSuccess={() => dispatch(getOrders())} />
+                <OrderDetailsDrawer open={viewDetailsOpen} onClose={closeDrawer} order={selectedOrder} onEdit={handleEditFromDrawer} />
                 <DeleteModal
                     open={deleteOrderOpen}
                     onClose={() => setDeleteOrderOpen(false)}

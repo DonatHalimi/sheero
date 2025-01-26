@@ -14,7 +14,7 @@ const createContact = async (req, res) => {
 
 const getContacts = async (req, res) => {
     try {
-        const contacts = await Contact.find();
+        const contacts = await Contact.find().populate('userId', 'firstName lastName email');
         res.status(200).json(contacts);
     } catch (error) {
         res.status(500).json({ message: 'Server error', error: error.message });

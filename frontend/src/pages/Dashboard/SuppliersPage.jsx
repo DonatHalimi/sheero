@@ -5,6 +5,7 @@ import DashboardTable from '../../components/Dashboard/DashboardTable';
 import DeleteModal from '../../components/Modal/DeleteModal';
 import AddSupplierModal from '../../components/Modal/Supplier/AddSupplierModal';
 import EditSupplierModal from '../../components/Modal/Supplier/EditSupplierModal';
+import SupplierDetailsDrawer from '../../components/Modal/Supplier/SupplierDetailsDrawer';
 import { getSuppliers } from '../../store/actions/dashboardActions';
 
 const SupplierPage = () => {
@@ -17,11 +18,26 @@ const SupplierPage = () => {
     const [editSupplierOpen, setEditSupplierOpen] = useState(false);
     const [deleteSupplierOpen, setDeleteSupplierOpen] = useState(false);
     const [currentPage, setCurrentPage] = useState(0);
+    const [viewDetailsOpen, setViewDetailsOpen] = useState(false);
+
     const itemsPerPage = 5;
 
     useEffect(() => {
         dispatch(getSuppliers());
     }, [dispatch]);
+
+    useEffect(() => {
+        const handleKeydown = (e) => {
+            if (e.altKey && e.key === 'a') {
+                setAddSupplierOpen(prev => !prev);
+            }
+        };
+
+        window.addEventListener('keydown', handleKeydown);
+        return () => {
+            window.removeEventListener('keydown', handleKeydown);
+        };
+    }, [suppliers]);
 
     const handleSelectSupplier = (supplierId) => {
         const id = Array.isArray(supplierId) ? supplierId[0] : supplierId;
@@ -50,6 +66,12 @@ const SupplierPage = () => {
         setEditSupplierOpen(true);
     };
 
+    const handleEditFromDrawer = (supplier) => {
+        setViewDetailsOpen(false);
+        setSelectedSupplier(supplier);
+        setEditSupplierOpen(true);
+    };
+
     const getSelectedSuppliers = () => {
         return selectedSuppliers
             .map((id) => suppliers.find((supplier) => supplier._id === id))
@@ -59,6 +81,16 @@ const SupplierPage = () => {
     const handleDeleteSuccess = () => {
         dispatch(getSuppliers());
         setSelectedSuppliers([]);
+    };
+
+    const handleViewDetails = (supplier) => {
+        setSelectedSupplier(supplier);
+        setViewDetailsOpen(true);
+    };
+
+    const closeDrawer = () => {
+        setViewDetailsOpen(false);
+        setSelectedSupplier(null);
     };
 
     const columns = [
@@ -93,13 +125,15 @@ const SupplierPage = () => {
                             currentPage={currentPage}
                             onPageChange={handlePageClick}
                             onEdit={handleEdit}
+                            onViewDetails={handleViewDetails}
                         />
                     </>
 
                 )}
 
                 <AddSupplierModal open={addSupplierOpen} onClose={() => setAddSupplierOpen(false)} onAddSuccess={() => dispatch(getSuppliers())} />
-                <EditSupplierModal open={editSupplierOpen} onClose={() => setEditSupplierOpen(false)} supplier={selectedSupplier} onEditSuccess={() => dispatch(getSuppliers())} />
+                <EditSupplierModal open={editSupplierOpen} onClose={() => setEditSupplierOpen(false)} supplier={selectedSupplier} onViewDetails={handleViewDetails} onEditSuccess={() => dispatch(getSuppliers())} />
+                <SupplierDetailsDrawer open={viewDetailsOpen} onClose={closeDrawer} supplier={selectedSupplier} onEdit={handleEditFromDrawer} />
                 <DeleteModal
                     open={deleteSupplierOpen}
                     onClose={() => setDeleteSupplierOpen(false)}

@@ -185,7 +185,20 @@ const getAllOrders = async (req, res) => {
         const orders = await Order.find()
             .populate('user', 'firstName lastName email')
             .populate('products.product', 'name price')
-            .populate('address', 'name street phoneNumber city country')
+            .populate({
+                path: 'address',
+                select: 'name street phoneNumber city country',
+                populate: [
+                    {
+                        path: 'country',
+                        select: 'countryCode name'
+                    },
+                    {
+                        path: 'city',
+                        select: 'name zipCode'
+                    }
+                ]
+            })
             .sort({ createdAt: -1 });
 
         res.json(orders);
@@ -256,6 +269,8 @@ const updateDeliveryStatus = async (req, res) => {
             return res.status(404).json({ success: false, message: 'Order not found.' });
         }
 
+        const previousStatus = order.status;
+
         order.status = status;
 
         if (paymentStatus) {
@@ -270,7 +285,11 @@ const updateDeliveryStatus = async (req, res) => {
 
         await order.save();
 
-        res.json({ message: 'Order updated successfully', order });
+        res.json({
+            success: true,
+            message: `The status of order #${orderId} has been successfully updated from '${previousStatus}' to '${status}'. Click to copy the order ID.`,
+            order,
+        });
     } catch (error) {
         console.error('Error updating order:', error);
         res.status(500).json({ success: false, message: 'Error updating order.' });

@@ -6,6 +6,7 @@ import DeleteModal from '../../components/Modal/DeleteModal';
 import ImagePreviewModal from '../../components/Modal/ImagePreviewModal';
 import AddSlideshowModal from '../../components/Modal/Slideshow/AddSlideshowModal';
 import EditSlideshowModal from '../../components/Modal/Slideshow/EditSlideshowModal';
+import SlideshowDetailsDrawer from '../../components/Modal/Slideshow/SlideshowDetailsDrawer';
 import { getImages } from '../../store/actions/slideshowActions';
 
 const SlideshowPage = () => {
@@ -19,11 +20,26 @@ const SlideshowPage = () => {
     const [deleteImageOpen, setDeleteImageOpen] = useState(false);
     const [imagePreviewOpen, setImagePreviewOpen] = useState(false);
     const [currentPage, setCurrentPage] = useState(0);
+    const [viewDetailsOpen, setViewDetailsOpen] = useState(false);
+
     const itemsPerPage = 5;
 
     useEffect(() => {
         dispatch(getImages())
     }, [dispatch]);
+
+    useEffect(() => {
+        const handleKeydown = (e) => {
+            if (e.altKey && e.key === 'a') {
+                setAddImageOpen(prev => !prev);
+            }
+        };
+
+        window.addEventListener('keydown', handleKeydown);
+        return () => {
+            window.removeEventListener('keydown', handleKeydown);
+        };
+    }, [images]);
 
     const handleSelectImage = (imageId) => {
         const id = Array.isArray(imageId) ? imageId[0] : imageId;
@@ -53,6 +69,12 @@ const SlideshowPage = () => {
         setEditImageOpen(true);
     };
 
+    const handleEditFromDrawer = (image) => {
+        setViewDetailsOpen(false);
+        setSelectedImage(image);
+        setEditImageOpen(true);
+    };
+
     const getSelectedImages = () => {
         return selectedImages
             .map((id) => images.find((image) => image._id === id))
@@ -62,6 +84,16 @@ const SlideshowPage = () => {
     const handleDeleteSuccess = () => {
         dispatch(getImages());
         setSelectedImages([]);
+    };
+
+    const handleViewDetails = (image) => {
+        setSelectedImage(image);
+        setViewDetailsOpen(true);
+    };
+
+    const closeDrawer = () => {
+        setViewDetailsOpen(false);
+        setSelectedImage(null);
     };
 
     const columns = [
@@ -100,13 +132,14 @@ const SlideshowPage = () => {
                             currentPage={currentPage}
                             onPageChange={(event) => setCurrentPage(event.selected)}
                             onEdit={handleEdit}
-                            containerClassName='max-w-screen-2xl mx-auto'
+                            onViewDetails={handleViewDetails}
                         />
                     </>
                 )}
 
                 <AddSlideshowModal open={addImageOpen} onClose={() => setAddImageOpen(false)} onAddSuccess={() => dispatch(getImages())} />
-                <EditSlideshowModal open={editImageOpen} onClose={() => setEditImageOpen(false)} image={selectedImage} onEditSuccess={() => dispatch(getImages())} />
+                <EditSlideshowModal open={editImageOpen} onClose={() => setEditImageOpen(false)} image={selectedImage} onViewDetails={handleViewDetails} onEditSuccess={() => dispatch(getImages())} />
+                <SlideshowDetailsDrawer open={viewDetailsOpen} onClose={closeDrawer} image={selectedImage} onEdit={handleEditFromDrawer} />
                 <DeleteModal
                     open={deleteImageOpen}
                     onClose={() => setDeleteImageOpen(false)}

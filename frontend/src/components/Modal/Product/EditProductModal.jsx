@@ -1,5 +1,4 @@
-import { ArrowBack } from '@mui/icons-material';
-import UploadIcon from '@mui/icons-material/Upload';
+import { ArrowBack, Upload } from '@mui/icons-material';
 import { Autocomplete, Box, MenuItem, Modal, TextField, Typography } from '@mui/material';
 import React, { useEffect, useState } from 'react';
 import { toast } from 'react-toastify';
@@ -352,7 +351,7 @@ const EditProductModal = ({ open, onClose, product, onEditSuccess }) => {
                             role={undefined}
                             variant="contained"
                             tabIndex={-1}
-                            startIcon={<UploadIcon />}
+                            startIcon={<Upload />}
                             className="w-full !mb-6"
                         >
                             Upload image

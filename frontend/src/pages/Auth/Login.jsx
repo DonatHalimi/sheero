@@ -26,7 +26,6 @@ const Login = () => {
 
     useEffect(() => {
         if (auth.isAuthenticated) {
-            toast.success('Login successful');
             navigate('/');
         }
     }, [auth.isAuthenticated, navigate]);
@@ -86,7 +85,7 @@ const Login = () => {
             const response = await dispatch(loginUser(email, password));
 
             if (response?.success) {
-                toast.success('Login successful');
+                toast.success('Successfully logged in');
             } else if (response?.errors) {
                 response.errors.forEach((err) => {
                     toast.info(`${err.message}`);
@@ -105,14 +104,9 @@ const Login = () => {
             <Navbar />
             <Container component="main" maxWidth="xs" className="flex flex-1 flex-col align-left mt-20 mb-20">
                 <div className="bg-white flex flex-col align-left rounded-md shadow-md p-6">
-                    <Typography variant="h5" align="left" className="!mb-4 font-extrabold text-stone-600">
+                    <Typography variant="h5" align="left" className="font-extrabold text-stone-600">
                         Welcome Back
                     </Typography>
-
-                    <SocialLoginButtons
-                        handleGoogleLogin={handleGoogleLogin}
-                        handleFacebookLogin={handleFacebookLogin}
-                    />
 
                     <Box component="form" onSubmit={handleSubmit} noValidate className="w-full">
                         {Object.entries(formData).map(([name, value]) => {
@@ -153,6 +147,7 @@ const Login = () => {
                                             isValid={formData[`${name}Valid`]}
                                             value={value}
                                             message={errorMessages[name]}
+                                            isLoginPage={true}
                                         />
                                     </div>
                                 );
@@ -163,8 +158,8 @@ const Login = () => {
                             type="submit"
                             fullWidth
                             variant="contained"
-                            sx={{ mb: 2, mt: 2 }}
                             disabled={!isFormValid}
+                            sx={{ mb: 2, mt: 2 }}
                         >
                             Log In
                         </BrownButton>
@@ -178,6 +173,11 @@ const Login = () => {
                                 Sign Up
                             </span>
                         </Typography>
+
+                        <SocialLoginButtons
+                            handleGoogleLogin={handleGoogleLogin}
+                            handleFacebookLogin={handleFacebookLogin}
+                        />
                     </Box>
                 </div>
             </Container>

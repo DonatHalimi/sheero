@@ -3,6 +3,7 @@ import { useDispatch, useSelector } from 'react-redux';
 import { DashboardHeader, DashboardImage, LoadingDataGrid } from '../../assets/CustomComponents';
 import DashboardTable from '../../components/Dashboard/DashboardTable';
 import AddCategoryModal from '../../components/Modal/Category/AddCategoryModal';
+import CategoryDetailsDrawer from '../../components/Modal/Category/CategoryDetailsDrawer';
 import EditCategoryModal from '../../components/Modal/Category/EditCategoryModal';
 import DeleteModal from '../../components/Modal/DeleteModal';
 import ImagePreviewModal from '../../components/Modal/ImagePreviewModal';
@@ -19,11 +20,26 @@ const CategoriesPage = () => {
     const [deleteCategoryOpen, setDeleteCategoryOpen] = useState(false);
     const [imagePreviewOpen, setImagePreviewOpen] = useState(false);
     const [currentPage, setCurrentPage] = useState(0);
+    const [viewDetailsOpen, setViewDetailsOpen] = useState(false);
+
     const itemsPerPage = 5;
 
     useEffect(() => {
         dispatch(getCategories());
     }, [dispatch]);
+
+    useEffect(() => {
+        const handleKeydown = (e) => {
+            if (e.altKey && e.key === 'a') {
+                setAddCategoryOpen(prev => !prev);
+            }
+        };
+
+        window.addEventListener('keydown', handleKeydown);
+        return () => {
+            window.removeEventListener('keydown', handleKeydown);
+        };
+    }, [categories]);
 
     const handleSelectCategory = (categoryId) => {
         const id = Array.isArray(categoryId) ? categoryId[0] : categoryId;
@@ -53,6 +69,12 @@ const CategoriesPage = () => {
         setEditCategoryOpen(true);
     };
 
+    const handleEditFromDrawer = (category) => {
+        setViewDetailsOpen(false);
+        setSelectedCategory(category);
+        setEditCategoryOpen(true);
+    };
+
     const getSelectedCategories = () => {
         return selectedCategories
             .map((id) => categories.find((category) => category._id === id))
@@ -62,6 +84,16 @@ const CategoriesPage = () => {
     const handleDeleteSuccess = () => {
         dispatch(getCategories());
         setSelectedCategories([]);
+    };
+
+    const handleViewDetails = (category) => {
+        setSelectedCategory(category);
+        setViewDetailsOpen(true);
+    };
+
+    const closeDrawer = () => {
+        setViewDetailsOpen(false);
+        setSelectedCategory(null);
     };
 
     const columns = [
@@ -99,12 +131,14 @@ const CategoriesPage = () => {
                             currentPage={currentPage}
                             onPageChange={handlePageClick}
                             onEdit={handleEdit}
+                            onViewDetails={handleViewDetails}
                         />
                     </>
                 )}
 
                 <AddCategoryModal open={addCategoryOpen} onClose={() => setAddCategoryOpen(false)} onAddSuccess={() => dispatch(getCategories())} />
-                <EditCategoryModal open={editCategoryOpen} onClose={() => setEditCategoryOpen(false)} category={selectedCategory} onEditSuccess={() => dispatch(getCategories())} />
+                <EditCategoryModal open={editCategoryOpen} onClose={() => setEditCategoryOpen(false)} category={selectedCategory} onViewDetails={handleViewDetails} onEditSuccess={() => dispatch(getCategories())} />
+                <CategoryDetailsDrawer open={viewDetailsOpen} onClose={closeDrawer} category={selectedCategory} onEdit={handleEditFromDrawer} />
                 <DeleteModal
                     open={deleteCategoryOpen}
                     onClose={() => setDeleteCategoryOpen(false)}

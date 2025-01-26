@@ -1,19 +1,34 @@
-import { MenuItem, Select, Typography } from '@mui/material';
+import { MenuItem, Select } from '@mui/material';
 import React, { useEffect, useState } from 'react';
 import { toast } from 'react-toastify';
-import { BrownButton, CustomBox, CustomModal, handleApiError } from '../../../assets/CustomComponents';
+import { ActionButtons, CustomBox, CustomModal, CustomTypography, handleApiError, ReadOnlyTextField } from '../../../assets/CustomComponents';
 import useAxios from '../../../utils/axiosInstance';
 
-const EditReturnRequestModal = ({ open, onClose, returnRequest, onEditSuccess }) => {
+const EditReturnRequestModal = ({ open, onClose, returnRequest, onViewDetails, onEditSuccess }) => {
     const [status, setStatus] = useState(returnRequest ? returnRequest.status : 'pending');
-
     const axiosInstance = useAxios();
+
+    const user = `${returnRequest?.user.firstName} ${returnRequest?.user.lastName} - ${returnRequest?.user.email}`;
+    const products = typeof returnRequest?.products === 'string'
+        ? returnRequest.products.split(', ').map((productName, index) => ({
+            _id: `unknown-${index}`,
+            name: productName.trim(),
+        })) : Array.isArray(returnRequest?.products)
+            ? returnRequest.products
+            : [];
+
 
     useEffect(() => {
         if (returnRequest) {
             setStatus(returnRequest.status);
         }
     }, [returnRequest]);
+
+    const copyToClipboard = (text) => {
+        navigator.clipboard.writeText(text).then(() => {
+            toast.success('Return Request ID copied to clipboard!');
+        });
+    };
 
     const handleEditReturnRequest = async () => {
         const updatedData = {
@@ -26,7 +41,12 @@ const EditReturnRequestModal = ({ open, onClose, returnRequest, onEditSuccess })
                 status,
                 ...updatedData
             });
-            toast.success(response.data.message);
+
+            toast.success(response.data.message, {
+                onClick: () => copyToClipboard(returnRequest._id),
+                autoClose: false
+            });
+
             onEditSuccess(response.data);
             onClose();
         } catch (error) {
@@ -37,7 +57,44 @@ const EditReturnRequestModal = ({ open, onClose, returnRequest, onEditSuccess })
     return (
         <CustomModal open={open} onClose={onClose}>
             <CustomBox>
-                <Typography variant="h5">Edit Status</Typography>
+                <CustomTypography variant="h5">Edit Status</CustomTypography>
+
+
+                <ReadOnlyTextField
+                    label="Order ID"
+                    value={returnRequest?.order}
+                    className="!mb-4"
+                />
+
+                <ReadOnlyTextField
+                    label="User"
+                    value={user}
+                    className="!mb-4"
+                />
+
+                <ReadOnlyTextField
+                    label="Product(s)"
+                    value={products
+                        .map(product => product?.name || 'Unknown Product')
+                        .join(', ')}
+                    multiline
+                    rows={4}
+                    className="!mb-4"
+                />
+
+                <ReadOnlyTextField
+                    label="Reason"
+                    value={returnRequest?.reason}
+                    className="!mb-4"
+                />
+
+                {returnRequest?.reason === 'Other' && returnRequest?.customReason && (
+                    <ReadOnlyTextField
+                        label="Custom Reason"
+                        value={returnRequest?.customReason}
+                        className="!mb-4"
+                    />
+                )}
 
                 <Select
                     label="Status"
@@ -52,14 +109,15 @@ const EditReturnRequestModal = ({ open, onClose, returnRequest, onEditSuccess })
                     <MenuItem value="rejected">Rejected</MenuItem>
                 </Select>
 
-                <BrownButton
-                    onClick={handleEditReturnRequest}
-                    variant="contained"
-                    color="primary"
-                    className="w-full"
-                >
-                    Save Changes
-                </BrownButton>
+                <ActionButtons
+                    primaryButtonLabel="Save"
+                    secondaryButtonLabel="View Details"
+                    onPrimaryClick={handleEditReturnRequest}
+                    onSecondaryClick={() => {
+                        onViewDetails(returnRequest);
+                        onClose();
+                    }}
+                />
             </CustomBox>
         </CustomModal>
     );

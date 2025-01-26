@@ -1,4 +1,4 @@
-import UploadIcon from '@mui/icons-material/Upload';
+import { Upload } from '@mui/icons-material';
 import React, { useState } from 'react';
 import { toast } from 'react-toastify';
 import { BrownButton, BrownOutlinedTextField, CustomBox, CustomModal, CustomTypography, handleApiError, OutlinedBrownButton, VisuallyHiddenInput } from '../../../assets/CustomComponents';
@@ -12,7 +12,7 @@ const AddCategoryModal = ({ open, onClose, onAddSuccess }) => {
 
     const axiosInstance = useAxios();
 
-    const validateName = (v) => /^[A-Z][\sa-zA-Z\W]{3,28}$/.test(v);
+    const validateName = (v) => /^[A-ZÇ][\sa-zA-ZëËçÇ\W]{3,28}$/.test(v);
 
     const isValidForm = isValidName && image;
 
@@ -76,7 +76,7 @@ const AddCategoryModal = ({ open, onClose, onAddSuccess }) => {
                     role={undefined}
                     variant="contained"
                     tabIndex={-1}
-                    startIcon={<UploadIcon />}
+                    startIcon={<Upload />}
                     className="w-full !mb-6"
                 >
                     Upload image

@@ -5,6 +5,7 @@ import DashboardTable from '../../components/Dashboard/DashboardTable';
 import DeleteModal from '../../components/Modal/DeleteModal';
 import AddFAQModal from '../../components/Modal/FAQ/AddFAQModal';
 import EditFAQModal from '../../components/Modal/FAQ/EditFAQModal';
+import FAQDetailsDrawer from '../../components/Modal/FAQ/FAQDetailsDrawer';
 import { getFAQs } from '../../store/actions/dashboardActions';
 
 const FAQPage = () => {
@@ -17,11 +18,26 @@ const FAQPage = () => {
     const [editFaqOpen, setEditFaqOpen] = useState(false);
     const [deleteFaqOpen, setDeleteFaqOpen] = useState(false);
     const [currentPage, setCurrentPage] = useState(0);
+    const [viewDetailsOpen, setViewDetailsOpen] = useState(false);
+
     const itemsPerPage = 5;
 
     useEffect(() => {
         dispatch(getFAQs());
     }, [dispatch]);
+
+    useEffect(() => {
+        const handleKeydown = (e) => {
+            if (e.altKey && e.key === 'a') {
+                setAddFaqOpen(prev => !prev);
+            }
+        };
+
+        window.addEventListener('keydown', handleKeydown);
+        return () => {
+            window.removeEventListener('keydown', handleKeydown);
+        };
+    }, [faqs]);
 
     const handleSelectFaq = (faqId) => {
         const id = Array.isArray(faqId) ? faqId[0] : faqId;
@@ -46,6 +62,12 @@ const FAQPage = () => {
         setEditFaqOpen(true);
     };
 
+    const handleEditFromDrawer = (faq) => {
+        setViewDetailsOpen(false);
+        setSelectedFaq(faq);
+        setEditFaqOpen(true);
+    };
+
     const getSelectedFaqs = () => {
         return selectedFaqs
             .map((id) => faqs.find((faq) => faq._id === id))
@@ -55,6 +77,16 @@ const FAQPage = () => {
     const handleDeleteSuccess = () => {
         dispatch(getFAQs());
         setSelectedFaqs([]);
+    };
+
+    const handleViewDetails = (faq) => {
+        setSelectedFaq(faq);
+        setViewDetailsOpen(true);
+    };
+
+    const closeDrawer = () => {
+        setViewDetailsOpen(false);
+        setSelectedFaq(null);
     };
 
     const columns = [
@@ -88,12 +120,14 @@ const FAQPage = () => {
                             currentPage={currentPage}
                             onPageChange={handlePageClick}
                             onEdit={handleEdit}
+                            onViewDetails={handleViewDetails}
                         />
                     </>
                 )}
 
                 <AddFAQModal open={addFaqOpen} onClose={() => setAddFaqOpen(false)} onAddSuccess={() => dispatch(getFAQs())} />
-                <EditFAQModal open={editFaqOpen} onClose={() => setEditFaqOpen(false)} faq={selectedFaq} onEditSuccess={() => dispatch(getFAQs())} />
+                <EditFAQModal open={editFaqOpen} onClose={() => setEditFaqOpen(false)} faq={selectedFaq} onViewDetails={handleViewDetails} onEditSuccess={() => dispatch(getFAQs())} />
+                <FAQDetailsDrawer open={viewDetailsOpen} onClose={closeDrawer} faq={selectedFaq} onEdit={handleEditFromDrawer} />
                 <DeleteModal
                     open={deleteFaqOpen}
                     onClose={() => setDeleteFaqOpen(false)}

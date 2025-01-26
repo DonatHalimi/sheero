@@ -1,10 +1,10 @@
 import { InputLabel, MenuItem, Select } from '@mui/material';
 import React, { useEffect, useState } from 'react';
 import { toast } from 'react-toastify';
-import { BrownButton, BrownOutlinedTextField, CustomBox, CustomModal, CustomTypography, handleApiError, OutlinedBrownFormControl } from '../../../assets/CustomComponents';
+import { ActionButtons, BrownOutlinedTextField, CustomBox, CustomModal, CustomTypography, handleApiError, OutlinedBrownFormControl } from '../../../assets/CustomComponents';
 import useAxios from '../../../utils/axiosInstance';
 
-const EditSubSubcategoryModal = ({ open, onClose, subSubcategory, onEditSuccess }) => {
+const EditSubSubcategoryModal = ({ open, onClose, subSubcategory, onViewDetails, onEditSuccess }) => {
     const [name, setName] = useState('');
     const [isValidName, setIsValidName] = useState(true);
     const [subcategory, setSubcategory] = useState('');
@@ -12,7 +12,7 @@ const EditSubSubcategoryModal = ({ open, onClose, subSubcategory, onEditSuccess 
 
     const axiosInstance = useAxios();
 
-    const validateName = (v) => /^[A-Z][\sa-zA-Z\W]{3,27}$/.test(v);
+    const validateName = (v) => /^[A-ZÇ][\sa-zA-ZëËçÇ\W]{3,27}$/.test(v);
 
     const isValidForm = name && isValidName && subcategory;
 
@@ -81,15 +81,19 @@ const EditSubSubcategoryModal = ({ open, onClose, subSubcategory, onEditSuccess 
                         ))}
                     </Select>
                 </OutlinedBrownFormControl>
-                <BrownButton
-                    onClick={handleEditSubSubcategory}
-                    variant="contained"
-                    color="primary"
-                    disabled={!isValidForm}
-                    className="w-full"
-                >
-                    Save Changes
-                </BrownButton>
+
+                <ActionButtons
+                    primaryButtonLabel="Save"
+                    secondaryButtonLabel="View Details"
+                    onPrimaryClick={handleEditSubSubcategory}
+                    onSecondaryClick={() => {
+                        onViewDetails(subSubcategory);
+                        onClose();
+                    }}
+                    primaryButtonProps={{
+                        disabled: !isValidForm
+                    }}
+                />
             </CustomBox>
         </CustomModal>
     );

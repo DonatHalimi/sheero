@@ -3,6 +3,7 @@ import { useDispatch, useSelector } from 'react-redux';
 import { DashboardHeader, LoadingDataGrid } from '../../assets/CustomComponents';
 import DashboardTable from '../../components/Dashboard/DashboardTable';
 import AddAddressModal from '../../components/Modal/Address/AddAddressModal';
+import AddressDetailsDrawer from '../../components/Modal/Address/AddressDetailsDrawer';
 import EditAddressModal from '../../components/Modal/Address/EditAddressModal';
 import DeleteModal from '../../components/Modal/DeleteModal';
 import { getAddresses } from '../../store/actions/dashboardActions';
@@ -17,11 +18,26 @@ const AddressesPage = () => {
     const [editAddressOpen, setEditAddressOpen] = useState(false);
     const [deleteAddressOpen, setDeleteAddressOpen] = useState(false);
     const [currentPage, setCurrentPage] = useState(0);
+    const [viewDetailsOpen, setViewDetailsOpen] = useState(false);
+
     const itemsPerPage = 5;
 
     useEffect(() => {
         dispatch(getAddresses());
     }, [dispatch]);
+
+    useEffect(() => {
+        const handleKeydown = (e) => {
+            if (e.altKey && e.key === 'a') {
+                setAddAddressOpen(prev => !prev);
+            }
+        };
+
+        window.addEventListener('keydown', handleKeydown);
+        return () => {
+            window.removeEventListener('keydown', handleKeydown);
+        };
+    }, [addresses]);
 
     const handleSelectAddress = (addressId) => {
         const id = Array.isArray(addressId) ? addressId[0] : addressId;
@@ -42,6 +58,12 @@ const AddressesPage = () => {
         setEditAddressOpen(true);
     };
 
+    const handleEditFromDrawer = (address) => {
+        setViewDetailsOpen(false);
+        setSelectedAddress(address);
+        setEditAddressOpen(true);
+    };
+
     const getSelectedAddresses = () => {
         return selectedAddresses
             .map((id) => addresses.find((address) => address._id === id))
@@ -53,17 +75,25 @@ const AddressesPage = () => {
         setSelectedAddresses([]);
     };
 
+    const handleViewDetails = (address) => {
+        setSelectedAddress(address);
+        setViewDetailsOpen(true);
+    };
+
+    const closeDrawer = () => {
+        setViewDetailsOpen(false);
+        setSelectedAddress(null);
+    };
+
     const columns = [
-        { key: 'user.firstName', label: 'First Name' },
-        { key: 'user.lastName', label: 'Last Name' },
+        { key: 'fullName', label: 'Full Name', render: (row) => `${row.user?.firstName} ${row.user?.lastName}` },
         { key: 'user.email', label: 'Email' },
         { key: 'name', label: 'Name' },
         { key: 'street', label: 'Street' },
         { key: 'phoneNumber', label: 'Phone Number' },
-        { key: 'comment', label: 'Comment', render: (row) => row.comment || 'N/A' },
-        { key: 'country.name', label: 'Country' },
-        { key: 'city.name', label: 'City' },
+        { key: 'city.name', label: 'City / Country', render: (row) => `${row.city.name}, ${row.country.name}` },
         { key: 'city.zipCode', label: 'Zip Code' },
+        { key: 'comment', label: 'Comment', render: (row) => row.comment || 'N/A' },
         { key: 'actions', label: 'Actions' }
     ];
 
@@ -92,12 +122,14 @@ const AddressesPage = () => {
                             currentPage={currentPage}
                             onPageChange={(event) => setCurrentPage(event.selected)}
                             onEdit={handleEdit}
+                            onViewDetails={handleViewDetails}
                         />
                     </>
                 )}
 
                 <AddAddressModal open={addAddressOpen} onClose={() => setAddAddressOpen(false)} onAddSuccess={() => dispatch(getAddresses())} />
-                <EditAddressModal open={editAddressOpen} onClose={() => setEditAddressOpen(false)} address={selectedAddress} onEditSuccess={() => dispatch(getAddresses())} />
+                <EditAddressModal open={editAddressOpen} onClose={() => setEditAddressOpen(false)} address={selectedAddress} onViewDetails={handleViewDetails} onEditSuccess={() => dispatch(getAddresses())} />
+                <AddressDetailsDrawer open={viewDetailsOpen} onClose={closeDrawer} address={selectedAddress} onEdit={handleEditFromDrawer} />
                 <DeleteModal
                     open={deleteAddressOpen}
                     onClose={() => setDeleteAddressOpen(false)}

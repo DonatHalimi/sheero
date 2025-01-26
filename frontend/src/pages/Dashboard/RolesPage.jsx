@@ -5,6 +5,7 @@ import DashboardTable from '../../components/Dashboard/DashboardTable';
 import DeleteModal from '../../components/Modal/DeleteModal.jsx';
 import AddRoleModal from '../../components/Modal/Role/AddRoleModal.jsx';
 import EditRoleModal from '../../components/Modal/Role/EditRoleModal.jsx';
+import RoleDetailsDrawer from '../../components/Modal/Role/RoleDetailsDrawer.jsx';
 import { getRoles } from '../../store/actions/dashboardActions.js';
 
 const RolesPage = () => {
@@ -17,11 +18,26 @@ const RolesPage = () => {
     const [editRoleOpen, setEditRoleOpen] = useState(false);
     const [deleteRoleOpen, setDeleteRoleOpen] = useState(false);
     const [currentPage, setCurrentPage] = useState(0);
+    const [viewDetailsOpen, setViewDetailsOpen] = useState(false);
+
     const itemsPerPage = 5;
 
     useEffect(() => {
         dispatch(getRoles());
     }, [dispatch]);
+
+    useEffect(() => {
+        const handleKeydown = (e) => {
+            if (e.altKey && e.key === 'a') {
+                setAddRoleOpen(prev => !prev);
+            }
+        };
+
+        window.addEventListener('keydown', handleKeydown);
+        return () => {
+            window.removeEventListener('keydown', handleKeydown);
+        };
+    }, [roles]);
 
     const handleSelectRole = (roleId) => {
         const id = Array.isArray(roleId) ? roleId[0] : roleId;
@@ -46,6 +62,12 @@ const RolesPage = () => {
         setEditRoleOpen(true);
     };
 
+    const handleEditFromDrawer = (role) => {
+        setViewDetailsOpen(false);
+        setSelectedRole(role);
+        setEditRoleOpen(true);
+    };
+
     const getSelectedRoles = () => {
         return selectedRoles
             .map((id) => roles.find((role) => role._id === id))
@@ -55,6 +77,16 @@ const RolesPage = () => {
     const handleDeleteSuccess = () => {
         dispatch(getRoles());
         setSelectedRoles([]);
+    };
+
+    const handleViewDetails = (role) => {
+        setSelectedRole(role);
+        setViewDetailsOpen(true);
+    };
+
+    const closeDrawer = () => {
+        setViewDetailsOpen(false);
+        setSelectedRole(null);
     };
 
     const columns = [
@@ -87,12 +119,14 @@ const RolesPage = () => {
                             currentPage={currentPage}
                             onPageChange={handlePageClick}
                             onEdit={handleEdit}
+                            onViewDetails={handleViewDetails}
                         />
                     </>
                 )}
 
                 <AddRoleModal open={addRoleOpen} onClose={() => setAddRoleOpen(false)} onAddSuccess={() => dispatch(getRoles())} />
-                <EditRoleModal open={editRoleOpen} onClose={() => setEditRoleOpen(false)} role={selectedRole} onEditSuccess={() => dispatch(getRoles())} />
+                <EditRoleModal open={editRoleOpen} onClose={() => setEditRoleOpen(false)} role={selectedRole} onViewDetails={handleViewDetails} onEditSuccess={() => dispatch(getRoles())} />
+                <RoleDetailsDrawer open={viewDetailsOpen} onClose={closeDrawer} role={selectedRole} onEdit={handleEditFromDrawer} />
                 <DeleteModal
                     open={deleteRoleOpen}
                     onClose={() => setDeleteRoleOpen(false)}

@@ -29,7 +29,6 @@ const ContactUs = () => {
             subject: '',
             message: ''
         });
-        window.scrollTo(0, 0);
         user && subjectRef.current?.focus();
     }, [user]);
 

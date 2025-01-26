@@ -1,10 +1,10 @@
-import { InputLabel, MenuItem, Select } from '@mui/material';
+import { Autocomplete, TextField } from '@mui/material';
 import React, { useEffect, useState } from 'react';
 import { toast } from 'react-toastify';
-import { BrownButton, BrownOutlinedTextField, CustomBox, CustomModal, CustomTypography, handleApiError, OutlinedBrownFormControl } from '../../../assets/CustomComponents';
+import { ActionButtons, BrownOutlinedTextField, CustomBox, CustomModal, CustomPaper, CustomTypography, DashboardCountryFlag, handleApiError } from '../../../assets/CustomComponents';
 import useAxios from '../../../utils/axiosInstance';
 
-const EditAddressModal = ({ open, onClose, address, onEditSuccess }) => {
+const EditAddressModal = ({ open, onClose, address, onViewDetails, onEditSuccess }) => {
     const [name, setName] = useState('');
     const [isValidName, setIsValidName] = useState(true);
     const [street, setStreet] = useState('');
@@ -16,11 +16,11 @@ const EditAddressModal = ({ open, onClose, address, onEditSuccess }) => {
     const [city, setCity] = useState('');
     const [country, setCountry] = useState('');
     const [cities, setCities] = useState([]);
-    const [countries, setCountries] = useState([]);
+    const [countriesWithGroups, setCountriesWithGroups] = useState([]);
 
     const axiosInstance = useAxios();
 
-    const validateName = (v) => /^[A-Z][a-zA-Z]{2,10}$/.test(v);
+    const validateName = (v) => /^[A-ZÇ][a-zA-ZëËçÇ\s]{2,15}$/.test(v);
     const validatePhoneNumber = (v) => /^0(44|45|48|49)\d{6}$/.test(v);
     const validateStreet = (v) => /^[A-Z][a-zA-Z0-9\s]{2,27}$/.test(v);
     const validateComment = (v) => !v || /^[a-zA-Z0-9\s]{2,25}$/.test(v);
@@ -43,19 +43,40 @@ const EditAddressModal = ({ open, onClose, address, onEditSuccess }) => {
             setCountry(address.country._id);
         }
 
-        const fetchCountriesAndCities = async () => {
+        const fetchCountries = async () => {
             try {
                 const countriesResponse = await axiosInstance.get('/countries/get');
-                const citiesResponse = await axiosInstance.get('/cities/get');
-                setCountries(countriesResponse.data);
-                setCities(citiesResponse.data)
+                const sortedCountries = countriesResponse.data.sort((a, b) => a.name.localeCompare(b.name));
+                const countriesWithGroups = sortedCountries.map(country => ({
+                    ...country,
+                    firstLetter: country.name[0].toUpperCase()
+                }));
+                setCountriesWithGroups(countriesWithGroups);
             } catch (error) {
                 console.error('Error fetching countries', error);
             }
         };
 
-        fetchCountriesAndCities();
+        fetchCountries();
     }, [address]);
+
+    useEffect(() => {
+        const fetchCitiesByCountry = async () => {
+            if (country) {
+                try {
+                    const citiesResponse = await axiosInstance.get(`/cities/country/${country}`);
+                    const sortedCities = citiesResponse.data.sort((a, b) => a.name.localeCompare(b.name));
+                    setCities(sortedCities);
+                } catch (error) {
+                    console.error('Error fetching cities by country', error);
+                }
+            } else {
+                setCities([]);
+            }
+        };
+
+        fetchCitiesByCountry();
+    }, [country]);
 
     const handleEditAddress = async () => {
         const updatedData = {
@@ -77,6 +98,11 @@ const EditAddressModal = ({ open, onClose, address, onEditSuccess }) => {
         }
     };
 
+    const handleCountryChange = (e, newValue) => {
+        setCountry(newValue ? newValue._id : '');
+        setCity('');
+    };
+
     return (
         <CustomModal open={open} onClose={onClose}>
             <CustomBox>
@@ -92,8 +118,7 @@ const EditAddressModal = ({ open, onClose, address, onEditSuccess }) => {
                     error={!isValidName}
                     helperText={!isValidName ? 'Name must start with a capital letter and be 2-10 characters long' : ''}
                     fullWidth
-                    margin="normal"
-                    className='mb-4'
+                    className='!mb-4'
                 />
 
                 <BrownOutlinedTextField
@@ -104,10 +129,9 @@ const EditAddressModal = ({ open, onClose, address, onEditSuccess }) => {
                         setIsValidStreet(validateStreet(e.target.value));
                     }}
                     fullWidth
-                    margin="normal"
                     error={!isValidStreet}
                     helperText={!isValidStreet ? 'Street must start with a capital letter and be 2-27 characters long' : ''}
-                    className='mb-4'
+                    className='!mb-4'
                 />
 
                 <BrownOutlinedTextField
@@ -118,62 +142,67 @@ const EditAddressModal = ({ open, onClose, address, onEditSuccess }) => {
                         setIsValidPhoneNumber(validatePhoneNumber(e.target.value));
                     }}
                     fullWidth
-                    margin="normal"
                     placeholder="044/45/48 XXXXXX"
                     error={!isValidPhoneNumber}
                     helperText={!isValidPhoneNumber ? 'Phone number must start with 044, 045, 048 or 049 followed by 6 digits' : ''}
-                    className='mb-4'
+                    className='!mb-4'
                 />
 
                 <BrownOutlinedTextField
-                    label="Comment"
+                    label="Comment (Optional)"
                     value={comment}
                     onChange={(e) => {
                         setComment(e.target.value)
                         setIsValidComment(validateComment(e.target.value));
                     }}
                     fullWidth
-                    margin="normal"
                     error={!isValidComment}
                     helperText={!isValidComment ? 'Comment must be 2-25 characters long' : ''}
-                    className='mb-4'
+                    multiline
+                    rows={4}
+                    className='!mb-4'
                 />
 
-                <OutlinedBrownFormControl fullWidth margin="normal">
-                    <InputLabel>Country</InputLabel>
-                    <Select
-                        label='Country'
-                        value={country}
-                        onChange={(e) => setCountry(e.target.value)}
-                    >
-                        {countries.map((country) => (
-                            <MenuItem key={country._id} value={country._id}>{country.name}</MenuItem>
-                        ))}
-                    </Select>
-                </OutlinedBrownFormControl>
-
-                <OutlinedBrownFormControl fullWidth margin="normal">
-                    <InputLabel>City</InputLabel>
-                    <Select
-                        label='City'
-                        value={city}
-                        onChange={(e) => setCity(e.target.value)}
-                        className='mb-4'
-                    >
-                        {cities.map((city) => (
-                            <MenuItem key={city._id} value={city._id}>{city.name}</MenuItem>
-                        ))}
-                    </Select>
-                </OutlinedBrownFormControl>
-                <BrownButton
-                    onClick={handleEditAddress}
-                    variant="contained"
-                    color="primary"
+                <Autocomplete
+                    id="country-autocomplete"
+                    options={countriesWithGroups}
+                    groupBy={(option) => option.firstLetter}
+                    getOptionLabel={(option) => option.name}
+                    value={countriesWithGroups.find((c) => c._id === country) || null}
+                    onChange={handleCountryChange}
+                    PaperComponent={CustomPaper}
                     fullWidth
-                    disabled={!isValidForm}
-                >
-                    Update
-                </BrownButton>
+                    renderOption={(props, option) => (
+                        <li {...props} style={{ display: 'flex', alignItems: 'center' }}>
+                            <DashboardCountryFlag countryCode={option.countryCode} name={option.name} />
+                        </li>
+                    )}
+                    renderInput={(params) => <TextField {...params} label="Country" variant="outlined" />}
+                    className='!mb-4'
+                />
+
+                <Autocomplete
+                    options={cities}
+                    getOptionLabel={(option) => option.name}
+                    value={cities.find((c) => c._id === city) || null}
+                    onChange={(e, newValue) => setCity(newValue ? newValue._id : '')}
+                    renderInput={(params) => (
+                        <TextField {...params} label="City" fullWidth className='!mb-4' />
+                    )}
+                />
+
+                <ActionButtons
+                    primaryButtonLabel="Save"
+                    secondaryButtonLabel="View Details"
+                    onPrimaryClick={handleEditAddress}
+                    onSecondaryClick={() => {
+                        onViewDetails(address);
+                        onClose();
+                    }}
+                    primaryButtonProps={{
+                        disabled: !isValidForm
+                    }}
+                />
             </CustomBox>
         </CustomModal>
     );

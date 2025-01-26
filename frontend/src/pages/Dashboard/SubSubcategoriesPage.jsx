@@ -5,6 +5,7 @@ import DashboardTable from '../../components/Dashboard/DashboardTable';
 import DeleteModal from '../../components/Modal/DeleteModal';
 import AddSubSubcategoryModal from '../../components/Modal/SubSubcategory/AddSubSubcategoryModal';
 import EditSubSubcategoryModal from '../../components/Modal/SubSubcategory/EditSubSubcategoryModal';
+import SubSubcategoryDetailsDrawer from '../../components/Modal/SubSubcategory/SubSubcategoryDetailsDrawer';
 import { getSubSubcategories } from '../../store/actions/dashboardActions';
 
 const SubSubcategoriesPage = () => {
@@ -17,11 +18,26 @@ const SubSubcategoriesPage = () => {
     const [editSubSubcategoryOpen, setEditSubSubcategoryOpen] = useState(false);
     const [deleteSubSubcategoryOpen, setDeleteSubSubcategoryOpen] = useState(false);
     const [currentPage, setCurrentPage] = useState(0);
+    const [viewDetailsOpen, setViewDetailsOpen] = useState(false);
+
     const itemsPerPage = 5;
 
     useEffect(() => {
         dispatch(getSubSubcategories());
     }, [dispatch]);
+
+    useEffect(() => {
+        const handleKeydown = (e) => {
+            if (e.altKey && e.key === 'a') {
+                setAddSubSubcategoryOpen(prev => !prev);
+            }
+        };
+
+        window.addEventListener('keydown', handleKeydown);
+        return () => {
+            window.removeEventListener('keydown', handleKeydown);
+        };
+    }, [subSubcategories]);
 
     const handleSelectSubSubcategory = (subsubcategoryId) => {
         const id = Array.isArray(subsubcategoryId) ? subsubcategoryId[0] : subsubcategoryId;
@@ -46,6 +62,12 @@ const SubSubcategoriesPage = () => {
         setEditSubSubcategoryOpen(true);
     };
 
+    const handleEditFromDrawer = (subSubcategory) => {
+        setViewDetailsOpen(false);
+        setSelectedSubSubcategory(subSubcategory);
+        setEditSubSubcategoryOpen(true);
+    };
+
     const getSelectedSubSubcategories = () => {
         return selectedSubSubcategories
             .map((id) => subSubcategories.find((subSubcategory) => subSubcategory._id === id))
@@ -55,6 +77,16 @@ const SubSubcategoriesPage = () => {
     const handleDeleteSuccess = () => {
         dispatch(getSubSubcategories());
         setSelectedSubSubcategories([]);
+    };
+
+    const handleViewDetails = (subSubcategory) => {
+        setSelectedSubSubcategory(subSubcategory);
+        setViewDetailsOpen(true);
+    };
+
+    const closeDrawer = () => {
+        setViewDetailsOpen(false);
+        setSelectedSubSubcategory(null);
     };
 
     const columns = [
@@ -88,12 +120,14 @@ const SubSubcategoriesPage = () => {
                             currentPage={currentPage}
                             onPageChange={handlePageClick}
                             onEdit={handleEdit}
+                            onViewDetails={handleViewDetails}
                         />
                     </>
                 )}
 
                 <AddSubSubcategoryModal open={addSubSubcategoryOpen} onClose={() => setAddSubSubcategoryOpen(false)} onAddSuccess={() => dispatch(getSubSubcategories())} />
-                <EditSubSubcategoryModal open={editSubSubcategoryOpen} onClose={() => setEditSubSubcategoryOpen(false)} subSubcategory={selectedSubSubcategory} onEditSuccess={() => dispatch(getSubSubcategories())} />
+                <EditSubSubcategoryModal open={editSubSubcategoryOpen} onClose={() => setEditSubSubcategoryOpen(false)} subSubcategory={selectedSubSubcategory} onViewDetails={handleViewDetails} onEditSuccess={() => dispatch(getSubSubcategories())} />
+                <SubSubcategoryDetailsDrawer open={viewDetailsOpen} onClose={closeDrawer} subSubcategory={selectedSubSubcategory} onEdit={handleEditFromDrawer} />
                 <DeleteModal
                     open={deleteSubSubcategoryOpen}
                     onClose={() => setDeleteSubSubcategoryOpen(false)}

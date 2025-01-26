@@ -8,6 +8,7 @@ import {
     ChevronRight,
     Clear,
     Close,
+    Create,
     CreateOutlined,
     DashboardOutlined,
     Delete,
@@ -112,12 +113,14 @@ import logo from './img/brand/logo.png';
 import {
     customMenuProps,
     dashboardTitleSx,
+    drawerPaperSx,
     filterLayoutSx,
     getExpandIconProps,
     getMotionDivProps,
     goBackButtonSx,
     headerFilterSx,
     headerSearchSx,
+    iconButtonSx,
     layoutContainerSx,
     paginationStackSx,
     paginationStyling,
@@ -1330,17 +1333,112 @@ export const CustomBox = (props) => (
     <Box className="bg-white p-3 sm:p-4 rounded-lg w-full focus:outline-none" {...props} />
 );
 
+export const BoxBetween = (props) => (
+    <Box sx={{ display: 'flex', justifyContent: 'space-between', gap: 2 }} {...props} />
+)
+
 export const CustomTypography = (props) => (
     <Typography className="!text-xl !font-bold !mb-3" {...props} />
 );
+
+export const CloseButton = ({ onClose }) => (
+    <IconButton
+        aria-label="close"
+        onClick={onClose}
+        sx={iconButtonSx}
+    >
+        <Close />
+    </IconButton>
+);
+
+export const ReadOnlyTextField = (props) => (
+    <TextField
+        variant="outlined"
+        fullWidth
+        InputProps={{
+            readOnly: true,
+            ...props.InputProps
+        }}
+        {...props}
+    />
+);
+
+export const ActionButtons = ({
+    primaryButtonLabel,
+    secondaryButtonLabel,
+    onPrimaryClick,
+    onSecondaryClick,
+    isValidForm,
+    primaryButtonProps = {},
+    secondaryButtonProps = {},
+    gap = 20,
+    width = 200,
+}) => {
+    return (
+        <Box style={{ gap: `${gap}px` }} className="flex">
+            <OutlinedBrownButton
+                onClick={onSecondaryClick}
+                variant="outlined"
+                color="primary"
+                style={{ width: `${width}px` }}
+                {...secondaryButtonProps}
+            >
+                {secondaryButtonLabel}
+            </OutlinedBrownButton>
+
+            <BrownButton
+                onClick={onPrimaryClick}
+                variant="contained"
+                color="primary"
+                isValidForm={isValidForm}
+                style={{ width: `${width}px` }}
+                {...primaryButtonProps}
+            >
+                {primaryButtonLabel}
+            </BrownButton>
+        </Box>
+    );
+};
+
+export const EditExportButtons = ({
+    onEditClick,
+    onExportClick,
+    editButtonLabel = 'Edit',
+    exportButtonLabel = 'Export as JSON',
+    editButtonProps = {},
+    exportButtonProps = {},
+    width = 220,
+}) => {
+    return (
+        <BoxBetween>
+            <BrownButton
+                variant="contained"
+                startIcon={<Create />}
+                onClick={onEditClick}
+                style={{ width: `${width}px` }}
+                {...editButtonProps}
+            >
+                {editButtonLabel}
+            </BrownButton>
+
+            <OutlinedBrownButton
+                variant="contained"
+                startIcon={<Download />}
+                onClick={onExportClick}
+                style={{ width: `${width}px` }}
+                {...exportButtonProps}
+            >
+                {exportButtonLabel}
+            </OutlinedBrownButton>
+        </BoxBetween>
+    );
+};
 
 export const CustomDeleteModal = ({ open, onClose, onDelete, title, message }) => (
     <AnimatePresence>
         <Modal open={open} onClose={onClose} className="flex items-center justify-center outline-none">
             <BounceAnimation>
-                <Box
-                    className="bg-white p-4 rounded-lg shadow-lg w-full"
-                >
+                <Box className="bg-white p-4 rounded-lg shadow-lg w-full">
                     <Typography variant="h6" className="text-xl font-bold mb-2">
                         {title}
                     </Typography>
@@ -1551,7 +1649,7 @@ export const TabPanel = ({ children, value, index }) => {
     );
 };
 
-export const DetailsBox = styled(Box)({
+export const ProductDetailsBox = styled(Box)({
     width: '100%',
     display: 'flex',
     flexDirection: 'column',
@@ -1785,8 +1883,8 @@ export const GoBackButton = () => {
     return (
         <div className="flex justify-left mb-4">
             <RoundIconButton
-                className="text-black rounded-md px-4 py-2"
                 onClick={goBack}
+                className="text-black rounded-md px-4 py-2"
             >
                 <GoBackArrow />
             </RoundIconButton>
@@ -2089,11 +2187,12 @@ export const CenteredMoreVertIcon = ({ onClick, ...props }) => (
     </Box>
 );
 
-export const ErrorTooltip = ({ field, focusedField, isValid, message, value }) =>
+export const ErrorTooltip = ({ field, focusedField, isValid, message, value, isLoginPage = false }) =>
     focusedField === field && value.trim() && !isValid && (
-        <div className="absolute left-0 top-full bg-white text-red-500 text-sm p-2 rounded-lg shadow-md w-full z-10">
+        <div className={`absolute left-0 ${isLoginPage ? 'top-[74px]' : 'top-[58px]'} bg-white text-red-500 text-sm p-2 rounded-lg shadow-md w-full z-10`}>
             <span className="block text-xs font-semibold mb-1">{message.title}</span>
             {message.details}
+            <div className="absolute top-[-5px] left-[20px] w-0 h-0 border-l-[5px] border-r-[5px] border-b-[5px] border-transparent border-b-white"></div>
         </div>
     );
 
@@ -2468,19 +2567,7 @@ export const generateOrderPDF = async (order) => {
 export const downloadUserData = (user) => {
     if (!user) return;
 
-    const formatDate = (date) =>
-        `${date.getDate()}-${date.getMonth() + 1}-${date.getFullYear()}`;
-
-    const createDownloadLink = (data, fileName) => {
-        const link = document.createElement('a');
-        link.href = `data:text/json;charset=utf-8,${encodeURIComponent(data)}`;
-        link.download = fileName;
-        document.body.appendChild(link);
-        link.click();
-        document.body.removeChild(link);
-    };
-
-    const date = formatDate(new Date());
+    const date = formatDownloadDate(new Date());
     const fileName = `${user.firstName}_${user.lastName}_PersonalData_${date}.json`;
     const data = JSON.stringify(user, null, 2);
 
@@ -2580,27 +2667,493 @@ export const generateReturnPDF = (returnRequest) => {
     doc.save(`return_${returnRequest._id}.pdf`);
 };
 
+const createDownloadLink = (data, fileName) => {
+    const link = document.createElement('a');
+    link.href = `data:text/json;charset=utf-8,${encodeURIComponent(data)}`;
+    link.download = fileName;
+    document.body.appendChild(link);
+    link.click();
+    document.body.removeChild(link);
+};
+
+const formatDownloadDate = (date) =>
+    `${date.getDate()}-${date.getMonth() + 1}-${date.getFullYear()}`;
+
 export const downloadAddress = (address) => {
     if (!address) return;
 
-    const formatDate = (date) =>
-        `${date.getDate()}-${date.getMonth() + 1}-${date.getFullYear()}`;
-
-    const createDownloadLink = (data, fileName) => {
-        const link = document.createElement('a');
-        link.href = `data:text/json;charset=utf-8,${encodeURIComponent(data)}`;
-        link.download = fileName;
-        document.body.appendChild(link);
-        link.click();
-        document.body.removeChild(link);
-    };
-
-    const date = formatDate(new Date());
+    const date = formatDownloadDate(new Date());
     const fileName = `Address_${address.name}_${date}.json`;
     const data = JSON.stringify(address, null, 2);
 
     createDownloadLink(data, fileName);
 };
+
+export const downloadAddressData = (address) => {
+    if (!address) return;
+
+    const date = formatDownloadDate(new Date());
+    const fileName = `${address.user.firstName}_${address.user.lastName}_AddressDetails_${date}.json`;
+
+    const data = {
+        user: {
+            firstName: address.user.firstName,
+            lastName: address.user.lastName,
+            email: address.user.email
+        },
+        address: {
+            id: address.id,
+            name: address.name,
+            street: address.street,
+            country: {
+                countryCode: address.country.countryCode,
+                name: address.country.name,
+            },
+            city: {
+                name: address.city.name,
+                zipCode: address.city.zipCode
+            },
+            phoneNumber: address.phoneNumber,
+            comment: address.comment || 'N/A',
+            createdAt: address.createdAt,
+            updatedAt: address.updatedAt
+        },
+        exportDate: new Date().toISOString()
+    };
+
+    const json = JSON.stringify(data, null, 2);
+    createDownloadLink(json, fileName);
+};
+
+export const downloadCategoryData = (category) => {
+    if (!category) return;
+
+    const date = formatDownloadDate(new Date());
+    const fileName = `${category.name}_Details_${date}.json`;
+
+    const data = {
+        category: {
+            id: category._id,
+            name: category.name,
+            image: category.image,
+            createdAt: category.createdAt,
+            updatedAt: category.updatedAt
+        },
+        exportDate: new Date().toISOString()
+    };
+
+    const json = JSON.stringify(data, null, 2);
+    createDownloadLink(json, fileName);
+};
+
+export const downloadCityData = (city) => {
+    if (!city) return;
+
+    const date = formatDownloadDate(new Date());
+    const fileName = `${city.name}_Details_${date}.json`;
+
+    const data = {
+        city: {
+            id: city._id,
+            name: city.name,
+            zipCode: city.zipCode,
+            country: {
+                countryCode: city.country.countryCode,
+                name: city.country.name
+            },
+            createdAt: city.createdAt,
+            updatedAt: city.updatedAt
+        },
+        exportDate: new Date().toISOString()
+    };
+
+    const json = JSON.stringify(data, null, 2);
+    createDownloadLink(json, fileName);
+};
+
+export const downloadContactData = (contact) => {
+    if (!contact) return;
+
+    const date = formatDownloadDate(new Date());
+    const fileName = `${contact.name}_Details_${date}.json`;
+
+    const data = {
+        contact: {
+            id: contact._id,
+            name: contact.name,
+            email: contact.email,
+            subject: contact.subject,
+            message: contact.message,
+            user: {
+                id: contact.userId ? contact.userId._id : 'N/A',
+                firstName: contact.userId ? contact.userId.firstName : 'N/A',
+                lastName: contact.userId ? contact.userId.lastName : 'N/A',
+                email: contact.userId ? contact.userId.email : 'N/A'
+            },
+            createdAt: contact.createdAt,
+        },
+        exportDate: new Date().toISOString()
+    };
+
+    const json = JSON.stringify(data, null, 2);
+    createDownloadLink(json, fileName);
+};
+
+export const downloadCountryData = (country) => {
+    if (!country) return;
+
+    const date = formatDownloadDate(new Date());
+    const fileName = `${country.name}_Details_${date}.json`;
+
+    const data = {
+        country: {
+            id: country._id,
+            countryCode: country.countryCode,
+            name: country.name,
+        },
+        exportDate: new Date().toISOString()
+    };
+
+    const json = JSON.stringify(data, null, 2);
+    createDownloadLink(json, fileName);
+};
+
+export const downloadFaqData = (faq) => {
+    if (!faq) return;
+
+    const date = formatDownloadDate(new Date());
+    const fileName = `${faq.question}_Details_${date}.json`;
+
+    const data = {
+        faq: {
+            id: faq._id,
+            question: faq.question,
+            answer: faq.answer,
+        },
+        exportDate: new Date().toISOString()
+    };
+
+    const json = JSON.stringify(data, null, 2);
+    createDownloadLink(json, fileName);
+};
+
+export const downloadOrderData = (order) => {
+    if (!order) return;
+
+    const date = formatDownloadDate(new Date());
+    const fileName = `Order #${order.id}_Details_${date}.json`;
+
+    const data = {
+        order: {
+            id: order._id,
+            user: {
+                id: order.user._id,
+                firstName: order.user.firstName,
+                lastName: order.user.lastName,
+                email: order.user.email
+            },
+            address: {
+                id: order.address._id,
+                name: order.address.name,
+                street: order.address.street,
+                country: {
+                    countryCode: order.address.country.countryCode,
+                    name: order.address.country.name
+                },
+                city: {
+                    name: order.address.city.name,
+                    zipCode: order.address.city.zipCode
+                },
+                phoneNumber: order.address.phoneNumber,
+                comment: order.address.comment || 'N/A'
+            },
+            products: order.products.map(product => ({
+                name: product.product?.name || 'Unknown Product',
+                quantity: product.quantity || 0
+            })),
+            totalAmount: order.totalAmount,
+            paymentMethod: order.paymentMethod,
+            paymentStatus: order.paymentStatus,
+            paymentIntentId: order.paymentIntentId || 'N/A',
+            status: order.status,
+            arrivalDateRange: {
+                start: order.arrivalDateRange.start,
+                end: order.arrivalDateRange.end
+            },
+            createdAt: order.createdAt,
+        },
+        exportDate: new Date().toISOString()
+    };
+
+    const json = JSON.stringify(data, null, 2);
+    createDownloadLink(json, fileName);
+};
+
+export const downloadProductData = (product) => {
+    if (!product) return;
+
+    const truncateItems = (items, maxItems = 3) => {
+        if (!items || items.length === 0) return null;
+        if (items.length <= maxItems) {
+            return items;
+        }
+        return [...items.slice(0, maxItems), '...'];
+    };
+
+    const formatDimensions = (dimensions) => {
+        if (!dimensions || !dimensions.length || !dimensions.width || !dimensions.height || !dimensions.unit) {
+            return null;
+        }
+        return `${dimensions.length} x ${dimensions.width} x ${dimensions.height} ${dimensions.unit}`;
+    };
+
+    const formatShipping = (shipping) => {
+        if (!shipping) return null;
+        return {
+            weight: shipping.weight || null,
+            dimensions: formatDimensions(shipping.dimensions) || null,
+            cost: shipping.cost || null,
+            packageSize: shipping.packageSize || null,
+        };
+    };
+
+    const formatSupplier = (supplier) => {
+        if (!supplier) return null;
+        return {
+            name: supplier.name || null,
+            contactInfo: {
+                email: supplier.contactInfo?.email || null,
+                phoneNumber: supplier.contactInfo?.phoneNumber || null,
+            },
+        };
+    };
+
+    const date = formatDownloadDate(new Date());
+    const fileName = `${product.name}_Details_${date}.json`;
+
+    const data = {
+        product: {
+            name: product.name || null,
+            description: product.description || null,
+            details: truncateItems(product.details?.map(detail => `${detail.attribute}: ${detail.value}`)) || null,
+            price: product.price || null,
+            salePrice: product.salePrice || null,
+            discount: product.discount ? {
+                type: product.discount.type || null,
+                value: product.discount.value || null,
+            } : null,
+            category: product.category?.name || null,
+            subcategory: product.subcategory?.name || null,
+            subSubcategory: product.subSubcategory?.name || null,
+            image: product.image || null,
+            inventoryCount: product.inventoryCount || null,
+            dimensions: formatDimensions(product.dimensions) || null,
+            variants: truncateItems(product.variants?.map(variant => ({
+                color: variant.color || null,
+                size: variant.size || null,
+            }))) || null,
+            supplier: formatSupplier(product.supplier) || null,
+            shipping: formatShipping(product.shipping) || null,
+        },
+        exportDate: new Date().toISOString(),
+    };
+
+    const json = JSON.stringify(data, null, 2);
+    createDownloadLink(json, fileName);
+};
+
+export const downloadReturnRequestData = (returnRequest) => {
+    if (!returnRequest) return;
+
+    const date = formatDownloadDate(new Date());
+    const fileName = `Return Request #${returnRequest._id}_Details_${date}.json`;
+
+    const data = {
+        returnRequest: {
+            id: returnRequest.id,
+            user: {
+                id: returnRequest.user.id,
+                firstName: returnRequest.user.firstName,
+                lastName: returnRequest.user.lastName,
+                email: returnRequest.user.email
+            },
+            order: returnRequest.order,
+            products: returnRequest.products,
+            reason: returnRequest.reason,
+            customReason: returnRequest.customReason || 'N/A',
+            status: returnRequest.status,
+            createdAt: returnRequest.createdAt,
+            updatedAt: returnRequest.updatedAt
+        },
+        exportDate: new Date().toISOString()
+    };
+
+    const json = JSON.stringify(data, null, 2);
+    createDownloadLink(json, fileName);
+};
+
+export const downloadReviewData = (returnRequest) => {
+    if (!returnRequest) return;
+
+    const date = formatDownloadDate(new Date());
+    const fileName = `Return Request #${returnRequest._id}_Details_${date}.json`;
+
+    const data = {
+        returnRequest: {
+            id: returnRequest.id,
+            user: {
+                id: returnRequest.user.id,
+                firstName: returnRequest.user.firstName,
+                lastName: returnRequest.user.lastName,
+                email: returnRequest.user.email
+            },
+            order: returnRequest.order,
+            products: returnRequest.products,
+            reason: returnRequest.reason,
+            customReason: returnRequest.customReason || 'N/A',
+            status: returnRequest.status,
+            createdAt: returnRequest.createdAt,
+            updatedAt: returnRequest.updatedAt
+        },
+        exportDate: new Date().toISOString()
+    };
+
+    const json = JSON.stringify(data, null, 2);
+    createDownloadLink(json, fileName);
+};
+
+export const downloadRoleData = (role) => {
+    if (!role) return;
+
+    const date = formatDownloadDate(new Date());
+    const fileName = `${role.name}_Details_${date}.json`;
+
+    const data = {
+        role: {
+            id: role._id,
+            name: role.name,
+        },
+        exportDate: new Date().toISOString()
+    };
+
+    const json = JSON.stringify(data, null, 2);
+    createDownloadLink(json, fileName);
+};
+
+export const downloadImageData = (image) => {
+    if (!image) return;
+
+    const date = formatDownloadDate(new Date());
+    const fileName = `${image.title}_Details_${date}.json`;
+
+    const data = {
+        image: {
+            id: image._id,
+            image: image.image,
+            title: image.title,
+            description: image.description,
+            createdAt: image.createdAt,
+            updatedAt: image.updatedAt
+        },
+        exportDate: new Date().toISOString()
+    };
+
+    const json = JSON.stringify(data, null, 2);
+    createDownloadLink(json, fileName);
+};
+
+export const downloadSubcategoryData = (subcategory) => {
+    if (!subcategory) return;
+
+    const date = formatDownloadDate(new Date());
+    const fileName = `${subcategory.name}_Details_${date}.json`;
+
+    const data = {
+        subcategory: {
+            id: subcategory._id,
+            name: subcategory.name,
+            image: subcategory.image,
+            category: subcategory.category.name,
+            createdAt: subcategory.createdAt,
+            updatedAt: subcategory.updatedAt
+        },
+        exportDate: new Date().toISOString()
+    };
+
+    const json = JSON.stringify(data, null, 2);
+    createDownloadLink(json, fileName);
+}
+
+export const downloadSubSubcategoryData = (subSubcategory) => {
+    if (!subSubcategory) return;
+
+    const date = formatDownloadDate(new Date());
+    const fileName = `${subSubcategory.name}_Details_${date}.json`;
+
+    const data = {
+        subSubcategory: {
+            id: subSubcategory._id,
+            name: subSubcategory.name,
+            subcategory: subSubcategory.subcategory.name,
+            createdAt: subSubcategory.createdAt,
+            updatedAt: subSubcategory.updatedAt
+        },
+        exportDate: new Date().toISOString()
+    };
+
+    const json = JSON.stringify(data, null, 2);
+    createDownloadLink(json, fileName);
+}
+
+export const downloadSupplierData = (supplier) => {
+    if (!supplier) return;
+
+    const date = formatDownloadDate(new Date());
+    const fileName = `${supplier.name}_Details_${date}.json`
+
+    const data = {
+        supplier: {
+            id: supplier._id,
+            name: supplier.name,
+            contactInfo: {
+                email: supplier.contactInfo.email,
+                phoneNumber: supplier.contactInfo.phoneNumber,
+            },
+            createdAt: supplier.createdAt,
+            updatedAt: supplier.updatedAt
+        },
+        exportDate: new Date().toISOString()
+    };
+
+    const json = JSON.stringify(data, null, 2);
+    createDownloadLink(json, fileName);
+}
+
+export const downloadUserDetails = (user) => {
+    if (!user) return;
+
+    const date = formatDownloadDate(new Date());
+    const fileName = `${user.firstName}_${user.lastName}_Details_${date}.json`
+
+    const data = {
+        user: {
+            id: user._id,
+            firstName: user.firstName,
+            lastName: user.lastName,
+            email: user.email,
+            role: user.role.name,
+            profilePicture: user.profilePicture,
+            googleId: user.googleId || 'N/A',
+            facebookId: user.facebookId || 'N/A',
+            createdAt: user.createdAt,
+            updatedAt: user.updatedAt
+        },
+        exportDate: new Date().toISOString()
+    };
+
+    const json = JSON.stringify(data, null, 2);
+    createDownloadLink(json, fileName);
+}
 
 // Download link end
 
@@ -2609,33 +3162,50 @@ const BACKEND_URL =
         ? 'https://sheero-backend.onrender.com'
         : 'http://localhost:5000';
 
+const openAuthWindow = ({ url, title, width = 1000, height = 750, successType }) => {
+    return new Promise((resolve, reject) => {
+        try {
+            // Adjust width and height based on screen size
+            const isMobile = window.innerWidth <= 768;
+            const adjustedWidth = isMobile ? 500 : width;
+            const adjustedHeight = isMobile ? 600 : height;
+
+            const left = window.screenX + (window.outerWidth - adjustedWidth) / 2;
+            const top = window.screenY + (window.outerHeight - adjustedHeight) / 2;
+
+            const authWindow = window.open(
+                url,
+                title,
+                `width=${adjustedWidth},height=${adjustedHeight},left=${left},top=${top},toolbar=0,scrollbars=0,status=0,resizable=0,location=0,menuBar=0`
+            );
+
+            const handleMessage = (event) => {
+                if (event.origin !== BACKEND_URL) return;
+
+                if (event.data.type === successType) {
+                    if (authWindow) authWindow.close();
+                    window.removeEventListener('message', handleMessage);
+                    resolve();
+                }
+            };
+
+            window.addEventListener('message', handleMessage);
+        } catch (error) {
+            reject(error);
+        }
+    });
+};
+
 export const handleGoogleLogin = async () => {
     try {
-        const width = 500;
-        const height = 600;
-        const left = window.screenX + (window.outerWidth - width) / 2;
-        const top = window.screenY + (window.outerHeight - height) / 2;
+        await openAuthWindow({
+            url: getApiUrl('/auth/google'),
+            title: 'Google Sign In',
+            successType: 'GOOGLE_AUTH_SUCCESS',
+        });
 
-        const googleWindow = window.open(
-            `${getApiUrl('/auth/google')}`,
-            'Google Sign In',
-            `width=${width},height=${height},left=${left},top=${top},toolbar=0,scrollbars=0,status=0,resizable=0,location=0,menuBar=0`
-        );
-
-        const handleMessage = async (event) => {
-            if (event.origin !== BACKEND_URL) return;
-
-            if (event.data.type === 'GOOGLE_AUTH_SUCCESS') {
-                if (googleWindow) googleWindow.close();
-                window.removeEventListener('message', handleMessage);
-
-                toast.success('Successfully logged in using Google!');
-
-                window.location.href = '/';
-            }
-        };
-
-        window.addEventListener('message', handleMessage);
+        toast.success('Successfully logged in using Google!');
+        window.location.href = '/';
     } catch (error) {
         console.error('Google authentication error:', error);
         toast.error('Failed to authenticate with Google');
@@ -2644,31 +3214,14 @@ export const handleGoogleLogin = async () => {
 
 export const handleFacebookLogin = async () => {
     try {
-        const width = 500;
-        const height = 600;
-        const left = window.screenX + (window.outerWidth - width) / 2;
-        const top = window.screenY + (window.outerHeight - height) / 2;
+        await openAuthWindow({
+            url: getApiUrl('/auth/facebook'),
+            title: 'Facebook Sign In',
+            successType: 'FACEBOOK_AUTH_SUCCESS',
+        });
 
-        const facebookWindow = window.open(
-            `${getApiUrl('/auth/facebook')}`,
-            'Facebook Sign In',
-            `width=${width},height=${height},left=${left},top=${top},toolbar=0,scrollbars=0,status=0,resizable=0,location=0,menuBar=0`
-        );
-
-        const handleMessage = async (event) => {
-            if (event.origin !== BACKEND_URL) return;
-
-            if (event.data.type === 'FACEBOOK_AUTH_SUCCESS') {
-                if (facebookWindow) facebookWindow.close();
-                window.removeEventListener('message', handleMessage);
-
-                toast.success('Successfully logged in using Facebook!');
-
-                window.location.href = '/';
-            }
-        };
-
-        window.addEventListener('message', handleMessage);
+        toast.success('Successfully logged in using Facebook!');
+        window.location.href = '/';
     } catch (error) {
         console.error('Facebook authentication error:', error);
         toast.error('Failed to authenticate with Facebook');
@@ -2679,7 +3232,7 @@ export const AccountLinkStatusIcon = ({ hasId, platform }) => {
     return (
         <>
             {hasId ? (
-                <Tooltip title={`Logged in via ${platform}`} placement="left" arrow>
+                <Tooltip title={`Linked with ${platform}`} placement="left" arrow>
                     <Check style={{ color: green[500] }} />
                 </Tooltip>
             ) : (
@@ -2689,9 +3242,26 @@ export const AccountLinkStatusIcon = ({ hasId, platform }) => {
     );
 };
 
+export const AccountLinkStatus = ({ hasId, platform }) => {
+    return (
+        <Box className="flex items-center gap-2">
+            <AccountLinkStatusIcon hasId={hasId} platform={platform} />
+            {hasId ? <Typography>Linked with {platform}</Typography> : <Typography>Not linked with {platform}</Typography>}
+        </Box>
+    );
+};
+
 export const SocialLoginButtons = ({ handleGoogleLogin, handleFacebookLogin, isRegisterPage = false }) => {
     return (
         <>
+            <div className={`flex items-center mt-4 ${isRegisterPage ? '!mb-4' : '!mb-4'}`}>
+                <Divider className="flex-1" />
+                <Typography variant="body2" className="!mx-2 text-gray-500">
+                    or
+                </Typography>
+                <Divider className="flex-1" />
+            </div>
+
             <BrownButton
                 fullWidth
                 variant="outlined"
@@ -2711,14 +3281,6 @@ export const SocialLoginButtons = ({ handleGoogleLogin, handleFacebookLogin, isR
             >
                 Continue with Facebook
             </BrownButton>
-
-            <div className={`flex items-center ${isRegisterPage ? '!mb-6' : '!mb-2'}`}>
-                <Divider className="flex-1" />
-                <Typography variant="body2" className="!mx-2 text-gray-500">
-                    or
-                </Typography>
-                <Divider className="flex-1" />
-            </div>
         </>
     );
 };
@@ -2751,21 +3313,18 @@ export const DashboardHeader = ({
     return (
         <div className="bg-white sticky top-16 z-50 p-4 flex items-center justify-between w-full mb-4 rounded-md shadow-sm border-b">
             <Tooltip title="Scroll to top" arrow>
-                <Button
-                    onClick={handleScrollToTop}
-                    sx={dashboardTitleSx}
-                >
+                <Button onClick={handleScrollToTop} sx={dashboardTitleSx}>
                     {title}
                 </Button>
             </Tooltip>
             <div>
-                <OutlinedBrownButton onClick={() => setAddItemOpen(true)} className='!mr-4'>
-                    Add {itemName}
-                </OutlinedBrownButton>
+                <Tooltip title="Shortcut: Alt + A" placement="top" arrow enterDelay={2000}>
+                    <OutlinedBrownButton onClick={() => setAddItemOpen(true)} className="!mr-4">
+                        Add {itemName}
+                    </OutlinedBrownButton>
+                </Tooltip>
                 {selectedItems.length > 0 && (
-                    <OutlinedBrownButton
-                        onClick={() => setDeleteItemOpen(true)}
-                    >
+                    <OutlinedBrownButton onClick={() => setDeleteItemOpen(true)}>
                         {isMultipleSelected ? `Delete ${itemNamePlural}` : `Delete ${itemName}`}
                     </OutlinedBrownButton>
                 )}

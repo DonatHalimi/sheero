@@ -11,7 +11,7 @@ const AddCountryModal = ({ open, onClose, onAddSuccess }) => {
 
     const axiosInstance = useAxios();
 
-    const validateName = (v) => /^[A-Z][a-zA-Z\s]{3,15}$/.test(v);
+    const validateName = (v) => /^[A-ZÇ][a-zA-ZëËçÇ\s]{3,35}$/.test(v);
     const validateCountryCode = (v) => /^[A-Z]{2,3}$/.test(v);
 
     const isValidForm = isValidName && isValidCode;
@@ -52,7 +52,7 @@ const AddCountryModal = ({ open, onClose, onAddSuccess }) => {
                         setIsValidName(validateName(e.target.value));
                     }}
                     error={!isValidName}
-                    helperText={!isValidName ? 'Name must start with a capital letter and be 3-15 characters long' : ''}
+                    helperText={!isValidName ? 'Name must start with a capital letter and be 3-35 characters long' : ''}
                     className="!mb-4"
                 />
 

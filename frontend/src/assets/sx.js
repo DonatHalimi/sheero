@@ -289,6 +289,7 @@ export const dashboardDrawerSx = (open) => ({
     transition: 'width 0.4s ease-in-out',
     height: '100vh',
     overflow: 'hidden',
+    zIndex: 1000,
     '& .custom-scrollbar': {
         height: '100%',
         overflowY: 'auto',
@@ -334,3 +335,19 @@ export const dashboardTableSx = {
     },
     '--DataGrid-overlayHeight': '300px',
 };
+
+export const drawerPaperSx = {
+    sx: {
+        width: '30%',
+        minWidth: '300px',
+        maxWidth: '500px',
+        padding: 3,
+        zIndex: 9999,
+    }
+}
+
+export const iconButtonSx = {
+    position: 'absolute',
+    top: 10,
+    right: 10,
+}

@@ -5,6 +5,7 @@ import DashboardTable from '../../components/Dashboard/DashboardTable';
 import DeleteModal from '../../components/Modal/DeleteModal';
 import AddReturnRequestModal from '../../components/Modal/ReturnRequest/AddReturnRequestModal';
 import EditReturnRequestModal from '../../components/Modal/ReturnRequest/EditReturnRequestModal';
+import ReturnDetailsDrawer from '../../components/Modal/ReturnRequest/ReturnDetailsDrawer';
 import { getReturnRequests } from '../../store/actions/dashboardActions';
 
 const ReturnsPage = () => {
@@ -17,6 +18,8 @@ const ReturnsPage = () => {
     const [editReturnRequestOpen, setEditReturnRequestOpen] = useState(false);
     const [deleteReturnRequestOpen, setDeleteReturnRequestOpen] = useState(false);
     const [currentPage, setCurrentPage] = useState(0);
+    const [viewDetailsOpen, setViewDetailsOpen] = useState(false);
+
     const itemsPerPage = 5;
 
     useEffect(() => {
@@ -49,6 +52,12 @@ const ReturnsPage = () => {
         setEditReturnRequestOpen(true);
     };
 
+    const handleEditFromDrawer = (returnRequest) => {
+        setViewDetailsOpen(false);
+        setSelectedReturnRequest(returnRequest);
+        setEditReturnRequestOpen(true);
+    };
+
     const getSelectedReturnRequests = () => {
         return selectedReturnRequests
             .map((id) => returnRequests.find((returnRequest) => returnRequest._id === id))
@@ -60,7 +69,18 @@ const ReturnsPage = () => {
         setSelectedReturnRequests([]);
     };
 
+    const handleViewDetails = (returnRequest) => {
+        setSelectedReturnRequest(returnRequest);
+        setViewDetailsOpen(true);
+    };
+
+    const closeDrawer = () => {
+        setViewDetailsOpen(false);
+        setSelectedReturnRequest(null);
+    };
+
     const columns = [
+        { key: 'id', label: 'Return ID' },
         { key: 'order', label: 'Order ID' },
         { key: 'user.email', label: 'User' },
         { key: 'products', label: 'Products' },
@@ -112,12 +132,14 @@ const ReturnsPage = () => {
                             currentPage={currentPage}
                             onPageChange={handlePageClick}
                             onEdit={handleEdit}
+                            onViewDetails={handleViewDetails}
                         />
                     </>
                 )}
 
                 <AddReturnRequestModal open={addReturnRequestOpen} onClose={() => setAddReturnRequestOpen(false)} onAddSuccess={() => dispatch(getReturnRequests())} />
-                <EditReturnRequestModal open={editReturnRequestOpen} onClose={() => setEditReturnRequestOpen(false)} returnRequest={selectedReturnRequest} onEditSuccess={() => dispatch(getReturnRequests())} />
+                <EditReturnRequestModal open={editReturnRequestOpen} onClose={() => setEditReturnRequestOpen(false)} returnRequest={selectedReturnRequest} onViewDetails={handleViewDetails} onEditSuccess={() => dispatch(getReturnRequests())} />
+                <ReturnDetailsDrawer open={viewDetailsOpen} onClose={closeDrawer} returnRequest={selectedReturnRequest} onEdit={handleEditFromDrawer} />
                 <DeleteModal
                     open={deleteReturnRequestOpen}
                     onClose={() => setDeleteReturnRequestOpen(false)}

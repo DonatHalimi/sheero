@@ -1,4 +1,4 @@
-import UploadIcon from '@mui/icons-material/Upload';
+import { Upload } from '@mui/icons-material';
 import React, { useState } from 'react';
 import { toast } from 'react-toastify';
 import { BrownButton, BrownOutlinedTextField, CustomBox, CustomModal, CustomTypography, handleApiError, OutlinedBrownButton, VisuallyHiddenInput } from '../../../assets/CustomComponents';
@@ -95,7 +95,7 @@ const AddSlideshowModal = ({ open, onClose, onAddSuccess }) => {
                     role={undefined}
                     variant="contained"
                     tabIndex={-1}
-                    startIcon={<UploadIcon />}
+                    startIcon={<Upload />}
                     className="w-full !mb-6"
                 >
                     Upload image

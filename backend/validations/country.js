@@ -1,14 +1,14 @@
 const yup = require('yup');
 const Country = require('../models/Country');
 
-const isValidName = (v) => /^[A-Z][a-zA-Z\s]{3,15}$/.test(v);
+const isValidName = (v) => /^[A-ZÇ][a-zA-ZëËçÇ\s]{3,35}$/.test(v);
 const isValidCountryCode = (v) => /^[A-Z]{2,3}$/.test(v);
 
 const createSchema = yup.object({
     name: yup
         .string()
         .required('Name is required')
-        .test('is-valid-name', 'Name must start with a capital letter and be 3-15 characters long', isValidName),
+        .test('is-valid-name', 'Name must start with a capital letter and be 3-35 characters long', isValidName),
     countryCode: yup
         .string()
         .required('Country code is required')
@@ -36,7 +36,7 @@ const updateSchema = yup.object({
         }),
     name: yup
         .string()
-        .test('is-valid-name', 'Name must start with a capital letter and be 3-15 characters long', value => {
+        .test('is-valid-name', 'Name must start with a capital letter and be 3-35 characters long', value => {
             if (!value) return true;
             return isValidName(value);
         }),

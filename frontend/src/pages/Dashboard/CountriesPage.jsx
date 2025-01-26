@@ -3,6 +3,7 @@ import { useDispatch, useSelector } from "react-redux";
 import { DashboardCountryFlag, DashboardHeader, LoadingDataGrid } from '../../assets/CustomComponents.jsx';
 import DashboardTable from '../../components/Dashboard/DashboardTable';
 import AddCountryModal from '../../components/Modal/Country/AddCountryModal.jsx';
+import CountryDetailsDrawer from '../../components/Modal/Country/CountryDetailsDrawer.jsx';
 import EditCountryModal from '../../components/Modal/Country/EditCountryModal.jsx';
 import DeleteModal from '../../components/Modal/DeleteModal.jsx';
 import { getCountries } from '../../store/actions/addressActions.js';
@@ -17,11 +18,26 @@ const CountriesPage = () => {
     const [editCountryOpen, setEditCountryOpen] = useState(false);
     const [deleteCountryOpen, setDeleteCountryOpen] = useState(false);
     const [currentPage, setCurrentPage] = useState(0);
+    const [viewDetailsOpen, setViewDetailsOpen] = useState(false);
+
     const itemsPerPage = 5;
 
     useEffect(() => {
         dispatch(getCountries());
     }, [dispatch]);
+
+    useEffect(() => {
+        const handleKeydown = (e) => {
+            if (e.altKey && e.key === 'a') {
+                setAddCountryOpen(prev => !prev);
+            }
+        };
+
+        window.addEventListener('keydown', handleKeydown);
+        return () => {
+            window.removeEventListener('keydown', handleKeydown);
+        };
+    }, [countries]);
 
     const handleSelectCountry = (countryId) => {
         const id = Array.isArray(countryId) ? countryId[0] : countryId;
@@ -46,6 +62,12 @@ const CountriesPage = () => {
         setEditCountryOpen(true);
     };
 
+    const handleEditFromDrawer = (country) => {
+        setViewDetailsOpen(false);
+        setSelectedCountry(country);
+        setEditCountryOpen(true);
+    };
+
     const getSelectedCountries = () => {
         return selectedCountries
             .map((id) => countries.find((country) => country._id === id))
@@ -55,6 +77,16 @@ const CountriesPage = () => {
     const handleDeleteSuccess = () => {
         dispatch(getCountries());
         setSelectedCountries([]);
+    };
+
+    const handleViewDetails = (country) => {
+        setSelectedCountry(country);
+        setViewDetailsOpen(true);
+    };
+
+    const closeDrawer = () => {
+        setViewDetailsOpen(false);
+        setSelectedCountry(null);
     };
 
     const columns = [
@@ -92,12 +124,14 @@ const CountriesPage = () => {
                             currentPage={currentPage}
                             onPageChange={handlePageClick}
                             onEdit={handleEdit}
+                            onViewDetails={handleViewDetails}
                         />
                     </>
                 )}
 
                 <AddCountryModal open={addCountryOpen} onClose={() => setAddCountryOpen(false)} onAddSuccess={() => dispatch(getCountries())} />
-                <EditCountryModal open={editCountryOpen} onClose={() => setEditCountryOpen(false)} country={selectedCountry} onEditSuccess={() => dispatch(getCountries())} />
+                <EditCountryModal open={editCountryOpen} onClose={() => setEditCountryOpen(false)} country={selectedCountry} onViewDetails={handleViewDetails} onEditSuccess={() => dispatch(getCountries())} />
+                <CountryDetailsDrawer open={viewDetailsOpen} onClose={closeDrawer} country={selectedCountry} onEdit={handleEditFromDrawer} />
                 <DeleteModal
                     open={deleteCountryOpen}
                     onClose={() => setDeleteCountryOpen(false)}

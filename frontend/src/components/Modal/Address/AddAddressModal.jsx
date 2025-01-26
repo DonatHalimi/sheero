@@ -1,7 +1,7 @@
 import { Autocomplete, TextField } from '@mui/material';
 import React, { useEffect, useState } from 'react';
 import { toast } from 'react-toastify';
-import { BrownButton, BrownOutlinedTextField, CustomBox, CustomModal, CustomPaper, CustomTypography, handleApiError } from '../../../assets/CustomComponents';
+import { BrownButton, BrownOutlinedTextField, CustomBox, CustomModal, CustomPaper, CustomTypography, DashboardCountryFlag, handleApiError } from '../../../assets/CustomComponents';
 import useAxios from '../../../utils/axiosInstance';
 
 const AddAddressModal = ({ open, onClose, onAddSuccess }) => {
@@ -20,7 +20,7 @@ const AddAddressModal = ({ open, onClose, onAddSuccess }) => {
 
     const axiosInstance = useAxios();
 
-    const validateName = (v) => /^[A-Z][a-zA-Z]{2,10}$/.test(v);
+    const validateName = (v) => /^[A-ZÇ][a-zA-ZëËçÇ\s]{2,10}$/.test(v);
     const validatePhoneNumber = (v) => /^0(44|45|48|49)\d{6}$/.test(v);
     const validateStreet = (v) => /^[A-Z][a-zA-Z0-9\s]{2,27}$/.test(v);
     const validateComment = (v) => !v || /^[a-zA-Z0-9\s]{2,25}$/.test(v);
@@ -145,7 +145,7 @@ const AddAddressModal = ({ open, onClose, onAddSuccess }) => {
                 <BrownOutlinedTextField
                     fullWidth
                     required
-                    label="Comment"
+                    label="Comment (Optional)"
                     value={comment}
                     onChange={(e) => {
                         setComment(e.target.value)
@@ -153,6 +153,8 @@ const AddAddressModal = ({ open, onClose, onAddSuccess }) => {
                     }}
                     error={!isValidComment}
                     helperText={!isValidComment ? "Comment must be 2-25 characters long" : ""}
+                    multiline
+                    rows={4}
                     className="!mb-4"
                 />
 
@@ -165,6 +167,11 @@ const AddAddressModal = ({ open, onClose, onAddSuccess }) => {
                     onChange={handleCountryChange}
                     PaperComponent={CustomPaper}
                     fullWidth
+                    renderOption={(props, option) => (
+                        <li {...props} style={{ display: 'flex', alignItems: 'center' }}>
+                            <DashboardCountryFlag countryCode={option.countryCode} name={option.name} />
+                        </li>
+                    )}
                     renderInput={(params) => <TextField {...params} label="Country" variant="outlined" />}
                     className='!mb-4'
                 />

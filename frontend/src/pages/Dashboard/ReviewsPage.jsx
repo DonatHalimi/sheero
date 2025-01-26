@@ -5,6 +5,7 @@ import DashboardTable from '../../components/Dashboard/DashboardTable';
 import DeleteModal from '../../components/Modal/DeleteModal';
 import AddReviewModal from '../../components/Modal/Review/AddReviewModal';
 import EditReviewModal from '../../components/Modal/Review/EditReviewModal';
+import ReviewDetailsDrawer from '../../components/Modal/Review/ReviewDetailsDrawer';
 import { getReviews } from '../../store/actions/dashboardActions';
 
 const ReviewsPage = () => {
@@ -17,11 +18,26 @@ const ReviewsPage = () => {
     const [editReviewOpen, setEditReviewOpen] = useState(false);
     const [deleteReviewOpen, setDeleteReviewOpen] = useState(false);
     const [currentPage, setCurrentPage] = useState(0);
+    const [viewDetailsOpen, setViewDetailsOpen] = useState(false);
+
     const itemsPerPage = 5;
 
     useEffect(() => {
         dispatch(getReviews());
     }, [dispatch]);
+
+    useEffect(() => {
+        const handleKeydown = (e) => {
+            if (e.altKey && e.key === 'a') {
+                setAddReviewOpen(prev => !prev);
+            }
+        };
+
+        window.addEventListener('keydown', handleKeydown);
+        return () => {
+            window.removeEventListener('keydown', handleKeydown);
+        };
+    }, [reviews]);
 
     const handleSelectReview = (reviewId) => {
         const id = Array.isArray(reviewId) ? reviewId[0] : reviewId;
@@ -46,6 +62,12 @@ const ReviewsPage = () => {
         setEditReviewOpen(true);
     };
 
+    const handleEditFromDrawer = (review) => {
+        setViewDetailsOpen(false);
+        setSelectedReview(review);
+        setEditReviewOpen(true);
+    };
+
     const getSelectedReviews = () => {
         return selectedReviews
             .map((id) => reviews.find((review) => review._id === id))
@@ -57,10 +79,23 @@ const ReviewsPage = () => {
         setSelectedReviews([]);
     };
 
+    const handleViewDetails = (review) => {
+        setSelectedReview(review);
+        setViewDetailsOpen(true);
+    };
+
+    const closeDrawer = () => {
+        setViewDetailsOpen(false);
+        setSelectedReview(null);
+    };
+
     const columns = [
-        { key: 'user.firstName', label: 'First Name' },
-        { key: 'user.lastName', label: 'Last Name' },
-        { key: 'user.email', label: 'Email' },
+        {
+            key: 'user',
+            label: 'User',
+            render: (review) => `${review.user.firstName} ${review.user.lastName} - ${review.user.email}`
+        },
+        { key: 'product.name', label: 'Product' },
         { key: 'title', label: 'Title' },
         {
             key: 'rating',
@@ -76,7 +111,6 @@ const ReviewsPage = () => {
             label: 'Comment',
             render: (review) => review.comment ? review.comment : 'N/A'
         },
-        { key: 'product.name', label: 'Product' },
         { key: 'actions', label: 'Actions' }
     ];
 
@@ -106,12 +140,14 @@ const ReviewsPage = () => {
                             currentPage={currentPage}
                             onPageChange={handlePageClick}
                             onEdit={handleEdit}
+                            onViewDetails={handleViewDetails}
                         />
                     </>
                 )}
 
                 <AddReviewModal open={addReviewOpen} onClose={() => setAddReviewOpen(false)} onAddSuccess={() => dispatch(getReviews())} />
-                <EditReviewModal open={editReviewOpen} onClose={() => setEditReviewOpen(false)} review={selectedReview} onEditSuccess={() => dispatch(getReviews())} />
+                <EditReviewModal open={editReviewOpen} onClose={() => setEditReviewOpen(false)} review={selectedReview} onViewDetails={handleViewDetails} onEditSuccess={() => dispatch(getReviews())} />
+                <ReviewDetailsDrawer open={viewDetailsOpen} onClose={closeDrawer} review={selectedReview} onEdit={handleEditFromDrawer} />
                 <DeleteModal
                     open={deleteReviewOpen}
                     onClose={() => setDeleteReviewOpen(false)}

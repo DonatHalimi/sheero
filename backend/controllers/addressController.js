@@ -26,7 +26,7 @@ const getAddresses = async (req, res) => {
         const addresses = await Address.find()
             .populate('user', 'firstName lastName email')
             .populate('city', 'name zipCode')
-            .populate('country', 'name');
+            .populate('country', 'name countryCode');
 
         res.status(200).json(addresses);
     } catch (error) {
@@ -39,7 +39,7 @@ const getAddress = async (req, res) => {
         const address = await Address.findById(req.params.id)
             .populate('user', 'email')
             .populate('city', 'name zipCode')
-            .populate('country', 'name');
+            .populate('country', 'name countryCode');
 
         res.status(200).json(address);
     } catch (error) {
@@ -74,10 +74,10 @@ const updateAddress = async (req, res) => {
             { new: true, runValidators: true }
         );
 
-        res.status(200).json({ message: 'Address updated succesfully', updatedAddress });
+        res.status(200).json({ message: 'Address updated successfully', updatedAddress });
     } catch (error) {
         console.error('Error updating address:', error);
-        res.status(500).json({ message: 'Server error' });
+        res.status(500).json({ message: 'Server error', error: error.message });
     }
 };
 
