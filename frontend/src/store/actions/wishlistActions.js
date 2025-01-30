@@ -1,10 +1,9 @@
-import axios from 'axios';
-import { getApiUrl } from '../../utils/config';
+import { clearWishlistService, getUsersWishlistService, removeFromWishlistService } from '../../services/wishlistService';
 import { CLEAR_WISHLIST, GET_WISHLIST_ITEMS, GET_WISHLIST_ITEMS_ERROR, REMOVE_FROM_WISHLIST } from '../types';
 
 export const getWishlistItems = () => async (dispatch) => {
     try {
-        const res = await axios.get(getApiUrl('/wishlist'), { withCredentials: true });
+        const res = await getUsersWishlistService();
 
         dispatch({
             type: GET_WISHLIST_ITEMS,
@@ -20,10 +19,7 @@ export const getWishlistItems = () => async (dispatch) => {
 
 export const removeFromWishlist = (productId) => async (dispatch) => {
     try {
-        await axios.delete(getApiUrl('/wishlist/remove'), {
-            data: { productId },
-            withCredentials: true,
-        });
+        await removeFromWishlistService(productId);
 
         dispatch({
             type: REMOVE_FROM_WISHLIST,
@@ -36,7 +32,7 @@ export const removeFromWishlist = (productId) => async (dispatch) => {
 
 export const clearWishlist = (closeModal) => async (dispatch) => {
     try {
-        await axios.delete(getApiUrl('/wishlist/clear'), { withCredentials: true });
+        await clearWishlistService();
 
         dispatch({ type: CLEAR_WISHLIST });
         if (closeModal) {

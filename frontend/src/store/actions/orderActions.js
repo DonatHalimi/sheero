@@ -1,10 +1,9 @@
-import axios from 'axios';
-import { getApiUrl } from '../../utils/config';
+import { getUserOrdersService } from '../../services/orderService';
 import { GET_USER_ORDERS, GET_USER_ORDERS_ERROR } from '../types';
 
 export const getUserOrders = (userId) => async (dispatch) => {
     try {
-        const res = await axios.get(getApiUrl(`/orders/user/${userId}`), { withCredentials: true });
+        const res = await getUserOrdersService(userId);
 
         dispatch({
             type: GET_USER_ORDERS,

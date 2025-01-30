@@ -2,15 +2,13 @@ import { Upload } from '@mui/icons-material';
 import React, { useState } from 'react';
 import { toast } from 'react-toastify';
 import { BrownButton, BrownOutlinedTextField, CustomBox, CustomModal, CustomTypography, handleApiError, OutlinedBrownButton, VisuallyHiddenInput } from '../../../assets/CustomComponents';
-import useAxios from '../../../utils/axiosInstance';
+import { addCategoryService } from '../../../services/categoryService';
 
 const AddCategoryModal = ({ open, onClose, onAddSuccess }) => {
     const [name, setName] = useState('');
     const [isValidName, setIsValidName] = useState(true);
     const [image, setImage] = useState(null);
     const [imagePreview, setImagePreview] = useState(null);
-
-    const axiosInstance = useAxios();
 
     const validateName = (v) => /^[A-ZÇ][\sa-zA-ZëËçÇ\W]{3,28}$/.test(v);
 
@@ -27,7 +25,7 @@ const AddCategoryModal = ({ open, onClose, onAddSuccess }) => {
         formData.append('image', image);
 
         try {
-            const response = await axiosInstance.post('/categories/create', formData);
+            const response = await addCategoryService(formData);
             toast.success(response.data.message);
             onAddSuccess(response.data);
             onClose();

@@ -1,5 +1,15 @@
-import axios from 'axios';
-import { getApiUrl } from '../../utils/config';
+import { getAddressesService } from '../../services/addressService';
+import { getCitiesService } from '../../services/cityService';
+import { getContactsService } from '../../services/contactService';
+import { getFAQsService } from '../../services/faqService';
+import { getOrdersService } from '../../services/orderService';
+import { getReturnRequestsService } from '../../services/returnService';
+import { getReviewsService } from '../../services/reviewService';
+import { getRolesService } from '../../services/roleService';
+import { getSubcategoriesService } from '../../services/subcategoryService';
+import { getSubSubcategoriesService } from '../../services/subSubcategoryService';
+import { getSuppliersService } from '../../services/supplierService';
+import { getUsersService } from '../../services/userService';
 import {
     GET_ADDRESSES,
     GET_ADDRESSES_ERROR,
@@ -29,7 +39,7 @@ import {
 
 export const getUsers = () => async (dispatch) => {
     try {
-        const res = await axios.get(getApiUrl('/users/get'), { withCredentials: true });
+        const res = await getUsersService();
 
         dispatch({
             type: GET_USERS,
@@ -45,7 +55,7 @@ export const getUsers = () => async (dispatch) => {
 
 export const getRoles = () => async (dispatch) => {
     try {
-        const res = await axios.get(getApiUrl('/roles/get'), { withCredentials: true });
+        const res = await getRolesService();
 
         dispatch({
             type: GET_ROLES,
@@ -61,7 +71,7 @@ export const getRoles = () => async (dispatch) => {
 
 export const getReviews = () => async (dispatch) => {
     try {
-        const res = await axios.get(getApiUrl('/reviews/get'), { withCredentials: true });
+        const res = await getReviewsService();
 
         dispatch({
             type: GET_REVIEWS,
@@ -77,7 +87,7 @@ export const getReviews = () => async (dispatch) => {
 
 export const getOrders = () => async (dispatch) => {
     try {
-        const res = await axios.get(getApiUrl('/orders/get'), { withCredentials: true });
+        const res = await getOrdersService();
 
         dispatch({
             type: GET_ORDERS,
@@ -93,7 +103,7 @@ export const getOrders = () => async (dispatch) => {
 
 export const getReturnRequests = () => async (dispatch) => {
     try {
-        const res = await axios.get(getApiUrl('/returns/get'), { withCredentials: true });
+        const res = await getReturnRequestsService();
 
         dispatch({
             type: GET_RETURNS,
@@ -109,7 +119,7 @@ export const getReturnRequests = () => async (dispatch) => {
 
 export const getFAQs = () => async (dispatch) => {
     try {
-        const res = await axios.get(getApiUrl('/faqs/get'), { withCredentials: true });
+        const res = await getFAQsService();
 
         dispatch({
             type: GET_FAQS,
@@ -125,7 +135,7 @@ export const getFAQs = () => async (dispatch) => {
 
 export const getContacts = () => async (dispatch) => {
     try {
-        const res = await axios.get(getApiUrl('/contact/get'), { withCredentials: true });
+        const res = await getContactsService();
 
         dispatch({
             type: GET_CONTACTS,
@@ -141,7 +151,7 @@ export const getContacts = () => async (dispatch) => {
 
 export const getSubcategories = () => async (dispatch) => {
     try {
-        const res = await axios.get(getApiUrl('/subcategories/get'), { withCredentials: true });
+        const res = await getSubcategoriesService();
 
         dispatch({
             type: GET_SUBCATEGORIES,
@@ -157,7 +167,7 @@ export const getSubcategories = () => async (dispatch) => {
 
 export const getSubSubcategories = () => async (dispatch) => {
     try {
-        const res = await axios.get(getApiUrl('/subSubcategories/get'), { withCredentials: true });
+        const res = await getSubSubcategoriesService();
 
         dispatch({
             type: GET_SUBSUBCATEGORIES,
@@ -173,7 +183,7 @@ export const getSubSubcategories = () => async (dispatch) => {
 
 export const getCities = () => async (dispatch) => {
     try {
-        const res = await axios.get(getApiUrl('/cities/get'), { withCredentials: true });
+        const res = await getCitiesService();
 
         dispatch({
             type: GET_CITIES,
@@ -189,7 +199,7 @@ export const getCities = () => async (dispatch) => {
 
 export const getAddresses = () => async (dispatch) => {
     try {
-        const res = await axios.get(getApiUrl('/addresses/get'), { withCredentials: true });
+        const res = await getAddressesService();
 
         dispatch({
             type: GET_ADDRESSES,
@@ -205,7 +215,7 @@ export const getAddresses = () => async (dispatch) => {
 
 export const getSuppliers = () => async (dispatch) => {
     try {
-        const res = await axios.get(getApiUrl('/suppliers/get'), { withCredentials: true });
+        const res = await getSuppliersService();
 
         dispatch({
             type: GET_SUPPLIERS,

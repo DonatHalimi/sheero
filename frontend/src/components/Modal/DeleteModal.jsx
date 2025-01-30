@@ -1,11 +1,9 @@
 import React from 'react';
 import { toast } from 'react-toastify';
 import { CustomDeleteModal } from '../../assets/CustomComponents';
-import useAxios from '../../utils/axiosInstance';
+import axiosInstance from '../../utils/axiosInstance';
 
 const DeleteModal = ({ open, onClose, items, onDeleteSuccess, endpoint, title, message }) => {
-    const axiosInstance = useAxios();
-
     const handleDelete = async () => {
         const idsToDelete = items.map(item => item._id).filter(id => id);
 

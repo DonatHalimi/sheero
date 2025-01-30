@@ -2,7 +2,7 @@ import { Upload } from '@mui/icons-material';
 import React, { useEffect, useState } from 'react';
 import { toast } from 'react-toastify';
 import { ActionButtons, BrownOutlinedTextField, CustomBox, CustomModal, CustomTypography, handleApiError, OutlinedBrownButton, VisuallyHiddenInput } from '../../../assets/CustomComponents';
-import useAxios from '../../../utils/axiosInstance';
+import { editCategoryService } from '../../../services/categoryService';
 import { getImageUrl } from '../../../utils/config';
 
 const EditCategoryModal = ({ open, onClose, category, onViewDetails, onEditSuccess }) => {
@@ -10,8 +10,6 @@ const EditCategoryModal = ({ open, onClose, category, onViewDetails, onEditSucce
     const [isValidName, setIsValidName] = useState(true);
     const [image, setImage] = useState(null);
     const [imagePreview, setImagePreview] = useState('');
-
-    const axiosInstance = useAxios();
 
     const validateName = (v) => /^[A-ZÇ][\sa-zA-ZëËçÇ\W]{3,28}$/.test(v);
 
@@ -37,7 +35,7 @@ const EditCategoryModal = ({ open, onClose, category, onViewDetails, onEditSucce
         }
 
         try {
-            const response = await axiosInstance.put(`/categories/update/${category._id}`, formData);
+            const response = await editCategoryService(category._id, formData);
             toast.success(response.data.message);
             onEditSuccess(response.data);
             onClose();
@@ -95,7 +93,7 @@ const EditCategoryModal = ({ open, onClose, category, onViewDetails, onEditSucce
                 </OutlinedBrownButton>
                 {imagePreview && (
                     <div className="mb-4">
-                        <img src={imagePreview} alt="Preview" className="w-1/4 h-auto mx-auto rounded-md" />
+                        <img src={imagePreview} alt="Preview" className="max-w-full h-auto mx-auto rounded-md" />
                     </div>
                 )}
 

@@ -1,6 +1,7 @@
 import React, { useEffect, useState } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
-import { DashboardHeader, LoadingDataGrid } from '../../assets/CustomComponents';
+import { DashboardHeader, exportOptions, LoadingDataGrid } from '../../assets/CustomComponents';
+import { exportToExcel, exportToJSON } from '../../assets/DataExport';
 import DashboardTable from '../../components/Dashboard/DashboardTable';
 import DeleteModal from '../../components/Modal/DeleteModal';
 import AddSubSubcategoryModal from '../../components/Modal/SubSubcategory/AddSubSubcategoryModal';
@@ -95,6 +96,15 @@ const SubSubcategoriesPage = () => {
         { label: 'Actions', key: 'actions' }
     ];
 
+    const handleExport = (data, format) => {
+        const flattenedSubSubcategories = data.map(subSubcategory => ({
+            ...subSubcategory,
+            subcategory: subSubcategory.subcategory ? subSubcategory.subcategory.name : 'N/A',
+        }))
+
+        format === 'excel' ? exportToExcel(flattenedSubSubcategories, 'subSubcategories_data') : exportToJSON(data, 'subSubcategories_data');
+    }
+
     return (
         <div className='container mx-auto max-w-screen-2xl px-4 mt-20'>
             <div className='flex flex-col items-center justify-center'>
@@ -108,6 +118,7 @@ const SubSubcategoriesPage = () => {
                             setAddItemOpen={setAddSubSubcategoryOpen}
                             setDeleteItemOpen={setDeleteSubSubcategoryOpen}
                             itemName="SubSubcategory"
+                            exportOptions={exportOptions(subSubcategories, handleExport)}
                         />
 
                         <DashboardTable

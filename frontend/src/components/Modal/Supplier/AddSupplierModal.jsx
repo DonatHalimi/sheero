@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
 import { toast } from 'react-toastify';
 import { BrownButton, BrownOutlinedTextField, CustomBox, CustomModal, CustomTypography, handleApiError, knownEmailProviders } from '../../../assets/CustomComponents';
-import useAxios from '../../../utils/axiosInstance';
+import { addSupplierService } from '../../../services/supplierService';
 
 const AddSupplierModal = ({ open, onClose, onAddSuccess }) => {
     const [name, setName] = useState('');
@@ -10,8 +10,6 @@ const AddSupplierModal = ({ open, onClose, onAddSuccess }) => {
     const [isValidEmail, setIsValidEmail] = useState(true);
     const [phoneNumber, setPhoneNumber] = useState('');
     const [isValidPhoneNumber, setIsValidPhoneNumber] = useState(true);
-
-    const axiosInstance = useAxios();
 
     const validateName = (v) => /^[A-ZÇ][\sa-zA-ZëËçÇ\W]{2,15}$/.test(v);
     const validatePhoneNumber = (v) => /^0(44|45|48|49)\d{6}$/.test(v);
@@ -34,7 +32,7 @@ const AddSupplierModal = ({ open, onClose, onAddSuccess }) => {
         }
 
         try {
-            const response = await axiosInstance.post('/suppliers/create', data);
+            const response = await addSupplierService(data);
             toast.success(response.data.message);
             onAddSuccess(response.data);
             onClose();

@@ -1,5 +1,4 @@
-import axios from 'axios';
-import { getApiUrl } from '../../utils/config';
+import { editUserService, loadUserService, loginUserService, logoutUserService, registerUserService } from '../../services/authService';
 import { AUTH_ERROR, AUTH_LOADING, LOGIN_SUCCESS, LOGOUT, REGISTER_SUCCESS, SET_USER } from '../types';
 
 export const selectIsAdmin = (state) => {
@@ -12,7 +11,7 @@ export const loadUser = () => async dispatch => {
     dispatch({ type: AUTH_LOADING });
 
     try {
-        const res = await axios.get(getApiUrl('/auth/me'), { withCredentials: true });
+        const res = await loadUserService();
 
         dispatch({
             type: SET_USER,
@@ -27,7 +26,7 @@ export const loadUser = () => async dispatch => {
 
 export const registerUser = (userData) => async (dispatch) => {
     try {
-        const res = await axios.post(getApiUrl('/auth/register'), userData, { withCredentials: true, });
+        const res = await registerUserService(userData);
 
         dispatch({
             type: REGISTER_SUCCESS,
@@ -53,7 +52,7 @@ export const loginUser = (email, password) => async dispatch => {
     dispatch({ type: AUTH_LOADING });
 
     try {
-        const res = await axios.post(getApiUrl('/auth/login'), { email, password }, { withCredentials: true });
+        const res = await loginUserService(email, password);
 
         dispatch({
             type: LOGIN_SUCCESS,
@@ -78,7 +77,7 @@ export const loginUser = (email, password) => async dispatch => {
 
 export const logoutUser = () => async dispatch => {
     try {
-        await axios.post(getApiUrl('/auth/logout'), {}, { withCredentials: true });
+        await logoutUserService();
     } catch (error) {
         console.error('Logout error:', error);
     }
@@ -87,11 +86,11 @@ export const logoutUser = () => async dispatch => {
     window.location.reload();
 };
 
-export const updateUserProfile = (userData) => async (dispatch, getState) => {
-    try {
-        dispatch({ type: AUTH_LOADING });
+export const updateUserProfile = (userData) => async (dispatch) => {
+    dispatch({ type: AUTH_LOADING });
 
-        const response = await axios.put(getApiUrl('/auth/profile'), userData, { withCredentials: true, });
+    try {
+        const response = await editUserService(userData);
 
         dispatch({
             type: SET_USER,

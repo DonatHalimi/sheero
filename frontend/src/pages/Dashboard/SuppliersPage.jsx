@@ -1,6 +1,7 @@
 import React, { useEffect, useState } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
-import { DashboardHeader, LoadingDataGrid } from '../../assets/CustomComponents';
+import { DashboardHeader, exportOptions, LoadingDataGrid } from '../../assets/CustomComponents';
+import { exportToExcel, exportToJSON } from '../../assets/DataExport';
 import DashboardTable from '../../components/Dashboard/DashboardTable';
 import DeleteModal from '../../components/Modal/DeleteModal';
 import AddSupplierModal from '../../components/Modal/Supplier/AddSupplierModal';
@@ -100,6 +101,15 @@ const SupplierPage = () => {
         { label: 'Actions', key: 'actions' }
     ];
 
+    const handleExport = (data, format) => {
+        const flattenedSuppliers = data.map(supplier => ({
+            ...supplier,
+            contactInfo: supplier.contactInfo.email + ' - ' + supplier.contactInfo.phoneNumber
+        }))
+
+        format === 'excel' ? exportToExcel(flattenedSuppliers, 'suppliers_data') : exportToJSON(data, 'suppliers_data');
+    }
+
     return (
         <div className='container mx-auto max-w-screen-2xl px-4 mt-20'>
             <div className='flex flex-col items-center justify-center'>
@@ -113,6 +123,7 @@ const SupplierPage = () => {
                             setAddItemOpen={setAddSupplierOpen}
                             setDeleteItemOpen={setDeleteSupplierOpen}
                             itemName="Supplier"
+                            exportOptions={exportOptions(suppliers, handleExport)}
                         />
 
                         <DashboardTable

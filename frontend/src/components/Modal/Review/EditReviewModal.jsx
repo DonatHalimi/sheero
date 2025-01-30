@@ -2,7 +2,7 @@ import { InputLabel, MenuItem, Rating, Select } from '@mui/material';
 import React, { useEffect, useState } from 'react';
 import { toast } from 'react-toastify';
 import { ActionButtons, BrownOutlinedTextField, CustomBox, CustomModal, CustomTypography, handleApiError, OutlinedBrownFormControl, ReadOnlyTextField } from '../../../assets/CustomComponents';
-import useAxios from '../../../utils/axiosInstance';
+import { editReviewService, getProductNamesService } from '../../../services/reviewService';
 
 const EditReviewModal = ({ open, onClose, review, onViewDetails, onEditSuccess }) => {
     const [title, setTitle] = useState('');
@@ -12,8 +12,6 @@ const EditReviewModal = ({ open, onClose, review, onViewDetails, onEditSuccess }
     const [isValidComment, setIsValidComment] = useState(true);
     const [product, setProduct] = useState('');
     const [products, setProducts] = useState([]);
-
-    const axiosInstance = useAxios();
 
     const validateTitle = (v) => /^[A-Z][\Wa-zA-Z\s]{2,40}$/.test(v);
     const validateComment = (v) => /^[A-Z][\Wa-zA-Z\s]{3,500}$/.test(v);
@@ -25,7 +23,7 @@ const EditReviewModal = ({ open, onClose, review, onViewDetails, onEditSuccess }
     useEffect(() => {
         const fetchProducts = async () => {
             try {
-                const response = await axiosInstance.get('/reviews/products');
+                const response = await getProductNamesService();
                 setProducts(response.data);
             } catch (error) {
                 console.error('Error fetching products', error);
@@ -53,7 +51,7 @@ const EditReviewModal = ({ open, onClose, review, onViewDetails, onEditSuccess }
         }
 
         try {
-            const response = await axiosInstance.put(`/reviews/update/${review._id}`, updatedData);
+            const response = await editReviewService(review._id, updatedData);
             toast.success(response.data.message);
             onEditSuccess(response.data);
             onClose();

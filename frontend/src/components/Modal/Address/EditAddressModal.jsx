@@ -2,7 +2,9 @@ import { Autocomplete, TextField } from '@mui/material';
 import React, { useEffect, useState } from 'react';
 import { toast } from 'react-toastify';
 import { ActionButtons, BrownOutlinedTextField, CustomBox, CustomModal, CustomPaper, CustomTypography, DashboardCountryFlag, handleApiError } from '../../../assets/CustomComponents';
-import useAxios from '../../../utils/axiosInstance';
+import { editAddressService } from '../../../services/addressService';
+import { getCitiesByCountryService } from '../../../services/cityService';
+import { getCountriesService } from '../../../services/countryService';
 
 const EditAddressModal = ({ open, onClose, address, onViewDetails, onEditSuccess }) => {
     const [name, setName] = useState('');
@@ -17,8 +19,6 @@ const EditAddressModal = ({ open, onClose, address, onViewDetails, onEditSuccess
     const [country, setCountry] = useState('');
     const [cities, setCities] = useState([]);
     const [countriesWithGroups, setCountriesWithGroups] = useState([]);
-
-    const axiosInstance = useAxios();
 
     const validateName = (v) => /^[A-ZÇ][a-zA-ZëËçÇ\s]{2,15}$/.test(v);
     const validatePhoneNumber = (v) => /^0(44|45|48|49)\d{6}$/.test(v);
@@ -45,7 +45,7 @@ const EditAddressModal = ({ open, onClose, address, onViewDetails, onEditSuccess
 
         const fetchCountries = async () => {
             try {
-                const countriesResponse = await axiosInstance.get('/countries/get');
+                const countriesResponse = await getCountriesService();
                 const sortedCountries = countriesResponse.data.sort((a, b) => a.name.localeCompare(b.name));
                 const countriesWithGroups = sortedCountries.map(country => ({
                     ...country,
@@ -64,7 +64,7 @@ const EditAddressModal = ({ open, onClose, address, onViewDetails, onEditSuccess
         const fetchCitiesByCountry = async () => {
             if (country) {
                 try {
-                    const citiesResponse = await axiosInstance.get(`/cities/country/${country}`);
+                    const citiesResponse = await getCitiesByCountryService(country);
                     const sortedCities = citiesResponse.data.sort((a, b) => a.name.localeCompare(b.name));
                     setCities(sortedCities);
                 } catch (error) {
@@ -89,7 +89,7 @@ const EditAddressModal = ({ open, onClose, address, onViewDetails, onEditSuccess
         };
 
         try {
-            const response = await axiosInstance.put(`/addresses/update/${address._id}`, updatedData);
+            const response = await editAddressService(address._id, updatedData);
             toast.success(response.data.message);
             onEditSuccess(response.data);
             onClose();

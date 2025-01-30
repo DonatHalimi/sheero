@@ -1,6 +1,7 @@
 import React, { useEffect, useState } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
-import { DashboardHeader, LoadingDataGrid } from '../../assets/CustomComponents';
+import { DashboardHeader, exportOptions, LoadingDataGrid } from '../../assets/CustomComponents';
+import { exportToExcel, exportToJSON } from '../../assets/DataExport';
 import DashboardTable from '../../components/Dashboard/DashboardTable';
 import AddContactModal from '../../components/Modal/Contact/AddContactModal';
 import ContactDetailsDrawer from '../../components/Modal/Contact/ContactDetailsDrawer';
@@ -84,6 +85,15 @@ const ContactPage = () => {
         { key: 'actions', label: 'Actions' }
     ];
 
+    const handleExport = (data, format) => {
+        const flattenedContacts = data.map(contact => ({
+            ...contact,
+            userId: contact.userId ? contact.userId.email : 'N/A'
+        }))
+
+        format === 'excel' ? exportToExcel(flattenedContacts, 'contacts_data') : exportToJSON(data, 'contacts_data');
+    }
+
     return (
         <div className='container mx-auto max-w-screen-2xl px-4 mt-20'>
             <div className='flex flex-col items-center justify-center'>
@@ -97,6 +107,7 @@ const ContactPage = () => {
                             setAddItemOpen={setAddContactOpen}
                             setDeleteItemOpen={setDeleteContactOpen}
                             itemName="Contact"
+                            exportOptions={exportOptions(contacts, handleExport)}
                         />
 
                         <DashboardTable

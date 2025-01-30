@@ -2,15 +2,14 @@ import { InputLabel, MenuItem, Select } from '@mui/material';
 import React, { useEffect, useState } from 'react';
 import { toast } from 'react-toastify';
 import { ActionButtons, BrownOutlinedTextField, CustomBox, CustomModal, CustomTypography, handleApiError, OutlinedBrownFormControl } from '../../../assets/CustomComponents';
-import useAxios from '../../../utils/axiosInstance';
+import { getSubcategoriesService } from '../../../services/subcategoryService';
+import { editSubSubcategoryService } from '../../../services/subSubcategoryService';
 
 const EditSubSubcategoryModal = ({ open, onClose, subSubcategory, onViewDetails, onEditSuccess }) => {
     const [name, setName] = useState('');
     const [isValidName, setIsValidName] = useState(true);
     const [subcategory, setSubcategory] = useState('');
     const [subcategories, setSubcategories] = useState([]);
-
-    const axiosInstance = useAxios();
 
     const validateName = (v) => /^[A-ZÇ][\sa-zA-ZëËçÇ\W]{3,27}$/.test(v);
 
@@ -24,7 +23,7 @@ const EditSubSubcategoryModal = ({ open, onClose, subSubcategory, onViewDetails,
 
         const fetchSubcategories = async () => {
             try {
-                const response = await axiosInstance.get('/subcategories/get');
+                const response = await getSubcategoriesService();
                 setSubcategories(response.data);
             } catch (error) {
                 console.error('Error fetching subcategories', error);
@@ -42,7 +41,7 @@ const EditSubSubcategoryModal = ({ open, onClose, subSubcategory, onViewDetails,
         }
 
         try {
-            const response = await axiosInstance.put(`/subsubcategories/update/${subSubcategory._id}`, updatedData);
+            const response = await editSubSubcategoryService(subSubcategory._id, updatedData);
             toast.success(response.data.message);
             onEditSuccess(response.data);
             onClose();

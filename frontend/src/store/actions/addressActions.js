@@ -1,10 +1,11 @@
-import axios from 'axios';
-import { getApiUrl } from '../../utils/config';
+import { addAddressService, editAddressService, getAddressByUserService, getAddressService } from '../../services/addressService';
+import { getCitiesByCountryService } from '../../services/cityService';
+import { getCountriesService } from '../../services/countryService';
 import { ADD_ADDRESS, ADDRESS_ERROR, GET_ADDRESS, GET_CITIES_BY_COUNTRY, GET_COUNTRIES, UPDATE_ADDRESS } from '../types';
 
 export const getAddress = (addressId) => async (dispatch) => {
     try {
-        const res = await axios.get(getApiUrl(`/addresses/get/${addressId}`), { withCredentials: true });
+        const res = await getAddressService(addressId);
 
         dispatch({
             type: GET_ADDRESS,
@@ -20,7 +21,7 @@ export const getAddress = (addressId) => async (dispatch) => {
 
 export const getAddressByUser = (userId) => async (dispatch) => {
     try {
-        const res = await axios.get(getApiUrl(`/addresses/user/${userId}`), { withCredentials: true });
+        const res = await getAddressByUserService(userId);
 
         dispatch({
             type: GET_ADDRESS,
@@ -36,7 +37,7 @@ export const getAddressByUser = (userId) => async (dispatch) => {
 
 export const addAddress = (addressData) => async (dispatch) => {
     try {
-        const res = await axios.post(getApiUrl('/addresses/create'), addressData, { withCredentials: true });
+        const res = await addAddressService(addressData);
 
         dispatch({
             type: ADD_ADDRESS,
@@ -50,10 +51,9 @@ export const addAddress = (addressData) => async (dispatch) => {
     }
 };
 
-
 export const updateAddress = (addressId, addressData) => async (dispatch) => {
     try {
-        const res = await axios.put(getApiUrl(`/addresses/update/${addressId}`), addressData, { withCredentials: true });
+        const res = await editAddressService(addressId, addressData);
 
         dispatch({
             type: UPDATE_ADDRESS,
@@ -69,7 +69,7 @@ export const updateAddress = (addressId, addressData) => async (dispatch) => {
 
 export const getCountries = () => async (dispatch) => {
     try {
-        const res = await axios.get(getApiUrl('/countries/get'), { withCredentials: true });
+        const res = await getCountriesService();
 
         dispatch({
             type: GET_COUNTRIES,
@@ -85,7 +85,7 @@ export const getCountries = () => async (dispatch) => {
 
 export const getCities = (countryId) => async (dispatch) => {
     try {
-        const res = await axios.get(getApiUrl(`/cities/country/${countryId}`), { withCredentials: true });
+        const res = await getCitiesByCountryService(countryId);
 
         dispatch({
             type: GET_CITIES_BY_COUNTRY,

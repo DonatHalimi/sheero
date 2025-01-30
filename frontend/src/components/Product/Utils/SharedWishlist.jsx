@@ -2,8 +2,8 @@ import React, { useEffect, useState } from 'react';
 import { toast } from 'react-toastify';
 import { CustomPagination, EmptyState, Header, LoadingProductItem } from '../../../assets/CustomComponents';
 import emptyWishlistImage from '../../../assets/img/empty/wishlist.png';
-import useAxios from '../../../utils/axiosInstance';
-import { getApiUrl } from '../../../utils/config';
+import { loadUserService } from '../../../services/authService';
+import { getSharedUserWishlistService } from '../../../services/wishlistService';
 import Navbar from '../../Navbar/Navbar';
 import Footer from '../../Utils/Footer';
 import ProductItem from '../Items/ProductItem';
@@ -17,16 +17,14 @@ const SharedWishlist = () => {
     const [totalItems, setTotalItems] = useState(0);
     const [loading, setLoading] = useState(true);
 
-    const axiosInstance = useAxios();
-
     useEffect(() => {
         const fetchWishlist = async () => {
             setLoading(true);
             try {
-                const userResponse = await axiosInstance.get(getApiUrl('/auth/me'));
+                const userResponse = await loadUserService();
                 const userId = userResponse.data.id;
 
-                const { data } = await axiosInstance.get(getApiUrl(`/wishlist/${userId}`));
+                const { data } = await getSharedUserWishlistService(userId);
                 setWishlistItems(data.items);
                 setFullName(`${data.firstName} ${data.lastName}`);
                 setTotalItems(data.items.length);

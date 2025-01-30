@@ -1,11 +1,12 @@
-import axios from 'axios';
 import React, { useEffect, useState } from 'react';
 import { useParams } from 'react-router-dom';
 import { calculatePageCount, CustomPagination, FilterLayout, filterProductsByPrice, getPaginatedItems, handlePageChange, ProductGrid, sortProducts, SplideList } from '../../assets/CustomComponents';
 import noProducts from '../../assets/img/products/no-products.png';
 import Navbar from '../../components/Navbar/Navbar';
 import Footer from '../../components/Utils/Footer';
-import { getApiUrl } from '../../utils/config';
+import { getCategoryByIdService } from '../../services/categoryService';
+import { getProductsBySubSubcategoryService } from '../../services/productService';
+import { getSubSubcategoriesService } from '../../services/subSubcategoryService';
 
 const itemsPerPage = 40;
 
@@ -25,18 +26,21 @@ const ProductsBySubSubCategory = () => {
         const fetchData = async () => {
             setLoading(true);
             try {
-                const subSubcategoryResponse = await axios.get(getApiUrl(`/subsubcategories/get/${id}`));
-                const subSubcategoryData = subSubcategoryResponse.data;
+                const subSubcategoryResponse = await getSubSubcategoriesService(id);
+                const subSubcategories = subSubcategoryResponse.data;
+
+                const subSubcategoryData = subSubcategories.find(
+                    (item) => item._id === id
+                );
+
                 setSubsubcategoryData(subSubcategoryData);
 
                 if (subSubcategoryData.subcategory?.category) {
-                    const categoryResponse = await axios.get(
-                        getApiUrl(`/categories/get/${subSubcategoryData.subcategory.category}`)
-                    );
+                    const categoryResponse = await getCategoryByIdService(subSubcategoryData.subcategory.category);
                     setCategoryData(categoryResponse.data);
                 }
 
-                const productsResponse = await axios.get(getApiUrl(`/products/get-by-subSubcategory/${id}`));
+                const productsResponse = await getProductsBySubSubcategoryService(id);
                 setProducts(productsResponse.data.products);
                 setFilteredProducts(productsResponse.data.products);
                 setCurrentPage(1);
@@ -82,7 +86,7 @@ const ProductsBySubSubCategory = () => {
             _id: subSubcategoryData?.subcategory?._id || '',
             name: subSubcategoryData?.subcategory?.name || '',
         },
-    }
+    };
 
     return (
         <>

@@ -3,7 +3,8 @@ import { IconButton, InputAdornment, InputLabel, MenuItem, Select } from '@mui/m
 import React, { useEffect, useState } from 'react';
 import { toast } from 'react-toastify';
 import { ActionButtons, BrownOutlinedTextField, CustomBox, CustomModal, CustomTypography, handleApiError, knownEmailProviders, OutlinedBrownFormControl } from '../../../assets/CustomComponents';
-import useAxios from '../../../utils/axiosInstance';
+import { getRolesService } from '../../../services/roleService';
+import { editUserService } from '../../../services/userService';
 
 const EditUserModal = ({ open, onClose, user, onViewDetails, onEditSuccess }) => {
     const [firstName, setFirstName] = useState('');
@@ -18,8 +19,6 @@ const EditUserModal = ({ open, onClose, user, onViewDetails, onEditSuccess }) =>
     const [role, setRole] = useState('');
     const [roles, setRoles] = useState([]);
 
-    const axiosInstance = useAxios();
-
     const validateName = (v) => /^[A-ZÇ][\sa-zA-ZëËçÇ\W]{2,10}$/.test(v);
     const validateEmail = (v) => new RegExp(`^[a-zA-Z0-9._%+-]+@(${knownEmailProviders.join('|')})$`, 'i').test(v);
     const validatePassword = (v) => /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[@$!%*?&\(\)_\+\-.])[A-Za-z\d@$!%*?&\(\)_\+\-.]{8,}$/.test(v);
@@ -29,7 +28,7 @@ const EditUserModal = ({ open, onClose, user, onViewDetails, onEditSuccess }) =>
     useEffect(() => {
         const fetchRoles = async () => {
             try {
-                const response = await axiosInstance.get('/roles/get');
+                const response = await getRolesService();
                 setRoles(response.data);
             } catch (error) {
                 console.error('Error fetching roles', error);
@@ -65,11 +64,11 @@ const EditUserModal = ({ open, onClose, user, onViewDetails, onEditSuccess }) =>
                 email,
                 role,
             };
-            if (password && password.trim()) {
+            if (password?.trim()) {
                 updatedData.password = password;
             }
 
-            const response = await axiosInstance.put(`/users/update/${user._id}`, updatedData);
+            const response = await editUserService(user._id, updatedData);
             toast.success(response.data.message);
             onEditSuccess(response.data);
             onClose();

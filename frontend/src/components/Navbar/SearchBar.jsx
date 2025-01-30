@@ -2,14 +2,13 @@ import { ClickAwayListener } from '@mui/material';
 import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { SearchBarInput, SearchDropdown } from '../../assets/CustomComponents';
-import useAxios from '../../utils/axiosInstance';
+import { fetchSearchResultsService } from '../../services/productService';
 
 const SearchBar = () => {
     const [searchTerm, setSearchTerm] = useState('');
     const [suggestions, setSuggestions] = useState([]);
     const [debounceTimeout, setDebounceTimeout] = useState(null);
     const navigate = useNavigate();
-    const axiosInstance = useAxios();
 
     const handleInputChange = (event) => {
         const query = event.target.value;
@@ -23,7 +22,7 @@ const SearchBar = () => {
             setTimeout(async () => {
                 if (query.length > 2) {
                     try {
-                        const { data } = await axiosInstance.get('/products/search', { params: { query } });
+                        const { data } = await fetchSearchResultsService(query);
                         setSuggestions(data.results);
                     } catch (error) {
                         console.error('Error fetching autocomplete results:', error);

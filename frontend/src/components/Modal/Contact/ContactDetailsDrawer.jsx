@@ -1,8 +1,9 @@
 import { Download } from '@mui/icons-material';
 import { Box, Drawer, Typography } from '@mui/material';
 import React from 'react';
-import { BoxBetween, CloseButton, downloadContactData, OutlinedBrownButton, ReadOnlyTextField } from '../../../assets/CustomComponents';
+import { BoxBetween, CloseButton, OutlinedBrownButton, ReadOnlyTextField } from '../../../assets/CustomComponents';
 import { drawerPaperSx } from '../../../assets/sx';
+import { downloadContactData } from '../../../assets/DataExport';
 
 const ContactDetailsDrawer = ({ open, onClose, contact, onEdit }) => {
     const user = `${contact?.userId?.firstName} ${contact?.userId?.lastName} - ${contact?.userId?.email}`;

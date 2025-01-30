@@ -1,6 +1,7 @@
 import React, { useEffect, useState } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
-import { DashboardHeader, DashboardImage, LoadingDataGrid } from '../../assets/CustomComponents';
+import { DashboardHeader, DashboardImage, exportOptions, LoadingDataGrid } from '../../assets/CustomComponents';
+import { exportToExcel, exportToJSON } from '../../assets/DataExport';
 import DashboardTable from '../../components/Dashboard/DashboardTable';
 import AddCategoryModal from '../../components/Modal/Category/AddCategoryModal';
 import CategoryDetailsDrawer from '../../components/Modal/Category/CategoryDetailsDrawer';
@@ -106,6 +107,10 @@ const CategoriesPage = () => {
         { key: 'actions', label: 'Actions' }
     ];
 
+    const handleExport = (data, format) => {
+        format === 'excel' ? exportToExcel(data, 'categories_data') : exportToJSON(data, 'categories_data');
+    }
+
     return (
         <div className='container mx-auto max-w-screen-2xl px-4 mt-20'>
             <div className='flex flex-col items-center justify-center'>
@@ -119,6 +124,7 @@ const CategoriesPage = () => {
                             setAddItemOpen={setAddCategoryOpen}
                             setDeleteItemOpen={setDeleteCategoryOpen}
                             itemName="Category"
+                            exportOptions={exportOptions(categories, handleExport)}
                         />
 
                         <DashboardTable

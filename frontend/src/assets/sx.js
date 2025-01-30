@@ -351,3 +351,21 @@ export const iconButtonSx = {
     top: 10,
     right: 10,
 }
+
+export const productChipSx = {
+    width: '100%',
+    padding: '4px 0',
+    '& .MuiChip-root': {
+        maxWidth: '100%',
+        textAlign: 'left',
+        height: 'auto',
+        '& .MuiChip-label': {
+            whiteSpace: 'normal',
+            overflow: 'visible',
+            textOverflow: 'clip',
+            display: 'block',
+            padding: '8px 12px',
+            textAlign: 'left',
+        },
+    },
+}

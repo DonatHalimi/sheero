@@ -3,7 +3,7 @@ import { Autocomplete, Box, MenuItem, Modal, TextField, Typography } from '@mui/
 import React, { useEffect, useState } from 'react';
 import { toast } from 'react-toastify';
 import { BrownButton, BrownOutlinedTextField, CustomPaper, OutlinedBrownButton, OutlinedBrownFormControl, VisuallyHiddenInput } from '../../../assets/CustomComponents';
-import useAxios from '../../../utils/axiosInstance';
+import axiosInstance from '../../../utils/axiosInstance';
 import { getImageUrl } from '../../../utils/config';
 
 const EditProductModal = ({ open, onClose, product, onEditSuccess }) => {
@@ -34,8 +34,6 @@ const EditProductModal = ({ open, onClose, product, onEditSuccess }) => {
     const [shippingCost, setShippingCost] = useState('');
     const [packageSize, setPackageSize] = useState('medium');
     const [details, setDetails] = useState([{ attribute: '', value: '' }]);
-
-    const axiosInstance = useAxios();
 
     useEffect(() => {
         if (product) {
@@ -165,11 +163,7 @@ const EditProductModal = ({ open, onClose, product, onEditSuccess }) => {
         }
 
         try {
-            await axiosInstance.put(`/products/update/${product._id}`, formData, {
-                headers: {
-                    'Content-Type': 'multipart/form-data'
-                }
-            });
+            await axiosInstance.put(`/products/update/${product._id}`, formData);
             toast.success('Product updated successfully');
             onEditSuccess();
             setStep(1);

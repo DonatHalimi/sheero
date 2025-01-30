@@ -1,6 +1,7 @@
 import React, { useEffect, useState } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
-import { AccountLinkStatusIcon, DashboardHeader, LoadingDataGrid } from '../../assets/CustomComponents';
+import { AccountLinkStatusIcon, DashboardHeader, exportOptions, LoadingDataGrid } from '../../assets/CustomComponents';
+import { exportToExcel, exportToJSON } from '../../assets/DataExport';
 import DashboardTable from '../../components/Dashboard/DashboardTable';
 import DeleteModal from '../../components/Modal/DeleteModal';
 import AddUserModal from '../../components/Modal/User/AddUserModal';
@@ -114,6 +115,15 @@ const UsersPage = () => {
         { key: 'actions', label: 'Actions' }
     ];
 
+    const handleExport = (data, format) => {
+        const flattenedUsers = data.map(user => ({
+            ...user,
+            role: user.role?.name || 'N/A',
+        }));
+
+        format === 'excel' ? exportToExcel(flattenedUsers, 'users_data') : exportToJSON(data, 'users_data');
+    };
+
     return (
         <div className='container mx-auto max-w-screen-2xl px-4 mt-20'>
             <div className='flex flex-col items-center justify-center'>
@@ -127,6 +137,7 @@ const UsersPage = () => {
                             setAddItemOpen={setAddUserOpen}
                             setDeleteItemOpen={setDeleteUserOpen}
                             itemName="User"
+                            exportOptions={exportOptions(users, handleExport)}
                         />
 
                         <DashboardTable

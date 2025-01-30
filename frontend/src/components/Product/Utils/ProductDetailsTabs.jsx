@@ -1,27 +1,26 @@
 import { Typography } from '@mui/material';
 import React, { useEffect, useState } from 'react';
 import { ProductDetailsBox, ProductTabs, ReviewModal, ReviewsList, TabPanel } from '../../../assets/CustomComponents';
-import useAxios from '../../../utils/axiosInstance';
+import { getProductReviewsService } from '../../../services/reviewService';
 
 const ProductDetailsTabs = ({ product }) => {
   const [value, setValue] = useState(0);
   const [reviews, setReviews] = useState([]);
   const [selectedReview, setSelectedReview] = useState(null);
   const [open, setOpen] = useState(false);
-  const axiosInstance = useAxios();
 
   useEffect(() => {
-    const fetchReviews = async () => {
+    const getProductReviews = async () => {
       try {
-        const { data } = await axiosInstance.get(`/reviews/products/${product._id}`);
+        const { data } = await getProductReviewsService(product._id);
         setReviews(data);
       } catch (error) {
         console.error('Error fetching reviews', error);
       }
     };
 
-    fetchReviews();
-  }, [product._id, axiosInstance]);
+    getProductReviews();
+  }, [product._id]);
 
   const handleChange = (event, newValue) => setValue(newValue);
 

@@ -1,15 +1,13 @@
 import React, { useState } from 'react';
 import { toast } from 'react-toastify';
 import { BrownButton, BrownOutlinedTextField, CustomBox, CustomModal, CustomTypography, handleApiError } from '../../../assets/CustomComponents';
-import useAxios from '../../../utils/axiosInstance';
+import { addCountryService } from '../../../services/countryService';
 
 const AddCountryModal = ({ open, onClose, onAddSuccess }) => {
     const [name, setName] = useState('');
     const [isValidName, setIsValidName] = useState(true);
     const [countryCode, setCountryCode] = useState('');
     const [isValidCode, setIsValidCode] = useState(true);
-
-    const axiosInstance = useAxios();
 
     const validateName = (v) => /^[A-ZÇ][a-zA-ZëËçÇ\s]{3,35}$/.test(v);
     const validateCountryCode = (v) => /^[A-Z]{2,3}$/.test(v);
@@ -28,7 +26,7 @@ const AddCountryModal = ({ open, onClose, onAddSuccess }) => {
         }
 
         try {
-            const response = await axiosInstance.post('/countries/create', data);
+            const response = await addCountryService(data);
             toast.success(response.data.message);
             onAddSuccess(response.data);
             onClose();

@@ -4,7 +4,8 @@ import React, { useEffect, useState } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 import { toast } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
-import { BrownButton, BrownOutlinedTextField, downloadUserData, Header, knownEmailProviders, LoadingDetails, ProfileLayout } from '../../assets/CustomComponents';
+import { BrownButton, BrownOutlinedTextField, Header, knownEmailProviders, LoadingDetails, ProfileLayout } from '../../assets/CustomComponents';
+import { downloadUserData } from '../../assets/DataExport';
 import Navbar from '../../components/Navbar/Navbar';
 import Footer from '../../components/Utils/Footer';
 import { updateUserProfile } from '../../store/actions/authActions';
@@ -105,7 +106,6 @@ const ProfileDetails = () => {
 
             if (result.success) {
                 toast.success('Profile updated successfully!');
-                window.location.reload();
             } else {
                 toast.error(result.error || 'Profile update failed');
             }

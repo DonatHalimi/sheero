@@ -1,6 +1,7 @@
 import React, { useEffect, useState } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
-import { DashboardHeader, LoadingDataGrid } from '../../assets/CustomComponents';
+import { DashboardHeader, exportOptions, LoadingDataGrid } from '../../assets/CustomComponents';
+import { exportToExcel, exportToJSON } from '../../assets/DataExport';
 import DashboardTable from '../../components/Dashboard/DashboardTable';
 import AddAddressModal from '../../components/Modal/Address/AddAddressModal';
 import AddressDetailsDrawer from '../../components/Modal/Address/AddressDetailsDrawer';
@@ -97,6 +98,18 @@ const AddressesPage = () => {
         { key: 'actions', label: 'Actions' }
     ];
 
+    const handleExport = (data, format) => {
+        const flattenedAddress = data.map(address => ({
+            ...address,
+            user: address.user.email,
+            city: address.city.name,
+            country: address.country.name,
+            comment: address.comment || 'N/A'
+        }))
+
+        format === 'excel' ? exportToExcel(flattenedAddress, 'addresses_data') : exportToJSON(data, 'addresses_data');
+    }
+
     return (
         <div className='container mx-auto max-w-screen-2xl px-4 mt-20'>
             <div className='flex flex-col items-center justify-center'>
@@ -110,6 +123,7 @@ const AddressesPage = () => {
                             setAddItemOpen={setAddAddressOpen}
                             setDeleteItemOpen={setDeleteAddressOpen}
                             itemName="Address"
+                            exportOptions={exportOptions(addresses, handleExport)}
                         />
 
                         <DashboardTable

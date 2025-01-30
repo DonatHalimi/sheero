@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
 import { toast } from 'react-toastify';
 import { BrownButton, BrownOutlinedTextField, CustomBox, CustomModal, CustomTypography, handleApiError } from '../../../assets/CustomComponents';
-import useAxios from '../../../utils/axiosInstance';
+import { addReturnRequestService } from '../../../services/returnService';
 
 const AddReturnRequestModal = ({ open, onClose, onAddSuccess }) => {
     const [order, setOrder] = useState('');
@@ -9,8 +9,6 @@ const AddReturnRequestModal = ({ open, onClose, onAddSuccess }) => {
     const [user, setUser] = useState('');
     const [reason, setReason] = useState('');
     const [isValidOrder, setIsValidOrder] = useState(true);
-
-    const axiosInstance = useAxios();
 
     const validateOrder = (id) => /^\d{9}$/.test(id);
 
@@ -28,7 +26,7 @@ const AddReturnRequestModal = ({ open, onClose, onAddSuccess }) => {
         };
 
         try {
-            const response = await axiosInstance.post('/returns/create', data);
+            const response = await addReturnRequestService(data);
             toast.success(response.data.message);
             onAddSuccess(response.data);
             onClose();

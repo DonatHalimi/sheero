@@ -2,7 +2,9 @@ import { Autocomplete, TextField } from '@mui/material';
 import React, { useEffect, useState } from 'react';
 import { toast } from 'react-toastify';
 import { BrownButton, BrownOutlinedTextField, CustomBox, CustomModal, CustomPaper, CustomTypography, DashboardCountryFlag, handleApiError } from '../../../assets/CustomComponents';
-import useAxios from '../../../utils/axiosInstance';
+import { addAddressService } from '../../../services/addressService';
+import { getCitiesByCountryService } from '../../../services/cityService';
+import { getCountriesService } from '../../../services/countryService';
 
 const AddAddressModal = ({ open, onClose, onAddSuccess }) => {
     const [name, setName] = useState('');
@@ -17,8 +19,6 @@ const AddAddressModal = ({ open, onClose, onAddSuccess }) => {
     const [country, setCountry] = useState(null);
     const [cities, setCities] = useState([]);
     const [countries, setCountries] = useState([]);
-
-    const axiosInstance = useAxios();
 
     const validateName = (v) => /^[A-ZÇ][a-zA-ZëËçÇ\s]{2,10}$/.test(v);
     const validatePhoneNumber = (v) => /^0(44|45|48|49)\d{6}$/.test(v);
@@ -36,7 +36,7 @@ const AddAddressModal = ({ open, onClose, onAddSuccess }) => {
     useEffect(() => {
         const fetchCountries = async () => {
             try {
-                const response = await axiosInstance.get('/countries/get');
+                const response = await getCountriesService();
                 const countriesWithGroups = response.data.map(country => ({
                     ...country,
                     firstLetter: country.name[0].toUpperCase()
@@ -55,7 +55,7 @@ const AddAddressModal = ({ open, onClose, onAddSuccess }) => {
         setCity(null);
         if (newValue) {
             try {
-                const response = await axiosInstance.get(`/cities/country/${newValue._id}`);
+                const response = await getCitiesByCountryService(newValue._id);
                 const citiesWithGroups = response.data.map(city => ({
                     ...city,
                     firstLetter: city.name[0].toUpperCase()
@@ -85,7 +85,7 @@ const AddAddressModal = ({ open, onClose, onAddSuccess }) => {
         };
 
         try {
-            const response = await axiosInstance.post('/addresses/create', data);
+            const response = await addAddressService(data);
             toast.success(response.data.message);
             onAddSuccess();
             onClose();

@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
 import { toast } from 'react-toastify';
 import { BrownButton, BrownOutlinedTextField, CustomBox, CustomModal, CustomTypography, handleApiError, knownEmailProviders } from '../../../assets/CustomComponents';
-import useAxios from '../../../utils/axiosInstance';
+import { addContactService } from '../../../services/contactService';
 
 const AddContactModal = ({ open, onClose, onAddSuccess }) => {
     const [formData, setFormData] = useState({
@@ -15,8 +15,6 @@ const AddContactModal = ({ open, onClose, onAddSuccess }) => {
     const [isValidEmail, setIsValidEmail] = useState(true);
     const [isValidSubject, setIsValidSubject] = useState(true);
     const [isValidMessage, setIsValidMessage] = useState(true);
-
-    const axiosInstance = useAxios();
 
     const validateName = (v) => /^[A-ZÇ][a-zA-ZëËçÇ\s]{3,15}$/.test(v);
     const validateEmail = (v) => new RegExp(`^[a-zA-Z0-9._%+-]+@(${knownEmailProviders.join('|')})$`, 'i').test(v);
@@ -41,8 +39,15 @@ const AddContactModal = ({ open, onClose, onAddSuccess }) => {
             return;
         }
 
+        const data = {
+            name,
+            email,
+            subject,
+            message
+        };
+
         try {
-            const response = await axiosInstance.post('/contact/create', formData);
+            const response = await addContactService(data);
             toast.success(response.data.message);
             onAddSuccess(response.data);
             onClose();

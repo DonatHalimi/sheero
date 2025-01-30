@@ -2,7 +2,7 @@ import { FormControl, InputLabel, MenuItem, Rating, Select } from '@mui/material
 import React, { useEffect, useState } from 'react';
 import { toast } from 'react-toastify';
 import { BrownButton, BrownOutlinedTextField, CustomBox, CustomModal, CustomTypography, handleApiError } from '../../../assets/CustomComponents';
-import useAxios from '../../../utils/axiosInstance';
+import { addReviewService, getProductNamesService, getReviewsService } from '../../../services/reviewService';
 
 const AddReviewModal = ({ open, onClose, onAddSuccess }) => {
     const [title, setTitle] = useState('');
@@ -14,8 +14,6 @@ const AddReviewModal = ({ open, onClose, onAddSuccess }) => {
     const [products, setProducts] = useState([]);
     const [userReviews, setUserReviews] = useState([]);
 
-    const axiosInstance = useAxios();
-
     const validateTitle = (v) => /^[A-Z][\Wa-zA-Z\s]{2,40}$/.test(v);
     const validateComment = (v) => /^[A-Z][\Wa-zA-Z\s]{3,500}$/.test(v);
 
@@ -24,7 +22,7 @@ const AddReviewModal = ({ open, onClose, onAddSuccess }) => {
     useEffect(() => {
         const fetchProducts = async () => {
             try {
-                const response = await axiosInstance.get('/reviews/products');
+                const response = await getProductNamesService();
                 setProducts(response.data);
             } catch (error) {
                 console.error('Error fetching products', error);
@@ -33,7 +31,7 @@ const AddReviewModal = ({ open, onClose, onAddSuccess }) => {
 
         const fetchUserReviews = async () => {
             try {
-                const response = await axiosInstance.get('/reviews/get');
+                const response = await getReviewsService();
                 setUserReviews(response.data);
             } catch (error) {
                 console.error('Error fetching user reviews', error);
@@ -62,10 +60,10 @@ const AddReviewModal = ({ open, onClose, onAddSuccess }) => {
             title,
             rating,
             comment,
-        }
+        };
 
         try {
-            const response = await axiosInstance.post(`/reviews/product/${productId}`, data);
+            const response = await addReviewService(productId, data);
             toast.success(response.data.message);
             onAddSuccess(response.data);
             onClose();

@@ -23,6 +23,7 @@ The frontend serves as the user interface layer of the application, interacting 
 │   │   ├── assets/
 │   │   ├── components/
 │   │   ├── pages/
+│   │   ├── services/
 │   │   ├── store/
 │   │   └── utils/
 │   ├── App.jsx
@@ -47,13 +48,16 @@ The frontend serves as the user interface layer of the application, interacting 
     - **CustomComponents.jsx**: Contains reusable components that can be utilized across various parts of the frontend.
     - **dashboardPages.js**: Contains components or pages specifically for the dashboard view.
     - **imports.js**: Includes modules or files that are imported and shared across multiple components or views.
-    - **sx.js**: Exports **sx** (style) classes for styling components, typically using the `sx` prop from libraries like MUI (Material UI) for consistent styling.
+    - **sx.js**: Exports **sx** (style) classes for styling components, typically using the `sx` prop from the [MUI](https://mui.com/system/the-sx-prop/) library for consistent styling.
 
   - **components/**  
-    Contains reusable React components. These components are the building blocks of the application, such as buttons, forms, headers, etc.
+    Contains reusable React components. These components are the building blocks of the application, such as product cards, dashboard action modals, navbar components, etc.
 
   - **pages/**  
     Contains React components representing the main views or pages of the app, such as Home, Product Details, Orders, etc.
+
+  - **services/**  
+    Contains helper functions for interacting with the backend API.
 
   - **store/**  
     This folder contains the Redux-related files for managing the global application state. It ensures consistent and predictable state management across the app. Key components include:

@@ -5,11 +5,10 @@ import { toast } from 'react-toastify';
 import { ErrorTooltip } from '../../assets/CustomComponents';
 import Navbar from '../../components/Navbar/Navbar';
 import Footer from '../../components/Utils/Footer';
-import useAxios from '../../utils/axiosInstance';
+import { addContactService } from '../../services/contactService';
 
 const ContactUs = () => {
     const { user } = useSelector((state) => state.auth);
-    const axiosInstance = useAxios();
 
     const [formData, setFormData] = useState({
         name: '',
@@ -51,13 +50,15 @@ const ContactUs = () => {
         e.preventDefault();
         toast.info('Sending message...', { autoClose: 500 });
 
+        const data = {
+            ...formData,
+            userId: user?._id || null
+        };
+
         try {
-            await axiosInstance.post('/contact/create', {
-                ...formData,
-                userId: user?._id || null
-            });
+            await addContactService(data);
             setLoading(false);
-            toast.success('Message sent successfully!', { autoClose: 2000 });
+            toast.success('Message sent successfully, we will get back to you soon!', { autoClose: 2000 });
             setFormData({
                 name: user?.firstName || '',
                 email: user?.email || '',

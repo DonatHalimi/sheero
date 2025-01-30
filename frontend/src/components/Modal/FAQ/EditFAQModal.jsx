@@ -1,15 +1,13 @@
 import React, { useEffect, useState } from 'react';
 import { toast } from 'react-toastify';
 import { ActionButtons, BrownOutlinedTextField, CustomBox, CustomModal, CustomTypography } from '../../../assets/CustomComponents';
-import useAxios from '../../../utils/axiosInstance';
+import { editFAQService } from '../../../services/faqService';
 
 const EditFAQModal = ({ open, onClose, faq, onViewDetails, onEditSuccess }) => {
     const [question, setQuestion] = useState('');
     const [isValidQuestion, setIsValidQuestion] = useState(true);
     const [answer, setAnswer] = useState('');
     const [isValidAnswer, setIsValidAnswer] = useState(true);
-
-    const axiosInstance = useAxios();
 
     const validateFAQ = (v) => /^[A-Z][\s\S]{10,50}$/.test(v);
     const isValidForm = isValidQuestion && isValidAnswer;
@@ -28,7 +26,7 @@ const EditFAQModal = ({ open, onClose, faq, onViewDetails, onEditSuccess }) => {
         }
 
         try {
-            const response = await axiosInstance.put(`/faqs/update/${faq._id}`, updatedData);
+            const response = await editFAQService(faq._id, updatedData);
             toast.success(response.data.message);
             onEditSuccess(response.data);
             onClose();

@@ -1,6 +1,7 @@
 import React, { useEffect, useState } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
-import { DashboardHeader, DashboardImage, LoadingDataGrid } from '../../assets/CustomComponents';
+import { DashboardHeader, DashboardImage, exportOptions, LoadingDataGrid } from '../../assets/CustomComponents';
+import { exportToExcel, exportToJSON } from '../../assets/DataExport';
 import DashboardTable from '../../components/Dashboard/DashboardTable';
 import DeleteModal from '../../components/Modal/DeleteModal';
 import ImagePreviewModal from '../../components/Modal/ImagePreviewModal';
@@ -107,6 +108,10 @@ const SlideshowPage = () => {
         { key: 'actions', label: 'Actions' }
     ];
 
+    const handleExport = (data, format) => {
+        format === 'excel' ? exportToExcel(data, 'images_data') : exportToJSON(data, 'images_data');
+    }
+
     return (
         <div className='container mx-auto max-w-screen-2xl px-4 mt-20'>
             <div className='flex flex-col items-center justify-center'>
@@ -120,6 +125,7 @@ const SlideshowPage = () => {
                             setAddItemOpen={setAddImageOpen}
                             setDeleteItemOpen={setDeleteImageOpen}
                             itemName="Image"
+                            exportOptions={exportOptions(images, handleExport)}
                         />
 
                         <DashboardTable

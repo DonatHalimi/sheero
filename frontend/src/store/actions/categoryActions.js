@@ -1,10 +1,9 @@
-import axios from 'axios';
-import { getApiUrl } from '../../utils/config';
+import { getCategoriesService, getSubcategoriesByCategoryService, getSubSubcategoriesBySubcategoryService } from '../../services/categoryService';
 import { GET_CATEGORIES, GET_CATEGORIES_ERROR, GET_SUBCATEGORIES_BY_CATEGORY, GET_SUBCATEGORIES_BY_CATEGORY_ERROR, GET_SUBSUBCATEGORIES_BY_SUBCATEGORY, GET_SUBSUBCATEGORIES_BY_SUBCATEGORY_ERROR } from '../types';
 
 export const getCategories = () => async (dispatch) => {
     try {
-        const res = await axios.get(getApiUrl('/categories/get'), { withCredentials: true });
+        const res = await getCategoriesService();
 
         dispatch({
             type: GET_CATEGORIES,
@@ -20,7 +19,7 @@ export const getCategories = () => async (dispatch) => {
 
 export const getSubcategoriesAndSubsubcategories = (categoryId) => async (dispatch) => {
     try {
-        const res = await axios.get(getApiUrl(`/subcategories/get-by-category/${categoryId}`), { withCredentials: true });
+        const res = await getSubcategoriesByCategoryService(categoryId);
 
         dispatch({
             type: GET_SUBCATEGORIES_BY_CATEGORY,
@@ -29,10 +28,7 @@ export const getSubcategoriesAndSubsubcategories = (categoryId) => async (dispat
 
         const subsubPromises = res.data.map(async (subcategory) => {
             try {
-                const subsubRes = await axios.get(
-                    getApiUrl(`/subsubcategories/get-by-subcategory/${subcategory._id}`),
-                    { withCredentials: true }
-                );
+                const subsubRes = await getSubSubcategoriesBySubcategoryService(subcategory._id);
                 return { subcategoryId: subcategory._id, subsubcategories: subsubRes.data };
             } catch (error) {
                 dispatch({

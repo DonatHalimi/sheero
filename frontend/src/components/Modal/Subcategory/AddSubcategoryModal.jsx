@@ -4,7 +4,8 @@ import Autocomplete from '@mui/material/Autocomplete';
 import React, { useEffect, useState } from 'react';
 import { toast } from 'react-toastify';
 import { BrownButton, BrownOutlinedTextField, CustomBox, CustomModal, CustomPaper, CustomTypography, handleApiError, OutlinedBrownButton, VisuallyHiddenInput } from '../../../assets/CustomComponents';
-import useAxios from '../../../utils/axiosInstance';
+import { getCategoriesService } from '../../../services/categoryService';
+import { addSubcategoryService } from '../../../services/subcategoryService';
 
 const AddSubcategoryModal = ({ open, onClose, onAddSuccess }) => {
     const [name, setName] = useState('');
@@ -14,8 +15,6 @@ const AddSubcategoryModal = ({ open, onClose, onAddSuccess }) => {
     const [category, setCategory] = useState(null);
     const [categories, setCategories] = useState([]);
 
-    const axiosInstance = useAxios();
-
     const validateName = (v) => /^[A-ZÇ][\sa-zA-ZëËçÇ\W]{3,27}$/.test(v);
 
     const isValidForm = name && isValidName && image && category;
@@ -23,7 +22,7 @@ const AddSubcategoryModal = ({ open, onClose, onAddSuccess }) => {
     useEffect(() => {
         const fetchCategories = async () => {
             try {
-                const response = await axiosInstance.get('/categories/get');
+                const response = await getCategoriesService();
                 const categoriesWithGroups = response.data.map(category => ({
                     ...category,
                     firstLetter: category.name[0].toUpperCase()
@@ -50,11 +49,7 @@ const AddSubcategoryModal = ({ open, onClose, onAddSuccess }) => {
         formData.append('category', category._id);
 
         try {
-            const response = await axiosInstance.post('/subcategories/create', formData, {
-                headers: {
-                    'Content-Type': 'multipart/form-data'
-                }
-            });
+            const response = await addSubcategoryService(formData);
             toast.success(response.data.message);
             onAddSuccess(response.data);
             onClose();

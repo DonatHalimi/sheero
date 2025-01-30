@@ -1,7 +1,8 @@
 import { Box, Drawer, Typography } from '@mui/material';
 import React from 'react';
-import { CloseButton, downloadFaqData, EditExportButtons, ReadOnlyTextField } from '../../../assets/CustomComponents';
+import { CloseButton, EditExportButtons, ReadOnlyTextField } from '../../../assets/CustomComponents';
 import { drawerPaperSx } from '../../../assets/sx';
+import { downloadFaqData } from '../../../assets/DataExport';
 
 const FAQDetailsDrawer = ({ open, onClose, faq, onEdit }) => {
     const handleEditClick = () => {

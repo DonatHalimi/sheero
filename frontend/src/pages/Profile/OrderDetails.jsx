@@ -2,17 +2,17 @@ import { LinearProgress, Table, TableBody, TableCell, TableContainer, TableHead,
 import React, { useEffect, useState } from 'react';
 import { Link, useParams } from 'react-router-dom';
 import 'react-toastify/dist/ReactToastify.css';
-import { EmptyState, formatDate, formatPrice, generateOrderPDF, Header, LoadingOrderDetails, ProfileLayout } from '../../assets/CustomComponents';
+import { EmptyState, formatDate, formatPrice, Header, LoadingOrderDetails, ProfileLayout } from '../../assets/CustomComponents';
+import { generateOrderPDF } from '../../assets/DataExport';
 import emptyOrdersImage from '../../assets/img/empty/orders.png';
 import Navbar from '../../components/Navbar/Navbar';
 import ReturnModal from '../../components/Product/Modals/ReturnModal';
 import Footer from '../../components/Utils/Footer';
-import useAxios from '../../utils/axiosInstance';
+import { getOrderDetailsService } from '../../services/orderService';
 import { getImageUrl } from '../../utils/config';
 
 const OrderDetails = () => {
     const { orderId } = useParams();
-    const axiosInstance = useAxios();
 
     const [order, setOrder] = useState(null);
     const [isReturnModalOpen, setIsReturnModalOpen] = useState(false);
@@ -28,7 +28,7 @@ const OrderDetails = () => {
 
     const fetchOrderDetails = async () => {
         try {
-            const response = await axiosInstance.get(`/orders/${orderId}`);
+            const response = await getOrderDetailsService(orderId);
             setOrder(response.data.data);
         } catch (error) {
             console.error('Error fetching order details:', error);

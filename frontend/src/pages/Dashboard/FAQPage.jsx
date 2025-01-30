@@ -1,6 +1,7 @@
 import React, { useEffect, useState } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
-import { DashboardHeader, LoadingDataGrid } from '../../assets/CustomComponents';
+import { DashboardHeader, exportOptions, LoadingDataGrid } from '../../assets/CustomComponents';
+import { exportToExcel, exportToJSON } from '../../assets/DataExport';
 import DashboardTable from '../../components/Dashboard/DashboardTable';
 import DeleteModal from '../../components/Modal/DeleteModal';
 import AddFAQModal from '../../components/Modal/FAQ/AddFAQModal';
@@ -95,6 +96,10 @@ const FAQPage = () => {
         { key: 'actions', label: 'Actions' }
     ];
 
+    const handleExport = (data, format) => {
+        format === 'excel' ? exportToExcel(data, 'faqs_data') : exportToJSON(data, 'faqs_data');
+    }
+
     return (
         <div className='container mx-auto max-w-screen-2xl px-4 mt-20'>
             <div className='flex flex-col items-center justify-center'>
@@ -108,6 +113,7 @@ const FAQPage = () => {
                             setAddItemOpen={setAddFaqOpen}
                             setDeleteItemOpen={setDeleteFaqOpen}
                             itemName="FAQ"
+                            exportOptions={exportOptions(faqs, handleExport)}
                         />
 
                         <DashboardTable

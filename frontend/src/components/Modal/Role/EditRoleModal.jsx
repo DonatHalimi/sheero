@@ -1,13 +1,11 @@
 import React, { useEffect, useState } from 'react';
 import { toast } from 'react-toastify';
 import { ActionButtons, BrownOutlinedTextField, CustomBox, CustomModal, CustomTypography, handleApiError } from '../../../assets/CustomComponents';
-import useAxios from '../../../utils/axiosInstance';
+import { editRoleService } from '../../../services/roleService';
 
 const EditRoleModal = ({ open, onClose, role, onViewDetails, onEditSuccess }) => {
     const [name, setName] = useState('');
     const [isValidName, setIsValidName] = useState(true);
-
-    const axiosInstance = useAxios();
 
     const validateName = (v) => /^[a-zA-Z\s]{2,10}$/.test(v);
 
@@ -30,7 +28,7 @@ const EditRoleModal = ({ open, onClose, role, onViewDetails, onEditSuccess }) =>
         };
 
         try {
-            const response = await axiosInstance.put(`/roles/update/${role._id}`, updatedData);
+            const response = await editRoleService(role._id, updatedData);
             toast.success(response.data.message);
             onEditSuccess(response.data);
             onClose();

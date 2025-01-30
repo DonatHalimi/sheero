@@ -1,6 +1,7 @@
 import React, { useEffect, useState } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
-import { DashboardHeader, formatDate, LoadingDataGrid } from '../../assets/CustomComponents';
+import { DashboardHeader, exportOptions, formatDate, LoadingDataGrid } from '../../assets/CustomComponents';
+import { exportToExcel, exportToJSON } from '../../assets/DataExport';
 import DashboardTable from '../../components/Dashboard/DashboardTable';
 import DeleteModal from '../../components/Modal/DeleteModal';
 import EditOrderModal from '../../components/Modal/Order/EditOrderModal';
@@ -74,41 +75,39 @@ const OrdersPage = () => {
         setSelectedOrder(null);
     };
 
+    const formatArrivalDateRange = (order) => `${formatDate(order.arrivalDateRange.start)} - ${formatDate(order.arrivalDateRange.end)}`;
+    const formatUser = (order) => `${order.user.email}`;
+    const formatProducts = (order) => order.products.map(item => item.product.name).join(', ');
+    const formatQuantity = (order) => order.products.map(item => item.quantity).join(', ');
+    const formatTotalAmount = (order) => `€  ${order.totalAmount.toFixed(2)}`;
+    const formatPaymentInfo = (order) => `${order.paymentMethod} - ${order.paymentStatus}`;
+    const formatAddress = (order) => `${order?.address?.street}, ${order?.address?.city?.name}, ${order?.address?.country?.name}, ${order?.address?.phoneNumber}`;
+
     const columns = [
         { key: '_id', label: 'Order ID' },
         { key: 'user.email', label: 'User' },
-        {
-            key: 'products',
-            label: 'Products',
-            render: (order) => order.products.map((item) => item.product.name).join(', ')
-        },
-        {
-            key: 'quantity',
-            label: 'Quantity',
-            render: (order) => order.products.map((item) => item.quantity).join(', ')
-        },
-        { key: 'totalAmount', label: 'Total Amount' },
-        {
-            key: 'paymentInfo',
-            label: 'Payment Info',
-            render: (order) => {
-                const paymentMethod = order.paymentMethod || 'N/A';
-                const paymentStatus = order.paymentStatus || 'N/A';
-                return `${paymentMethod} - ${paymentStatus}`;
-            }
-        },
-        {
-            key: 'arrivalDateRange',
-            label: 'Delivery Date',
-            render: (order) => {
-                const startDate = formatDate(order.arrivalDateRange.start);
-                const endDate = formatDate(order.arrivalDateRange.end);
-                return `${startDate} - ${endDate}`;
-            }
-        },
+        { key: 'products', label: 'Products', render: formatProducts },
+        { key: 'quantity', label: 'Quantity', render: formatQuantity },
+        { key: 'totalAmount', label: 'Total Amount', render: formatTotalAmount },
+        { key: 'paymentInfo', label: 'Payment Info', render: formatPaymentInfo },
+        { key: 'arrivalDateRange', label: 'Delivery Date', render: formatArrivalDateRange },
         { key: 'status', label: 'Delivery Status' },
         { key: 'actions', label: 'Actions' }
     ];
+
+    const handleExport = (data, format) => {
+        const flattenedOrders = data.map(order => ({
+            ...order,
+            arrivalDateRange: formatArrivalDateRange(order),
+            user: formatUser(order),
+            products: formatProducts(order),
+            quantity: formatQuantity(order),
+            totalAmount: formatTotalAmount(order),
+            address: formatAddress(order)
+        }))
+
+        format === 'excel' ? exportToExcel(flattenedOrders, 'orders_data') : exportToJSON(data, 'orders_data');
+    };
 
     return (
         <div className='container mx-auto max-w-screen-2xl px-4 mt-20'>
@@ -122,6 +121,7 @@ const OrdersPage = () => {
                             selectedItems={selectedOrders}
                             setDeleteItemOpen={setDeleteOrderOpen}
                             itemName="Order"
+                            exportOptions={exportOptions(orders, handleExport)}
                         />
 
                         <DashboardTable

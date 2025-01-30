@@ -1,10 +1,9 @@
-import axios from 'axios';
-import { getApiUrl } from '../../utils/config';
+import { getUserReturnRequestsService } from '../../services/returnService';
 import { GET_USER_RETURNS, GET_USER_RETURNS_ERROR } from '../types';
 
 export const getUserReturns = (userId) => async (dispatch) => {
     try {
-        const res = await axios.get(getApiUrl(`/returns/user/${userId}`), { withCredentials: true });
+        const res = await getUserReturnRequestsService(userId);
 
         dispatch({
             type: GET_USER_RETURNS,

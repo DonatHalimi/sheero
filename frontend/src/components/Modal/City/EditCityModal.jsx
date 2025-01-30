@@ -2,7 +2,8 @@ import { Autocomplete, TextField } from '@mui/material';
 import React, { useEffect, useState } from 'react';
 import { toast } from 'react-toastify';
 import { ActionButtons, BrownOutlinedTextField, CustomBox, CustomModal, CustomPaper, CustomTypography, DashboardCountryFlag, handleApiError } from '../../../assets/CustomComponents';
-import useAxios from '../../../utils/axiosInstance';
+import { editCityService } from '../../../services/cityService';
+import { getCountriesService } from '../../../services/countryService';
 
 const EditCityModal = ({ open, onClose, city, onViewDetails, onEditSuccess }) => {
     const [name, setName] = useState('');
@@ -11,8 +12,6 @@ const EditCityModal = ({ open, onClose, city, onViewDetails, onEditSuccess }) =>
     const [zipCode, setZipCode] = useState('');
     const [isValidZipCode, setIsValidZipCode] = useState(true);
     const [countriesWithGroups, setCountriesWithGroups] = useState([]);
-
-    const axiosInstance = useAxios();
 
     const validateName = (v) => /^[A-ZÇ][a-zA-ZëËçÇ\s]{2,15}$/.test(v);
     const validateZipCode = (v) => /^[0-9]{4,5}$/.test(v);
@@ -28,7 +27,7 @@ const EditCityModal = ({ open, onClose, city, onViewDetails, onEditSuccess }) =>
 
         const fetchCountries = async () => {
             try {
-                const response = await axiosInstance.get('/countries/get');
+                const response = await getCountriesService();
                 const countriesWithGroups = response.data.map(country => ({
                     ...country,
                     firstLetter: country.name[0].toUpperCase()
@@ -50,7 +49,7 @@ const EditCityModal = ({ open, onClose, city, onViewDetails, onEditSuccess }) =>
         }
 
         try {
-            const response = await axiosInstance.put(`/cities/update/${city._id}`, updatedData);
+            const response = await editCityService(city._id, updatedData);
             toast.success(response.data.message);
             onEditSuccess(response.data);
             onClose();

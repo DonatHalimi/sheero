@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 import { toast } from 'react-toastify';
-import { calculatePageCount, CustomDeleteModal, CustomPagination, EmptyState, getPaginatedItems, handlePageChange, Header, LoadingProductItem, ProfileLayout } from '../../assets/CustomComponents';
+import { calculatePageCount, CustomDeleteModal, CustomPagination, EmptyState, getPaginatedItems, handlePageChange, Header, LoadingOverlay, LoadingProductItem, ProfileLayout } from '../../assets/CustomComponents';
 import emptyWishlistImage from '../../assets/img/empty/wishlist.png';
 import Navbar from '../../components/Navbar/Navbar';
 import WishlistItem from '../../components/Product/Items/WishlistItem';
@@ -17,6 +17,7 @@ const Wishlist = () => {
 
     const [isModalOpen, setIsModalOpen] = useState(false);
     const [currentPage, setCurrentPage] = useState(1);
+    const [isActionLoading, setIsActionLoading] = useState(false);
 
     useEffect(() => {
         if (isAuthenticated) {
@@ -24,12 +25,15 @@ const Wishlist = () => {
         }
     }, [isAuthenticated, dispatch]);
 
-    const handleRemoveFromWishlist = (productId) => {
+    const handleRemoveFromWishlist = async (productId) => {
+        setIsActionLoading(true);
         try {
-            dispatch(removeFromWishlist(productId));
+            await dispatch(removeFromWishlist(productId));
             toast.success('Product removed from wishlist');
         } catch (error) {
             toast.error('Failed to remove from wishlist');
+        } finally {
+            setIsActionLoading(false);
         }
     };
 
@@ -58,6 +62,8 @@ const Wishlist = () => {
 
     return (
         <>
+            {isActionLoading && <LoadingOverlay />}
+
             <Navbar />
             <ProfileLayout>
                 <Header

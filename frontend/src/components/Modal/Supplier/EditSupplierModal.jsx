@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from 'react';
 import { toast } from 'react-toastify';
 import { ActionButtons, BrownOutlinedTextField, CustomBox, CustomModal, CustomTypography, handleApiError, knownEmailProviders } from '../../../assets/CustomComponents';
-import useAxios from '../../../utils/axiosInstance';
+import { editSupplierService } from '../../../services/supplierService';
 
 const EditSupplierModal = ({ open, onClose, supplier, onViewDetails, onEditSuccess }) => {
     const [name, setName] = useState('');
@@ -10,8 +10,6 @@ const EditSupplierModal = ({ open, onClose, supplier, onViewDetails, onEditSucce
     const [isValidEmail, setIsValidEmail] = useState(true);
     const [phoneNumber, setPhoneNumber] = useState('');
     const [isValidPhoneNumber, setIsValidPhoneNumber] = useState(true);
-
-    const axiosInstance = useAxios();
 
     const validateName = (v) => /^[A-ZÇ][\sa-zA-ZëËçÇ\W]{2,15}$/.test(v);
     const validatePhoneNumber = (v) => /^0(44|45|48|49)\d{6}$/.test(v);
@@ -40,7 +38,7 @@ const EditSupplierModal = ({ open, onClose, supplier, onViewDetails, onEditSucce
         }
 
         try {
-            const response = await axiosInstance.put(`/suppliers/update/${supplier._id}`, updatedData);
+            const response = await editSupplierService(supplier._id, updatedData);
             toast.success(response.data.message);
             onEditSuccess(response.data);
             onClose();

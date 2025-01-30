@@ -1,10 +1,9 @@
-import axios from 'axios';
-import { getApiUrl } from '../../utils/config';
+import { getSlideShowService } from '../../services/slideshowService';
 import { GET_SLIDESHOWS, GET_SLIDESHOWS_ERROR } from '../types';
 
 export const getImages = () => async (dispatch) => {
     try {
-        const res = await axios.get(getApiUrl('/slideshow/get'), { withCredentials: true });
+        const res = await getSlideShowService();
 
         dispatch({
             type: GET_SLIDESHOWS,

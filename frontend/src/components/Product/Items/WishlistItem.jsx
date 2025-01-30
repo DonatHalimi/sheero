@@ -4,25 +4,23 @@ import { useNavigate } from 'react-router-dom';
 import { toast } from 'react-toastify';
 import { CartDeleteButtons, DiscountPercentage, formatPrice, LoadingOverlay, OutOfStock } from '../../../assets/CustomComponents';
 import NoImage from '../../../assets/img/errors/product-not-found.png';
-import useAxios from '../../../utils/axiosInstance';
+import { addToCartService } from '../../../services/cartService';
 import { getImageUrl } from '../../../utils/config';
 
 const WishlistItem = ({ product, onRemove }) => {
     const { isAuthenticated } = useSelector(state => state.auth);
 
-    const axiosInstance = useAxios();
-    const navigate = useNavigate();
-
-    const [isActionLoading, setIsActionLoading] = useState(false);
-
     const { _id, name, image, price, discount, salePrice, inventoryCount } = product || {};
     const imageUrl = getImageUrl(image);
+    const [isActionLoading, setIsActionLoading] = useState(false);
+
     const discountPercentage = discount?.value || 0;
     const finalPrice = salePrice > 0 ? salePrice : price;
 
     const formattedFinalPrice = formatPrice(finalPrice);
     const formattedPrice = formatPrice(price);
 
+    const navigate = useNavigate();
     const handleClick = () => { if (_id) navigate(`/product/${_id}`); };
 
     const handleAddToCart = async (e) => {
@@ -41,8 +39,7 @@ const WishlistItem = ({ product, onRemove }) => {
         };
 
         try {
-            await axiosInstance.post(`/cart/add`, data);
-
+            await addToCartService(data);
             toast.success('Product added to cart!', { onClick: () => navigate('/cart') });
 
             document.dispatchEvent(new CustomEvent('cartUpdated', { detail: _id }));
@@ -56,12 +53,7 @@ const WishlistItem = ({ product, onRemove }) => {
 
     const handleRemove = async (e) => {
         e.stopPropagation();
-        setIsActionLoading(true);
-        try {
-            await onRemove(_id);
-        } finally {
-            setIsActionLoading(false);
-        }
+        await onRemove(_id);
     };
 
     return (

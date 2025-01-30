@@ -1,11 +1,12 @@
-import axios from 'axios';
 import React, { useEffect, useState } from 'react';
 import { useNavigate, useParams } from 'react-router-dom';
 import { calculatePageCount, CustomPagination, FilterLayout, filterProductsByPrice, getPaginatedItems, handlePageChange, ProductGrid, sortProducts, SplideList } from '../../assets/CustomComponents';
 import noProducts from '../../assets/img/products/no-products.png';
 import Navbar from '../../components/Navbar/Navbar';
 import Footer from '../../components/Utils/Footer';
-import { getApiUrl } from '../../utils/config';
+import { getProductsBySubcategoryService } from '../../services/productService';
+import { getSubSubcategoriesBySubCategoryService } from '../../services/subSubcategoryService';
+import { getSubcategoryByIdService } from '../../services/subcategoryService';
 
 const itemsPerPage = 40;
 
@@ -28,7 +29,7 @@ const ProductsBySubcategory = () => {
         setLoadingSubSubcategories(true);
         if (!subsubcategories[subcategoryId]) {
             try {
-                const { data } = await axios.get(getApiUrl(`/subsubcategories/get-by-subCategory/${subcategoryId}`));
+                const { data } = await getSubSubcategoriesBySubCategoryService(subcategoryId);
                 setSubsubcategories(prev => ({ ...prev, [subcategoryId]: data }));
             } catch (error) {
                 console.error('Error fetching subcategories:', error);
@@ -44,12 +45,12 @@ const ProductsBySubcategory = () => {
         const fetchProductsAndSubcategory = async () => {
             setLoading(true);
             try {
-                const subcategoryResponse = await axios.get(getApiUrl(`/subcategories/get/${id}`));
+                const subcategoryResponse = await getSubcategoryByIdService(id);
                 setSubcategoryData(subcategoryResponse.data);
 
                 await fetchSubSubcategories(id);
 
-                const productsResponse = await axios.get(getApiUrl(`/products/get-by-subcategory/${id}`));
+                const productsResponse = await getProductsBySubcategoryService(id);
                 setProducts(productsResponse.data.products);
                 setFilteredProducts(productsResponse.data.products);
                 setCurrentPage(1);

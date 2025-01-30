@@ -1,6 +1,7 @@
 import React, { useEffect, useState } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
-import { DashboardCountryFlag, DashboardHeader, LoadingDataGrid } from '../../assets/CustomComponents';
+import { DashboardCountryFlag, DashboardHeader, exportOptions, LoadingDataGrid } from '../../assets/CustomComponents';
+import { exportToExcel, exportToJSON } from '../../assets/DataExport';
 import DashboardTable from '../../components/Dashboard/DashboardTable';
 import AddCityModal from '../../components/Modal/City/AddCityModal';
 import CityDetailsDrawer from '../../components/Modal/City/CityDetailsDrawer';
@@ -99,6 +100,15 @@ const CitiesPage = () => {
         { key: 'actions', label: 'Actions' },
     ];
 
+    const handleExport = (data, format) => {
+        const flattenedCities = data.map(city => ({
+            ...city,
+            country: city.country.name
+        }))
+
+        format === 'excel' ? exportToExcel(flattenedCities, 'cities_data') : exportToJSON(data, 'cities_data');
+    }
+
     return (
         <div className='container mx-auto max-w-screen-2xl px-4 mt-20'>
             <div className='flex flex-col items-center justify-center'>
@@ -112,6 +122,7 @@ const CitiesPage = () => {
                             setAddItemOpen={setAddCityOpen}
                             setDeleteItemOpen={setDeleteCityOpen}
                             itemName="City"
+                            exportOptions={exportOptions(cities, handleExport)}
                         />
 
                         <DashboardTable

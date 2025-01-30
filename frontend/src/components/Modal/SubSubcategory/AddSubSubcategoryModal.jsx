@@ -2,15 +2,14 @@ import { Autocomplete, TextField } from '@mui/material';
 import React, { useEffect, useState } from 'react';
 import { toast } from 'react-toastify';
 import { BrownButton, BrownOutlinedTextField, CustomBox, CustomModal, CustomPaper, CustomTypography, handleApiError } from '../../../assets/CustomComponents';
-import useAxios from '../../../utils/axiosInstance';
+import { getSubcategoriesService } from '../../../services/subcategoryService';
+import { addSubSubcategoryService } from '../../../services/subSubcategoryService';
 
 const AddSubSubcategoryModal = ({ open, onClose, onAddSuccess }) => {
     const [name, setName] = useState('');
     const [isValidName, setIsValidName] = useState(true);
     const [subcategory, setSubcategory] = useState(null);
     const [subcategories, setSubcategories] = useState([]);
-
-    const axiosInstance = useAxios();
 
     const validateName = (v) => /^[A-ZÇ][\sa-zA-ZëËçÇ\W]{3,27}$/.test(v);
 
@@ -19,7 +18,7 @@ const AddSubSubcategoryModal = ({ open, onClose, onAddSuccess }) => {
     useEffect(() => {
         const fetchSubcategories = async () => {
             try {
-                const response = await axiosInstance.get('/subcategories/get');
+                const response = await getSubcategoriesService();
                 const subCategoriesWithGroups = response.data.map(subCategory => ({
                     ...subCategory,
                     firstLetter: subCategory.name[0].toUpperCase()
@@ -47,7 +46,7 @@ const AddSubSubcategoryModal = ({ open, onClose, onAddSuccess }) => {
         }
 
         try {
-            const response = await axiosInstance.post('/subsubcategories/create', data);
+            const response = await addSubSubcategoryService(data);
             toast.success(response.data.message);
             onAddSuccess(response.data);
             onClose();

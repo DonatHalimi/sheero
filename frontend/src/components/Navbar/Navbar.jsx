@@ -4,18 +4,9 @@ import React, { useEffect, useState } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 import { useLocation, useNavigate } from 'react-router-dom';
 import { toast } from 'react-toastify';
-import {
-    CartDropdown,
-    CartIcon,
-    LoadingOverlay,
-    LoginButton,
-    NavbarLogo,
-    ProfileDropdown,
-    ProfileIcon,
-    WishlistIcon,
-} from '../../assets/CustomComponents';
+import { CartDropdown, CartIcon, LoadingOverlay, LoginButton, NavbarLogo, ProfileDropdown, ProfileIcon, WishlistIcon } from '../../assets/CustomComponents';
+import { clearCartService, getCartService, removeFromCartService, updateQuantityService } from '../../services/cartService';
 import { logoutUser, selectIsAdmin } from '../../store/actions/authActions';
-import useAxios from '../../utils/axiosInstance';
 import CategoryNavbar from './CategoryNavbar';
 import SearchBar from './SearchBar';
 
@@ -25,7 +16,6 @@ const Navbar = () => {
 
     const dispatch = useDispatch();
     const location = useLocation();
-    const axiosInstance = useAxios();
     const navigate = useNavigate();
 
     const [cartItems, setCartItems] = useState([]);
@@ -39,7 +29,7 @@ const Navbar = () => {
     const fetchCart = async () => {
         setIsFetchingCart(true);
         try {
-            const { data: cart } = await axiosInstance.get('/cart');
+            const { data: cart } = await getCartService();
             setCartItems(cart.items || []);
             const total = (cart.items || []).reduce((acc, item) => {
                 const price = item.product.salePrice || item.product.price;
@@ -66,7 +56,7 @@ const Navbar = () => {
     const handleRemoveItem = async (productId) => {
         setIsLoading(true);
         try {
-            await axiosInstance.delete('/cart/remove', { data: { productId } });
+            await removeFromCartService(productId);
             toast.success('Product removed from cart');
 
             await fetchCart();
@@ -82,8 +72,9 @@ const Navbar = () => {
     };
 
     const handleClearCart = async () => {
+        setIsLoading(true);
         try {
-            await axiosInstance.delete('/cart/clear');
+            await clearCartService();
             toast.success('Cart cleared successfully');
             await fetchCart();
             window.dispatchEvent(new Event('cartUpdate'));
@@ -91,16 +82,20 @@ const Navbar = () => {
         } catch (error) {
             console.error('Error clearing cart:', error);
             toast.error('Failed to clear cart');
+        } finally {
+            setIsLoading(false);
         }
     };
 
     const handleUpdateQuantity = async (productId, quantityChange) => {
         setIsLoading(true);
+
+        const cartData = {
+            productId,
+            quantityChange
+        }
         try {
-            const { data } = await axiosInstance.put('/cart/quantity/update', {
-                productId,
-                quantityChange
-            });
+            const { data } = await updateQuantityService(cartData);
 
             setCartItems(data.items);
             setCartTotal(data.items.reduce((sum, item) => {

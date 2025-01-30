@@ -1,7 +1,8 @@
 import { Box, Drawer, Typography } from '@mui/material';
 import React from 'react';
-import { CloseButton, downloadReviewData, EditExportButtons, RatingStars, ReadOnlyTextField } from '../../../assets/CustomComponents';
+import { CloseButton, EditExportButtons, RatingStars, ReadOnlyTextField } from '../../../assets/CustomComponents';
 import { drawerPaperSx } from '../../../assets/sx';
+import { downloadReviewData } from '../../../assets/DataExport';
 
 const ReviewDetailsDrawer = ({ open, onClose, review, onEdit }) => {
     const header = `Review from ${review?.user.firstName} ${review?.user.lastName} - ${review?.user.email} for ${review?.product.name}`;

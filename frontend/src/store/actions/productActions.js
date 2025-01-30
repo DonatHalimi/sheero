@@ -1,10 +1,9 @@
-import axios from 'axios';
-import { getApiUrl } from '../../utils/config';
+import { getProductsService } from '../../services/productService';
 import { GET_PRODUCTS, GET_PRODUCTS_ERROR } from '../types';
 
 export const getProducts = () => async (dispatch) => {
     try {
-        const res = await axios.get(getApiUrl('/products/get'), { withCredentials: true });
+        const res = await getProductsService();
 
         dispatch({
             type: GET_PRODUCTS,

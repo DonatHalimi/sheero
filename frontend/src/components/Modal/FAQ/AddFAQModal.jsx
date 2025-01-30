@@ -1,15 +1,13 @@
 import React, { useState } from 'react';
 import { toast } from 'react-toastify';
 import { BrownButton, BrownOutlinedTextField, CustomBox, CustomModal, CustomTypography, handleApiError } from '../../../assets/CustomComponents';
-import useAxios from '../../../utils/axiosInstance';
+import { addFAQService } from '../../../services/faqService';
 
 const AddFAQModal = ({ open, onClose, onAddSuccess }) => {
     const [question, setQuestion] = useState('');
     const [isValidQuestion, setIsValidQuestion] = useState(true);
     const [answer, setAnswer] = useState('');
     const [isValidAnswer, setIsValidAnswer] = useState(true);
-
-    const axiosInstance = useAxios();
 
     const validateFAQ = (v) => /^[A-Z][\s\S]{10,50}$/.test(v);
     const isValidForm = isValidQuestion && isValidAnswer;
@@ -26,7 +24,7 @@ const AddFAQModal = ({ open, onClose, onAddSuccess }) => {
         }
 
         try {
-            const response = await axiosInstance.post('/faqs/create', data);
+            const response = await addFAQService(data);
             toast.success(response.data.message);
             onAddSuccess(response.data);
             onClose();

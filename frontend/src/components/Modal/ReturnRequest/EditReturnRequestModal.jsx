@@ -2,11 +2,10 @@ import { MenuItem, Select } from '@mui/material';
 import React, { useEffect, useState } from 'react';
 import { toast } from 'react-toastify';
 import { ActionButtons, CustomBox, CustomModal, CustomTypography, handleApiError, ReadOnlyTextField } from '../../../assets/CustomComponents';
-import useAxios from '../../../utils/axiosInstance';
+import { editReturnRequestStatusService } from '../../../services/returnService';
 
 const EditReturnRequestModal = ({ open, onClose, returnRequest, onViewDetails, onEditSuccess }) => {
     const [status, setStatus] = useState(returnRequest ? returnRequest.status : 'pending');
-    const axiosInstance = useAxios();
 
     const user = `${returnRequest?.user.firstName} ${returnRequest?.user.lastName} - ${returnRequest?.user.email}`;
     const products = typeof returnRequest?.products === 'string'
@@ -36,11 +35,7 @@ const EditReturnRequestModal = ({ open, onClose, returnRequest, onViewDetails, o
         };
 
         try {
-            const response = await axiosInstance.put('/returns/manage', {
-                requestId: returnRequest._id,
-                status,
-                ...updatedData
-            });
+            const response = await editReturnRequestStatusService(returnRequest._id, updatedData);
 
             toast.success(response.data.message, {
                 onClick: () => copyToClipboard(returnRequest._id),

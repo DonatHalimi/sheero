@@ -1,6 +1,7 @@
 import React, { useEffect, useState } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
-import { DashboardHeader, LoadingDataGrid, RatingStars } from '../../assets/CustomComponents';
+import { DashboardHeader, exportOptions, LoadingDataGrid, RatingStars } from '../../assets/CustomComponents';
+import { exportToExcel, exportToJSON } from '../../assets/DataExport';
 import DashboardTable from '../../components/Dashboard/DashboardTable';
 import DeleteModal from '../../components/Modal/DeleteModal';
 import AddReviewModal from '../../components/Modal/Review/AddReviewModal';
@@ -114,6 +115,15 @@ const ReviewsPage = () => {
         { key: 'actions', label: 'Actions' }
     ];
 
+    const handleExport = (data, format) => {
+        const flattenedReviews = data.map(review => ({
+            ...review,
+            user: `${review.user.firstName} ${review.user.lastName} - ${review.user.email}`,
+            product: review.product.name
+        }))
+
+        format === 'excel' ? exportToExcel(flattenedReviews, 'reviews_data') : exportToJSON(reviews, 'reviews_data');
+    }
 
     return (
         <div className='container mx-auto max-w-screen-2xl px-4 mt-20'>
@@ -128,6 +138,7 @@ const ReviewsPage = () => {
                             setAddItemOpen={setAddReviewOpen}
                             setDeleteItemOpen={setDeleteReviewOpen}
                             itemName="Review"
+                            exportOptions={exportOptions(reviews, handleExport)}
                         />
 
                         <DashboardTable

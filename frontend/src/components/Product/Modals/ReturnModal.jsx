@@ -3,7 +3,8 @@ import React, { useEffect, useState } from 'react';
 import { useNavigate, useParams } from 'react-router-dom';
 import { toast } from 'react-toastify';
 import { BrownButton, CustomBox, CustomModal, LoadingReturn } from '../../../assets/CustomComponents';
-import useAxios from '../../../utils/axiosInstance';
+import { getOrderDetailsService } from '../../../services/orderService';
+import { addReturnRequestService } from '../../../services/returnService';
 import { getImageUrl } from '../../../utils/config';
 
 const ReturnModal = ({ open, onClose }) => {
@@ -21,7 +22,6 @@ const ReturnModal = ({ open, onClose }) => {
 
     const validateCustomReason = (reason) => /^[A-Z][a-zA-Z\s]{5,20}$/.test(reason);
 
-    const axiosInstance = useAxios();
     const navigate = useNavigate();
 
     const returnReasons = [
@@ -41,7 +41,7 @@ const ReturnModal = ({ open, onClose }) => {
     const fetchOrderDetails = async () => {
         try {
             setLoading(true);
-            const response = await axiosInstance.get(`/orders/${orderId}`);
+            const response = await getOrderDetailsService(orderId);
             if (response.data.success) {
                 const products = response.data.data.products;
                 setOrderProducts(products);
@@ -94,7 +94,7 @@ const ReturnModal = ({ open, onClose }) => {
         };
 
         try {
-            await axiosInstance.post('/returns/create', returnData);
+            await addReturnRequestService(returnData);
 
             toast.success('Return request submitted successfully', {
                 onClick: () => navigate('/profile/returns'),

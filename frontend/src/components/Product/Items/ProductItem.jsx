@@ -4,12 +4,12 @@ import { useNavigate } from 'react-router-dom';
 import { toast } from 'react-toastify';
 import { CartWishlistButtons, DiscountPercentage, formatPrice, LoadingOverlay, OutOfStock } from '../../../assets/CustomComponents';
 import NoImage from '../../../assets/img/errors/product-not-found.png';
-import useAxios from '../../../utils/axiosInstance';
-import { getApiUrl, getImageUrl } from '../../../utils/config';
+import { addToCartService } from '../../../services/cartService';
+import { addToWishlistService } from '../../../services/wishlistService';
+import { getImageUrl } from '../../../utils/config';
 
 const ProductItem = ({ product }) => {
     const { isAuthenticated } = useSelector(state => state.auth) || {};
-    const axiosInstance = useAxios();
     const navigate = useNavigate();
 
     const [isLoading, setIsLoading] = useState({ cart: false, wishlist: false });
@@ -32,32 +32,38 @@ const ProductItem = ({ product }) => {
             return;
         }
 
+        const payload = { productId: product._id, ...(action === 'cart' && { quantity: 1 }) };
+
         setIsLoading((prev) => ({ ...prev, [action]: true }));
 
+        const service = action === 'cart' ? addToCartService : addToWishlistService;
+
         try {
-            const endpoint = action === 'cart' ? 'cart/add' : 'wishlist/add';
-            await axiosInstance.post(getApiUrl(`/${endpoint}`), {
-                productId: _id,
-                ...(action === 'cart' && { quantity: 1 }),
-            });
+            await service(payload);
 
             toast.success(`Product added to ${action === 'cart' ? 'cart' : 'wishlist'}!`, {
                 onClick: () => navigate(`/${action === 'wishlist' ? 'profile/wishlist' : 'cart'}`),
             });
 
             if (action === 'cart') {
-                document.dispatchEvent(new CustomEvent('cartUpdated', { detail: _id }));
+                document.dispatchEvent(new CustomEvent('cartUpdated', { detail: product._id }));
+                if (1 > product.inventoryCount) {
+                    toast.error(`Cannot add more than ${product.inventoryCount} items to cart.`);
+                    return;
+                }
             }
         } catch (error) {
-            if (error.response?.data?.errors && Array.isArray(error.response.data.errors)) {
+            if (error.response?.data?.errors) {
                 error.response.data.errors.forEach((err) => {
-                    toast.info(`${err.message}`, {
+                    toast.info(err.message, {
                         onClick: () => navigate(`/${action === 'wishlist' ? 'profile/wishlist' : 'cart'}`),
                     });
                 });
             } else {
                 const errorMsg = error.response?.data?.message || `Failed to add product to ${action}.`;
-                toast.info(errorMsg, { onClick: () => navigate(`/${action === 'wishlist' ? 'profile/wishlist' : 'cart'}`) });
+                toast.info(errorMsg, {
+                    onClick: () => navigate(`/${action === 'wishlist' ? 'profile/wishlist' : 'cart'}`),
+                });
             }
         } finally {
             setIsLoading((prev) => ({ ...prev, [action]: false }));

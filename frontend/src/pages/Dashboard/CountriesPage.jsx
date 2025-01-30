@@ -1,6 +1,7 @@
 import React, { useEffect, useState } from 'react';
 import { useDispatch, useSelector } from "react-redux";
-import { DashboardCountryFlag, DashboardHeader, LoadingDataGrid } from '../../assets/CustomComponents.jsx';
+import { DashboardCountryFlag, DashboardHeader, exportOptions, LoadingDataGrid } from '../../assets/CustomComponents.jsx';
+import { exportToExcel, exportToJSON } from '../../assets/DataExport.jsx';
 import DashboardTable from '../../components/Dashboard/DashboardTable';
 import AddCountryModal from '../../components/Modal/Country/AddCountryModal.jsx';
 import CountryDetailsDrawer from '../../components/Modal/Country/CountryDetailsDrawer.jsx';
@@ -99,6 +100,10 @@ const CountriesPage = () => {
         { key: 'actions', label: 'Actions' }
     ];
 
+    const handleExport = (data, format) => {
+        format === 'excel' ? exportToExcel(data, 'countries_data') : exportToJSON(data, 'countries_data');
+    }
+
     return (
         <div className='container mx-auto max-w-screen-2xl px-4 mt-20'>
             <div className='flex flex-col items-center justify-center'>
@@ -112,6 +117,7 @@ const CountriesPage = () => {
                             setAddItemOpen={setAddCountryOpen}
                             setDeleteItemOpen={setDeleteCountryOpen}
                             itemName="Country"
+                            exportOptions={exportOptions(countries, handleExport)}
                         />
 
                         <DashboardTable

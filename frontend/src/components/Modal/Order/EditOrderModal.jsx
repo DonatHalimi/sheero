@@ -1,12 +1,12 @@
-import { Box, MenuItem, Typography } from '@mui/material';
+import { Box, Chip, MenuItem, Typography } from '@mui/material';
 import React, { useEffect, useState } from 'react';
 import { toast } from 'react-toastify';
 import { ActionButtons, BrownOutlinedTextField, CustomBox, CustomModal, CustomTypography, formatDate, ReadOnlyTextField } from '../../../assets/CustomComponents';
-import useAxios from '../../../utils/axiosInstance';
+import { editOrderService } from '../../../services/orderService';
+import { productChipSx } from '../../../assets/sx';
 
 const EditOrderModal = ({ open, onClose, order, onViewDetails, onEditSuccess }) => {
     const [newStatus, setNewStatus] = useState(order?.status || '');
-    const axiosInstance = useAxios();
 
     const user = `${order?.user?.firstName} ${order?.user?.lastName} - ${order?.user?.email}`;
     const productLabel = order?.products?.length > 1 ? 'Products' : 'Product';
@@ -48,7 +48,7 @@ const EditOrderModal = ({ open, onClose, order, onViewDetails, onEditSuccess }) 
         }
 
         try {
-            const response = await axiosInstance.put(`/orders/status/update`, updateData);
+            const response = await editOrderService(updateData);
 
             toast.success(response.data.message, {
                 onClick: () => copyToClipboard(order._id),
@@ -81,20 +81,22 @@ const EditOrderModal = ({ open, onClose, order, onViewDetails, onEditSuccess }) 
                     className="!mb-4"
                 />
 
-                <Typography variant="body1" className="!font-bold">
-                    {productLabel} + (Quantity)
-                </Typography>
-                <Box component="ul" sx={{ pl: 2, mt: 1 }} className="list-disc">
+                <Box>
+                    <Typography variant="body1" className="!font-semibold !mb-2">
+                        {productLabel} + (Quantity)
+                    </Typography>
                     {order?.products && order?.products.length > 0 ? (
                         order?.products.map((item, index) => (
-                            <Typography
+                            <Box
                                 key={index}
-                                variant="body2"
-                                component="li"
-                                className='!mb-1'
+                                sx={productChipSx}
                             >
-                                {item.product?.name} <span className="!font-bold">({item.quantity})</span>
-                            </Typography>
+                                <Chip
+                                    label={`${item.product?.name} (${item.quantity})`}
+                                    variant="outlined"
+                                    className="!font-semibold w-full !justify-start"
+                                />
+                            </Box>
                         ))
                     ) : (
                         <Typography variant="body2" component="li">

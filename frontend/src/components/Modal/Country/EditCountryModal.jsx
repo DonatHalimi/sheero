@@ -1,15 +1,13 @@
 import React, { useEffect, useState } from 'react';
 import { toast } from 'react-toastify';
 import { ActionButtons, BrownOutlinedTextField, CustomBox, CustomModal, CustomTypography, handleApiError } from '../../../assets/CustomComponents';
-import useAxios from '../../../utils/axiosInstance';
+import { editCountryService } from '../../../services/countryService';
 
 const EditCountryModal = ({ open, onClose, country, onViewDetails, onEditSuccess }) => {
     const [name, setName] = useState('');
     const [isValidName, setIsValidName] = useState(true);
     const [countryCode, setCountryCode] = useState('');
     const [isValidCode, setIsValidCode] = useState(true);
-
-    const axiosInstance = useAxios();
 
     const validateName = (v) => /^[A-ZÇ][a-zA-ZëËçÇ\s]{3,35}$/.test(v);
     const validateCountryCode = (v) => /^[A-Z]{2,3}$/.test(v);
@@ -35,7 +33,7 @@ const EditCountryModal = ({ open, onClose, country, onViewDetails, onEditSuccess
         }
 
         try {
-            const response = await axiosInstance.put(`/countries/update/${country._id}`, updatedData);
+            const response = await editCountryService(country._id, updatedData);
             toast.success(response.data.message);
             onEditSuccess(response.data);
             onClose();

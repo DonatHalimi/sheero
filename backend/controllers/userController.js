@@ -1,6 +1,10 @@
 const bcrypt = require('bcryptjs');
 const User = require('../models/User');
 const Role = require('../models/Role');
+const Address = require('../models/Address');
+const Order = require('../models/Order');
+const ReturnRequest = require('../models/ReturnRequest');
+const Review = require('../models/Review');
 
 const createUser = async (req, res) => {
     const { firstName, lastName, email, password, role } = req.body;
@@ -92,9 +96,15 @@ const deleteUsers = async (req, res) => {
     const { ids } = req.body;
 
     try {
-        await User.deleteMany({ _id: { $in: ids } });
+        await Promise.all([
+            User.deleteMany({ _id: { $in: ids } }),
+            Address.deleteMany({ user: { $in: ids } }),
+            Order.deleteMany({ user: { $in: ids } }),
+            ReturnRequest.deleteMany({ user: { $in: ids } }),
+            Review.deleteMany({ user: { $in: ids } })
+        ]);
 
-        res.status(200).json({ message: 'Users deleted successfully' });
+        res.status(200).json({ message: 'Users and related data deleted successfully' });
     } catch (error) {
         res.status(500).json({ message: 'Server error', error: error.message });
     }

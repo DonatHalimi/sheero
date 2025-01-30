@@ -2,7 +2,7 @@ import { Upload } from '@mui/icons-material';
 import React, { useState } from 'react';
 import { toast } from 'react-toastify';
 import { BrownButton, BrownOutlinedTextField, CustomBox, CustomModal, CustomTypography, handleApiError, OutlinedBrownButton, VisuallyHiddenInput } from '../../../assets/CustomComponents';
-import useAxios from '../../../utils/axiosInstance';
+import { addSlideshowService } from '../../../services/slideshowService';
 
 const AddSlideshowModal = ({ open, onClose, onAddSuccess }) => {
     const [title, setTitle] = useState('');
@@ -11,8 +11,6 @@ const AddSlideshowModal = ({ open, onClose, onAddSuccess }) => {
     const [isValidDescription, setIsValidDescription] = useState(true);
     const [image, setImage] = useState(null);
     const [imagePreview, setImagePreview] = useState(null);
-
-    const axiosInstance = useAxios();
 
     const isValid = (v) => /^[A-Z][\sa-zA-Z\W]{3,15}$/.test(v);
 
@@ -30,11 +28,7 @@ const AddSlideshowModal = ({ open, onClose, onAddSuccess }) => {
         formData.append('image', image);
 
         try {
-            const response = await axiosInstance.post('/slideshow/create', formData, {
-                headers: {
-                    'Content-Type': 'multipart/form-data'
-                }
-            });
+            const response = await addSlideshowService(formData);
             toast.success(response.data.message);
             onAddSuccess(response.data);
             onClose();

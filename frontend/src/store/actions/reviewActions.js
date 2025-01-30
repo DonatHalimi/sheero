@@ -1,10 +1,9 @@
-import axios from 'axios';
-import { getApiUrl } from '../../utils/config';
+import { deleteUserReviewService, editReviewService, getUserReviewsService } from '../../services/reviewService';
 import { DELETE_USER_REVIEW, DELETE_USER_REVIEW_ERROR, EDIT_USER_REVIEW, EDIT_USER_REVIEW_ERROR, GET_USER_REVIEWS, GET_USER_REVIEWS_ERROR } from '../types';
 
 export const getUserReviews = (userId) => async (dispatch) => {
     try {
-        const res = await axios.get(getApiUrl(`/reviews/user/${userId}`), { withCredentials: true });
+        const res = await getUserReviewsService(userId);
 
         dispatch({
             type: GET_USER_REVIEWS,
@@ -20,7 +19,7 @@ export const getUserReviews = (userId) => async (dispatch) => {
 
 export const editUserReview = (reviewId, reviewData) => async (dispatch) => {
     try {
-        const res = await axios.put(getApiUrl(`/reviews/update/${reviewId}`), reviewData, { withCredentials: true });
+        const res = await editReviewService(reviewId, reviewData);
 
         dispatch({
             type: EDIT_USER_REVIEW,
@@ -36,7 +35,7 @@ export const editUserReview = (reviewId, reviewData) => async (dispatch) => {
 
 export const deleteUserReview = (reviewId) => async (dispatch) => {
     try {
-        await axios.delete(getApiUrl(`/reviews/delete/${reviewId}`), { withCredentials: true });
+        await deleteUserReviewService(reviewId);
 
         dispatch({
             type: DELETE_USER_REVIEW,

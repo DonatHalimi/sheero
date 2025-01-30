@@ -1,6 +1,7 @@
 import React, { useEffect, useState } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
-import { DashboardHeader, formatDate, LoadingDataGrid } from '../../assets/CustomComponents';
+import { DashboardHeader, exportOptions, formatDate, LoadingDataGrid } from '../../assets/CustomComponents';
+import { exportToExcel, exportToJSON } from '../../assets/DataExport';
 import DashboardTable from '../../components/Dashboard/DashboardTable';
 import DeleteModal from '../../components/Modal/DeleteModal';
 import AddReturnRequestModal from '../../components/Modal/ReturnRequest/AddReturnRequestModal';
@@ -104,6 +105,18 @@ const ReturnsPage = () => {
         return products.map(product => product.name).join(', ');
     };
 
+    const userFormat = (returnRequest) => `${returnRequest.user.firstName} ${returnRequest.user.lastName} - ${returnRequest.user.email}`;
+
+    const handleExport = (data, format) => {
+        const flattenedReturnRequests = data.map(returnRequest => ({
+            ...returnRequest,
+            products: renderProducts(returnRequest.products),
+            user: userFormat(returnRequest),
+        }))
+
+        format === 'excel' ? exportToExcel(flattenedReturnRequests, 'returnRequests_data') : exportToJSON(data, 'returnRequests_data');
+    }
+
     return (
         <div className='container mx-auto max-w-screen-2xl px-4 mt-20'>
             <div className='flex flex-col items-center justify-center'>
@@ -117,6 +130,7 @@ const ReturnsPage = () => {
                             setAddItemOpen={setAddReturnRequestOpen}
                             setDeleteItemOpen={setDeleteReturnRequestOpen}
                             itemName="Return Request"
+                            exportOptions={exportOptions(returnRequests, handleExport)}
                         />
 
                         <DashboardTable

@@ -1,6 +1,7 @@
 import React, { useEffect, useState } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
-import { DashboardHeader, DashboardImage, LoadingDataGrid } from '../../assets/CustomComponents';
+import { DashboardHeader, DashboardImage, exportOptions, LoadingDataGrid } from '../../assets/CustomComponents';
+import { exportToExcel, exportToJSON } from '../../assets/DataExport';
 import DashboardTable from '../../components/Dashboard/DashboardTable';
 import DeleteModal from '../../components/Modal/DeleteModal';
 import ImagePreviewModal from '../../components/Modal/ImagePreviewModal';
@@ -104,6 +105,40 @@ const ProductsPage = () => {
         setSelectedProduct(null);
     };
 
+    const formatDimensions = (dimensions) => {
+        return `${dimensions.length ? dimensions.length + ' x ' : ''}${dimensions.width ? dimensions.width + ' x ' : ''}${dimensions.height ? dimensions.height : ''} ${dimensions.unit}`;
+    };
+
+    const formatDiscount = (discount) => {
+        return discount ? `${discount.value} ${discount.type}` : 'No Discount';
+    };
+
+    const formatName = (name) => {
+        return name?.name || 'Not Found';
+    };
+
+    const formatVariants = (variants) => {
+        return variants.length ? variants.map(variant => variant.name).join(', ') : 'No Variants';
+    };
+
+    const formatSupplier = (supplier) => {
+        return `${supplier?.name || 'No Supplier'} (${supplier?.contactInfo?.email || 'No Email'})`;
+    };
+
+    const formatDetails = (details) => {
+        return details.length ? details.join(', ') : 'No Details';
+    };
+
+    const formatReviews = (reviews) => {
+        return reviews.length
+            ? reviews.join(', ')
+            : 'No Reviews';
+    };
+
+    const formatShipping = (shipping) => {
+        return `${shipping?.packageSize || 'Unknown Size'} | ${shipping?.cost ? '€' + shipping.cost : 'No Cost'} | Dimensions: ${shipping?.dimensions ? formatDimensions(shipping.dimensions) : 'No Dimensions'}`;
+    };
+
     const columns = [
         { key: 'name', label: 'Name' },
         {
@@ -112,14 +147,33 @@ const ProductsPage = () => {
             render: (item) => <DashboardImage item={item} handleImageClick={handleImageClick} />
         },
         { key: 'description', label: 'Description' },
-        { key: 'price', label: 'Price' },
-        { key: 'salePrice', label: 'Sale Price', render: (item) => item.salePrice ? item.salePrice : 'N/A' },
+        { key: 'price', label: 'Price', render: (item) => `€  ${item.price.toFixed(2)}` },
+        { key: 'salePrice', label: 'Sale Price', render: (item) => item.salePrice ? `€  ${item.salePrice.toFixed(2)}` : 'N/A' },
         { key: 'category.name', label: 'Category' },
         { key: 'subcategory.name', label: 'Subcategory' },
         { key: 'subSubcategory.name', label: 'SubSubcategory' },
         { key: 'inventoryCount', label: 'Inventory Count' },
         { key: 'actions', label: 'Actions' }
     ];
+
+    const handleExport = (data, format) => {
+
+        const flattenedProducts = data.map((product) => ({
+            ...product,
+            dimensions: formatDimensions(product.dimensions),
+            discount: formatDiscount(product.discount),
+            category: formatName(product.category),
+            subcategory: formatName(product.subcategory),
+            subSubcategory: formatName(product.subSubcategory),
+            variants: formatVariants(product.variants),
+            supplier: formatSupplier(product.supplier),
+            details: formatDetails(product.details),
+            reviews: formatReviews(product.reviews),
+            shipping: formatShipping(product.shipping),
+        }))
+
+        format === 'excel' ? exportToExcel(flattenedProducts, 'products_data') : exportToJSON(data, 'products_data');
+    }
 
     return (
         <div className='container mx-auto max-w-full mt-20'>
@@ -134,6 +188,7 @@ const ProductsPage = () => {
                             setAddItemOpen={setAddProductOpen}
                             setDeleteItemOpen={setDeleteProductOpen}
                             itemName="Product"
+                            exportOptions={exportOptions(products, handleExport)}
                         />
 
                         <DashboardTable

@@ -9,8 +9,8 @@ import emptyCartImage from '../../assets/img/empty/cart.png';
 import Navbar from '../../components/Navbar/Navbar';
 import PaymentModal from '../../components/Product/Modals/PaymentModal';
 import Footer from '../../components/Utils/Footer';
+import { clearCartService, createStripeSessionService, getCartService, makeCashPaymentService, removeFromCartService, updateQuantityService } from '../../services/cartService';
 import { getAddressByUser } from '../../store/actions/addressActions';
-import useAxios from '../../utils/axiosInstance';
 import { getImageUrl } from '../../utils/config';
 
 const Cart = () => {
@@ -19,7 +19,6 @@ const Cart = () => {
 
     const dispatch = useDispatch();
     const navigate = useNavigate();
-    const axiosInstance = useAxios();
 
     const [cart, setCart] = useState({ items: [] });
     const [loading, setLoading] = useState(true);
@@ -40,7 +39,7 @@ const Cart = () => {
 
     const fetchCart = async () => {
         try {
-            const { data } = await axiosInstance.get('/cart');
+            const { data } = await getCartService();
             setCart(data);
         } catch (error) {
             console.error('Failed to fetch cart:', error?.response?.data?.message || error.message);
@@ -67,8 +66,14 @@ const Cart = () => {
 
     const updateQuantity = async (productId, quantityChange) => {
         setActionLoading(true);
+
+        const cartData = {
+            productId,
+            quantityChange,
+        }
+
         try {
-            const { data } = await axiosInstance.put('/cart/quantity/update', { productId, quantityChange });
+            const { data } = await updateQuantityService(cartData);
             setCart(data);
             document.dispatchEvent(new CustomEvent('cartUpdated', { detail: data }));
         } catch (error) {
@@ -81,12 +86,12 @@ const Cart = () => {
     const handleRemove = async (productId) => {
         setActionLoading(true);
         try {
-            const { data } = await axiosInstance.delete('/cart/remove', { data: { productId } });
+            const { data } = await removeFromCartService(productId);
 
             if (data?.items) {
                 setCart(data);
             } else {
-                const response = await axiosInstance.get('/cart');
+                const response = await getCartService();
                 setCart(response.data);
             }
 
@@ -101,7 +106,7 @@ const Cart = () => {
     const handleClearCart = async () => {
         setActionLoading(true);
         try {
-            const { data } = await axiosInstance.delete('/cart/clear');
+            const { data } = await clearCartService();
             setCart(data);
             document.dispatchEvent(new CustomEvent('cartUpdated', { detail: data }));
 
@@ -134,15 +139,17 @@ const Cart = () => {
     };
 
     const handleStripePayment = async () => {
-        try {
-            const { data } = await axiosInstance.post('/orders/payment/stripe', {
-                cartId: cart._id,
-                addressId: address._id,
-                userId: user.id,
-                email: user.email,
-            });
+        const cartData = {
+            cartId: cart._id,
+            addressId: address._id,
+            userId: user.id,
+            email: user.email,
+        }
 
-            await axiosInstance.delete('/cart/clear');
+        try {
+            const { data } = await createStripeSessionService(cartData);
+
+            await clearCartService();
             setShowPaymentModal(false);
             window.location.href = data.url;
         } catch (error) {
@@ -152,14 +159,16 @@ const Cart = () => {
     };
 
     const handleCashPayment = async () => {
-        try {
-            const { data } = await axiosInstance.post('/orders/payment/cash', {
-                cartId: cart._id,
-                addressId: address._id,
-                userId: user.id,
-            });
+        const cartData = {
+            cartId: cart._id,
+            addressId: address._id,
+            userId: user.id,
+        }
 
-            await axiosInstance.delete('/cart/clear');
+        try {
+            const { data } = await makeCashPaymentService(cartData);
+
+            await clearCartService();
             toast.success(data.message || "Order placed successfully. Please pay with cash upon delivery.");
             setShowPaymentModal(false);
             navigate('/profile/orders');

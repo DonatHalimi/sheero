@@ -2,7 +2,8 @@ import { Box, FormControl, InputLabel, MenuItem, Select, TextField } from '@mui/
 import React, { useEffect, useState } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 import { toast } from 'react-toastify';
-import { BrownButton, downloadAddress, Header, LoadingDetails, ProfileLayout } from '../../assets/CustomComponents';
+import { BrownButton, Header, LoadingDetails, ProfileLayout } from '../../assets/CustomComponents';
+import { downloadAddress } from '../../assets/DataExport';
 import Navbar from '../../components/Navbar/Navbar';
 import Footer from '../../components/Utils/Footer';
 import { addAddress, getAddressByUser, getCities, getCountries, updateAddress } from '../../store/actions/addressActions';
@@ -90,10 +91,12 @@ const AddressDetails = () => {
                 await dispatch(updateAddress(address._id, updatedAddress));
                 toast.success('Address updated successfully');
                 await dispatch(getAddressByUser(user.id));
+                window.location.reload();
             } else {
                 await dispatch(addAddress(updatedAddress));
                 toast.success('Address added successfully');
                 await dispatch(getAddressByUser(user.id));
+                window.location.reload();
             }
             setIsSubmitted(true);
         } catch (error) {

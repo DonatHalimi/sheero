@@ -1,11 +1,11 @@
-import axios from 'axios';
 import React, { useEffect, useState } from 'react';
 import { useNavigate, useParams } from 'react-router-dom';
 import { calculatePageCount, CustomPagination, FilterLayout, filterProductsByPrice, getPaginatedItems, handlePageChange, ProductGrid, sortProducts, SplideList } from '../../assets/CustomComponents';
 import noProducts from '../../assets/img/products/no-products.png';
 import Navbar from '../../components/Navbar/Navbar';
 import Footer from '../../components/Utils/Footer';
-import { getApiUrl } from '../../utils/config';
+import { getCategoryByIdService, getSubcategoriesByCategoryService } from '../../services/categoryService';
+import { getProductsByCategoryService } from '../../services/productService';
 
 const itemsPerPage = 40;
 
@@ -28,7 +28,7 @@ const ProductsByCategory = () => {
         setLoadingSubcategories(true);
         if (!subcategories[categoryId]) {
             try {
-                const { data } = await axios.get(getApiUrl(`/subcategories/get-by-category/${categoryId}`));
+                const { data } = await getSubcategoriesByCategoryService(categoryId);
                 setSubcategories(prev => ({ ...prev, [categoryId]: data }));
             } catch (error) {
                 console.error('Error fetching subcategories:', error);
@@ -44,12 +44,12 @@ const ProductsByCategory = () => {
         const fetchProductsAndCategory = async () => {
             setLoading(true);
             try {
-                const categoryResponse = await axios.get(getApiUrl(`/categories/get/${id}`));
+                const categoryResponse = await getCategoryByIdService(id);
                 setCategoryName(categoryResponse.data.name);
 
                 await fetchSubcategories(id);
 
-                const productsResponse = await axios.get(getApiUrl(`/products/get-by-category/${id}`));
+                const productsResponse = await getProductsByCategoryService(id);
                 setProducts(productsResponse.data.products);
                 setFilteredProducts(productsResponse.data.products);
                 setCurrentPage(1);

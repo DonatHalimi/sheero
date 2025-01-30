@@ -2,7 +2,7 @@ import { Upload } from '@mui/icons-material';
 import React, { useEffect, useState } from 'react';
 import { toast } from 'react-toastify';
 import { ActionButtons, BrownOutlinedTextField, CustomBox, CustomModal, CustomTypography, handleApiError, OutlinedBrownButton, VisuallyHiddenInput } from '../../../assets/CustomComponents';
-import useAxios from '../../../utils/axiosInstance';
+import { editSlideshowService } from '../../../services/slideshowService';
 import { getImageUrl } from '../../../utils/config';
 
 const EditSlideshowModal = ({ open, onClose, image, onViewDetails, onEditSuccess }) => {
@@ -12,8 +12,6 @@ const EditSlideshowModal = ({ open, onClose, image, onViewDetails, onEditSuccess
     const [isValidDescription, setIsValidDescription] = useState(true);
     const [newImage, setNewImage] = useState(null);
     const [imagePreview, setImagePreview] = useState('');
-
-    const axiosInstance = useAxios();
 
     const isValid = (v) => /^[A-Z][\sa-zA-Z\W]{3,15}$/.test(v);
 
@@ -40,11 +38,7 @@ const EditSlideshowModal = ({ open, onClose, image, onViewDetails, onEditSuccess
         }
 
         try {
-            const response = await axiosInstance.put(`/slideshow/update/${image._id}`, formData, {
-                headers: {
-                    'Content-Type': 'multipart/form-data'
-                }
-            });
+            const response = await editSlideshowService(image._id, formData);
             toast.success(response.data.message);
             onEditSuccess(response.data);
             onClose();

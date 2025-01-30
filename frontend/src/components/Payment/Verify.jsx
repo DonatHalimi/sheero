@@ -1,7 +1,7 @@
 import { CircularProgress } from '@mui/material';
 import React, { useEffect, useState } from 'react';
 import { useLocation } from 'react-router-dom';
-import useAxios from '../../utils/axiosInstance';
+import { verifyStripeOrderService } from '../../services/orderService';
 import CancelPayment from './CancelPayment';
 import SuccessPayment from './SuccessPayment';
 
@@ -12,7 +12,6 @@ const Verify = () => {
     const order_id = searchParams.get('order_id');
     const [loading, setLoading] = useState(true);
     const [success, setSuccess] = useState(false);
-    const axiosInstance = useAxios();
 
     useEffect(() => {
         const verifyPayment = async () => {
@@ -22,7 +21,7 @@ const Verify = () => {
             };
 
             try {
-                const response = await axiosInstance.post('/orders/verify', data);
+                const response = await verifyStripeOrderService(data);
 
                 setSuccess(response.data.success);
             } catch (err) {
@@ -38,7 +37,7 @@ const Verify = () => {
             console.error('Missing required parameters');
             setLoading(false);
         }
-    }, [session_id, order_id, axiosInstance]);
+    }, [session_id, order_id]);
 
     if (loading) {
         return <CircularProgress />;

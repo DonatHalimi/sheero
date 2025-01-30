@@ -1,7 +1,8 @@
-import { Box, Drawer, Typography } from '@mui/material';
+import { Box, Chip, Drawer, Typography } from '@mui/material';
 import React from 'react';
-import { BoxBetween, CloseButton, downloadOrderData, EditExportButtons, formatDate, ReadOnlyTextField } from '../../../assets/CustomComponents';
-import { drawerPaperSx } from '../../../assets/sx';
+import { BoxBetween, CloseButton, EditExportButtons, formatDate, ReadOnlyTextField } from '../../../assets/CustomComponents';
+import { drawerPaperSx, productChipSx } from '../../../assets/sx';
+import { downloadOrderData } from '../../../assets/DataExport';
 
 const OrderDetailsDrawer = ({ open, onClose, order, onEdit }) => {
     const handleEditClick = () => {
@@ -40,27 +41,27 @@ const OrderDetailsDrawer = ({ open, onClose, order, onEdit }) => {
                         />
 
                         <Box>
-                            <Typography variant="body1" className="!font-bold">
+                            <Typography variant="body1" className="!font-semibold !mb-2">
                                 {productLabel} + (Quantity)
                             </Typography>
-                            <Box component="ul" sx={{ pl: 2, mt: 1 }} className="list-disc">
-                                {order?.products && order?.products.length > 0 ? (
-                                    order?.products.map((item, index) => (
-                                        <Typography
-                                            key={index}
-                                            variant="body2"
-                                            component="li"
-                                            className='!mb-1'
-                                        >
-                                            {item.product?.name} <span className="!font-bold">({item.quantity})</span>
-                                        </Typography>
-                                    ))
-                                ) : (
-                                    <Typography variant="body2" component="li">
-                                        No products found
-                                    </Typography>
-                                )}
-                            </Box>
+                            {order?.products && order?.products.length > 0 ? (
+                                order?.products.map((item, index) => (
+                                    <Box
+                                        key={index}
+                                        sx={productChipSx}
+                                    >
+                                        <Chip
+                                            label={`${item.product?.name} (${item.quantity})`}
+                                            variant="outlined"
+                                            className="!font-semibold w-full !justify-start"
+                                        />
+                                    </Box>
+                                ))
+                            ) : (
+                                <Typography variant="body2" component="li">
+                                    No products found
+                                </Typography>
+                            )}
                         </Box>
 
                         <ReadOnlyTextField

@@ -3,7 +3,8 @@ import { InputLabel, MenuItem, Select } from '@mui/material';
 import React, { useEffect, useState } from 'react';
 import { toast } from 'react-toastify';
 import { ActionButtons, BrownOutlinedTextField, CustomBox, CustomModal, CustomTypography, handleApiError, OutlinedBrownButton, OutlinedBrownFormControl, VisuallyHiddenInput } from '../../../assets/CustomComponents';
-import useAxios from '../../../utils/axiosInstance';
+import { getCategoriesService } from '../../../services/categoryService';
+import { editSubcategoryService } from '../../../services/subcategoryService';
 import { getImageUrl } from '../../../utils/config';
 
 const EditSubcategoryModal = ({ open, onClose, subcategory, onViewDetails, onEditSuccess }) => {
@@ -13,8 +14,6 @@ const EditSubcategoryModal = ({ open, onClose, subcategory, onViewDetails, onEdi
     const [imagePreview, setImagePreview] = useState('');
     const [category, setCategory] = useState('');
     const [categories, setCategories] = useState([]);
-
-    const axiosInstance = useAxios();
 
     const validateName = (v) => /^[A-ZÇ][\sa-zA-ZëËçÇ\W]{3,27}$/.test(v);
 
@@ -31,7 +30,7 @@ const EditSubcategoryModal = ({ open, onClose, subcategory, onViewDetails, onEdi
     useEffect(() => {
         const fetchCategories = async () => {
             try {
-                const response = await axiosInstance.get('/categories/get');
+                const response = await getCategoriesService();
                 setCategories(response.data);
             } catch (error) {
                 console.error('Error fetching categories', error);
@@ -51,11 +50,7 @@ const EditSubcategoryModal = ({ open, onClose, subcategory, onViewDetails, onEdi
         }
 
         try {
-            const response = await axiosInstance.put(`/subcategories/update/${subcategory._id}`, formData, {
-                headers: {
-                    'Content-Type': 'multipart/form-data',
-                },
-            });
+            const response = await editSubcategoryService(subcategory._id, formData);
             toast.success(response.data.message);
             onEditSuccess(response.data);
             onClose();

@@ -4,7 +4,7 @@ import { useSelector } from 'react-redux';
 import { useNavigate } from 'react-router-dom';
 import { toast } from 'react-toastify';
 import { BrownButton, BrownOutlinedTextField, CustomBox, CustomModal, CustomTypography } from '../../../assets/CustomComponents';
-import useAxios from '../../../utils/axiosInstance';
+import { addReviewService, checkReviewEligibilityService } from '../../../services/reviewService';
 
 const AddReviewModal = ({ open, onClose, product, onReviewSuccess }) => {
     const { isAuthenticated } = useSelector((state) => state.auth);
@@ -20,7 +20,6 @@ const AddReviewModal = ({ open, onClose, product, onReviewSuccess }) => {
     const validateTitle = (v) => /^[A-Z][\Wa-zA-Z\s]{2,40}$/.test(v);
     const validateComment = (v) => /^[A-Z][\Wa-zA-Z\s]{3,500}$/.test(v);
 
-    const axiosInstance = useAxios();
     const navigate = useNavigate();
 
     useEffect(() => {
@@ -32,7 +31,7 @@ const AddReviewModal = ({ open, onClose, product, onReviewSuccess }) => {
             }
 
             try {
-                const response = await axiosInstance.get(`/reviews/orders/check-review/${product._id}`);
+                const response = await checkReviewEligibilityService(product._id);
                 setCanReview(response.data.canReview);
             } catch (error) {
                 console.error('Error checking review eligibility:', error);
@@ -42,7 +41,7 @@ const AddReviewModal = ({ open, onClose, product, onReviewSuccess }) => {
         if (open) {
             checkIfCanReview();
         }
-    }, [open, product, isAuthenticated, axiosInstance]);
+    }, [open, product, isAuthenticated]);
 
     const handleTitleChange = (event) => {
         const value = event.target.value;
@@ -84,7 +83,7 @@ const AddReviewModal = ({ open, onClose, product, onReviewSuccess }) => {
         };
 
         try {
-            await axiosInstance.post(`/reviews/product/${product._id}`, data);
+            await addReviewService(product._id, data);
 
             toast.success('Review added successfully', {
                 onClick: () => navigate('/profile/reviews'),
@@ -123,6 +122,8 @@ const AddReviewModal = ({ open, onClose, product, onReviewSuccess }) => {
                     value={product?.name || ''}
                     InputProps={{ readOnly: true }}
                     fullWidth
+                    multiline
+                    rows={3}
                     margin="normal"
                     variant="outlined"
                     disabled={!!product?.name}

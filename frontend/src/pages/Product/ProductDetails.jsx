@@ -1,6 +1,5 @@
 import { Add, LocalAtm, Payment, Remove } from '@mui/icons-material';
 import { IconButton } from '@mui/material';
-import axios from 'axios';
 import React, { useEffect, useState } from 'react';
 import { useSelector } from 'react-redux';
 import { useNavigate, useParams } from 'react-router-dom';
@@ -11,12 +10,13 @@ import Navbar from '../../components/Navbar/Navbar';
 import AddReviewModal from '../../components/Product/Modals/AddReviewModal';
 import ProductDetailsTabs from '../../components/Product/Utils/ProductDetailsTabs';
 import Footer from '../../components/Utils/Footer';
-import useAxios from '../../utils/axiosInstance';
-import { getApiUrl, getImageUrl } from '../../utils/config';
+import { addToCartService } from '../../services/cartService';
+import { getProductDetails } from '../../services/productService';
+import { addToWishlistService } from '../../services/wishlistService';
+import { getImageUrl } from '../../utils/config';
 
 const ProductDetails = () => {
     const { isAuthenticated } = useSelector((state) => state.auth);
-    const axiosInstance = useAxios();
     const { id } = useParams();
     const navigate = useNavigate();
 
@@ -39,7 +39,7 @@ const ProductDetails = () => {
     useEffect(() => {
         const fetchProduct = async () => {
             try {
-                const response = await axios.get(getApiUrl(`/products/get/${id}`));
+                const response = await getProductDetails(id);
                 setProduct(response.data);
             } catch (error) {
                 console.error('Error fetching product:', error);
@@ -84,13 +84,13 @@ const ProductDetails = () => {
             return;
         }
 
-        const endpoint = action === 'cart' ? 'cart/add' : 'wishlist/add';
         const payload = { productId: product._id, ...(action === 'cart' && { quantity }) };
         const setLoadingState = action === 'cart' ? setIsCartLoading : setIsWishlistLoading;
+        const service = action === 'cart' ? addToCartService : addToWishlistService;
 
         setLoadingState(true);
         try {
-            await axiosInstance.post(getApiUrl(`/${endpoint}`), payload);
+            await service(payload);
 
             toast.success(`Product added to ${action === 'cart' ? 'cart' : 'wishlist'}!`, {
                 onClick: () => navigate(`/${action === 'wishlist' ? 'profile/wishlist' : 'cart'}`),
@@ -98,11 +98,11 @@ const ProductDetails = () => {
 
             if (action === 'cart') {
                 document.dispatchEvent(new CustomEvent('cartUpdated', { detail: product._id }));
-            }
 
-            if (action === 'cart' && quantity > product.inventoryCount) {
-                toast.error(`Cannot add more than ${product.inventoryCount} items to cart.`);
-                return;
+                if (quantity > product.inventoryCount) {
+                    toast.error(`Cannot add more than ${product.inventoryCount} items to cart.`);
+                    return;
+                }
             }
         } catch (error) {
             if (error.response && error.response.data.errors) {

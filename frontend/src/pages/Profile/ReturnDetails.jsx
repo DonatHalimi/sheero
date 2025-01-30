@@ -1,16 +1,16 @@
 import { LinearProgress, Table, TableBody, TableCell, TableContainer, TableHead, TableRow } from '@mui/material';
 import React, { useEffect, useState } from 'react';
 import { Link, useParams } from 'react-router-dom';
-import { EmptyState, formatDate, generateReturnPDF, Header, LoadingOrderDetails, ProfileLayout } from '../../assets/CustomComponents';
+import { EmptyState, formatDate, Header, LoadingOrderDetails, ProfileLayout } from '../../assets/CustomComponents';
+import { generateReturnPDF } from '../../assets/DataExport';
 import emptyReturnsImage from '../../assets/img/empty/orders.png';
 import Navbar from '../../components/Navbar/Navbar';
 import Footer from '../../components/Utils/Footer';
-import useAxios from '../../utils/axiosInstance';
+import { getReturnDetailsService } from '../../services/returnService';
 import { getImageUrl } from '../../utils/config';
 
 const ReturnDetails = () => {
     const { returnId } = useParams();
-    const axiosInstance = useAxios();
 
     const [returnRequest, setReturnRequest] = useState(null);
     const [loading, setLoading] = useState(true);
@@ -18,7 +18,7 @@ const ReturnDetails = () => {
 
     const fetchReturnDetails = async () => {
         try {
-            const response = await axiosInstance.get(`/returns/${returnId}`);
+            const response = await getReturnDetailsService(returnId);
             setReturnRequest(response.data.data);
         } catch (error) {
             console.error('Error fetching return details:', error);

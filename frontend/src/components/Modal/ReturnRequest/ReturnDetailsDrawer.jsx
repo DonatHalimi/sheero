@@ -1,7 +1,8 @@
 import { Box, Drawer, Typography } from '@mui/material';
 import React from 'react';
-import { BoxBetween, CloseButton, downloadReturnRequestData, EditExportButtons, ReadOnlyTextField } from '../../../assets/CustomComponents';
+import { BoxBetween, CloseButton, EditExportButtons, ReadOnlyTextField } from '../../../assets/CustomComponents';
 import { drawerPaperSx } from '../../../assets/sx';
+import { downloadReturnRequestData } from '../../../assets/DataExport';
 
 const ReturnRequestDetailsDrawer = ({ open, onClose, returnRequest, onEdit }) => {
     const header = `Return Request from ${returnRequest?.user.firstName} ${returnRequest?.user.lastName} - ${returnRequest?.user.email} for Order #${returnRequest?.order}`;

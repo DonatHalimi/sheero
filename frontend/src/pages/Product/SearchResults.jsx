@@ -6,7 +6,7 @@ import noResultsImage from '../../assets/img/empty/search-results.png';
 import Navbar from '../../components/Navbar/Navbar';
 import ProductItem from '../../components/Product/Items/ProductItem';
 import Footer from '../../components/Utils/Footer';
-import useAxios from '../../utils/axiosInstance';
+import { fetchSearchResultsService } from '../../services/productService';
 
 const itemsPerPage = 40;
 
@@ -15,7 +15,6 @@ const SearchResults = () => {
     const [currentPage, setCurrentPage] = useState(1);
     const [totalProducts, setTotalProducts] = useState(0);
     const [error, setError] = useState(null);
-    const axiosInstance = useAxios();
     const location = useLocation();
 
     const query = new URLSearchParams(location.search).get('query');
@@ -24,7 +23,7 @@ const SearchResults = () => {
         const fetchSearchResults = async () => {
             setError(null);
             try {
-                const response = await axiosInstance.get('/products/search', { params: { query } });
+                const response = await fetchSearchResultsService(query);
                 setProducts(response.data.results);
                 setTotalProducts(response.data.results.length);
             } catch (err) {
@@ -35,7 +34,7 @@ const SearchResults = () => {
         if (query) {
             fetchSearchResults();
         }
-    }, [query, axiosInstance]);
+    }, [query]);
 
     const renderProductItems = () => (
         currentPageItems.map(product => <ProductItem key={product._id} product={product} />)

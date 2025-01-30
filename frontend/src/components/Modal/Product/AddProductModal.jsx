@@ -4,7 +4,7 @@ import React, { useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { toast } from 'react-toastify';
 import { BrownButton, BrownOutlinedTextField, CustomPaper, OutlinedBrownButton, OutlinedBrownFormControl, VisuallyHiddenInput } from '../../../assets/CustomComponents';
-import useAxios from '../../../utils/axiosInstance';
+import axiosInstance from '../../../utils/axiosInstance';
 
 const AddProductModal = ({ open, onClose, onAddSuccess }) => {
     const [step, setStep] = useState(1);
@@ -37,7 +37,6 @@ const AddProductModal = ({ open, onClose, onAddSuccess }) => {
     const [details, setDetails] = useState([{ attribute: '', value: '' }]);
 
     const navigate = useNavigate();
-    const axiosInstance = useAxios();
 
     const [debounceTimeout, setDebounceTimeout] = useState(null);
 
@@ -132,11 +131,7 @@ const AddProductModal = ({ open, onClose, onAddSuccess }) => {
         formData.append('productId', productId);
 
         try {
-            await axiosInstance.post('/products/upload-image', formData, {
-                headers: {
-                    'Content-Type': 'multipart/form-data'
-                }
-            });
+            await axiosInstance.post('/products/upload-image', formData);
             setStep(3);
             toast.success('Image uploaded successfully');
         } catch (error) {

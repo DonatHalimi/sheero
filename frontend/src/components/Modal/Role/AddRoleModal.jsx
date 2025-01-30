@@ -1,13 +1,11 @@
 import React, { useState } from 'react';
 import { toast } from 'react-toastify';
 import { BrownButton, BrownOutlinedTextField, CustomBox, CustomModal, CustomTypography, handleApiError } from '../../../assets/CustomComponents';
-import useAxios from '../../../utils/axiosInstance';
+import { addRoleService } from '../../../services/roleService';
 
 const AddRoleModal = ({ open, onClose, onAddSuccess }) => {
     const [name, setName] = useState('');
     const [isValidName, setIsValidName] = useState(true);
-
-    const axiosInstance = useAxios();
 
     const validateName = (v) => /^[a-zA-Z\s]{2,10}$/.test(v);
 
@@ -24,7 +22,7 @@ const AddRoleModal = ({ open, onClose, onAddSuccess }) => {
         };
 
         try {
-            const response = await axiosInstance.post('/roles/create', data);
+            const response = await addRoleService(data);
             toast.success(response.data.message);
             onAddSuccess(response.data);
             onClose();
