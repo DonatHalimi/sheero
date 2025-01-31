@@ -4,7 +4,7 @@ import { useDispatch, useSelector } from 'react-redux';
 import { useLocation, useNavigate } from 'react-router-dom';
 import { useSwipeable } from 'react-swipeable';
 import { CategoryDropdown, CategoryList, SidebarFooter, SidebarHeader } from '../../assets/CustomComponents';
-import { getCategories, getSubcategoriesAndSubsubcategories } from '../../store/actions/categoryActions';
+import { getSubcategoriesAndSubsubcategories } from '../../store/actions/categoryActions';
 
 const CategoryNavbar = ({ isSidebarOpen, toggleSidebar }) => {
     const { categories, subcategories, subsubcategories, loading } = useSelector((state) => state.categories);
@@ -18,18 +18,6 @@ const CategoryNavbar = ({ isSidebarOpen, toggleSidebar }) => {
     const categoryListRef = useRef(null);
     const navigate = useNavigate();
     const location = useLocation();
-
-    useEffect(() => {
-        dispatch(getCategories());
-    }, [dispatch]);
-
-    useEffect(() => {
-        if (activeCategory) {
-            setDropdownLoading(true);
-            dispatch(getSubcategoriesAndSubsubcategories(activeCategory))
-                .finally(() => setDropdownLoading(false));
-        }
-    }, [activeCategory, dispatch]);
 
     const handleCategoryHover = (categoryId) => {
         setOpenCategory(categoryId);

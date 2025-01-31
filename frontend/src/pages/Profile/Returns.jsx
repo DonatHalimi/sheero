@@ -7,7 +7,7 @@ import ReturnItem from '../../components/Product/Items/ReturnItem';
 import Footer from '../../components/Utils/Footer';
 import { getUserReturns } from '../../store/actions/returnActions';
 
-const itemsPerPage = 4;
+const itemsPerPage = 8;
 
 const Returns = () => {
     const { user } = useSelector((state) => state.auth);

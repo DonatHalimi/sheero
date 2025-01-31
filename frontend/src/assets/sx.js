@@ -210,16 +210,38 @@ export const searchDropdownImageSx = {
 }
 
 export const sidebarLayoutSx = {
-    position: { xs: 'static', md: 'absolute' },
-    top: { md: '24px' },
-    left: { md: '10' },
-    width: { xs: '100%', md: '320px' },
+    position: { xs: 'static', md: 'sticky' },
+    top: { md: '100px' },
+    left: { md: '100px' },
+    width: { xs: '100%', md: '315px' },
     bgcolor: 'white',
     p: { xs: 2, md: 3 },
     boxShadow: '0 1px 2px 0 rgb(0 0 0 / 0.05)',
     borderRadius: '6px',
-    mt: { xs: 10, md: 2 }
-}
+    zIndex: 1000,
+    mt: { xs: 10, md: 5 },
+    zIndex: 1,
+    alignSelf: 'flex-start',
+};
+
+export const profileLayoutSx = {
+    display: 'flex',
+    flexDirection: { xs: 'column', md: 'row' },
+    maxWidth: '1250px',
+    mx: 'auto',
+    px: { xs: 2, md: 3 },
+    gap: { md: 2 },
+    position: 'relative',
+    mb: 10,
+    mt: 5,
+    alignItems: 'flex-start',
+};
+
+export const layoutContainerSx = {
+    flex: 1,
+    width: '100%',
+    mt: { xs: 4, md: 5 },
+};
 
 export const customMenuProps = {
     PaperProps: {
@@ -238,30 +260,16 @@ export const customMenuProps = {
     },
 };
 
-export const profileLayoutSx = {
-    maxWidth: '1250px',
-    mx: 'auto',
-    px: { xs: 2, md: 3 },
-    display: 'flex',
-    flexDirection: { xs: 'column', md: 'row' },
-    gap: { md: 3 },
-    position: 'relative',
-    mb: 10,
-    mt: 5
-}
-
-export const layoutContainerSx = { flex: 1, ml: { md: '332px' }, width: '100%', mt: { xs: 4, md: 5 }, }
-
 export const filterLayoutSx = {
+    display: 'flex',
+    flexDirection: { xs: 'column', md: 'row' },
     maxWidth: '1250px',
     mx: 'auto',
     px: { xs: 2, md: 3 },
-    display: 'flex',
-    flexDirection: { xs: 'column', md: 'row' },
-    gap: { md: 3 },
+    gap: { md: 2 },
     position: 'relative',
     mb: 10,
-    mt: { xs: 18, md: 5 },
+    mt: 5,
 }
 
 export const getMotionDivProps = (isOpen) => ({

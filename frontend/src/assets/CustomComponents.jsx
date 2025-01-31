@@ -1311,10 +1311,10 @@ export const BounceAnimation = forwardRef(({ children }, ref) => (
         }}
         transition={{
             type: "spring",
-            damping: 15,
-            stiffness: 200,
-            mass: 1.2,
-            bounce: 0.25
+            damping: 20,
+            stiffness: 180,
+            mass: 1.5,
+            bounce: 0.2
         }}
     >
         {children}
@@ -1327,7 +1327,7 @@ export const CustomModal = ({ open, onClose, children, ...props }) => (
             open={open}
             onClose={onClose}
             {...props}
-            className="flex items-center justify-center p-4 sm:p-0"
+            className="flex items-center justify-center p-4 sm:p-0 outline-none focus:outline-none"
         >
             <BounceAnimation>
                 <Box className="bg-white rounded-lg shadow-lg w-full mx-auto max-w-[95vw] sm:max-w-md focus:outline-none">
@@ -1339,7 +1339,7 @@ export const CustomModal = ({ open, onClose, children, ...props }) => (
 );
 
 export const CustomBox = (props) => (
-    <Box className="bg-white p-3 sm:p-4 rounded-lg w-full focus:outline-none" {...props} />
+    <Box className="bg-white p-3 sm:p-4 rounded-lg w-full !outline-none !focus:outline-none" {...props} />
 );
 
 export const BoxBetween = (props) => (
@@ -2353,7 +2353,7 @@ export const Header = ({
     };
 
     return (
-        <div className="bg-white sticky top-20 z-50 p-4 flex items-center justify-between w-full mb-3 rounded-md shadow-sm">
+        <div className="bg-white p-4 rounded-md shadow-sm mb-4 flex justify-between items-center">
             <Typography variant="h5" className="text-gray-800 font-semilight">
                 {loading ? (
                     <WaveSkeleton width={150} />
@@ -2526,9 +2526,7 @@ export const AccountLinkStatusIcon = ({ hasId, platform }) => {
     return (
         <>
             {hasId ? (
-                <Tooltip title={`Linked with ${platform}`} placement="left" arrow>
-                    <Check style={{ color: green[500] }} />
-                </Tooltip>
+                <Check style={{ color: green[500] }} />
             ) : (
                 <Clear style={{ color: red[500] }} />
             )}
@@ -2968,7 +2966,7 @@ export const ProfileIcon = ({ handleProfileDropdownToggle, isDropdownOpen }) => 
                     centerRipple={false}
                 >
                     {loading ? (
-                        <WaveSkeleton variant="circle" width={40} height={40} className="mr-2" />
+                        <WaveSkeleton variant="circle" width={50} height={20} className="mr-1 rounded-md" />
                     ) : (
                         <img
                             src={user?.profilePicture}

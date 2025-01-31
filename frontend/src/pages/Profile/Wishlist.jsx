@@ -8,7 +8,7 @@ import WishlistItem from '../../components/Product/Items/WishlistItem';
 import Footer from '../../components/Utils/Footer';
 import { clearWishlist, getWishlistItems, removeFromWishlist } from '../../store/actions/wishlistActions';
 
-const itemsPerPage = 6;
+const itemsPerPage = 12;
 
 const Wishlist = () => {
     const { user, isAuthenticated } = useSelector((state) => state.auth);

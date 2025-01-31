@@ -2,24 +2,18 @@ import { KeyboardArrowDown } from '@mui/icons-material';
 import { CircularProgress, Typography } from '@mui/material';
 import React, { useEffect, useState } from 'react';
 import { useInView } from 'react-intersection-observer';
-import { useDispatch, useSelector } from 'react-redux';
+import { useSelector } from 'react-redux';
 import { BrownButton, ProductGrid } from '../../assets/CustomComponents';
-import { getProducts } from '../../store/actions/productActions';
 
 const initialItems = 49;
 
 const ProductList = () => {
     const { products, loading } = useSelector((state) => state.products);
-    const dispatch = useDispatch();
 
     const [visibleProducts, setVisibleProducts] = useState(initialItems);
     const [autoLoadEnabled, setAutoLoadEnabled] = useState(false);
 
     const { ref: loadMoreRef, inView } = useInView({ threshold: 1 });
-
-    useEffect(() => {
-        dispatch(getProducts());
-    }, [dispatch]);
 
     const handleLoadMore = () => {
         setVisibleProducts((prev) => Math.min(prev + initialItems, products.length));

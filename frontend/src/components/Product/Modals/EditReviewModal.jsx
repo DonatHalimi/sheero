@@ -78,6 +78,8 @@ const EditReviewModal = ({ open, onClose, review, onEditSuccess }) => {
                         readOnly: true,
                     }}
                     fullWidth
+                    multiline
+                    rows={3}
                     margin="normal"
                     variant="outlined"
                     disabled={!!review?.product?.name}

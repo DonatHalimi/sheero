@@ -1,6 +1,6 @@
 import axiosInstance from '../utils/axiosInstance';
 
-export const loadUserService = () => axiosInstance('/auth/me');
+export const loadUserService = () => axiosInstance.get('/auth/me');
 
 export const registerUserService = (userData) => axiosInstance.post('/auth/register', userData);
 

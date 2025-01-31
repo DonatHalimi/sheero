@@ -7,6 +7,9 @@ import 'react-toastify/dist/ReactToastify.css';
 import App from './App';
 import './index.css';
 import { loadUser } from './store/actions/authActions';
+import { getCategories } from './store/actions/categoryActions';
+import { getProducts } from './store/actions/productActions';
+import { getImages } from './store/actions/slideshowActions';
 import store from './store/store';
 import theme from './utils/theme';
 
@@ -15,7 +18,10 @@ const Main = () => {
 
   useEffect(() => {
     dispatch(loadUser());
-  }, []);
+    dispatch(getCategories());
+    dispatch(getImages());
+    dispatch(getProducts());
+  }, [dispatch]);
 
   return (
     <ThemeProvider theme={theme}>

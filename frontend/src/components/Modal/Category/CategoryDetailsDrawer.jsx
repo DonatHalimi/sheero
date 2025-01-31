@@ -1,9 +1,9 @@
 import { Box, Drawer, Typography } from '@mui/material';
 import React from 'react';
 import { CloseButton, EditExportButtons, ReadOnlyTextField } from '../../../assets/CustomComponents';
+import { downloadCategoryData } from '../../../assets/DataExport';
 import { drawerPaperSx } from '../../../assets/sx';
 import { getImageUrl } from '../../../utils/config';
-import { downloadCategoryData } from '../../../assets/DataExport';
 
 const CategoryDetailsDrawer = ({ open, onClose, category, onEdit }) => {
     const handleEditClick = () => {
@@ -24,7 +24,7 @@ const CategoryDetailsDrawer = ({ open, onClose, category, onEdit }) => {
                 {category ? (
                     <>
                         <Typography className='!font-bold !text-lg'>
-                            {category.name}'s Details
+                            {category.name} Category Details
                         </Typography>
 
                         <ReadOnlyTextField

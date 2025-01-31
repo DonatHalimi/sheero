@@ -2,8 +2,8 @@ import { Box, Chip, MenuItem, Typography } from '@mui/material';
 import React, { useEffect, useState } from 'react';
 import { toast } from 'react-toastify';
 import { ActionButtons, BrownOutlinedTextField, CustomBox, CustomModal, CustomTypography, formatDate, ReadOnlyTextField } from '../../../assets/CustomComponents';
-import { editOrderService } from '../../../services/orderService';
 import { productChipSx } from '../../../assets/sx';
+import { editOrderService } from '../../../services/orderService';
 
 const EditOrderModal = ({ open, onClose, order, onViewDetails, onEditSuccess }) => {
     const [newStatus, setNewStatus] = useState(order?.status || '');

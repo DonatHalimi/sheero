@@ -39,7 +39,7 @@ const AddRoleModal = ({ open, onClose, onAddSuccess }) => {
                 <BrownOutlinedTextField
                     fullWidth
                     required
-                    label="Role Name"
+                    label="Name"
                     value={name}
                     onChange={(e) => {
                         setName(e.target.value)

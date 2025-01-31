@@ -9,6 +9,10 @@ export const getCategories = () => async (dispatch) => {
             type: GET_CATEGORIES,
             payload: res.data,
         });
+
+        res.data.forEach((category) => {
+            dispatch(getSubcategoriesAndSubsubcategories(category._id));
+        });
     } catch (error) {
         dispatch({
             type: GET_CATEGORIES_ERROR,

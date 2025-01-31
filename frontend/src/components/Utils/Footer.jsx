@@ -106,7 +106,7 @@ const Footer = () => {
                 {/* Footer bottom section with copyright */}
                 <div className="mt-8 pt-8 border-t border-stone-700 text-center select-none">
                     <p className="text-gray-200 text-left md:text-center">
-                        &copy; {displayYear()} sheero. All Rights Reserved. - <a href='https://github.com/DonatHalimi' target='_blank' className='underline'>Donat</a>
+                        &copy; {displayYear()} sheero. All Rights Reserved. - <a href='https://github.com/DonatHalimi' target='_blank' className='underline'>Donat Halimi</a>
                     </p>
                 </div>
             </div>

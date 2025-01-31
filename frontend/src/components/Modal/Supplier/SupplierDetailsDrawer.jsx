@@ -1,8 +1,8 @@
 import { Box, Drawer, Typography } from '@mui/material';
 import React from 'react';
 import { BoxBetween, CloseButton, EditExportButtons, ReadOnlyTextField } from '../../../assets/CustomComponents';
-import { drawerPaperSx } from '../../../assets/sx';
 import { downloadSupplierData } from '../../../assets/DataExport';
+import { drawerPaperSx } from '../../../assets/sx';
 
 const SupplierDetailsDrawer = ({ open, onClose, supplier, onEdit }) => {
     const handleEditClick = () => {

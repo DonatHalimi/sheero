@@ -1,8 +1,8 @@
 import { Box, Chip, Drawer, Typography } from '@mui/material';
 import React from 'react';
 import { BoxBetween, CloseButton, EditExportButtons, formatDate, ReadOnlyTextField } from '../../../assets/CustomComponents';
-import { drawerPaperSx, productChipSx } from '../../../assets/sx';
 import { downloadOrderData } from '../../../assets/DataExport';
+import { drawerPaperSx, productChipSx } from '../../../assets/sx';
 
 const OrderDetailsDrawer = ({ open, onClose, order, onEdit }) => {
     const handleEditClick = () => {

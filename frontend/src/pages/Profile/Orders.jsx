@@ -10,7 +10,7 @@ import Footer from '../../components/Utils/Footer';
 import { getUserOrders } from '../../store/actions/orderActions';
 import { getImageUrl } from '../../utils/config';
 
-const itemsPerPage = 5;
+const itemsPerPage = 8;
 
 const Orders = () => {
     const { user } = useSelector((state) => state.auth);
