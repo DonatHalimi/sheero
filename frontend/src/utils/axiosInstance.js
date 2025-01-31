@@ -12,9 +12,9 @@ axiosInstance.interceptors.response.use(
     (error) => {
         if (error.response?.status === 401) {
             const currentPath = window.location.pathname;
-            if (currentPath !== '/login') {
+            if (currentPath !== '/') {
                 console.error('Unauthorized access - Please log in again.');
-                window.location.href = '/login';
+                window.location.href = '/';
             }
         }
         return Promise.reject(error);

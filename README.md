@@ -35,7 +35,7 @@ To set up the project locally, follow these steps:
 
 2. Install the backend dependencies:
    ```bash
-   cd server
+   cd backend
    npm i
    ```
 
@@ -45,7 +45,7 @@ To set up the project locally, follow these steps:
    npm i
    ```
 
-4. Create a `.env` file in both the `server` and `frontend` directories to store environment variables:
+4. Create a `.env` file in both the `backend` and `frontend` directories to store environment variables:
 
    **Backend (`backend/.env`)**
    ```bash
