@@ -2690,14 +2690,58 @@ export const SearchDropdown = ({ results, onClickSuggestion }) => {
         return Number(price).toFixed(2);
     };
 
+    const [selectedIndex, setSelectedIndex] = useState(-1);
+    const listRef = useRef(null);
+
+    useEffect(() => {
+        const handleKeyDown = (e) => {
+            if (results.length === 0) return;
+
+            if (e.key === 'ArrowDown') {
+                setSelectedIndex((prevIndex) => (prevIndex + 1) % results.length);
+            } else if (e.key === 'ArrowUp') {
+                setSelectedIndex((prevIndex) => (prevIndex - 1 + results.length) % results.length);
+            } else if (e.key === 'Enter' && selectedIndex !== -1) {
+                onClickSuggestion(results[selectedIndex]._id);
+            }
+        };
+
+        window.addEventListener('keydown', handleKeyDown);
+        return () => {
+            window.removeEventListener('keydown', handleKeyDown);
+        };
+    }, [selectedIndex, results, onClickSuggestion]);
+
+    useEffect(() => {
+        if (listRef.current && selectedIndex !== -1) {
+            const listItem = listRef.current.children[selectedIndex];
+            const listContainer = listRef.current;
+
+            if (listItem) {
+                const itemTop = listItem.offsetTop;
+                const itemHeight = listItem.offsetHeight;
+                const containerHeight = listContainer.clientHeight;
+
+                if (itemTop + itemHeight > containerHeight) {
+                    listContainer.scrollTop = itemTop + itemHeight - containerHeight;
+                } else if (itemTop < listContainer.scrollTop) {
+                    listContainer.scrollTop = itemTop;
+                }
+            }
+        }
+    }, [selectedIndex, results]);
+
     return (
-        <List sx={searchDropdownSx}>
-            {results.map((result) => (
+        <List sx={searchDropdownSx} ref={listRef}>
+            {results.map((result, index) => (
                 <ListItem
                     key={result._id}
                     button
                     onClick={() => onClickSuggestion(result._id)}
-                    sx={searchDropdownItemSx}
+                    sx={{
+                        ...searchDropdownItemSx,
+                        backgroundColor: index === selectedIndex ? '#e0e0e0' : 'transparent',
+                    }}
                 >
                     <img
                         src={getImageUrl(result.image)}
@@ -3435,7 +3479,7 @@ export const DashboardSearchSuggestions = ({
                     <div
                         key={item.id}
                         onClick={() => handleSuggestionClick(item)}
-                        className={`px-4 pt-[10px] pb-[10px] hover:bg-gray-100 cursor-pointer flex items-center gap-4 transition duration-150 ease-in-out ${index === selectedIndex ? 'bg-gray-200' : ''}`}
+                        className={`px-4 pt-[10px] pb-[10px] hover:bg-gray-100 cursor-pointer flex items-center gap-4 transition duration-150 ease-in-out ${index === selectedIndex ? 'bg-gray-200 border-l-4 border-stone-500' : ''}`}
                     >
                         {item.icon?.inactive && (
                             <item.icon.inactive className="w-5 h-5 text-stone-500" />
@@ -3456,7 +3500,6 @@ export const DashboardSearchBar = ({ collapsed, onMenuItemClick, getAllMenuItems
     const location = useLocation();
     const suggestionsRef = useRef(null);
 
-    // Filter suggestions based on the search term
     useEffect(() => {
         const allItems = getAllMenuItems();
         if (!searchTerm) {
@@ -3474,7 +3517,6 @@ export const DashboardSearchBar = ({ collapsed, onMenuItemClick, getAllMenuItems
         setSelectedIndex(-1);
     }, [searchTerm, getAllMenuItems]);
 
-    // Clear search term and suggestions when the location changes
     useEffect(() => {
         setSearchTerm('');
         setShowSuggestions(false);
@@ -3488,7 +3530,6 @@ export const DashboardSearchBar = ({ collapsed, onMenuItemClick, getAllMenuItems
         setSelectedIndex(-1);
     };
 
-    // Handle keyboard events (arrow keys to navigate, enter to select, and escape to close)
     const handleKeyDown = (e) => {
         if (!showSuggestions || suggestions.length === 0) return;
 
@@ -3524,7 +3565,6 @@ export const DashboardSearchBar = ({ collapsed, onMenuItemClick, getAllMenuItems
         }
     };
 
-    // Scroll to the selected suggestion on arrow key navigation
     const scrollToSuggestion = (index) => {
         if (suggestionsRef.current) {
             const suggestionElement = suggestionsRef.current.children[index];

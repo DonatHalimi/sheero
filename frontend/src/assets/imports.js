@@ -32,6 +32,7 @@ export const Profile = React.lazy(() => import('../pages/Profile/ProfileDetails'
 export const Addresses = React.lazy(() => import('../pages/Profile/AddressDetails'));
 export const Orders = React.lazy(() => import('../pages/Profile/Orders'));
 export const OrderDetails = React.lazy(() => import('../pages/Profile/OrderDetails'));
+export const OTPVerification = React.lazy(() => import('../pages/Auth/OTPVerification'));
 export const Returns = React.lazy(() => import('../pages/Profile/Returns'));
 export const ReturnDetails = React.lazy(() => import('../pages/Profile/ReturnDetails'));
 export const Wishlist = React.lazy(() => import('../pages/Profile/Wishlist'));

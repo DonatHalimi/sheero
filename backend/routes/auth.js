@@ -1,7 +1,7 @@
 const express = require('express');
 const cookieConfig = require('../config/cookie');
 const passport = require('passport');
-const { registerUser, loginUser, getCurrentUser, updateUserProfile, logoutUser } = require('../controllers/authController.js');
+const { registerUser, loginUser, getCurrentUser, updateUserProfile, logoutUser, verifyOTP, resendOTP } = require('../controllers/authController.js');
 const { registerSchema, loginSchema } = require('../validations/auth');
 const { requireAuth } = require('../middleware/auth.js');
 const validate = require('../middleware/validation');
@@ -14,6 +14,8 @@ const redirectUrl = NODE_ENV === 'production'
     : 'http://localhost:3000';
 
 router.post('/register', validate(registerSchema), registerUser);
+router.post('/verify-otp', verifyOTP);
+router.post('/resend-otp', resendOTP);
 router.post('/login', validate(loginSchema), loginUser);
 router.post('/logout', logoutUser);
 router.get('/me', requireAuth, getCurrentUser);

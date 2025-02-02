@@ -193,10 +193,9 @@ export const searchDropdownItemSx = {
     borderRadius: 1,
     boxShadow: '0px 1px 3px rgba(0, 0, 0, 0.1)',
     marginBottom: '8px',
-    border: '1px solid transparent',
+    backgroundColor: '#e0e0e0',
     '&:hover': {
-        borderColor: '#78716C',
-        backgroundColor: 'white',
+        backgroundColor: '#e0e0e0',
     },
     transition: 'border-color 0.2s ease',
 }

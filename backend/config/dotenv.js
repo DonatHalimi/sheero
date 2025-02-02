@@ -19,6 +19,8 @@ module.exports = {
     GOOGLE_CLIENT_SECRET: checkEnvVar('GOOGLE_CLIENT_SECRET'),
     FACEBOOK_CLIENT_ID: checkEnvVar('FACEBOOK_CLIENT_ID'),
     FACEBOOK_CLIENT_SECRET: checkEnvVar('FACEBOOK_CLIENT_SECRET'),
+    SMTP_USER: checkEnvVar('SMTP_USER'),
+    SMTP_PASS: checkEnvVar('SMTP_PASS'),
     JWT_REFRESH_SECRET: process.env.JWT_REFRESH_SECRET,
     SEED_DB: process.env.SEED_DB,
     ADMIN_FIRST_NAME: process.env.ADMIN_FIRST_NAME,

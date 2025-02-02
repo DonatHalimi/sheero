@@ -9,6 +9,7 @@
   - [Setting up Google and Facebook OAuth](#setting-up-google-and-facebook-oauth)  
     - [Google Client ID and Client Secret](#google-client-id-and-client-secret)  
     - [Facebook App ID and App Secret](#facebook-app-id-and-app-secret)  
+  - [Setting Up SMTP with Gmail](#setting-up-smtp-with-gmail)
 - [Usage](#usage)  
 - [Features](#features)  
 - [Technologies Used](#technologies-used)  
@@ -64,6 +65,8 @@ To set up the project locally, follow these steps:
    GOOGLE_CLIENT_SECRET=your_google_client_secret
    FACEBOOK_CLIENT_ID=your_facebook_client_id
    FACEBOOK_CLIENT_SECRET=your_facebook_client_secret
+   SMTP_USER=your_smtp_user
+   SMTP_PASS=your_smtp_pass
    ```
 
    **Frontend (`frontend/.env`)**
@@ -82,6 +85,7 @@ To set up the project locally, follow these steps:
   - **SESSION_SECRET**: A secret key used for signing session cookies.
   - **GOOGLE_CLIENT_ID**, **GOOGLE_CLIENT_SECRET**: Client IDs and secrets for Google OAuth integration.
   - **FACEBOOK_CLIENT_ID**, **FACEBOOK_CLIENT_SECRET**: Client IDs and secrets for Facebook OAuth integration.
+  - **SMTP_USER**, **SMTP_PASS**: SMTP credentials for sending emails.
 
 ## Setting up Google and Facebook OAuth
 
@@ -161,6 +165,29 @@ Facebook credentials are needed for enabling Facebook login in your app. Follow 
    - Under **Customize**, click **Permissions** and add the **email** permission. This is necessary to access the user's email address during authentication.
 
 7. **Official Guide:** Refer to the [Facebook Login Setup Documentation](https://developers.facebook.com/docs/facebook-login) for further guidance.
+
+---
+
+## Setting Up SMTP with Gmail  
+
+To configure Gmail SMTP for sending emails from your application, follow these steps:  
+
+### **Generate SMTP Credentials for Gmail**  
+
+#### **SMTP Username**  
+Your SMTP username is your Gmail email address (e.g., `your_email@gmail.com`).  
+
+#### **SMTP Password (Google App Password)**  
+If two-factor authentication is enabled, you must generate an App Password instead of using your regular password in the `.env` file.  
+
+1. **Access Google Security Settings**  
+   - Navigate to [Google Account Security](https://myaccount.google.com/security).  
+
+2. **Generate an App Password**  
+   - In the search bar at the navigation bar, type **"App passwords"**.  
+   - Sign in again if prompted.  
+   - Under the **App name** field, enter a relevant name for your application (e.g., **"sheero"**).  
+   - Click **Create**, then copy the generated 16-character password into the backend `.env` file.  
 
 ---
 

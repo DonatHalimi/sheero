@@ -14,6 +14,7 @@ import {
   NotFound,
   OrderDetails,
   Orders,
+  OTPVerification,
   ProductDetails,
   ProductsByCategory,
   ProductsBySubcategory,
@@ -45,6 +46,7 @@ const App = () => (
         <Route path="/" element={<Home />} />
         <Route path="/login" element={<PublicRoute><Login /></PublicRoute>} />
         <Route path="/register" element={<PublicRoute><Register /></PublicRoute>} />
+        <Route path='/verify-otp' element={<PublicRoute><OTPVerification /></PublicRoute>} />
         <Route path="/faqs" element={<FAQs />} />
         <Route path="/not-allowed" element={<NotAllowed />} />
         <Route path="/category/:id/" element={<ProductsByCategory />} />

@@ -32,7 +32,14 @@ class EnvValidator {
             'MONGODB_URI',
             'JWT_SECRET',
             'STRIPE_SECRET_KEY',
-            'NODE_ENV'
+            'NODE_ENV',
+            'SESSION_SECRET',
+            'GOOGLE_CLIENT_ID',
+            'GOOGLE_CLIENT_SECRET',
+            'FACEBOOK_CLIENT_ID',
+            'FACEBOOK_CLIENT_SECRET',
+            'SMTP_USER',
+            'SMTP_PASS',
         ];
     }
 
@@ -40,7 +47,7 @@ class EnvValidator {
         const envPath = path.resolve(__dirname, '../.env');
 
         if (!fs.existsSync(envPath)) {
-            throw new Error([ 
+            throw new Error([
                 '.env file not found!',
                 'Please create the .env file with required environment variables.',
                 'The .env file should be located in the root of the backend directory (e.g. backend/.env).',
@@ -53,7 +60,7 @@ class EnvValidator {
 
     validateVar(name) {
         const value = process.env[name];
-        
+
         if (!value) {
             throw new Error(`${name} is not defined in environment variables`);
         }

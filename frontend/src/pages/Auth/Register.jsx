@@ -4,7 +4,7 @@ import React, { useState } from 'react';
 import { useDispatch } from 'react-redux';
 import { useNavigate } from 'react-router-dom';
 import { toast } from 'react-toastify';
-import { BrownButton, BrownOutlinedTextField, ErrorTooltip, handleFacebookLogin, handleGoogleLogin, knownEmailProviders, SocialLoginButtons } from '../../assets/CustomComponents';
+import { BrownButton, BrownOutlinedTextField, ErrorTooltip, handleFacebookLogin, handleGoogleLogin, knownEmailProviders, LoadingOverlay, SocialLoginButtons } from '../../assets/CustomComponents';
 import Navbar from '../../components/Navbar/Navbar';
 import Footer from '../../components/Utils/Footer';
 import { registerUser } from '../../store/actions/authActions';
@@ -21,6 +21,7 @@ const Register = () => {
     });
     const [focusedField, setFocusedField] = useState(null);
     const [showPassword, setShowPassword] = useState(false);
+    const [loading, setLoading] = useState(false);
 
     const handleClickShowPassword = () => setShowPassword((prev) => !prev);
     const handleMouseDownPassword = (event) => event.preventDefault();
@@ -60,6 +61,8 @@ const Register = () => {
     };
 
     const handleSubmit = async (e) => {
+        setLoading(true);
+
         e.preventDefault();
         if (Object.values(formData).some((value) => !value)) {
             return toast.error('Please fill in all fields');
@@ -75,14 +78,15 @@ const Register = () => {
         try {
             const response = await dispatch(registerUser(formData));
             if (response?.success) {
-                toast.success('Registration successful, please log in');
-                navigate('/login');
+                navigate('/verify-otp', { state: { email: response.data.email } });
             } else if (response?.errors) {
                 response.errors.forEach((err) => toast.info(`${err.message}`));
             }
         } catch (error) {
             console.error('Registration error:', error);
             toast.error('An error occurred during registration');
+        } finally {
+            setLoading(false);
         }
     };
 
@@ -90,6 +94,8 @@ const Register = () => {
 
     return (
         <Box className="flex flex-col bg-neutral-50 min-h-[100vh]">
+            {loading && <LoadingOverlay />}
+
             <Navbar />
             <Container component="main" maxWidth="xs" className="flex flex-1 flex-col align-left mt-20 mb-20">
                 <div className="bg-white flex flex-col align-left rounded-md shadow-md p-6">
