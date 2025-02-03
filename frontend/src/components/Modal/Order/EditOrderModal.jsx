@@ -1,7 +1,7 @@
 import { Box, Chip, MenuItem, Typography } from '@mui/material';
 import React, { useEffect, useState } from 'react';
 import { toast } from 'react-toastify';
-import { ActionButtons, BrownOutlinedTextField, CustomBox, CustomModal, CustomTypography, formatDate, ReadOnlyTextField } from '../../../assets/CustomComponents';
+import { ActionButtons, BrownOutlinedTextField, CustomBox, CustomModal, CustomTypography, formatDate, handleApiError, ReadOnlyTextField } from '../../../assets/CustomComponents';
 import { productChipSx } from '../../../assets/sx';
 import { editOrderService } from '../../../services/orderService';
 
@@ -52,7 +52,7 @@ const EditOrderModal = ({ open, onClose, order, onViewDetails, onEditSuccess }) 
 
             toast.success(response.data.message, {
                 onClick: () => copyToClipboard(order._id),
-                autoClose: false
+                autoClose: 6000
             });
 
             onEditSuccess(response.data);

@@ -138,7 +138,7 @@ const OrderDetails = () => {
                                                             <img
                                                                 src={getImageUrl(product.image)}
                                                                 alt={product.name}
-                                                                className="w-16 h-16 object-contain rounded mr-2"
+                                                                className="w-16 h-16 object-contain rounded mr-4"
                                                             />
                                                             <div>
                                                                 <div className='hover:underline'>{product.name}</div>

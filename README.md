@@ -218,7 +218,9 @@ The root `package.json` should look like this:
   "description": "",
   "main": "index.js",
   "scripts": {
-    "start": "concurrently --kill-others \"npm run start-frontend\" \"npm run start-backend\"",
+    "check-frontend-env": "node frontend/src/utils/checkEnv.js",
+    "check-backend-env": "node backend/config/checkEnv.js",
+    "start": "npm run check-frontend-env && npm run check-backend-env && concurrently --kill-others \"npm run start-frontend\" \"npm run start-backend\"",
     "start-frontend": "cd frontend && npm run dev",
     "start-backend": "cd backend && npm run dev"
   },
@@ -239,14 +241,16 @@ Once the application is running, you can access it in your web browser at `http:
 
 ## Features
 
-- User authentication and authorization with accessToken through cookies
-- Google and Facebook login options for seamless authentication
-- State management with Redux for handling application state
+- User [authentication](https://auth0.com/intro-to-iam/what-is-authentication) and [authorization](https://auth0.com/intro-to-iam/what-is-authorization) using [JSON Web Tokens](https://jwt.io/introduction) through [cookies](https://www.cloudflare.com/learning/privacy/what-are-cookies/)
+- [Google](https://developers.google.com) and [Facebook](https://developers.facebook.com) login options for seamless authentication
+- [OTP](https://en.wikipedia.org/wiki/One-time_password) account verification through email for enhanced security, via local SMTP configuration
+- [Role-based access control](https://auth0.com/docs/manage-users/access-control/rbac) for different user roles
+- [Redux state management](https://redux.js.org/introduction/getting-started) for handling application state
 - Address management for shipping
 - Product management with categories
 - Wishlist for saving your favorite products
 - Shopping cart functionality
-- Simple payment options with Stripe or cash
+- Simple payment options with [Stripe](https://stripe.com) or cash
 - Real-time order tracking for updates on your purchases
 - Users can submit reviews and request returns for products in orders with the status marked as ``Delivered``
 

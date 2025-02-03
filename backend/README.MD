@@ -37,6 +37,8 @@ The backend provides APIs that are documented and accessible through Postman. Yo
 - **cors.js**: Sets up Cross-Origin Resource Sharing (CORS) settings, allowing or restricting access to the backend from specific domains.
 - **db.js**: Establishes a connection to the MongoDB database, enabling the backend to read and write data to the database.
 - **dotenv.js**: Loads environment variables from a `.env` file. This is essential for securely storing sensitive configuration values (like database credentials, API keys, and secrets). It uses the `dotenv` package to load variables, and if any are missing or undefined, it will throw an error.
+- **emailService.js**: Sends emails for different purposes using the configured SMTP settings defined in `mailer.js`.
+- **mailer.js**: Configures a Gmail SMTP transporter for sending emails using the `nodemailer` library.
 - **passport.js**: Configures strategies for user authentication via third-party services like Google and Facebook using Passport.js.
 - **server.js**: Initializes and starts the server, setting up necessary configurations and listening for incoming API requests.
 
@@ -83,6 +85,7 @@ The backend provides APIs that are documented and accessible through Postman. Yo
     "jsonwebtoken": "^9.0.2",
     "mongoose": "^8.5.1",
     "multer": "^1.4.5-lts.1",
+    "nodemailer": "^6.10.0",
     "passport": "^0.7.0",
     "passport-facebook": "^3.0.0",
     "passport-google-oauth20": "^2.0.0",
@@ -109,6 +112,10 @@ The backend provides APIs that are documented and accessible through Postman. Yo
 - **[JWT (jsonwebtoken)](https://jwt.io/introduction)**: A package that provides methods for creating, signing, and verifying JSON Web Tokens, used to secure API endpoints.
 - **[Mongoose](https://www.npmjs.com/package/mongoose)**: An Object Document Mapper (ODM) that simplifies interactions with MongoDB by providing schema-based models for documents.
 - **[Multer](https://www.npmjs.com/package/multer)**: Middleware used for handling multipart form data, commonly used for handling file uploads (like images).
+- **[Nodemailer](https://www.npmjs.com/package/nodemailer)**: A library for sending emails using a SMTP transport, allowing the backend to send verification emails and other notifications.
+- **[Passport](https://www.npmjs.com/package/passport)**: A middleware for handling authentication strategies, including Facebook and Google OAuth.
+- **[Passport-Facebook](https://www.npmjs.com/package/passport-facebook)**: A strategy for authenticating users using Facebook OAuth.
+- **[Passport-Google-OAuth20](https://www.npmjs.com/package/passport-google-oauth20)**: A strategy for authenticating users using Google OAuth.
 - **[Nodemon](https://www.npmjs.com/package/nodemon)**: A development utility that automatically restarts the server when changes are detected in the source code.
 - **[Stripe](https://www.npmjs.com/package/stripe)**: A library for integrating with the Stripe payment system, allowing the backend to handle payments securely.
 - **[Yup](https://www.npmjs.com/package/yup)**: A JavaScript schema validator used for validating and parsing data to ensure it conforms to expected structures.

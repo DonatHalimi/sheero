@@ -4,7 +4,7 @@ const User = require('../models/User');
 const Role = require('../models/Role');
 const cookieConfig = require('../config/cookie');
 const { JWT_SECRET } = require('../config/dotenv');
-const sendVerificationEmail = require('../config/sendVerificationEmail');
+const { sendVerificationEmail } = require('../config/emailService');
 
 const generateAccessToken = (user) => {
     return jwt.sign({

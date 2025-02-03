@@ -3,6 +3,7 @@ const Order = require('../models/Order');
 const Stripe = require('stripe');
 const Cart = require('../models/Cart');
 const { STRIPE_SECRET_KEY, NODE_ENV } = require('../config/dotenv');
+const { sendOrderUpdateEmail } = require('../config/emailService');
 
 const stripe = Stripe(STRIPE_SECRET_KEY);
 
@@ -98,6 +99,24 @@ const payWithStripe = async (req, res) => {
 
         await Order.findByIdAndUpdate(order._id, { paymentIntentId: session.id });
 
+        const populatedOrder = await Order.findById(order._id)
+            .populate('user')
+            .populate('products.product')
+            .populate('address')
+            .populate({
+                path: 'address',
+                populate: [
+                    { path: 'city', select: 'name zipCode' },
+                    { path: 'country', select: 'name' }
+                ]
+            });
+
+        if (populatedOrder.user && populatedOrder.user.email) {
+            await sendOrderUpdateEmail(populatedOrder);
+        } else {
+            console.warn(`Order ${order._id} has no user email associated.`);
+        }
+
         res.json({ url: session.url });
     } catch (error) {
         console.error('Error creating Stripe session or saving order', error);
@@ -135,9 +154,8 @@ const payWithCash = async (req, res) => {
     try {
         const cart = await Cart.findById(cartId).populate('items.product');
         const address = await Address.findById(addressId)
-            .populate('city', 'name')
-            .populate('country', 'name')
-            .exec();
+            .populate('city', 'name zipCode')
+            .populate('country', 'name');
 
         if (!cart || !address) {
             return res.status(404).send('Cart or address not found');
@@ -173,7 +191,29 @@ const payWithCash = async (req, res) => {
             })
         );
 
-        res.json({ success: true, message: 'Order created successfully. Please pay with cash on delivery.' });
+        const populatedOrder = await Order.findById(order._id)
+            .populate('user')
+            .populate('products.product')
+            .populate('address')
+            .populate({
+                path: 'address',
+                populate: [
+                    { path: 'city', select: 'name zipCode' },
+                    { path: 'country', select: 'name' }
+                ]
+            });
+
+        if (populatedOrder.user && populatedOrder.user.email) {
+            await sendOrderUpdateEmail(populatedOrder);
+        } else {
+            console.warn(`Order ${order._id} has no user email associated.`);
+        }
+
+        res.json({
+            success: true,
+            message: 'Order created successfully. Please pay with cash on delivery.',
+            order: populatedOrder,
+        });
     } catch (error) {
         console.error('Error processing cash order', error);
         res.status(500).json({ error: 'Server error', details: error.message });
@@ -263,7 +303,16 @@ const updateDeliveryStatus = async (req, res) => {
             return res.status(400).json({ success: false, message: 'orderId and status are required.' });
         }
 
-        const order = await Order.findById(orderId).populate('products.product');
+        const order = await Order.findById(orderId)
+            .populate('products.product')
+            .populate('user')
+            .populate({
+                path: 'address',
+                populate: [
+                    { path: 'city', select: 'name zipCode' },
+                    { path: 'country', select: 'name' }
+                ]
+            });
 
         if (!order) {
             return res.status(404).json({ success: false, message: 'Order not found.' });
@@ -284,6 +333,12 @@ const updateDeliveryStatus = async (req, res) => {
         }
 
         await order.save();
+
+        if (order.user && order.user.email) {
+            await sendOrderUpdateEmail(order);
+        } else {
+            console.warn(`Order ${orderId} has no user email associated.`);
+        }
 
         res.json({
             success: true,
