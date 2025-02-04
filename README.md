@@ -82,7 +82,7 @@ To set up the project locally, follow these steps:
   - **NODE_ENV**: The environment in which the app is running (`development` or `production`).
   - **SEED_DB**: Set to `true` to enable initial database seeding (e.g., creating the default roles and the admin user). Useful for the first-time setup or resetting the database. Leave it empty or set to `false` to skip seeding.
   - **ADMIN_FIRST_NAME**, **ADMIN_LAST_NAME**, **ADMIN_EMAIL**, **ADMIN_PASSWORD**: Credentials for the default admin user to be created during database seeding.
-  - **SESSION_SECRET**: A secret key used for signing session cookies.
+  - **SESSION_SECRET**: A secret key used for signing session cookies for google and facebook login.
   - **GOOGLE_CLIENT_ID**, **GOOGLE_CLIENT_SECRET**: Client IDs and secrets for Google OAuth integration.
   - **FACEBOOK_CLIENT_ID**, **FACEBOOK_CLIENT_SECRET**: Client IDs and secrets for Facebook OAuth integration.
   - **SMTP_USER**, **SMTP_PASS**: SMTP credentials for sending emails.
@@ -175,10 +175,12 @@ To configure Gmail SMTP for sending emails from your application, follow these s
 ### **Generate SMTP Credentials for Gmail**  
 
 #### **SMTP Username**  
-Your SMTP username is your Gmail email address (e.g., `your_email@gmail.com`).  
+**SMTP_USER** is simply your Gmail email address (e.g., `SMTP_USER=your_email@gmail.com`).  
 
-#### **SMTP Password (Google App Password)**  
-If two-factor authentication is enabled, you must generate an App Password instead of using your regular password in the `.env` file.  
+#### **SMTP Password**  
+If you have two-factor authentication enabled, you must generate an App Password instead of using your regular password in the `.env` file for the SMTP password.  
+
+Follow these steps to generate an App Password:
 
 1. **Access Google Security Settings**  
    - Navigate to [Google Account Security](https://myaccount.google.com/security).  
@@ -187,7 +189,7 @@ If two-factor authentication is enabled, you must generate an App Password inste
    - In the search bar at the navigation bar, type **"App passwords"**.  
    - Sign in again if prompted.  
    - Under the **App name** field, enter a relevant name for your application (e.g., **"sheero"**).  
-   - Click **Create**, then copy the generated 16-character password into the backend `.env` file.  
+   - Click **Create**, then copy the generated 16-character password into the backend `.env` file for the **SMTP_PASS** environment variable. (e.g., `SMTP_PASS=your_generated_password`)
 
 ---
 
@@ -253,16 +255,18 @@ Once the application is running, you can access it in your web browser at `http:
 - Simple payment options with [Stripe](https://stripe.com) or cash
 - Real-time order tracking for updates on your purchases
 - Users can submit reviews and request returns for products in orders with the status marked as ``Delivered``
+- Personalized email notifications for order status updates, return requests status updates and product reviews
+- Export user and address data as JSON, order and return request data as PDF, and all admin dashboard data as Excel or JSON
 
 ### Technologies Used
 
 #### Frontend
 The frontend is built with modern web technologies that focus on UI/UX, routing, and handling API requests efficiently.  
-Follow the instructions in the [frontend/README.md](frontend/README.md) file to learn more about the structure of the frontend directory and `package.json`.
+Follow the documentation in the [frontend/README.md](frontend/README.md) file to learn more about the structure of the frontend directory and its `package.json`.
 
 #### Backend
 The backend is a Node.js API server designed to handle requests, manage authentication, and interact with the MongoDB database. It uses JWT tokens for secure access and authorization, along with Stripe for payment integration.  
-Follow the instructions in the [backend/README.md](backend/README.md) file to learn more about the structure of the backend directory and `package.json`.
+Follow the documentation in the [backend/README.md](backend/README.md) file to learn more about the structure of the backend directory and its `package.json`.
 
 ## Stripe Payment Testing
 

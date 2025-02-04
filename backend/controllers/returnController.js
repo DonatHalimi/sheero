@@ -19,17 +19,10 @@ const createReturnRequest = async (req, res) => {
         });
 
         const savedReturnRequest = await returnRequest.save();
-        if (!savedReturnRequest || !savedReturnRequest._id) {
-            throw new Error('Failed to save return request');
-        }
 
         const populatedReturnRequest = await ReturnRequest.findById(savedReturnRequest._id)
             .populate('user')
             .populate('products');
-
-        if (!populatedReturnRequest) {
-            return res.status(404).json({ message: 'Return request not found after saving' });
-        }
 
         if (populatedReturnRequest.user?.email) {
             await sendReturnRequestUpdateEmail(populatedReturnRequest);

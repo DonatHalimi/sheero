@@ -3,7 +3,7 @@ import React, { useEffect, useState } from 'react';
 import { useSelector } from 'react-redux';
 import { useNavigate } from 'react-router-dom';
 import { toast } from 'react-toastify';
-import { BrownButton, BrownOutlinedTextField, CustomBox, CustomModal, CustomTypography } from '../../../assets/CustomComponents';
+import { BrownButton, BrownOutlinedTextField, CustomBox, CustomModal, CustomTypography, LoadingOverlay } from '../../../assets/CustomComponents';
 import { addReviewService, checkReviewEligibilityService } from '../../../services/reviewService';
 
 const AddReviewModal = ({ open, onClose, product, onReviewSuccess }) => {
@@ -16,6 +16,7 @@ const AddReviewModal = ({ open, onClose, product, onReviewSuccess }) => {
     const [titleValid, setTitleValid] = useState(true);
     const [commentValid, setCommentValid] = useState(true);
     const [focusedField, setFocusedField] = useState(null);
+    const [loading, setLoading] = useState(false);
 
     const validateTitle = (v) => /^[A-Z][\Wa-zA-Z\s]{2,40}$/.test(v);
     const validateComment = (v) => /^[A-Z][\Wa-zA-Z\s]{3,500}$/.test(v);
@@ -56,6 +57,7 @@ const AddReviewModal = ({ open, onClose, product, onReviewSuccess }) => {
     };
 
     const handleAddReview = async () => {
+        setLoading(true);
         if (!isAuthenticated) {
             toast.info('You need to be logged in to add a review');
             return;
@@ -99,6 +101,8 @@ const AddReviewModal = ({ open, onClose, product, onReviewSuccess }) => {
             } else {
                 toast.error('Error adding review');
             }
+        } finally {
+            setLoading(false);
         }
     };
 
@@ -110,6 +114,8 @@ const AddReviewModal = ({ open, onClose, product, onReviewSuccess }) => {
                 <CustomTypography variant="h5" className="!text-gray-800 !font-semilight">
                     Add Review
                 </CustomTypography>
+
+                {loading && <LoadingOverlay />}
 
                 {canReview === false && (
                     <CustomTypography variant="body2" className="!text-red-600">

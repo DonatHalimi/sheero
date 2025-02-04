@@ -42,6 +42,7 @@ import {
 import React, { useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { ActiveListItem, CollapsibleListItem, DashboardSearchBar, getLocalStorageState, saveLocalStorageState, StyledInboxIcon, StyledMoveToInboxIcon } from '../../assets/CustomComponents';
+import { Tooltip } from '@mui/material';
 
 // User related pages
 const userMenuItems = [
@@ -203,13 +204,18 @@ export const mainListItems = ({ setCurrentView, collapsed }) => {
   }, []);
 
   const renderMenuItem = ({ id, icon, label }) => (
-    <ActiveListItem
-      key={id}
-      handleClick={() => handleItemClick(id)}
-      selected={activeItem === id}
-      icon={activeItem === id ? <icon.active /> : <icon.inactive />}
-      primary={!collapsed ? label : ""}
-    />
+    <div key={id}>
+      <Tooltip title={collapsed ? label : ""} arrow placement="right">
+        <div>
+          <ActiveListItem
+            handleClick={() => handleItemClick(id)}
+            selected={activeItem === id}
+            icon={activeItem === id ? <icon.active /> : <icon.inactive />}
+            primary={!collapsed ? label : ""}
+          />
+        </div>
+      </Tooltip>
+    </div>
   );
 
   const getAllMenuItems = () => {

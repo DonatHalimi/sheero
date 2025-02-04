@@ -1,6 +1,7 @@
 const Review = require('../models/Review');
 const Product = require('../models/Product');
 const Order = require('../models/Order');
+const { sendReviewEmail } = require('../config/emailService');
 
 const populateR = (query) => {
     return query.populate([
@@ -23,7 +24,18 @@ const createReview = async (req, res) => {
             comment
         });
 
-        await review.save();
+        const savedReview = await review.save();
+
+        const populatedReview = await Review.findById(savedReview._id)
+            .populate('user')
+            .populate('product');
+
+        if (populatedReview.user?.email) {
+            await sendReviewEmail(populatedReview);
+        } else {
+            console.warn(`Review ${savedReview._id} has no associated email.`);
+        }
+
         await Product.findByIdAndUpdate(productId, { $push: { reviews: review._id } });
 
         res.status(201).json({ message: 'Review created successfully', review });

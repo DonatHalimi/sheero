@@ -1,5 +1,5 @@
 const { SMTP_USER } = require('./dotenv');
-const { statusImages, returnStatusImages, createAttachments, generateEmailVerificationHtml, generateOrderEmailHtml, generateReturnRequestEmailHtml,
+const { statusImages, returnStatusImages, createAttachments, generateEmailVerificationHtml, generateOrderEmailHtml, generateReturnRequestEmailHtml, generateReviewEmailHtml,
     brandImages, headerMessages, returnStatusMessages, returnBodyMessages, orderStatusMessages, orderBodyMessages }
     = require('./emailUtils');
 const transporter = require('./mailer');
@@ -93,4 +93,22 @@ async function sendReturnRequestUpdateEmail(returnRequest) {
     return sendEmail(returnRequest.user.email, subject, text, html, attachments);
 }
 
-module.exports = { sendVerificationEmail, sendOrderUpdateEmail, sendReturnRequestUpdateEmail };
+async function sendReviewEmail(review) {
+    if (!review || !review._id) {
+        throw new Error('Invalid review object');
+    }
+
+    const { orderAttachments, returnRequestAttachments, reviewAttachments } = createAttachments(undefined, undefined, review);
+    const attachments = [...orderAttachments, ...returnRequestAttachments, ...reviewAttachments];
+
+    const subject = `Review for ${review.product.name} at sheero`;
+    const text = `Review #${review._id}`;
+
+    const html = generateReviewEmailHtml(review, {
+        brandImages,
+    });
+
+    return sendEmail(review.user.email, subject, text, html, attachments);
+}
+
+module.exports = { sendVerificationEmail, sendOrderUpdateEmail, sendReturnRequestUpdateEmail, sendReviewEmail };
