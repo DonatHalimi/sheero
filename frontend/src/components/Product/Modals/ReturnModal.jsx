@@ -2,7 +2,7 @@ import { Checkbox, FormControl, FormControlLabel, InputLabel, ListItemText, Menu
 import React, { useEffect, useState } from 'react';
 import { useNavigate, useParams } from 'react-router-dom';
 import { toast } from 'react-toastify';
-import { BrownButton, CustomBox, CustomModal, LoadingReturn } from '../../../assets/CustomComponents';
+import { BrownButton, CustomBox, CustomModal, LoadingOverlay, LoadingReturn } from '../../../assets/CustomComponents';
 import { getOrderDetailsService } from '../../../services/orderService';
 import { addReturnRequestService } from '../../../services/returnService';
 import { getImageUrl } from '../../../utils/config';
@@ -16,6 +16,7 @@ const ReturnModal = ({ open, onClose }) => {
     const [confirmSelection, setConfirmSelection] = useState(false);
 
     const [loading, setLoading] = useState(true);
+    const [submitLoading, setSubmitLoading] = useState(false);
 
     const [customReasonValid, setCustomReasonValid] = useState(true);
     const [focusedField, setFocusedField] = useState(null);
@@ -76,6 +77,7 @@ const ReturnModal = ({ open, onClose }) => {
     };
 
     const handleSubmit = async () => {
+        setSubmitLoading(true);
         if (selectedProducts.length === 0 || reason.trim() === '') {
             toast.error("Please select at least one product and provide a reason for the return.");
             return;
@@ -111,6 +113,8 @@ const ReturnModal = ({ open, onClose }) => {
                 toast.error(error.response?.data?.message || 'Error submitting return request.');
             }
             console.error('Error submitting return request:', error);
+        } finally {
+            setSubmitLoading(false);
         }
     };
 
@@ -119,6 +123,8 @@ const ReturnModal = ({ open, onClose }) => {
     return (
         <CustomModal open={open} onClose={onClose}>
             <CustomBox>
+                {submitLoading && <LoadingOverlay />}
+
                 <Typography variant="h6" className='!mb-3'>
                     Return Products
                 </Typography>

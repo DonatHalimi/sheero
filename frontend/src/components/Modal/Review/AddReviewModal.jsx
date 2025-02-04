@@ -52,7 +52,7 @@ const AddReviewModal = ({ open, onClose, onAddSuccess }) => {
         const alreadyReviewed = userReviews.some(review => review.productId === productId);
 
         if (alreadyReviewed) {
-            toast.error('You have already reviewed this product', { closeOnClick: true });
+            toast.error('You have already reviewed this product');
             return;
         }
 

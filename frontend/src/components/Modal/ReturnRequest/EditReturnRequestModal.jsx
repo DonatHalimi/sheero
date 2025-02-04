@@ -1,11 +1,12 @@
 import { MenuItem, Select } from '@mui/material';
 import React, { useEffect, useState } from 'react';
 import { toast } from 'react-toastify';
-import { ActionButtons, CustomBox, CustomModal, CustomTypography, handleApiError, ReadOnlyTextField } from '../../../assets/CustomComponents';
+import { ActionButtons, BrownOutlinedTextField, CustomBox, CustomModal, CustomTypography, handleApiError, LoadingOverlay, ReadOnlyTextField } from '../../../assets/CustomComponents';
 import { editReturnRequestStatusService } from '../../../services/returnService';
 
 const EditReturnRequestModal = ({ open, onClose, returnRequest, onViewDetails, onEditSuccess }) => {
     const [status, setStatus] = useState(returnRequest ? returnRequest.status : 'pending');
+    const [loading, setLoading] = useState(false);
 
     const user = `${returnRequest?.user.firstName} ${returnRequest?.user.lastName} - ${returnRequest?.user.email}`;
     const products = typeof returnRequest?.products === 'string'
@@ -30,6 +31,13 @@ const EditReturnRequestModal = ({ open, onClose, returnRequest, onViewDetails, o
     };
 
     const handleEditReturnRequest = async () => {
+        setLoading(true);
+
+        if (!status) {
+            toast.error('Please select a status');
+            return;
+        }
+
         const updatedData = {
             status,
         };
@@ -39,21 +47,24 @@ const EditReturnRequestModal = ({ open, onClose, returnRequest, onViewDetails, o
 
             toast.success(response.data.message, {
                 onClick: () => copyToClipboard(returnRequest._id),
-                autoClose: false
+                autoClose: 6000
             });
 
             onEditSuccess(response.data);
             onClose();
         } catch (error) {
             handleApiError(error, 'Error updating return request');
+        } finally {
+            setLoading(false);
         }
     };
 
     return (
         <CustomModal open={open} onClose={onClose}>
             <CustomBox>
-                <CustomTypography variant="h5">Edit Status</CustomTypography>
+                <CustomTypography variant="h5">Edit Return Request Status</CustomTypography>
 
+                {loading && <LoadingOverlay />}
 
                 <ReadOnlyTextField
                     label="Order ID"
@@ -91,18 +102,19 @@ const EditReturnRequestModal = ({ open, onClose, returnRequest, onViewDetails, o
                     />
                 )}
 
-                <Select
-                    label="Status"
+                <BrownOutlinedTextField
+                    select
+                    fullWidth
+                    label="Return Request Status"
                     value={status}
                     onChange={(e) => setStatus(e.target.value)}
-                    fullWidth
                     className="!mb-4"
                 >
                     <MenuItem value="pending">Pending</MenuItem>
                     <MenuItem value="approved">Approved</MenuItem>
                     <MenuItem value="processed">Processed</MenuItem>
                     <MenuItem value="rejected">Rejected</MenuItem>
-                </Select>
+                </BrownOutlinedTextField>
 
                 <ActionButtons
                     primaryButtonLabel="Save"

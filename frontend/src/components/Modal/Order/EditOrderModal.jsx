@@ -1,12 +1,13 @@
 import { Box, Chip, MenuItem, Typography } from '@mui/material';
 import React, { useEffect, useState } from 'react';
 import { toast } from 'react-toastify';
-import { ActionButtons, BrownOutlinedTextField, CustomBox, CustomModal, CustomTypography, formatDate, handleApiError, ReadOnlyTextField } from '../../../assets/CustomComponents';
+import { ActionButtons, BrownOutlinedTextField, CustomBox, CustomModal, CustomTypography, formatDate, handleApiError, LoadingOverlay, ReadOnlyTextField } from '../../../assets/CustomComponents';
 import { productChipSx } from '../../../assets/sx';
 import { editOrderService } from '../../../services/orderService';
 
 const EditOrderModal = ({ open, onClose, order, onViewDetails, onEditSuccess }) => {
     const [newStatus, setNewStatus] = useState(order?.status || '');
+    const [loading, setLoading] = useState(false);
 
     const user = `${order?.user?.firstName} ${order?.user?.lastName} - ${order?.user?.email}`;
     const productLabel = order?.products?.length > 1 ? 'Products' : 'Product';
@@ -25,10 +26,9 @@ const EditOrderModal = ({ open, onClose, order, onViewDetails, onEditSuccess }) 
     };
 
     const handleEditOrder = async () => {
+        setLoading(true);
         if (!newStatus) {
-            toast.error('Please select a status', {
-                closeOnClick: true
-            });
+            toast.error('Please select a status');
             return;
         }
 
@@ -59,6 +59,8 @@ const EditOrderModal = ({ open, onClose, order, onViewDetails, onEditSuccess }) 
             onClose();
         } catch (error) {
             handleApiError(error, 'Error updating order status');
+        } finally {
+            setLoading(false);
         }
     };
 
@@ -66,6 +68,8 @@ const EditOrderModal = ({ open, onClose, order, onViewDetails, onEditSuccess }) 
         <CustomModal open={open} onClose={onClose}>
             <CustomBox>
                 <CustomTypography variant="h5">Edit Order Status</CustomTypography>
+
+                {loading && <LoadingOverlay />}
 
                 <ReadOnlyTextField
                     label="Order ID"

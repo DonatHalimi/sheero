@@ -23,7 +23,7 @@ const EditCountryModal = ({ open, onClose, country, onViewDetails, onEditSuccess
 
     const handleEditCountry = async () => {
         if (!name || !countryCode) {
-            toast.error('Please fill in all required fields', { closeOnClick: true });
+            toast.error('Please fill in all required fields');
             return;
         }
 

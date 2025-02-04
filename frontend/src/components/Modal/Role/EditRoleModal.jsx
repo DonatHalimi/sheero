@@ -19,7 +19,7 @@ const EditRoleModal = ({ open, onClose, role, onViewDetails, onEditSuccess }) =>
 
     const handleEditRole = async () => {
         if (!name) {
-            toast.error('Please fill in the role name', { closeOnClick: true });
+            toast.error('Please fill in the role name');
             return;
         }
 

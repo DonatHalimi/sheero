@@ -38,6 +38,7 @@ The backend provides APIs that are documented and accessible through Postman. Yo
 - **db.js**: Establishes a connection to the MongoDB database, enabling the backend to read and write data to the database.
 - **dotenv.js**: Loads environment variables from a `.env` file. This is essential for securely storing sensitive configuration values (like database credentials, API keys, and secrets). It uses the `dotenv` package to load variables, and if any are missing or undefined, it will throw an error.
 - **emailService.js**: Sends emails for different purposes using the configured SMTP settings defined in `mailer.js`.
+- **emailUtils.js**: Utility functions for sending emails.
 - **mailer.js**: Configures a Gmail SMTP transporter for sending emails using the `nodemailer` library.
 - **passport.js**: Configures strategies for user authentication via third-party services like Google and Facebook using Passport.js.
 - **server.js**: Initializes and starts the server, setting up necessary configurations and listening for incoming API requests.

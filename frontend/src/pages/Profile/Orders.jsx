@@ -140,7 +140,6 @@ const Orders = () => {
                 )}
             </ProfileLayout>
 
-            {filteredOrders.length === 1 && <div className='mb-48' />}
             <Footer />
         </>
     );

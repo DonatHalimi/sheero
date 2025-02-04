@@ -113,7 +113,6 @@ const Returns = () => {
                 )}
             </ProfileLayout>
 
-            {filteredReturns.length === 1 && <div className="mb-48" />}
             <Footer />
         </>
     );
