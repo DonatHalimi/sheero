@@ -39,10 +39,10 @@ import {
   Widgets,
   WidgetsOutlined
 } from '@mui/icons-material';
+import { Tooltip } from '@mui/material';
 import React, { useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { ActiveListItem, CollapsibleListItem, DashboardSearchBar, getLocalStorageState, saveLocalStorageState, StyledInboxIcon, StyledMoveToInboxIcon } from '../../assets/CustomComponents';
-import { Tooltip } from '@mui/material';
 
 // User related pages
 const userMenuItems = [

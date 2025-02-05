@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
-import { DashboardHeader, DashboardImage, exportOptions, LoadingDataGrid } from '../../assets/CustomComponents';
+import { DashboardHeader, DashboardImage, exportOptions, formatDetails, formatDimensions, formatDiscount, formatName, formatReviews, formatShipping, formatSupplier, formatVariants, LoadingDataGrid } from '../../assets/CustomComponents';
 import { exportToExcel, exportToJSON } from '../../assets/DataExport';
 import DashboardTable from '../../components/Dashboard/DashboardTable';
 import DeleteModal from '../../components/Modal/DeleteModal';
@@ -103,40 +103,6 @@ const ProductsPage = () => {
     const closeDrawer = () => {
         setViewDetailsOpen(false);
         setSelectedProduct(null);
-    };
-
-    const formatDimensions = (dimensions) => {
-        return `${dimensions.length ? dimensions.length + ' x ' : ''}${dimensions.width ? dimensions.width + ' x ' : ''}${dimensions.height ? dimensions.height : ''} ${dimensions.unit}`;
-    };
-
-    const formatDiscount = (discount) => {
-        return discount ? `${discount.value} ${discount.type}` : 'No Discount';
-    };
-
-    const formatName = (name) => {
-        return name?.name || 'Not Found';
-    };
-
-    const formatVariants = (variants) => {
-        return variants.length ? variants.map(variant => variant.name).join(', ') : 'No Variants';
-    };
-
-    const formatSupplier = (supplier) => {
-        return `${supplier?.name || 'No Supplier'} (${supplier?.contactInfo?.email || 'No Email'})`;
-    };
-
-    const formatDetails = (details) => {
-        return details.length ? details.join(', ') : 'No Details';
-    };
-
-    const formatReviews = (reviews) => {
-        return reviews.length
-            ? reviews.join(', ')
-            : 'No Reviews';
-    };
-
-    const formatShipping = (shipping) => {
-        return `${shipping?.packageSize || 'Unknown Size'} | ${shipping?.cost ? '€' + shipping.cost : 'No Cost'} | Dimensions: ${shipping?.dimensions ? formatDimensions(shipping.dimensions) : 'No Dimensions'}`;
     };
 
     const columns = [

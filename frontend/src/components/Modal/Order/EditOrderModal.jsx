@@ -1,9 +1,10 @@
 import { Box, Chip, MenuItem, Typography } from '@mui/material';
 import React, { useEffect, useState } from 'react';
 import { toast } from 'react-toastify';
-import { ActionButtons, BrownOutlinedTextField, CustomBox, CustomModal, CustomTypography, formatDate, handleApiError, LoadingOverlay, ReadOnlyTextField } from '../../../assets/CustomComponents';
+import { ActionButtons, BoxBetween, BrownOutlinedTextField, CustomBox, CustomModal, CustomTypography, formatDate, handleApiError, LoadingOverlay, ReadOnlyTextField } from '../../../assets/CustomComponents';
 import { productChipSx } from '../../../assets/sx';
 import { editOrderService } from '../../../services/orderService';
+import { getImageUrl } from '../../../utils/config';
 
 const EditOrderModal = ({ open, onClose, order, onViewDetails, onEditSuccess }) => {
     const [newStatus, setNewStatus] = useState(order?.status || '');
@@ -82,23 +83,39 @@ const EditOrderModal = ({ open, onClose, order, onViewDetails, onEditSuccess }) 
                     label="User"
                     value={user}
                     fullWidth
-                    className="!mb-4"
+                    className="!mb-2"
                 />
 
-                <Box>
+                <Box className="!mb-4">
                     <Typography variant="body1" className="!font-semibold !mb-2">
                         {productLabel} + (Quantity)
                     </Typography>
                     {order?.products && order?.products.length > 0 ? (
                         order?.products.map((item, index) => (
-                            <Box
-                                key={index}
-                                sx={productChipSx}
-                            >
+                            <Box key={index} sx={productChipSx}>
                                 <Chip
-                                    label={`${item.product?.name} (${item.quantity})`}
+                                    label={
+                                        <Box display="flex" alignItems="center" gap={1}>
+                                            <Box
+                                                onClick={() => window.open(`/product/${item.product?._id}`, '_blank')}
+                                                display="flex"
+                                                alignItems="center"
+                                                gap={1}
+                                                sx={{ cursor: 'pointer' }}
+                                            >
+                                                <img
+                                                    src={getImageUrl(item.product?.image)}
+                                                    alt={item.product?.name}
+                                                    className="w-10 h-10 object-contain"
+                                                />
+                                                <Typography variant="body2" className="!font-semibold hover:underline">
+                                                    {`${item.product?.name} (${item.quantity})`}
+                                                </Typography>
+                                            </Box>
+                                        </Box>
+                                    }
                                     variant="outlined"
-                                    className="!font-semibold w-full !justify-start"
+                                    className="w-full !justify-start"
                                 />
                             </Box>
                         ))
@@ -109,17 +126,29 @@ const EditOrderModal = ({ open, onClose, order, onViewDetails, onEditSuccess }) 
                     )}
                 </Box>
 
-                <ReadOnlyTextField
-                    label="Total Amount"
-                    value={order?.totalAmount}
-                    className="!mb-4 !mt-4"
-                />
+                <BoxBetween>
+                    <ReadOnlyTextField
+                        label="Total Amount (€)"
+                        value={`€ ${order?.totalAmount.toFixed(2)}`}
+                        className="!mb-4"
+                    />
 
-                <ReadOnlyTextField
-                    label="Payment Method"
-                    value={order?.paymentMethod}
-                    className="!mb-4"
-                />
+                    <ReadOnlyTextField
+                        label="Payment Method"
+                        value={order?.paymentMethod}
+                        className="!mb-4"
+                    />
+                </BoxBetween>
+
+                {order?.paymentMethod === 'stripe' && (
+                    <ReadOnlyTextField
+                        label="Payment Intent Id"
+                        value={order?.paymentIntentId}
+                        multiline
+                        rows={2}
+                        className="!mb-4"
+                    />
+                )}
 
                 <ReadOnlyTextField
                     label="Arrival Date Range"

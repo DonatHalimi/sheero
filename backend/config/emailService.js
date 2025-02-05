@@ -1,8 +1,11 @@
 const { SMTP_USER } = require('./dotenv');
 const { statusImages, returnStatusImages, createAttachments, generateEmailVerificationHtml, generateOrderEmailHtml, generateReturnRequestEmailHtml, generateReviewEmailHtml,
-    brandImages, headerMessages, returnStatusMessages, returnBodyMessages, orderStatusMessages, orderBodyMessages }
+    brandImages, headerMessages, returnStatusMessages, returnBodyMessages, orderStatusMessages, orderBodyMessages,
+    generateProductInventoryEmailHtml }
     = require('./emailUtils');
 const transporter = require('./mailer');
+const Role = require('../models/Role');
+const User = require('../models/User');
 
 async function sendEmail(userEmail, subject, text, html, attachments = []) {
     const mailOptions = {
@@ -111,4 +114,50 @@ async function sendReviewEmail(review) {
     return sendEmail(review.user.email, subject, text, html, attachments);
 }
 
-module.exports = { sendVerificationEmail, sendOrderUpdateEmail, sendReturnRequestUpdateEmail, sendReviewEmail };
+async function sendProductInventoryUpdateEmail(order) {
+    if (!order || !order.user) {
+        console.error('Invalid order object');
+        return;
+    }
+
+    const { orderAttachments, returnRequestAttachments } = createAttachments(order, undefined);
+    const attachments = [...orderAttachments, ...returnRequestAttachments];
+
+    const subject = `Order #${order._id} Product Inventory Update`;
+    const text = `\n\Products inventory update for order #${order._id}.`;
+
+    try {
+        // Fetch the 'admin' role ObjectId
+        const adminRole = await Role.findOne({ name: 'admin' });
+        if (!adminRole) {
+            console.error('Admin role not found');
+            return;
+        }
+
+        // Fetch all users with the 'admin' role ObjectId
+        const adminUsers = await User.find({ role: adminRole._id });
+
+        if (adminUsers.length === 0) {
+            console.log('No admin users found');
+            return;
+        }
+
+        // Send the email to each admin user
+        for (const admin of adminUsers) {
+            const html = generateProductInventoryEmailHtml(order, {
+                recipientEmail: admin.email,
+                brandImages,
+                headerMessages,
+                orderStatusMessages,
+                orderBodyMessages,
+                statusImages,
+            });
+
+            await sendEmail(admin.email, subject, text, html, attachments);
+        }
+    } catch (error) {
+        console.error('Error sending emails to admins:', error);
+    }
+}
+
+module.exports = { sendVerificationEmail, sendOrderUpdateEmail, sendReturnRequestUpdateEmail, sendReviewEmail, sendProductInventoryUpdateEmail };

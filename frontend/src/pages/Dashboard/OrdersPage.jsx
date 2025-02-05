@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
-import { DashboardHeader, exportOptions, formatDate, LoadingDataGrid } from '../../assets/CustomComponents';
+import { DashboardHeader, exportOptions, formatAddress, formatArrivalDateRange, formatPaymentInfo, formatProducts, formatQuantity, formatTotalAmount, formatUser, LoadingDataGrid } from '../../assets/CustomComponents';
 import { exportToExcel, exportToJSON } from '../../assets/DataExport';
 import DashboardTable from '../../components/Dashboard/DashboardTable';
 import DeleteModal from '../../components/Modal/DeleteModal';
@@ -74,14 +74,6 @@ const OrdersPage = () => {
         setViewDetailsOpen(false);
         setSelectedOrder(null);
     };
-
-    const formatArrivalDateRange = (order) => `${formatDate(order.arrivalDateRange.start)} - ${formatDate(order.arrivalDateRange.end)}`;
-    const formatUser = (order) => `${order.user.email}`;
-    const formatProducts = (order) => order.products.map(item => item.product.name).join(', ');
-    const formatQuantity = (order) => order.products.map(item => item.quantity).join(', ');
-    const formatTotalAmount = (order) => `€  ${order.totalAmount.toFixed(2)}`;
-    const formatPaymentInfo = (order) => `${order.paymentMethod} - ${order.paymentStatus}`;
-    const formatAddress = (order) => `${order?.address?.street}, ${order?.address?.city?.name}, ${order?.address?.country?.name}, ${order?.address?.phoneNumber}`;
 
     const columns = [
         { key: '_id', label: 'Order ID' },

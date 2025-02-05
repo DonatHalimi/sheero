@@ -3,6 +3,7 @@ import React from 'react';
 import { BoxBetween, CloseButton, EditExportButtons, formatDate, ReadOnlyTextField } from '../../../assets/CustomComponents';
 import { downloadOrderData } from '../../../assets/DataExport';
 import { drawerPaperSx, productChipSx } from '../../../assets/sx';
+import { getImageUrl } from '../../../utils/config';
 
 const OrderDetailsDrawer = ({ open, onClose, order, onEdit }) => {
     const handleEditClick = () => {
@@ -46,14 +47,30 @@ const OrderDetailsDrawer = ({ open, onClose, order, onEdit }) => {
                             </Typography>
                             {order?.products && order?.products.length > 0 ? (
                                 order?.products.map((item, index) => (
-                                    <Box
-                                        key={index}
-                                        sx={productChipSx}
-                                    >
+                                    <Box key={index} sx={productChipSx}>
                                         <Chip
-                                            label={`${item.product?.name} (${item.quantity})`}
+                                            label={
+                                                <Box display="flex" alignItems="center" gap={1}>
+                                                    <Box
+                                                        onClick={() => window.open(`/product/${item.product?._id}`, '_blank')}
+                                                        display="flex"
+                                                        alignItems="center"
+                                                        gap={1}
+                                                        sx={{ cursor: 'pointer' }}
+                                                    >
+                                                        <img
+                                                            src={getImageUrl(item.product?.image)}
+                                                            alt={item.product?.name}
+                                                            className="w-10 h-10 object-contain"
+                                                        />
+                                                        <Typography variant="body2" className="!font-semibold hover:underline">
+                                                            {`${item.product?.name} (${item.quantity})`}
+                                                        </Typography>
+                                                    </Box>
+                                                </Box>
+                                            }
                                             variant="outlined"
-                                            className="!font-semibold w-full !justify-start"
+                                            className="w-full !justify-start"
                                         />
                                     </Box>
                                 ))

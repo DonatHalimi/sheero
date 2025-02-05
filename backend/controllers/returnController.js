@@ -79,7 +79,7 @@ const manageReturnRequest = async (req, res) => {
 const getAllReturnRequests = async (req, res) => {
     try {
         const returnRequests = await ReturnRequest.find()
-            .populate('products', '_id name')
+            .populate('products', '_id name image')
             .populate('user', '_id email firstName lastName')
             .sort({ createdAt: -1 });
 

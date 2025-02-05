@@ -366,6 +366,7 @@ export const productChipSx = {
         maxWidth: '100%',
         textAlign: 'left',
         height: 'auto',
+        borderRadius: '4px',
         '& .MuiChip-label': {
             whiteSpace: 'normal',
             overflow: 'visible',

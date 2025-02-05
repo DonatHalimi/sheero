@@ -158,7 +158,7 @@ const headerMessages = {
 const orderStatusMessages = {
   pending: `We have successfully received your order! <br>After we review the availability of your items, your order will be processed.</br>`,
   shipped: `Good news! Your order has been verified and shipped. It is now on its way to you.`,
-  delivered: `Your order has been successfully delivered. We hope you enjoy your purchase!`,
+  delivered: `Your order has been successfully delivered, we hope you enjoy your purchase!`,
   canceled: `Unfortunately, your order has been canceled. If you need further assistance, please reach out to us.`,
 };
 
@@ -546,8 +546,212 @@ function generateReviewEmailHtml(review, options = {}) {
   `;
 }
 
+function generateProductInventoryEmailHtml(order, options = {}) {
+  const { brandImages, statusImages, recipientEmail } = options;
+  const productLabel = order.products.length > 1 ? "products" : "product";
+  const formattedOrderDate = formatDate(order.createdAt);
+  const formattedArrivalStart = formatDate(order.arrivalDateRange.start);
+  const formattedArrivalEnd = formatDate(order.arrivalDateRange.end);
+
+  return `
+     <div style="font-family: Outfit, sans-serif; max-width: 700px; margin: 0 auto; padding: 35px; background-color: #f5f5f5; position: relative; border-radius: 8px;">
+        <div style="display: flex; align-items: center; justify-content: space-between;">
+          ${brandImages.logo
+      ? `<img src="cid:brandLogo" alt="Brand Logo" style="width: 30%; max-width: 150px; display: block;" />`
+      : `sheero`
+    }
+        </div>
+
+        <!-- Greeting Section -->
+        <p style="font-size: 16px; font-weight: 500; margin-bottom: 15px;">Hello <strong style="color: #57534E; text-decoration: underline;">${recipientEmail}</strong>,</p>
+        <p style="font-size: 16px; font-weight: 500; margin-bottom: 20px;">
+          Below is a summary of the projected inventory for the ${productLabel} ordered by <strong style="color: #57534E; text-decoration: underline;">${order.user.email}</strong> on 
+          <strong>${formattedOrderDate}</strong> with the order id #<strong style="color: #57534E; text-decoration: underline;">${order._id}</strong>.
+        </p>
+        
+        <p style="font-size: 16px; font-weight: 500; margin-bottom: 20px;">
+          Please note that the inventory of the ${productLabel} will only be updated if you choose to set the order status to 
+          <strong>shipped</strong> in the 
+          <a href="https://sheero.onrender.com/dashboard/orders" style="color: #57534E; text-decoration: underline;">
+          orders dashboard
+          </a>.
+        </p>
+            
+        <!-- Inventory Update Section -->
+          <div style="background-color: white; padding: 20px; border-radius: 8px; box-shadow: 0 2px 4px rgba(0,0,0,0.1); margin-bottom: 20px;">
+            <h3 style="font-size: 18px; font-weight: 600; margin-bottom: 8px; text-align: center;">Inventory Update</h3>
+            <table style="width: 100%; border-collapse: collapse;">
+              <thead>
+                <tr>
+                  <th style="text-align: left; padding: 8px; border-bottom: 1px solid #ddd;">Product ID</th>
+                  <th style="text-align: right; padding: 8px; border-bottom: 1px solid #ddd;">Previous Inventory</th>
+                  <th style="text-align: right; padding: 8px; border-bottom: 1px solid #ddd;">Projected Inventory</th>
+                </tr>
+              </thead>
+              <tbody>
+                ${order.products.map(({ product, previousInventory, updatedInventory }) => `
+                  <tr key="${product._id}">
+                    <td style="padding: 8px; border-bottom: 1px solid #ddd;">
+                        <strong>${product._id}</strong>
+                    </td>
+                    <td style="text-align: right; padding: 8px; border-bottom: 1px solid #ddd;">
+                        ${previousInventory}
+                    </td>
+                    <td style="text-align: right; padding: 8px; border-bottom: 1px solid #ddd;">
+                        ${updatedInventory}
+                    </td>
+                  </tr>`).join('')}
+              </tbody>
+              </table>
+
+              <div>
+                <p style="font-size: 14px; color: #666; text-align: center; margin-bottom: 10px;">
+                  <a href="https://sheero.onrender.com/dashboard/orders" style="color: #57534E; text-decoration: underline; font-weight: bold;">Search the above ${productLabel} in the orders dashboard</a>
+                </p>
+              </div>
+            </div>
+
+        <!-- Existing Order Details and Products Section -->
+        <div style="background-color: white; padding: 20px; border-radius: 8px; box-shadow: 0 2px 4px rgba(0,0,0,0.1);">
+          <p style="font-size: 18px; font-weight: 600; text-align: center; margin-bottom: 8px;">Order #${order._id} Status</p>
+          <p style="font-size: 14px; color: #666; text-align: center;">Order Date: ${formattedOrderDate}</p>
+          ${order.status === 'delivered'
+      ? `<p style="font-size: 14px; color: #666; text-align: center; margin-bottom: 6px;">Arrival Date: ${formattedArrivalStart}</p>`
+      : `<p style="font-size: 14px; color: #666; text-align: center; margin-bottom: 10px;">Arrival Date: ${formattedArrivalStart} - ${formattedArrivalEnd}</p>`
+    }
+          ${statusImages[order.status]
+      ? `<img src="cid:statusImage" alt="${order.status}" style="width: 80%; max-width: 600px; display: block; margin: 0 auto;" />`
+      : `Status: ${order.status}`
+    }
+
+          <!-- Products Table -->
+          <div style="margin-bottom: 20px;">
+            <table style="width: 100%; border-collapse: collapse;">
+              <thead>
+                <tr>
+                  <th style="text-align: left; padding: 8px; border-bottom: 1px solid #ddd;">Product</th>
+                  <th style="text-align: right; padding: 8px; border-bottom: 1px solid #ddd;">Price</th>
+                </tr>
+              </thead>
+              <tbody>
+                ${order.products.map(({ product, quantity, price }) => `
+                  <tr key="${product._id}">
+                    <td style="padding: 8px; border-bottom: 1px solid #ddd;">
+                      <div style="display: flex; align-items: center;">
+                        <img src="cid:productImage-${product._id}" alt="${product.name}" style="width: 64px; height: 64px; object-fit: contain; margin-right: 8px; border-radius: 4px;" />
+                        <div>
+                          <div style="font-weight: 500;">${product.name}</div>
+                          <div style="font-size: 14px; color: #666;">Quantity: ${quantity}</div>
+                        </div>
+                      </div>
+                    </td>
+                    <td style="text-align: right; padding: 8px; border-bottom: 1px solid #ddd;">€ ${formatPrice(price)}</td>
+                  </tr>
+                `).join('')}
+              </tbody>
+            </table>
+          </div>
+
+        <!-- Total Amount Section -->
+        <div style="margin-bottom: 20px;">
+          <div>
+            <p style="font-size: 16px; font-weight: 600; margin-bottom: 8px;">Total Amount</p>
+            <table style="width: 100%; border-collapse: collapse;">
+              <tbody>
+                <tr>
+                  <td style="padding: 8px; font-weight: 600;">Subtotal:</td>
+                  <td style="text-align: right; padding: 8px;">
+                    € ${formatPrice(order.products.reduce((total, { quantity, price }) => total + (price * quantity), 0))}
+                  </td>
+                </tr>
+                <tr>
+                  <td style="padding: 8px; font-weight: 600;">Shipping:</td>
+                  <td style="text-align: right; padding: 8px;">€ 2.00</td>
+                </tr>
+                <tr>
+                  <td style="padding: 8px; font-weight: 600;">Grand Total:</td>
+                  <td style="text-align: right; padding: 8px; font-weight: 600;">
+                    € ${formatPrice(order.totalAmount)}
+                  </td>
+                </tr>
+              </tbody>
+            </table>
+           </div>
+        </div>
+
+        <div style="border-bottom: 1px solid #e0e0e0; width: 100%; margin: auto; margin-top: 14px;"></div>
+
+          <!-- Shipping Address Section -->
+          <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 20px; margin-bottom: 20px;">
+            <div>
+              <p style="font-size: 16px; font-weight: 600; margin-bottom: 8px;">Shipping Address</p>
+              <table style="width: 100%; border-collapse: collapse;">
+                <tbody>
+                  <tr>
+                    <td style="padding: 8px; font-weight: 600;">Name:</td>
+                    <td style="text-align: right; padding: 8px;">${order.address?.name || 'N/A'}</td>
+                  </tr>
+                  <tr>
+                    <td style="padding: 8px; font-weight: 600;">Country:</td>
+                    <td style="text-align: right; padding: 8px;">${order.address?.country?.name || 'N/A'}</td>
+                  </tr>
+                  <tr>
+                    <td style="padding: 8px; font-weight: 600;">City:</td>
+                    <td style="text-align: right; padding: 8px;">${order.address?.city?.name || 'N/A'}</td>
+                  </tr>
+                  <tr>
+                    <td style="padding: 8px; font-weight: 600;">Zip Code:</td>
+                    <td style="text-align: right; padding: 8px;">${order.address?.city?.zipCode || 'N/A'}</td>
+                  </tr>
+                  <tr>
+                    <td style="padding: 8px; font-weight: 600;">Street:</td>
+                    <td style="text-align: right; padding: 8px;">${order.address?.street || 'N/A'}</td>
+                  </tr>
+                  <tr>
+                    <td style="padding: 8px; font-weight: 600;">Phone Number:</td>
+                    <td style="text-align: right; padding: 8px;">${order.address?.phoneNumber || 'N/A'}</td>
+                  </tr>
+                  <tr>
+                    <td style="padding: 8px; font-weight: 600;">Comment:</td>
+                    <td style="text-align: right; padding: 8px;">${order.address?.comment || 'N/A'}</td>
+                  </tr>
+                </tbody>
+              </table>
+            </div>
+
+        <div style="border-bottom: 1px solid #e0e0e0; width: 100%; margin: auto; margin-top: 14px;"></div>
+
+            <!-- Payment Information Section -->
+            <div>
+              <p style="font-size: 16px; font-weight: 600; margin-bottom: 8px;">Payment Information</p>
+              <table style="width: 100%; border-collapse: collapse;">
+                <tbody>
+                  <tr>
+                    <td style="padding: 8px; font-weight: 600;">Payment Method:</td>
+                    <td style="text-align: right; padding: 8px;">
+                      ${order.paymentMethod ? order.paymentMethod.charAt(0).toUpperCase() + order.paymentMethod.slice(1) : 'N/A'}
+                    </td>
+                  </tr>
+                  <tr>
+                    <td style="padding: 8px; font-weight: 600;">Payment Status:</td>
+                    <td style="text-align: right; padding: 8px;">
+                      ${order.paymentMethod === 'stripe' && order.paymentStatus === 'succeeded'
+      ? 'Successful'
+      : (order.paymentStatus ? order.paymentStatus.charAt(0).toUpperCase() + order.paymentStatus.slice(1) : 'N/A')
+    }
+                    </td>
+                  </tr>
+                </tbody>
+              </table>
+            </div>
+          </div>
+        </div>
+      </div>
+  `;
+}
+
 module.exports = {
   statusImages, returnStatusImages, createAttachments, brandImages, headerMessages,
   orderStatusMessages, orderBodyMessages, returnStatusMessages, returnBodyMessages,
-  generateEmailVerificationHtml, generateOrderEmailHtml, generateReturnRequestEmailHtml, generateReviewEmailHtml
+  generateEmailVerificationHtml, generateOrderEmailHtml, generateReturnRequestEmailHtml, generateReviewEmailHtml, generateProductInventoryEmailHtml
 };

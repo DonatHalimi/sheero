@@ -1,6 +1,6 @@
-import { CircularProgress } from '@mui/material';
 import React, { useEffect, useState } from 'react';
 import { useLocation } from 'react-router-dom';
+import { LoadingOverlay } from '../../assets/CustomComponents';
 import { verifyStripeOrderService } from '../../services/orderService';
 import CancelPayment from './CancelPayment';
 import SuccessPayment from './SuccessPayment';
@@ -40,7 +40,7 @@ const Verify = () => {
     }, [session_id, order_id]);
 
     if (loading) {
-        return <CircularProgress />;
+        return <LoadingOverlay />;
     }
 
     return success ? <SuccessPayment /> : <CancelPayment />;

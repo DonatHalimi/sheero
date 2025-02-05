@@ -3,7 +3,8 @@ const Order = require('../models/Order');
 const Stripe = require('stripe');
 const Cart = require('../models/Cart');
 const { STRIPE_SECRET_KEY, NODE_ENV } = require('../config/dotenv');
-const { sendOrderUpdateEmail } = require('../config/emailService');
+const { sendOrderUpdateEmail, sendProductInventoryUpdateEmail } = require('../config/emailService');
+const Product = require('../models/Product');
 
 const stripe = Stripe(STRIPE_SECRET_KEY);
 
@@ -49,30 +50,32 @@ const payWithStripe = async (req, res) => {
 
         const order = new Order({
             user: userId,
-            products: cart.items.map(item => ({
-                product: item.product._id,
-                quantity: item.quantity,
-                price: item.product.salePrice || item.product.price,
+            products: await Promise.all(cart.items.map(async (item) => {
+                const currentInventory = item.product.inventoryCount;
+                const projectedInventory = currentInventory - item.quantity;
+
+                if (currentInventory < item.quantity) {
+                    throw new Error(`Product ${item.product.name} is out of stock.`);
+                }
+
+                return {
+                    product: item.product._id,
+                    quantity: item.quantity,
+                    price: item.product.salePrice || item.product.price,
+                    previousInventory: currentInventory,
+                    updatedInventory: projectedInventory,
+                    inventoryUpdated: false
+                };
             })),
             address: addressId,
             totalAmount: totalWithShipping,
             paymentStatus: 'pending',
             paymentMethod: 'stripe',
             paymentIntentId: 'pending',
+            status: 'pending'
         });
 
         await order.save();
-
-        await Promise.all(
-            cart.items.map(async (item) => {
-                if (item.product.inventoryCount >= item.quantity) {
-                    item.product.inventoryCount -= item.quantity;
-                    await item.product.save();
-                } else {
-                    throw new Error(`Product ${item.product.name} is out of stock.`);
-                }
-            })
-        );
 
         const session = await stripe.checkout.sessions.create({
             payment_method_types: ['card'],
@@ -99,24 +102,6 @@ const payWithStripe = async (req, res) => {
 
         await Order.findByIdAndUpdate(order._id, { paymentIntentId: session.id });
 
-        const populatedOrder = await Order.findById(order._id)
-            .populate('user')
-            .populate('products.product')
-            .populate('address')
-            .populate({
-                path: 'address',
-                populate: [
-                    { path: 'city', select: 'name zipCode' },
-                    { path: 'country', select: 'name' }
-                ]
-            });
-
-        if (populatedOrder.user && populatedOrder.user.email) {
-            await sendOrderUpdateEmail(populatedOrder);
-        } else {
-            console.warn(`Order ${order._id} has no user email associated.`);
-        }
-
         res.json({ url: session.url });
     } catch (error) {
         console.error('Error creating Stripe session or saving order', error);
@@ -131,10 +116,26 @@ const verifyOrder = async (req, res) => {
         const isSuccess = String(success) === 'true';
 
         if (isSuccess) {
-            const updatedOrder = await Order.findByIdAndUpdate(order_id, { paymentStatus: 'completed' }, { new: true });
+            const updatedOrder = await Order.findByIdAndUpdate(order_id, { paymentStatus: 'completed' }, { new: true })
+                .populate('user')
+                .populate('products.product')
+                .populate({
+                    path: 'address',
+                    populate: [
+                        { path: 'city', select: 'name zipCode' },
+                        { path: 'country', select: 'name' }
+                    ]
+                });
 
             if (!updatedOrder) {
                 return res.status(404).json({ success: false, message: 'Order not found.' });
+            }
+
+            if (updatedOrder.user && updatedOrder.user.email) {
+                await sendOrderUpdateEmail(updatedOrder);
+                await sendProductInventoryUpdateEmail(updatedOrder);
+            } else {
+                console.warn(`Order ${order_id} has no user email associated.`);
             }
 
             return res.json({ success: true, message: 'Payment completed successfully.', order: updatedOrder });
@@ -167,29 +168,31 @@ const payWithCash = async (req, res) => {
 
         const order = new Order({
             user: userId,
-            products: cart.items.map(item => ({
-                product: item.product._id,
-                quantity: item.quantity,
-                price: item.product.salePrice || item.product.price,
+            products: await Promise.all(cart.items.map(async (item) => {
+                const currentInventory = item.product.inventoryCount;
+                const projectedInventory = currentInventory - item.quantity;
+
+                if (currentInventory < item.quantity) {
+                    throw new Error(`Product ${item.product.name} is out of stock.`);
+                }
+
+                return {
+                    product: item.product._id,
+                    quantity: item.quantity,
+                    price: item.product.salePrice || item.product.price,
+                    previousInventory: currentInventory,
+                    updatedInventory: projectedInventory,
+                    inventoryUpdated: false
+                };
             })),
             address: addressId,
             totalAmount: totalAmount,
             paymentStatus: 'pending',
             paymentMethod: 'cash',
+            status: 'pending'
         });
 
         await order.save();
-
-        await Promise.all(
-            cart.items.map(async (item) => {
-                if (item.product.inventoryCount >= item.quantity) {
-                    item.product.inventoryCount -= item.quantity;
-                    await item.product.save();
-                } else {
-                    throw new Error(`Product ${item.product.name} is out of stock.`);
-                }
-            })
-        );
 
         const populatedOrder = await Order.findById(order._id)
             .populate('user')
@@ -205,6 +208,7 @@ const payWithCash = async (req, res) => {
 
         if (populatedOrder.user && populatedOrder.user.email) {
             await sendOrderUpdateEmail(populatedOrder);
+            await sendProductInventoryUpdateEmail(populatedOrder);
         } else {
             console.warn(`Order ${order._id} has no user email associated.`);
         }
@@ -224,7 +228,7 @@ const getAllOrders = async (req, res) => {
     try {
         const orders = await Order.find()
             .populate('user', 'firstName lastName email')
-            .populate('products.product', 'name price')
+            .populate('products.product', 'name price image')
             .populate({
                 path: 'address',
                 select: 'name street phoneNumber city country',
@@ -319,6 +323,21 @@ const updateDeliveryStatus = async (req, res) => {
         }
 
         const previousStatus = order.status;
+
+        // Update inventory count only when status changes to shipped and hasn't been updated before
+        if (status === 'shipped' && previousStatus !== 'shipped') {
+            await Promise.all(order.products.map(async (orderProduct) => {
+                if (!orderProduct.inventoryUpdated) {
+                    const product = await Product.findById(orderProduct.product._id);
+                    if (product) {
+                        product.inventoryCount -= orderProduct.quantity;
+                        await product.save();
+
+                        orderProduct.inventoryUpdated = true;
+                    }
+                }
+            }));
+        }
 
         order.status = status;
 

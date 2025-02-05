@@ -3814,6 +3814,48 @@ export const sortProducts = (products, order) => {
     }
 };
 
+export const formatDimensions = (dimensions) => {
+    return `${dimensions.length ? dimensions.length + ' x ' : ''}${dimensions.width ? dimensions.width + ' x ' : ''}${dimensions.height ? dimensions.height : ''} ${dimensions.unit}`;
+};
+
+export const formatDiscount = (discount) => {
+    return discount ? `${discount.value} ${discount.type}` : 'No Discount';
+};
+
+export const formatName = (name) => {
+    return name?.name || 'Not Found';
+};
+
+export const formatVariants = (variants) => {
+    return variants.length ? variants.map(variant => variant.name).join(', ') : 'No Variants';
+};
+
+export const formatSupplier = (supplier) => {
+    return `${supplier?.name || 'No Supplier'} (${supplier?.contactInfo?.email || 'No Email'})`;
+};
+
+export const formatDetails = (details) => {
+    return details.length ? details.join(', ') : 'No Details';
+};
+
+export const formatReviews = (reviews) => {
+    return reviews.length
+        ? reviews.join(', ')
+        : 'No Reviews';
+};
+
+export const formatShipping = (shipping) => {
+    return `${shipping?.packageSize || 'Unknown Size'} | ${shipping?.cost ? '€' + shipping.cost : 'No Cost'} | Dimensions: ${shipping?.dimensions ? formatDimensions(shipping.dimensions) : 'No Dimensions'}`;
+};
+
+export const formatArrivalDateRange = (order) => `${formatDate(order.arrivalDateRange.start)} - ${formatDate(order.arrivalDateRange.end)}`;
+export const formatUser = (order) => `${order.user.email}`;
+export const formatProducts = (order) => order.products.map(item => item.product.name).join(', ');
+export const formatQuantity = (order) => order.products.map(item => item.quantity).join(', ');
+export const formatTotalAmount = (order) => `€  ${order.totalAmount.toFixed(2)}`;
+export const formatPaymentInfo = (order) => `${order.paymentMethod} - ${order.paymentStatus}`;
+export const formatAddress = (order) => `${order?.address?.street}, ${order?.address?.city?.name}, ${order?.address?.country?.name}, ${order?.address?.phoneNumber}`;
+
 export const knownEmailProviders = [
     'gmail.com',
     'yahoo.com',
