@@ -3,7 +3,7 @@ import { TextField } from '@mui/material';
 import Autocomplete from '@mui/material/Autocomplete';
 import React, { useEffect, useState } from 'react';
 import { toast } from 'react-toastify';
-import { BrownButton, BrownOutlinedTextField, CustomBox, CustomModal, CustomPaper, CustomTypography, handleApiError, OutlinedBrownButton, VisuallyHiddenInput } from '../../../assets/CustomComponents';
+import { BrownButton, BrownOutlinedTextField, CustomBox, CustomModal, CustomPaper, CustomTypography, handleApiError, LoadingLabel, OutlinedBrownButton, VisuallyHiddenInput } from '../../../assets/CustomComponents';
 import { getCategoriesService } from '../../../services/categoryService';
 import { addSubcategoryService } from '../../../services/subcategoryService';
 
@@ -14,6 +14,7 @@ const AddSubcategoryModal = ({ open, onClose, onAddSuccess }) => {
     const [imagePreview, setImagePreview] = useState(null);
     const [category, setCategory] = useState(null);
     const [categories, setCategories] = useState([]);
+    const [loading, setLoading] = useState(false);
 
     const validateName = (v) => /^[A-ZÇ][\sa-zA-ZëËçÇ\W]{3,27}$/.test(v);
 
@@ -38,6 +39,8 @@ const AddSubcategoryModal = ({ open, onClose, onAddSuccess }) => {
     }, []);
 
     const handleAddSubcategory = async () => {
+        setLoading(true);
+
         if (!name || !image || !category) {
             toast.error('Please fill in all the fields');
             return;
@@ -55,6 +58,8 @@ const AddSubcategoryModal = ({ open, onClose, onAddSuccess }) => {
             onClose();
         } catch (error) {
             handleApiError(error, 'Error adding subcategory');
+        } finally {
+            setLoading(false);
         }
     };
 
@@ -125,10 +130,10 @@ const AddSubcategoryModal = ({ open, onClose, onAddSuccess }) => {
                     onClick={handleAddSubcategory}
                     variant="contained"
                     color="primary"
-                    disabled={!isValidForm}
+                    disabled={!isValidForm || loading}
                     className="w-full"
                 >
-                    Add
+                    <LoadingLabel loading={loading} />
                 </BrownButton>
             </CustomBox>
         </CustomModal>

@@ -2,7 +2,7 @@ import { Visibility, VisibilityOff } from '@mui/icons-material';
 import { IconButton, InputAdornment, InputLabel, MenuItem, Select } from '@mui/material';
 import React, { useEffect, useState } from 'react';
 import { toast } from 'react-toastify';
-import { BrownButton, BrownOutlinedTextField, CustomBox, CustomModal, CustomTypography, handleApiError, knownEmailProviders, OutlinedBrownFormControl } from '../../../assets/CustomComponents';
+import { BrownButton, BrownOutlinedTextField, CustomBox, CustomModal, CustomTypography, handleApiError, knownEmailProviders, LoadingLabel, OutlinedBrownFormControl } from '../../../assets/CustomComponents';
 import { getRolesService } from '../../../services/roleService';
 import { addUserService } from '../../../services/userService';
 
@@ -18,6 +18,7 @@ const AddUserModal = ({ open, onClose, onAddSuccess }) => {
     const [showPassword, setShowPassword] = useState(false);
     const [role, setRole] = useState('');
     const [roles, setRoles] = useState([]);
+    const [loading, setLoading] = useState(false);
 
     const validateName = (v) => /^[A-ZÇ][\sa-zA-ZëËçÇ\W]{2,10}$/.test(v);
     const validateEmail = (v) => new RegExp(`^[a-zA-Z0-9._%+-]+@(${knownEmailProviders.join('|')})$`, 'i').test(v);
@@ -42,6 +43,8 @@ const AddUserModal = ({ open, onClose, onAddSuccess }) => {
     const handleMouseDownPassword = () => setShowPassword(!showPassword);
 
     const handleAddUser = async () => {
+        setLoading(true);
+
         if (!firstName || !lastName || !email || !password || !role) {
             toast.error('Please fill in all the fields');
             return;
@@ -72,6 +75,8 @@ const AddUserModal = ({ open, onClose, onAddSuccess }) => {
             onClose();
         } catch (error) {
             handleApiError(error, 'Error adding user');
+        } finally {
+            setLoading(false);
         }
     };
 
@@ -162,10 +167,10 @@ const AddUserModal = ({ open, onClose, onAddSuccess }) => {
                     onClick={handleAddUser}
                     variant="contained"
                     color="primary"
-                    disabled={!isValidForm}
+                    disabled={!isValidForm || loading}
                     className="w-full"
                 >
-                    Add
+                    <LoadingLabel loading={loading} />
                 </BrownButton>
             </CustomBox>
         </CustomModal>

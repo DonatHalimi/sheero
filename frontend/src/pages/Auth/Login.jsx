@@ -4,10 +4,11 @@ import React, { useEffect, useState } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 import { useNavigate } from 'react-router-dom';
 import { toast } from 'react-toastify';
-import { BrownButton, BrownOutlinedTextField, ErrorTooltip, handleFacebookLogin, handleGoogleLogin, knownEmailProviders, SocialLoginButtons } from '../../assets/CustomComponents';
+import { BrownButton, BrownOutlinedTextField, ErrorTooltip, handleFacebookLogin, handleGoogleLogin, knownEmailProviders, LoadingLabel, SocialLoginButtons } from '../../assets/CustomComponents';
 import Navbar from '../../components/Navbar/Navbar';
 import Footer from '../../components/Utils/Footer';
 import { loginUser } from '../../store/actions/authActions';
+import ForgotPassword from './ForgotPassword';
 
 const Login = () => {
     const auth = useSelector((state) => state.auth);
@@ -23,6 +24,8 @@ const Login = () => {
     });
     const [showPassword, setShowPassword] = useState(false);
     const [focusedField, setFocusedField] = useState(null);
+    const [loading, setLoading] = useState(false);
+    const [forgotPasswordOpen, setForgotPasswordOpen] = useState(false);
 
     useEffect(() => {
         if (auth.isAuthenticated) {
@@ -64,6 +67,8 @@ const Login = () => {
     };
 
     const handleSubmit = async (e) => {
+        setLoading(true);
+
         e.preventDefault();
 
         const { email, password, emailValid, passwordValid } = formData;
@@ -94,6 +99,8 @@ const Login = () => {
         } catch (error) {
             console.error('Login error:', error);
             toast.error('An error occurred during login');
+        } finally {
+            setLoading(false);
         }
     };
 
@@ -149,6 +156,13 @@ const Login = () => {
                                             message={errorMessages[name]}
                                             isLoginPage={true}
                                         />
+                                        {name === 'password' && (
+                                            <div className='text-left text-sm text-gray-500'>
+                                                <span onClick={() => setForgotPasswordOpen(true)} className="cursor-pointer hover:underline">
+                                                    Forgot Password?
+                                                </span>
+                                            </div>
+                                        )}
                                     </div>
                                 );
                             }
@@ -158,12 +172,12 @@ const Login = () => {
                             type="submit"
                             fullWidth
                             variant="contained"
-                            disabled={!isFormValid}
+                            disabled={!isFormValid || loading}
                             sx={{ mb: 2, mt: 2 }}
                         >
-                            Log In
+                            <LoadingLabel loading={loading} defaultLabel='Log In' loadingLabel='Logging in' />
                         </BrownButton>
-                        <Typography variant="body2" align="left" sx={{ color: 'text.secondary' }}>
+                        <div className='text-left text-sm text-stone-500'>
                             Don't have an account?{' '}
                             <span
                                 onClick={() => navigate('/register')}
@@ -172,7 +186,7 @@ const Login = () => {
                             >
                                 Sign Up
                             </span>
-                        </Typography>
+                        </div>
 
                         <SocialLoginButtons
                             handleGoogleLogin={handleGoogleLogin}
@@ -181,6 +195,7 @@ const Login = () => {
                     </Box>
                 </div>
             </Container>
+            <ForgotPassword open={forgotPasswordOpen} onClose={() => setForgotPasswordOpen(false)} />
             <Footer />
         </Box>
     );

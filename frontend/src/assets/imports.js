@@ -15,6 +15,8 @@ export { default as Home } from '../pages/Info/Home';
 // Lazy-loaded components
 export const Login = React.lazy(() => import('../pages/Auth/Login'));
 export const Register = React.lazy(() => import('../pages/Auth/Register'));
+export const OTPVerification = React.lazy(() => import('../pages/Auth/OTPVerification'));
+export const ResetPassword = React.lazy(() => import('../pages/Auth/ResetPassword'));
 export const FAQs = React.lazy(() => import('../pages/Info/FAQs'));
 export const NotAllowed = React.lazy(() => import('../pages/Errors/NotAllowed'));
 export const NotFound = React.lazy(() => import('../pages/Errors/NotFound'));
@@ -32,7 +34,6 @@ export const Profile = React.lazy(() => import('../pages/Profile/ProfileDetails'
 export const Addresses = React.lazy(() => import('../pages/Profile/AddressDetails'));
 export const Orders = React.lazy(() => import('../pages/Profile/Orders'));
 export const OrderDetails = React.lazy(() => import('../pages/Profile/OrderDetails'));
-export const OTPVerification = React.lazy(() => import('../pages/Auth/OTPVerification'));
 export const Returns = React.lazy(() => import('../pages/Profile/Returns'));
 export const ReturnDetails = React.lazy(() => import('../pages/Profile/ReturnDetails'));
 export const Wishlist = React.lazy(() => import('../pages/Profile/Wishlist'));

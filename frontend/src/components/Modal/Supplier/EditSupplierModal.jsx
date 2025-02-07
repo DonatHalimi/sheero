@@ -10,6 +10,7 @@ const EditSupplierModal = ({ open, onClose, supplier, onViewDetails, onEditSucce
     const [isValidEmail, setIsValidEmail] = useState(true);
     const [phoneNumber, setPhoneNumber] = useState('');
     const [isValidPhoneNumber, setIsValidPhoneNumber] = useState(true);
+    const [loading, setLoading] = useState(false);
 
     const validateName = (v) => /^[A-ZÇ][\sa-zA-ZëËçÇ\W]{2,15}$/.test(v);
     const validatePhoneNumber = (v) => /^0(44|45|48|49)\d{6}$/.test(v);
@@ -29,6 +30,8 @@ const EditSupplierModal = ({ open, onClose, supplier, onViewDetails, onEditSucce
     }, [supplier]);
 
     const handleEditSupplier = async () => {
+        setLoading(true);
+
         const updatedData = {
             name,
             contactInfo: {
@@ -44,6 +47,8 @@ const EditSupplierModal = ({ open, onClose, supplier, onViewDetails, onEditSucce
             onClose();
         } catch (error) {
             handleApiError(error, 'Error updating supplier');
+        } finally {
+            setLoading(false);
         }
     };
 
@@ -100,8 +105,9 @@ const EditSupplierModal = ({ open, onClose, supplier, onViewDetails, onEditSucce
                         onClose();
                     }}
                     primaryButtonProps={{
-                        disabled: !isValidForm
+                        disabled: !isValidForm || loading
                     }}
+                    loading={loading}
                 />
             </CustomBox>
         </CustomModal>

@@ -19,6 +19,7 @@ const EditAddressModal = ({ open, onClose, address, onViewDetails, onEditSuccess
     const [country, setCountry] = useState('');
     const [cities, setCities] = useState([]);
     const [countriesWithGroups, setCountriesWithGroups] = useState([]);
+    const [loading, setLoading] = useState(false);
 
     const validateName = (v) => /^[A-ZÇ][a-zA-ZëËçÇ\s]{2,15}$/.test(v);
     const validatePhoneNumber = (v) => /^0(44|45|48|49)\d{6}$/.test(v);
@@ -79,6 +80,8 @@ const EditAddressModal = ({ open, onClose, address, onViewDetails, onEditSuccess
     }, [country]);
 
     const handleEditAddress = async () => {
+        setLoading(true);
+
         const updatedData = {
             name,
             street,
@@ -95,6 +98,8 @@ const EditAddressModal = ({ open, onClose, address, onViewDetails, onEditSuccess
             onClose();
         } catch (error) {
             handleApiError(error, 'Error updating address');
+        } finally {
+            setLoading(false);
         }
     };
 
@@ -200,8 +205,9 @@ const EditAddressModal = ({ open, onClose, address, onViewDetails, onEditSuccess
                         onClose();
                     }}
                     primaryButtonProps={{
-                        disabled: !isValidForm
+                        disabled: !isValidForm || loading
                     }}
+                    loading={loading}
                 />
             </CustomBox>
         </CustomModal>

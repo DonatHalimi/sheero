@@ -1,7 +1,7 @@
 import { FormControl, InputLabel, MenuItem, Rating, Select } from '@mui/material';
 import React, { useEffect, useState } from 'react';
 import { toast } from 'react-toastify';
-import { BrownButton, BrownOutlinedTextField, CustomBox, CustomModal, CustomTypography, handleApiError } from '../../../assets/CustomComponents';
+import { BrownButton, BrownOutlinedTextField, CustomBox, CustomModal, CustomTypography, handleApiError, LoadingLabel } from '../../../assets/CustomComponents';
 import { addReviewService, getProductNamesService, getReviewsService } from '../../../services/reviewService';
 
 const AddReviewModal = ({ open, onClose, onAddSuccess }) => {
@@ -13,6 +13,7 @@ const AddReviewModal = ({ open, onClose, onAddSuccess }) => {
     const [productId, setProductId] = useState(null);
     const [products, setProducts] = useState([]);
     const [userReviews, setUserReviews] = useState([]);
+    const [loading, setLoading] = useState(false);
 
     const validateTitle = (v) => /^[A-Z][\Wa-zA-Z\s]{2,40}$/.test(v);
     const validateComment = (v) => /^[A-Z][\Wa-zA-Z\s]{3,500}$/.test(v);
@@ -43,6 +44,8 @@ const AddReviewModal = ({ open, onClose, onAddSuccess }) => {
     }, []);
 
     const handleAddReview = async () => {
+        setLoading(true);
+
         if (!title || rating < 1 || rating > 5 || !productId) {
             toast.error('Please fill in all the fields and select a rating between 1 and 5 stars');
             return;
@@ -69,6 +72,8 @@ const AddReviewModal = ({ open, onClose, onAddSuccess }) => {
             onClose();
         } catch (error) {
             handleApiError(error, 'Error adding review');
+        } finally {
+            setLoading(false);
         }
     };
 
@@ -137,10 +142,10 @@ const AddReviewModal = ({ open, onClose, onAddSuccess }) => {
                     onClick={handleAddReview}
                     variant="contained"
                     color="primary"
-                    disabled={!isValidForm}
+                    disabled={!isValidForm || loading}
                     className="w-full"
                 >
-                    Add
+                    <LoadingLabel loading={loading} />
                 </BrownButton>
             </CustomBox>
         </CustomModal>

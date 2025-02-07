@@ -1,7 +1,7 @@
 import { Box, Chip, MenuItem, Typography } from '@mui/material';
 import React, { useEffect, useState } from 'react';
 import { toast } from 'react-toastify';
-import { ActionButtons, BoxBetween, BrownOutlinedTextField, CustomBox, CustomModal, CustomTypography, formatDate, handleApiError, LoadingOverlay, ReadOnlyTextField } from '../../../assets/CustomComponents';
+import { ActionButtons, BoxBetween, BrownOutlinedTextField, CustomBox, CustomModal, CustomTypography, formatDate, handleApiError, ReadOnlyTextField } from '../../../assets/CustomComponents';
 import { productChipSx } from '../../../assets/sx';
 import { editOrderService } from '../../../services/orderService';
 import { getImageUrl } from '../../../utils/config';
@@ -69,8 +69,6 @@ const EditOrderModal = ({ open, onClose, order, onViewDetails, onEditSuccess }) 
         <CustomModal open={open} onClose={onClose}>
             <CustomBox>
                 <CustomTypography variant="h5">Edit Order Status</CustomTypography>
-
-                {loading && <LoadingOverlay />}
 
                 <ReadOnlyTextField
                     label="Order ID"
@@ -178,6 +176,10 @@ const EditOrderModal = ({ open, onClose, order, onViewDetails, onEditSuccess }) 
                         onViewDetails(order);
                         onClose();
                     }}
+                    primaryButtonProps={{
+                        disabled: loading
+                    }}
+                    loading={loading}
                 />
             </CustomBox>
         </CustomModal>

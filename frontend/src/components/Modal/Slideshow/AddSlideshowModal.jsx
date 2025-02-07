@@ -1,7 +1,7 @@
 import { Upload } from '@mui/icons-material';
 import React, { useState } from 'react';
 import { toast } from 'react-toastify';
-import { BrownButton, BrownOutlinedTextField, CustomBox, CustomModal, CustomTypography, handleApiError, OutlinedBrownButton, VisuallyHiddenInput } from '../../../assets/CustomComponents';
+import { BrownButton, BrownOutlinedTextField, CustomBox, CustomModal, CustomTypography, handleApiError, LoadingLabel, OutlinedBrownButton, VisuallyHiddenInput } from '../../../assets/CustomComponents';
 import { addSlideshowService } from '../../../services/slideshowService';
 
 const AddSlideshowModal = ({ open, onClose, onAddSuccess }) => {
@@ -11,12 +11,15 @@ const AddSlideshowModal = ({ open, onClose, onAddSuccess }) => {
     const [isValidDescription, setIsValidDescription] = useState(true);
     const [image, setImage] = useState(null);
     const [imagePreview, setImagePreview] = useState(null);
+    const [loading, setLoading] = useState(false);
 
     const isValid = (v) => /^[A-Z][\sa-zA-Z\W]{3,15}$/.test(v);
 
     const isValidForm = title && isValidTitle && description && isValidDescription && image;
 
     const handleAddImage = async () => {
+        setLoading(true);
+
         if (!title || !image) {
             toast.error('Please fill in all the fields');
             return;
@@ -34,6 +37,8 @@ const AddSlideshowModal = ({ open, onClose, onAddSuccess }) => {
             onClose();
         } catch (error) {
             handleApiError(error, 'Error adding image');
+        } finally {
+            setLoading(false);
         }
     };
 
@@ -104,10 +109,10 @@ const AddSlideshowModal = ({ open, onClose, onAddSuccess }) => {
                     onClick={handleAddImage}
                     variant="contained"
                     color="primary"
-                    disabled={!isValidForm}
+                    disabled={!isValidForm || loading}
                     className="w-full"
                 >
-                    Add
+                    <LoadingLabel loading={loading} />
                 </BrownButton>
             </CustomBox>
         </CustomModal>

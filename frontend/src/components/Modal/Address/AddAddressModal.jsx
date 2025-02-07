@@ -1,7 +1,7 @@
 import { Autocomplete, TextField } from '@mui/material';
 import React, { useEffect, useState } from 'react';
 import { toast } from 'react-toastify';
-import { BrownButton, BrownOutlinedTextField, CustomBox, CustomModal, CustomPaper, CustomTypography, DashboardCountryFlag, handleApiError } from '../../../assets/CustomComponents';
+import { BrownButton, BrownOutlinedTextField, CustomBox, CustomModal, CustomPaper, CustomTypography, DashboardCountryFlag, handleApiError, LoadingLabel } from '../../../assets/CustomComponents';
 import { addAddressService } from '../../../services/addressService';
 import { getCitiesByCountryService } from '../../../services/cityService';
 import { getCountriesService } from '../../../services/countryService';
@@ -19,6 +19,7 @@ const AddAddressModal = ({ open, onClose, onAddSuccess }) => {
     const [country, setCountry] = useState(null);
     const [cities, setCities] = useState([]);
     const [countries, setCountries] = useState([]);
+    const [loading, setLoading] = useState(false);
 
     const validateName = (v) => /^[A-ZÇ][a-zA-ZëËçÇ\s]{2,10}$/.test(v);
     const validatePhoneNumber = (v) => /^0(44|45|48|49)\d{6}$/.test(v);
@@ -70,6 +71,7 @@ const AddAddressModal = ({ open, onClose, onAddSuccess }) => {
     };
 
     const handleAddAddress = async () => {
+        setLoading(true);
         if (!name || !street || !phoneNumber || !city || !country) {
             toast.error('Please fill in all the fields');
             return;
@@ -91,6 +93,8 @@ const AddAddressModal = ({ open, onClose, onAddSuccess }) => {
             onClose();
         } catch (error) {
             handleApiError(error, 'Error adding address');
+        } finally {
+            setLoading(false);
         }
     };
 
@@ -197,7 +201,7 @@ const AddAddressModal = ({ open, onClose, onAddSuccess }) => {
                     disabled={!isFormValid}
                     className="w-full"
                 >
-                    Add
+                    <LoadingLabel loading={loading} />
                 </BrownButton>
             </CustomBox>
         </CustomModal>

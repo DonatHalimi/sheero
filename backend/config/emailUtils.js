@@ -185,13 +185,17 @@ const returnBodyMessages = {
 
 function generateEmailVerificationHtml(userEmail, otp) {
   return `
-    <div style="font-family: Arial, sans-serif; color: #333;">
-        <p>Hello, <strong>${userEmail}</strong>,</p>
-        <p>Thank you for signing up with <a href="https://sheero.onrender.com" style="color: #57534E; text-decoration: none; font-weight: bold;">sheero</a>! Your One-Time Password (OTP) is:</p>
+    <div style="font-family: 'Outfit', sans-serif; background-color: #f4f4f4; padding: 20px; border-radius: 8px; max-width: 600px;">
+        <p style="font-size: 18px; color: #57534E; margin-bottom: 16px;">Hello, <strong>${userEmail}</strong>,</p>
+        <p style="font-size: 16px; color: #57534E; line-height: 1.5; margin-bottom: 20px;">Thank you for signing up with <a href="https://sheero.onrender.com" style="color: #57534E; text-decoration: none; font-weight: bold;">sheero</a>! Your One-Time Password (OTP) is:</p>
         <h2 style="color: #57534E;">${otp}</h2>
-        <p>Please enter this code to complete your registration. It will expire in <strong>2 minutes</strong>.</p>
-        <p>If you did not request this, you can safely ignore this email.</p>
-        <p>Best regards,<br/><strong><a href="https://sheero.onrender.com" style="color: #57534E; text-decoration: underline;">sheero</a></strong></p>
+        <p style="font-size: 16px; color: #57534E; line-height: 1.5; margin-bottom: 20px;">Please enter this code to complete your registration. It will expire in <strong>5 minutes</strong>.</p>
+        <p style="font-size: 16px; color: #333; line-height: 1.5; margin-bottom: 20px;">If you did not request this, you can safely ignore this email.</p>
+        <p style="font-size: 16px; color: #57534E; margin-bottom: 12px;">Best regards,<br/><strong><a href="https://sheero.onrender.com" style="color: #57534E; text-decoration: underline;">sheero</a></strong></p>
+
+        <p style="font-size: 12px; color: #888; margin-top: 20px; text-align: left;">
+          &copy; 2025 sheero. All rights reserved.
+        </p>
     </div>
     `
 }
@@ -383,6 +387,9 @@ function generateOrderEmailHtml(order, options = {}) {
             If you have any questions, please <a href="https://sheero.onrender.com/contact-us" style="color: #57534E; text-decoration: underline;">contact us</a> through our contact form or through our <a href="mailto:support@sheero.com" style="color: #57534E; text-decoration: underline;">email address</a>.
           </p>
 
+          <p style="font-size: 12px; color: #888; margin-top: 40px; text-align: center;">
+            &copy; 2025 sheero. All rights reserved.
+          </p>
         </div>
       </div>
     `;
@@ -469,6 +476,10 @@ function generateReturnRequestEmailHtml(returnRequest, options = {}) {
           <p style="color: #666; font-size: 12px; margin-top: 20px;">
             If you have any questions, please <a href="https://sheero.onrender.com/contact-us" style="color: #57534E; text-decoration: underline;">contact us</a> through our contact form or through our <a href="mailto:support@sheero.com" style="color: #57534E; text-decoration: underline;">email address</a>.
           </p>
+
+        <p style="font-size: 12px; color: #888; margin-top: 40px; text-align: center;">
+          &copy; 2025 sheero. All rights reserved.
+        </p>
         </div>
       </div>
     `;
@@ -540,6 +551,10 @@ function generateReviewEmailHtml(review, options = {}) {
 
         <p style="color: #666; font-size: 12px; margin-top: 20px;">
           If you have any questions, please <a href="https://sheero.onrender.com/contact-us" style="color: #57534E; text-decoration: underline;">contact us</a> or through our <a href="mailto:support@sheero.com" style="color: #57534E; text-decoration: underline;">email address</a>.
+        </p>
+
+        <p style="font-size: 12px; color: #888; margin-top: 40px; text-align: center;">
+          &copy; 2025 sheero. All rights reserved.
         </p>
       </div>
     </div>
@@ -745,13 +760,83 @@ function generateProductInventoryEmailHtml(order, options = {}) {
               </table>
             </div>
           </div>
+
+          <p style="font-size: 12px; color: #888; margin-top: 40px; text-align: center;">
+            &copy; 2025 sheero. All rights reserved.
+          </p>
         </div>
       </div>
+  `;
+}
+
+function generateResetPasswordEmailHtml(user, resetUrl) {
+  return `
+    <div style="font-family: 'Outfit', sans-serif; background-color: #f4f4f4; padding: 20px; border-radius: 8px; max-width: 600px;">
+      <!-- Greeting Section -->
+      <p style="font-size: 18px; color: #333; margin-bottom: 16px;">
+        Hello <strong style="color: #4A3C28;">${user.firstName}</strong>,
+      </p>
+      
+      <!-- Password Reset Link -->
+      <p style="font-size: 16px; color: #333; line-height: 1.5; margin-bottom: 20px;">
+        We have received a request to reset your password. If you didn't make this request, simply ignore this email.
+        <br/>
+        To reset your password, please <a href="${resetUrl}" style="color: #4A3C28; font-weight: bold; text-decoration: underline;">click here</a>.
+        <br/><br/>
+        <span style="color: #888; font-size: 14px;">This link will expire in 15 minutes.</span>
+      </p>
+
+      <!-- Footer Section -->
+      <p style="font-size: 14px; color: #333; margin-bottom: 12px;">
+        Best regards,<br/>
+        <strong><a href="https://sheero.onrender.com" style="color: #4A3C28; text-decoration: underline;">sheero</a></strong>
+      </p>
+
+      <p style="font-size: 14px; color: #777; margin-top: 20px; text-align: left;">
+        If you have any questions, feel free to <a href="https://sheero.onrender.com/contact-us" style="color: #4A3C28; text-decoration: underline;">contact us</a> through our contact form or through our <a href="mailto:support@sheero.com" style="color: #4A3C28; text-decoration: underline;">email</a>.
+      </p>
+
+      <p style="font-size: 12px; color: #888; margin-top: 20px; text-align: left;">
+        &copy; 2025 sheero. All rights reserved.
+      </p>
+    </div>
+  `;
+}
+
+function generatePasswordResetSuccessEmailHtml(user) {
+  return `
+    <div style="font-family: 'Outfit', sans-serif; background-color: #f4f4f4; padding: 20px; border-radius: 8px; max-width: 600px;">
+      <!-- Greeting Section -->
+      <p style="font-size: 18px; color: #333; margin-bottom: 16px;">
+        Hello <strong>${user.firstName}</strong>,
+      </p>
+      
+      <!-- Password Reset Success Message -->
+      <p style="font-size: 16px; color: #333; line-height: 1.5; margin-bottom: 20px;">
+        Your password has been successfully updated!
+        <p style="font-size: 16px;">You can now <a href="https://sheero.onrender.com/login" style="color: #4A3C28; text-decoration: underline;">log in</a> with your new password.</p>
+      </p>
+
+      <!-- Footer Section -->
+      <p style="font-size: 16px; color: #333; margin-bottom: 12px;">
+        Best regards,<br/>
+        <strong><a href="https://sheero.onrender.com" style="color: #4A3C28; text-decoration: underline;">sheero</a></strong>
+      </p>
+
+      <p style="font-size: 14px; color: #777; margin-top: 20px; text-align: left;">
+        If you have any questions, feel free to <a href="https://sheero.onrender.com/contact-us" style="color: #4A3C28; text-decoration: underline;">contact us</a> through our contact form or through our <a href="mailto:support@sheero.com" style="color: #4A3C28; text-decoration: underline;">email</a>.
+      </p>
+
+      <p style="font-size: 12px; color: #888; margin-top: 20px; text-align: left;">
+        &copy; 2025 sheero. All rights reserved.
+      </p>
+    </div>
   `;
 }
 
 module.exports = {
   statusImages, returnStatusImages, createAttachments, brandImages, headerMessages,
   orderStatusMessages, orderBodyMessages, returnStatusMessages, returnBodyMessages,
-  generateEmailVerificationHtml, generateOrderEmailHtml, generateReturnRequestEmailHtml, generateReviewEmailHtml, generateProductInventoryEmailHtml
+  generateEmailVerificationHtml, generateOrderEmailHtml, generateReturnRequestEmailHtml,
+  generateReviewEmailHtml, generateProductInventoryEmailHtml, generateResetPasswordEmailHtml, generatePasswordResetSuccessEmailHtml
 };

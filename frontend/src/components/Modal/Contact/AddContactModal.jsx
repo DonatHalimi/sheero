@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import { toast } from 'react-toastify';
-import { BrownButton, BrownOutlinedTextField, CustomBox, CustomModal, CustomTypography, handleApiError, knownEmailProviders } from '../../../assets/CustomComponents';
+import { BrownButton, BrownOutlinedTextField, CustomBox, CustomModal, CustomTypography, handleApiError, knownEmailProviders, LoadingLabel } from '../../../assets/CustomComponents';
 import { addContactService } from '../../../services/contactService';
 
 const AddContactModal = ({ open, onClose, onAddSuccess }) => {
@@ -15,6 +15,7 @@ const AddContactModal = ({ open, onClose, onAddSuccess }) => {
     const [isValidEmail, setIsValidEmail] = useState(true);
     const [isValidSubject, setIsValidSubject] = useState(true);
     const [isValidMessage, setIsValidMessage] = useState(true);
+    const [loading, setLoading] = useState(false);
 
     const validateName = (v) => /^[A-ZÇ][a-zA-ZëËçÇ\s]{3,15}$/.test(v);
     const validateEmail = (v) => new RegExp(`^[a-zA-Z0-9._%+-]+@(${knownEmailProviders.join('|')})$`, 'i').test(v);
@@ -32,6 +33,8 @@ const AddContactModal = ({ open, onClose, onAddSuccess }) => {
         isValidMessage;
 
     const handleAddContact = async () => {
+        setLoading(true);
+
         const { name, email, subject, message } = formData;
 
         if (!name || !email || !subject || !message) {
@@ -53,6 +56,8 @@ const AddContactModal = ({ open, onClose, onAddSuccess }) => {
             onClose();
         } catch (error) {
             handleApiError(error, 'Error adding contact');
+        } finally {
+            setLoading(false);
         }
     };
 
@@ -121,10 +126,10 @@ const AddContactModal = ({ open, onClose, onAddSuccess }) => {
                     onClick={handleAddContact}
                     variant="contained"
                     color="primary"
-                    disabled={!isValidForm}
+                    disabled={!isValidForm || loading}
                     className="w-full"
                 >
-                    Add
+                    <LoadingLabel loading={loading} />
                 </BrownButton>
             </CustomBox>
         </CustomModal>

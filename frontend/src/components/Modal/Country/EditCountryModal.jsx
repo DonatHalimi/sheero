@@ -8,6 +8,7 @@ const EditCountryModal = ({ open, onClose, country, onViewDetails, onEditSuccess
     const [isValidName, setIsValidName] = useState(true);
     const [countryCode, setCountryCode] = useState('');
     const [isValidCode, setIsValidCode] = useState(true);
+    const [loading, setLoading] = useState(false);
 
     const validateName = (v) => /^[A-ZÇ][a-zA-ZëËçÇ\s]{3,35}$/.test(v);
     const validateCountryCode = (v) => /^[A-Z]{2,3}$/.test(v);
@@ -22,6 +23,8 @@ const EditCountryModal = ({ open, onClose, country, onViewDetails, onEditSuccess
     }, [country]);
 
     const handleEditCountry = async () => {
+        setLoading(true);
+
         if (!name || !countryCode) {
             toast.error('Please fill in all required fields');
             return;
@@ -39,6 +42,8 @@ const EditCountryModal = ({ open, onClose, country, onViewDetails, onEditSuccess
             onClose();
         } catch (error) {
             handleApiError(error, 'Error updating country');
+        } finally {
+            setLoading(false);
         }
     };
 
@@ -84,8 +89,9 @@ const EditCountryModal = ({ open, onClose, country, onViewDetails, onEditSuccess
                         onClose();
                     }}
                     primaryButtonProps={{
-                        disabled: !isValidForm
+                        disabled: !isValidForm || loading
                     }}
+                    loading={loading}
                 />
             </CustomBox>
         </CustomModal>

@@ -1,13 +1,12 @@
 import { Mail } from '@mui/icons-material';
 import React, { useEffect, useRef, useState } from 'react';
-import { useDispatch } from 'react-redux';
 import { useLocation, useNavigate } from 'react-router-dom';
 import { toast } from 'react-toastify';
-import { BrownButton, LoadingOverlay } from '../../assets/CustomComponents';
-import { resendOTP, verifyOTP } from '../../store/actions/authActions';
+import { BrownButton, copyToClipboard, LoadingLabel, LoadingOverlay } from '../../assets/CustomComponents';
+import { resendOTPService, verifyOTPService } from '../../services/authService';
+import { Button } from '@mui/material';
 
 const OTPVerification = () => {
-    const dispatch = useDispatch();
     const navigate = useNavigate();
     const location = useLocation();
 
@@ -80,15 +79,21 @@ const OTPVerification = () => {
         setLoading(true);
 
         try {
-            const response = await dispatch(verifyOTP({ email, otp }));
-            if (response?.success) {
-                toast.success('Email verified and account created successfully');
-                navigate('/login');
-            } else {
-                toast.error(response?.error || 'OTP verification failed.');
-            }
+            const response = await verifyOTPService(email, otp);
+
+            const successMessage = response.data.message;
+
+            toast.success(
+                <div onClick={() => copyToClipboard(email)} className='cursor-pointer'>
+                    {successMessage}
+                </div>,
+                { autoClose: false }
+            );
+
+            navigate('/login');
         } catch (error) {
-            toast.error('An error occurred during OTP verification.');
+            const errorMessage = error.response?.data?.error || error.response?.data?.message;
+            toast.error(errorMessage);
         } finally {
             setLoading(false);
         }
@@ -97,12 +102,11 @@ const OTPVerification = () => {
     const handleResendOTP = async () => {
         setResendLoading(true);
         try {
-            const response = await dispatch(resendOTP({ email }));
-            if (response?.success) {
-                toast.success(response.data.message);
-            }
+            const response = await resendOTPService(email);
+            toast.success(response.data.message);
         } catch (error) {
-            toast.error('Error resending OTP');
+            const errorMessage = error.response?.data?.error || error.response?.data?.message;
+            toast.error(errorMessage);
         } finally {
             setResendLoading(false);
         }
@@ -148,22 +152,20 @@ const OTPVerification = () => {
                         disabled={loading || otpArray.includes('')}
                         className="w-full text-white py-10 h-full px-4 rounded-lg font-medium transition-all duration-200 flex items-center justify-center gap-2 disabled:opacity-50 disabled:cursor-not-allowed"
                     >
-                        {loading ? (
-                            <div className="w-5 h-5 border-2 border-white border-t-transparent rounded-full animate-spin" />
-                        ) : 'Verify Email'}
+                        <LoadingLabel loading={loading} defaultLabel='Verify Email' loadingLabel='Verifying' />
                     </BrownButton>
 
                     <div className="text-center">
                         <p className="text-gray-600">
                             Didn't receive the code?{' '}
-                            <button
+                            <Button
                                 type="button"
                                 onClick={handleResendOTP}
                                 disabled={resendLoading}
                                 className="text-stone-600 hover:text-stone-700 font-medium transition-colors hover:underline"
                             >
-                                {resendLoading && <LoadingOverlay />}Resend
-                            </button>
+                                <LoadingLabel loading={resendLoading} defaultLabel='Resend' loadingLabel='Resending' />
+                            </Button>
                         </p>
                     </div>
                 </form>

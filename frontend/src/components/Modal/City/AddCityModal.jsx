@@ -1,7 +1,7 @@
 import { Autocomplete, TextField } from '@mui/material';
 import React, { useEffect, useState } from 'react';
 import { toast } from 'react-toastify';
-import { BrownButton, BrownOutlinedTextField, CustomBox, CustomModal, CustomPaper, CustomTypography, DashboardCountryFlag, handleApiError } from '../../../assets/CustomComponents';
+import { BrownButton, BrownOutlinedTextField, CustomBox, CustomModal, CustomPaper, CustomTypography, DashboardCountryFlag, handleApiError, LoadingLabel } from '../../../assets/CustomComponents';
 import { addCityService } from '../../../services/cityService';
 import { getCountriesService } from '../../../services/countryService';
 
@@ -12,6 +12,7 @@ const AddCityModal = ({ open, onClose, onAddSuccess }) => {
     const [zipCode, setZipCode] = useState('');
     const [isValidZipCode, setIsValidZipCode] = useState(true);
     const [countriesWithGroups, setCountriesWithGroups] = useState([]);
+    const [loading, setLoading] = useState(false);
 
     const validateName = (v) => /^[A-ZÇ][a-zA-ZëËçÇ\s]{2,15}$/.test(v);
     const validateZipCode = (v) => /^[0-9]{4,5}$/.test(v);
@@ -36,6 +37,8 @@ const AddCityModal = ({ open, onClose, onAddSuccess }) => {
     }, []);
 
     const handleAddCity = async () => {
+        setLoading(true);
+
         if (!name || !country || !zipCode) {
             toast.error('Please fill in all the fields');
             return;
@@ -54,6 +57,8 @@ const AddCityModal = ({ open, onClose, onAddSuccess }) => {
             onClose();
         } catch (error) {
             handleApiError(error, 'Error adding city');
+        } finally {
+            setLoading(false);
         }
     };
 
@@ -110,10 +115,10 @@ const AddCityModal = ({ open, onClose, onAddSuccess }) => {
                     onClick={handleAddCity}
                     variant="contained"
                     color="primary"
-                    disabled={!isValidForm}
+                    disabled={!isValidForm || loading}
                     className="w-full"
                 >
-                    Add
+                    <LoadingLabel loading={loading} />
                 </BrownButton>
             </CustomBox>
         </CustomModal>

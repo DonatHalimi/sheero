@@ -10,6 +10,7 @@ const EditSubSubcategoryModal = ({ open, onClose, subSubcategory, onViewDetails,
     const [isValidName, setIsValidName] = useState(true);
     const [subcategory, setSubcategory] = useState('');
     const [subcategories, setSubcategories] = useState([]);
+    const [loading, setLoading] = useState(false);
 
     const validateName = (v) => /^[A-ZÇ][\sa-zA-ZëËçÇ\W]{3,27}$/.test(v);
 
@@ -35,6 +36,8 @@ const EditSubSubcategoryModal = ({ open, onClose, subSubcategory, onViewDetails,
     }, [subSubcategory]);
 
     const handleEditSubSubcategory = async () => {
+        setLoading(true);
+
         const updatedData = {
             name,
             subcategory
@@ -47,6 +50,8 @@ const EditSubSubcategoryModal = ({ open, onClose, subSubcategory, onViewDetails,
             onClose();
         } catch (error) {
             handleApiError(error, 'Error updating subsubcategory');
+        } finally {
+            setLoading(false);
         }
     };
 
@@ -90,8 +95,9 @@ const EditSubSubcategoryModal = ({ open, onClose, subSubcategory, onViewDetails,
                         onClose();
                     }}
                     primaryButtonProps={{
-                        disabled: !isValidForm
+                        disabled: !isValidForm || loading
                     }}
+                    loading={loading}
                 />
             </CustomBox>
         </CustomModal>

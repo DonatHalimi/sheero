@@ -377,3 +377,12 @@ export const productChipSx = {
         },
     },
 }
+
+export const customModalSx = {
+    "&:focus": { outline: "none !important" },
+    "& *:focus": { outline: "none !important" }
+}
+
+export const customBoxSx = {
+    "&:focus": { outline: "none !important" }
+}

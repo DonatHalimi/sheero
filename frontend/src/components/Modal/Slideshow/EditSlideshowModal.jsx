@@ -12,6 +12,7 @@ const EditSlideshowModal = ({ open, onClose, image, onViewDetails, onEditSuccess
     const [isValidDescription, setIsValidDescription] = useState(true);
     const [newImage, setNewImage] = useState(null);
     const [imagePreview, setImagePreview] = useState('');
+    const [loading, setLoading] = useState(false);
 
     const isValid = (v) => /^[A-Z][\sa-zA-Z\W]{3,15}$/.test(v);
 
@@ -30,6 +31,8 @@ const EditSlideshowModal = ({ open, onClose, image, onViewDetails, onEditSuccess
     }, [image]);
 
     const handleEditImage = async () => {
+        setLoading(true);
+
         const formData = new FormData();
         formData.append('title', title);
         formData.append('description', description);
@@ -44,6 +47,8 @@ const EditSlideshowModal = ({ open, onClose, image, onViewDetails, onEditSuccess
             onClose();
         } catch (error) {
             handleApiError(error, 'Error updating image');
+        } finally {
+            setLoading(false);
         }
     };
 
@@ -120,8 +125,9 @@ const EditSlideshowModal = ({ open, onClose, image, onViewDetails, onEditSuccess
                         onClose();
                     }}
                     primaryButtonProps={{
-                        disabled: !isValidForm
+                        disabled: !isValidForm || loading,
                     }}
+                    loading={loading}
                 />
             </CustomBox>
         </CustomModal>

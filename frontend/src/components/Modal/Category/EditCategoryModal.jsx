@@ -10,6 +10,7 @@ const EditCategoryModal = ({ open, onClose, category, onViewDetails, onEditSucce
     const [isValidName, setIsValidName] = useState(true);
     const [image, setImage] = useState(null);
     const [imagePreview, setImagePreview] = useState('');
+    const [loading, setLoading] = useState(false);
 
     const validateName = (v) => /^[A-ZÇ][\sa-zA-ZëËçÇ\W]{3,28}$/.test(v);
 
@@ -28,6 +29,8 @@ const EditCategoryModal = ({ open, onClose, category, onViewDetails, onEditSucce
     }, [category]);
 
     const handleEditCategory = async () => {
+        setLoading(true);
+
         const formData = new FormData();
         formData.append('name', name);
         if (image) {
@@ -41,6 +44,8 @@ const EditCategoryModal = ({ open, onClose, category, onViewDetails, onEditSucce
             onClose();
         } catch (error) {
             handleApiError(error, 'Error updating category');
+        } finally {
+            setLoading(false);
         }
     };
 
@@ -106,8 +111,9 @@ const EditCategoryModal = ({ open, onClose, category, onViewDetails, onEditSucce
                         onClose();
                     }}
                     primaryButtonProps={{
-                        disabled: !isValidForm
+                        disabled: !isValidForm || loading,
                     }}
+                    loading={loading}
                 />
             </CustomBox>
         </CustomModal>

@@ -1,7 +1,7 @@
 import { Autocomplete, TextField } from '@mui/material';
 import React, { useEffect, useState } from 'react';
 import { toast } from 'react-toastify';
-import { BrownButton, BrownOutlinedTextField, CustomBox, CustomModal, CustomPaper, CustomTypography, handleApiError } from '../../../assets/CustomComponents';
+import { BrownButton, BrownOutlinedTextField, CustomBox, CustomModal, CustomPaper, CustomTypography, handleApiError, LoadingLabel } from '../../../assets/CustomComponents';
 import { getSubcategoriesService } from '../../../services/subcategoryService';
 import { addSubSubcategoryService } from '../../../services/subSubcategoryService';
 
@@ -10,6 +10,7 @@ const AddSubSubcategoryModal = ({ open, onClose, onAddSuccess }) => {
     const [isValidName, setIsValidName] = useState(true);
     const [subcategory, setSubcategory] = useState(null);
     const [subcategories, setSubcategories] = useState([]);
+    const [loading, setLoading] = useState(false);
 
     const validateName = (v) => /^[A-ZÇ][\sa-zA-ZëËçÇ\W]{3,27}$/.test(v);
 
@@ -35,6 +36,8 @@ const AddSubSubcategoryModal = ({ open, onClose, onAddSuccess }) => {
     }, []);
 
     const handleAddSubSubcategory = async () => {
+        setLoading(true);
+
         if (!name || !subcategory) {
             toast.error('Please fill in all the fields');
             return;
@@ -52,6 +55,8 @@ const AddSubSubcategoryModal = ({ open, onClose, onAddSuccess }) => {
             onClose();
         } catch (error) {
             handleApiError(error, 'Error updating subsubcategory');
+        } finally {
+            setLoading(false);
         }
     };
 
@@ -88,10 +93,10 @@ const AddSubSubcategoryModal = ({ open, onClose, onAddSuccess }) => {
                     onClick={handleAddSubSubcategory}
                     variant="contained"
                     color="primary"
-                    disabled={!isValidForm}
+                    disabled={!isValidForm || loading}
                     className="w-full"
                 >
-                    Add
+                    <LoadingLabel loading={loading} />
                 </BrownButton>
             </CustomBox>
         </CustomModal>

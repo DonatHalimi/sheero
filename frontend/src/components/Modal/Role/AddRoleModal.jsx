@@ -1,17 +1,20 @@
 import React, { useState } from 'react';
 import { toast } from 'react-toastify';
-import { BrownButton, BrownOutlinedTextField, CustomBox, CustomModal, CustomTypography, handleApiError } from '../../../assets/CustomComponents';
+import { BrownButton, BrownOutlinedTextField, CustomBox, CustomModal, CustomTypography, handleApiError, LoadingLabel } from '../../../assets/CustomComponents';
 import { addRoleService } from '../../../services/roleService';
 
 const AddRoleModal = ({ open, onClose, onAddSuccess }) => {
     const [name, setName] = useState('');
     const [isValidName, setIsValidName] = useState(true);
+    const [loading, setLoading] = useState(false);
 
     const validateName = (v) => /^[a-zA-Z\s]{2,10}$/.test(v);
 
     const isValidForm = name && isValidName;
 
     const handleAddRole = async () => {
+        setLoading(true);
+
         if (!name) {
             toast.error('Please fill in the role name');
             return;
@@ -28,6 +31,8 @@ const AddRoleModal = ({ open, onClose, onAddSuccess }) => {
             onClose();
         } catch (error) {
             handleApiError(error, 'Error adding role');
+        } finally {
+            setLoading(false);
         }
     };
 
@@ -53,10 +58,10 @@ const AddRoleModal = ({ open, onClose, onAddSuccess }) => {
                     onClick={handleAddRole}
                     variant="contained"
                     color="primary"
-                    disabled={!isValidForm}
+                    disabled={!isValidForm || loading}
                     className="w-full"
                 >
-                    Add
+                    <LoadingLabel loading={loading} />
                 </BrownButton>
             </CustomBox>
         </CustomModal>

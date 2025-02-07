@@ -1,4 +1,4 @@
-import { editUserService, loadUserService, loginUserService, logoutUserService, registerUserService, resendOTPService, verifyOTPService } from '../../services/authService';
+import { editUserService, loadUserService, loginUserService, logoutUserService, registerUserService } from '../../services/authService';
 import { AUTH_ERROR, AUTH_LOADING, LOGIN_SUCCESS, LOGOUT, REGISTER_SUCCESS, SET_USER } from '../types';
 
 export const selectIsAdmin = (state) => {
@@ -47,24 +47,6 @@ export const registerUser = (userData) => async (dispatch) => {
         };
     }
 };
-
-export const verifyOTP = ({ email, otp }) => async () => {
-    try {
-        const { data } = await verifyOTPService(email, otp);
-        return { success: true, data };
-    } catch (error) {
-        return { success: false, error: error.response?.data?.error || 'OTP verification failed' };
-    }
-};
-
-export const resendOTP = ({ email }) => async () => {
-    try {
-        const { data } = await resendOTPService(email);
-        return { success: true, data };
-    } catch (error) {
-        return { success: false, error: error.response?.data?.error || 'OTP verification failed' };
-    }
-}
 
 export const loginUser = (email, password) => async dispatch => {
     dispatch({ type: AUTH_LOADING });

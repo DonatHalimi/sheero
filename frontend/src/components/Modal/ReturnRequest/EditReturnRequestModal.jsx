@@ -1,7 +1,7 @@
 import { MenuItem } from '@mui/material';
 import React, { useEffect, useState } from 'react';
 import { toast } from 'react-toastify';
-import { ActionButtons, BrownOutlinedTextField, CustomBox, CustomModal, CustomTypography, handleApiError, LoadingOverlay, ReadOnlyTextField } from '../../../assets/CustomComponents';
+import { ActionButtons, BrownOutlinedTextField, CustomBox, CustomModal, CustomTypography, handleApiError, ReadOnlyTextField } from '../../../assets/CustomComponents';
 import { editReturnRequestStatusService } from '../../../services/returnService';
 
 const EditReturnRequestModal = ({ open, onClose, returnRequest, onViewDetails, onEditSuccess }) => {
@@ -64,8 +64,6 @@ const EditReturnRequestModal = ({ open, onClose, returnRequest, onViewDetails, o
             <CustomBox>
                 <CustomTypography variant="h5">Edit Return Request Status</CustomTypography>
 
-                {loading && <LoadingOverlay />}
-
                 <ReadOnlyTextField
                     label="Order ID"
                     value={returnRequest?.order}
@@ -124,6 +122,10 @@ const EditReturnRequestModal = ({ open, onClose, returnRequest, onViewDetails, o
                         onViewDetails(returnRequest);
                         onClose();
                     }}
+                    primaryButtonProps={{
+                        disabled: loading
+                    }}
+                    loading={loading}
                 />
             </CustomBox>
         </CustomModal>

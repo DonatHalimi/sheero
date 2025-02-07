@@ -4,7 +4,7 @@ import React, { useState } from 'react';
 import { useDispatch } from 'react-redux';
 import { useNavigate } from 'react-router-dom';
 import { toast } from 'react-toastify';
-import { BrownButton, BrownOutlinedTextField, ErrorTooltip, handleFacebookLogin, handleGoogleLogin, knownEmailProviders, LoadingOverlay, SocialLoginButtons } from '../../assets/CustomComponents';
+import { BrownButton, BrownOutlinedTextField, ErrorTooltip, handleFacebookLogin, handleGoogleLogin, knownEmailProviders, LoadingLabel, SocialLoginButtons } from '../../assets/CustomComponents';
 import Navbar from '../../components/Navbar/Navbar';
 import Footer from '../../components/Utils/Footer';
 import { registerUser } from '../../store/actions/authActions';
@@ -94,8 +94,6 @@ const Register = () => {
 
     return (
         <Box className="flex flex-col bg-neutral-50 min-h-[100vh]">
-            {loading && <LoadingOverlay />}
-
             <Navbar />
             <Container component="main" maxWidth="xs" className="flex flex-1 flex-col align-left mt-20 mb-20">
                 <div className="bg-white flex flex-col align-left rounded-md shadow-md p-6">
@@ -156,12 +154,12 @@ const Register = () => {
                             type="submit"
                             fullWidth
                             variant="contained"
-                            disabled={!isFormValid}
+                            disabled={!isFormValid || loading}
                             sx={{ mb: 2 }}
                         >
-                            Register
+                            <LoadingLabel loading={loading} defaultLabel='Register' loadingLabel='Registering' />
                         </BrownButton>
-                        <Typography variant="body2" align="left" sx={{ color: 'text.secondary' }}>
+                        <div className='text-left text-sm text-stone-500'>
                             Already have an account?{' '}
                             <span
                                 onClick={() => navigate('/login')}
@@ -170,7 +168,7 @@ const Register = () => {
                             >
                                 Log In
                             </span>
-                        </Typography>
+                        </div>
 
                         <SocialLoginButtons
                             handleGoogleLogin={handleGoogleLogin}

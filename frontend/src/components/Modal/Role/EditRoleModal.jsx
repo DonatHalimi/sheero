@@ -6,6 +6,7 @@ import { editRoleService } from '../../../services/roleService';
 const EditRoleModal = ({ open, onClose, role, onViewDetails, onEditSuccess }) => {
     const [name, setName] = useState('');
     const [isValidName, setIsValidName] = useState(true);
+    const [loading, setLoading] = useState(false);
 
     const validateName = (v) => /^[a-zA-Z\s]{2,10}$/.test(v);
 
@@ -18,6 +19,8 @@ const EditRoleModal = ({ open, onClose, role, onViewDetails, onEditSuccess }) =>
     }, [role]);
 
     const handleEditRole = async () => {
+        setLoading(true);
+
         if (!name) {
             toast.error('Please fill in the role name');
             return;
@@ -34,6 +37,8 @@ const EditRoleModal = ({ open, onClose, role, onViewDetails, onEditSuccess }) =>
             onClose();
         } catch (error) {
             handleApiError(error, 'Error updating role');
+        } finally {
+            setLoading(false);
         }
     };
 
@@ -65,8 +70,9 @@ const EditRoleModal = ({ open, onClose, role, onViewDetails, onEditSuccess }) =>
                         onClose();
                     }}
                     primaryButtonProps={{
-                        disabled: !isValidForm
+                        disabled: !isValidForm || loading,
                     }}
+                    loading={loading}
                 />
             </CustomBox>
         </CustomModal>

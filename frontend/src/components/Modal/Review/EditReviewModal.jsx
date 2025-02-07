@@ -12,6 +12,7 @@ const EditReviewModal = ({ open, onClose, review, onViewDetails, onEditSuccess }
     const [isValidComment, setIsValidComment] = useState(true);
     const [product, setProduct] = useState('');
     const [products, setProducts] = useState([]);
+    const [loading, setLoading] = useState(false);
 
     const validateTitle = (v) => /^[A-Z][\Wa-zA-Z\s]{2,40}$/.test(v);
     const validateComment = (v) => /^[A-Z][\Wa-zA-Z\s]{3,500}$/.test(v);
@@ -43,6 +44,8 @@ const EditReviewModal = ({ open, onClose, review, onViewDetails, onEditSuccess }
     }, [review]);
 
     const handleEditReview = async () => {
+        setLoading(true);
+
         const updatedData = {
             title,
             rating,
@@ -57,6 +60,8 @@ const EditReviewModal = ({ open, onClose, review, onViewDetails, onEditSuccess }
             onClose();
         } catch (error) {
             handleApiError(error, 'Error updating review');
+        } finally {
+            setLoading(false);
         }
     };
 
@@ -136,8 +141,9 @@ const EditReviewModal = ({ open, onClose, review, onViewDetails, onEditSuccess }
                         onClose();
                     }}
                     primaryButtonProps={{
-                        disabled: !isValidForm
+                        disabled: !isValidForm || loading
                     }}
+                    loading={loading}
                 />
             </CustomBox>
         </CustomModal>

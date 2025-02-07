@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import { toast } from 'react-toastify';
-import { BrownButton, BrownOutlinedTextField, CustomBox, CustomModal, CustomTypography, handleApiError, knownEmailProviders } from '../../../assets/CustomComponents';
+import { BrownButton, BrownOutlinedTextField, CustomBox, CustomModal, CustomTypography, handleApiError, knownEmailProviders, LoadingLabel } from '../../../assets/CustomComponents';
 import { addSupplierService } from '../../../services/supplierService';
 
 const AddSupplierModal = ({ open, onClose, onAddSuccess }) => {
@@ -10,6 +10,7 @@ const AddSupplierModal = ({ open, onClose, onAddSuccess }) => {
     const [isValidEmail, setIsValidEmail] = useState(true);
     const [phoneNumber, setPhoneNumber] = useState('');
     const [isValidPhoneNumber, setIsValidPhoneNumber] = useState(true);
+    const [loading, setLoading] = useState(false);
 
     const validateName = (v) => /^[A-ZÇ][\sa-zA-ZëËçÇ\W]{2,15}$/.test(v);
     const validatePhoneNumber = (v) => /^0(44|45|48|49)\d{6}$/.test(v);
@@ -18,6 +19,8 @@ const AddSupplierModal = ({ open, onClose, onAddSuccess }) => {
     const isValidForm = name && isValidName && email && isValidEmail && phoneNumber && isValidPhoneNumber;
 
     const handleAddSupplier = async () => {
+        setLoading(true);
+
         if (!name || !email || !phoneNumber) {
             toast.error('Please fill in all the fields');
             return;
@@ -38,6 +41,8 @@ const AddSupplierModal = ({ open, onClose, onAddSuccess }) => {
             onClose();
         } catch (error) {
             handleApiError(error, 'Error adding supplier');
+        } finally {
+            setLoading(false);
         }
     };
 
@@ -91,10 +96,10 @@ const AddSupplierModal = ({ open, onClose, onAddSuccess }) => {
                     onClick={handleAddSupplier}
                     variant="contained"
                     color="primary"
-                    disabled={!isValidForm}
+                    disabled={!isValidForm || loading}
                     className="w-full"
                 >
-                    Add
+                    <LoadingLabel loading={loading} />
                 </BrownButton>
             </CustomBox>
         </CustomModal>

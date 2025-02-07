@@ -16,7 +16,9 @@ const userSchema = new mongoose.Schema({
             const letter = this.firstName.charAt(0).toUpperCase();
             return `https://dummyimage.com/100x100/${color.slice(1)}/ffffff&text=${letter}`;
         }
-    }
+    },
+    resetPasswordToken: { type: String, default: null },
+    resetPasswordExpires: { type: Date, default: null },
 });
 
 // Change profilePicture text on first name change

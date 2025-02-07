@@ -57,11 +57,6 @@ const userMenuItems = [
     label: 'Roles'
   },
   {
-    id: 'reviews',
-    icon: { active: Star, inactive: StarHalf },
-    label: 'Reviews'
-  },
-  {
     id: 'orders',
     icon: { active: Inbox, inactive: StyledInboxIcon },
     label: 'Orders'
@@ -70,6 +65,11 @@ const userMenuItems = [
     id: 'returns',
     icon: { active: MoveToInbox, inactive: StyledMoveToInboxIcon },
     label: 'Returns'
+  },
+  {
+    id: 'reviews',
+    icon: { active: Star, inactive: StarHalf },
+    label: 'Reviews'
   },
 ];
 

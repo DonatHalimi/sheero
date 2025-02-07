@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import { toast } from 'react-toastify';
-import { BrownButton, BrownOutlinedTextField, CustomBox, CustomModal, CustomTypography, handleApiError } from '../../../assets/CustomComponents';
+import { BrownButton, BrownOutlinedTextField, CustomBox, CustomModal, CustomTypography, handleApiError, LoadingLabel } from '../../../assets/CustomComponents';
 import { addFAQService } from '../../../services/faqService';
 
 const AddFAQModal = ({ open, onClose, onAddSuccess }) => {
@@ -8,11 +8,14 @@ const AddFAQModal = ({ open, onClose, onAddSuccess }) => {
     const [isValidQuestion, setIsValidQuestion] = useState(true);
     const [answer, setAnswer] = useState('');
     const [isValidAnswer, setIsValidAnswer] = useState(true);
+    const [loading, setLoading] = useState(false);
 
     const validateFAQ = (v) => /^[A-Z][\s\S]{10,50}$/.test(v);
-    const isValidForm = isValidQuestion && isValidAnswer;
+    const isValidForm = isValidQuestion && isValidAnswer && question && answer;
 
     const handleAddFAQ = async () => {
+        setLoading(true);
+
         if (!question || !answer) {
             toast.error('Please fill in all the fields');
             return;
@@ -30,6 +33,8 @@ const AddFAQModal = ({ open, onClose, onAddSuccess }) => {
             onClose();
         } catch (error) {
             handleApiError(error, 'Error adding faq');
+        } finally {
+            setLoading(false);
         }
     };
 
@@ -73,10 +78,10 @@ const AddFAQModal = ({ open, onClose, onAddSuccess }) => {
                     onClick={handleAddFAQ}
                     variant="contained"
                     color="primary"
-                    disabled={!isValidForm}
+                    disabled={!isValidForm || loading}
                     className="w-full"
                 >
-                    Add
+                    <LoadingLabel loading={loading} />
                 </BrownButton>
             </CustomBox>
         </CustomModal>

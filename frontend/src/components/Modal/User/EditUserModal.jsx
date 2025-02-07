@@ -18,6 +18,7 @@ const EditUserModal = ({ open, onClose, user, onViewDetails, onEditSuccess }) =>
     const [showPassword, setShowPassword] = useState(false);
     const [role, setRole] = useState('');
     const [roles, setRoles] = useState([]);
+    const [loading, setLoading] = useState(false);
 
     const validateName = (v) => /^[A-ZÇ][\sa-zA-ZëËçÇ\W]{2,10}$/.test(v);
     const validateEmail = (v) => new RegExp(`^[a-zA-Z0-9._%+-]+@(${knownEmailProviders.join('|')})$`, 'i').test(v);
@@ -53,6 +54,8 @@ const EditUserModal = ({ open, onClose, user, onViewDetails, onEditSuccess }) =>
     const handleMouseDownPassword = () => setShowPassword(!showPassword);
 
     const handleEditUser = async () => {
+        setLoading(true);
+
         if (!validateEmail(email)) {
             toast.error('Please enter a valid email address');
             return;
@@ -74,6 +77,8 @@ const EditUserModal = ({ open, onClose, user, onViewDetails, onEditSuccess }) =>
             onClose();
         } catch (error) {
             handleApiError(error, 'Error updating user');
+        } finally {
+            setLoading(false);
         }
     };
 
@@ -170,8 +175,9 @@ const EditUserModal = ({ open, onClose, user, onViewDetails, onEditSuccess }) =>
                         onClose();
                     }}
                     primaryButtonProps={{
-                        disabled: !isValidForm
+                        disabled: !isValidForm || loading
                     }}
+                    loading={loading}
                 />
             </CustomBox>
         </CustomModal>

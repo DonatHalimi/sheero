@@ -1,7 +1,7 @@
 const express = require('express');
 const cookieConfig = require('../config/cookie');
 const passport = require('passport');
-const { registerUser, loginUser, getCurrentUser, updateUserProfile, logoutUser, verifyOTP, resendOTP } = require('../controllers/authController.js');
+const { registerUser, verifyOTP, resendOTP, loginUser, getCurrentUser, updateUserProfile, forgotPassword, resetPassword, validateResetToken, logoutUser } = require('../controllers/authController.js');
 const { registerSchema, loginSchema } = require('../validations/auth');
 const { requireAuth } = require('../middleware/auth.js');
 const validate = require('../middleware/validation');
@@ -17,6 +17,9 @@ router.post('/register', validate(registerSchema), registerUser);
 router.post('/verify-otp', verifyOTP);
 router.post('/resend-otp', resendOTP);
 router.post('/login', validate(loginSchema), loginUser);
+router.post('/forgot-password', forgotPassword);
+router.post('/reset-password/:token', resetPassword);
+router.get('/validate-token/:token', validateResetToken);
 router.post('/logout', logoutUser);
 router.get('/me', requireAuth, getCurrentUser);
 router.put('/profile', requireAuth, updateUserProfile);

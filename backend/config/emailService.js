@@ -1,7 +1,7 @@
-const { SMTP_USER } = require('./dotenv');
+const { SMTP_USER, NODE_ENV } = require('./dotenv');
 const { statusImages, returnStatusImages, createAttachments, generateEmailVerificationHtml, generateOrderEmailHtml, generateReturnRequestEmailHtml, generateReviewEmailHtml,
     brandImages, headerMessages, returnStatusMessages, returnBodyMessages, orderStatusMessages, orderBodyMessages,
-    generateProductInventoryEmailHtml }
+    generateProductInventoryEmailHtml, generateResetPasswordEmailHtml, generatePasswordResetSuccessEmailHtml }
     = require('./emailUtils');
 const transporter = require('./mailer');
 const Role = require('../models/Role');
@@ -160,4 +160,24 @@ async function sendProductInventoryUpdateEmail(order) {
     }
 }
 
-module.exports = { sendVerificationEmail, sendOrderUpdateEmail, sendReturnRequestUpdateEmail, sendReviewEmail, sendProductInventoryUpdateEmail };
+
+async function sendResetPasswordEmail(user, resetToken) {
+    const frontendURL = NODE_ENV === 'production' ? 'https://sheero.onrender.com' : 'http://localhost:3000';
+
+    const resetUrl = `${frontendURL}/reset-password/${resetToken}`;
+    const subject = 'Password Reset Request';
+    const text = `Hello ${user.email},\n\nPlease click the following link to reset your password:\n\n${resetUrl}\n\nIf you did not request a password reset, please ignore this email.`;
+    const html = generateResetPasswordEmailHtml(user, resetUrl);
+
+    await sendEmail(user.email, subject, text, html);
+}
+
+async function sendPasswordResetSuccessEmail(user) {
+    const subject = 'Password Reset Success';
+    const text = `Hello ${user.email},\n\nYour password has been successfully reset.`;
+    const html = generatePasswordResetSuccessEmailHtml(user);
+
+    await sendEmail(user.email, subject, text, html);
+}
+
+module.exports = { sendVerificationEmail, sendOrderUpdateEmail, sendReturnRequestUpdateEmail, sendReviewEmail, sendProductInventoryUpdateEmail, sendResetPasswordEmail, sendPasswordResetSuccessEmail };

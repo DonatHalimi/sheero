@@ -4,7 +4,11 @@ import { CustomDeleteModal } from '../../assets/CustomComponents';
 import axiosInstance from '../../utils/axiosInstance';
 
 const DeleteModal = ({ open, onClose, items, onDeleteSuccess, endpoint, title, message }) => {
+    const [loading, setLoading] = React.useState(false);
+
     const handleDelete = async () => {
+        setLoading(true);
+
         const idsToDelete = items.map(item => item._id).filter(id => id);
 
         try {
@@ -24,6 +28,8 @@ const DeleteModal = ({ open, onClose, items, onDeleteSuccess, endpoint, title, m
             }
 
             console.error(`Error deleting ${itemType}`, error);
+        } finally {
+            setLoading(false);
         }
     };
 
@@ -34,6 +40,7 @@ const DeleteModal = ({ open, onClose, items, onDeleteSuccess, endpoint, title, m
             title={title}
             message={message}
             onDelete={handleDelete}
+            loading={loading}
         />
     );
 };

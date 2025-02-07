@@ -1,7 +1,7 @@
 import { Upload } from '@mui/icons-material';
 import React, { useState } from 'react';
 import { toast } from 'react-toastify';
-import { BrownButton, BrownOutlinedTextField, CustomBox, CustomModal, CustomTypography, handleApiError, OutlinedBrownButton, VisuallyHiddenInput } from '../../../assets/CustomComponents';
+import { BrownButton, BrownOutlinedTextField, CustomBox, CustomModal, CustomTypography, handleApiError, LoadingLabel, OutlinedBrownButton, VisuallyHiddenInput } from '../../../assets/CustomComponents';
 import { addCategoryService } from '../../../services/categoryService';
 
 const AddCategoryModal = ({ open, onClose, onAddSuccess }) => {
@@ -9,12 +9,15 @@ const AddCategoryModal = ({ open, onClose, onAddSuccess }) => {
     const [isValidName, setIsValidName] = useState(true);
     const [image, setImage] = useState(null);
     const [imagePreview, setImagePreview] = useState(null);
+    const [loading, setLoading] = useState(false);
 
     const validateName = (v) => /^[A-ZÇ][\sa-zA-ZëËçÇ\W]{3,28}$/.test(v);
 
     const isValidForm = isValidName && image;
 
     const handleAddCategory = async () => {
+        setLoading(true);
+
         if (!name || !image) {
             toast.error('Please fill in all the fields');
             return;
@@ -31,6 +34,8 @@ const AddCategoryModal = ({ open, onClose, onAddSuccess }) => {
             onClose();
         } catch (error) {
             handleApiError(error, 'Error adding category');
+        } finally {
+            setLoading(false);
         }
     };
 
@@ -89,10 +94,10 @@ const AddCategoryModal = ({ open, onClose, onAddSuccess }) => {
                     onClick={handleAddCategory}
                     variant="contained"
                     color="primary"
-                    disabled={!isValidForm}
+                    disabled={!isValidForm || loading}
                     className="w-full"
                 >
-                    Add
+                    <LoadingLabel loading={loading} />
                 </BrownButton>
             </CustomBox>
         </CustomModal>

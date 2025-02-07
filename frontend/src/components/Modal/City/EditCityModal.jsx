@@ -12,6 +12,7 @@ const EditCityModal = ({ open, onClose, city, onViewDetails, onEditSuccess }) =>
     const [zipCode, setZipCode] = useState('');
     const [isValidZipCode, setIsValidZipCode] = useState(true);
     const [countriesWithGroups, setCountriesWithGroups] = useState([]);
+    const [loading, setLoading] = useState(false);
 
     const validateName = (v) => /^[A-ZÇ][a-zA-ZëËçÇ\s]{2,15}$/.test(v);
     const validateZipCode = (v) => /^[0-9]{4,5}$/.test(v);
@@ -42,6 +43,8 @@ const EditCityModal = ({ open, onClose, city, onViewDetails, onEditSuccess }) =>
     }, [city]);
 
     const handleEditCity = async () => {
+        setLoading(true);
+
         const updatedData = {
             name,
             country,
@@ -55,6 +58,8 @@ const EditCityModal = ({ open, onClose, city, onViewDetails, onEditSuccess }) =>
             onClose();
         } catch (error) {
             handleApiError(error, 'Error updating city');
+        } finally {
+            setLoading(false);
         }
     };
 
@@ -118,8 +123,9 @@ const EditCityModal = ({ open, onClose, city, onViewDetails, onEditSuccess }) =>
                         onClose();
                     }}
                     primaryButtonProps={{
-                        disabled: !isValidForm
+                        disabled: !isValidForm || loading
                     }}
+                    loading={loading}
                 />
             </CustomBox>
         </CustomModal>

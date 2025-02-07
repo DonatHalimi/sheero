@@ -112,7 +112,9 @@ import Footer from '../components/Utils/Footer';
 import { getApiUrl, getImageUrl } from '../utils/config';
 import logo from './img/brand/logo.png';
 import {
+    customBoxSx,
     customMenuProps,
+    customModalSx,
     dashboardTitleSx,
     filterLayoutSx,
     getExpandIconProps,
@@ -1326,11 +1328,18 @@ export const CustomModal = ({ open, onClose, children, ...props }) => (
         <Modal
             open={open}
             onClose={onClose}
+            disableAutoFocus
+            disableEnforceFocus
+            sx={customModalSx}
             {...props}
-            className="flex items-center justify-center p-4 sm:p-0 outline-none focus:outline-none"
+            className="flex items-center justify-center p-4 sm:p-0 outline-none"
         >
             <BounceAnimation>
-                <Box className="bg-white rounded-lg shadow-lg w-full mx-auto max-w-[95vw] sm:max-w-md focus:outline-none">
+                <Box
+                    tabIndex="-1"
+                    sx={customBoxSx}
+                    className="bg-white rounded-lg shadow-lg w-full mx-auto max-w-[95vw] sm:max-w-md outline-none"
+                >
                     {children}
                 </Box>
             </BounceAnimation>
@@ -1372,6 +1381,19 @@ export const ReadOnlyTextField = (props) => (
     />
 );
 
+export const LoadingLabel = ({ loading, defaultLabel = 'Add', loadingLabel = 'Adding' }) => (
+    <>
+        {loading ? (
+            <>
+                {loadingLabel}{' '}
+                <div className="w-5 h-5 border-2 border-white border-t-transparent rounded-full animate-spin ml-2" />
+            </>
+        ) : (
+            defaultLabel
+        )}
+    </>
+);
+
 export const ActionButtons = ({
     primaryButtonLabel,
     secondaryButtonLabel,
@@ -1382,6 +1404,7 @@ export const ActionButtons = ({
     secondaryButtonProps = {},
     gap = 20,
     width = 200,
+    loading = false,
 }) => {
     return (
         <Box style={{ gap: `${gap}px` }} className="flex">
@@ -1403,7 +1426,11 @@ export const ActionButtons = ({
                 style={{ width: `${width}px` }}
                 {...primaryButtonProps}
             >
-                {primaryButtonLabel}
+                <LoadingLabel
+                    loading={loading}
+                    defaultLabel={primaryButtonLabel}
+                    loadingLabel={'Saving'}
+                />
             </BrownButton>
         </Box>
     );
@@ -1443,7 +1470,7 @@ export const EditExportButtons = ({
     );
 };
 
-export const CustomDeleteModal = ({ open, onClose, onDelete, title, message }) => (
+export const CustomDeleteModal = ({ open, onClose, onDelete, loading, title, message }) => (
     <AnimatePresence>
         <Modal open={open} onClose={onClose} className="flex items-center justify-center outline-none">
             <BounceAnimation>
@@ -1458,8 +1485,8 @@ export const CustomDeleteModal = ({ open, onClose, onDelete, title, message }) =
                         <OutlinedBrownButton onClick={onClose} variant="outlined" className="!mr-4">
                             Cancel
                         </OutlinedBrownButton>
-                        <BrownButton onClick={onDelete} variant="contained" color="error">
-                            Delete
+                        <BrownButton onClick={onDelete} variant="contained" color="error" disabled={loading}>
+                            <LoadingLabel loading={loading} defaultLabel="Delete" loadingLabel="Deleting" />
                         </BrownButton>
                     </div>
                 </Box>
@@ -3855,6 +3882,10 @@ export const formatQuantity = (order) => order.products.map(item => item.quantit
 export const formatTotalAmount = (order) => `€  ${order.totalAmount.toFixed(2)}`;
 export const formatPaymentInfo = (order) => `${order.paymentMethod} - ${order.paymentStatus}`;
 export const formatAddress = (order) => `${order?.address?.street}, ${order?.address?.city?.name}, ${order?.address?.country?.name}, ${order?.address?.phoneNumber}`;
+
+export const copyToClipboard = (text) => {
+    navigator.clipboard.writeText(text);
+};
 
 export const knownEmailProviders = [
     'gmail.com',

@@ -10,7 +10,9 @@ const axiosInstance = axios.create({
 axiosInstance.interceptors.response.use(
     (response) => response,
     (error) => {
-        if (error.response?.status === 401) {
+        const isGetUserEndpoint = error.config?.url?.includes('/auth/me');
+
+        if (error.response?.status === 401 && !isGetUserEndpoint) {
             const currentPath = window.location.pathname;
             if (currentPath !== '/') {
                 console.error('Unauthorized access - Please log in again.');

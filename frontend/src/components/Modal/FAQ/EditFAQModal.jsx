@@ -8,6 +8,7 @@ const EditFAQModal = ({ open, onClose, faq, onViewDetails, onEditSuccess }) => {
     const [isValidQuestion, setIsValidQuestion] = useState(true);
     const [answer, setAnswer] = useState('');
     const [isValidAnswer, setIsValidAnswer] = useState(true);
+    const [loading, setLoading] = useState(false);
 
     const validateFAQ = (v) => /^[A-Z][\s\S]{10,50}$/.test(v);
     const isValidForm = isValidQuestion && isValidAnswer;
@@ -20,6 +21,8 @@ const EditFAQModal = ({ open, onClose, faq, onViewDetails, onEditSuccess }) => {
     }, [faq]);
 
     const handleEditFAQ = async () => {
+        setLoading(true);
+
         const updatedData = {
             question,
             answer
@@ -32,6 +35,8 @@ const EditFAQModal = ({ open, onClose, faq, onViewDetails, onEditSuccess }) => {
             onClose();
         } catch (error) {
             handleApiError(error, 'Error updating faq');
+        } finally {
+            setLoading(false);
         }
     };
 
@@ -80,8 +85,9 @@ const EditFAQModal = ({ open, onClose, faq, onViewDetails, onEditSuccess }) => {
                         onClose();
                     }}
                     primaryButtonProps={{
-                        disabled: !isValidForm
+                        disabled: !isValidForm || loading
                     }}
+                    loading={loading}
                 />
             </CustomBox>
         </CustomModal>
