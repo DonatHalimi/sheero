@@ -38,7 +38,7 @@ The frontend serves as the user interface layer of the application, interacting 
 ### **Folder and File Explanations**
 
 - **public/**  
-  Contains static files like `_redirects`, `robots.txt`, `sitemap.xml` for [SEO](https://developers.google.com/search/docs/fundamentals/seo-starter-guide) optimization.
+  Contains static files like `robots.txt`, `sitemap.xml` for [SEO](https://developers.google.com/search/docs/fundamentals/seo-starter-guide) optimization.
 
 - **src/**  
   The source code directory that houses the core functionality of the frontend application.
@@ -99,7 +99,7 @@ The frontend serves as the user interface layer of the application, interacting 
   "scripts": {
     "check-env": "node ./src/utils/checkEnv.js",
     "dev": "npm run check-env && vite --port 3000 --open",
-    "build": "npm run check-env && vite build && cp public/_redirects dist/",
+    "build": "npm run check-env && vite build",
     "lint": "eslint . --ext js,jsx --report-unused-disable-directives --max-warnings 0",
     "preview": "vite preview"
   },

@@ -6,7 +6,7 @@
   "scripts": {
     "check-env": "node ./src/utils/checkEnv.js",
     "dev": "npm run check-env && vite --port 3000 --open",
-    "build": "npm run check-env && vite build && cp public/_redirects dist/",
+    "build": "npm run check-env && vite build",
     "lint": "eslint . --ext js,jsx --report-unused-disable-directives --max-warnings 0",
     "preview": "vite preview"
   },
