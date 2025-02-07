@@ -4,7 +4,6 @@ const cors = require('cors');
 const corsOptions = require('./config/cors');
 const express = require('express');
 const launchServer = require('./config/server');
-const path = require('path');
 const routes = require('./routes');
 const passport = require('./config/passport');
 const session = require('express-session');
@@ -35,13 +34,6 @@ app.use(passport.session());
 
 app.use('/uploads', express.static('uploads'));
 app.use('/api', routes);
-
-if (NODE_ENV === 'production') {
-    app.use(express.static('frontend/build'));
-    app.get('*', (req, res) => {
-        res.sendFile(path.resolve(__dirname, 'frontend', 'build', 'index.html'));
-    });
-}
 
 connectDB();
 launchServer(app);
