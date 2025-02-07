@@ -2,7 +2,7 @@ import { Checkbox, FormControl, FormControlLabel, InputLabel, ListItemText, Menu
 import React, { useEffect, useState } from 'react';
 import { useNavigate, useParams } from 'react-router-dom';
 import { toast } from 'react-toastify';
-import { BrownButton, CustomBox, CustomModal, LoadingOverlay, LoadingReturn } from '../../../assets/CustomComponents';
+import { BrownButton, CustomBox, CustomModal, LoadingLabel, LoadingOverlay, LoadingReturn } from '../../../assets/CustomComponents';
 import { getOrderDetailsService } from '../../../services/orderService';
 import { addReturnRequestService } from '../../../services/returnService';
 import { getImageUrl } from '../../../utils/config';
@@ -118,13 +118,11 @@ const ReturnModal = ({ open, onClose }) => {
         }
     };
 
-    const isDisabled = !selectedProducts.length || !reason || (reason === 'Other' && !customReasonValid) || !confirmSelection;
+    const isDisabled = !selectedProducts.length || !reason || (reason === 'Other' && !customReasonValid) || !confirmSelection || submitLoading;
 
     return (
         <CustomModal open={open} onClose={onClose}>
             <CustomBox>
-                {submitLoading && <LoadingOverlay />}
-
                 <Typography variant="h6" className='!mb-3'>
                     Return Products
                 </Typography>
@@ -224,7 +222,7 @@ const ReturnModal = ({ open, onClose }) => {
                             fullWidth
                             className='!mt-3'
                         >
-                            Submit Return Request
+                            <LoadingLabel loading={submitLoading} defaultLabel="Submit" loadingLabel="Submitting" />
                         </BrownButton>
                     </>
                 )}
