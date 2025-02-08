@@ -35,6 +35,7 @@ import {
   ToastContainer,
   ToTop,
   Verify,
+  Verify2FAOTP,
   Wishlist,
 } from './assets/imports';
 
@@ -48,6 +49,7 @@ const App = () => (
         <Route path="/login" element={<PublicRoute><Login /></PublicRoute>} />
         <Route path="/register" element={<PublicRoute><Register /></PublicRoute>} />
         <Route path='/verify-otp' element={<PublicRoute><OTPVerification /></PublicRoute>} />
+        <Route path="/verify-2fa" element={<Verify2FAOTP />} />
         <Route path="/reset-password/:token" element={<PublicRoute><ResetPassword /></PublicRoute>} />
         <Route path="/faqs" element={<FAQs />} />
         <Route path="/not-allowed" element={<NotAllowed />} />

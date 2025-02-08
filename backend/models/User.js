@@ -19,6 +19,7 @@ const userSchema = new mongoose.Schema({
     },
     resetPasswordToken: { type: String, default: null },
     resetPasswordExpires: { type: Date, default: null },
+    twoFactorEnabled: { type: Boolean, default: false },
 });
 
 // Change profilePicture text on first name change

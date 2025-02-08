@@ -1,18 +1,22 @@
 import { Visibility, VisibilityOff } from '@mui/icons-material';
-import { Box, IconButton, InputAdornment, TextField, Tooltip } from '@mui/material';
+import { Box, IconButton, InputAdornment, Switch, TextField, Tooltip } from '@mui/material';
 import React, { useEffect, useState } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 import { toast } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
-import { BrownButton, BrownOutlinedTextField, Header, knownEmailProviders, LoadingDetails, ProfileLayout } from '../../assets/CustomComponents';
+import { BrownButton, BrownOutlinedTextField, Header, knownEmailProviders, LoadingDetails, LoadingLabel, ProfileLayout, TwoFactorButton } from '../../assets/CustomComponents';
 import { downloadUserData } from '../../assets/DataExport';
 import Navbar from '../../components/Navbar/Navbar';
 import Footer from '../../components/Utils/Footer';
-import { updateUserProfile } from '../../store/actions/authActions';
+import { loadUser, updateUserProfile } from '../../store/actions/authActions';
+import { profileBoxSx } from '../../assets/sx';
+import { useNavigate } from 'react-router-dom';
+import { disable2faService, enable2faService } from '../../services/authService';
 
 const ProfileDetails = () => {
     const { user, loading } = useSelector(state => state.auth);
     const dispatch = useDispatch();
+    const navigate = useNavigate();
 
     const [initialData, setInitialData] = useState({ firstName: '', lastName: '', email: '' });
     const [firstName, setFirstName] = useState('');
@@ -22,6 +26,8 @@ const ProfileDetails = () => {
     const [newPassword, setNewPassword] = useState('');
     const [showPassword, setShowPassword] = useState(false);
     const [showNewPassword, setShowNewPassword] = useState(false);
+    const [is2faOn, setIs2faOn] = useState(user?.twoFactorEnabled || false);
+    const [is2faLoading, setIs2faLoading] = useState(false);
 
     const [firstNameValid, setFirstNameValid] = useState(true);
     const [lastNameValid, setLastNameValid] = useState(true);
@@ -41,8 +47,47 @@ const ProfileDetails = () => {
             setFirstName(user.firstName);
             setLastName(user.lastName);
             setEmail(user.email);
+            setIs2faOn(user.twoFactorEnabled || false);
         }
     }, [user]);
+
+    const enableTwoFactor = async () => {
+        setIs2faLoading(true);
+
+        try {
+            const response = await enable2faService();
+
+            if (response.data.success) {
+                toast.success(response.data.message);
+                navigate('/verify-2fa', { state: { email: response.data.email, isEnabling2FA: true } });
+            }
+        } catch (error) {
+            toast.error(error.response?.data?.message || 'Failed to enable 2FA');
+        } finally {
+            setIs2faLoading(false);
+        }
+    };
+
+    const disableTwoFactor = async () => {
+        setIs2faLoading(true);
+
+        try {
+            const response = await disable2faService();
+
+            if (response.data.disableOtpPending) {
+                toast.success(response.data.message);
+                navigate('/verify-2fa', { state: { email: user.email, isDisabling2FA: true } });
+            } else if (response.data.success) {
+                toast.success('Two-factor authentication disabled successfully.');
+                setIs2faOn(false);
+                dispatch(loadUser());
+            }
+        } catch (error) {
+            toast.error(error.response?.data?.message || 'Failed to disable 2FA');
+        } finally {
+            setIs2faLoading(false);
+        }
+    };
 
     const handleClickShowPassword = () => setShowPassword(!showPassword);
     const handleClickShowNewPassword = () => setShowNewPassword(!showNewPassword);
@@ -167,13 +212,13 @@ const ProfileDetails = () => {
                         sx={{
                             p: { xs: 3, md: 3 },
                         }}
-                        className="bg-white rounded-md shadow-sm mb-24"
+                        className="bg-white rounded-md shadow-sm mb-6"
                     >
                         {loading ? (
                             <LoadingDetails />
                         ) : (
                             <form onSubmit={handleSubmit} className="space-y-1">
-                                <Box sx={{ display: 'flex', flexDirection: { xs: 'column', md: 'row' }, gap: { xs: 3, md: 2 } }}>
+                                <Box sx={profileBoxSx}>
                                     <div className="relative flex-grow">
                                         <TextField
                                             fullWidth
@@ -245,7 +290,7 @@ const ProfileDetails = () => {
                                     </div>
                                 </Box>
 
-                                <Box sx={{ display: 'flex', flexDirection: { xs: 'column', md: 'row' }, gap: { xs: 0, md: 2 } }}>
+                                <Box sx={profileBoxSx}>
                                     <div className="relative flex-grow">
                                         <BrownOutlinedTextField
                                             variant="outlined"
@@ -339,8 +384,38 @@ const ProfileDetails = () => {
                         )}
                     </Box>
                 </Tooltip>
-            </ProfileLayout >
 
+                <Header title="Account Security" />
+                <Box
+                    sx={{
+                        p: { xs: 3, md: 3 }
+                    }}
+                    className="bg-white rounded-md shadow-sm mb-5"
+                >
+                    {loading ? (
+                        <LoadingDetails />
+                    ) : (
+                        <>
+                            <div className="flex items-center justify-between">
+                                <div className="flex items-center space-x-2">
+                                    <h2 className="text-base">Two-Factor Authentication</h2>
+                                    <p className={`text-sm bg-stone-50 rounded-md px-2 ${is2faOn ? 'text-green-500' : 'text-red-500'}`}>
+                                        {is2faOn ? 'Enabled' : 'Disabled'}
+                                    </p>
+                                </div>
+                                <TwoFactorButton
+                                    is2faOn={is2faOn}
+                                    is2faLoading={is2faLoading}
+                                    onClick={is2faOn ? disableTwoFactor : enableTwoFactor}
+                                />
+                            </div>
+                            <p className="mt-2 text-sm text-gray-600">
+                                You'll need to verify an OTP code sent to your email each login for added security.
+                            </p>
+                        </>
+                    )}
+                </Box>
+            </ProfileLayout >
             <Footer />
         </>
     );

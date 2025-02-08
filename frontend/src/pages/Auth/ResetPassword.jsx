@@ -39,7 +39,6 @@ const ResetPassword = () => {
 
             try {
                 const res = await validateResetTokenService(token);
-                console.log(res);
                 setEmail(res.data.email)
                 setLoading(false);
             } catch (error) {
@@ -119,8 +118,8 @@ const ResetPassword = () => {
                     </div>
                 </div>
                 <div className="text-center mb-1">
-                    <h2 className="text-2xl font-bold text-gray-800 mb-2">Password Reset</h2>
-                    <p className="text-gray-600">Set a new password for <span className="font-semibold">{email}</span></p>
+                    <h2 className="text-2xl font-bold text-stone-800 mb-2">Password Reset</h2>
+                    <p className="text-stone-600">Set a new password for <span className="font-semibold">{email}</span></p>
                 </div>
                 <form onSubmit={handleSubmit}>
                     <div className="relative">

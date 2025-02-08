@@ -16,6 +16,10 @@ export const validateResetTokenService = (token) => axiosInstance.get(`/auth/val
 
 export const loginUserService = (email, password) => axiosInstance.post('/auth/login', { email, password });
 
+export const enable2faService = () => axiosInstance.post('/auth/enable-2fa');
+
+export const disable2faService = () => axiosInstance.post('/auth/disable-2fa');
+
 export const logoutUserService = () => axiosInstance.post('/auth/logout');
 
 export const editUserService = (userData) => axiosInstance.put('/auth/profile', userData);

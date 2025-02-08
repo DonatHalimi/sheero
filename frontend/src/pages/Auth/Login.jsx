@@ -27,12 +27,6 @@ const Login = () => {
     const [loading, setLoading] = useState(false);
     const [forgotPasswordOpen, setForgotPasswordOpen] = useState(false);
 
-    useEffect(() => {
-        if (auth.isAuthenticated) {
-            navigate('/');
-        }
-    }, [auth.isAuthenticated, navigate]);
-
     const handleClickShowPassword = () => setShowPassword(!showPassword);
     const handleMouseDownPassword = (event) => event.preventDefault();
 
@@ -67,9 +61,8 @@ const Login = () => {
     };
 
     const handleSubmit = async (e) => {
-        setLoading(true);
-
         e.preventDefault();
+        setLoading(true);
 
         const { email, password, emailValid, passwordValid } = formData;
 
@@ -87,17 +80,22 @@ const Login = () => {
         }
 
         try {
-            const response = await dispatch(loginUser(email, password));
+            const result = await dispatch(loginUser(email, password));
 
-            if (response?.success) {
-                toast.success('Successfully logged in');
-            } else if (response?.errors) {
-                response.errors.forEach((err) => {
+            if (result.success) {
+                if (result.requires2FA) {
+                    toast.success(result.message);
+                    navigate('/verify-2fa', { state: { email: result.email } });
+                } else {
+                    toast.success(result.message);
+                    navigate('/');
+                }
+            } else if (result?.errors) {
+                result.errors.forEach((err) => {
                     toast.info(`${err.message}`);
                 });
             }
         } catch (error) {
-            console.error('Login error:', error);
             toast.error('An error occurred during login');
         } finally {
             setLoading(false);

@@ -189,7 +189,7 @@ function generateEmailVerificationHtml(userEmail, otp) {
         <p style="font-size: 18px; color: #57534E; margin-bottom: 16px;">Hello, <strong>${userEmail}</strong>,</p>
         <p style="font-size: 16px; color: #57534E; line-height: 1.5; margin-bottom: 20px;">Thank you for signing up with <a href="https://sheero.onrender.com" style="color: #57534E; text-decoration: none; font-weight: bold;">sheero</a>! Your One-Time Password (OTP) is:</p>
         <h2 style="color: #57534E;">${otp}</h2>
-        <p style="font-size: 16px; color: #57534E; line-height: 1.5; margin-bottom: 20px;">Please enter this code to complete your registration. It will expire in <strong>5 minutes</strong>.</p>
+        <p style="font-size: 16px; color: #57534E; line-height: 1.5; margin-bottom: 20px;">Please enter this code to complete your registration. It will expire in <strong>10 minutes</strong>.</p>
         <p style="font-size: 16px; color: #333; line-height: 1.5; margin-bottom: 20px;">If you did not request this, you can safely ignore this email.</p>
         <p style="font-size: 16px; color: #57534E; margin-bottom: 12px;">Best regards,<br/><strong><a href="https://sheero.onrender.com" style="color: #57534E; text-decoration: underline;">sheero</a></strong></p>
 
@@ -834,9 +834,70 @@ function generatePasswordResetSuccessEmailHtml(user) {
   `;
 }
 
+function generateEnable2FAEmailHtml(userEmail, otp) {
+  return `
+    <div style="font-family: 'Outfit', sans-serif; background-color: #f4f4f4; padding: 20px; border-radius: 8px; max-width: 600px;">
+        <p style="font-size: 18px; color: #57534E; margin-bottom: 16px;">Hello, <strong>${userEmail}</strong>,</p>
+        <p style="font-size: 16px; color: #57534E; line-height: 1.5; margin-bottom: 20px;">We have received a request to enable Two-Factor Authentication for your account.
+          <br/>
+          Your One-Time Password (OTP) is:
+        </p>
+        <h2 style="color: #57534E;">${otp}</h2>
+        <p style="font-size: 16px; color: #57534E; line-height: 1.5; margin-bottom: 20px;">Please enter this code to enable Two-Factor Authentication. It will expire in <strong>10 minutes</strong>.</p>
+        <p style="font-size: 16px; color: #333; line-height: 1.5; margin-bottom: 20px;">If you did not request this, you can safely ignore this email.</p>
+        <p style="font-size: 16px; color: #57534E; margin-bottom: 12px;">Best regards,<br/><strong><a href="https://sheero.onrender.com" style="color: #57534E; text-decoration: underline;">sheero</a></strong></p>
+
+        <p style="font-size: 12px; color: #888; margin-top: 20px; text-align: left;">
+          &copy; 2025 sheero. All rights reserved.
+        </p>
+    </div>
+    `
+}
+
+function generateDisable2FAEmailHtml(userEmail, otp) {
+  return `
+    <div style="font-family: 'Outfit', sans-serif; background-color: #f4f4f4; padding: 20px; border-radius: 8px; max-width: 600px;">
+        <p style="font-size: 18px; color: #57534E; margin-bottom: 16px;">Hello, <strong>${userEmail}</strong>,</p>
+        <p style="font-size: 16px; color: #57534E; line-height: 1.5; margin-bottom: 20px;">We have received a request to disable Two-Factor Authentication for your account. 
+          <br/>
+          Your One-Time Password (OTP) is:
+        </p>
+        <h2 style="color: #57534E;">${otp}</h2>
+        <p style="font-size: 16px; color: #57534E; line-height: 1.5; margin-bottom: 20px;">Please enter this code to disable Two-Factor Authentication. It will expire in <strong>10 minutes</strong>.</p>
+        <p style="font-size: 16px; color: #333; line-height: 1.5; margin-bottom: 20px;">If you did not request this, you can safely ignore this email.</p>
+        <p style="font-size: 16px; color: #57534E; margin-bottom: 12px;">Best regards,<br/><strong><a href="https://sheero.onrender.com" style="color: #57534E; text-decoration: underline;">sheero</a></strong></p>
+
+        <p style="font-size: 12px; color: #888; margin-top: 20px; text-align: left;">
+          &copy; 2025 sheero. All rights reserved.
+        </p>
+    </div>
+    `
+}
+
+function generateLogin2FAEmailHtml(userEmail, otp) {
+  return `
+    <div style="font-family: 'Outfit', sans-serif; background-color: #f4f4f4; padding: 20px; border-radius: 8px; max-width: 600px;">
+        <p style="font-size: 18px; color: #57534E; margin-bottom: 16px;">Hello, <strong>${userEmail}</strong>,</p>
+        <p style="font-size: 16px; color: #57534E; line-height: 1.5; margin-bottom: 20px;">Since you have enabled Two-Factor Authentication, you must log in using your One-Time Password (OTP). 
+          <br/>
+          Your One-Time Password (OTP) is:
+        </p>
+        <h2 style="color: #57534E;">${otp}</h2>
+        <p style="font-size: 16px; color: #57534E; line-height: 1.5; margin-bottom: 20px;">Please enter this code to log in to your account. It will expire in <strong>10 minutes</strong>.</p>
+        <p style="font-size: 16px; color: #333; line-height: 1.5; margin-bottom: 20px;">If you did not request this, you can safely ignore this email.</p>
+        <p style="font-size: 16px; color: #57534E; margin-bottom: 12px;">Best regards,<br/><strong><a href="https://sheero.onrender.com" style="color: #57534E; text-decoration: underline;">sheero</a></strong></p>
+
+        <p style="font-size: 12px; color: #888; margin-top: 20px; text-align: left;">
+          &copy; 2025 sheero. All rights reserved.
+        </p>
+    </div>
+    `
+}
+
 module.exports = {
   statusImages, returnStatusImages, createAttachments, brandImages, headerMessages,
   orderStatusMessages, orderBodyMessages, returnStatusMessages, returnBodyMessages,
   generateEmailVerificationHtml, generateOrderEmailHtml, generateReturnRequestEmailHtml,
-  generateReviewEmailHtml, generateProductInventoryEmailHtml, generateResetPasswordEmailHtml, generatePasswordResetSuccessEmailHtml
+  generateReviewEmailHtml, generateProductInventoryEmailHtml, generateResetPasswordEmailHtml, generatePasswordResetSuccessEmailHtml,
+  generateEnable2FAEmailHtml, generateDisable2FAEmailHtml, generateLogin2FAEmailHtml
 };

@@ -7,6 +7,7 @@ import { downloadAddress } from '../../assets/DataExport';
 import Navbar from '../../components/Navbar/Navbar';
 import Footer from '../../components/Utils/Footer';
 import { addAddress, getAddressByUser, getCities, getCountries, updateAddress } from '../../store/actions/addressActions';
+import { profileBoxSx } from '../../assets/sx';
 
 const AddressDetails = () => {
     const { user } = useSelector((state) => state.auth);
@@ -179,7 +180,7 @@ const AddressDetails = () => {
                         <LoadingDetails showAdditionalField={true} />
                     ) : (
                         <form onSubmit={handleSaveAddress} className="space-y-5">
-                            <Box sx={{ display: 'flex', flexDirection: { xs: 'column', md: 'row' }, gap: { xs: 3, md: 2 } }}>
+                            <Box sx={profileBoxSx}>
                                 <div className="relative w-full">
                                     <TextField
                                         fullWidth

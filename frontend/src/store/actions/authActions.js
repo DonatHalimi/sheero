@@ -54,23 +54,31 @@ export const loginUser = (email, password) => async dispatch => {
     try {
         const res = await loginUserService(email, password);
 
-        dispatch({
-            type: LOGIN_SUCCESS,
-            payload: res.data.user
-        });
+        if (!res.data.requires2FA) {
+            dispatch({
+                type: LOGIN_SUCCESS,
+                payload: res.data.user
+            });
+            dispatch(loadUser());
+        }
 
-        dispatch(loadUser());
-        return { success: true, data: res.data };
+        return {
+            success: true,
+            message: res.data.message,
+            requires2FA: res.data.requires2FA || false,
+            email: res.data.email
+        };
+
     } catch (error) {
         dispatch({
             type: AUTH_ERROR,
-            payload: error.response ? error.response.data : 'An error occurred',
+            payload: error.response?.data || 'An error occurred',
         });
 
-        const errorData = error.response?.data || { message: 'An error occurred' };
         return {
             success: false,
-            errors: errorData.errors || [{ message: errorData.message || 'Login failed' }]
+            message: error.response?.data?.message || 'Login failed',
+            errors: error.response?.data?.errors || [{ message: 'An error occurred during login' }]
         };
     }
 };

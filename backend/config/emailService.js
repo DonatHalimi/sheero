@@ -1,8 +1,9 @@
 const { SMTP_USER, NODE_ENV } = require('./dotenv');
 const { statusImages, returnStatusImages, createAttachments, generateEmailVerificationHtml, generateOrderEmailHtml, generateReturnRequestEmailHtml, generateReviewEmailHtml,
     brandImages, headerMessages, returnStatusMessages, returnBodyMessages, orderStatusMessages, orderBodyMessages,
-    generateProductInventoryEmailHtml, generateResetPasswordEmailHtml, generatePasswordResetSuccessEmailHtml }
-    = require('./emailUtils');
+    generateProductInventoryEmailHtml, generateResetPasswordEmailHtml, generatePasswordResetSuccessEmailHtml,
+    generateEnable2FAEmailHtml, generateDisable2FAEmailHtml, generateLogin2FAEmailHtml
+} = require('./emailUtils');
 const transporter = require('./mailer');
 const Role = require('../models/Role');
 const User = require('../models/User');
@@ -180,4 +181,31 @@ async function sendPasswordResetSuccessEmail(user) {
     await sendEmail(user.email, subject, text, html);
 }
 
-module.exports = { sendVerificationEmail, sendOrderUpdateEmail, sendReturnRequestUpdateEmail, sendReviewEmail, sendProductInventoryUpdateEmail, sendResetPasswordEmail, sendPasswordResetSuccessEmail };
+async function send2FAEmail(userEmail, otp) {
+    const subject = 'Enabling Two-Factor Authentication Code';
+    const text = `Hello ${userEmail},\n\nYour One-Time Password (OTP) for enabling two-factor authentication is: ${otp}\n\nIt will expire in 10 minutes.`;
+
+    const html = generateEnable2FAEmailHtml(userEmail, otp);
+    return sendEmail(userEmail, subject, text, html);
+}
+
+async function sendDisable2FAEmail(userEmail, otp) {
+    const subject = 'Disabling Two-Factor Authentication Code';
+    const text = `Hello ${userEmail},\n\nYour One-Time Password (OTP) for disabling two-factor authentication is: ${otp}\n\nIt will expire in 10 minutes.`;
+
+    const html = generateDisable2FAEmailHtml(userEmail, otp);
+    return sendEmail(userEmail, subject, text, html);
+}
+
+async function sendLogin2FAEmail(userEmail, otp) {
+    const subject = 'Login Two-Factor Authentication Code';
+    const text = `Hello ${userEmail},\n\nYour two-factor authentication OTP is: ${otp}\n\nIt will expire in 5 minutes.`;
+
+    const html = generateLogin2FAEmailHtml(userEmail, otp);
+    return sendEmail(userEmail, subject, text, html);
+}
+
+module.exports = {
+    sendVerificationEmail, sendOrderUpdateEmail, sendReturnRequestUpdateEmail, sendReviewEmail, sendProductInventoryUpdateEmail,
+    sendResetPasswordEmail, sendPasswordResetSuccessEmail, send2FAEmail, sendDisable2FAEmail, sendLogin2FAEmail
+};

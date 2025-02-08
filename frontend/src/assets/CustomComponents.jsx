@@ -29,6 +29,8 @@ import {
     Inbox,
     InboxOutlined,
     Info,
+    Lock,
+    LockOpen,
     Login,
     Logout,
     Menu as MenuIcon,
@@ -3731,6 +3733,38 @@ export const DashboardNavbar = ({
                 </div>
             </DashboardToolbar>
         </DashboardAppBar>
+    );
+};
+
+export const TwoFactorButton = ({ is2faOn, is2faLoading, onClick }) => {
+    return (
+        <BrownButton onClick={onClick} disabled={is2faLoading}>
+            <LoadingLabel
+                loading={is2faLoading}
+                defaultLabel={
+                    is2faOn ? (
+                        <>
+                            <LockOpen className="mr-2" /> Disable
+                        </>
+                    ) : (
+                        <>
+                            <Lock className="mr-2" /> Enable
+                        </>
+                    )
+                }
+                loadingLabel={
+                    is2faOn ? (
+                        <>
+                            <LockOpen className="mr-2" /> Disabling
+                        </>
+                    ) : (
+                        <>
+                            <Lock className="mr-2" /> Enabling
+                        </>
+                    )
+                }
+            />
+        </BrownButton>
     );
 };
 

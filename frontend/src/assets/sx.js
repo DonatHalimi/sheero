@@ -386,3 +386,9 @@ export const customModalSx = {
 export const customBoxSx = {
     "&:focus": { outline: "none !important" }
 }
+
+export const profileBoxSx = {
+    display: 'flex',
+    flexDirection: { xs: 'column', md: 'row' },
+    gap: { xs: 3, md: 2 }
+}
