@@ -5,7 +5,7 @@ const Role = require('../models/Role');
 const cookieConfig = require('../config/cookie');
 const crypto = require('crypto');
 const { JWT_SECRET } = require('../config/dotenv');
-const { sendVerificationEmail, sendResetPasswordEmail, sendPasswordResetSuccessEmail, send2FAEmail, sendDisable2FAEmail, sendLogin2FAEmail } = require('../config/emailService');
+const { sendVerificationEmail, sendResetPasswordEmail, sendPasswordResetSuccessEmail, sendEnable2FAEmail, sendDisable2FAEmail, sendLogin2FAEmail } = require('../config/emailService');
 
 const generateOTP = () => Math.floor(100000 + Math.random() * 900000).toString();
 
@@ -19,6 +19,7 @@ const generateAccessToken = (user) => {
 const otpStore = {};
 const pendingUsers = {};
 const rateLimitStore = {};
+const twoFARateLimitStore = {};
 const twoFactorOtpStore = {};
 
 const registerUser = async (req, res) => {
@@ -55,29 +56,43 @@ const registerUser = async (req, res) => {
 const verifyOTP = async (req, res) => {
     const { email, otp: userOtp } = req.body;
 
-    if (!email || !userOtp) return res.status(400).json({ error: 'Email and OTP are required.' });
+    if (!email || !userOtp) return res.status(400).json({ error: 'Email and OTP are required' });
 
     const record = otpStore[email];
 
-    if (!record) return res.status(400).json({ error: 'Invalid or expired OTP. Please request a new one.' });
+    if (!record) return res.status(400).json({ error: 'Invalid or expired OTP. Please request a new one' });
 
-    if (record.expires < Date.now()) return res.status(400).json({ error: 'OTP has expired. Please request a new one.' });
+    if (record.expires < Date.now()) return res.status(400).json({ error: 'OTP has expired. Please request a new one' });
 
-    if (record.otp !== userOtp) return res.status(400).json({ error: 'Invalid OTP. Please try again.' });
-
-    delete otpStore[email];
-
-    const pendingUser = pendingUsers[email];
-    if (!pendingUser) return res.status(400).json({ error: 'No pending registration found for this email.' });
+    if (record.otp !== userOtp) return res.status(400).json({ error: 'Invalid OTP. Please try again' });
 
     try {
-        const user = new User(pendingUser);
-        await user.save();
+        const pendingUser = pendingUsers[email];
+        const newUser = new User(pendingUser);
+        await newUser.save();
         delete pendingUsers[email];
 
-        res.status(200).json({ success: true, message: `Email verified and account created successfully for ${email}. Click to copy email.` });
+        delete otpStore[email];
+
+        const user = await User.findById(newUser._id).populate('role');
+
+        const accessToken = generateAccessToken(user);
+        res.cookie('accessToken', accessToken, cookieConfig);
+
+        res.status(200).json({
+            success: true,
+            message: "Email verified and logged in successfully",
+            user: {
+                id: user._id,
+                firstName: user.firstName,
+                lastName: user.lastName,
+                email: user.email,
+                role: user.role.name,
+                accessToken: accessToken
+            }
+        });
     } catch (error) {
-        res.status(500).json({ message: 'Failed to create user account', error: error.message });
+        res.status(500).json({ message: 'Server error', error: error.message });
     }
 };
 
@@ -92,11 +107,11 @@ const resendOTP = async (req, res) => {
 
         if (lastRequestTime && currentTime - lastRequestTime < rateLimitDuration) {
             const waitTime = Math.ceil((rateLimitDuration - (currentTime - lastRequestTime)) / 1000);
-            return res.status(429).json({ error: `Too many requests. Please wait ${waitTime} seconds before trying again.` });
+            return res.status(429).json({ error: `Too many requests. Please wait ${waitTime} seconds before trying again` });
         }
 
         const record = otpStore[email];
-        if (!record) return res.status(400).json({ error: 'No OTP found for this email. Please register first.' });
+        if (!record) return res.status(400).json({ error: 'No OTP found for this email. Please register first' });
 
         const newOtp = generateOTP();
         otpStore[email] = {
@@ -107,7 +122,7 @@ const resendOTP = async (req, res) => {
         rateLimitStore[email] = currentTime;
         await sendVerificationEmail(email, newOtp);
 
-        res.status(200).json({ message: 'OTP re-sent to email. Please check your inbox' });
+        res.status(200).json({ message: `OTP re-sent to ${email}. Please check your inbox` });
     } catch (error) {
         res.status(500).json({ message: 'Failed to resend OTP', error: error.message });
     }
@@ -158,185 +173,150 @@ const loginUser = async (req, res) => {
     }
 };
 
-const enable2FA = async (req, res) => {
-    if (!req.user) {
-        return res.status(401).json({ message: 'Unauthorized. User not found.' });
+const sendOTPForTwoFactor = async (user, action, isResend = false) => {
+    const newOtp = generateOTP();
+    const expiresIn = Date.now() + 10 * 60 * 1000;
+
+    twoFactorOtpStore[user.email] = {
+        otp: newOtp.toString(),
+        expires: expiresIn
+    };
+
+    const actionMessages = {
+        enable: `OTP code ${isResend ? 'resent' : 'sent'} to ${user.email}. Please verify to enable two-factor authentication`,
+        disable: `OTP code ${isResend ? 'resent' : 'sent'} to ${user.email}. Please verify to disable two-factor authentication`,
+        login: `OTP code ${isResend ? 'resent' : 'sent'} to ${user.email}. Please verify your login using the OTP`
+    };
+
+    switch (action) {
+        case 'enable':
+            await sendEnable2FAEmail(user.email, newOtp);
+            break;
+        case 'disable':
+            await sendDisable2FAEmail(user.email, newOtp);
+            break;
+        case 'login':
+            await sendLogin2FAEmail(user.email, newOtp);
+            break;
+        default:
+            throw new Error("Invalid action for sending OTP");
     }
 
-    const userId = req.user.userId;
+    return { message: actionMessages[action], otp: newOtp };
+};
+
+const enable2FA = async (req, res) => {
+    if (!req.user) return res.status(401).json({ message: 'Unauthorized. User not found' });
+
+    const user = await User.findById(req.user.userId);
+    if (!user) return res.status(404).json({ message: 'User not found.' });
+
+    if (user.twoFactorEnabled) return res.status(400).json({ message: 'Two-factor authentication is already enabled' });
+
     try {
-        const user = await User.findById(userId);
-        if (!user) return res.status(404).json({ message: 'User not found.' });
-
-        if (user.twoFactorEnabled) {
-            return res.status(400).json({ message: 'Two-factor authentication is already enabled.' });
-        }
-
-        const newOtp = generateOTP();
-        const expiresIn = Date.now() + 10 * 60 * 1000;
-
-        twoFactorOtpStore[user.email] = {
-            otp: newOtp.toString(),
-            expires: expiresIn
-        };
-
-        await send2FAEmail(user.email, newOtp);
-
+        const result = await sendOTPForTwoFactor(user, 'enable');
         res.status(200).json({
             success: true,
-            message: `OTP code sent to ${user.email}. Please verify to enable two-factor authentication`,
+            message: result.message,
             email: user.email
         });
     } catch (error) {
-        console.error('Error enabling 2FA:', error);
         res.status(500).json({ success: false, message: 'Internal server error.' });
     }
 };
 
 const disable2FA = async (req, res) => {
-    const userId = req.user.userId;
+    if (!req.user) return res.status(401).json({ message: 'Unauthorized. User not found' });
+
+    const user = await User.findById(req.user.userId);
+    if (!user) return res.status(404).json({ message: 'User not found.' });
+
+    if (!user.twoFactorEnabled) {
+        return res.status(400).json({ message: 'Two-factor authentication is already disabled' });
+    }
 
     try {
-        const user = await User.findById(userId);
-        if (!user) return res.status(404).json({ message: "User not found." });
-
-        if (!user.twoFactorEnabled) return res.status(400).json({ message: "Two-factor authentication is already disabled." });
-
-        const newOtp = generateOTP();
-
-        twoFactorOtpStore[user.email] = {
-            otp: newOtp,
-            expires: Date.now() + 10 * 60 * 1000
-        };
-
-        try {
-            await sendDisable2FAEmail(user.email, newOtp);
-
-            res.status(200).json({
-                success: true,
-                message: `OTP code sent to ${user.email}. Please verify to disable two-factor authentication`,
-                email: user.email,
-                disableOtpPending: true
-            });
-        } catch (emailError) {
-            res.status(500).json({ success: false, message: "Failed to send OTP email" });
-        }
+        const result = await sendOTPForTwoFactor(user, 'disable');
+        res.status(200).json({
+            success: true,
+            message: result.message,
+            email: user.email,
+            disableOtpPending: true
+        });
     } catch (error) {
         res.status(500).json({ success: false, message: error.message });
     }
 };
 
-const verifyLoginOTP = async (req, res) => {
-    const { email, otp } = req.body;
-    if (!email || !otp) {
-        return res.status(400).json({ message: "Email and OTP are required" });
+const resend2FAOTP = async (req, res) => {
+    let { action, email } = req.body;
+    let user;
+
+    try {
+        if (!email && req.user) {
+            user = await User.findById(req.user.userId);
+            if (!user) return res.status(404).json({ success: false, message: 'User not found.' });
+            email = user.email;
+        }
+
+        if (!email) return res.status(400).json({ success: false, message: 'Email is required.' });
+
+        const currentTime = Date.now();
+        const rateLimitDuration = 60 * 1000;
+        const lastRequestTime = twoFARateLimitStore[email];
+
+        if (lastRequestTime && currentTime - lastRequestTime < rateLimitDuration) {
+            const waitTime = Math.ceil((rateLimitDuration - (currentTime - lastRequestTime)) / 1000);
+            return res.status(429).json({ success: false, message: `Too many requests. Please wait ${waitTime} seconds before trying again.` });
+        }
+
+        if (action === 'login') {
+            user = await User.findOne({ email });
+            if (!user) return res.status(404).json({ success: false, message: 'User not found.' });
+
+            if (!user.twoFactorEnabled) return res.status(400).json({ success: false, message: 'Two-factor authentication is not enabled for this account.' });
+
+        } else {
+            if (!user) {
+                user = await User.findById(req.user.userId);
+                if (!user) return res.status(404).json({ success: false, message: 'User not found.' });
+            }
+
+            if (action === 'enable' && user.twoFactorEnabled) return res.status(400).json({ success: false, message: 'Two-factor authentication is already enabled.' });
+
+            if (action === 'disable' && !user.twoFactorEnabled) return res.status(400).json({ success: false, message: 'Two-factor authentication is already disabled.' });
+        }
+
+        const result = await sendOTPForTwoFactor(user, action, true);
+        twoFARateLimitStore[email] = currentTime;
+
+        res.status(200).json({
+            success: true,
+            message: result.message,
+            email: user.email,
+            action: action
+        });
+    } catch (error) {
+        res.status(500).json({ error: error.message });
+    }
+};
+
+const verifyTwoFactorOTP = async (req, res) => {
+    const { email, otp, action } = req.body;
+    if (!email || !otp || !action) {
+        return res.status(400).json({ message: "Email, OTP, and action are required" });
     }
 
     const record = twoFactorOtpStore[email];
 
-    if (!record) {
-        return res.status(400).json({ message: "No OTP request found. Please try again" });
-    }
+    if (!record) return res.status(400).json({ message: "No OTP request found. Please try again" });
 
     if (record.expires < Date.now()) {
         delete twoFactorOtpStore[email];
         return res.status(400).json({ message: "OTP has expired. Please try again" });
     }
 
-    if (record.otp.toString() !== otp.toString()) {
-        return res.status(400).json({ message: "Invalid OTP" });
-    }
-
-    delete twoFactorOtpStore[email];
-
-    try {
-        const user = await User.findOne({ email });
-        if (!user) {
-            return res.status(404).json({ message: "User not found." });
-        }
-
-        const accessToken = generateAccessToken(user);
-        res.cookie('accessToken', accessToken, cookieConfig);
-
-        res.status(200).json({
-            success: true,
-            message: "OTP verification successful. Successfully logged in",
-            user: {
-                id: user._id,
-                email: user.email,
-                accessToken
-            }
-        });
-    } catch (error) {
-        res.status(500).json({ message: "Internal server error." });
-    }
-};
-
-const verifyEnable2FAOTP = async (req, res) => {
-    const { email, otp } = req.body;
-    if (!email || !otp) {
-        return res.status(400).json({ message: "Email and OTP are required." });
-    }
-
-    const record = twoFactorOtpStore[email];
-
-    if (!record) {
-        return res.status(400).json({ message: "No OTP request found. Please try again." });
-    }
-
-    if (record.expires < Date.now()) {
-        delete twoFactorOtpStore[email];
-        return res.status(400).json({ message: "OTP has expired. Please try again." });
-    }
-
-    if (record.otp.toString() !== otp.toString()) {
-        return res.status(400).json({ message: "Invalid OTP." });
-    }
-
-    delete twoFactorOtpStore[email];
-
-    try {
-        const user = await User.findOne({ email });
-        if (!user) {
-            return res.status(404).json({ message: "User not found." });
-        }
-
-        user.twoFactorEnabled = true;
-        await user.save();
-
-        res.status(200).json({
-            success: true,
-            message: "Two-factor authentication has been enabled successfully.",
-            user: {
-                id: user._id,
-                email: user.email
-            }
-        });
-    } catch (error) {
-        res.status(500).json({ message: "Internal server error." });
-    }
-};
-
-const verifyDisable2FAOTP = async (req, res) => {
-    const { email, otp } = req.body;
-
-    if (!email || !otp) {
-        return res.status(400).json({ message: "Email and OTP are required" });
-    }
-
-    const record = twoFactorOtpStore[email];
-    if (!record) {
-        return res.status(400).json({ message: "No OTP request found. Please try again" });
-    }
-
-    if (record.expires < Date.now()) {
-        delete twoFactorOtpStore[email];
-        return res.status(400).json({ message: "OTP has expired. Please try again" });
-    }
-
-    if (record.otp !== otp) {
-        return res.status(400).json({ message: "Invalid OTP." });
-    }
+    if (record.otp.toString() !== otp.toString()) return res.status(400).json({ message: "Invalid OTP" });
 
     delete twoFactorOtpStore[email];
 
@@ -344,12 +324,35 @@ const verifyDisable2FAOTP = async (req, res) => {
         const user = await User.findOne({ email });
         if (!user) return res.status(404).json({ message: "User not found" });
 
-        user.twoFactorEnabled = false;
-        await user.save();
-
-        res.status(200).json({ success: true, message: "Two-factor authentication disabled successfully" });
+        switch (action) {
+            case 'enable':
+                user.twoFactorEnabled = true;
+                await user.save();
+                return res.status(200).json({
+                    success: true,
+                    message: "Two-factor authentication has been enabled successfully",
+                    user: { id: user._id, email: user.email }
+                });
+            case 'disable':
+                user.twoFactorEnabled = false;
+                await user.save();
+                return res.status(200).json({
+                    success: true,
+                    message: "Two-factor authentication has been disabled successfully"
+                });
+            case 'login':
+                const accessToken = generateAccessToken(user);
+                res.cookie('accessToken', accessToken, cookieConfig);
+                return res.status(200).json({
+                    success: true,
+                    message: "OTP verification successful. Successfully logged in",
+                    user: { id: user._id, email: user.email, accessToken }
+                });
+            default:
+                return res.status(400).json({ message: "Invalid action." });
+        }
     } catch (error) {
-        res.status(500).json({ success: false, message: error.message });
+        return res.status(500).json({ message: "Internal server error." });
     }
 };
 
@@ -486,4 +489,4 @@ const logoutUser = (req, res) => {
     res.json({ message: 'Logout successful' });
 };
 
-module.exports = { registerUser, verifyOTP, resendOTP, loginUser, enable2FA, verifyEnable2FAOTP, verifyLoginOTP, disable2FA, verifyDisable2FAOTP, getCurrentUser, updateUserProfile, forgotPassword, resetPassword, validateResetToken, logoutUser };
+module.exports = { registerUser, verifyOTP, resendOTP, loginUser, enable2FA, disable2FA, resend2FAOTP, verifyTwoFactorOTP, getCurrentUser, updateUserProfile, forgotPassword, resetPassword, validateResetToken, logoutUser };

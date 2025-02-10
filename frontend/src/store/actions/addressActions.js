@@ -1,7 +1,7 @@
 import { addAddressService, editAddressService, getAddressByUserService, getAddressService } from '../../services/addressService';
 import { getCitiesByCountryService } from '../../services/cityService';
 import { getCountriesService } from '../../services/countryService';
-import { ADD_ADDRESS, ADDRESS_ERROR, GET_ADDRESS, GET_CITIES_BY_COUNTRY, GET_COUNTRIES, UPDATE_ADDRESS } from '../types';
+import { ADD_ADDRESS, ADDRESS_ERROR, GET_ADDRESS, GET_ADDRESS_BY_USER, GET_CITIES_BY_COUNTRY, GET_COUNTRIES, UPDATE_ADDRESS } from '../types';
 
 export const getAddress = (addressId) => async (dispatch) => {
     try {
@@ -24,7 +24,7 @@ export const getAddressByUser = (userId) => async (dispatch) => {
         const res = await getAddressByUserService(userId);
 
         dispatch({
-            type: GET_ADDRESS,
+            type: GET_ADDRESS_BY_USER,
             payload: res.data,
         });
     } catch (error) {

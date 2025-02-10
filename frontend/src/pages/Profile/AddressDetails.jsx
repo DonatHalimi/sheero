@@ -2,16 +2,16 @@ import { Box, FormControl, InputLabel, MenuItem, Select, TextField } from '@mui/
 import React, { useEffect, useState } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 import { toast } from 'react-toastify';
-import { BrownButton, Header, LoadingDetails, ProfileLayout } from '../../assets/CustomComponents';
+import { BrownButton, Header, LoadingDetails, LoadingLabel, ProfileLayout } from '../../assets/CustomComponents';
 import { downloadAddress } from '../../assets/DataExport';
+import { profileBoxSx } from '../../assets/sx';
 import Navbar from '../../components/Navbar/Navbar';
 import Footer from '../../components/Utils/Footer';
 import { addAddress, getAddressByUser, getCities, getCountries, updateAddress } from '../../store/actions/addressActions';
-import { profileBoxSx } from '../../assets/sx';
 
 const AddressDetails = () => {
     const { user } = useSelector((state) => state.auth);
-    const { address, countries, cities, loading } = useSelector((state) => state.address);
+    const { address, countries, cities, loadingUserAddress } = useSelector((state) => state.address);
     const dispatch = useDispatch();
 
     const [initialData, setInitialData] = useState({
@@ -22,6 +22,7 @@ const AddressDetails = () => {
         country: '',
         comment: '',
     });
+    const [originalAddress, setOriginalAddress] = useState(null);
 
     const [existingAddress, setExistingAddress] = useState(null);
     const [isSubmitted, setIsSubmitted] = useState(false);
@@ -47,16 +48,19 @@ const AddressDetails = () => {
     useEffect(() => {
         if (address) {
             setExistingAddress(true);
-            setInitialData({
+            const newInitialData = {
                 name: address.name || '',
                 street: address.street || '',
                 phoneNumber: address.phoneNumber || '',
                 city: address.city?._id || '',
                 country: address.country?._id || '',
                 comment: address.comment || '',
-            });
+            };
+            setInitialData(newInitialData);
+            setOriginalAddress(newInitialData);
         } else {
             setExistingAddress(false);
+            setOriginalAddress(null);
         }
     }, [address]);
 
@@ -78,6 +82,8 @@ const AddressDetails = () => {
     };
 
     const handleSaveAddress = async (e) => {
+        setIsSubmitted(true);
+
         e.preventDefault();
 
         if (!initialData.name || !initialData.street || !initialData.phoneNumber || !initialData.city || !initialData.country) {
@@ -91,17 +97,17 @@ const AddressDetails = () => {
             if (address) {
                 await dispatch(updateAddress(address._id, updatedAddress));
                 toast.success('Address updated successfully');
+                setOriginalAddress(updatedAddress);
                 await dispatch(getAddressByUser(user.id));
-                window.location.reload();
             } else {
                 await dispatch(addAddress(updatedAddress));
                 toast.success('Address added successfully');
                 await dispatch(getAddressByUser(user.id));
-                window.location.reload();
             }
-            setIsSubmitted(true);
         } catch (error) {
             toast.error('Error saving address');
+        } finally {
+            setIsSubmitted(false);
         }
     };
 
@@ -147,13 +153,9 @@ const AddressDetails = () => {
     };
 
     const isFormValid = nameValid && streetValid && phoneNumberValid && commentValid && initialData.city && initialData.country;
-    const isFormUnchanged = address &&
-        initialData.name === address.name &&
-        initialData.street === address.street &&
-        initialData.phoneNumber === address.phoneNumber &&
-        initialData.city === address.city?._id &&
-        initialData.country === address.country?._id &&
-        initialData.comment === address.comment;
+    const isFormUnchanged = originalAddress && Object.keys(initialData).every(
+        key => initialData[key] === originalAddress[key]
+    );
 
     const handleDownloadAddress = () => {
         if (address) {
@@ -171,15 +173,16 @@ const AddressDetails = () => {
                     onDownloadAddress={handleDownloadAddress}
                 />
 
-                <Box className='bg-white rounded-md shadow-sm mb-3'
+                <Box
                     sx={{
                         p: { xs: 3, md: 3 }
                     }}
+                    className='bg-white rounded-md shadow-sm mb-3'
                 >
-                    {loading ? (
+                    {loadingUserAddress ? (
                         <LoadingDetails showAdditionalField={true} />
                     ) : (
-                        <form onSubmit={handleSaveAddress} className="space-y-5">
+                        <form onSubmit={handleSaveAddress} className="space-y-4">
                             <Box sx={profileBoxSx}>
                                 <div className="relative w-full">
                                     <TextField
@@ -254,7 +257,7 @@ const AddressDetails = () => {
                                 </div>
                             </Box>
 
-                            <Box sx={{ display: 'flex', flexDirection: { xs: 'column', md: 'row' }, gap: { xs: 3, md: 2 } }}>
+                            <Box sx={profileBoxSx}>
                                 <FormControl fullWidth variant="outlined" required>
                                     <InputLabel>Country</InputLabel>
                                     <Select
@@ -321,13 +324,18 @@ const AddressDetails = () => {
                                 variant="contained"
                                 color="primary"
                                 disabled={isFormUnchanged || !isFormValid || isSubmitted}
+                                className="w-1/6"
                             >
-                                {existingAddress ? 'Update' : 'Add'}
+                                <LoadingLabel
+                                    loading={isSubmitted}
+                                    defaultLabel={existingAddress ? 'Update' : 'Add'}
+                                    loadingLabel={existingAddress ? 'Updating' : 'Adding'}
+                                />
                             </BrownButton>
                         </form>
                     )}
                 </Box>
-            </ProfileLayout>
+            </ProfileLayout >
             <Footer />
         </>
     );

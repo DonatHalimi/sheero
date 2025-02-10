@@ -27,7 +27,7 @@ async function sendEmail(userEmail, subject, text, html, attachments = []) {
 }
 
 async function sendVerificationEmail(userEmail, otp) {
-    const subject = 'OTP verification code for sheero';
+    const subject = 'OTP Verification Code for sheero';
     const text = `Hello ${userEmail},\n\nYour OTP is: ${otp}\n\nIt will expire in 2 minutes.`;
     const html = generateEmailVerificationHtml(userEmail, otp);
 
@@ -181,7 +181,7 @@ async function sendPasswordResetSuccessEmail(user) {
     await sendEmail(user.email, subject, text, html);
 }
 
-async function send2FAEmail(userEmail, otp) {
+async function sendEnable2FAEmail(userEmail, otp) {
     const subject = 'Enabling Two-Factor Authentication Code';
     const text = `Hello ${userEmail},\n\nYour One-Time Password (OTP) for enabling two-factor authentication is: ${otp}\n\nIt will expire in 10 minutes.`;
 
@@ -207,5 +207,5 @@ async function sendLogin2FAEmail(userEmail, otp) {
 
 module.exports = {
     sendVerificationEmail, sendOrderUpdateEmail, sendReturnRequestUpdateEmail, sendReviewEmail, sendProductInventoryUpdateEmail,
-    sendResetPasswordEmail, sendPasswordResetSuccessEmail, send2FAEmail, sendDisable2FAEmail, sendLogin2FAEmail
+    sendResetPasswordEmail, sendPasswordResetSuccessEmail, sendEnable2FAEmail, sendDisable2FAEmail, sendLogin2FAEmail
 };

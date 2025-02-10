@@ -20,6 +20,10 @@ export const enable2faService = () => axiosInstance.post('/auth/enable-2fa');
 
 export const disable2faService = () => axiosInstance.post('/auth/disable-2fa');
 
+export const verify2faService = (email, otp, action) => axiosInstance.post('/auth/verify-2fa', { email, otp, action });
+
+export const resend2faService = (email, action) => axiosInstance.post('/auth/resend-2fa', { action, email });
+
 export const logoutUserService = () => axiosInstance.post('/auth/logout');
 
 export const editUserService = (userData) => axiosInstance.put('/auth/profile', userData);

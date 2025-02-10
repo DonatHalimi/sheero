@@ -1,17 +1,17 @@
 import { Visibility, VisibilityOff } from '@mui/icons-material';
-import { Box, IconButton, InputAdornment, Switch, TextField, Tooltip } from '@mui/material';
+import { Box, IconButton, InputAdornment, TextField, Tooltip } from '@mui/material';
 import React, { useEffect, useState } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
+import { useNavigate } from 'react-router-dom';
 import { toast } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
 import { BrownButton, BrownOutlinedTextField, Header, knownEmailProviders, LoadingDetails, LoadingLabel, ProfileLayout, TwoFactorButton } from '../../assets/CustomComponents';
 import { downloadUserData } from '../../assets/DataExport';
+import { profileBoxSx } from '../../assets/sx';
 import Navbar from '../../components/Navbar/Navbar';
 import Footer from '../../components/Utils/Footer';
-import { loadUser, updateUserProfile } from '../../store/actions/authActions';
-import { profileBoxSx } from '../../assets/sx';
-import { useNavigate } from 'react-router-dom';
 import { disable2faService, enable2faService } from '../../services/authService';
+import { loadUser, updateUserProfile } from '../../store/actions/authActions';
 
 const ProfileDetails = () => {
     const { user, loading } = useSelector(state => state.auth);
@@ -26,6 +26,7 @@ const ProfileDetails = () => {
     const [newPassword, setNewPassword] = useState('');
     const [showPassword, setShowPassword] = useState(false);
     const [showNewPassword, setShowNewPassword] = useState(false);
+    const [isSubmitting, setIsSubmitting] = useState(false);
     const [is2faOn, setIs2faOn] = useState(user?.twoFactorEnabled || false);
     const [is2faLoading, setIs2faLoading] = useState(false);
 
@@ -59,7 +60,9 @@ const ProfileDetails = () => {
 
             if (response.data.success) {
                 toast.success(response.data.message);
-                navigate('/verify-2fa', { state: { email: response.data.email, isEnabling2FA: true } });
+                navigate('/verify-2fa', { state: { email: response.data.email, action: 'enable' } });
+            } else {
+                toast.error(response.data.message || 'Failed to enable 2FA');
             }
         } catch (error) {
             toast.error(error.response?.data?.message || 'Failed to enable 2FA');
@@ -76,7 +79,7 @@ const ProfileDetails = () => {
 
             if (response.data.disableOtpPending) {
                 toast.success(response.data.message);
-                navigate('/verify-2fa', { state: { email: user.email, isDisabling2FA: true } });
+                navigate('/verify-2fa', { state: { email: user.email, action: 'disable' } });
             } else if (response.data.success) {
                 toast.success('Two-factor authentication disabled successfully.');
                 setIs2faOn(false);
@@ -134,6 +137,8 @@ const ProfileDetails = () => {
     const handleSubmit = async (e) => {
         e.preventDefault();
 
+        setIsSubmitting(true);
+
         const updatedData = {};
         if (firstName !== initialData.firstName) updatedData.firstName = firstName;
         if (lastName !== initialData.lastName) updatedData.lastName = lastName;
@@ -155,8 +160,9 @@ const ProfileDetails = () => {
                 toast.error(result.error || 'Profile update failed');
             }
         } catch (error) {
-            console.error('Error updating profile:', error);
             toast.error('Profile update failed');
+        } finally {
+            setIsSubmitting(false);
         }
     };
 
@@ -196,6 +202,8 @@ const ProfileDetails = () => {
         ? `Profile details cannot be changed because you've logged in using ${provider}.`
         : '';
 
+    const isSubmitDisabled = isFormUnchanged || !isFormValid || isSubmitting;
+
     return (
         <>
             <Navbar />
@@ -212,12 +220,12 @@ const ProfileDetails = () => {
                         sx={{
                             p: { xs: 3, md: 3 },
                         }}
-                        className="bg-white rounded-md shadow-sm mb-6"
+                        className="bg-white rounded-md shadow-sm mb-4"
                     >
                         {loading ? (
                             <LoadingDetails />
                         ) : (
-                            <form onSubmit={handleSubmit} className="space-y-1">
+                            <form onSubmit={handleSubmit}>
                                 <Box sx={profileBoxSx}>
                                     <div className="relative flex-grow">
                                         <TextField
@@ -376,21 +384,21 @@ const ProfileDetails = () => {
                                     type="submit"
                                     variant="contained"
                                     color="primary"
-                                    disabled={isFormUnchanged || !isFormValid}
+                                    disabled={isSubmitDisabled}
+                                    className='w-1/6 !mt-2'
                                 >
-                                    Update
+                                    <LoadingLabel loading={isSubmitting} defaultLabel="Update" loadingLabel="Updating" />
                                 </BrownButton>
                             </form>
                         )}
                     </Box>
                 </Tooltip>
 
-                <Header title="Account Security" />
                 <Box
                     sx={{
                         p: { xs: 3, md: 3 }
                     }}
-                    className="bg-white rounded-md shadow-sm mb-5"
+                    className="bg-white rounded-md shadow-sm mb-5 !p-5"
                 >
                     {loading ? (
                         <LoadingDetails />

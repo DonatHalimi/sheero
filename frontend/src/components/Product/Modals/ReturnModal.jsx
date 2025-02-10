@@ -2,7 +2,7 @@ import { Checkbox, FormControl, FormControlLabel, InputLabel, ListItemText, Menu
 import React, { useEffect, useState } from 'react';
 import { useNavigate, useParams } from 'react-router-dom';
 import { toast } from 'react-toastify';
-import { BrownButton, CustomBox, CustomModal, LoadingLabel, LoadingOverlay, LoadingReturn } from '../../../assets/CustomComponents';
+import { BrownButton, CustomBox, CustomModal, LoadingLabel, LoadingReturn } from '../../../assets/CustomComponents';
 import { getOrderDetailsService } from '../../../services/orderService';
 import { addReturnRequestService } from '../../../services/returnService';
 import { getImageUrl } from '../../../utils/config';

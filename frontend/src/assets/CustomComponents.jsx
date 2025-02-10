@@ -128,6 +128,7 @@ import {
     layoutContainerSx,
     paginationStackSx,
     paginationStyling,
+    profileBoxSx,
     profileLayoutSx,
     reviewCommentSx,
     reviewContainerSx,
@@ -1019,31 +1020,25 @@ export const LoadingDataGrid = () => {
 export const LoadingDetails = ({ showAdditionalField }) => {
     return (
         <Box className='space-y-0'>
-            <Box sx={{ display: 'flex', flexDirection: { xs: 'column', md: 'row' }, gap: { xs: 3, md: 2 } }}>
-                <div className="flex-1">
-                    <WaveSkeleton variant="text" width="100%" height={70} />
-                </div>
-                <div className="flex-1">
-                    <WaveSkeleton variant="text" width="100%" height={70} />
-                </div>
-                <div className="flex-1">
-                    <WaveSkeleton variant="text" width="100%" height={70} />
-                </div>
+            <Box sx={profileBoxSx}>
+                <WaveSkeleton variant="text" width="100%" height={85} className='flex-1' />
+                <WaveSkeleton variant="text" width="100%" height={85} className='flex-1' />
+                <WaveSkeleton variant="text" width="100%" height={85} className='flex-1' />
             </Box>
-            <Box sx={{ display: 'flex', flexDirection: { xs: 'column', md: 'row' }, gap: { xs: 3, md: 2 } }}>
-                <div className="flex-1">
-                    <WaveSkeleton variant="text" width="100%" height={70} className='rounded' />
-                </div>
-                <div className="flex-1">
-                    <WaveSkeleton variant="text" width="100%" height={70} className='rounded' />
-                </div>
+            <Box sx={profileBoxSx} className='relative bottom-4'>
+                <WaveSkeleton variant="text" width="100%" height={80} className='flex-1' />
+                <WaveSkeleton variant="text" width="100%" height={80} className='flex-1' />
             </Box>
             {showAdditionalField && (
                 <>
-                    <WaveSkeleton variant="text" width="100%" height={70} className='rounded' />
+                    <div className='relative bottom-7'>
+                        <WaveSkeleton variant="text" width="100%" height={80} className='rounded' />
+                    </div>
                 </>
             )}
-            <WaveSkeleton variant="text" width={90} height={40} className='rounded' />
+            <div className='relative bottom-9'>
+                <WaveSkeleton variant="text" width={90} height={60} className='rounded' />
+            </div>
         </Box>
     );
 };

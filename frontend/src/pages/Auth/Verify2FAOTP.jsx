@@ -1,11 +1,13 @@
-import React, { useState, useEffect, useRef } from 'react';
-import { useDispatch } from 'react-redux';
-import { toast } from 'react-toastify';
-import { useLocation, useNavigate } from 'react-router-dom';
-import axiosInstance from '../../utils/axiosInstance';
-import { loadUser } from '../../store/actions/authActions';
 import { Mail } from '@mui/icons-material';
+import React, { useEffect, useRef, useState } from 'react';
+import { useDispatch } from 'react-redux';
+import { useLocation, useNavigate } from 'react-router-dom';
+import { toast } from 'react-toastify';
 import { BrownButton, LoadingLabel } from '../../assets/CustomComponents';
+import { resend2faService, verify2faService } from '../../services/authService';
+import { loadUser } from '../../store/actions/authActions';
+import { LOGIN_SUCCESS } from '../../store/types';
+import { Button } from '@mui/material';
 
 const Verify2FAOTP = () => {
     const dispatch = useDispatch();
@@ -14,9 +16,9 @@ const Verify2FAOTP = () => {
 
     const [otpArray, setOtpArray] = useState(['', '', '', '', '', '']);
     const [loading, setLoading] = useState(false);
-
+    const [resendLoading, setResendLoading] = useState(false);
     const inputRefs = useRef([]);
-    const { email, isEnabling2FA, isDisabling2FA } = location.state || {};
+    const { email, action } = location.state || {};
 
     useEffect(() => {
         if (!email) {
@@ -82,28 +84,14 @@ const Verify2FAOTP = () => {
         setLoading(true);
 
         try {
-            let endpoint;
-            if (isEnabling2FA) {
-                endpoint = '/auth/verify-enable-2fa';
-            } else if (isDisabling2FA) {
-                endpoint = '/auth/verify-disable-2fa';
-            } else {
-                endpoint = '/auth/verify-login-otp';
-            }
+            const response = await verify2faService(email, otp, action);
 
-            const response = await axiosInstance.post(endpoint, { email, otp });
-
-            if (response.data.success) {
-                dispatch(loadUser());
-
-                if (isEnabling2FA) {
-                    toast.success(response.data.message);
-                } else if (isDisabling2FA) {
-                    toast.success(response.data.message);
-                } else {
-                    toast.success(response.data.message);
+            if (response.data?.success) {
+                if (action === 'login') {
+                    dispatch({ type: LOGIN_SUCCESS, payload: response.data.user });
                 }
-
+                dispatch(loadUser());
+                toast.success(response.data.message);
                 navigate('/');
             } else {
                 toast.error(response.data.message || 'OTP verification failed.');
@@ -116,10 +104,24 @@ const Verify2FAOTP = () => {
         }
     };
 
-    const bodyMessage = isEnabling2FA
-        ? `We've sent a code to <strong>${email}</strong> in order to enable Two-Factor Authentication`
-        : isDisabling2FA
-            ? `We've sent a code to <strong>${email}</strong> in order to disable Two-Factor Authentication`
+    const handleResendOTP = async () => {
+        setResendLoading(true);
+
+        try {
+            const response = await resend2faService(email, action);
+            toast.success(response.data.message);
+        } catch (error) {
+            const errorMessage = error.response?.data?.message || 'Failed to resend OTP';
+            toast.error(errorMessage);
+        } finally {
+            setResendLoading(false);
+        }
+    };
+
+    const bodyMessage = action === 'enable'
+        ? `We've sent a code to <strong>${email}</strong> to enable Two-Factor Authentication`
+        : action === 'disable'
+            ? `We've sent a code to <strong>${email}</strong> to disable Two-Factor Authentication`
             : `We've sent a code to <strong>${email}</strong>. Please verify it in order to log in`;
 
     return (
@@ -159,8 +161,23 @@ const Verify2FAOTP = () => {
                         disabled={loading || otpArray.includes('')}
                         className="w-full text-white py-10 h-full px-4 rounded-lg font-medium transition-all duration-200 flex items-center justify-center gap-2 disabled:opacity-50 disabled:cursor-not-allowed"
                     >
-                        <LoadingLabel loading={loading} defaultLabel='Verify OTP' loadingLabel='Verifying' />
+                        <LoadingLabel loading={loading} defaultLabel='Verify' loadingLabel='Verifying' />
                     </BrownButton>
+
+                    <div className="text-center">
+                        <p className="text-gray-600">
+                            Didn't receive the code?{' '}
+                            <Button
+                                type="button"
+                                onClick={handleResendOTP}
+                                disabled={resendLoading}
+                                className="text-stone-600 hover:text-stone-700 font-medium transition-colors hover:underline"
+                            >
+                                <LoadingLabel loading={resendLoading} defaultLabel='Resend' loadingLabel='Resending' />
+                            </Button>
+                        </p>
+                    </div>
+
                 </form>
             </div>
         </div>

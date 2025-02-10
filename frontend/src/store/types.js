@@ -8,6 +8,7 @@ export const AUTH_LOADING = 'AUTH_LOADING';
 
 // User address action types
 export const GET_ADDRESS = 'GET_ADDRESS';
+export const GET_ADDRESS_BY_USER = 'GET_ADDRESS_BY_USER';
 export const ADD_ADDRESS = 'ADD_ADDRESS';
 export const UPDATE_ADDRESS = 'UPDATE_ADDRESS';
 export const DELETE_ADDRESS = 'DELETE_ADDRESS';

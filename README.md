@@ -257,6 +257,8 @@ Once the application is running, you can access it in your web browser at `http:
 - Users can submit reviews and request returns for products in orders with the status marked as ``Delivered``
 - Personalized email notifications for order status updates, return requests status updates and product reviews
 - Export user and address data as JSON, order and return request data as PDF, and all admin dashboard data as Excel or JSON
+- Users can reset their password with a reset link sent through their email
+- Users can add 2FA to their account for enhanced security
 
 ### Technologies Used
 

@@ -1,6 +1,6 @@
 import { Visibility, VisibilityOff } from '@mui/icons-material';
 import { Box, Container, IconButton, InputAdornment, Typography } from '@mui/material';
-import React, { useEffect, useState } from 'react';
+import React, { useState } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 import { useNavigate } from 'react-router-dom';
 import { toast } from 'react-toastify';
@@ -85,7 +85,7 @@ const Login = () => {
             if (result.success) {
                 if (result.requires2FA) {
                     toast.success(result.message);
-                    navigate('/verify-2fa', { state: { email: result.email } });
+                    navigate('/verify-2fa', { state: { email: result.email, action: 'login' } });
                 } else {
                     toast.success(result.message);
                     navigate('/');

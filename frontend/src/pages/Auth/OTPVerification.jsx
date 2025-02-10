@@ -1,12 +1,16 @@
 import { Mail } from '@mui/icons-material';
+import { Button } from '@mui/material';
 import React, { useEffect, useRef, useState } from 'react';
+import { useDispatch } from 'react-redux';
 import { useLocation, useNavigate } from 'react-router-dom';
 import { toast } from 'react-toastify';
-import { BrownButton, copyToClipboard, LoadingLabel, LoadingOverlay } from '../../assets/CustomComponents';
+import { BrownButton, copyToClipboard, LoadingLabel } from '../../assets/CustomComponents';
 import { resendOTPService, verifyOTPService } from '../../services/authService';
-import { Button } from '@mui/material';
+import { loadUser } from '../../store/actions/authActions';
+import { LOGIN_SUCCESS } from '../../store/types';
 
 const OTPVerification = () => {
+    const dispatch = useDispatch();
     const navigate = useNavigate();
     const location = useLocation();
 
@@ -80,17 +84,25 @@ const OTPVerification = () => {
 
         try {
             const response = await verifyOTPService(email, otp);
+            const { user, message, success } = response.data;
 
-            const successMessage = response.data.message;
+            if (success) {
+                dispatch({
+                    type: LOGIN_SUCCESS,
+                    payload: user
+                });
+
+                dispatch(loadUser());
+            }
 
             toast.success(
                 <div onClick={() => copyToClipboard(email)} className='cursor-pointer'>
-                    {successMessage}
+                    {message}
                 </div>,
                 { autoClose: false }
             );
 
-            navigate('/login');
+            navigate('/');
         } catch (error) {
             const errorMessage = error.response?.data?.error || error.response?.data?.message;
             toast.error(errorMessage);

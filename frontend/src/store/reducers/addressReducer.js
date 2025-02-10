@@ -1,8 +1,9 @@
-import { ADD_ADDRESS, ADDRESS_ERROR, DELETE_ADDRESS, GET_ADDRESS, GET_CITIES_BY_COUNTRY, GET_COUNTRIES, UPDATE_ADDRESS } from '../types';
+import { ADD_ADDRESS, ADDRESS_ERROR, DELETE_ADDRESS, GET_ADDRESS, GET_ADDRESS_BY_USER, GET_CITIES_BY_COUNTRY, GET_COUNTRIES, UPDATE_ADDRESS } from '../types';
 
 const initialState = {
     address: null,
     loading: true,
+    loadingUserAddress: true,
     loadingCountries: true,
     error: null,
     countries: [],
@@ -16,6 +17,14 @@ export default function (state = initialState, action) {
                 ...state,
                 address: action.payload,
                 loading: false,
+                error: null,
+            };
+
+        case GET_ADDRESS_BY_USER:
+            return {
+                ...state,
+                address: action.payload,
+                loadingUserAddress: false,
                 error: null,
             };
 

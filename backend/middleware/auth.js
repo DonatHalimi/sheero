@@ -96,4 +96,14 @@ const requireOwnershipOrAdmin = (Model) => {
     };
 };
 
-module.exports = { authenticateToken, authorizeRole, requireAuth, requireAuthAndRole, refreshAccessToken, requireOwnershipOrAdmin };
+const conditionalRequireAuth = (req, res, next) => {
+    const { action } = req.body;
+
+    if (action === 'enable' || action === 'disable') {
+        return requireAuth(req, res, next);
+    }
+
+    next();
+};
+
+module.exports = { authenticateToken, authorizeRole, requireAuth, requireAuthAndRole, refreshAccessToken, requireOwnershipOrAdmin, conditionalRequireAuth };
