@@ -2,7 +2,7 @@ const yup = require('yup');
 const Supplier = require('../models/Supplier');
 
 const isValidName = (v) => /^[A-Z][a-zA-Z]{2,15}$/.test(v);
-const isValidPhone = (v) => /^0(44|45|48|49)\d{6}$/.test(v);
+const isValidPhone = (v) => /^0(43|44|45|46|47|48|49)\d{6}$/.test(v);
 
 const createSchema = yup.object({
     name: yup
@@ -17,7 +17,7 @@ const createSchema = yup.object({
         phoneNumber: yup
             .string()
             .required('Phone number is required')
-            .test('is-valid-phone', 'Phone number must start with 044, 045, 048 or 049 followed by 6 digits', isValidPhone),
+            .test('is-valid-phone', 'Phone number must start with 043, 044, 045, 046, 047, 048 or 049 followed by 6 digits', isValidPhone),
     }),
 });
 
@@ -55,7 +55,7 @@ const updateSchema = yup.object({
             .email('Must be a valid email address'),
         phoneNumber: yup
             .string()
-            .test('is-valid-phone', 'Phone number must start with 044, 045, 048 or 049 followed by 6 digits', function (value) {
+            .test('is-valid-phone', 'Phone number must start with 043, 044, 045, 046, 047, 048 or 049 followed by 6 digits', function (value) {
                 if (value) {
                     return isValidPhone(value);
                 }

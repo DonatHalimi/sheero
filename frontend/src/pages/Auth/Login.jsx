@@ -85,7 +85,7 @@ const Login = () => {
             if (result.success) {
                 if (result.requires2FA) {
                     toast.success(result.message);
-                    navigate('/verify-2fa', { state: { email: result.email, action: 'login' } });
+                    navigate('/verify-otp', { state: { email: result.email, action: 'login' } });
                 } else {
                     toast.success(result.message);
                     navigate('/');

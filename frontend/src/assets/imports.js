@@ -16,7 +16,6 @@ export { default as Home } from '../pages/Info/Home';
 export const Login = React.lazy(() => import('../pages/Auth/Login'));
 export const Register = React.lazy(() => import('../pages/Auth/Register'));
 export const OTPVerification = React.lazy(() => import('../pages/Auth/OTPVerification'));
-export const Verify2FAOTP = React.lazy(() => import('../pages/Auth/Verify2FAOTP'));
 export const ResetPassword = React.lazy(() => import('../pages/Auth/ResetPassword'));
 export const FAQs = React.lazy(() => import('../pages/Info/FAQs'));
 export const NotAllowed = React.lazy(() => import('../pages/Errors/NotAllowed'));

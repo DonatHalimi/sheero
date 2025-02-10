@@ -40,7 +40,7 @@ const WishlistItem = ({ product, onRemove }) => {
 
         try {
             await addToCartService(data);
-            toast.success('Product added to cart!', { onClick: () => navigate('/cart') });
+            toast.success('Product added to cart', { onClick: () => navigate('/cart') });
 
             document.dispatchEvent(new CustomEvent('cartUpdated', { detail: _id }));
         } catch (error) {

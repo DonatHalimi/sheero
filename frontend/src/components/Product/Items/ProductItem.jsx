@@ -41,7 +41,7 @@ const ProductItem = ({ product }) => {
         try {
             await service(payload);
 
-            toast.success(`Product added to ${action === 'cart' ? 'cart' : 'wishlist'}!`, {
+            toast.success(`Product added to ${action === 'cart' ? 'cart' : 'wishlist'}`, {
                 onClick: () => navigate(`/${action === 'wishlist' ? 'profile/wishlist' : 'cart'}`),
             });
 

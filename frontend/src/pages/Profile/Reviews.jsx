@@ -64,7 +64,6 @@ const Reviews = () => {
     const handleEditSuccess = () => {
         setLoadingOverlay(false);
         dispatch(getUserReviews(user.id));
-        window.location.reload();
     };
 
     const handleDeleteClick = () => {

@@ -129,7 +129,7 @@ const Cart = () => {
 
     const handleShowModal = () => {
         if (!address) {
-            toast.warn("No address found. Click here to add one!", {
+            toast.warn("No address found. Click here to add one", {
                 onClick: () => navigate('/profile/address'),
                 autoClose: false,
             });

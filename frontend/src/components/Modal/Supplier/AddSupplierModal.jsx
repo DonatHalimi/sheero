@@ -13,7 +13,7 @@ const AddSupplierModal = ({ open, onClose, onAddSuccess }) => {
     const [loading, setLoading] = useState(false);
 
     const validateName = (v) => /^[A-ZÇ][\sa-zA-ZëËçÇ\W]{2,15}$/.test(v);
-    const validatePhoneNumber = (v) => /^0(44|45|48|49)\d{6}$/.test(v);
+    const validatePhoneNumber = (v) => /^0(43|44|45|46|47|48|49)\d{6}$/.test(v);
     const validateEmail = (v) => new RegExp(`^[a-zA-Z0-9._%+-]+@(${knownEmailProviders.join('|')})$`, 'i').test(v);
 
     const isValidForm = name && isValidName && email && isValidEmail && phoneNumber && isValidPhoneNumber;
@@ -89,7 +89,7 @@ const AddSupplierModal = ({ open, onClose, onAddSuccess }) => {
                         setIsValidPhoneNumber(validatePhoneNumber(e.target.value));
                     }}
                     error={!isValidPhoneNumber}
-                    helperText={!isValidPhoneNumber ? "Phone number must start with 044, 045, 048 or 049 followed by 6 digits" : ""}
+                    helperText={!isValidPhoneNumber ? "Phone number must start with 043, 044, 045, 046, 047, 048 or 049 followed by 6 digits" : ""}
                     className='!mb-4'
                 />
                 <BrownButton

@@ -56,6 +56,7 @@ export default function (state = initialState, action) {
             return {
                 ...state,
                 loading: false,
+                loadingUserAddress: false,
                 error: action.payload,
             };
 

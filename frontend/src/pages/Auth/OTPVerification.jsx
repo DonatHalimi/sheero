@@ -5,7 +5,7 @@ import { useDispatch } from 'react-redux';
 import { useLocation, useNavigate } from 'react-router-dom';
 import { toast } from 'react-toastify';
 import { BrownButton, copyToClipboard, LoadingLabel } from '../../assets/CustomComponents';
-import { resendOTPService, verifyOTPService } from '../../services/authService';
+import { resend2faService, resendOTPService, verify2faService, verifyOTPService } from '../../services/authService';
 import { loadUser } from '../../store/actions/authActions';
 import { LOGIN_SUCCESS } from '../../store/types';
 
@@ -17,16 +17,16 @@ const OTPVerification = () => {
     const [otpArray, setOtpArray] = useState(['', '', '', '', '', '']);
     const [loading, setLoading] = useState(false);
     const [resendLoading, setResendLoading] = useState(false);
-
     const inputRefs = useRef([]);
-    const email = location.state?.email;
+    const lastSubmittedOtpRef = useRef('');
+    const { email, action } = location.state || {};
 
     useEffect(() => {
         if (!email) {
-            toast.error('No valid email provided. Please register first.');
-            navigate('/register');
+            toast.error(action ? 'User email not found. Please try logging in again.' : 'No valid email provided. Please register first.');
+            navigate(action ? '/login' : '/register');
         }
-    }, [email, navigate]);
+    }, [email, navigate, action]);
 
     useEffect(() => {
         inputRefs.current[0]?.focus();
@@ -76,35 +76,41 @@ const OTPVerification = () => {
     };
 
     const handleVerifyOTP = async (e) => {
-        e.preventDefault();
+        if (e && e.preventDefault) e.preventDefault();
         const otp = otpArray.join('');
-        if (otp.length !== 6) return toast.error('Please enter the complete OTP');
+
+        if (otp.length !== 6) {
+            toast.error('Please enter the complete OTP');
+            return;
+        }
 
         setLoading(true);
 
         try {
-            const response = await verifyOTPService(email, otp);
-            const { user, message, success } = response.data;
-
-            if (success) {
-                dispatch({
-                    type: LOGIN_SUCCESS,
-                    payload: user
-                });
-
-                dispatch(loadUser());
+            let response;
+            if (action) {
+                response = await verify2faService(email, otp, action);
+            } else {
+                response = await verifyOTPService(email, otp);
             }
 
-            toast.success(
-                <div onClick={() => copyToClipboard(email)} className='cursor-pointer'>
-                    {message}
-                </div>,
-                { autoClose: false }
-            );
-
-            navigate('/');
+            if (response.data?.success) {
+                if (!action || action === 'login') {
+                    dispatch({ type: LOGIN_SUCCESS, payload: response.data.user });
+                }
+                dispatch(loadUser());
+                toast.success(
+                    <div onClick={() => copyToClipboard(email)} className='cursor-pointer'>
+                        {response.data.message}
+                    </div>,
+                    { autoClose: false }
+                );
+                navigate('/');
+            } else {
+                toast.error(response.data.message || 'OTP verification failed.');
+            }
         } catch (error) {
-            const errorMessage = error.response?.data?.error || error.response?.data?.message;
+            const errorMessage = error.response?.data?.message || 'OTP verification failed.';
             toast.error(errorMessage);
         } finally {
             setLoading(false);
@@ -113,16 +119,38 @@ const OTPVerification = () => {
 
     const handleResendOTP = async () => {
         setResendLoading(true);
+
         try {
-            const response = await resendOTPService(email);
+            let response;
+            if (action) {
+                response = await resend2faService(email, action);
+            } else {
+                response = await resendOTPService(email);
+            }
             toast.success(response.data.message);
         } catch (error) {
-            const errorMessage = error.response?.data?.error || error.response?.data?.message;
+            const errorMessage = error.response?.data?.message || 'Failed to resend OTP';
             toast.error(errorMessage);
         } finally {
             setResendLoading(false);
         }
     };
+
+    const bodyMessage = action
+        ? action === 'enable'
+            ? `We've sent a code to <strong>${email}</strong> to enable Two-Factor Authentication`
+            : action === 'disable'
+                ? `We've sent a code to <strong>${email}</strong> to disable Two-Factor Authentication`
+                : `We've sent a code to <strong>${email}</strong>. Please verify it in order to log in`
+        : `We've sent a code to <strong>${email}</strong>`;
+
+    useEffect(() => {
+        const otp = otpArray.join('');
+        if (otp.length === 6 && otp !== lastSubmittedOtpRef.current && !loading) {
+            lastSubmittedOtpRef.current = otp;
+            handleVerifyOTP();
+        }
+    }, [otpArray, loading]);
 
     return (
         <div className="min-h-screen flex items-center justify-center bg-[#F9FAFB] p-4">
@@ -135,10 +163,7 @@ const OTPVerification = () => {
 
                 <div className="text-center mb-8">
                     <h2 className="text-2xl font-bold text-gray-800 mb-2">Verify Your Email</h2>
-                    <p className="text-gray-600">
-                        We've sent a code to{' '}
-                        <span className="font-medium text-gray-800">{email}</span>
-                    </p>
+                    <p className="text-stone-600" dangerouslySetInnerHTML={{ __html: bodyMessage }}></p>
                 </div>
 
                 <form onSubmit={handleVerifyOTP} className="space-y-6">
@@ -164,7 +189,7 @@ const OTPVerification = () => {
                         disabled={loading || otpArray.includes('')}
                         className="w-full text-white py-10 h-full px-4 rounded-lg font-medium transition-all duration-200 flex items-center justify-center gap-2 disabled:opacity-50 disabled:cursor-not-allowed"
                     >
-                        <LoadingLabel loading={loading} defaultLabel='Verify Email' loadingLabel='Verifying' />
+                        <LoadingLabel loading={loading} defaultLabel={action ? 'Verify' : 'Verify Email'} loadingLabel='Verifying' />
                     </BrownButton>
 
                     <div className="text-center">

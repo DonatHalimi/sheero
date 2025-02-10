@@ -3,7 +3,7 @@ import React, { useEffect, useState } from 'react';
 import { useSelector } from 'react-redux';
 import { useNavigate } from 'react-router-dom';
 import { toast } from 'react-toastify';
-import { BrownButton, BrownOutlinedTextField, CustomBox, CustomModal, CustomTypography, LoadingOverlay } from '../../../assets/CustomComponents';
+import { BrownButton, BrownOutlinedTextField, CustomBox, CustomModal, CustomTypography, LoadingLabel } from '../../../assets/CustomComponents';
 import { addReviewService, checkReviewEligibilityService } from '../../../services/reviewService';
 
 const AddReviewModal = ({ open, onClose, product, onReviewSuccess }) => {
@@ -115,8 +115,6 @@ const AddReviewModal = ({ open, onClose, product, onReviewSuccess }) => {
                     Add Review
                 </CustomTypography>
 
-                {loading && <LoadingOverlay />}
-
                 {canReview === false && (
                     <CustomTypography variant="body2" className="!text-red-600">
                         Product can only be reviewed after buying it
@@ -190,10 +188,10 @@ const AddReviewModal = ({ open, onClose, product, onReviewSuccess }) => {
 
                 <BrownButton
                     onClick={handleAddReview}
-                    disabled={isDisabled}
+                    disabled={isDisabled || loading}
                     fullWidth
                 >
-                    Submit Review
+                    <LoadingLabel loading={loading} defaultLabel="Submit" loadingLabel="Submitting" />
                 </BrownButton>
             </CustomBox>
         </CustomModal>

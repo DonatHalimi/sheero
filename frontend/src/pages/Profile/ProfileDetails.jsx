@@ -60,7 +60,7 @@ const ProfileDetails = () => {
 
             if (response.data.success) {
                 toast.success(response.data.message);
-                navigate('/verify-2fa', { state: { email: response.data.email, action: 'enable' } });
+                navigate('/verify-otp', { state: { email: response.data.email, action: 'enable' } });
             } else {
                 toast.error(response.data.message || 'Failed to enable 2FA');
             }
@@ -72,23 +72,30 @@ const ProfileDetails = () => {
     };
 
     const disableTwoFactor = async () => {
+        console.log('Disabling 2FA');
         setIs2faLoading(true);
 
         try {
             const response = await disable2faService();
+            console.log('Disable 2FA response:', response);
 
             if (response.data.disableOtpPending) {
                 toast.success(response.data.message);
-                navigate('/verify-2fa', { state: { email: user.email, action: 'disable' } });
+                console.log('Redirecting to OTP verification page');
+                console.log('Navigation State:', { email: user.email, action: 'disable' }); // Debugging
+                navigate('/verify-otp', { state: { email: user.email, action: 'disable' } });
             } else if (response.data.success) {
                 toast.success('Two-factor authentication disabled successfully.');
+                console.log('2FA disabled successfully');
                 setIs2faOn(false);
                 dispatch(loadUser());
             }
         } catch (error) {
+            console.error('Error disabling 2FA:', error);
             toast.error(error.response?.data?.message || 'Failed to disable 2FA');
         } finally {
             setIs2faLoading(false);
+            console.log('2FA state:', is2faOn ? 'enabled' : 'disabled');
         }
     };
 

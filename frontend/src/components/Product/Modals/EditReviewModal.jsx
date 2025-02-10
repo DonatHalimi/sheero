@@ -2,13 +2,15 @@ import { Rating, TextField } from '@mui/material';
 import React, { useEffect, useState } from 'react';
 import { useDispatch } from 'react-redux';
 import { toast } from 'react-toastify';
-import { BrownButton, BrownOutlinedTextField, CustomBox, CustomModal, CustomTypography } from '../../../assets/CustomComponents';
-import { editUserReview } from '../../../store/actions/reviewActions';
+import { BrownButton, BrownOutlinedTextField, CustomBox, CustomModal, CustomTypography, LoadingLabel } from '../../../assets/CustomComponents';
+import { editUserReview, getUserReviews } from '../../../store/actions/reviewActions';
 
 const EditReviewModal = ({ open, onClose, review, onEditSuccess }) => {
     const [title, setTitle] = useState('');
     const [rating, setRating] = useState(null);
     const [comment, setComment] = useState('');
+    const [loading, setLoading] = useState(false);
+
     const [titleValid, setTitleValid] = useState(true);
     const [commentValid, setCommentValid] = useState(true);
     const [focusedField, setFocusedField] = useState(null);
@@ -38,6 +40,8 @@ const EditReviewModal = ({ open, onClose, review, onEditSuccess }) => {
     };
 
     const handleEditReview = async () => {
+        setLoading(true);
+
         if (!review || !review._id) {
             toast.error('Invalid review ID');
             return;
@@ -52,6 +56,7 @@ const EditReviewModal = ({ open, onClose, review, onEditSuccess }) => {
         try {
             dispatch(editUserReview(review._id, updatedData));
             toast.success('Review updated successfully');
+            dispatch(getUserReviews(review.user._id));
             onEditSuccess(updatedData);
             onClose();
         } catch (error) {
@@ -61,6 +66,8 @@ const EditReviewModal = ({ open, onClose, review, onEditSuccess }) => {
             } else {
                 toast.error('Error editing review');
             }
+        } finally {
+            setLoading(false);
         }
     };
 
@@ -135,7 +142,7 @@ const EditReviewModal = ({ open, onClose, review, onEditSuccess }) => {
                 )}
 
                 <BrownButton onClick={handleEditReview} disabled={isDisabled} fullWidth>
-                    Save Changes
+                    <LoadingLabel loading={loading} defaultLabel="Save" loadingLabel="Saving" />
                 </BrownButton>
             </CustomBox>
         </CustomModal>

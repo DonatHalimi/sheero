@@ -1,8 +1,8 @@
-import { Box, Button, Container, TextField, Typography } from '@mui/material';
+import { Container, TextField, Typography } from '@mui/material';
 import React, { useEffect, useRef, useState } from 'react';
 import { useSelector } from 'react-redux';
 import { toast } from 'react-toastify';
-import { ErrorTooltip } from '../../assets/CustomComponents';
+import { BrownButton, ErrorTooltip, LoadingLabel } from '../../assets/CustomComponents';
 import Navbar from '../../components/Navbar/Navbar';
 import Footer from '../../components/Utils/Footer';
 import { addContactService } from '../../services/contactService';
@@ -48,7 +48,8 @@ const ContactUs = () => {
 
     const handleSubmit = async (e) => {
         e.preventDefault();
-        toast.info('Sending message...', { autoClose: 500 });
+
+        setLoading(true);
 
         const data = {
             ...formData,
@@ -57,8 +58,7 @@ const ContactUs = () => {
 
         try {
             await addContactService(data);
-            setLoading(false);
-            toast.success('Message sent successfully, we will get back to you soon!', { autoClose: 2000 });
+            toast.success('Message sent successfully, we will get back to you soon!');
             setFormData({
                 name: user?.firstName || '',
                 email: user?.email || '',
@@ -66,7 +66,9 @@ const ContactUs = () => {
                 message: ''
             });
         } catch (error) {
-            toast.error(`Error: ${error.response?.data?.message || 'Server error'}`, { autoClose: 3000 });
+            toast.error(`Error: ${error.response?.data?.message || 'Server error'}`);
+        } finally {
+            setLoading(false);
         }
     };
 
@@ -99,6 +101,7 @@ const ContactUs = () => {
                 <Typography variant="h5" align="left" className="!mb-4 font-extrabold text-stone-600">
                     Contact Us
                 </Typography>
+
                 <form onSubmit={handleSubmit} className="flex flex-col gap-4">
                     {Object.entries(formData).map(([name, value]) => (
                         <div key={name} className="relative flex-grow">
@@ -130,17 +133,14 @@ const ContactUs = () => {
                             />
                         </div>
                     ))}
-                    <Box textAlign="left">
-                        <Button
-                            type="submit"
-                            variant="contained"
-                            color="primary"
-                            disabled={isFormValid}
-                            className="bg-blue-500 hover:bg-blue-600 text-white"
-                        >
-                            {loading ? 'Sending...' : 'Submit'}
-                        </Button>
-                    </Box>
+                    <BrownButton
+                        type="submit"
+                        variant="contained"
+                        disabled={isFormValid || loading}
+                        className="w-full"
+                    >
+                        <LoadingLabel loading={loading} defaultLabel="Submit" loadingLabel="Sending" />
+                    </BrownButton>
                 </form>
             </Container>
             <Footer />

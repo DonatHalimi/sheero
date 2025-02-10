@@ -4,7 +4,7 @@ const Country = require('../models/Country');
 const Address = require('../models/Address');
 
 const isValidName = (v) => /^[A-Z][a-zA-Z]{2,10}$/.test(v);
-const isValidPhone = (v) => /^0(44|45|48|49)\d{6}$/.test(v);
+const isValidPhone = (v) => /^0(43|44|45|46|47|48|49)\d{6}$/.test(v);
 const isValidStreet = (v) => /^[A-Z][a-zA-Z0-9\s]{2,27}$/.test(v);
 const isValidComment = (v) => /^[a-zA-Z0-9\s]{2,25}$/.test(v);
 
@@ -20,7 +20,7 @@ const createSchema = yup.object({
     phoneNumber: yup
         .string()
         .required('Phone number is required')
-        .test('is-valid-phone', 'Phone number must start with 044, 045, 048 or 049 followed by 6 digits', isValidPhone),
+        .test('is-valid-phone', 'Phone number must start with 043, 044, 045, 046, 047, 048 or 049 followed by 6 digits', isValidPhone),
     city: yup
         .string()
         .required('City is required')
@@ -145,7 +145,7 @@ const updateSchema = yup.object({
         }),
     phoneNumber: yup
         .string()
-        .test('is-valid-phone', 'Phone number must start with 044, 045, 048 or 049 followed by 6 digits', function (value) {
+        .test('is-valid-phone', 'Phone number must start with 043, 044, 045, 046, 047, 048 or 049 followed by 6 digits', function (value) {
             if (value) {
                 return isValidPhone(value);
             }

@@ -22,7 +22,7 @@ const AddAddressModal = ({ open, onClose, onAddSuccess }) => {
     const [loading, setLoading] = useState(false);
 
     const validateName = (v) => /^[A-ZÇ][a-zA-ZëËçÇ\s]{2,10}$/.test(v);
-    const validatePhoneNumber = (v) => /^0(44|45|48|49)\d{6}$/.test(v);
+    const validatePhoneNumber = (v) => /^0(43|44|45|46|47|48|49)\d{6}$/.test(v);
     const validateStreet = (v) => /^[A-Z][a-zA-Z0-9\s]{2,27}$/.test(v);
     const validateComment = (v) => !v || /^[a-zA-Z0-9\s]{2,25}$/.test(v);
 
@@ -142,7 +142,7 @@ const AddAddressModal = ({ open, onClose, onAddSuccess }) => {
                     }}
                     placeholder="044/45/48 XXXXXX"
                     error={!isValidPhoneNumber}
-                    helperText={!isValidPhoneNumber ? "Phone number must start with 044, 045, 048 or 049 followed by 6 digits" : ""}
+                    helperText={!isValidPhoneNumber ? "Phone number must start with 043, 044, 045, 046, 047, 048 or 049 followed by 6 digits" : ""}
                     className="!mb-4"
                 />
 
@@ -198,10 +198,10 @@ const AddAddressModal = ({ open, onClose, onAddSuccess }) => {
                     onClick={handleAddAddress}
                     variant="contained"
                     color="primary"
-                    disabled={!isFormValid}
+                    disabled={!isFormValid || loading}
                     className="w-full"
                 >
-                    <LoadingLabel loading={loading} />
+                    <LoadingLabel loading={loading} defaultLabel="Add" />
                 </BrownButton>
             </CustomBox>
         </CustomModal>

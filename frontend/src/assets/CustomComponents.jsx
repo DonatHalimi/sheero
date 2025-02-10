@@ -2828,8 +2828,8 @@ export const ProfileDropdown = ({ isOpen, isAdmin, handleLogout }) => {
 
     return (
         <div
-            className="absolute right-0 mt-1 w-48 bg-white border shadow-lg rounded-lg p-2"
             tabIndex="0"
+            className="absolute right-0 mt-1 w-48 bg-white border shadow-lg rounded-lg p-2"
         >
             <DropdownAnimation isOpen={isOpen}>
                 {isAdmin && (
@@ -3013,11 +3013,9 @@ export const NavbarLogo = ({ dashboardStyling }) => {
             e.preventDefault();
             navigate('/');
         }}>
-            <Tooltip title="Home" arrow>
-                <div className={`flex items-center cursor-pointer ${dashboardStyling || ''}`}>
-                    <img src={logo} alt="logo" className="w-[132px] md:w-auto h-9" />
-                </div>
-            </Tooltip>
+            <div className={`flex items-center cursor-pointer ${dashboardStyling || ''}`}>
+                <img src={logo} alt="logo" className="w-[132px] md:w-auto h-9" />
+            </div>
         </a>
     );
 };
@@ -3026,34 +3024,32 @@ export const ProfileIcon = ({ handleProfileDropdownToggle, isDropdownOpen }) => 
     const { user, loading } = useSelector((state) => state.auth);
 
     return (
-        <Tooltip title="Profile" arrow>
-            <div className="flex items-center">
-                <ProfileButton
-                    onMouseDown={handleProfileDropdownToggle}
-                    isDropdownOpen={isDropdownOpen}
-                    centerRipple={false}
-                >
-                    {loading ? (
-                        <WaveSkeleton variant="circle" width={50} height={20} className="mr-1 rounded-md" />
-                    ) : (
-                        <img
-                            src={user?.profilePicture}
-                            alt={`${user?.firstName}'s profile`}
-                            className="w-[26px] h-[26px] rounded-full object-cover"
-                        />
-                    )}
-                    {loading ? (
-                        <WaveSkeleton variant="text" width={80} height={20} className="ml-2" />
-                    ) : (
-                        user?.firstName && (
-                            <span className="text-sm overflow-hidden text-ellipsis ml-2 ">
-                                {user.firstName}
-                            </span>
-                        )
-                    )}
-                </ProfileButton>
-            </div>
-        </Tooltip>
+        <div className="flex items-center">
+            <ProfileButton
+                onMouseDown={handleProfileDropdownToggle}
+                isDropdownOpen={isDropdownOpen}
+                centerRipple={false}
+            >
+                {loading ? (
+                    <WaveSkeleton variant="circle" width={50} height={20} className="mr-1 rounded-md" />
+                ) : (
+                    <img
+                        src={user?.profilePicture}
+                        alt={`${user?.firstName}'s profile`}
+                        className="w-[26px] h-[26px] rounded-full object-cover"
+                    />
+                )}
+                {loading ? (
+                    <WaveSkeleton variant="text" width={80} height={20} className="ml-2" />
+                ) : (
+                    user?.firstName && (
+                        <span className="text-sm overflow-hidden text-ellipsis ml-2 ">
+                            {user.firstName}
+                        </span>
+                    )
+                )}
+            </ProfileButton>
+        </div>
     );
 };
 

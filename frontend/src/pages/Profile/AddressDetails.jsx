@@ -113,7 +113,7 @@ const AddressDetails = () => {
 
     const validateName = (name) => /^[A-ZÇ][a-zA-ZëËçÇ]{1,9}$/.test(name);
     const validateStreet = (street) => /^[A-Z][a-zA-Z0-9\s\-\.]{1,26}$/.test(street);
-    const validatePhoneNumber = (phoneNumber) => /^0(44|45|48)\d{6}$/.test(phoneNumber);
+    const validatePhoneNumber = (phoneNumber) => /^0(43|44|45|46|47|48|49)\d{6}$/.test(phoneNumber);
     const validateComment = (comment) => /^[a-zA-Z0-9\s]{2,25}$/.test(comment);
 
     const handleNameChange = (e) => {
@@ -245,12 +245,11 @@ const AddressDetails = () => {
                                         error={!phoneNumberValid}
                                         InputLabelProps={{ className: 'text-gray-700' }}
                                         InputProps={{ className: 'text-gray-700' }}
-                                        placeholder="044/45/48 XXXXXX"
                                     />
                                     {focusedField === 'phoneNumber' && !phoneNumberValid && (
-                                        <div className="absolute left-0 bottom-[-78px] bg-white text-red-500 text-sm p-2 rounded-lg shadow-md w-full z-10">
+                                        <div className="absolute left-0 top-[58px] bg-white text-red-500 text-sm p-2 rounded-lg shadow-md w-full z-10">
                                             <span className="block text-xs font-semibold mb-1">Invalid Phone Number</span>
-                                            Must be in the format: 044/45/48 followed by 6 digits.
+                                            Must be in the format: 043/44/45/46/47/48/49 followed by 6 digits.
                                             <div className="absolute top-[-5px] left-[20px] w-0 h-0 border-l-[5px] border-r-[5px] border-b-[5px] border-transparent border-b-white"></div>
                                         </div>
                                     )}
