@@ -5,7 +5,7 @@ import { downloadReviewData } from '../../../assets/DataExport';
 import { drawerPaperSx } from '../../../assets/sx';
 
 const ReviewDetailsDrawer = ({ open, onClose, review, onEdit }) => {
-    const header = `Review from ${review?.user.firstName} ${review?.user.lastName} - ${review?.user.email} for ${review?.product.name}`;
+    const header = `Review from <strong>${review?.user.firstName} ${review?.user.lastName} - ${review?.user.email}</strong> for <strong>${review?.product.name}</strong>`;
     const user = `${review?.user.firstName} ${review?.user.lastName} - ${review?.user.email}`;
 
     const handleEditClick = () => {
@@ -25,9 +25,7 @@ const ReviewDetailsDrawer = ({ open, onClose, review, onEdit }) => {
             <Box className="flex flex-col w-full mt-4 gap-4">
                 {review ? (
                     <>
-                        <Typography className='!font-bold !text-lg'>
-                            {header}
-                        </Typography>
+                        <Typography className='!text-lg' dangerouslySetInnerHTML={{ __html: header }} />
 
                         <ReadOnlyTextField
                             label="Review ID"

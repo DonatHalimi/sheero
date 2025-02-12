@@ -9,6 +9,8 @@ import {
     GET_FAQS_ERROR,
     GET_ORDERS,
     GET_ORDERS_ERROR,
+    GET_RESTOCK_SUBSCRIPTIONS,
+    GET_RESTOCK_SUBSCRIPTIONS_ERROR,
     GET_RETURNS,
     GET_RETURNS_ERROR,
     GET_REVIEWS,
@@ -38,6 +40,7 @@ const initialState = {
     cities: [],
     addresses: [],
     suppliers: [],
+    productRestockSubscriptions: [],
     loadingUsers: true,
     loadingRoles: true,
     loadingReviews: true,
@@ -50,6 +53,7 @@ const initialState = {
     loadingCities: true,
     loadingAddresses: true,
     loadingSuppliers: true,
+    loadingProductRestockSubscriptions: true,
     error: null,
 };
 
@@ -151,6 +155,14 @@ export default function (state = initialState, action) {
                 error: null,
             };
 
+        case GET_RESTOCK_SUBSCRIPTIONS:
+            return {
+                ...state,
+                productRestockSubscriptions: action.payload,
+                loadingProductRestockSubscriptions: false,
+                error: null,
+            };
+
         case GET_USERS_ERROR:
         case GET_ROLES_ERROR:
         case GET_REVIEWS_ERROR:
@@ -163,6 +175,7 @@ export default function (state = initialState, action) {
         case GET_CITIES_ERROR:
         case GET_ADDRESSES_ERROR:
         case GET_SUPPLIERS_ERROR:
+        case GET_RESTOCK_SUBSCRIPTIONS_ERROR:
             return {
                 ...state,
                 loadingUsers: false,
@@ -177,6 +190,7 @@ export default function (state = initialState, action) {
                 loadingCities: false,
                 loadingAddresses: false,
                 loadingSuppliers: false,
+                loadingProductRestockSubscriptions: false,
                 error: action.payload,
             };
         default:

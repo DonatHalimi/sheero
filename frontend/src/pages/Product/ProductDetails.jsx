@@ -4,14 +4,14 @@ import React, { useEffect, useState } from 'react';
 import { useSelector } from 'react-redux';
 import { useNavigate, useParams } from 'react-router-dom';
 import { toast } from 'react-toastify';
-import { DetailsBreadcrumbs, DetailsCartWishlistButtons, formatPrice, LoadingOverlay, LoadingProductDetails, OutOfStock } from '../../assets/CustomComponents';
+import { DetailsBreadcrumbs, DetailsCartWishlistButtons, formatPrice, LoadingOverlay, LoadingProductDetails, OutOfStock, ProductRestockNotificationModal, } from '../../assets/CustomComponents';
 import ImagePreviewModal from '../../components/Modal/ImagePreviewModal';
 import Navbar from '../../components/Navbar/Navbar';
 import AddReviewModal from '../../components/Product/Modals/AddReviewModal';
 import ProductDetailsTabs from '../../components/Product/Utils/ProductDetailsTabs';
 import Footer from '../../components/Utils/Footer';
 import { addToCartService } from '../../services/cartService';
-import { getProductDetails } from '../../services/productService';
+import { getProductDetails, subscribeForRestockService } from '../../services/productService';
 import { addToWishlistService } from '../../services/wishlistService';
 import { getImageUrl } from '../../utils/config';
 
@@ -22,10 +22,13 @@ const ProductDetails = () => {
 
     const [product, setProduct] = useState(null);
     const [imagePreviewOpen, setImagePreviewOpen] = useState(false);
-    const [loading, setLoading] = useState(true);
+    const [isLoadingProduct, setIsLoadingProduct] = useState(true);
     const [isCartLoading, setIsCartLoading] = useState(false);
     const [isWishlistLoading, setIsWishlistLoading] = useState(false);
     const [isReviewModalOpen, setIsReviewModalOpen] = useState(false);
+    const [isRestockModalOpen, setIsRestockModalOpen] = useState(false);
+    const [notifyEmail, setNotifyEmail] = useState('');
+    const [isNotifyLoading, setIsNotifyLoading] = useState(false);
     const [quantity, setQuantity] = useState(1);
 
     const { name, image, price, salePrice, discount, inventoryCount } = product || {};
@@ -45,7 +48,7 @@ const ProductDetails = () => {
                 console.error('Error fetching product:', error);
                 toast.error('Failed to load product details');
             } finally {
-                setLoading(false);
+                setIsLoadingProduct(false);
             }
         };
         fetchProduct();
@@ -62,6 +65,15 @@ const ProductDetails = () => {
 
     const handleReviewSuccess = () => {
         setIsReviewModalOpen(false);
+    };
+
+    const openRestockNotificationModal = () => {
+        setIsRestockModalOpen(true);
+    };
+
+    const closeRestockNotificationModal = () => {
+        setNotifyEmail('');
+        setIsRestockModalOpen(false);
     };
 
     const handleQuantityChange = (change) => {
@@ -120,12 +132,33 @@ const ProductDetails = () => {
         }
     };
 
+    const handleRestockNotificationSubmit = async () => {
+        if (!notifyEmail) {
+            toast.error('Please enter your email.');
+            return;
+        }
+        setIsNotifyLoading(true);
+        try {
+            const response = await subscribeForRestockService(product._id, notifyEmail);
+            if (response.data.alreadySubscribed) {
+                toast.info(response.data.message);
+            } else {
+                toast.success(response.data.message);
+            }
+            closeRestockNotificationModal();
+        } catch (error) {
+            toast.error('Failed to subscribe for notifications.');
+        } finally {
+            setIsNotifyLoading(false);
+        }
+    };
+
     return (
         <>
-            {(isCartLoading || isWishlistLoading) && (<LoadingOverlay />)}
+            {(isCartLoading || isWishlistLoading) && <LoadingOverlay />}
 
             <Navbar />
-            {loading ? (
+            {isLoadingProduct ? (
                 <LoadingProductDetails />
             ) : (
                 <>
@@ -206,6 +239,14 @@ const ProductDetails = () => {
                                     <span className="text-sm font-semibold text-stone-600 bg-stone-100 rounded-md px-2">
                                         {inventoryText}
                                     </span>
+                                    {inventoryCount === 0 && (
+                                        <p
+                                            onClick={openRestockNotificationModal}
+                                            className="ml-auto underline cursor-pointer text-sm"
+                                        >
+                                            Notify me when available
+                                        </p>
+                                    )}
                                 </div>
 
                                 <div className="flex items-center mt-2">
@@ -240,6 +281,15 @@ const ProductDetails = () => {
                     <div className="container mx-auto px-4 bg-white mt-8 mb-8 rounded-md max-w-5xl">
                         <ProductDetailsTabs product={product} />
                     </div>
+
+                    <ProductRestockNotificationModal
+                        open={isRestockModalOpen}
+                        onClose={closeRestockNotificationModal}
+                        handleNotifySubmit={handleRestockNotificationSubmit}
+                        notifyEmail={notifyEmail}
+                        setNotifyEmail={setNotifyEmail}
+                        loading={isNotifyLoading}
+                    />
 
                     <ImagePreviewModal
                         open={imagePreviewOpen}

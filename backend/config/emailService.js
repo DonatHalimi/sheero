@@ -2,7 +2,8 @@ const { SMTP_USER, NODE_ENV } = require('./dotenv');
 const { statusImages, returnStatusImages, createAttachments, generateEmailVerificationHtml, generateOrderEmailHtml, generateReturnRequestEmailHtml, generateReviewEmailHtml,
     brandImages, headerMessages, returnStatusMessages, returnBodyMessages, orderStatusMessages, orderBodyMessages,
     generateProductInventoryEmailHtml, generateResetPasswordEmailHtml, generatePasswordResetSuccessEmailHtml,
-    generateEnable2FAEmailHtml, generateDisable2FAEmailHtml, generateLogin2FAEmailHtml
+    generateEnable2FAEmailHtml, generateDisable2FAEmailHtml, generateLogin2FAEmailHtml,
+    generateProductInventoryUpdateHtml
 } = require('./emailUtils');
 const transporter = require('./mailer');
 const Role = require('../models/Role');
@@ -112,7 +113,7 @@ async function sendReviewEmail(review) {
         brandImages,
     });
 
-    return sendEmail(review.user.email, subject, text, html, attachments);
+    await sendEmail(review.user.email, subject, text, html, attachments);
 }
 
 async function sendProductInventoryUpdateEmail(order) {
@@ -186,7 +187,7 @@ async function sendEnable2FAEmail(userEmail, otp) {
     const text = `Hello ${userEmail},\n\nYour One-Time Password (OTP) for enabling two-factor authentication is: ${otp}\n\nIt will expire in 10 minutes.`;
 
     const html = generateEnable2FAEmailHtml(userEmail, otp);
-    return sendEmail(userEmail, subject, text, html);
+    await sendEmail(userEmail, subject, text, html);
 }
 
 async function sendDisable2FAEmail(userEmail, otp) {
@@ -194,7 +195,7 @@ async function sendDisable2FAEmail(userEmail, otp) {
     const text = `Hello ${userEmail},\n\nYour One-Time Password (OTP) for disabling two-factor authentication is: ${otp}\n\nIt will expire in 10 minutes.`;
 
     const html = generateDisable2FAEmailHtml(userEmail, otp);
-    return sendEmail(userEmail, subject, text, html);
+    await sendEmail(userEmail, subject, text, html);
 }
 
 async function sendLogin2FAEmail(userEmail, otp) {
@@ -202,10 +203,24 @@ async function sendLogin2FAEmail(userEmail, otp) {
     const text = `Hello ${userEmail},\n\nYour two-factor authentication OTP is: ${otp}\n\nIt will expire in 5 minutes.`;
 
     const html = generateLogin2FAEmailHtml(userEmail, otp);
-    return sendEmail(userEmail, subject, text, html);
+    await sendEmail(userEmail, subject, text, html);
+}
+
+async function sendProductRestockNotificationEmail(email, product) {
+    const { orderAttachments, returnRequestAttachments, reviewAttachments, productInventoryAttachments } = createAttachments(undefined, undefined, undefined, product);
+    const attachments = [...orderAttachments, ...returnRequestAttachments, ...reviewAttachments, ...productInventoryAttachments];
+
+    const subject = `Product '${product.name}' is now in stock!`;
+    const text = `Hello,\nThe product "${product.name}" you subscribed to is now in stock.`;
+
+    const html = generateProductInventoryUpdateHtml(email, product, {
+        brandImages,
+    });
+
+    await sendEmail(email, subject, text, html, attachments);
 }
 
 module.exports = {
     sendVerificationEmail, sendOrderUpdateEmail, sendReturnRequestUpdateEmail, sendReviewEmail, sendProductInventoryUpdateEmail,
-    sendResetPasswordEmail, sendPasswordResetSuccessEmail, sendEnable2FAEmail, sendDisable2FAEmail, sendLogin2FAEmail
+    sendResetPasswordEmail, sendPasswordResetSuccessEmail, sendEnable2FAEmail, sendDisable2FAEmail, sendLogin2FAEmail, sendProductRestockNotificationEmail
 };

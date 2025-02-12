@@ -52,10 +52,11 @@ const returnStatusImages = {
   rejected: getImageUrl('rejected.png'),
 }
 
-const createAttachments = (order = {}, returnRequest = {}, review = {}) => {
+const createAttachments = (order = {}, returnRequest = {}, review = {}, productInventory = {}) => {
   const orderAttachments = [];
   const returnRequestAttachments = [];
   const reviewAttachments = [];
+  const productInventoryAttachments = [];
 
   if (order.status && statusImages[order.status]) {
     orderAttachments.push({
@@ -119,6 +120,18 @@ const createAttachments = (order = {}, returnRequest = {}, review = {}) => {
     });
   }
 
+  if (productInventory && productInventory.image) {
+    const imagePath = cleanImagePath(productInventory.image);
+    const fullImagePath = path.join(__dirname, '..', 'uploads', imagePath);
+    if (fs.existsSync(fullImagePath)) {
+      productInventoryAttachments.push({
+        filename: `${productInventory._id}.png`,
+        path: fullImagePath,
+        cid: `productImage-${productInventory._id}`
+      });
+    }
+  }
+
   if (review.product) {
     if (review.product?.image) {
       const imagePath = cleanImagePath(review.product.image);
@@ -137,7 +150,8 @@ const createAttachments = (order = {}, returnRequest = {}, review = {}) => {
   return {
     orderAttachments,
     returnRequestAttachments,
-    reviewAttachments
+    reviewAttachments,
+    productInventoryAttachments
   };
 };
 
@@ -774,14 +788,14 @@ function generateResetPasswordEmailHtml(user, resetUrl) {
     <div style="font-family: 'Outfit', sans-serif; background-color: #f4f4f4; padding: 20px; border-radius: 8px; max-width: 600px;">
       <!-- Greeting Section -->
       <p style="font-size: 18px; color: #333; margin-bottom: 16px;">
-        Hello <strong style="color: #4A3C28;">${user.firstName}</strong>,
+        Hello <strong style="color: #57534E;">${user.firstName}</strong>,
       </p>
       
       <!-- Password Reset Link -->
       <p style="font-size: 16px; color: #333; line-height: 1.5; margin-bottom: 20px;">
         We have received a request to reset your password. If you didn't make this request, simply ignore this email.
         <br/>
-        To reset your password, please <a href="${resetUrl}" style="color: #4A3C28; font-weight: bold; text-decoration: underline;">click here</a>.
+        To reset your password, please <a href="${resetUrl}" style="color: #57534E; font-weight: bold; text-decoration: underline;">click here</a>.
         <br/><br/>
         <span style="color: #888; font-size: 14px;">This link will expire in 15 minutes.</span>
       </p>
@@ -789,11 +803,11 @@ function generateResetPasswordEmailHtml(user, resetUrl) {
       <!-- Footer Section -->
       <p style="font-size: 14px; color: #333; margin-bottom: 12px;">
         Best regards,<br/>
-        <strong><a href="https://sheero.onrender.com" style="color: #4A3C28; text-decoration: underline;">sheero</a></strong>
+        <strong><a href="https://sheero.onrender.com" style="color: #57534E; text-decoration: underline;">sheero</a></strong>
       </p>
 
       <p style="font-size: 14px; color: #777; margin-top: 20px; text-align: left;">
-        If you have any questions, feel free to <a href="https://sheero.onrender.com/contact-us" style="color: #4A3C28; text-decoration: underline;">contact us</a> through our contact form or through our <a href="mailto:support@sheero.com" style="color: #4A3C28; text-decoration: underline;">email</a>.
+        If you have any questions, feel free to <a href="https://sheero.onrender.com/contact-us" style="color: #57534E; text-decoration: underline;">contact us</a> through our contact form or through our <a href="mailto:support@sheero.com" style="color: #57534E; text-decoration: underline;">email</a>.
       </p>
 
       <p style="font-size: 12px; color: #888; margin-top: 20px; text-align: left;">
@@ -814,17 +828,17 @@ function generatePasswordResetSuccessEmailHtml(user) {
       <!-- Password Reset Success Message -->
       <p style="font-size: 16px; color: #333; line-height: 1.5; margin-bottom: 20px;">
         Your password has been successfully updated!
-        <p style="font-size: 16px;">You can now <a href="https://sheero.onrender.com/login" style="color: #4A3C28; text-decoration: underline;">log in</a> with your new password.</p>
+        <p style="font-size: 16px;">You can now <a href="https://sheero.onrender.com/login" style="color: #57534E; text-decoration: underline;">log in</a> with your new password.</p>
       </p>
 
       <!-- Footer Section -->
       <p style="font-size: 16px; color: #333; margin-bottom: 12px;">
         Best regards,<br/>
-        <strong><a href="https://sheero.onrender.com" style="color: #4A3C28; text-decoration: underline;">sheero</a></strong>
+        <strong><a href="https://sheero.onrender.com" style="color: #57534E; text-decoration: underline;">sheero</a></strong>
       </p>
 
       <p style="font-size: 14px; color: #777; margin-top: 20px; text-align: left;">
-        If you have any questions, feel free to <a href="https://sheero.onrender.com/contact-us" style="color: #4A3C28; text-decoration: underline;">contact us</a> through our contact form or through our <a href="mailto:support@sheero.com" style="color: #4A3C28; text-decoration: underline;">email</a>.
+        If you have any questions, feel free to <a href="https://sheero.onrender.com/contact-us" style="color: #57534E; text-decoration: underline;">contact us</a> through our contact form or through our <a href="mailto:support@sheero.com" style="color: #57534E; text-decoration: underline;">email</a>.
       </p>
 
       <p style="font-size: 12px; color: #888; margin-top: 20px; text-align: left;">
@@ -894,10 +908,66 @@ function generateLogin2FAEmailHtml(userEmail, otp) {
     `
 }
 
+function generateProductInventoryUpdateHtml(email, product, options = {}) {
+  const { brandImages } = options;
+
+  return `
+    <div style="font-family: 'Outfit', sans-serif; background-color: #f4f4f4; padding: 20px; margin: 0 auto; border-radius: 8px; max-width: 700px;">
+        <!-- Brand Logo -->
+        <div style="display: flex; align-items: center; justify-content: space-between;">
+        ${brandImages.logo
+      ? `<img src="cid:brandLogo" alt="Brand Logo" style="width: 30%; max-width: 150px; display: block;" />`
+      : `sheero`
+    }
+        </div>
+        <!-- Greeting Section -->
+        <p style="font-size: 18px; color: #57534E; margin-bottom: 16px;">Hello <strong>${email}</strong>,</p>
+        <p style="font-size: 16px; color: #57534E; line-height: 1.5; margin-bottom: 20px;">We're thrilled to let you know that <strong>${product.name}</strong> 
+        is finally back in stock! Since you've shown interest in this product, we wanted to give you a heads up so you can grab it before it's gone again.</p>
+        
+        <!-- Product Details Section -->
+        <p style="font-size: 16px; color: #57534E; line-height: 1.5; margin-bottom: 20px;">You can view the product by clicking <a href="https://sheero.onrender.com/product/${product._id}" style="color: #57534E; text-decoration: underline;"><strong>here</strong></a></p>
+        <table style="width: 100%; border-collapse: collapse; margin-bottom: 20px;">
+            <thead>
+              <tr>
+                <th style="text-align: left; padding: 8px; border-bottom: 1px solid #ddd;">Product</th>
+                <th style="text-align: left; padding: 8px; border-bottom: 1px solid #ddd;">Inventory</th>
+                <th style="text-align: left; padding: 8px; border-bottom: 1px solid #ddd;">Price</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr>
+                <td style="padding: 8px; border-bottom: 1px solid #ddd; text-align: center;">
+                  <div style="display: flex; flex-direction: column; align-items: center;">
+                    <img src="cid:productImage-${product._id}" alt="${product.name}" style="width: 64px; height: 64px; object-fit: contain; margin-bottom: 8px; border-radius: 4px;" />
+                    <div style="font-weight: 500;">${product.name}</div>
+                  </div>
+                </td>
+                <td style="text-align: center; padding: 8px; border-bottom: 1px solid #ddd;">${product.inventoryCount}</td>
+                <td style="text-align: center; padding: 8px; border-bottom: 1px solid #ddd;">€ ${product.salePrice > 0 ? product.salePrice.toFixed(2) : product.price.toFixed(2)}</td>
+              </tr>
+            </tbody>
+        </table>
+
+        <p style="font-size: 16px; color: #57534E; line-height: 1.5; margin-bottom: 20px;">You will no longer receive further updates for this product unless you decide to re-subscribe at a later time. Thank you for staying connected with us.</p>
+
+        <p style="font-size: 16px; color: #57534E; margin-bottom: 12px;">Best regards,<br/><strong><a href="https://sheero.onrender.com" style="color: #57534E; text-decoration: underline;">sheero</a></strong></p>
+
+      <p style="font-size: 14px; color: #777; margin-top: 20px; text-align: left;">
+        If you have any questions, feel free to <a href="https://sheero.onrender.com/contact-us" style="color: #57534E; text-decoration: underline;">contact us</a> through our contact form or through our <a href="mailto:support@sheero.com" style="color: #57534E; text-decoration: underline;">email</a>.
+      </p>
+
+        <p style="font-size: 12px; color: #888; margin-top: 20px; text-align: center;">
+          &copy; 2025 sheero. All rights reserved.
+        </p>
+    </div>
+  `;
+}
+
 module.exports = {
   statusImages, returnStatusImages, createAttachments, brandImages, headerMessages,
   orderStatusMessages, orderBodyMessages, returnStatusMessages, returnBodyMessages,
   generateEmailVerificationHtml, generateOrderEmailHtml, generateReturnRequestEmailHtml,
   generateReviewEmailHtml, generateProductInventoryEmailHtml, generateResetPasswordEmailHtml, generatePasswordResetSuccessEmailHtml,
-  generateEnable2FAEmailHtml, generateDisable2FAEmailHtml, generateLogin2FAEmailHtml
+  generateEnable2FAEmailHtml, generateDisable2FAEmailHtml, generateLogin2FAEmailHtml, generateProductInventoryUpdateHtml
 };

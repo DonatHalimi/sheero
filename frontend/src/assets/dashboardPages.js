@@ -11,6 +11,7 @@ const pages = {
     main: React.lazy(() => import('../pages/Dashboard/DashboardContent')),
     orders: React.lazy(() => import('../pages/Dashboard/OrdersPage')),
     products: React.lazy(() => import('../pages/Dashboard/ProductsPage')),
+    productRestockSubscriptions: React.lazy(() => import('../pages/Dashboard/ProductRestockSubscriptionsPage')),
     returns: React.lazy(() => import('../pages/Dashboard/ReturnsPage')),
     reviews: React.lazy(() => import('../pages/Dashboard/ReviewsPage')),
     roles: React.lazy(() => import('../pages/Dashboard/RolesPage')),

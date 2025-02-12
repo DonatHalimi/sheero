@@ -725,6 +725,32 @@ export const downloadUserDetails = (user) => {
     createDownloadLink(json, fileName);
 }
 
+export const downloadSubscriptionData = (subscription) => {
+    if (!subscription) return;
+
+    const date = formatDownloadDate(new Date());
+    const fileName = `${subscription.productId.name}_Restock_Details_${date}.json`
+
+    const data = {
+        subscription: {
+            id: subscription._id,
+            name: subscription.name,
+            email: subscription.email,
+            productId: {
+                id: subscription.productId._id,
+                name: subscription.productId.name,
+                image: subscription.productId.image,
+                inventoryCount: subscription.productId.inventoryCount,
+            },
+            createdAt: subscription.createdAt,
+        },
+        exportDate: new Date().toISOString()
+    };
+
+    const json = JSON.stringify(data, null, 2);
+    createDownloadLink(json, fileName);
+}
+
 export const exportToExcel = (data, fileName = 'exported_data') => {
     const date = formatDownloadDate(new Date());
 

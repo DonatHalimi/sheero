@@ -61,13 +61,6 @@ const ProductsPage = () => {
         setCurrentPage(event.selected);
     };
 
-    const truncateItems = (items, maxItems = 3) => {
-        if (items.length <= maxItems) {
-            return items;
-        }
-        return [...items.slice(0, maxItems), '...'];
-    };
-
     const handleImageClick = (imageUrl) => {
         setSelectedProduct(imageUrl);
         setImagePreviewOpen(true);

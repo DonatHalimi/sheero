@@ -86,6 +86,11 @@ const productMenuItems = [
     label: 'Images'
   },
   {
+    id: 'productRestockSubscriptions',
+    icon: { active: Inventory, inactive: Inventory2Outlined },
+    label: 'Restock Subscriptions'
+  },
+  {
     id: 'faqs',
     icon: { active: Help, inactive: HelpOutlineOutlined },
     label: 'FAQs'

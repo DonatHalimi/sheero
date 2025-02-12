@@ -1811,6 +1811,85 @@ export const ProductTabs = ({ value, handleChange }) => {
     );
 };
 
+export const ProductRestockNotificationModal = ({
+    open,
+    onClose,
+    handleNotifySubmit,
+    notifyEmail,
+    setNotifyEmail,
+    loading,
+}) => {
+    const [isValidEmail, setIsValidEmail] = useState(true);
+    const [errorVisible, setErrorVisible] = useState(false);
+    const { user } = useSelector((state) => state.auth);
+
+    const userEmail = user?.email;
+
+    useEffect(() => {
+        if (userEmail && open) {
+            setNotifyEmail(userEmail);
+        }
+    }, [userEmail, open, setNotifyEmail]);
+
+    const validateEmail = (email) => /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email);
+
+    const handleChange = (e) => {
+        const email = e.target.value;
+        setNotifyEmail(email);
+        setIsValidEmail(validateEmail(email));
+        setErrorVisible(!validateEmail(email) && email.length > 0);
+    };
+
+    const handleSubmit = () => {
+        if (!validateEmail(notifyEmail)) {
+            setIsValidEmail(false);
+            setErrorVisible(true);
+            return;
+        }
+        handleNotifySubmit();
+    };
+
+    const handleBlur = () => {
+        if (!isValidEmail && notifyEmail) setErrorVisible(true);
+    };
+
+    return (
+        <CustomModal open={open} onClose={onClose}>
+            <CustomBox>
+                <Typography variant="h6" className="!mb-2">Get Notified</Typography>
+                <p className="mb-2">Enter your email address below, and we will notify you once the product is back in stock.</p>
+                <BrownOutlinedTextField
+                    autoFocus
+                    margin="dense"
+                    label="Email"
+                    type="email"
+                    fullWidth
+                    variant="outlined"
+                    value={notifyEmail}
+                    onChange={handleChange}
+                    onBlur={handleBlur}
+                />
+                {!isValidEmail && notifyEmail && errorVisible && (
+                    <div className="absolute bottom-[11px] bg-white text-red-500 text-sm p-2 rounded-lg shadow-md w-[calc(100%-30px)] z-10">
+                        <span className="block text-xs font-semibold mb-1">Invalid Email</span>
+                        Please enter a valid email address.
+                        <div className="absolute top-[-5px] left-[20px] w-0 h-0 border-l-[5px] border-r-[5px] border-b-[5px] border-transparent border-b-white"></div>
+                    </div>
+                )}
+                <BrownButton
+                    onClick={handleSubmit}
+                    variant="contained"
+                    color="primary"
+                    disabled={loading}
+                    className="w-full !mt-3"
+                >
+                    <LoadingLabel loading={loading} defaultLabel="Submit" loadingLabel="Submitting" />
+                </BrownButton>
+            </CustomBox>
+        </CustomModal>
+    );
+};
+
 export const CustomPagination = ({ count, page, onChange, size = 'large', sx = {} }) => {
     const paginationEnabled = count > 1;
 

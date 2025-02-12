@@ -5,15 +5,13 @@ const SubSubcategory = require('../models/SubSubcategory')
 const Review = require('../models/Review');
 const fs = require('fs');
 const User = require('../models/User');
+const ProductRestockSubscription = require('../models/ProductRestockSubscription');
+const { sendProductRestockNotificationEmail } = require('../config/emailService');
 
 const createProduct = async (req, res) => {
-    const requestingUser = await User.findById(req.user.userId).populate('role');
-    if (requestingUser.role.name !== 'admin') {
-        return res.status(403).json({ message: 'Forbidden' });
-    }
-
     const { name, description, price, salePrice, category, subcategory, subSubcategory, inventoryCount, dimensions, variants, discount, supplier, shipping, details } = req.body;
     const image = req.file ? req.file.path : '';
+
     try {
         const product = new Product({
             name, description, price, salePrice, category, subcategory, subSubcategory, inventoryCount, dimensions, variants, discount, supplier, shipping, image, details
@@ -90,16 +88,14 @@ const getProductsBySubSubCategory = async (req, res) => {
 }
 
 const updateProduct = async (req, res) => {
-    const requestingUser = await User.findById(req.user.userId).populate('role');
-    if (requestingUser.role.name !== 'admin') {
-        return res.status(403).json({ message: 'Forbidden' });
-    }
-
     const { name, description, price, salePrice, category, subcategory, subSubcategory, inventoryCount, dimensions, variants, discount, supplier, shipping, details } = req.body;
     let image = req.body.image;
+
     try {
         const oldProduct = await Product.findById(req.params.id);
         if (!oldProduct) return res.status(404).json({ message: 'Product not found' });
+
+        const wasOutOfStock = oldProduct.inventoryCount === 0;
 
         if (req.file) {
             if (oldProduct.image) {
@@ -124,9 +120,90 @@ const updateProduct = async (req, res) => {
             },
             { new: true }
         );
+
+        if (wasOutOfStock && product.inventoryCount > 0) {
+            const subscriptions = await ProductRestockSubscription.find({ productId: product._id });
+            for (const sub of subscriptions) {
+                try {
+                    await sendProductRestockNotificationEmail(sub.email, product);
+                    await ProductRestockSubscription.deleteOne({ _id: sub._id });
+                } catch (emailError) {
+                    console.error(`Failed to send restock email to ${sub.email}:`, emailError);
+                }
+            }
+        }
+
         res.status(200).json(product);
     } catch (error) {
         res.status(500).json({ message: 'Server error', error: error.message });
+    }
+};
+
+const subscribeForRestock = async (req, res) => {
+    const { email } = req.body;
+    const productId = req.params.productId;
+
+    if (!email) {
+        return res.status(400).json({ message: 'Email is required.' });
+    }
+
+    try {
+        const product = await Product.findById(productId);
+        if (!product) {
+            return res.status(404).json({ message: 'Product not found.' });
+        }
+
+        const existingSubscription = await ProductRestockSubscription.findOne({ productId, email });
+        if (existingSubscription) {
+            return res.status(200).json({
+                alreadySubscribed: true,
+                message: 'Your email is already subscribed to receive restock notifications for this product'
+            });
+        }
+
+        const subscription = await ProductRestockSubscription.create({ productId, email });
+        res.status(200).json({
+            alreadySubscribed: false,
+            message: 'You will receive an email when the product is restocked',
+            subscription
+        });
+    } catch (error) {
+        console.error('Error subscribing for restock:', error);
+        res.status(500).json({ message: 'Error creating subscription.', error: error.message });
+    }
+};
+
+const getAllRestockSubscriptions = async (req, res) => {
+    try {
+        const subscriptions = await ProductRestockSubscription.find()
+            .populate('productId', 'name image inventoryCount')
+            .exec();
+
+        res.status(200).json(subscriptions);
+    } catch (error) {
+        res.status(500).json({ message: 'Error fetching subscriptions.', error: error.message });
+    }
+};
+
+const deleteRestockSubscriptions = async (req, res) => {
+    const { ids } = req.body;
+
+    if (!ids || !Array.isArray(ids) || ids.length === 0) {
+        return res.status(400).json({ message: 'Invalid or empty ids array' });
+    }
+
+    try {
+        const subscriptions = await ProductRestockSubscription.find({ _id: { $in: ids } });
+
+        if (subscriptions.length !== ids.length) {
+            return res.status(404).json({ message: 'One or more subscriptions not found' });
+        }
+
+        await ProductRestockSubscription.deleteMany({ _id: { $in: ids } });
+
+        res.status(200).json({ message: 'Subscriptions deleted successfully' });
+    } catch (error) {
+        res.status(500).json({ message: 'Error deleting subscriptions.', error: error.message });
     }
 };
 
@@ -318,6 +395,7 @@ const addProductVariantsAndDetails = async (req, res) => {
 };
 
 module.exports = {
-    createProduct, getProducts, getProduct, updateProduct, getProductsByCategory, getProductsBySubCategory, getProductsBySubSubCategory,
+    createProduct, getProducts, getProduct, updateProduct, subscribeForRestock, getAllRestockSubscriptions, deleteRestockSubscriptions,
+    getProductsByCategory, getProductsBySubCategory, getProductsBySubSubCategory,
     deleteProduct, deleteProducts, searchProducts, createProductBasic, uploadProductImage, addProductVariantsAndDetails
 };

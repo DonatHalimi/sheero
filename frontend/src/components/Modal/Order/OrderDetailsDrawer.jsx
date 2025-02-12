@@ -12,7 +12,7 @@ const OrderDetailsDrawer = ({ open, onClose, order, onEdit }) => {
     };
 
     const productLabel = order?.products?.length > 1 ? 'Products' : 'Product';
-    const header = `Order from ${order?.user.firstName} ${order?.user.lastName} - ${order?.user.email} for ${order?.products.length} ${productLabel}`;
+    const header = `Order from  <strong>${order?.user.firstName} ${order?.user.lastName} - ${order?.user.email}</strong> for <strong>${order?.products.length} ${productLabel}</strong>`;
     const user = `${order?.user.firstName} ${order?.user.lastName} - ${order?.user.email}`;
 
     return (
@@ -27,9 +27,7 @@ const OrderDetailsDrawer = ({ open, onClose, order, onEdit }) => {
             <Box className="flex flex-col w-full mt-4 gap-4">
                 {order ? (
                     <>
-                        <Typography className='!font-bold !text-lg'>
-                            {header}
-                        </Typography>
+                        <Typography className='!text-lg' dangerouslySetInnerHTML={{ __html: header }} />
 
                         <ReadOnlyTextField
                             label="Order ID"

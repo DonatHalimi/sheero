@@ -11,3 +11,7 @@ export const getProductsByCategoryService = (categoryId) => axiosInstance.get(`/
 export const getProductsBySubcategoryService = (id) => axiosInstance.get(`/products/get-by-subcategory/${id}`);
 
 export const getProductsBySubSubcategoryService = (id) => axiosInstance.get(`/products/get-by-subSubcategory/${id}`);
+
+export const subscribeForRestockService = (id, email) => axiosInstance.post(`/products/${id}/subscribe-restock`, { email });
+
+export const getRestockSubscriptions = () => axiosInstance.get('/products/restock-subscriptions');

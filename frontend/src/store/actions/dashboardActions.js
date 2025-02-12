@@ -3,6 +3,7 @@ import { getCitiesService } from '../../services/cityService';
 import { getContactsService } from '../../services/contactService';
 import { getFAQsService } from '../../services/faqService';
 import { getOrdersService } from '../../services/orderService';
+import { getRestockSubscriptions } from '../../services/productService';
 import { getReturnRequestsService } from '../../services/returnService';
 import { getReviewsService } from '../../services/reviewService';
 import { getRolesService } from '../../services/roleService';
@@ -21,6 +22,8 @@ import {
     GET_FAQS_ERROR,
     GET_ORDERS,
     GET_ORDERS_ERROR,
+    GET_RESTOCK_SUBSCRIPTIONS,
+    GET_RESTOCK_SUBSCRIPTIONS_ERROR,
     GET_RETURNS,
     GET_RETURNS_ERROR,
     GET_REVIEWS,
@@ -224,6 +227,22 @@ export const getSuppliers = () => async (dispatch) => {
     } catch (error) {
         dispatch({
             type: GET_SUPPLIERS_ERROR,
+            payload: error.response?.data?.message || 'Failed to get suppliers',
+        });
+    }
+};
+
+export const getProductRestockSubscriptions = () => async (dispatch) => {
+    try {
+        const res = await getRestockSubscriptions();
+
+        dispatch({
+            type: GET_RESTOCK_SUBSCRIPTIONS,
+            payload: res.data
+        });
+    } catch (error) {
+        dispatch({
+            type: GET_RESTOCK_SUBSCRIPTIONS_ERROR,
             payload: error.response?.data?.message || 'Failed to get suppliers',
         });
     }

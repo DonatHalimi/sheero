@@ -5,7 +5,7 @@ import { downloadReturnRequestData } from '../../../assets/DataExport';
 import { drawerPaperSx } from '../../../assets/sx';
 
 const ReturnRequestDetailsDrawer = ({ open, onClose, returnRequest, onEdit }) => {
-    const header = `Return Request from ${returnRequest?.user.firstName} ${returnRequest?.user.lastName} - ${returnRequest?.user.email} for Order #${returnRequest?.order}`;
+    const header = `Return Request from <strong>${returnRequest?.user.firstName} ${returnRequest?.user.lastName} - ${returnRequest?.user.email}</strong> for Order #<strong>${returnRequest?.order}</strong>`;
     const user = `${returnRequest?.user.firstName} ${returnRequest?.user.lastName} - ${returnRequest?.user.email}`;
 
     const products = typeof returnRequest?.products === 'string'
@@ -33,9 +33,7 @@ const ReturnRequestDetailsDrawer = ({ open, onClose, returnRequest, onEdit }) =>
             <Box className="flex flex-col w-full mt-4 gap-4">
                 {returnRequest ? (
                     <>
-                        <Typography className='!font-bold !text-lg'>
-                            {header}
-                        </Typography>
+                        <Typography className='!text-lg' dangerouslySetInnerHTML={{ __html: header }} />
 
                         <BoxBetween>
                             <ReadOnlyTextField
