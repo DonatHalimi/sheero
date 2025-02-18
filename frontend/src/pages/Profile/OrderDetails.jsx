@@ -40,9 +40,11 @@ const OrderDetails = () => {
     const getStatusProgress = (status) => {
         switch (status) {
             case 'pending':
-                return 16;
+                return 13;
+            case 'processed':
+                return 43;
             case 'shipped':
-                return 57;
+                return 70.5;
             case 'delivered':
                 return 100;
             case 'canceled':
@@ -83,14 +85,18 @@ const OrderDetails = () => {
                                 <p className="font-semilight text-center text-gray-500 text-md">
                                     Order Date: {formatDate(order.createdAt)}
                                 </p>
-                                {order.status === 'delivered' ? (
-                                    <p className="font-semilight mb-3 text-center text-gray-500 text-md">
-                                        Arrival Date: {formatDate(order.arrivalDateRange.start)}
-                                    </p>
+                                {order.status === 'canceled' ? (
+                                    <div className="font-semilight mb-3 text-center text-gray-500 text-md" />
                                 ) : (
-                                    <p className="font-semilight mb-3 text-center text-gray-500 text-md">
-                                        Arrival Date: {formatDate(order.arrivalDateRange.start)} - {formatDate(order.arrivalDateRange.end)}
-                                    </p>
+                                    order.status === 'delivered' ? (
+                                        <p className="font-semilight mb-3 text-center text-gray-500 text-md">
+                                            Arrival Date: {formatDate(order.arrivalDateRange.start)}
+                                        </p>
+                                    ) : (
+                                        <p className="font-semilight mb-3 text-center text-gray-500 text-md">
+                                            Arrival Date: {formatDate(order.arrivalDateRange.start)} - {formatDate(order.arrivalDateRange.end)}
+                                        </p>
+                                    )
                                 )}
                                 <LinearProgress
                                     variant="determinate"
@@ -109,6 +115,7 @@ const OrderDetails = () => {
                                     ) : (
                                         <>
                                             <span className={`text - center ${order.status === 'pending' ? 'font-semibold bg-stone-100 rounded-md px-1' : ''} `}>Pending</span>
+                                            <span className={`text-center ${order.status === 'processed' ? 'font-semibold bg-stone-100 rounded-md px-1' : ''} `}>Processed</span>
                                             <span className={`text - center ${order.status === 'shipped' ? 'font-semibold bg-stone-100 rounded-md px-1' : ''} `}>Shipped</span>
                                             <span className={`text - center ${order.status === 'delivered' ? 'font-semibold bg-stone-100 rounded-md px-1' : ''} `}>Delivered</span>
                                         </>

@@ -3,7 +3,8 @@ const { statusImages, returnStatusImages, createAttachments, generateEmailVerifi
     brandImages, headerMessages, returnStatusMessages, returnBodyMessages, orderStatusMessages, orderBodyMessages,
     generateProductInventoryEmailHtml, generateResetPasswordEmailHtml, generatePasswordResetSuccessEmailHtml,
     generateEnable2FAEmailHtml, generateDisable2FAEmailHtml, generateLogin2FAEmailHtml,
-    generateProductInventoryUpdateHtml
+    generateProductInventoryUpdateHtml, generateProductRestockSubHtml,
+    generateContactHtml, generateContactToAdminsHtml
 } = require('./emailUtils');
 const transporter = require('./mailer');
 const Role = require('../models/Role');
@@ -46,6 +47,7 @@ async function sendOrderUpdateEmail(order) {
 
     const orderSubjectMessages = {
         pending: `Order #${order._id} has been received.`,
+        processed: `Order #${order._id} has been processed.`,
         shipped: `Order #${order._id} has been shipped.`,
         delivered: `Order #${order._id} has been delivered.`,
         canceled: `Order #${order._id} has been canceled.`,
@@ -162,7 +164,6 @@ async function sendProductInventoryUpdateEmail(order) {
     }
 }
 
-
 async function sendResetPasswordEmail(user, resetToken) {
     const frontendURL = NODE_ENV === 'production' ? 'https://sheero.onrender.com' : 'http://localhost:3000';
 
@@ -220,7 +221,95 @@ async function sendProductRestockNotificationEmail(email, product) {
     await sendEmail(email, subject, text, html, attachments);
 }
 
+async function sendProductRestockSubscriptionEmail(email, product) {
+    const { orderAttachments, returnRequestAttachments, reviewAttachments, productInventoryAttachments } = createAttachments(undefined, undefined, undefined, product);
+    const attachments = [...orderAttachments, ...returnRequestAttachments, ...reviewAttachments, ...productInventoryAttachments];
+
+    const subject = `You've subscribed to the product restock updates for '${product.name}'!`;
+    const text = `Hello,\n We will notify you as soon as the product "${product.name}" is back in stock.`;
+
+    const html = generateProductRestockSubHtml(email, product, {
+        brandImages,
+    });
+
+    await sendEmail(email, subject, text, html, attachments);
+}
+
+async function sendContactEmail(contact) {
+    if (!contact || !contact._id) {
+        throw new Error('Invalid contact object');
+    }
+
+    const { orderAttachments, returnRequestAttachments, reviewAttachments, productInventoryAttachments } = createAttachments(undefined, undefined, undefined, contact);
+    const attachments = [...orderAttachments, ...returnRequestAttachments, ...reviewAttachments, ...productInventoryAttachments];
+
+    const subject = `Thank you for reaching out to sheero!`;
+    const text = `Dear ${contact.name},\n\nThank you for taking the time to contact us. We will review your message and get back to you as soon as possible.\n\nBest regards, sheero team`;
+
+    const html = generateContactHtml(contact, {
+        brandImages,
+    });
+
+    await sendEmail(contact.email, subject, text, html, attachments);
+}
+
+async function sendContactEmail(contact) {
+    if (!contact || !contact._id) {
+        throw new Error('Invalid contact object');
+    }
+
+    const { orderAttachments, returnRequestAttachments, reviewAttachments, productInventoryAttachments } = createAttachments(undefined, undefined, undefined, contact);
+    const attachments = [...orderAttachments, ...returnRequestAttachments, ...reviewAttachments, ...productInventoryAttachments];
+
+    const subject = `Thank you for reaching out to sheero!`;
+    const text = `We will read your message and get back to you as soon as possible.\n\nBest regards, sheero`;
+
+    const html = generateContactHtml(contact, {
+        brandImages,
+    });
+
+    await sendEmail(contact.email, subject, text, html, attachments);
+}
+
+async function sendContactEmailToAdmins(contact) {
+    const { orderAttachments, returnRequestAttachments, reviewAttachments, productInventoryAttachments } = createAttachments(undefined, undefined, undefined, contact);
+    const attachments = [...orderAttachments, ...returnRequestAttachments, ...reviewAttachments, ...productInventoryAttachments];
+
+    const subject = `New message from ${contact.name}!`;
+    const text = `Please get back to ${contact.email} as soon as possible.\n\nBest regards, sheero.`;
+
+    try {
+        // Fetch the 'admin' role ObjectId
+        const adminRole = await Role.findOne({ name: 'admin' });
+        if (!adminRole) {
+            console.error('Admin role not found');
+            return;
+        }
+
+        // Fetch all users with the 'admin' role ObjectId
+        const adminUsers = await User.find({ role: adminRole._id });
+
+        if (adminUsers.length === 0) {
+            console.log('No admin users found');
+            return;
+        }
+
+        // Send the email to each admin user
+        for (const admin of adminUsers) {
+            const html = generateContactToAdminsHtml(contact, {
+                recipientEmail: admin.email,
+                brandImages,
+            });
+
+            await sendEmail(admin.email, subject, text, html, attachments);
+        }
+    } catch (error) {
+        console.error('Error sending emails to admins:', error);
+    }
+}
+
 module.exports = {
     sendVerificationEmail, sendOrderUpdateEmail, sendReturnRequestUpdateEmail, sendReviewEmail, sendProductInventoryUpdateEmail,
-    sendResetPasswordEmail, sendPasswordResetSuccessEmail, sendEnable2FAEmail, sendDisable2FAEmail, sendLogin2FAEmail, sendProductRestockNotificationEmail
+    sendResetPasswordEmail, sendPasswordResetSuccessEmail, sendEnable2FAEmail, sendDisable2FAEmail, sendLogin2FAEmail, sendProductRestockNotificationEmail, sendProductRestockSubscriptionEmail,
+    sendContactEmail, sendContactEmailToAdmins
 };

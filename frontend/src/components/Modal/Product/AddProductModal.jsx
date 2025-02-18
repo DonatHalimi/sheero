@@ -1,9 +1,8 @@
-import { Upload } from '@mui/icons-material';
 import { Autocomplete, Box, InputLabel, MenuItem, Modal, Select, TextField, Typography } from '@mui/material';
 import React, { useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { toast } from 'react-toastify';
-import { BrownButton, BrownOutlinedTextField, CustomPaper, OutlinedBrownButton, OutlinedBrownFormControl, VisuallyHiddenInput } from '../../../assets/CustomComponents';
+import { BrownButton, BrownOutlinedTextField, CustomPaper, ImageUploadBox, OutlinedBrownButton, OutlinedBrownFormControl, VisuallyHiddenInput } from '../../../assets/CustomComponents';
 import axiosInstance from '../../../utils/axiosInstance';
 
 const AddProductModal = ({ open, onClose, onAddSuccess }) => {
@@ -18,7 +17,6 @@ const AddProductModal = ({ open, onClose, onAddSuccess }) => {
     const [subSubcategory, setSubSubcategory] = useState(null);
     const [inventoryCount, setInventoryCount] = useState('');
     const [image, setImage] = useState(null);
-    const [imagePreview, setImagePreview] = useState(null);
     const [categories, setCategories] = useState([]);
     const [subcategories, setSubcategories] = useState([]);
     const [subSubcategories, setSubSubcategories] = useState([]);
@@ -81,16 +79,8 @@ const AddProductModal = ({ open, onClose, onAddSuccess }) => {
         };
     }, []);
 
-    const handleImageChange = (e) => {
-        const file = e.target.files[0];
+    const handleFileSelect = (file) => {
         setImage(file);
-        if (file) {
-            const reader = new FileReader();
-            reader.onloadend = () => {
-                setImagePreview(reader.result);
-            };
-            reader.readAsDataURL(file);
-        }
     };
 
     const handleBasicProductCreation = async () => {
@@ -331,22 +321,7 @@ const AddProductModal = ({ open, onClose, onAddSuccess }) => {
             case 2:
                 return (
                     <>
-                        <OutlinedBrownButton
-                            component="label"
-                            role={undefined}
-                            variant="contained"
-                            tabIndex={-1}
-                            startIcon={<Upload />}
-                            className="w-full !mb-6"
-                        >
-                            Upload image
-                            <VisuallyHiddenInput type="file" onChange={handleImageChange} />
-                        </OutlinedBrownButton>
-                        {imagePreview && (
-                            <div className="mb-6">
-                                <img src={imagePreview} alt="Preview" className="max-w-full h-auto mx-auto rounded-md" />
-                            </div>
-                        )}
+                        <ImageUploadBox onFileSelect={handleFileSelect} />
                         <BrownButton
                             onClick={handleImageUpload}
                             variant="contained"
@@ -474,7 +449,6 @@ const AddProductModal = ({ open, onClose, onAddSuccess }) => {
                 return null;
         }
     };
-
 
     return (
         <Modal open={open} onClose={onClose}>

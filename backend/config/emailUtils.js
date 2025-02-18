@@ -40,6 +40,7 @@ const getImageUrl = (imagePath) => {
 
 const statusImages = {
   pending: getImageUrl('pending.png'),
+  processed: getImageUrl('orderProcessed.png'),
   shipped: getImageUrl('shipped.png'),
   delivered: getImageUrl('delivered.png'),
   canceled: getImageUrl('canceled.png'),
@@ -59,9 +60,13 @@ const createAttachments = (order = {}, returnRequest = {}, review = {}, productI
   const productInventoryAttachments = [];
 
   if (order.status && statusImages[order.status]) {
+    const imageName = order.status === 'processed'
+      ? 'orderProcessed.png'
+      : `${order.status}.png`;
+
     orderAttachments.push({
-      filename: `${order.status}.png`,
-      path: path.join(__dirname, '..', 'uploads', `${order.status}.png`),
+      filename: imageName,
+      path: path.join(__dirname, '..', 'uploads', imageName),
       cid: 'statusImage'
     });
   }
@@ -171,6 +176,7 @@ const headerMessages = {
 
 const orderStatusMessages = {
   pending: `We have successfully received your order! <br>After we review the availability of your items, your order will be processed.</br>`,
+  processed: `Your order is now in the processing stage. <br>We will try our best to fulfill your order as soon as possible.</br>`,
   shipped: `Good news! Your order has been verified and shipped. It is now on its way to you.`,
   delivered: `Your order has been successfully delivered, we hope you enjoy your purchase!`,
   canceled: `Unfortunately, your order has been canceled. If you need further assistance, please reach out to us.`,
@@ -178,6 +184,7 @@ const orderStatusMessages = {
 
 const orderBodyMessages = {
   pending: `We will notify you once your order is processed.`,
+  processed: `We will notify you once your order is shipped.`,
   shipped: `If there are any updates, our team will contact you.`,
   delivered: `Thank you for choosing sheero, we appreciate your trust!`,
   canceled: `If you have any questions, please contact our support team at <a href="mailto:support@sheero.com" style="color: #57534E; text-decoration: underline; font-weight: bold;">support@sheero.com</a>.`,
@@ -564,7 +571,7 @@ function generateReviewEmailHtml(review, options = {}) {
         </div>
 
         <p style="color: #666; font-size: 12px; margin-top: 20px;">
-          If you have any questions, please <a href="https://sheero.onrender.com/contact-us" style="color: #57534E; text-decoration: underline;">contact us</a> or through our <a href="mailto:support@sheero.com" style="color: #57534E; text-decoration: underline;">email address</a>.
+          If you have any questions, please <a href="https://sheero.onrender.com/contact-us" style="color: #57534E; text-decoration: underline;">contact us</a> through our contact form or through our <a href="mailto:support@sheero.com" style="color: #57534E; text-decoration: underline;">email address</a>.
         </p>
 
         <p style="font-size: 12px; color: #888; margin-top: 40px; text-align: center;">
@@ -964,10 +971,186 @@ function generateProductInventoryUpdateHtml(email, product, options = {}) {
   `;
 }
 
+function generateProductRestockSubHtml(email, product, options = {}) {
+  const { brandImages } = options;
+
+  return `
+    <div style="font-family: 'Outfit', sans-serif; background-color: #f4f4f4; padding: 20px; margin: 0 auto; border-radius: 8px; max-width: 700px;">
+        <!-- Brand Logo -->
+        <div style="display: flex; align-items: center; justify-content: space-between;">
+        ${brandImages.logo
+      ? `<img src="cid:brandLogo" alt="Brand Logo" style="width: 30%; max-width: 150px; display: block;" />`
+      : `sheero`
+    }
+        </div>
+        
+        <!-- Greeting Section -->
+        <p style="font-size: 18px; color: #57534E; margin-bottom: 16px;">Hello <strong>${email}</strong>,</p>
+        <p style="font-size: 16px; color: #57534E; line-height: 1.5; margin-bottom: 20px;">You've just subscribed to get notified about <strong>${product.name}</strong> 
+        restock updates! As soon as the product is back in stock, we'll send you an email to let you know.</p>
+
+        <!-- Product Details Section -->
+        <p style="font-size: 16px; color: #57534E; line-height: 1.5; margin-bottom: 20px;">You can view the product by clicking <a href="https://sheero.onrender.com/product/${product._id}" style="color: #57534E; text-decoration: underline;"><strong>here</strong></a></p>
+        <table style="width: 100%; border-collapse: collapse; margin-bottom: 20px;">
+            <thead>
+              <tr>
+                <th style="text-align: left; padding: 8px; border-bottom: 1px solid #ddd;">Product</th>
+                <th style="text-align: left; padding: 8px; border-bottom: 1px solid #ddd;">Inventory</th>
+                <th style="text-align: left; padding: 8px; border-bottom: 1px solid #ddd;">Price</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr>
+                <td style="padding: 8px; border-bottom: 1px solid #ddd; text-align: center;">
+                  <div style="display: flex; flex-direction: column; align-items: center;">
+                    <img src="cid:productImage-${product._id}" alt="${product.name}" style="width: 64px; height: 64px; object-fit: contain; margin-bottom: 8px; border-radius: 4px;" />
+                    <div style="font-weight: 500;">${product.name}</div>
+                  </div>
+                </td>
+                <td style="text-align: center; padding: 8px; border-bottom: 1px solid #ddd;">${product.inventoryCount}</td>
+                <td style="text-align: center; padding: 8px; border-bottom: 1px solid #ddd;">€ ${product.salePrice > 0 ? product.salePrice.toFixed(2) : product.price.toFixed(2)}</td>
+              </tr>
+            </tbody>
+        </table>
+
+        <p style="font-size: 16px; color: #57534E; margin-bottom: 12px;">Best regards,<br/><strong><a href="https://sheero.onrender.com" style="color: #57534E; text-decoration: underline;">sheero</a></strong></p>
+
+        <p style="font-size: 14px; color: #777; margin-top: 20px; text-align: left;">
+          If you have any questions, feel free to <a href="https://sheero.onrender.com/contact-us" style="color: #57534E; text-decoration: underline;">contact us</a> through our contact form or through our <a href="mailto:support@sheero.com" style="color: #57534E; text-decoration: underline;">email</a>.
+        </p>
+
+        <p style="font-size: 12px; color: #888; margin-top: 20px; text-align: center;">
+          &copy; 2025 sheero. All rights reserved.
+        </p>
+    </div>
+  `;
+}
+
+function generateContactHtml(contact, options = {}) {
+  const { brandImages } = options;
+  const formattedDate = formatDate(contact.createdAt);
+
+  return `
+      <div style="font-family: Outfit, sans-serif; max-width: 700px; margin: 0 auto; padding: 35px; background-color: #f5f5f5; position: relative; border-radius: 8px;">
+        <!-- Brand Logo -->
+        <div style="display: flex; align-items: center; justify-content: space-between;">
+        ${brandImages.logo
+      ? `<img src="cid:brandLogo" alt="Brand Logo" style="width: 30%; max-width: 150px; display: block;" />`
+      : `sheero`
+    }
+        </div>
+
+        <!-- User Details -->
+        <p style="font-size: 16px; font-weight: 500; margin-bottom: 5px;">Hello <strong>${contact.email}</strong>,</p>
+        <p style="font-size: 14px; font-weight: 500; margin-bottom: 12px;">
+          <strong>Thank you for contacting us!</strong>
+        </p>
+        <p style="font-size: 14px; margin-bottom: 12px;">We appreciate you contacting us, we will get back to you as soon as possible!</p>
+        <p>Best regards,<br/>
+          <strong><a href="https://sheero.onrender.com" style="color: #57534E; text-decoration: underline;">sheero</a></strong>
+        </p>
+        <div style="background-color: white; padding: 20px; border-radius: 8px; box-shadow: 0 2px 4px rgba(0,0,0,0.1);">
+        <div style="margin-bottom: 10px;">
+          <p style="font-size: 18px; font-weight: 600; color: black; text-align: left;">
+            Contact details
+          </p>
+        </div>
+
+        <!-- Contact Details Section -->
+        <div style="background-color: #ffffff; border-radius: 8px; box-shadow: 0 1px 3px rgba(0,0,0,0.1); margin-bottom: 20px !important; margin-top: 20px !important;">
+          <div style="font-size: 16px; font-weight: 600; color: #333; border-bottom: 1px solid #ddd; padding-bottom: 10px; margin-bottom: 10px;">
+            <div style="display: flex; justify-content: space-between; align-items: center; gap: 20px;">
+                <span>${contact.subject}</span>
+            </div>
+          </div>
+
+          <div style="font-size: 14px; line-height: 1.6; color: #555; background-color: #f9f9f9; padding: 10px; border-radius: 6px; max-width: 100%;">
+            ${contact.message}
+          </div>
+          <div style="margin-bottom: 10px;">
+            <p style="font-size: 14px; color: #666; text-align: center;">
+              Contact Date: ${formattedDate}
+            </p>
+          </div>
+        </div>
+
+        <p style="color: #666; font-size: 12px; margin-top: 20px;">
+          If you have any questions, please <a href="https://sheero.onrender.com/contact-us" style="color: #57534E; text-decoration: underline;">contact us</a> through our contact form or through our <a href="mailto:support@sheero.com" style="color: #57534E; text-decoration: underline;">email address</a>.
+        </p>
+
+        <p style="font-size: 12px; color: #888; margin-top: 40px; text-align: center;">
+          &copy; 2025 sheero. All rights reserved.
+        </p>
+      </div>
+    </div>
+  `;
+}
+
+function generateContactToAdminsHtml(contact, options = {}) {
+  const { brandImages, recipientEmail } = options;
+  const formattedDate = formatDate(contact.createdAt);
+
+  return `
+      <div style="font-family: Outfit, sans-serif; max-width: 700px; margin: 0 auto; padding: 35px; background-color: #f5f5f5; position: relative; border-radius: 8px;">
+        <!-- Brand Logo -->
+        <div style="display: flex; align-items: center; justify-content: space-between;">
+        ${brandImages.logo
+      ? `<img src="cid:brandLogo" alt="Brand Logo" style="width: 30%; max-width: 150px; display: block;" />`
+      : `sheero`
+    }
+        </div>
+
+        <!-- User Details -->
+        <p style="font-size: 16px; font-weight: 500; margin-bottom: 15px;">Hello <strong style="color: #57534E; text-decoration: underline;">${recipientEmail}</strong>,</p>
+        <p style="font-size: 14px; font-weight: 500; margin-bottom: 12px;">
+          <strong>We have just received a new message from ${contact.email}!</strong>
+        </p>
+        <p style="font-size: 14px; margin-bottom: 12px;">We would appreciate it if you could get back to them as soon as possible.</p>
+        <p>Best regards,<br/>
+          <strong><a href="https://sheero.onrender.com" style="color: #57534E; text-decoration: underline;">sheero</a></strong>
+        </p>
+        <div style="background-color: white; padding: 20px; border-radius: 8px; box-shadow: 0 2px 4px rgba(0,0,0,0.1);">
+        <div style="margin-bottom: 10px;">
+          <p style="font-size: 18px; font-weight: 600; color: black; text-align: left;">
+            Contact details
+          </p>
+        </div>
+
+        <!-- Contact Details Section -->
+        <div style="background-color: #ffffff; border-radius: 8px; box-shadow: 0 1px 3px rgba(0,0,0,0.1); margin-bottom: 20px !important; margin-top: 20px !important;">
+          <div style="font-size: 16px; font-weight: 600; color: #333; border-bottom: 1px solid #ddd; padding-bottom: 10px; margin-bottom: 10px;">
+            <div style="display: flex; justify-content: space-between; align-items: center; gap: 20px;">
+                <span>${contact.subject}</span>
+            </div>
+          </div>
+
+          <div style="font-size: 14px; line-height: 1.6; color: #555; background-color: #f9f9f9; padding: 10px; border-radius: 6px; max-width: 100%;">
+            ${contact.message}
+          </div>
+          <div style="margin-bottom: 10px;">
+            <p style="font-size: 14px; color: #666; text-align: center;">
+              Contact Date: ${formattedDate}
+            </p>
+          </div>
+        </div>
+
+        <p style="color: #666; font-size: 12px; margin-top: 20px;">
+          If you have any questions, please <a href="https://sheero.onrender.com/contact-us" style="color: #57534E; text-decoration: underline;">contact us</a> through our contact form or through our <a href="mailto:support@sheero.com" style="color: #57534E; text-decoration: underline;">email address</a>.
+        </p>
+
+        <p style="font-size: 12px; color: #888; margin-top: 40px; text-align: center;">
+          &copy; 2025 sheero. All rights reserved.
+        </p>
+      </div>
+    </div>
+  `;
+}
+
 module.exports = {
   statusImages, returnStatusImages, createAttachments, brandImages, headerMessages,
   orderStatusMessages, orderBodyMessages, returnStatusMessages, returnBodyMessages,
   generateEmailVerificationHtml, generateOrderEmailHtml, generateReturnRequestEmailHtml,
   generateReviewEmailHtml, generateProductInventoryEmailHtml, generateResetPasswordEmailHtml, generatePasswordResetSuccessEmailHtml,
-  generateEnable2FAEmailHtml, generateDisable2FAEmailHtml, generateLogin2FAEmailHtml, generateProductInventoryUpdateHtml
+  generateEnable2FAEmailHtml, generateDisable2FAEmailHtml, generateLogin2FAEmailHtml, generateProductInventoryUpdateHtml, generateProductRestockSubHtml,
+  generateContactHtml, generateContactToAdminsHtml
 };

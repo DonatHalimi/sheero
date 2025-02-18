@@ -60,6 +60,13 @@ const Wishlist = () => {
     const pageCount = calculatePageCount(wishlistItems, itemsPerPage);
     const currentPageItems = getPaginatedItems(wishlistItems, currentPage, itemsPerPage);
 
+    useEffect(() => {
+        const newPageCount = calculatePageCount(wishlistItems, itemsPerPage);
+        if (currentPage > newPageCount) {
+            setCurrentPage(newPageCount > 0 ? newPageCount : 1);
+        }
+    }, [wishlistItems, currentPage]);
+
     return (
         <>
             {isActionLoading && <LoadingOverlay />}

@@ -108,6 +108,7 @@ const ContactPage = () => {
                             setDeleteItemOpen={setDeleteContactOpen}
                             itemName="Contact"
                             exportOptions={exportOptions(contacts, handleExport)}
+                            showAddButton={false}
                         />
 
                         <DashboardTable
@@ -120,6 +121,7 @@ const ContactPage = () => {
                             currentPage={currentPage}
                             onPageChange={handlePageClick}
                             onViewDetails={handleViewDetails}
+                            showEditButton={false}
                         />
                     </>
                 )}

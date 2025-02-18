@@ -118,6 +118,7 @@ const ProductRestockSubscriptionsPage = () => {
                             setDeleteItemOpen={setDeleteSubscriptionOpen}
                             itemName="Subscription"
                             exportOptions={exportOptions(productRestockSubscriptions, handleExport)}
+                            showAddButton={false}
                         />
                         <DashboardTable
                             columns={columns}
@@ -129,6 +130,7 @@ const ProductRestockSubscriptionsPage = () => {
                             currentPage={currentPage}
                             onPageChange={handlePageClick}
                             onViewDetails={handleViewDetails}
+                            showEditButton={false}
                         />
                     </>
                 )}

@@ -25,6 +25,8 @@ import {
   InboxOutlined,
   Inventory,
   Inventory2Outlined,
+  Mail,
+  MailOutlined,
   MoveToInbox,
   People,
   PeopleOutlineOutlined,
@@ -86,11 +88,6 @@ const productMenuItems = [
     label: 'Images'
   },
   {
-    id: 'productRestockSubscriptions',
-    icon: { active: Inventory, inactive: Inventory2Outlined },
-    label: 'Restock Subscriptions'
-  },
-  {
     id: 'faqs',
     icon: { active: Help, inactive: HelpOutlineOutlined },
     label: 'FAQs'
@@ -101,6 +98,15 @@ const productMenuItems = [
     label: 'Contacts'
   },
 ];
+
+// Newsletter related pages
+const newsLetterMenuItems = [
+  {
+    id: 'productRestockSubscriptions',
+    icon: { active: Inventory, inactive: Inventory2Outlined },
+    label: 'Restock'
+  }
+]
 
 // Category related pages
 const categoryMenuItems = [
@@ -169,6 +175,13 @@ const mainSections = [
     stateKey: 'categoriesOpen'
   },
   {
+    id: 'newsletters',
+    icon: { active: Mail, inactive: MailOutlined },
+    label: 'Newsletters',
+    items: newsLetterMenuItems,
+    stateKey: 'newslettersOpen'
+  },
+  {
     id: 'addresses',
     icon: { active: Explore, inactive: ExploreOutlined },
     label: 'Address',
@@ -182,6 +195,7 @@ export const mainListItems = ({ setCurrentView, collapsed }) => {
     crudOpen: true,
     usersOpen: true,
     productsOpen: true,
+    newslettersOpen: true,
     addressesOpen: true,
     categoriesOpen: true,
     reportsOpen: true

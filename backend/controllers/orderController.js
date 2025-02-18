@@ -109,6 +109,20 @@ const payWithStripe = async (req, res) => {
     }
 };
 
+const sendOrderEmails = async (order) => {
+    try {
+        if (!order.user?.email) {
+            console.warn(`Order ${order._id} has no user email associated.`);
+            return;
+        }
+
+        await sendOrderUpdateEmail(order);
+        await sendProductInventoryUpdateEmail(order); // TODO: add role 'inventoryManager' so that users with this role can receive emails of every product inventory update on every order
+    } catch (error) {
+        console.error(`Error sending emails for order ${order._id}:`, error);
+    }
+};
+
 const verifyOrder = async (req, res) => {
     const { order_id, success } = req.body;
 
@@ -131,14 +145,9 @@ const verifyOrder = async (req, res) => {
                 return res.status(404).json({ success: false, message: 'Order not found.' });
             }
 
-            if (updatedOrder.user && updatedOrder.user.email) {
-                await sendOrderUpdateEmail(updatedOrder);
-                await sendProductInventoryUpdateEmail(updatedOrder);
-            } else {
-                console.warn(`Order ${order_id} has no user email associated.`);
-            }
+            sendOrderEmails(updatedOrder);
 
-            return res.json({ success: true, message: 'Payment completed successfully.', order: updatedOrder });
+            return res.json({ success: true, message: 'Payment completed successfully', order: updatedOrder });
         } else {
             await Order.findByIdAndDelete(order_id);
 
@@ -206,12 +215,7 @@ const payWithCash = async (req, res) => {
                 ]
             });
 
-        if (populatedOrder.user && populatedOrder.user.email) {
-            await sendOrderUpdateEmail(populatedOrder);
-            await sendProductInventoryUpdateEmail(populatedOrder);
-        } else {
-            console.warn(`Order ${order._id} has no user email associated.`);
-        }
+        sendOrderEmails(populatedOrder);
 
         res.json({
             success: true,
@@ -349,6 +353,11 @@ const updateDeliveryStatus = async (req, res) => {
             const currentDate = new Date();
             order.arrivalDateRange.start = currentDate;
             order.arrivalDateRange.end = currentDate;
+        }
+
+        if (status === 'canceled') {
+            order.arrivalDateRange.start = null;
+            order.arrivalDateRange.end = null;
         }
 
         await order.save();

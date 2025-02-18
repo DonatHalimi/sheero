@@ -60,11 +60,13 @@ const AddReviewModal = ({ open, onClose, product, onReviewSuccess }) => {
         setLoading(true);
         if (!isAuthenticated) {
             toast.info('You need to be logged in to add a review');
+            setLoading(false);
             return;
         }
 
         if (!canReview) {
             toast.error('Product can only be reviewed after buying it');
+            setLoading(false);
             return;
         }
 

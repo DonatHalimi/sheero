@@ -54,6 +54,13 @@ const Returns = () => {
     const pageCount = calculatePageCount(filteredReturns, itemsPerPage);
     const currentPageItems = getPaginatedItems(filteredReturns, currentPage, itemsPerPage);
 
+    useEffect(() => {
+        const newPageCount = calculatePageCount(returns, itemsPerPage);
+        if (currentPage > newPageCount) {
+            setCurrentPage(newPageCount > 0 ? newPageCount : 1);
+        }
+    }, [returns, currentPage]);
+
     return (
         <>
             <Navbar />

@@ -1,8 +1,8 @@
-import { Box, Drawer, Typography } from '@mui/material';
+import { Box, Chip, Drawer, Typography } from '@mui/material';
 import React from 'react';
 import { CloseButton, EditExportButtons, RatingStars, ReadOnlyTextField } from '../../../assets/CustomComponents';
 import { downloadReviewData } from '../../../assets/DataExport';
-import { drawerPaperSx } from '../../../assets/sx';
+import { drawerPaperSx, productChipSx } from '../../../assets/sx';
 
 const ReviewDetailsDrawer = ({ open, onClose, review, onEdit }) => {
     const header = `Review from <strong>${review?.user.firstName} ${review?.user.lastName} - ${review?.user.email}</strong> for <strong>${review?.product.name}</strong>`;
@@ -48,9 +48,20 @@ const ReviewDetailsDrawer = ({ open, onClose, review, onEdit }) => {
                             rows={4}
                         />
 
-                        <div className='flex items-center relative !mb-3 text-xl'>
-                            <RatingStars rating={review.rating} />
-                        </div>
+                        <Box sx={productChipSx} className="flex flex-col gap-1">
+                            <Typography variant="body2" className="!text-gray-700">Rating</Typography>
+                            <Chip
+                                label={
+                                    <Box display="flex" alignItems="center" gap={1}>
+                                        <div className='flex items-center relative text-xl p-1'>
+                                            <RatingStars rating={review.rating} />
+                                        </div>
+                                    </Box>
+                                }
+                                variant="outlined"
+                                className="w-full !justify-start"
+                            />
+                        </Box>
 
                         <ReadOnlyTextField
                             label="Title"

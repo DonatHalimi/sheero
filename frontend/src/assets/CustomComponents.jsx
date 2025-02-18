@@ -51,6 +51,7 @@ import {
     ShoppingCartOutlined,
     Star,
     StarBorder,
+    UploadFile,
     ZoomIn,
     ZoomOut
 } from '@mui/icons-material';
@@ -104,7 +105,7 @@ import { GridToolbar } from '@mui/x-data-grid';
 import { Splide, SplideSlide } from '@splidejs/react-splide';
 import { AnimatePresence, motion } from 'framer-motion';
 import PropTypes from 'prop-types';
-import React, { forwardRef, useEffect, useRef, useState } from 'react';
+import React, { forwardRef, useCallback, useEffect, useRef, useState } from 'react';
 import { useSelector } from 'react-redux';
 import { Link as RouterLink, useLocation, useNavigate } from 'react-router-dom';
 import { toast } from 'react-toastify';
@@ -776,7 +777,7 @@ export const LoadingProductItem = ({ count = 15 }) => {
 export const LoadingReviewItem = () => (
     <>
         {Array.from({ length: 3 }).map((_, index) => (
-            <div key={index} className="relative p-4 mb-4 bg-white rounded-md shadow-sm">
+            <div key={index} className="relative p-4 mb-4 bg-white rounded-md shadow-sm h-[142px]">
                 <div className="absolute top-4 right-4">
                     <WaveSkeleton variant="circular" width={24} height={24} />
                 </div>
@@ -805,17 +806,17 @@ export const LoadingOrderItem = () => {
         <>
             <Box className="grid grid-cols-1 gap-4 rounded-md">
                 {Array.from({ length: 3 }).map((_, index) => (
-                    <Box key={index} className="bg-white shadow-md rounded-lg p-6 relative">
+                    <Box key={index} className="bg-white shadow-md rounded-lg p-6 relative h-[181px]">
                         <Box className="flex justify-between items-center mb-4">
                             <WaveSkeleton variant="text" width="40%" />
                             <Box>
                                 <WaveSkeleton variant="text" width={100} />
                             </Box>
                         </Box>
-                        <div className="flex space-x-3 mt-4 mb-2">
-                            <WaveSkeleton variant="rectangular" height={50} width={50} className='rounded' />
-                            <WaveSkeleton variant="rectangular" height={50} width={50} className='rounded' />
-                            <WaveSkeleton variant="rectangular" height={50} width={50} className='rounded' />
+                        <div className="flex space-x-3 mt-6 mb-2">
+                            <WaveSkeleton variant="rectangular" height={60} width={60} className='rounded' />
+                            <WaveSkeleton variant="rectangular" height={60} width={60} className='rounded' />
+                            <WaveSkeleton variant="rectangular" height={60} width={60} className='rounded' />
                         </div>
                     </Box>
                 ))}
@@ -2723,6 +2724,7 @@ export const DashboardHeader = ({
     setDeleteItemOpen,
     exportOptions = [],
     itemName,
+    showAddButton = true,
 }) => {
     const isMultipleSelected = selectedItems.length > 1;
     const itemNamePlural = pluralize(itemName, selectedItems.length);
@@ -2758,11 +2760,13 @@ export const DashboardHeader = ({
                 </Button>
             </Tooltip>
             <div>
-                <Tooltip title="Shortcut: Alt + A" placement="top" arrow enterDelay={2000}>
-                    <OutlinedBrownButton onClick={() => setAddItemOpen(true)} className="!mr-4">
-                        Add {itemName}
-                    </OutlinedBrownButton>
-                </Tooltip>
+                {showAddButton && (
+                    <Tooltip title="Shortcut: Alt + A" placement="top" arrow enterDelay={2000}>
+                        <OutlinedBrownButton onClick={() => setAddItemOpen(true)} className="!mr-4">
+                            Add {itemName}
+                        </OutlinedBrownButton>
+                    </Tooltip>
+                )}
                 {selectedItems.length > 0 && (
                     <OutlinedBrownButton onClick={() => setDeleteItemOpen(true)}>
                         {isMultipleSelected ? `Delete ${itemNamePlural}` : `Delete ${itemName}`}
@@ -3578,7 +3582,7 @@ export const DashboardSearchSuggestions = ({
                     <div
                         key={item.id}
                         onClick={() => handleSuggestionClick(item)}
-                        className={`px-4 pt-[10px] pb-[10px] hover:bg-gray-100 cursor-pointer flex items-center gap-4 transition duration-150 ease-in-out ${index === selectedIndex ? 'bg-gray-200 border-l-4 border-stone-500' : ''}`}
+                        className={`px-4 pt-[10px] pb-[10px] hover:bg-gray-100 cursor-pointer flex items-center gap-4 transition duration-150 ease-in-out ${index === selectedIndex ? 'bg-gray-100 border-l-4 border-stone-500 rounded' : ''}`}
                     >
                         {item.icon?.inactive && (
                             <item.icon.inactive className="w-5 h-5 text-stone-500" />
@@ -3710,6 +3714,78 @@ export const DashboardSearchBar = ({ collapsed, onMenuItemClick, getAllMenuItems
                 )}
             </div>
         </ClickAwayListener>
+    );
+};
+
+export const ImageUploadBox = ({ onFileSelect, initialPreview }) => {
+    const [imagePreview, setImagePreview] = useState(initialPreview || null);
+    const [isDragging, setIsDragging] = useState(false);
+
+    useEffect(() => {
+        setImagePreview(initialPreview || null);
+    }, [initialPreview]);
+
+    const handleFile = useCallback((file) => {
+        const validTypes = ['image/jpeg', 'image/jpg', 'image/png'];
+        if (validTypes.includes(file.type)) {
+            const reader = new FileReader();
+            reader.onloadend = () => {
+                setImagePreview(reader.result);
+            };
+            reader.readAsDataURL(file);
+            onFileSelect(file);
+        } else {
+            toast.error('Invalid file type. Please upload an image (jpeg, jpg or png)');
+            console.error('Invalid file type. Please upload an image (jpeg, jpg or png)');
+        }
+    }, [onFileSelect]);
+
+    const handleImageChange = (e) => {
+        const file = e.target.files[0];
+        if (file) handleFile(file);
+    };
+
+    const handleDragOver = (e) => {
+        e.preventDefault();
+        setIsDragging(true);
+    };
+
+    const handleDragLeave = (e) => {
+        e.preventDefault();
+        setIsDragging(false);
+    };
+
+    const handleDrop = (e) => {
+        e.preventDefault();
+        setIsDragging(false);
+        const file = e.dataTransfer.files[0];
+        if (file) handleFile(file);
+    };
+
+    return (
+        <Box
+            onDragOver={handleDragOver}
+            onDragLeave={handleDragLeave}
+            onDrop={handleDrop}
+            onClick={() => document.getElementById('file-input').click()}
+            className={`border-2 border-dashed ${isDragging ? 'border-stone-500' : 'border-stone-200'} rounded-md mb-4 p-6 cursor-pointer flex flex-col items-center justify-center gap-2`}
+        >
+            {imagePreview ? (
+                <img
+                    src={imagePreview}
+                    alt="Preview"
+                    className="max-w-full h-auto mx-auto rounded-md"
+                />
+            ) : (
+                <>
+                    <UploadFile sx={{ fontSize: 45 }} className={`text-${isDragging ? 'stone-700' : 'stone-600'}`} />
+                    <CustomTypography variant="body1" className={`text-${isDragging ? 'brown-500' : 'brown-200'}`}>
+                        Drag and drop an image here or click to select
+                    </CustomTypography>
+                </>
+            )}
+            <VisuallyHiddenInput id="file-input" type="file" onChange={handleImageChange} />
+        </Box>
     );
 };
 

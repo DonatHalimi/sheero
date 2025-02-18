@@ -16,7 +16,6 @@ const getNestedValue = (obj, path) => {
  * @param {Array} data - An array of data objects to be displayed in the table.
  * @param {Array} selectedItems - An array of selected item IDs.
  * @param {Function} onSelectItem - A callback function for when an item is selected.
- * @param {Function} onRowRightClick - A callback function for when a row is right-clicked.
  * @param {Number} itemsPerPage - The number of items to display per page.
  * @param {Number} currentPage - The current page number.
  * @param {Function} onPageChange - A callback function for when the page changes.
@@ -30,14 +29,14 @@ const DashboardTable = ({
     data,
     selectedItems,
     onSelectItem,
-    onRowRightClick,
     itemsPerPage,
     currentPage,
     onPageChange,
     renderTableActions,
     onEdit,
     containerClassName,
-    onViewDetails
+    onViewDetails,
+    showEditButton = true,
 }) => {
     const gridColumns = columns.map((column) => ({
         field: column.key,
@@ -48,9 +47,11 @@ const DashboardTable = ({
             if (column.key === 'actions') {
                 return (
                     <div onClick={(e) => e.stopPropagation()}>
-                        <ActionButton onClick={() => onEdit(params.row)}>
-                            <BrownCreateOutlinedIcon />
-                        </ActionButton>
+                        {showEditButton && (
+                            <ActionButton onClick={() => onEdit(params.row)}>
+                                <BrownCreateOutlinedIcon />
+                            </ActionButton>
+                        )}
                         <ActionButton onClick={() => onViewDetails(params.row)}>
                             <Visibility />
                         </ActionButton>
@@ -95,7 +96,6 @@ const DashboardTable = ({
                     columns={gridColumns}
                     onSelectionModelChange={(newSelection) => onSelectItem(newSelection)}
                     onRowClick={handleRowClick}
-                    onRowContextMenu={(event, params) => onRowRightClick(event, params.row)}
                     pageSize={itemsPerPage}
                     page={currentPage}
                     onPageChange={(params) => onPageChange(params.page)}

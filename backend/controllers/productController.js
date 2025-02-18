@@ -6,7 +6,7 @@ const Review = require('../models/Review');
 const fs = require('fs');
 const User = require('../models/User');
 const ProductRestockSubscription = require('../models/ProductRestockSubscription');
-const { sendProductRestockNotificationEmail } = require('../config/emailService');
+const { sendProductRestockNotificationEmail, sendProductRestockSubscriptionEmail } = require('../config/emailService');
 
 const createProduct = async (req, res) => {
     const { name, description, price, salePrice, category, subcategory, subSubcategory, inventoryCount, dimensions, variants, discount, supplier, shipping, details } = req.body;
@@ -139,19 +139,23 @@ const updateProduct = async (req, res) => {
     }
 };
 
+const sendRestockSubscriptionEmail = async (email, product, subscription) => {
+    try {
+        await sendProductRestockSubscriptionEmail(email, product, subscription);
+    } catch (error) {
+        console.error(`Failed to send subscription confirmation email to ${email}:`, error);
+    }
+};
+
 const subscribeForRestock = async (req, res) => {
     const { email } = req.body;
     const productId = req.params.productId;
 
-    if (!email) {
-        return res.status(400).json({ message: 'Email is required.' });
-    }
+    if (!email) return res.status(400).json({ message: 'Email is required.' });
 
     try {
         const product = await Product.findById(productId);
-        if (!product) {
-            return res.status(404).json({ message: 'Product not found.' });
-        }
+        if (!product) return res.status(404).json({ message: 'Product not found.' });
 
         const existingSubscription = await ProductRestockSubscription.findOne({ productId, email });
         if (existingSubscription) {
@@ -162,11 +166,14 @@ const subscribeForRestock = async (req, res) => {
         }
 
         const subscription = await ProductRestockSubscription.create({ productId, email });
+
         res.status(200).json({
             alreadySubscribed: false,
             message: 'You will receive an email when the product is restocked',
             subscription
         });
+
+        sendRestockSubscriptionEmail(email, product, subscription);
     } catch (error) {
         console.error('Error subscribing for restock:', error);
         res.status(500).json({ message: 'Error creating subscription.', error: error.message });

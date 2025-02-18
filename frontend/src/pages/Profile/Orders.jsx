@@ -77,7 +77,8 @@ const Orders = () => {
 
     const statusClasses = {
         pending: 'text-yellow-500',
-        shipped: 'text-blue-400',
+        processed: 'text-cyan-500',
+        shipped: 'text-blue-700',
         delivered: 'text-green-500',
         canceled: 'text-red-500',
         default: 'text-gray-500'
@@ -87,6 +88,13 @@ const Orders = () => {
 
     const pageCount = calculatePageCount(filteredOrders, itemsPerPage);
     const currentPageItems = getPaginatedItems(filteredOrders, currentPage, itemsPerPage);
+
+    useEffect(() => {
+        const newPageCount = calculatePageCount(orders, itemsPerPage);
+        if (currentPage > newPageCount) {
+            setCurrentPage(newPageCount > 0 ? newPageCount : 1);
+        }
+    }, [orders, currentPage]);
 
     return (
         <>

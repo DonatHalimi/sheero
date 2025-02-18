@@ -86,17 +86,7 @@ const ReturnsPage = () => {
         { key: 'user.email', label: 'User' },
         { key: 'products', label: 'Products' },
         { key: 'reason', label: 'Reason' },
-        {
-            key: 'createdAt',
-            label: 'Created At',
-            render: (returnData) => {
-                const date = returnData.createdAt ? new Date(returnData.createdAt) : null;
-                if (date) {
-                    return formatDate(date);
-                }
-                return 'N/A';
-            }
-        },
+        { key: 'createdAt', label: 'Created At', render: (row) => formatDate(row.createdAt) },
         { key: 'status', label: 'Status' },
         { key: 'actions', label: 'Actions' }
     ];

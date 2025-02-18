@@ -43,7 +43,7 @@ const EditOrderModal = ({ open, onClose, order, onViewDetails, onEditSuccess }) 
                 updateData.paymentStatus = 'completed';
             } else if (newStatus === 'canceled') {
                 updateData.paymentStatus = 'failed';
-            } else if (['pending', 'shipped'].includes(newStatus)) {
+            } else if (['pending', 'processed', 'shipped'].includes(newStatus)) {
                 updateData.paymentStatus = 'pending';
             }
         }
@@ -163,6 +163,7 @@ const EditOrderModal = ({ open, onClose, order, onViewDetails, onEditSuccess }) 
                     className="!mb-4"
                 >
                     <MenuItem value="pending">Pending</MenuItem>
+                    <MenuItem value="processed">Processed</MenuItem>
                     <MenuItem value="shipped">Shipped</MenuItem>
                     <MenuItem value="delivered">Delivered</MenuItem>
                     <MenuItem value="canceled">Canceled</MenuItem>

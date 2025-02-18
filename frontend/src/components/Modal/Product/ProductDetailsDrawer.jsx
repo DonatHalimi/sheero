@@ -64,13 +64,16 @@ const ProductDetailsDrawer = ({ open, onClose, product, onEdit }) => {
                             value={product.name || 'N/A'}
                             multiline
                             rows={3}
+                            onClick={() => window.open(`/product/${product._id}`, '_blank')}
+                            className='cursor-pointer hover:underline'
                         />
 
                         <Box className="flex flex-col items-center mt-3 mb-3">
                             <img
                                 src={getImageUrl(product.image)}
                                 alt={`${product.name} image`}
-                                className='w-1/3'
+                                onClick={() => window.open(`/product/${product._id}`, '_blank')}
+                                className='w-1/3 cursor-pointer'
                             />
                         </Box>
 

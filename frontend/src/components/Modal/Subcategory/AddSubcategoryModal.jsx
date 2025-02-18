@@ -1,9 +1,8 @@
-import { Upload } from '@mui/icons-material';
 import { TextField } from '@mui/material';
 import Autocomplete from '@mui/material/Autocomplete';
 import React, { useEffect, useState } from 'react';
 import { toast } from 'react-toastify';
-import { BrownButton, BrownOutlinedTextField, CustomBox, CustomModal, CustomPaper, CustomTypography, handleApiError, LoadingLabel, OutlinedBrownButton, VisuallyHiddenInput } from '../../../assets/CustomComponents';
+import { BrownButton, BrownOutlinedTextField, CustomBox, CustomModal, CustomPaper, CustomTypography, handleApiError, ImageUploadBox, LoadingLabel, OutlinedBrownButton, VisuallyHiddenInput } from '../../../assets/CustomComponents';
 import { getCategoriesService } from '../../../services/categoryService';
 import { addSubcategoryService } from '../../../services/subcategoryService';
 
@@ -11,7 +10,6 @@ const AddSubcategoryModal = ({ open, onClose, onAddSuccess }) => {
     const [name, setName] = useState('');
     const [isValidName, setIsValidName] = useState(true);
     const [image, setImage] = useState(null);
-    const [imagePreview, setImagePreview] = useState(null);
     const [category, setCategory] = useState(null);
     const [categories, setCategories] = useState([]);
     const [loading, setLoading] = useState(false);
@@ -63,22 +61,8 @@ const AddSubcategoryModal = ({ open, onClose, onAddSuccess }) => {
         }
     };
 
-    const handleImageChange = (e) => {
-        const file = e.target.files[0];
-        if (file) {
-            const validTypes = ['image/jpeg', 'image/jpg', 'image/png'];
-            if (validTypes.includes(file.type)) {
-                setImage(file);
-                const reader = new FileReader();
-                reader.onloadend = () => {
-                    setImagePreview(reader.result);
-                };
-                reader.readAsDataURL(file);
-            } else {
-                toast.error('Invalid file type. Please upload an image (jpeg, jpg or png)');
-                console.error('Invalid file type. Please upload an image (jpeg, jpg or png)');
-            }
-        }
+    const handleFileSelect = (file) => {
+        setImage(file);
     };
 
     return (
@@ -110,22 +94,9 @@ const AddSubcategoryModal = ({ open, onClose, onAddSuccess }) => {
                     renderInput={(params) => <TextField {...params} label="Category" variant="outlined" />}
                     className='!mb-4'
                 />
-                <OutlinedBrownButton
-                    component="label"
-                    role={undefined}
-                    variant="contained"
-                    tabIndex={-1}
-                    startIcon={<Upload />}
-                    className="w-full !mb-6"
-                >
-                    Upload image
-                    <VisuallyHiddenInput type="file" onChange={handleImageChange} />
-                </OutlinedBrownButton>
-                {imagePreview && (
-                    <div className="mb-4">
-                        <img src={imagePreview} alt="Preview" className="max-w-full h-auto mx-auto rounded-md" />
-                    </div>
-                )}
+
+                <ImageUploadBox onFileSelect={handleFileSelect} />
+
                 <BrownButton
                     onClick={handleAddSubcategory}
                     variant="contained"

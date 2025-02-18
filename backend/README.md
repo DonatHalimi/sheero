@@ -4,7 +4,9 @@
    1.1. [File Structure of Backend](#file-structure-of-backend)  
    1.2. [Folder Content](#folder-content)  
    1.3. [Backend `package.json`](#backend-packagejson)  
-   1.4. [Backend Dependencies](#backend-dependencies)  
+   1.4. [Backend Dependencies](#backend-dependencies)
+
+2. [Frontend](#frontend) 
 
 ---
 
@@ -120,3 +122,8 @@ The backend provides APIs that are documented and accessible through Postman. Yo
 - **[Nodemon](https://www.npmjs.com/package/nodemon)**: A development utility that automatically restarts the server when changes are detected in the source code.
 - **[Stripe](https://www.npmjs.com/package/stripe)**: A library for integrating with the Stripe payment system, allowing the backend to handle payments securely.
 - **[Yup](https://www.npmjs.com/package/yup)**: A JavaScript schema validator used for validating and parsing data to ensure it conforms to expected structures.
+
+## **Frontend**
+
+The frontend is built using React and is hosted in [Render](https://sheero.onrender.com).
+For more information on the frontend setup and usage, you can refer to the [README](frontend/README.md) in the frontend repository.

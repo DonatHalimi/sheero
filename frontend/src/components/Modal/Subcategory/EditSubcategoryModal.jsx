@@ -1,8 +1,7 @@
-import { Upload } from '@mui/icons-material';
 import { InputLabel, MenuItem, Select } from '@mui/material';
 import React, { useEffect, useState } from 'react';
 import { toast } from 'react-toastify';
-import { ActionButtons, BrownOutlinedTextField, CustomBox, CustomModal, CustomTypography, handleApiError, OutlinedBrownButton, OutlinedBrownFormControl, VisuallyHiddenInput } from '../../../assets/CustomComponents';
+import { ActionButtons, BrownOutlinedTextField, CustomBox, CustomModal, CustomTypography, handleApiError, ImageUploadBox, OutlinedBrownButton, OutlinedBrownFormControl, VisuallyHiddenInput } from '../../../assets/CustomComponents';
 import { getCategoriesService } from '../../../services/categoryService';
 import { editSubcategoryService } from '../../../services/subcategoryService';
 import { getImageUrl } from '../../../utils/config';
@@ -11,7 +10,6 @@ const EditSubcategoryModal = ({ open, onClose, subcategory, onViewDetails, onEdi
     const [name, setName] = useState('');
     const [isValidName, setIsValidName] = useState(true);
     const [image, setImage] = useState(null);
-    const [imagePreview, setImagePreview] = useState('');
     const [category, setCategory] = useState('');
     const [categories, setCategories] = useState([]);
     const [loading, setLoading] = useState(false);
@@ -24,7 +22,7 @@ const EditSubcategoryModal = ({ open, onClose, subcategory, onViewDetails, onEdi
         if (subcategory) {
             setName(subcategory.name || '');
             setCategory(subcategory.category?._id || '');
-            setImagePreview(subcategory.image ? getImageUrl(subcategory.image) : '');
+            setImage(null);
         }
     }, [subcategory]);
 
@@ -64,22 +62,8 @@ const EditSubcategoryModal = ({ open, onClose, subcategory, onViewDetails, onEdi
         }
     };
 
-    const handleImageChange = (e) => {
-        const file = e.target.files[0];
-        if (file) {
-            const validTypes = ['image/jpeg', 'image/jpg', 'image/png'];
-            if (validTypes.includes(file.type)) {
-                setImage(file);
-                const reader = new FileReader();
-                reader.onloadend = () => {
-                    setImagePreview(reader.result);
-                };
-                reader.readAsDataURL(file);
-            } else {
-                toast.error('Invalid file type. Please upload an image (jpeg, jpg, or png)');
-                console.error('Invalid file type. Please upload an image (jpeg, jpg, or png)');
-            }
-        }
+    const handleFileSelect = (file) => {
+        setImage(file);
     };
 
     return (
@@ -114,20 +98,8 @@ const EditSubcategoryModal = ({ open, onClose, subcategory, onViewDetails, onEdi
                         ))}
                     </Select>
                 </OutlinedBrownFormControl>
-                <OutlinedBrownButton
-                    component="label"
-                    variant="contained"
-                    startIcon={<Upload />}
-                    className="w-full !mb-6"
-                >
-                    Upload image
-                    <VisuallyHiddenInput type="file" onChange={handleImageChange} />
-                </OutlinedBrownButton>
-                {imagePreview && (
-                    <div className="mb-4">
-                        <img src={imagePreview} alt="Preview" className="max-w-full h-auto mx-auto rounded-md" />
-                    </div>
-                )}
+
+                <ImageUploadBox onFileSelect={handleFileSelect} initialPreview={subcategory?.image ? getImageUrl(subcategory.image) : ''} />
 
                 <ActionButtons
                     primaryButtonLabel="Save"

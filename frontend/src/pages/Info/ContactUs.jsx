@@ -57,8 +57,9 @@ const ContactUs = () => {
         };
 
         try {
-            await addContactService(data);
-            toast.success('Message sent successfully, we will get back to you soon!');
+            const response = await addContactService(data);
+            toast.success(response.data.message);
+
             setFormData({
                 name: user?.firstName || '',
                 email: user?.email || '',

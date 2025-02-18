@@ -7,6 +7,10 @@ function generateCustomId() {
     return timestamp + randomPart;
 }
 
+const paymentStatus = ['pending', 'completed', 'failed'];
+const paymentMethod = ['stripe', 'cash'];
+const status = ['pending', 'processed', 'shipped', 'delivered', 'canceled'];
+
 const orderSchema = new mongoose.Schema({
     _id: { type: String, default: generateCustomId },
     user: { type: mongoose.Schema.Types.ObjectId, ref: 'User', required: true },
@@ -20,10 +24,10 @@ const orderSchema = new mongoose.Schema({
     }],
     address: { type: mongoose.Schema.Types.ObjectId, ref: 'Address', required: true },
     totalAmount: { type: Number, required: true },
-    paymentStatus: { type: String, enum: ['pending', 'completed', 'failed'], default: 'pending' },
-    paymentMethod: { type: String, enum: ['stripe', 'cash'], default: 'stripe' },
-    paymentIntentId: { type: String, required: function() { return this.paymentMethod === 'stripe'; } },
-    status: { type: String, enum: ['pending', 'shipped', 'delivered', 'canceled'], default: 'pending' },
+    paymentStatus: { type: String, enum: paymentStatus, default: 'pending' },
+    paymentMethod: { type: String, enum: paymentMethod, default: 'stripe' },
+    paymentIntentId: { type: String, required: function () { return this.paymentMethod === 'stripe'; } },
+    status: { type: String, enum: status, default: 'pending' },
     arrivalDateRange: {
         start: { type: Date, default: null },
         end: { type: Date, default: null }

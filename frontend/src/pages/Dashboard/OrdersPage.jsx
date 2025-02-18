@@ -114,6 +114,7 @@ const OrdersPage = () => {
                             setDeleteItemOpen={setDeleteOrderOpen}
                             itemName="Order"
                             exportOptions={exportOptions(orders, handleExport)}
+                            showAddButton={false}
                         />
 
                         <DashboardTable

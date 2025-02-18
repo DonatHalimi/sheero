@@ -1,8 +1,8 @@
-import { ArrowBack, Upload } from '@mui/icons-material';
+import { ArrowBack } from '@mui/icons-material';
 import { Autocomplete, Box, MenuItem, Modal, TextField, Typography } from '@mui/material';
 import React, { useEffect, useState } from 'react';
 import { toast } from 'react-toastify';
-import { BrownButton, BrownOutlinedTextField, CustomPaper, OutlinedBrownButton, OutlinedBrownFormControl, VisuallyHiddenInput } from '../../../assets/CustomComponents';
+import { BrownButton, BrownOutlinedTextField, CustomPaper, ImageUploadBox, OutlinedBrownButton, OutlinedBrownFormControl, VisuallyHiddenInput } from '../../../assets/CustomComponents';
 import axiosInstance from '../../../utils/axiosInstance';
 import { getImageUrl } from '../../../utils/config';
 
@@ -17,7 +17,6 @@ const EditProductModal = ({ open, onClose, product, onEditSuccess }) => {
     const [subSubcategory, setSubSubcategory] = useState(null);
     const [inventoryCount, setInventoryCount] = useState('');
     const [image, setImage] = useState(null);
-    const [imagePreview, setImagePreview] = useState('');
     const [categories, setCategories] = useState([]);
     const [subcategories, setSubcategories] = useState([]);
     const [subSubcategories, setSubSubcategories] = useState([]);
@@ -47,7 +46,7 @@ const EditProductModal = ({ open, onClose, product, onEditSuccess }) => {
             setSubSubcategory(product.subSubcategory || null);
             setInventoryCount(product.inventoryCount || '');
             setSupplier(product.supplier || null);
-            setImagePreview(product.image ? getImageUrl(product.image) : '');
+            setImage(null);
 
             if (product.dimensions) {
                 setLength(product.dimensions.length || '');
@@ -114,16 +113,8 @@ const EditProductModal = ({ open, onClose, product, onEditSuccess }) => {
         fetchData();
     }, []);
 
-    const handleImageChange = (e) => {
-        const file = e.target.files[0];
+    const handleFileSelect = (file) => {
         setImage(file);
-        if (file) {
-            const reader = new FileReader();
-            reader.onloadend = () => {
-                setImagePreview(reader.result);
-            };
-            reader.readAsDataURL(file);
-        }
     };
 
     const handleEditProduct = async () => {
@@ -339,23 +330,18 @@ const EditProductModal = ({ open, onClose, product, onEditSuccess }) => {
                 return (
                     <>
                         {/* Step 2: Upload Image */}
-                        <Typography variant='h5' className="!text-xl !font-bold !mb-4">Upload Product Image</Typography>
-                        <OutlinedBrownButton
-                            component="label"
-                            role={undefined}
-                            variant="contained"
-                            tabIndex={-1}
-                            startIcon={<Upload />}
-                            className="w-full !mb-6"
-                        >
-                            Upload image
-                            <VisuallyHiddenInput type="file" onChange={handleImageChange} />
-                        </OutlinedBrownButton>
-                        {imagePreview && (
-                            <div className="mb-6">
-                                <img src={imagePreview} alt="Preview" className="max-w-full h-auto mx-auto rounded-md" />
-                            </div>
-                        )}
+                        <div className="flex items-center justify-between mb-4">
+                            <Typography variant='h5' className="!text-xl !font-bold">Update Product Image</Typography>
+                            <OutlinedBrownButton
+                                onClick={handleBackToStep1}
+                                startIcon={<ArrowBack />}
+                            >
+                                Back to Basic Info
+                            </OutlinedBrownButton>
+                        </div>
+
+                        <ImageUploadBox onFileSelect={handleFileSelect} initialPreview={product?.image ? getImageUrl(product.image) : ''} />
+
                         <BrownButton onClick={() => setStep(3)} variant="contained" color="primary" className="w-full">
                             Next: Edit Variants, Dimensions, and Shipping
                         </BrownButton>
@@ -365,7 +351,7 @@ const EditProductModal = ({ open, onClose, product, onEditSuccess }) => {
                 return (
                     <>
                         {/* Step 3: Variants, Dimensions, and Shipping */}
-                        <Typography variant='h5' className="!text-xl !font-bold !mb-4">Edit Variants, Dimensions, and Shipping</Typography>
+                        <Typography variant='h5' className="!text-xl !font-bold !mb-4">Edit Dimensions, Variants, Details and Shipping</Typography>
 
                         {/* Button to return to Step 1 */}
                         <OutlinedBrownButton

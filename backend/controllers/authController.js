@@ -6,6 +6,7 @@ const cookieConfig = require('../config/cookie');
 const crypto = require('crypto');
 const { JWT_SECRET } = require('../config/dotenv');
 const { sendVerificationEmail, sendResetPasswordEmail, sendPasswordResetSuccessEmail, sendEnable2FAEmail, sendDisable2FAEmail, sendLogin2FAEmail } = require('../config/emailService');
+const MemoryStore = require('../models/MemoryStore');
 
 const generateOTP = () => Math.floor(100000 + Math.random() * 900000).toString();
 
@@ -16,11 +17,11 @@ const generateAccessToken = (user) => {
     }, JWT_SECRET, { expiresIn: '7d' });
 };
 
-const otpStore = {};
-const pendingUsers = {};
-const rateLimitStore = {};
-const twoFARateLimitStore = {};
-const twoFactorOtpStore = {};
+const verificationCodeStore = new MemoryStore();
+const pendingUsersStore = new MemoryStore();
+const rateLimitStore = new MemoryStore();
+const twoFactorRateLimitStore = new MemoryStore();
+const twoFactorOtpStore = new MemoryStore();
 
 const registerUser = async (req, res) => {
     const { firstName, lastName, email, password, role } = req.body;
@@ -29,21 +30,17 @@ const registerUser = async (req, res) => {
         const hashedPassword = await bcrypt.hash(password, 10);
         const validRole = await Role.findById(role) || await Role.findOne({ name: 'user' });
 
-        pendingUsers[email] = {
+        pendingUsersStore.set(email, {
             firstName,
             lastName,
             email,
             password: hashedPassword,
             role: validRole._id,
             createdAt: Date.now()
-        };
+        });
 
         const otp = generateOTP();
-
-        otpStore[email] = {
-            otp,
-            expires: Date.now() + 5 * 60 * 1000
-        };
+        verificationCodeStore.set(email, otp, 5 * 60 * 1000);
 
         await sendVerificationEmail(email, otp);
 
@@ -58,21 +55,21 @@ const verifyOTP = async (req, res) => {
 
     if (!email || !userOtp) return res.status(400).json({ error: 'Email and OTP are required' });
 
-    const record = otpStore[email];
+    const storedOtp = verificationCodeStore.get(email);
 
-    if (!record) return res.status(400).json({ error: 'Invalid or expired OTP. Please request a new one' });
+    if (!storedOtp) return res.status(400).json({ error: "Invalid or expired OTP. Please request a new one" });
 
-    if (record.expires < Date.now()) return res.status(400).json({ error: 'OTP has expired. Please request a new one' });
-
-    if (record.otp !== userOtp) return res.status(400).json({ error: 'Invalid OTP. Please try again' });
+    if (storedOtp !== userOtp) return res.status(400).json({ error: 'Invalid OTP. Please try again' });
 
     try {
-        const pendingUser = pendingUsers[email];
+        const pendingUser = pendingUsersStore.get(email);
+        if (!pendingUser) return res.status(400).json({ error: 'No pending registration found for this email' });
+
         const newUser = new User(pendingUser);
         await newUser.save();
-        delete pendingUsers[email];
 
-        delete otpStore[email];
+        pendingUsersStore.delete(email);
+        verificationCodeStore.delete(email);
 
         const user = await User.findById(newUser._id).populate('role');
 
@@ -103,23 +100,20 @@ const resendOTP = async (req, res) => {
     try {
         const currentTime = Date.now();
         const rateLimitDuration = 60 * 1000;
-        const lastRequestTime = rateLimitStore[email];
+        const lastRequestTime = rateLimitStore.get(email);
 
         if (lastRequestTime && currentTime - lastRequestTime < rateLimitDuration) {
             const waitTime = Math.ceil((rateLimitDuration - (currentTime - lastRequestTime)) / 1000);
             return res.status(429).json({ error: `Too many requests. Please wait ${waitTime} seconds before trying again` });
         }
 
-        const record = otpStore[email];
-        if (!record) return res.status(400).json({ error: 'No OTP found for this email. Please register first' });
+        const existingOtp = verificationCodeStore.get(email);
+        if (!existingOtp) return res.status(400).json({ error: 'No OTP found for this email. Please register first' });
 
         const newOtp = generateOTP();
-        otpStore[email] = {
-            otp: newOtp,
-            expires: Date.now() + 10 * 60 * 1000
-        };
+        verificationCodeStore.set(email, newOtp, 10 * 60 * 1000);
 
-        rateLimitStore[email] = currentTime;
+        rateLimitStore.set(email, currentTime);
         await sendVerificationEmail(email, newOtp);
 
         res.status(200).json({ message: `OTP re-sent to ${email}. Please check your inbox` });
@@ -136,12 +130,7 @@ const loginUser = async (req, res) => {
 
         if (user.twoFactorEnabled) {
             const newOtp = generateOTP();
-            const expiresIn = Date.now() + 10 * 60 * 1000;
-
-            twoFactorOtpStore[email] = {
-                otp: newOtp.toString(),
-                expires: expiresIn
-            };
+            twoFactorOtpStore.set(email, newOtp.toString(), 10 * 60 * 1000);
 
             await sendLogin2FAEmail(email, newOtp);
 
@@ -175,12 +164,7 @@ const loginUser = async (req, res) => {
 
 const sendOTPForTwoFactor = async (user, action, isResend = false) => {
     const newOtp = generateOTP();
-    const expiresIn = Date.now() + 10 * 60 * 1000;
-
-    twoFactorOtpStore[user.email] = {
-        otp: newOtp.toString(),
-        expires: expiresIn
-    };
+    twoFactorOtpStore.set(user.email, newOtp.toString(), 10 * 60 * 1000);
 
     const actionMessages = {
         enable: `OTP code ${isResend ? 'resent' : 'sent'} to ${user.email}. Please verify to enable two-factor authentication`,
@@ -231,9 +215,7 @@ const disable2FA = async (req, res) => {
     const user = await User.findById(req.user.userId);
     if (!user) return res.status(404).json({ message: 'User not found.' });
 
-    if (!user.twoFactorEnabled) {
-        return res.status(400).json({ message: 'Two-factor authentication is already disabled' });
-    }
+    if (!user.twoFactorEnabled) return res.status(400).json({ message: 'Two-factor authentication is already disabled' });
 
     try {
         const result = await sendOTPForTwoFactor(user, 'disable');
@@ -263,7 +245,7 @@ const resend2FAOTP = async (req, res) => {
 
         const currentTime = Date.now();
         const rateLimitDuration = 60 * 1000;
-        const lastRequestTime = twoFARateLimitStore[email];
+        const lastRequestTime = twoFactorRateLimitStore.get(email);
 
         if (lastRequestTime && currentTime - lastRequestTime < rateLimitDuration) {
             const waitTime = Math.ceil((rateLimitDuration - (currentTime - lastRequestTime)) / 1000);
@@ -288,7 +270,7 @@ const resend2FAOTP = async (req, res) => {
         }
 
         const result = await sendOTPForTwoFactor(user, action, true);
-        twoFARateLimitStore[email] = currentTime;
+        twoFactorRateLimitStore.set(email, currentTime);
 
         res.status(200).json({
             success: true,
@@ -303,22 +285,16 @@ const resend2FAOTP = async (req, res) => {
 
 const verifyTwoFactorOTP = async (req, res) => {
     const { email, otp, action } = req.body;
-    if (!email || !otp || !action) {
-        return res.status(400).json({ message: "Email, OTP, and action are required" });
-    }
 
-    const record = twoFactorOtpStore[email];
+    if (!email || !otp || !action) return res.status(400).json({ message: 'Email, OTP, and action are required' });
 
-    if (!record) return res.status(400).json({ message: "No OTP request found. Please try again" });
+    const storedOtp = twoFactorOtpStore.get(email);
 
-    if (record.expires < Date.now()) {
-        delete twoFactorOtpStore[email];
-        return res.status(400).json({ message: "OTP has expired. Please try again" });
-    }
+    if (!storedOtp) return res.status(400).json({ message: "No OTP request found. Please try again" });
 
-    if (record.otp.toString() !== otp.toString()) return res.status(400).json({ message: "Invalid OTP" });
+    if (storedOtp.toString() !== otp.toString()) return res.status(400).json({ message: "Invalid OTP" });
 
-    delete twoFactorOtpStore[email];
+    twoFactorOtpStore.delete(email);
 
     try {
         const user = await User.findOne({ email });
@@ -420,7 +396,7 @@ const forgotPassword = async (req, res) => {
 
         const resetToken = crypto.randomBytes(32).toString('hex');
         user.resetPasswordToken = crypto.createHash('sha256').update(resetToken).digest('hex');
-        user.resetPasswordExpires = Date.now() + 15 * 60 * 1000;;
+        user.resetPasswordExpires = Date.now() + 15 * 60 * 1000;
         await user.save();
 
         await sendResetPasswordEmail(user, resetToken);

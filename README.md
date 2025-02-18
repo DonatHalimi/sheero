@@ -254,11 +254,15 @@ Once the application is running, you can access it in your web browser at `http:
 - Shopping cart functionality
 - Simple payment options with [Stripe](https://stripe.com) or cash
 - Real-time order tracking for updates on your purchases
-- Users can submit reviews and request returns for products in orders with the status marked as ``Delivered``
+- Users can submit reviews and request returns for products in their orders with the status marked as ``delivered``
 - Personalized email notifications for order status updates, return requests status updates and product reviews
-- Export user and address data as JSON, order and return request data as PDF, and all admin dashboard data as Excel or JSON
+- Export user and address data as JSON, order and return request data as PDF and all admin dashboard data as Excel or JSON
 - Users can reset their password with a reset link sent through their email
 - Users can add 2FA to their account for enhanced security
+- Users can subscribe to product restock notifications and receive an email when the product is restocked
+- Users will receive an email when they send a contact email through the contact form
+- TODO: Users with the role as `customerSupport` will receive the contact details of users who send contact emails through the contact form so that they can respond to them as soon as possible
+- TODO: Users with the role as `inventoryManager` will receive the order details so that they can set the order status as `processed` based on the item availability
 
 ### Technologies Used
 
