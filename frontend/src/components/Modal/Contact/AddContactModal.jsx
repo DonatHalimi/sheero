@@ -1,4 +1,5 @@
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
+import { useSelector } from 'react-redux';
 import { toast } from 'react-toastify';
 import { BrownButton, BrownOutlinedTextField, CustomBox, CustomModal, CustomTypography, handleApiError, knownEmailProviders, LoadingLabel } from '../../../assets/CustomComponents';
 import { addContactService } from '../../../services/contactService';
@@ -10,6 +11,7 @@ const AddContactModal = ({ open, onClose, onAddSuccess }) => {
         subject: '',
         message: ''
     });
+    const { user } = useSelector((state) => state.auth);
 
     const [isValidName, setIsValidName] = useState(true);
     const [isValidEmail, setIsValidEmail] = useState(true);
@@ -31,6 +33,16 @@ const AddContactModal = ({ open, onClose, onAddSuccess }) => {
         isValidEmail &&
         isValidSubject &&
         isValidMessage;
+
+    useEffect(() => {
+        if (user) {
+            setFormData((prevFormData) => ({
+                ...prevFormData,
+                name: user.firstName || '',
+                email: user.email || ''
+            }));
+        }
+    }, [user]);
 
     const handleAddContact = async () => {
         setLoading(true);

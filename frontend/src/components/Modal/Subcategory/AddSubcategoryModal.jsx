@@ -2,7 +2,7 @@ import { TextField } from '@mui/material';
 import Autocomplete from '@mui/material/Autocomplete';
 import React, { useEffect, useState } from 'react';
 import { toast } from 'react-toastify';
-import { BrownButton, BrownOutlinedTextField, CustomBox, CustomModal, CustomPaper, CustomTypography, handleApiError, ImageUploadBox, LoadingLabel, OutlinedBrownButton, VisuallyHiddenInput } from '../../../assets/CustomComponents';
+import { BrownButton, BrownOutlinedTextField, CustomBox, CustomModal, CustomPaper, CustomTypography, handleApiError, ImageUploadBox, LoadingLabel } from '../../../assets/CustomComponents';
 import { getCategoriesService } from '../../../services/categoryService';
 import { addSubcategoryService } from '../../../services/subcategoryService';
 

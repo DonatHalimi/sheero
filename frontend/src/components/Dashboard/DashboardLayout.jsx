@@ -7,7 +7,8 @@ import { useDispatch, useSelector } from 'react-redux';
 import { Outlet } from 'react-router-dom';
 import { DashboardCollapse, DashboardNavbar, Drawer, getLocalStorageState, saveLocalStorageState } from '../../assets/CustomComponents';
 import { dashboardBoxSx, dashboardDrawerSx } from '../../assets/sx';
-import { logoutUser, selectIsAdmin } from '../../store/actions/authActions';
+import { logoutUser, selectIsAdmin, selectIsContentManager, selectIsOrderManager, selectIsProductManager } from '../../store/actions/authActions';
+import { DashboardThemeProvider } from '../../utils/ThemeContext';
 import { mainListItems, secondaryListItems } from './listItems';
 
 /**
@@ -22,12 +23,20 @@ import { mainListItems, secondaryListItems } from './listItems';
  *   authenticated or not.
  * - `isAdmin`: a boolean indicating whether the user is an admin
  *   or not.
+ * - `isOrderManager`: a boolean indicating whether the user is an
+ *   order manager or not.
+ * - `isContentManager`: a boolean indicating whether the user is a
+ *   content manager or not.
  *
  * The component returns a JSX element that renders the layout.
  */
 const DashboardLayout = () => {
     const { isAuthenticated } = useSelector((state) => state.auth);
     const isAdmin = useSelector(selectIsAdmin);
+    const isOrderManager = useSelector(selectIsOrderManager);
+    const isContentManager = useSelector(selectIsContentManager);
+    const isProductManager = useSelector(selectIsProductManager);
+
     const dispatch = useDispatch();
 
     const [open, setOpen] = useState(() => getLocalStorageState('openSidebar', true));
@@ -61,39 +70,44 @@ const DashboardLayout = () => {
     }, [open]);
 
     return (
-        <Box className="flex h-screen overflow-hidden bg-[#F5F5F5]">
-            <DashboardNavbar
-                open={open}
-                toggleDrawer={toggleDrawer}
-                auth={isAuthenticated}
-                isDropdownOpen={isDropdownOpen}
-                handleProfileDropdownToggle={handleProfileDropdownToggle}
-                handleLogout={handleLogout}
-                isAdmin={isAdmin}
-            />
-            <Drawer
-                variant="permanent"
-                open={open}
-                sx={dashboardDrawerSx(open)}
-            >
-                <DashboardCollapse toggleDrawer={toggleDrawer} />
-                <Divider />
-                <div className="custom-scrollbar">
-                    <List component="nav">
-                        {mainListItems({ setCurrentView: () => { }, collapsed: !open })}
-                        {secondaryListItems}
-                    </List>
-                </div>
-            </Drawer>
-            <Box
-                component="main"
-                role="main"
-                sx={dashboardBoxSx}
-            >
-                <Toolbar />
-                <Outlet />
+        <DashboardThemeProvider>
+            <Box sx={{ backgroundColor: (theme) => theme.palette.background.default }} className="dashboard-container flex h-screen overflow-hidden">
+                <DashboardNavbar
+                    open={open}
+                    toggleDrawer={toggleDrawer}
+                    auth={isAuthenticated}
+                    isDropdownOpen={isDropdownOpen}
+                    handleProfileDropdownToggle={handleProfileDropdownToggle}
+                    handleLogout={handleLogout}
+                    isAdmin={isAdmin}
+                    isOrderManager={isOrderManager}
+                    isContentManager={isContentManager}
+                    isProductManager={isProductManager}
+                />
+                <Drawer
+                    variant="permanent"
+                    open={open}
+                    sx={dashboardDrawerSx(open)}
+                >
+                    <DashboardCollapse toggleDrawer={toggleDrawer} />
+                    <Divider />
+                    <div className="custom-scrollbar">
+                        <List component="nav">
+                            {mainListItems({ setCurrentView: () => { }, collapsed: !open })}
+                            {secondaryListItems}
+                        </List>
+                    </div>
+                </Drawer>
+                <Box
+                    component="main"
+                    role="main"
+                    sx={dashboardBoxSx}
+                >
+                    <Toolbar />
+                    <Outlet />
+                </Box>
             </Box>
-        </Box>
+        </DashboardThemeProvider>
     );
 };
 

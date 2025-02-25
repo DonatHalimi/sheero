@@ -1,6 +1,6 @@
 import { Box, Drawer, Typography } from '@mui/material';
 import React from 'react';
-import { CloseButton, EditExportButtons, ReadOnlyTextField } from '../../../assets/CustomComponents';
+import { BoxBetween, CloseButton, DateAdornment, EditExportButtons, formatDate, IdAdornment, ReadOnlyTextField } from '../../../assets/CustomComponents';
 import { downloadSubcategoryData } from '../../../assets/DataExport';
 import { drawerPaperSx } from '../../../assets/sx';
 import { getImageUrl } from '../../../utils/config';
@@ -30,11 +30,18 @@ const SubcategoryDetailsDrawer = ({ open, onClose, subcategory, onEdit }) => {
                         <ReadOnlyTextField
                             label="Subcategory ID"
                             value={subcategory._id}
+                            InputProps={IdAdornment()}
                         />
 
                         <ReadOnlyTextField
                             label="Name"
                             value={subcategory.name}
+                        />
+
+                        <ReadOnlyTextField
+                            label="Category ID"
+                            value={subcategory.category._id}
+                            InputProps={IdAdornment()}
                         />
 
                         <ReadOnlyTextField
@@ -49,6 +56,19 @@ const SubcategoryDetailsDrawer = ({ open, onClose, subcategory, onEdit }) => {
                                 className='w-1/3'
                             />
                         </Box>
+
+                        <BoxBetween>
+                            <ReadOnlyTextField
+                                label="Created At"
+                                value={formatDate(subcategory.createdAt)}
+                                InputProps={DateAdornment()}
+                            />
+                            <ReadOnlyTextField
+                                label="Updated At"
+                                value={formatDate(subcategory.updatedAt)}
+                                InputProps={DateAdornment()}
+                            />
+                        </BoxBetween>
 
                         <EditExportButtons
                             onEditClick={handleEditClick}

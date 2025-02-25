@@ -1,11 +1,13 @@
-import { Box, Chip, Drawer, Typography } from '@mui/material';
+import { Box, Chip, Drawer, Typography, useTheme } from '@mui/material';
 import React from 'react';
-import { BoxBetween, CloseButton, EditExportButtons, formatDate, ReadOnlyTextField } from '../../../assets/CustomComponents';
+import { BoxBetween, CloseButton, DateAdornment, DeliveryStatusAdornment, DrawerTypography, EditExportButtons, EuroAdornment, formatDate, IdAdornment, PaymentMethodAdornment, PaymentStatusAdornment, PersonAdornment, ReadOnlyTextField } from '../../../assets/CustomComponents';
 import { downloadOrderData } from '../../../assets/DataExport';
-import { drawerPaperSx, productChipSx } from '../../../assets/sx';
+import { chipSx, drawerPaperSx } from '../../../assets/sx';
 import { getImageUrl } from '../../../utils/config';
 
 const OrderDetailsDrawer = ({ open, onClose, order, onEdit }) => {
+    const theme = useTheme();
+
     const handleEditClick = () => {
         onClose();
         onEdit(order);
@@ -27,30 +29,32 @@ const OrderDetailsDrawer = ({ open, onClose, order, onEdit }) => {
             <Box className="flex flex-col w-full mt-4 gap-4">
                 {order ? (
                     <>
-                        <Typography className='!text-lg' dangerouslySetInnerHTML={{ __html: header }} />
+                        <Typography dangerouslySetInnerHTML={{ __html: header }} className='!text-lg' />
 
                         <ReadOnlyTextField
                             label="Order ID"
                             value={order._id}
+                            InputProps={IdAdornment()}
                         />
 
                         <ReadOnlyTextField
                             label="User"
                             value={user}
+                            InputProps={PersonAdornment()}
                         />
 
                         <Box>
-                            <Typography variant="body1" className="!font-semibold !mb-2">
+                            <DrawerTypography theme={theme}>
                                 {productLabel} + (Quantity)
-                            </Typography>
+                            </DrawerTypography>
                             {order?.products && order?.products.length > 0 ? (
                                 order?.products.map((item, index) => (
-                                    <Box key={index} sx={productChipSx}>
+                                    <Box key={index} sx={chipSx}>
                                         <Chip
                                             label={
                                                 <Box display="flex" alignItems="center" gap={1}>
                                                     <Box
-                                                        onClick={() => window.open(`/product/${item.product?._id}`, '_blank')}
+                                                        onClick={() => window.open(`/product/${item.product._id}`, '_blank')}
                                                         display="flex"
                                                         alignItems="center"
                                                         gap={1}
@@ -58,11 +62,11 @@ const OrderDetailsDrawer = ({ open, onClose, order, onEdit }) => {
                                                     >
                                                         <img
                                                             src={getImageUrl(item.product?.image)}
-                                                            alt={item.product?.name}
+                                                            alt={item.product.name}
                                                             className="w-10 h-10 object-contain"
                                                         />
-                                                        <Typography variant="body2" className="!font-semibold hover:underline">
-                                                            {`${item.product?.name} (${item.quantity})`}
+                                                        <Typography variant="body2" className="!font-semibold hover:underline" style={{ color: theme.palette.text.primary }}>
+                                                            {`${item.product.name} (${item.quantity})`}
                                                         </Typography>
                                                     </Box>
                                                 </Box>
@@ -73,7 +77,7 @@ const OrderDetailsDrawer = ({ open, onClose, order, onEdit }) => {
                                     </Box>
                                 ))
                             ) : (
-                                <Typography variant="body2" component="li">
+                                <Typography variant="body2" component="li" style={{ color: theme.palette.text.primary }}>
                                     No products found
                                 </Typography>
                             )}
@@ -81,34 +85,41 @@ const OrderDetailsDrawer = ({ open, onClose, order, onEdit }) => {
 
                         <ReadOnlyTextField
                             label="Total Amount"
-                            value={order.totalAmount}
+                            value={order.totalAmount.toFixed(2)}
+                            InputProps={EuroAdornment()}
                         />
 
                         <BoxBetween>
                             <ReadOnlyTextField
                                 label="Payment Method"
                                 value={order.paymentMethod}
+                                InputProps={PaymentMethodAdornment(order.paymentMethod)}
                             />
 
                             <ReadOnlyTextField
                                 label="Payment Status"
                                 value={order.paymentStatus}
+                                InputProps={PaymentStatusAdornment(order.paymentStatus)}
                             />
                         </BoxBetween>
 
                         <ReadOnlyTextField
                             label="Delivery Status"
                             value={order.status}
+                            InputProps={DeliveryStatusAdornment(order.status)}
                         />
+
                         <BoxBetween>
                             <ReadOnlyTextField
                                 label="Arrival Date Start"
                                 value={formatDate(order.arrivalDateRange?.start)}
+                                InputProps={DateAdornment()}
                             />
 
                             <ReadOnlyTextField
                                 label="Arrival Date End"
                                 value={formatDate(order.arrivalDateRange?.end)}
+                                InputProps={DateAdornment()}
                             />
                         </BoxBetween>
 

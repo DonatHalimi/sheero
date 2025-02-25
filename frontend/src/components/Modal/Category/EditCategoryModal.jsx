@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from 'react';
 import { toast } from 'react-toastify';
-import { ActionButtons, BrownOutlinedTextField, CustomBox, CustomModal, CustomTypography, handleApiError, ImageUploadBox, OutlinedBrownButton, VisuallyHiddenInput } from '../../../assets/CustomComponents';
+import { ActionButtons, BrownOutlinedTextField, CustomBox, CustomModal, CustomTypography, handleApiError, ImageUploadBox } from '../../../assets/CustomComponents';
 import { editCategoryService } from '../../../services/categoryService';
 import { getImageUrl } from '../../../utils/config';
 

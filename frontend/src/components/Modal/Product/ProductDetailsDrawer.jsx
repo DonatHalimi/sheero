@@ -1,6 +1,6 @@
 import { Box, Drawer, Typography } from '@mui/material';
 import React from 'react';
-import { BoxBetween, CloseButton, EditExportButtons, ReadOnlyTextField } from '../../../assets/CustomComponents';
+import { BoxBetween, CloseButton, EditExportButtons, EuroAdornment, IdAdornment, InventoryAdornment, ReadOnlyTextField, ShippingAdornment } from '../../../assets/CustomComponents';
 import { downloadProductData } from '../../../assets/DataExport';
 import { drawerPaperSx } from '../../../assets/sx';
 import { getImageUrl } from '../../../utils/config';
@@ -57,11 +57,12 @@ const ProductDetailsDrawer = ({ open, onClose, product, onEdit }) => {
                         <ReadOnlyTextField
                             label="Product ID"
                             value={product._id}
+                            InputProps={IdAdornment()}
                         />
 
                         <ReadOnlyTextField
                             label="Name"
-                            value={product.name || 'N/A'}
+                            value={product?.name}
                             multiline
                             rows={3}
                             onClick={() => window.open(`/product/${product._id}`, '_blank')}
@@ -79,7 +80,7 @@ const ProductDetailsDrawer = ({ open, onClose, product, onEdit }) => {
 
                         <ReadOnlyTextField
                             label="Description"
-                            value={product.description || 'N/A'}
+                            value={product?.description}
                             multiline
                             rows={3}
                         />
@@ -87,12 +88,14 @@ const ProductDetailsDrawer = ({ open, onClose, product, onEdit }) => {
                         <BoxBetween>
                             <ReadOnlyTextField
                                 label="Price"
-                                value={product.price || 'N/A'}
+                                value={product?.price}
+                                InputProps={EuroAdornment()}
                             />
 
                             <ReadOnlyTextField
                                 label="Sale Price"
-                                value={product.salePrice || 'N/A'}
+                                value={product?.salePrice}
+                                InputProps={EuroAdornment()}
                             />
 
                             <ReadOnlyTextField
@@ -104,6 +107,7 @@ const ProductDetailsDrawer = ({ open, onClose, product, onEdit }) => {
                         <ReadOnlyTextField
                             label="Shipping"
                             value={formatShipping(product.shipping)}
+                            InputProps={ShippingAdornment()}
                         />
 
                         <BoxBetween>
@@ -116,22 +120,25 @@ const ProductDetailsDrawer = ({ open, onClose, product, onEdit }) => {
                                 label="Subcategory"
                                 value={product.subcategory?.name || 'N/A'}
                             />
+                        </BoxBetween>
 
+                        <BoxBetween>
                             <ReadOnlyTextField
                                 label="SubSubcategory"
                                 value={product.subSubcategory?.name || 'N/A'}
                             />
-                        </BoxBetween>
 
-                        <ReadOnlyTextField
-                            label="Supplier"
-                            value={product.supplier?.name || 'N/A'}
-                        />
+                            <ReadOnlyTextField
+                                label="Supplier"
+                                value={product.supplier?.name || 'N/A'}
+                            />
+                        </BoxBetween>
 
                         <BoxBetween>
                             <ReadOnlyTextField
                                 label="Inventory Count"
                                 value={product.inventoryCount || 'N/A'}
+                                InputProps={InventoryAdornment()}
                             />
 
                             <ReadOnlyTextField

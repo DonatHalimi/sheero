@@ -2,7 +2,7 @@ import { Autocomplete, Box, InputLabel, MenuItem, Modal, Select, TextField, Typo
 import React, { useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { toast } from 'react-toastify';
-import { BrownButton, BrownOutlinedTextField, CustomPaper, ImageUploadBox, OutlinedBrownButton, OutlinedBrownFormControl, VisuallyHiddenInput } from '../../../assets/CustomComponents';
+import { BrownButton, BrownOutlinedTextField, CustomBox, CustomPaper, CustomTypography, ImageUploadBox, OutlinedBrownButton, OutlinedBrownFormControl } from '../../../assets/CustomComponents';
 import axiosInstance from '../../../utils/axiosInstance';
 
 const AddProductModal = ({ open, onClose, onAddSuccess }) => {
@@ -453,13 +453,13 @@ const AddProductModal = ({ open, onClose, onAddSuccess }) => {
     return (
         <Modal open={open} onClose={onClose}>
             <div className="flex items-center justify-center h-screen">
-                <Box className="edit-modal bg-white p-4 rounded-lg shadow-lg max-w-md w-full max-h-[80vh] overflow-y-auto">
+                <CustomBox className="edit-modal bg-white p-4 rounded-lg shadow-lg max-w-md w-full max-h-[80vh] overflow-y-auto">
                     <div className='flex justify-between mb-3'>
-                        <Typography variant='h5' className="!text-xl !font-bold !mb-4">Add Product</Typography>
+                        <CustomTypography variant='h5' className="!text-xl !font-bold !mb-4">Add Product</CustomTypography>
                         <OutlinedBrownButton onClick={resetForm}>Reset Form</OutlinedBrownButton>
                     </div>
                     {renderStep()}
-                </Box>
+                </CustomBox>
             </div>
         </Modal>
     );

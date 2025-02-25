@@ -6,13 +6,16 @@ import { useLocation, useNavigate } from 'react-router-dom';
 import { toast } from 'react-toastify';
 import { CartDropdown, CartIcon, LoadingOverlay, LoginButton, NavbarLogo, ProfileDropdown, ProfileIcon, WishlistIcon } from '../../assets/CustomComponents';
 import { clearCartService, getCartService, removeFromCartService, updateQuantityService } from '../../services/cartService';
-import { logoutUser, selectIsAdmin } from '../../store/actions/authActions';
+import { logoutUser, selectIsAdmin, selectIsContentManager, selectIsOrderManager, selectIsProductManager } from '../../store/actions/authActions';
 import CategoryNavbar from './CategoryNavbar';
 import SearchBar from './SearchBar';
 
 const Navbar = () => {
     const { isAuthenticated } = useSelector((state) => state.auth);
     const isAdmin = useSelector(selectIsAdmin);
+    const isOrderManager = useSelector(selectIsOrderManager);
+    const isContentManager = useSelector(selectIsContentManager);
+    const isProductManager = useSelector(selectIsProductManager);
 
     const dispatch = useDispatch();
     const location = useLocation();
@@ -184,6 +187,9 @@ const Navbar = () => {
                                                         <ProfileDropdown
                                                             isOpen={isProfileDropdownOpen}
                                                             isAdmin={isAdmin}
+                                                            isOrderManager={isOrderManager}
+                                                            isContentManager={isContentManager}
+                                                            isProductManager={isProductManager}
                                                             handleLogout={handleLogout}
                                                         />
                                                     )}

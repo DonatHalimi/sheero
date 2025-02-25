@@ -7,12 +7,12 @@ const validate = require('../middleware/validation');
 
 const router = express.Router();
 
-router.post('/create', requireAuthAndRole('admin'), upload.single('image'), validate(createSchema), createSubcategory);
+router.post('/create', requireAuthAndRole(['admin', 'productManager']), upload.single('image'), validate(createSchema), createSubcategory);
 router.get('/get', getSubcategories);
 router.get('/get/:id', validate(getByIdSchema), getSubcategoryById);
 router.get('/get-by-category/:categoryId', getSubcategoriesByCategory);
-router.put('/update/:id', requireAuthAndRole('admin'), upload.single('image'), validate(updateSchema), updateSubcategory);
-router.delete('/delete/:id', requireAuthAndRole('admin'), validate(deleteSchema), deleteSubcategory);
-router.delete('/delete-bulk', requireAuthAndRole('admin'), validate(deleteBulkSchema), deleteSubcategories)
+router.put('/update/:id', requireAuthAndRole(['admin', 'productManager']), upload.single('image'), validate(updateSchema), updateSubcategory);
+router.delete('/delete/:id', requireAuthAndRole(['admin', 'productManager']), validate(deleteSchema), deleteSubcategory);
+router.delete('/delete-bulk', requireAuthAndRole(['admin', 'productManager']), validate(deleteBulkSchema), deleteSubcategories)
 
 module.exports = router;

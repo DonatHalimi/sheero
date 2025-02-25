@@ -39,7 +39,7 @@ const updateRole = async (req, res) => {
 
 const deleteRole = async (req, res) => {
     try {
-        const role = await Role.findByIdAndDelete(req.params.id);
+        await Role.findByIdAndDelete(req.params.id);
         res.status(200).json({ message: 'Role deleted successfully' });
     } catch (error) {
         res.status(500).send(error);

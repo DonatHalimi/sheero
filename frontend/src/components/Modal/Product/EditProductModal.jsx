@@ -2,7 +2,7 @@ import { ArrowBack } from '@mui/icons-material';
 import { Autocomplete, Box, MenuItem, Modal, TextField, Typography } from '@mui/material';
 import React, { useEffect, useState } from 'react';
 import { toast } from 'react-toastify';
-import { BrownButton, BrownOutlinedTextField, CustomPaper, ImageUploadBox, OutlinedBrownButton, OutlinedBrownFormControl, VisuallyHiddenInput } from '../../../assets/CustomComponents';
+import { BrownButton, BrownOutlinedTextField, CustomPaper, ImageUploadBox, OutlinedBrownButton, OutlinedBrownFormControl } from '../../../assets/CustomComponents';
 import axiosInstance from '../../../utils/axiosInstance';
 import { getImageUrl } from '../../../utils/config';
 

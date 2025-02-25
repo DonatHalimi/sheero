@@ -1,11 +1,9 @@
-import { Tooltip } from '@mui/material';
 import React, { useEffect, useState } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 import { DashboardHeader, exportOptions, formatDate, LoadingDataGrid } from '../../assets/CustomComponents';
 import { exportToExcel, exportToJSON } from '../../assets/DataExport';
 import DashboardTable from '../../components/Dashboard/DashboardTable';
 import DeleteModal from '../../components/Modal/DeleteModal';
-import ImagePreviewModal from '../../components/Modal/ImagePreviewModal';
 import SubscriptionDetailsDrawer from '../../components/Modal/Product/SubscriptionDetailsDrawer';
 import { getProductRestockSubscriptions } from '../../store/actions/dashboardActions';
 import { getImageUrl } from '../../utils/config';
@@ -17,7 +15,6 @@ const ProductRestockSubscriptionsPage = () => {
     const [selectedSubscription, setSelectedSubscription] = useState(null);
     const [selectedSubscriptions, setSelectedSubscriptions] = useState([]);
     const [deleteSubscriptionOpen, setDeleteSubscriptionOpen] = useState(false);
-    const [imagePreviewOpen, setImagePreviewOpen] = useState(false);
     const [currentPage, setCurrentPage] = useState(0);
     const [viewDetailsOpen, setViewDetailsOpen] = useState(false);
 
@@ -41,11 +38,6 @@ const ProductRestockSubscriptionsPage = () => {
     const handlePageClick = (event) => {
         setCurrentPage(event.selected);
     }
-
-    const handleImageClick = (imageUrl) => {
-        setSelectedSubscription(imageUrl);
-        setImagePreviewOpen(true);
-    };
 
     const getSelectedSubscriptions = () => {
         return selectedSubscriptions
@@ -87,16 +79,13 @@ const ProductRestockSubscriptionsPage = () => {
             key: 'productImage',
             label: 'Product Image',
             render: (item) =>
-                <Tooltip title='Click to preview' placement='left' arrow>
-                    <img
-                        src={getImageUrl(item.productId.image)}
-                        alt={item.productId.image}
-                        width={70}
-                        style={{ position: 'relative', top: '3px' }}
-                        onClick={() => handleImageClick(getImageUrl(item.image))}
-                        className='rounded-md cursor-pointer'
-                    />
-                </Tooltip>
+                <img
+                    src={getImageUrl(item.productId.image)}
+                    alt={item.productId.name}
+                    width={70}
+                    style={{ position: 'relative', top: '3px' }}
+                    className='rounded-md'
+                />
         },
         { key: 'productName', label: 'Product Name', render: (row) => row.productId?.name },
         { key: 'productInventory', label: 'Product Inventory', render: (row) => row.productId?.inventoryCount || 0 },
@@ -146,8 +135,6 @@ const ProductRestockSubscriptionsPage = () => {
                 />
 
                 <SubscriptionDetailsDrawer open={viewDetailsOpen} onClose={closeDrawer} subscription={selectedSubscription} />
-
-                <ImagePreviewModal open={imagePreviewOpen} onClose={() => setImagePreviewOpen(false)} imageUrl={selectedSubscription} />
             </div>
         </div>
     );

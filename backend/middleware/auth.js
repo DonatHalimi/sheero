@@ -58,14 +58,16 @@ const requireAuth = (req, res, next) => {
     authenticateToken(req, res, next);
 };
 
-const requireAuthAndRole = (requiredRole) => {
+const requireAuthAndRole = (requiredRoles) => {
     return async (req, res, next) => {
         await authenticateToken(req, res, async (err) => {
             if (err) return next(err);
             const requestingUser = await User.findById(req.user.userId).populate('role');
             if (!requestingUser) return res.status(404).json({ message: 'User not found' });
 
-            if (requestingUser.role.name !== requiredRole) {
+            const allowedRoles = Array.isArray(requiredRoles) ? requiredRoles : [requiredRoles];
+
+            if (!allowedRoles.includes(requestingUser.role.name)) {
                 return res.status(403).json({ message: 'Forbidden' });
             }
             next();

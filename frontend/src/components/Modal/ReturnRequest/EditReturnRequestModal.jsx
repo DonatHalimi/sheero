@@ -1,7 +1,7 @@
 import { MenuItem } from '@mui/material';
 import React, { useEffect, useState } from 'react';
 import { toast } from 'react-toastify';
-import { ActionButtons, BrownOutlinedTextField, CustomBox, CustomModal, CustomTypography, handleApiError, ReadOnlyTextField } from '../../../assets/CustomComponents';
+import { ActionButtons, BrownOutlinedTextField, CustomBox, CustomModal, CustomTypography, DescriptionAdornment, handleApiError, IdAdornment, PersonAdornment, ReadOnlyTextField, ReturnStatusAdornment } from '../../../assets/CustomComponents';
 import { editReturnRequestStatusService } from '../../../services/returnService';
 
 const EditReturnRequestModal = ({ open, onClose, returnRequest, onViewDetails, onEditSuccess }) => {
@@ -67,12 +67,14 @@ const EditReturnRequestModal = ({ open, onClose, returnRequest, onViewDetails, o
                 <ReadOnlyTextField
                     label="Order ID"
                     value={returnRequest?.order}
+                    InputProps={IdAdornment()}
                     className="!mb-4"
                 />
 
                 <ReadOnlyTextField
                     label="User"
                     value={user}
+                    InputProps={PersonAdornment()}
                     className="!mb-4"
                 />
 
@@ -89,6 +91,7 @@ const EditReturnRequestModal = ({ open, onClose, returnRequest, onViewDetails, o
                 <ReadOnlyTextField
                     label="Reason"
                     value={returnRequest?.reason}
+                    InputProps={DescriptionAdornment()}
                     className="!mb-4"
                 />
 
@@ -96,6 +99,7 @@ const EditReturnRequestModal = ({ open, onClose, returnRequest, onViewDetails, o
                     <ReadOnlyTextField
                         label="Custom Reason"
                         value={returnRequest?.customReason}
+                        InputProps={DescriptionAdornment()}
                         className="!mb-4"
                     />
                 )}
@@ -106,6 +110,7 @@ const EditReturnRequestModal = ({ open, onClose, returnRequest, onViewDetails, o
                     label="Return Request Status"
                     value={status}
                     onChange={(e) => setStatus(e.target.value)}
+                    InputProps={ReturnStatusAdornment(status)}
                     className="!mb-4"
                 >
                     <MenuItem value="pending">Pending</MenuItem>

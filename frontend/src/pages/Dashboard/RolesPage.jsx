@@ -92,6 +92,7 @@ const RolesPage = () => {
 
     const columns = [
         { key: 'name', label: 'Name' },
+        { key: 'description', label: 'Description' },
         { key: 'actions', label: 'Actions' }
     ];
 

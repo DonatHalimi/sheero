@@ -6,11 +6,11 @@ const validate = require('../middleware/validation');
 
 const router = express.Router();
 
-router.post('/create', requireAuthAndRole('admin'), validate(createSchema), createFAQ);
+router.post('/create', requireAuthAndRole(['admin', 'contentManager']), validate(createSchema), createFAQ);
 router.get('/get', getFAQs);
 router.get('/get/:id', validate(getByIdSchema), getFAQ);
-router.put('/update/:id', requireAuthAndRole('admin'), validate(updateSchema), updateFAQ);
-router.delete('/delete/:id', requireAuthAndRole('admin'), validate(deleteSchema), deleteFAQ);
-router.delete('/delete-bulk', requireAuthAndRole('admin'), validate(deleteBulkSchema), deleteFAQs);
+router.put('/update/:id', requireAuthAndRole(['admin', 'contentManager']), validate(updateSchema), updateFAQ);
+router.delete('/delete/:id', requireAuthAndRole(['admin', 'contentManager']), validate(deleteSchema), deleteFAQ);
+router.delete('/delete-bulk', requireAuthAndRole(['admin', 'contentManager']), validate(deleteBulkSchema), deleteFAQs);
 
 module.exports = router;

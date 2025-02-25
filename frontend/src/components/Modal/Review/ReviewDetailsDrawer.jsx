@@ -1,10 +1,13 @@
-import { Box, Chip, Drawer, Typography } from '@mui/material';
+import { Box, Chip, Drawer, Typography, useTheme } from '@mui/material';
 import React from 'react';
-import { CloseButton, EditExportButtons, RatingStars, ReadOnlyTextField } from '../../../assets/CustomComponents';
+import { CloseButton, DrawerTypography, EditExportButtons, IdAdornment, PersonAdornment, RatingStars, ReadOnlyTextField } from '../../../assets/CustomComponents';
 import { downloadReviewData } from '../../../assets/DataExport';
-import { drawerPaperSx, productChipSx } from '../../../assets/sx';
+import { chipSx, drawerPaperSx } from '../../../assets/sx';
+import { getImageUrl } from '../../../utils/config';
 
 const ReviewDetailsDrawer = ({ open, onClose, review, onEdit }) => {
+    const theme = useTheme();
+
     const header = `Review from <strong>${review?.user.firstName} ${review?.user.lastName} - ${review?.user.email}</strong> for <strong>${review?.product.name}</strong>`;
     const user = `${review?.user.firstName} ${review?.user.lastName} - ${review?.user.email}`;
 
@@ -25,31 +28,61 @@ const ReviewDetailsDrawer = ({ open, onClose, review, onEdit }) => {
             <Box className="flex flex-col w-full mt-4 gap-4">
                 {review ? (
                     <>
-                        <Typography className='!text-lg' dangerouslySetInnerHTML={{ __html: header }} />
+                        <Typography dangerouslySetInnerHTML={{ __html: header }} className='!text-lg' />
 
                         <ReadOnlyTextField
                             label="Review ID"
                             value={review._id}
+                            InputProps={IdAdornment()}
                         />
                         <ReadOnlyTextField
                             label="User"
                             value={user}
+                            InputProps={PersonAdornment()}
                         />
 
                         <ReadOnlyTextField
                             label="Product ID"
                             value={review.product._id}
+                            InputProps={IdAdornment()}
                         />
 
-                        <ReadOnlyTextField
-                            label="Product"
-                            value={review.product.name}
-                            multiline
-                            rows={4}
-                        />
+                        <Box>
+                            <DrawerTypography theme={theme}>
+                                Product
+                            </DrawerTypography>
+                            <Box sx={chipSx}>
+                                <Chip
+                                    label={
+                                        <Box display="flex" alignItems="center" gap={1}>
+                                            <Box
+                                                onClick={() => window.open(`/product/${review.product?._id}`, '_blank')}
+                                                display="flex"
+                                                alignItems="center"
+                                                gap={1}
+                                                sx={{ cursor: 'pointer' }}
+                                            >
+                                                <img
+                                                    src={getImageUrl(review.product?.image)}
+                                                    alt={review.product?.name}
+                                                    className="w-10 h-10 object-contain"
+                                                />
+                                                <Typography variant="body2" className="!font-semibold hover:underline">
+                                                    {`${review.product?.name}`}
+                                                </Typography>
+                                            </Box>
+                                        </Box>
+                                    }
+                                    variant="outlined"
+                                    className="w-full !justify-start"
+                                />
+                            </Box>
+                        </Box>
 
-                        <Box sx={productChipSx} className="flex flex-col gap-1">
-                            <Typography variant="body2" className="!text-gray-700">Rating</Typography>
+                        <Box sx={chipSx} className="flex flex-col gap-1">
+                            <DrawerTypography theme={theme}>
+                                Rating
+                            </DrawerTypography>
                             <Chip
                                 label={
                                     <Box display="flex" alignItems="center" gap={1}>

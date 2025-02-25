@@ -7,11 +7,11 @@ const validate = require('../middleware/validation');
 
 const router = express.Router();
 
-router.post('/create', requireAuthAndRole('admin'), upload.single('image'), validate(createSchema), createImage);
+router.post('/create', requireAuthAndRole(['admin', 'contentManager']), upload.single('image'), validate(createSchema), createImage);
 router.get('/get', getImages);
 router.get('/get/:id', validate(getByIdSchema), getImageById);
-router.put('/update/:id', requireAuthAndRole('admin'), upload.single('image'), validate(updateSchema), updateImage);
-router.delete('/delete/:id', requireAuthAndRole('admin'), validate(deleteSchema), deleteImage);
-router.delete('/delete-bulk', requireAuthAndRole('admin'), validate(deleteBulkSchema), deleteImages);
+router.put('/update/:id', requireAuthAndRole(['admin', 'contentManager']), upload.single('image'), validate(updateSchema), updateImage);
+router.delete('/delete/:id', requireAuthAndRole(['admin', 'contentManager']), validate(deleteSchema), deleteImage);
+router.delete('/delete-bulk', requireAuthAndRole(['admin', 'contentManager']), validate(deleteBulkSchema), deleteImages);
 
 module.exports = router;

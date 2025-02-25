@@ -8,7 +8,7 @@ import Navbar from '../../Navbar/Navbar';
 import Footer from '../../Utils/Footer';
 import ProductItem from '../Items/ProductItem';
 
-const itemsPerPage = 10;
+const itemsPerPage = 12;
 
 const SharedWishlist = () => {
     const [wishlistItems, setWishlistItems] = useState([]);

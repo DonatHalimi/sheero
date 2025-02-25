@@ -1,8 +1,9 @@
-import { Modal } from '@mui/material';
+import { Modal, useTheme } from '@mui/material';
 import React, { useEffect, useRef, useState } from 'react';
 import { ImagePreviewControls, MAX_ZOOM_LEVEL, StyledImage, ZOOM_FACTOR } from '../../assets/CustomComponents';
 
 const ImagePreviewModal = ({ open, onClose, imageUrl }) => {
+    const theme = useTheme();
     const [scale, setScale] = useState(1);
     const [isFullscreen, setIsFullscreen] = useState(false);
     const containerRef = useRef(null);
@@ -32,7 +33,12 @@ const ImagePreviewModal = ({ open, onClose, imageUrl }) => {
 
     return (
         <Modal open={open} onClose={resetAndClose}>
-            <div ref={containerRef} onClick={resetAndClose} className={`fixed inset-0 flex items-center justify-center bg-white ${isFullscreen ? 'w-screen h-screen' : ''}`}>
+            <div
+                ref={containerRef}
+                onClick={resetAndClose}
+                style={{ backgroundColor: theme.palette.background.paper }}
+                className={`fixed inset-0 flex items-center justify-center ${isFullscreen ? 'w-screen h-screen' : ''}`}
+            >
                 <ImagePreviewControls
                     scale={scale}
                     setScale={setScale}

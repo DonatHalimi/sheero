@@ -243,26 +243,40 @@ Once the application is running, you can access it in your web browser at `http:
 
 ## Features
 
-- User [authentication](https://auth0.com/intro-to-iam/what-is-authentication) and [authorization](https://auth0.com/intro-to-iam/what-is-authorization) using [JSON Web Tokens](https://jwt.io/introduction) through [cookies](https://www.cloudflare.com/learning/privacy/what-are-cookies/)
-- [Google](https://developers.google.com) and [Facebook](https://developers.facebook.com) login options for seamless authentication
-- [OTP](https://en.wikipedia.org/wiki/One-time_password) account verification through email for enhanced security, via local SMTP configuration
-- [Role-based access control](https://auth0.com/docs/manage-users/access-control/rbac) for different user roles
-- [Redux state management](https://redux.js.org/introduction/getting-started) for handling application state
-- Address management for shipping
-- Product management with categories
-- Wishlist for saving your favorite products
-- Shopping cart functionality
-- Simple payment options with [Stripe](https://stripe.com) or cash
-- Real-time order tracking for updates on your purchases
-- Users can submit reviews and request returns for products in their orders with the status marked as ``delivered``
-- Personalized email notifications for order status updates, return requests status updates and product reviews
-- Export user and address data as JSON, order and return request data as PDF and all admin dashboard data as Excel or JSON
-- Users can reset their password with a reset link sent through their email
-- Users can add 2FA to their account for enhanced security
-- Users can subscribe to product restock notifications and receive an email when the product is restocked
-- Users will receive an email when they send a contact email through the contact form
-- TODO: Users with the role as `customerSupport` will receive the contact details of users who send contact emails through the contact form so that they can respond to them as soon as possible
-- TODO: Users with the role as `inventoryManager` will receive the order details so that they can set the order status as `processed` based on the item availability
+- **User Authentication and Authorization**:
+  - [Authentication](https://auth0.com/intro-to-iam/what-is-authentication) and [authorization](https://auth0.com/intro-to-iam/what-is-authorization) using [JSON Web Tokens](https://jwt.io/introduction) through [cookies](https://www.cloudflare.com/learning/privacy/what-are-cookies/).
+  - [Google](https://developers.google.com) and [Facebook](https://developers.facebook.com) login options for seamless authentication.
+  - [OTP](https://en.wikipedia.org/wiki/One-time_password) account verification through email for enhanced security, via local SMTP configuration.
+  - Users can reset their password with a reset link sent through their email.
+  - Users can add 2FA to their account for enhanced security.
+
+- **Role-Based Access Control**:
+  - **admin**:
+    - Full access to the admin dashboard.
+  - **user**:
+    - Can browse products, add items to their cart, make purchases, and view their order history.
+  - **customerSupport**:
+    - Receives the contact details of users who send contact emails through the contact form so that they can reply to them as soon as possible.
+  - **orderManager**:
+    - Receives the order details in their email so that they can set the order status as `processed` in the admin dashboard based on the item availability.
+  - **contentManager**:
+    - Can create, read, update, and delete slideshow images and FAQs in the admin dashboard.
+  - **productManager**:
+    - Can create, read, update, and delete products, categories, subcategories, sub-subcategories, reviews, product restock subscriptions, and suppliers in the admin dashboard.
+
+- **Core Functionality**:
+  - [Redux state management](https://redux.js.org/introduction/getting-started) for handling application state.
+  - Address management for shipping.
+  - Product management with categories.
+  - Wishlist for saving your favorite products.
+  - Shopping cart functionality.
+  - Simple payment options with [Stripe](https://stripe.com) or cash.
+  - Real-time order tracking for updates on your purchases.
+  - Users can submit reviews and request returns for products in their orders with the status marked as `delivered`.
+  - Personalized email notifications for order status updates, return request status updates, and product reviews.
+  - Export user and address data as JSON, order and return request data as PDF, and all admin dashboard data as Excel or JSON.
+  - Users can subscribe to product restock notifications and then will receive an email when the product is restocked.
+  - Users will receive an email when they send a contact email through the contact form.
 
 ### Technologies Used
 

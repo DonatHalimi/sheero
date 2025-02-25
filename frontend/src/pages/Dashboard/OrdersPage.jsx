@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
-import { DashboardHeader, exportOptions, formatAddress, formatArrivalDateRange, formatPaymentInfo, formatProducts, formatQuantity, formatTotalAmount, formatUser, LoadingDataGrid } from '../../assets/CustomComponents';
+import { DashboardHeader, exportOptions, formatAddress, formatArrivalDateRange, formatPaymentInfo, formatProducts, formatQuantity, formatTotalAmount, formatUser, LoadingDataGrid, RenderOrderDelStatus, RenderOrderPaymentInfo } from '../../assets/CustomComponents';
 import { exportToExcel, exportToJSON } from '../../assets/DataExport';
 import DashboardTable from '../../components/Dashboard/DashboardTable';
 import DeleteModal from '../../components/Modal/DeleteModal';
@@ -81,10 +81,18 @@ const OrdersPage = () => {
         { key: 'products', label: 'Products', render: formatProducts },
         { key: 'quantity', label: 'Quantity', render: formatQuantity },
         { key: 'totalAmount', label: 'Total Amount', render: formatTotalAmount },
-        { key: 'paymentInfo', label: 'Payment Info', render: formatPaymentInfo },
+        {
+            key: 'paymentInfo',
+            label: 'Payment Info',
+            render: RenderOrderPaymentInfo,
+        },
         { key: 'arrivalDateRange', label: 'Delivery Date', render: formatArrivalDateRange },
-        { key: 'status', label: 'Delivery Status' },
-        { key: 'actions', label: 'Actions' }
+        {
+            key: 'status',
+            label: 'Delivery Status',
+            render: (order) => <RenderOrderDelStatus order={order} />,
+        },
+        { key: 'actions', label: 'Actions' },
     ];
 
     const handleExport = (data, format) => {

@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
-import { DashboardHeader, exportOptions, formatDate, LoadingDataGrid } from '../../assets/CustomComponents';
+import { DashboardHeader, exportOptions, formatDate, LoadingDataGrid, RenderReturnStatus } from '../../assets/CustomComponents';
 import { exportToExcel, exportToJSON } from '../../assets/DataExport';
 import DashboardTable from '../../components/Dashboard/DashboardTable';
 import DeleteModal from '../../components/Modal/DeleteModal';
@@ -86,8 +86,11 @@ const ReturnsPage = () => {
         { key: 'user.email', label: 'User' },
         { key: 'products', label: 'Products' },
         { key: 'reason', label: 'Reason' },
-        { key: 'createdAt', label: 'Created At', render: (row) => formatDate(row.createdAt) },
-        { key: 'status', label: 'Status' },
+        {
+            key: 'status',
+            label: 'Status',
+            render: (returnRequest) => <RenderReturnStatus returnRequest={returnRequest} />,
+        },
         { key: 'actions', label: 'Actions' }
     ];
 

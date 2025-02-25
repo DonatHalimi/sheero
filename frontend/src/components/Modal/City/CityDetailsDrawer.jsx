@@ -1,6 +1,6 @@
 import { Box, Drawer, Typography } from '@mui/material';
 import React from 'react';
-import { BoxBetween, CloseButton, EditExportButtons, ReadOnlyTextField } from '../../../assets/CustomComponents';
+import { BoxBetween, CloseButton, EditExportButtons, IdAdornment, ReadOnlyTextField } from '../../../assets/CustomComponents';
 import { downloadCityData } from '../../../assets/DataExport';
 import { drawerPaperSx } from '../../../assets/sx';
 
@@ -29,6 +29,7 @@ const CityDetailsDrawer = ({ open, onClose, city, onEdit }) => {
                         <ReadOnlyTextField
                             label="City ID"
                             value={city._id}
+                            InputProps={IdAdornment()}
                         />
 
                         <BoxBetween>
@@ -42,6 +43,12 @@ const CityDetailsDrawer = ({ open, onClose, city, onEdit }) => {
                                 value={city.zipCode}
                             />
                         </BoxBetween>
+
+                        <ReadOnlyTextField
+                            label="Country ID"
+                            value={city.country._id}
+                            InputProps={IdAdornment()}
+                        />
 
                         <BoxBetween>
                             <ReadOnlyTextField

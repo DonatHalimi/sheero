@@ -1,8 +1,8 @@
-import { Box, Drawer, Typography } from '@mui/material';
+import { Box, Chip, Drawer, Typography } from '@mui/material';
 import React from 'react';
-import { AccountLinkStatus, BoxBetween, CloseButton, EditExportButtons, ReadOnlyTextField } from '../../../assets/CustomComponents';
+import { AccountLinkStatus, BoxBetween, CloseButton, EditExportButtons, IdAdornment, ReadOnlyTextField } from '../../../assets/CustomComponents';
 import { downloadUserDetails } from '../../../assets/DataExport';
-import { drawerPaperSx } from '../../../assets/sx';
+import { chipSx, drawerPaperSx } from '../../../assets/sx';
 
 const UserDetailsDrawer = ({ open, onClose, user, onEdit }) => {
     const handleEditClick = () => {
@@ -29,6 +29,7 @@ const UserDetailsDrawer = ({ open, onClose, user, onEdit }) => {
                         <ReadOnlyTextField
                             label="User ID"
                             value={user._id}
+                            InputProps={IdAdornment()}
                         />
 
                         <BoxBetween>
@@ -54,16 +55,44 @@ const UserDetailsDrawer = ({ open, onClose, user, onEdit }) => {
                             />
                         </BoxBetween>
 
-                        <BoxBetween>
-                            <AccountLinkStatus hasId={user.googleId} platform="Google" />
-                            <AccountLinkStatus hasId={user.facebookId} platform="Facebook" />
-                        </BoxBetween>
+                        <Box>
+                            <Box sx={chipSx} className='mb-2'>
+                                <Chip
+                                    label={
+                                        <Box
+                                            display="flex"
+                                            alignItems="center"
+                                            gap={1}
+                                        >
+                                            <AccountLinkStatus hasId={user.googleId} platform="Google" />
+                                        </Box>
+                                    }
+                                    variant="outlined"
+                                    className="w-full !justify-start !pt-1 !pb-1"
+                                />
+                            </Box>
+                            <Box sx={chipSx}>
+                                <Chip
+                                    label={
+                                        <Box
+                                            display="flex"
+                                            alignItems="center"
+                                            gap={1}
+                                        >
+                                            <AccountLinkStatus hasId={user.facebookId} platform="Facebook" />
+                                        </Box>
+                                    }
+                                    variant="outlined"
+                                    className="w-full !justify-start !pt-1 !pb-1"
+                                />
+                            </Box>
+                        </Box>
 
                         <Box className="flex flex-col items-center mt-3 mb-3 rounded-full">
                             <img
                                 src={user.profilePicture}
                                 alt={`${user.firstName} ${user.lastName}'s profile`}
-                                className='w-1/4 rounded-full'
+                                className='w-1/4 rounded-full mb-2'
                             />
                         </Box>
 

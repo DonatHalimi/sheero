@@ -1,7 +1,7 @@
 import { InputLabel, MenuItem, Select } from '@mui/material';
 import React, { useEffect, useState } from 'react';
 import { toast } from 'react-toastify';
-import { ActionButtons, BrownOutlinedTextField, CustomBox, CustomModal, CustomTypography, handleApiError, ImageUploadBox, OutlinedBrownButton, OutlinedBrownFormControl, VisuallyHiddenInput } from '../../../assets/CustomComponents';
+import { ActionButtons, BrownOutlinedTextField, CustomBox, CustomModal, CustomTypography, handleApiError, ImageUploadBox, OutlinedBrownFormControl } from '../../../assets/CustomComponents';
 import { getCategoriesService } from '../../../services/categoryService';
 import { editSubcategoryService } from '../../../services/subcategoryService';
 import { getImageUrl } from '../../../utils/config';

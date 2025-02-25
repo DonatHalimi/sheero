@@ -1,6 +1,6 @@
 import { Box, Drawer, Typography } from '@mui/material';
 import React from 'react';
-import { CloseButton, EditExportButtons, ReadOnlyTextField } from '../../../assets/CustomComponents';
+import { BoxBetween, CloseButton, DateAdornment, EditExportButtons, formatDate, IdAdornment, ReadOnlyTextField } from '../../../assets/CustomComponents';
 import { downloadSubSubcategoryData } from '../../../assets/DataExport';
 import { drawerPaperSx } from '../../../assets/sx';
 
@@ -29,6 +29,7 @@ const SubSubcategoryDetailsDrawer = ({ open, onClose, subSubcategory, onEdit }) 
                         <ReadOnlyTextField
                             label="SubSubcategory ID"
                             value={subSubcategory._id}
+                            InputProps={IdAdornment()}
                         />
 
                         <ReadOnlyTextField
@@ -37,9 +38,28 @@ const SubSubcategoryDetailsDrawer = ({ open, onClose, subSubcategory, onEdit }) 
                         />
 
                         <ReadOnlyTextField
+                            label="Subcategory ID"
+                            value={subSubcategory.subcategory._id}
+                            InputProps={IdAdornment()}
+                        />
+
+                        <ReadOnlyTextField
                             label="Subcategory"
                             value={subSubcategory.subcategory.name}
                         />
+
+                        <BoxBetween>
+                            <ReadOnlyTextField
+                                label="Created At"
+                                value={formatDate(subSubcategory.createdAt)}
+                                InputProps={DateAdornment()}
+                            />
+                            <ReadOnlyTextField
+                                label="Updated At"
+                                value={formatDate(subSubcategory.updatedAt)}
+                                InputProps={DateAdornment()}
+                            />
+                        </BoxBetween>
 
                         <EditExportButtons
                             onEditClick={handleEditClick}

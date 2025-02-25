@@ -120,6 +120,7 @@ The frontend serves as the user interface layer of the application, interacting 
     "npm": "^11.0.0",
     "postcss": "^8.4.39",
     "react": "^18.3.1",
+    "react-countup": "^6.5.3",
     "react-dom": "^18.3.1",
     "react-intersection-observer": "^9.13.1",
     "react-redux": "^9.1.2",
@@ -128,7 +129,8 @@ The frontend serves as the user interface layer of the application, interacting 
     "react-toastify": "^10.0.5",
     "redux": "^5.0.1",
     "tailwindcss": "^3.4.4",
-    "vite": "^5.3.1"
+    "vite": "^5.3.1",
+    "xlsx": "^0.18.5"
   },
   "devDependencies": {
     "@types/react": "^18.3.3",
@@ -154,6 +156,9 @@ The frontend serves as the user interface layer of the application, interacting 
 - **[Framer Motion](https://www.npmjs.com/package/framer-motion):** For adding animations to the UI.
 - **[Vite](https://vite.dev/guide/):** A fast build tool, used for frontend development and bundling.
 - **[React Toastify](https://www.npmjs.com/package/react-toastify):** Provides notifications in the UI.
+- **[XLSX](https://www.npmjs.com/package/xlsx):** For exporting data as Excel files.
+- **[JSPDF](https://www.npmjs.com/package/jspdf):** For exporting data as PDF files.
+- **[React Countup](https://www.npmjs.com/package/react-countup):** For counting upwards animation in the `Cart` page.
 
 ---
 

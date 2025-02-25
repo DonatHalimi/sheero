@@ -1,6 +1,7 @@
 import { Add, DeleteOutline, Remove } from '@mui/icons-material';
 import { IconButton, Table, TableBody, TableCell, TableContainer, TableHead, TableRow, Tooltip } from '@mui/material';
 import React, { useEffect, useState } from 'react';
+import CountUp from 'react-countup';
 import { useDispatch, useSelector } from 'react-redux';
 import { useNavigate } from 'react-router-dom';
 import { toast } from 'react-toastify';
@@ -22,6 +23,7 @@ const Cart = () => {
 
     const [cart, setCart] = useState({ items: [] });
     const [loading, setLoading] = useState(true);
+    const [loadingClearCart, setLoadingClearCart] = useState(false);
     const [openModal, setOpenModal] = useState(false);
     const [showPaymentModal, setShowPaymentModal] = useState(false);
     const [actionLoading, setActionLoading] = useState(false);
@@ -104,7 +106,7 @@ const Cart = () => {
     };
 
     const handleClearCart = async () => {
-        setActionLoading(true);
+        setLoadingClearCart(true);
         try {
             const { data } = await clearCartService();
             setCart(data);
@@ -116,7 +118,7 @@ const Cart = () => {
         } catch (error) {
             console.error('Failed to clear cart:', error?.response?.data?.message || error.message);
         } finally {
-            setActionLoading(false);
+            setLoadingClearCart(false);
             setOpenModal(false);
         }
     };
@@ -257,16 +259,16 @@ const Cart = () => {
                                                         {item.product.salePrice ? (
                                                             <>
                                                                 <span className="text-lg font-semibold">
-                                                                    {formatPrice(item.product.salePrice)} €
+                                                                    € {formatPrice(item.product.salePrice)}
                                                                 </span>
                                                                 <br />
                                                                 <span className="text-sm font-semibold text-stone-600 bg-stone-100 rounded-md px-1">
-                                                                    You save {formatPrice(item.product.price - item.product.salePrice)} €
+                                                                    You save € {formatPrice(item.product.price - item.product.salePrice)}
                                                                 </span>
                                                             </>
                                                         ) : (
                                                             <span className="text-lg font-semibold">
-                                                                {formatPrice(item.product.price)} €
+                                                                € {formatPrice(item.product.price)}
                                                             </span>
                                                         )}
                                                     </TableCell>
@@ -292,7 +294,7 @@ const Cart = () => {
                                                     </TableCell>
                                                     <TableCell align="center">
                                                         <h2 className="text-base font-semibold">
-                                                            {formatPrice(item.quantity * (item.product.salePrice || item.product.price))} €
+                                                            € {formatPrice(item.quantity * (item.product.salePrice || item.product.price))}
                                                         </h2>
                                                     </TableCell>
                                                     <TableCell align="center">
@@ -337,11 +339,11 @@ const Cart = () => {
                                                     {item.product.salePrice ? (
                                                         <>
                                                             <span className="text-lg font-semibold">
-                                                                {formatPrice(item.product.salePrice)} €
+                                                                € {formatPrice(item.product.salePrice)}
                                                             </span>
                                                             <br />
                                                             <span className="text-sm font-semibold text-stone-600 bg-stone-100 rounded-md px-1">
-                                                                You save {formatPrice(item.product.price - item.product.salePrice)} €
+                                                                You save € {formatPrice(item.product.price - item.product.salePrice)}
                                                             </span>
                                                         </>
                                                     ) : (
@@ -351,21 +353,23 @@ const Cart = () => {
                                                     )}
                                                 </div>
                                                 <div className="flex items-center justify-between">
-                                                    <div className="flex items-center border rounded">
-                                                        <button
+                                                    <div className="flex justify-center items-center">
+                                                        <IconButton
                                                             onClick={() => updateQuantity(item.product._id, -1)}
-                                                            className="px-3 py-1 border-r"
+                                                            size="small"
+                                                            className="bg-gray-100 hover:bg-gray-200 text-gray-600"
                                                         >
-                                                            -
-                                                        </button>
-                                                        <span className="px-4 py-1">{item.quantity}</span>
-                                                        <button
+                                                            <Remove fontSize="small" />
+                                                        </IconButton>
+                                                        <span className="px-3 py-1">{item.quantity}</span>
+                                                        <IconButton
                                                             onClick={() => updateQuantity(item.product._id, 1)}
                                                             disabled={item.quantity >= item.product.inventoryCount}
-                                                            className={`px-3 py-1 border-l ${item.quantity >= item.product.inventoryCount ? 'opacity-50' : ''}`}
+                                                            size="small"
+                                                            className={`border rounded-sm px-3 py-1 ${item.quantity >= item.product.inventoryCount ? 'opacity-50 cursor-not-allowed' : ''}`}
                                                         >
-                                                            +
-                                                        </button>
+                                                            <Add fontSize="small" />
+                                                        </IconButton>
                                                     </div>
                                                     <span className="font-semibold">
                                                         {formatPrice(item.quantity * (item.product.salePrice || item.product.price))} €
@@ -385,28 +389,50 @@ const Cart = () => {
                                 <div className="space-y-3">
                                     <div className="flex justify-between py-2 border-b">
                                         <span>Subtotal</span>
-                                        <span>{formatPrice(subtotal)} €</span>
+                                        <span>
+                                            <CountUp
+                                                end={subtotal}
+                                                duration={0.6}
+                                                separator=","
+                                                decimals={2}
+                                                prefix="€ "
+                                            />
+                                        </span>
                                     </div>
                                     <div className="flex justify-between py-2 border-b">
                                         <span>Shipping</span>
-                                        <span>{shippingCost.toFixed(2)} €</span>
+                                        <span>€ {shippingCost.toFixed(2)}</span>
                                     </div>
                                     {cart.items.some(item => item.product.salePrice) && (
                                         <div className="flex justify-between py-2 border-b">
                                             <span>Total Savings</span>
                                             <span>
-                                                -{cart.items.reduce((total, item) => {
-                                                    if (item.product.salePrice) {
-                                                        return total + (item.product.price - item.product.salePrice) * item.quantity;
-                                                    }
-                                                    return total;
-                                                }, 0).toFixed(2)} €
+                                                - <CountUp
+                                                    end={cart.items.reduce((total, item) => {
+                                                        if (item.product.salePrice) {
+                                                            return total + (item.product.price - item.product.salePrice) * item.quantity;
+                                                        }
+                                                        return total;
+                                                    }, 0)}
+                                                    duration={0.6}
+                                                    separator=","
+                                                    decimals={2}
+                                                    prefix="€ "
+                                                />
                                             </span>
                                         </div>
                                     )}
                                     <div className="flex justify-between py-2 font-bold !mb-2">
                                         <span>Total</span>
-                                        <span>{formatPrice(total)} €</span>
+                                        <span>
+                                            <CountUp
+                                                end={total}
+                                                duration={0.6}
+                                                separator=","
+                                                decimals={2}
+                                                prefix="€ "
+                                            />
+                                        </span>
                                     </div>
                                 </div>
                                 <CheckoutButton
@@ -436,6 +462,8 @@ const Cart = () => {
                 onDelete={handleClearCart}
                 title="Clear Cart"
                 message="Are you sure you want to clear the cart?"
+                loading={loadingClearCart}
+                disabled={loadingClearCart}
             />
 
             <Footer />

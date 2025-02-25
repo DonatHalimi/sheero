@@ -28,6 +28,7 @@ import {
   Mail,
   MailOutlined,
   MoveToInbox,
+  MoveToInboxOutlined,
   People,
   PeopleOutlineOutlined,
   Person,
@@ -43,8 +44,10 @@ import {
 } from '@mui/icons-material';
 import { Tooltip } from '@mui/material';
 import React, { useEffect, useState } from 'react';
+import { useSelector } from 'react-redux';
 import { useNavigate } from 'react-router-dom';
-import { ActiveListItem, CollapsibleListItem, DashboardSearchBar, getLocalStorageState, saveLocalStorageState, StyledInboxIcon, StyledMoveToInboxIcon } from '../../assets/CustomComponents';
+import { ActiveListItem, CollapsibleListItem, DashboardSearchBar, getLocalStorageState, saveLocalStorageState } from '../../assets/CustomComponents';
+import { selectIsContentManager, selectIsOrderManager, selectIsProductManager } from '../../store/actions/authActions';
 
 // User related pages
 const userMenuItems = [
@@ -60,12 +63,12 @@ const userMenuItems = [
   },
   {
     id: 'orders',
-    icon: { active: Inbox, inactive: StyledInboxIcon },
+    icon: { active: Inbox, inactive: InboxOutlined },
     label: 'Orders'
   },
   {
     id: 'returns',
-    icon: { active: MoveToInbox, inactive: StyledMoveToInboxIcon },
+    icon: { active: MoveToInbox, inactive: MoveToInboxOutlined },
     label: 'Returns'
   },
   {
@@ -204,6 +207,36 @@ export const mainListItems = ({ setCurrentView, collapsed }) => {
   const [menuState, setMenuState] = useState(getLocalStorageState('menuState', defaultState));
   const [activeItem, setActiveItem] = useState('');
   const navigate = useNavigate();
+  const isOrderManager = useSelector(selectIsOrderManager);
+  const isContentManager = useSelector(selectIsContentManager);
+  const isProductManager = useSelector(selectIsProductManager);
+
+  const filterSectionItems = (section, allowedItems) => ({
+    ...section,
+    items: section.items.filter(item => allowedItems.includes(item.id)),
+  });
+
+  const getFilteredSections = () => {
+    let allowedItems;
+
+    switch (true) {
+      case isOrderManager:
+        allowedItems = ['orders'];
+        break;
+      case isContentManager:
+        allowedItems = ['faqs', 'images'];
+        break;
+      case isProductManager:
+        allowedItems = ['reviews', 'products', 'categories', 'subcategories', 'subsubcategories', 'productRestockSubscriptions', 'suppliers'];
+        break;
+      default:
+        return mainSections;
+    }
+
+    return mainSections
+      .map(section => filterSectionItems(section, allowedItems))
+      .filter(section => section.items.length > 0);
+  };
 
   const handleItemClick = (view) => {
     setCurrentView(view);
@@ -231,6 +264,7 @@ export const mainListItems = ({ setCurrentView, collapsed }) => {
             selected={activeItem === id}
             icon={activeItem === id ? <icon.active /> : <icon.inactive />}
             primary={!collapsed ? label : ""}
+            isDashboard={true}
           />
         </div>
       </Tooltip>
@@ -254,19 +288,24 @@ export const mainListItems = ({ setCurrentView, collapsed }) => {
 
   return (
     <>
-      <DashboardSearchBar
-        collapsed={collapsed}
-        onMenuItemClick={handleItemClick}
-        getAllMenuItems={getAllMenuItems}
-      />
+      {!(isOrderManager || isContentManager || isProductManager) && (
+        <>
+          <DashboardSearchBar
+            collapsed={collapsed}
+            onMenuItemClick={handleItemClick}
+            getAllMenuItems={getAllMenuItems}
+          />
 
-      <ActiveListItem
-        icon={activeItem === 'main' ? <Dashboard /> : <DashboardOutlined />}
-        primary={!collapsed ? "Dashboard" : ""}
-        handleClick={() => handleItemClick('main')}
-        selected={activeItem === 'main'}
-        isMainPage={true}
-      />
+          <ActiveListItem
+            icon={activeItem === 'main' ? <Dashboard /> : <DashboardOutlined />}
+            primary={!collapsed ? "Dashboard" : ""}
+            handleClick={() => handleItemClick('main')}
+            selected={activeItem === 'main'}
+            isMainPage={true}
+            isDashboard={true}
+          />
+        </>
+      )}
 
       <CollapsibleListItem
         open={menuState.crudOpen}
@@ -274,7 +313,7 @@ export const mainListItems = ({ setCurrentView, collapsed }) => {
         icon={menuState.crudOpen ? <DashboardCustomize /> : <DashboardCustomizeOutlined />}
         primary={!collapsed ? "CRUDs" : ""}
       >
-        {mainSections.map(section => (
+        {getFilteredSections().map(section => (
           <CollapsibleListItem
             key={section.id}
             open={menuState[section.stateKey]}

@@ -1,6 +1,6 @@
 import { Box, Drawer, Typography } from '@mui/material';
 import React from 'react';
-import { CloseButton, EditExportButtons, ReadOnlyTextField } from '../../../assets/CustomComponents';
+import { CloseButton, EditExportButtons, IdAdornment, ReadOnlyTextField } from '../../../assets/CustomComponents';
 import { downloadRoleData } from '../../../assets/DataExport';
 import { drawerPaperSx } from '../../../assets/sx';
 
@@ -29,11 +29,19 @@ const RoleDetailsDrawer = ({ open, onClose, role, onEdit }) => {
                         <ReadOnlyTextField
                             label="Role ID"
                             value={role._id}
+                            InputProps={IdAdornment()}
                         />
 
                         <ReadOnlyTextField
                             label="Name"
                             value={role.name}
+                        />
+
+                        <ReadOnlyTextField
+                            label="Description"
+                            value={role.description}
+                            multiline
+                            rows={4}
                         />
 
                         <EditExportButtons

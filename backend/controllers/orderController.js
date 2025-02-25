@@ -117,7 +117,7 @@ const sendOrderEmails = async (order) => {
         }
 
         await sendOrderUpdateEmail(order);
-        await sendProductInventoryUpdateEmail(order); // TODO: add role 'inventoryManager' so that users with this role can receive emails of every product inventory update on every order
+        await sendProductInventoryUpdateEmail(order);
     } catch (error) {
         console.error(`Error sending emails for order ${order._id}:`, error);
     }
@@ -328,8 +328,8 @@ const updateDeliveryStatus = async (req, res) => {
 
         const previousStatus = order.status;
 
-        // Update inventory count only when status changes to shipped and hasn't been updated before
-        if (status === 'shipped' && previousStatus !== 'shipped') {
+        // Update inventory count only when status changes to processed and hasn't been updated before
+        if (status === 'processed' && previousStatus !== 'processed') {
             await Promise.all(order.products.map(async (orderProduct) => {
                 if (!orderProduct.inventoryUpdated) {
                     const product = await Product.findById(orderProduct.product._id);

@@ -1,13 +1,18 @@
 const yup = require('yup');
 const Role = require('../models/Role');
 
-const isValid = (v) => /^[a-zA-Z\s]{2,10}$/.test(v);
+const isValid = (v) => /^[a-zA-Z\s]{2,15}$/.test(v);
+const isValidDescription = (v) => /^.{5,500}$/.test(v);
 
 const createSchema = yup.object({
     name: yup
         .string()
         .required('Name is required')
-        .test('is-valid-name', 'Name must be 2-10 characters long', isValid),
+        .test('is-valid-name', 'Name must be 2-15 characters long', isValid),
+    description: yup
+        .string()
+        .required('Description is required')
+        .test('is-valid-description', 'Description must be 5-500 characters long', isValidDescription),
 });
 
 const getByIdSchema = yup.object({
@@ -31,9 +36,15 @@ const updateSchema = yup.object({
         }),
     name: yup
         .string()
-        .test('is-valid-name', 'Name must start with a capital letter and be 2-10 characters long', value => {
+        .test('is-valid-name', 'Name must start with a capital letter and be 2-15 characters long', value => {
             if (!value) return true;
             return isValid(value);
+        }),
+    description: yup
+        .string()
+        .test('is-valid-description', 'Description must be 5-500 characters long', value => {
+            if (!value) return true;
+            return isValidDescription(value);
         }),
 });
 

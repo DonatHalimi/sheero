@@ -1,6 +1,6 @@
 import { Box, Drawer, Typography } from '@mui/material';
 import React from 'react';
-import { BoxBetween, CloseButton, EditExportButtons, ReadOnlyTextField } from '../../../assets/CustomComponents';
+import { BoxBetween, CloseButton, DateAdornment, DescriptionAdornment, EditExportButtons, formatDate, IdAdornment, PersonAdornment, ReadOnlyTextField, ReturnStatusAdornment } from '../../../assets/CustomComponents';
 import { downloadReturnRequestData } from '../../../assets/DataExport';
 import { drawerPaperSx } from '../../../assets/sx';
 
@@ -39,17 +39,20 @@ const ReturnRequestDetailsDrawer = ({ open, onClose, returnRequest, onEdit }) =>
                             <ReadOnlyTextField
                                 label="Return Request ID"
                                 value={returnRequest._id}
+                                InputProps={IdAdornment()}
                             />
 
                             <ReadOnlyTextField
                                 label="Order ID"
                                 value={returnRequest.order}
+                                InputProps={IdAdornment()}
                             />
                         </BoxBetween>
 
                         <ReadOnlyTextField
                             label="User"
                             value={user}
+                            InputProps={PersonAdornment()}
                         />
 
                         <BoxBetween>
@@ -61,24 +64,35 @@ const ReturnRequestDetailsDrawer = ({ open, onClose, returnRequest, onEdit }) =>
                             />
                         </BoxBetween>
 
-                        <ReadOnlyTextField
-                            label="Reason"
-                            value={returnRequest.reason}
-                        />
-
                         <BoxBetween>
-                            {returnRequest.reason === 'Other' && returnRequest.customReason && (
-                                <ReadOnlyTextField
-                                    label="Custom Reason"
-                                    value={returnRequest.customReason}
-                                />
-                            )}
+                            <ReadOnlyTextField
+                                label="Reason"
+                                value={returnRequest.reason}
+                                InputProps={DescriptionAdornment()}
+                            />
+
                             <ReadOnlyTextField
                                 label="Status"
                                 value={returnRequest.status}
+                                InputProps={ReturnStatusAdornment(returnRequest.status)}
                             />
                         </BoxBetween>
 
+                        {returnRequest.reason === 'Other' && returnRequest.customReason && (
+                            <ReadOnlyTextField
+                                label="Custom Reason"
+                                value={returnRequest.customReason}
+                                multiline
+                                rows={3}
+                                InputProps={DescriptionAdornment()}
+                            />
+                        )}
+
+                        <ReadOnlyTextField
+                            label="Created At"
+                            value={formatDate(returnRequest.createdAt)}
+                            InputProps={DateAdornment()}
+                        />
                         <EditExportButtons
                             onEditClick={handleEditClick}
                             onExportClick={() => downloadReturnRequestData(returnRequest)}

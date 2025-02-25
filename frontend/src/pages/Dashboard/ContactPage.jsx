@@ -108,7 +108,6 @@ const ContactPage = () => {
                             setDeleteItemOpen={setDeleteContactOpen}
                             itemName="Contact"
                             exportOptions={exportOptions(contacts, handleExport)}
-                            showAddButton={false}
                         />
 
                         <DashboardTable

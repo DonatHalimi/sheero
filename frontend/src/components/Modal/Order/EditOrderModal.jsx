@@ -1,14 +1,15 @@
-import { Box, Chip, MenuItem, Typography } from '@mui/material';
+import { Box, Chip, MenuItem, Typography, useTheme } from '@mui/material';
 import React, { useEffect, useState } from 'react';
 import { toast } from 'react-toastify';
-import { ActionButtons, BoxBetween, BrownOutlinedTextField, CustomBox, CustomModal, CustomTypography, formatDate, handleApiError, ReadOnlyTextField } from '../../../assets/CustomComponents';
-import { productChipSx } from '../../../assets/sx';
+import { ActionButtons, BoxBetween, BrownOutlinedTextField, CustomBox, CustomModal, CustomTypography, DateAdornment, DeliveryStatusAdornment, EuroAdornment, formatDate, handleApiError, IdAdornment, PaymentMethodAdornment, PersonAdornment, ReadOnlyTextField } from '../../../assets/CustomComponents';
+import { chipSx } from '../../../assets/sx';
 import { editOrderService } from '../../../services/orderService';
 import { getImageUrl } from '../../../utils/config';
 
 const EditOrderModal = ({ open, onClose, order, onViewDetails, onEditSuccess }) => {
     const [newStatus, setNewStatus] = useState(order?.status || '');
     const [loading, setLoading] = useState(false);
+    const theme = useTheme();
 
     const user = `${order?.user?.firstName} ${order?.user?.lastName} - ${order?.user?.email}`;
     const productLabel = order?.products?.length > 1 ? 'Products' : 'Product';
@@ -74,6 +75,7 @@ const EditOrderModal = ({ open, onClose, order, onViewDetails, onEditSuccess }) 
                     label="Order ID"
                     value={order?._id}
                     fullWidth
+                    InputProps={IdAdornment()}
                     className="!mb-4"
                 />
 
@@ -81,16 +83,17 @@ const EditOrderModal = ({ open, onClose, order, onViewDetails, onEditSuccess }) 
                     label="User"
                     value={user}
                     fullWidth
+                    InputProps={PersonAdornment()}
                     className="!mb-2"
                 />
 
                 <Box className="!mb-4">
-                    <Typography variant="body1" className="!font-semibold !mb-2">
+                    <Typography variant="body2" style={{ color: theme.palette.text.primary }}>
                         {productLabel} + (Quantity)
                     </Typography>
                     {order?.products && order?.products.length > 0 ? (
                         order?.products.map((item, index) => (
-                            <Box key={index} sx={productChipSx}>
+                            <Box key={index} sx={chipSx}>
                                 <Chip
                                     label={
                                         <Box display="flex" alignItems="center" gap={1}>
@@ -126,14 +129,16 @@ const EditOrderModal = ({ open, onClose, order, onViewDetails, onEditSuccess }) 
 
                 <BoxBetween>
                     <ReadOnlyTextField
-                        label="Total Amount (€)"
-                        value={`€ ${order?.totalAmount.toFixed(2)}`}
+                        label="Total Amount"
+                        value={order?.totalAmount.toFixed(2)}
+                        InputProps={EuroAdornment()}
                         className="!mb-4"
                     />
 
                     <ReadOnlyTextField
                         label="Payment Method"
                         value={order?.paymentMethod}
+                        InputProps={PaymentMethodAdornment(order?.paymentMethod)}
                         className="!mb-4"
                     />
                 </BoxBetween>
@@ -144,6 +149,7 @@ const EditOrderModal = ({ open, onClose, order, onViewDetails, onEditSuccess }) 
                         value={order?.paymentIntentId}
                         multiline
                         rows={2}
+                        InputProps={IdAdornment()}
                         className="!mb-4"
                     />
                 )}
@@ -151,6 +157,7 @@ const EditOrderModal = ({ open, onClose, order, onViewDetails, onEditSuccess }) 
                 <ReadOnlyTextField
                     label="Arrival Date Range"
                     value={arrivalDateRange}
+                    InputProps={DateAdornment()}
                     className="!mb-4"
                 />
 
@@ -160,6 +167,7 @@ const EditOrderModal = ({ open, onClose, order, onViewDetails, onEditSuccess }) 
                     label="Order Status"
                     value={newStatus}
                     onChange={(e) => setNewStatus(e.target.value)}
+                    InputProps={DeliveryStatusAdornment(newStatus)}
                     className="!mb-4"
                 >
                     <MenuItem value="pending">Pending</MenuItem>

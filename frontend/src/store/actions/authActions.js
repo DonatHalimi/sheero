@@ -5,6 +5,18 @@ export const selectIsAdmin = (state) => {
     return state.auth?.user?.role === 'admin';
 };
 
+export const selectIsOrderManager = (state) => {
+    return state.auth?.user?.role === 'orderManager';
+}
+
+export const selectIsContentManager = (state) => {
+    return state.auth?.user?.role === 'contentManager';
+}
+
+export const selectIsProductManager = (state) => {
+    return state.auth?.user?.role === 'productManager';
+}
+
 export const selectIsAuthenticated = (state) => state.auth.isAuthenticated;
 
 export const loadUser = () => async dispatch => {

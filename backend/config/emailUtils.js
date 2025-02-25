@@ -176,7 +176,7 @@ const headerMessages = {
 
 const orderStatusMessages = {
   pending: `We have successfully received your order! <br>After we review the availability of your items, your order will be processed.</br>`,
-  processed: `Your order is now in the processing stage. <br>We will try our best to fulfill your order as soon as possible.</br>`,
+  processed: `Your order is now in the processing stage. <br>We will try our best to fulfill your order as soon as possible!</br>`,
   shipped: `Good news! Your order has been verified and shipped. It is now on its way to you.`,
   delivered: `Your order has been successfully delivered, we hope you enjoy your purchase!`,
   canceled: `Unfortunately, your order has been canceled. If you need further assistance, please reach out to us.`,
@@ -604,10 +604,13 @@ function generateProductInventoryEmailHtml(order, options = {}) {
           Below is a summary of the projected inventory for the ${productLabel} ordered by <strong style="color: #57534E; text-decoration: underline;">${order.user.email}</strong> on 
           <strong>${formattedOrderDate}</strong> with the order id #<strong style="color: #57534E; text-decoration: underline;">${order._id}</strong>.
         </p>
-        
+
+        <p style="font-size: 16px; font-weight: 500; margin-bottom: 20px;">
+          Since you've been assigned the role <strong>orderManager</strong>, we would appreciate it if you could check the inventory for the ${productLabel} and update the status of the order accordingly.
+        </p>
         <p style="font-size: 16px; font-weight: 500; margin-bottom: 20px;">
           Please note that the inventory of the ${productLabel} will only be updated if you choose to set the order status to 
-          <strong>shipped</strong> in the 
+          <strong>processed</strong> in the 
           <a href="https://sheero.onrender.com/dashboard/orders" style="color: #57534E; text-decoration: underline;">
           orders dashboard
           </a>.
@@ -1086,7 +1089,7 @@ function generateContactHtml(contact, options = {}) {
   `;
 }
 
-function generateContactToAdminsHtml(contact, options = {}) {
+function generateContactToCustomerSupportHtml(contact, options = {}) {
   const { brandImages, recipientEmail } = options;
   const formattedDate = formatDate(contact.createdAt);
 
@@ -1105,7 +1108,7 @@ function generateContactToAdminsHtml(contact, options = {}) {
         <p style="font-size: 14px; font-weight: 500; margin-bottom: 12px;">
           <strong>We have just received a new message from ${contact.email}!</strong>
         </p>
-        <p style="font-size: 14px; margin-bottom: 12px;">We would appreciate it if you could get back to them as soon as possible.</p>
+        <p style="font-size: 14px; margin-bottom: 12px;">Since you have been assigned with the role <strong>customerSupport</strong>, we would appreciate it if you could get back to them as soon as possible.</p>
         <p>Best regards,<br/>
           <strong><a href="https://sheero.onrender.com" style="color: #57534E; text-decoration: underline;">sheero</a></strong>
         </p>
@@ -1152,5 +1155,5 @@ module.exports = {
   generateEmailVerificationHtml, generateOrderEmailHtml, generateReturnRequestEmailHtml,
   generateReviewEmailHtml, generateProductInventoryEmailHtml, generateResetPasswordEmailHtml, generatePasswordResetSuccessEmailHtml,
   generateEnable2FAEmailHtml, generateDisable2FAEmailHtml, generateLogin2FAEmailHtml, generateProductInventoryUpdateHtml, generateProductRestockSubHtml,
-  generateContactHtml, generateContactToAdminsHtml
+  generateContactHtml, generateContactToCustomerSupportHtml
 };

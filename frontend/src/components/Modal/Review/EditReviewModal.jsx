@@ -1,8 +1,10 @@
-import { InputLabel, MenuItem, Rating, Select } from '@mui/material';
+import { Box, Chip, Rating, Typography } from '@mui/material';
 import React, { useEffect, useState } from 'react';
 import { toast } from 'react-toastify';
-import { ActionButtons, BrownOutlinedTextField, CustomBox, CustomModal, CustomTypography, handleApiError, OutlinedBrownFormControl, ReadOnlyTextField } from '../../../assets/CustomComponents';
-import { editReviewService, getProductNamesService } from '../../../services/reviewService';
+import { ActionButtons, BrownOutlinedTextField, CustomBox, CustomModal, CustomTypography, handleApiError, PersonAdornment, ReadOnlyTextField } from '../../../assets/CustomComponents';
+import { chipSx } from '../../../assets/sx';
+import { editReviewService } from '../../../services/reviewService';
+import { getImageUrl } from '../../../utils/config';
 
 const EditReviewModal = ({ open, onClose, review, onViewDetails, onEditSuccess }) => {
     const [title, setTitle] = useState('');
@@ -11,7 +13,6 @@ const EditReviewModal = ({ open, onClose, review, onViewDetails, onEditSuccess }
     const [comment, setComment] = useState('');
     const [isValidComment, setIsValidComment] = useState(true);
     const [product, setProduct] = useState('');
-    const [products, setProducts] = useState([]);
     const [loading, setLoading] = useState(false);
 
     const validateTitle = (v) => /^[A-Z][\Wa-zA-Z\s]{2,40}$/.test(v);
@@ -19,27 +20,14 @@ const EditReviewModal = ({ open, onClose, review, onViewDetails, onEditSuccess }
 
     const isValidForm = isValidTitle && isValidComment && rating && product;
 
-    const user = review?.user.firstName + ' ' + review?.user.lastName + ' - ' + review?.user.email
-
-    useEffect(() => {
-        const fetchProducts = async () => {
-            try {
-                const response = await getProductNamesService();
-                setProducts(response.data);
-            } catch (error) {
-                console.error('Error fetching products', error);
-            }
-        };
-
-        fetchProducts();
-    }, []);
+    const user = review?.user ? `${review.user.firstName} ${review.user.lastName} - ${review.user.email}` : 'Unknown User';
 
     useEffect(() => {
         if (review) {
-            setTitle(review.title);
-            setRating(Number(review.rating));
-            setComment(review.comment);
-            setProduct(review.product._id);
+            setTitle(review.title || '');
+            setRating(Number(review.rating) || null);
+            setComment(review.comment || '');
+            setProduct(review.product?._id || '');
         }
     }, [review]);
 
@@ -50,8 +38,7 @@ const EditReviewModal = ({ open, onClose, review, onViewDetails, onEditSuccess }
             title,
             rating,
             comment,
-            productId: product
-        }
+        };
 
         try {
             const response = await editReviewService(review._id, updatedData);
@@ -70,27 +57,46 @@ const EditReviewModal = ({ open, onClose, review, onViewDetails, onEditSuccess }
             <CustomBox>
                 <CustomTypography variant="h5">Edit Review</CustomTypography>
 
-                <OutlinedBrownFormControl fullWidth className="mb-4">
-                    <InputLabel>Product</InputLabel>
-                    <Select
-                        label="Product"
-                        value={product}
-                        onChange={(e) => setProduct(e.target.value)}
-                        className='!mb-4'
-                    >
-                        {products.map((product) => (
-                            <MenuItem key={product._id} value={product._id}>
-                                {product.name}
-                            </MenuItem>
-                        ))}
-                    </Select>
-                </OutlinedBrownFormControl>
-
                 <ReadOnlyTextField
                     label="User"
                     value={user}
+                    InputProps={PersonAdornment()}
                     className='!mb-4'
                 />
+
+                {review?.product ? (
+                    <Box className="mb-4 !mt-[-8px]">
+                        <Typography variant="body2" className="!text-gray-700">Product</Typography>
+                        <Box sx={chipSx}>
+                            <Chip
+                                label={
+                                    <Box display="flex" alignItems="center" gap={1}>
+                                        <Box
+                                            onClick={() => window.open(`/product/${review.product._id}`, '_blank')}
+                                            display="flex"
+                                            alignItems="center"
+                                            gap={1}
+                                            sx={{ cursor: 'pointer' }}
+                                        >
+                                            <img
+                                                src={getImageUrl(review.product.image)}
+                                                alt={review.product.name}
+                                                className="w-10 h-10 object-contain"
+                                            />
+                                            <Typography variant="body2" className="!font-semibold hover:underline">
+                                                {review.product.name}
+                                            </Typography>
+                                        </Box>
+                                    </Box>
+                                }
+                                variant="outlined"
+                                className="w-full !justify-start"
+                            />
+                        </Box>
+                    </Box>
+                ) : (
+                    <Typography variant="body2" className="!text-gray-700">No product associated with this review.</Typography>
+                )}
 
                 <BrownOutlinedTextField
                     label="Title"

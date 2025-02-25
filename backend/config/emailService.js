@@ -4,7 +4,7 @@ const { statusImages, returnStatusImages, createAttachments, generateEmailVerifi
     generateProductInventoryEmailHtml, generateResetPasswordEmailHtml, generatePasswordResetSuccessEmailHtml,
     generateEnable2FAEmailHtml, generateDisable2FAEmailHtml, generateLogin2FAEmailHtml,
     generateProductInventoryUpdateHtml, generateProductRestockSubHtml,
-    generateContactHtml, generateContactToAdminsHtml
+    generateContactHtml, generateContactToCustomerSupportHtml
 } = require('./emailUtils');
 const transporter = require('./mailer');
 const Role = require('../models/Role');
@@ -131,25 +131,24 @@ async function sendProductInventoryUpdateEmail(order) {
     const text = `\n\Products inventory update for order #${order._id}.`;
 
     try {
-        // Fetch the 'admin' role ObjectId
-        const adminRole = await Role.findOne({ name: 'admin' });
-        if (!adminRole) {
-            console.error('Admin role not found');
+        // Fetch the 'orderManager' role ObjectId
+        const orderManagerRole = await Role.findOne({ name: 'orderManager' });
+        if (!orderManagerRole) {
+            console.error('Order Manager role not found');
             return;
         }
 
-        // Fetch all users with the 'admin' role ObjectId
-        const adminUsers = await User.find({ role: adminRole._id });
+        const orderManagerUsers = await User.find({ role: orderManagerRole._id });
 
-        if (adminUsers.length === 0) {
-            console.log('No admin users found');
+        if (orderManagerUsers.length === 0) {
+            console.log('No order manager users found');
             return;
         }
 
-        // Send the email to each admin user
-        for (const admin of adminUsers) {
+        // Send the email to each orderManager user
+        for (const orderManager of orderManagerUsers) {
             const html = generateProductInventoryEmailHtml(order, {
-                recipientEmail: admin.email,
+                recipientEmail: orderManager.email,
                 brandImages,
                 headerMessages,
                 orderStatusMessages,
@@ -157,7 +156,7 @@ async function sendProductInventoryUpdateEmail(order) {
                 statusImages,
             });
 
-            await sendEmail(admin.email, subject, text, html, attachments);
+            await sendEmail(orderManager.email, subject, text, html, attachments);
         }
     } catch (error) {
         console.error('Error sending emails to admins:', error);
@@ -279,29 +278,29 @@ async function sendContactEmailToAdmins(contact) {
     const text = `Please get back to ${contact.email} as soon as possible.\n\nBest regards, sheero.`;
 
     try {
-        // Fetch the 'admin' role ObjectId
-        const adminRole = await Role.findOne({ name: 'admin' });
-        if (!adminRole) {
-            console.error('Admin role not found');
+        // Fetch the 'customerSupport' role ObjectId
+        const customerSupportRole = await Role.findOne({ name: 'customerSupport' });
+        if (!customerSupportRole) {
+            console.error('Customer Support role not found');
             return;
         }
 
-        // Fetch all users with the 'admin' role ObjectId
-        const adminUsers = await User.find({ role: adminRole._id });
+        // Fetch all users with the 'customerSupport' role ObjectId
+        const customerSupportUsers = await User.find({ role: customerSupportRole._id });
 
-        if (adminUsers.length === 0) {
-            console.log('No admin users found');
+        if (customerSupportUsers.length === 0) {
+            console.log('No customer support users found');
             return;
         }
 
-        // Send the email to each admin user
-        for (const admin of adminUsers) {
-            const html = generateContactToAdminsHtml(contact, {
-                recipientEmail: admin.email,
+        // Send the email to each customerSupport user
+        for (const supporter of customerSupportUsers) {
+            const html = generateContactToCustomerSupportHtml(contact, {
+                recipientEmail: supporter.email,
                 brandImages,
             });
 
-            await sendEmail(admin.email, subject, text, html, attachments);
+            await sendEmail(supporter.email, subject, text, html, attachments);
         }
     } catch (error) {
         console.error('Error sending emails to admins:', error);

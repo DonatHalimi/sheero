@@ -1,9 +1,8 @@
-import { Visibility } from '@mui/icons-material';
-import { Paper } from '@mui/material';
+import { Paper, useTheme } from '@mui/material';
 import { DataGrid } from '@mui/x-data-grid';
 import React from 'react';
-import { ActionButton, BrownCreateOutlinedIcon, CustomNoRowsOverlay, CustomToolbar } from '../../assets/CustomComponents';
-import { dashboardTableSx } from '../../assets/sx';
+import { ActionButton, CreateIcon, CustomNoRowsOverlay, CustomToolbar, VisibilityIcon } from '../../assets/CustomComponents';
+import { dashboardTablePaperSx, dashboardTableSx } from '../../assets/sx';
 
 const getNestedValue = (obj, path) => {
     return path.split('.').reduce((acc, part) => acc && acc[part], obj);
@@ -38,6 +37,8 @@ const DashboardTable = ({
     onViewDetails,
     showEditButton = true,
 }) => {
+    const theme = useTheme();
+
     const gridColumns = columns.map((column) => ({
         field: column.key,
         headerName: column.label,
@@ -49,11 +50,11 @@ const DashboardTable = ({
                     <div onClick={(e) => e.stopPropagation()}>
                         {showEditButton && (
                             <ActionButton onClick={() => onEdit(params.row)}>
-                                <BrownCreateOutlinedIcon />
+                                <CreateIcon theme={theme} />
                             </ActionButton>
                         )}
                         <ActionButton onClick={() => onViewDetails(params.row)}>
-                            <Visibility />
+                            <VisibilityIcon theme={theme} />
                         </ActionButton>
                     </div>
                 );
@@ -88,6 +89,7 @@ const DashboardTable = ({
         <>
             {renderTableActions && renderTableActions()}
             <Paper
+                sx={dashboardTablePaperSx(theme)}
                 style={{ height: 'auto', width: '100%', boxShadow: '0 1px 2px 0 rgb(0 0 0 / 0.05)' }}
                 className={`${containerClassName || 'max-w-screen-2xl mx-auto'} mb-20`}
             >
@@ -112,7 +114,7 @@ const DashboardTable = ({
                         noRowsOverlay: CustomNoRowsOverlay,
                     }}
                     sx={{
-                        ...dashboardTableSx,
+                        ...dashboardTableSx(theme),
                     }}
                 />
             </Paper>

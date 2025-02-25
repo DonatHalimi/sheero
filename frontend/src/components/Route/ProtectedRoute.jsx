@@ -4,15 +4,17 @@ import { Navigate } from 'react-router-dom';
 import { LoadingOverlay } from '../../assets/CustomComponents';
 
 /**
- * A wrapper component that checks if a user is authenticated and authorized to access the component.
- * If not authenticated, it redirects to the login page.
- * If authenticated but not authorized, it redirects to the not allowed page.
- * If authenticated and authorized, it renders the wrapped component.
- * @param {React.ReactNode} children The component to be wrapped
- * @param {boolean} adminOnly If true, only admins are authorized
- * @returns {React.ReactNode} The wrapped component if authorized, otherwise a redirect
+ * A wrapper component for protected routes that ensures only authenticated users
+ * with the appropriate roles can access the wrapped component. It handles loading
+ * states, redirects unauthenticated users to the login page, and restricts access
+ * based on user roles.
+ *
+ * @param {React.ReactNode} children - The component to be rendered if access is granted.
+ * @param {Array} allowedRoles - An array of roles permitted to access the route.
+ *                                If not provided, all authenticated users can access.
+ * @returns {React.ReactNode} The wrapped component if access is granted, otherwise a redirect.
  */
-const ProtectedRoute = ({ children, adminOnly }) => {
+const ProtectedRoute = ({ children, allowedRoles }) => {
     const { user, isAuthenticated, loading } = useSelector((state) => state.auth);
 
     if (loading) {
@@ -23,8 +25,11 @@ const ProtectedRoute = ({ children, adminOnly }) => {
         return <Navigate to="/login" />;
     }
 
-    if (adminOnly && user?.role !== 'admin') {
-        return <Navigate to="/not-allowed" />;
+    if (allowedRoles) {
+        if (!allowedRoles.includes(user?.role)) {
+            return <Navigate to="/not-allowed" />;
+        }
+        return children;
     }
 
     return children;

@@ -3,18 +3,26 @@ import {
     ArrowBack,
     ArrowBackIosNew,
     ArrowForwardIos,
+    CalendarMonth,
+    Cancel,
     Check,
+    CheckCircle,
     ChevronLeft,
     ChevronRight,
     Clear,
     Close,
     Create,
     CreateOutlined,
+    CreditCard,
+    DarkMode,
     DashboardOutlined,
     Delete,
     DeleteOutline,
     DeleteOutlined,
+    Description,
     Download,
+    ErrorOutline,
+    EuroSymbol,
     ExpandLess,
     ExpandMore,
     Facebook,
@@ -26,15 +34,19 @@ import {
     Google,
     Home,
     HomeOutlined,
+    HourglassBottom,
+    HourglassTop,
     Inbox,
     InboxOutlined,
-    Info,
+    InventoryOutlined,
+    LightMode,
+    LocalAtm,
+    LocalShipping,
     Lock,
     LockOpen,
     Login,
     Logout,
     Menu as MenuIcon,
-    MoreHoriz,
     MoreVert,
     MoveToInbox,
     MoveToInboxOutlined,
@@ -43,6 +55,7 @@ import {
     QuestionAnswerOutlined,
     Remove,
     Replay,
+    ReportProblem,
     Search,
     SearchOff,
     Settings,
@@ -51,7 +64,9 @@ import {
     ShoppingCartOutlined,
     Star,
     StarBorder,
+    Tag,
     UploadFile,
+    Visibility,
     ZoomIn,
     ZoomOut
 } from '@mui/icons-material';
@@ -97,7 +112,8 @@ import {
     Toolbar,
     Tooltip,
     Typography,
-    useMediaQuery
+    useMediaQuery,
+    useTheme
 } from '@mui/material';
 import { green, red } from '@mui/material/colors';
 import { styled } from '@mui/material/styles';
@@ -115,10 +131,20 @@ import Footer from '../components/Utils/Footer';
 import { getApiUrl, getImageUrl } from '../utils/config';
 import logo from './img/brand/logo.png';
 import {
+    addItemSx,
+    boxSx,
     customBoxSx,
     customMenuProps,
     customModalSx,
+    dashboardAppBarSx,
+    dashboardHeaderSx,
+    dashboardSearchItemSx,
+    dashboardSearchItemsSx,
+    dashboardSearchSuggestionsSx,
     dashboardTitleSx,
+    dashboardToolBarSx,
+    deleteItemSx,
+    exportIconSx,
     filterLayoutSx,
     getExpandIconProps,
     getMotionDivProps,
@@ -127,9 +153,15 @@ import {
     headerSearchSx,
     iconButtonSx,
     layoutContainerSx,
+    deleteModalBoxSx,
+    deleteModalButtonSx,
+    deleteModalTypographySx,
     paginationStackSx,
     paginationStyling,
     profileBoxSx,
+    profileDropdownButtonSx,
+    profileDropdownContainerSx,
+    profileIconSx,
     profileLayoutSx,
     reviewCommentSx,
     reviewContainerSx,
@@ -143,8 +175,12 @@ import {
     searchDropdownItemSx,
     searchDropdownSx,
     sidebarLayoutSx,
-    slideShowSkeletonSx
+    slideShowSkeletonSx,
+    loadingDataGridSkeletonSx,
+    loadingDataGridContainerSx
 } from './sx';
+import CountUp from 'react-countup';
+import { useDashboardTheme } from '../utils/ThemeContext';
 const FilterSidebar = React.lazy(() => import('../components/Product/Utils/FilterSidebar'));
 const ProfileSidebar = React.lazy(() => import('../pages/Profile/ProfileSidebar'));
 
@@ -156,66 +192,69 @@ const ProfileSidebar = React.lazy(() => import('../pages/Profile/ProfileSidebar'
  * @module CustomComponents
  */
 
-export const BrownOutlinedTextField = styled((props) => (
-    <TextField
-        {...props}
-        FormHelperTextProps={{
-            sx: {
-                marginLeft: 0,
-                ...(props?.FormHelperTextProps?.sx || {}),
-            },
-            ...props.FormHelperTextProps,
-        }}
-    />
-))({
+export const BrownOutlinedTextField = styled((props) => {
+    return (
+        <TextField
+            {...props}
+            FormHelperTextProps={{
+                sx: {
+                    marginLeft: 0,
+                    ...(props?.FormHelperTextProps?.sx || {}),
+                },
+                ...props.FormHelperTextProps,
+            }}
+        />
+    );
+})(({ theme }) => ({
     '& .MuiOutlinedInput-root': {
         '&.Mui-focused fieldset': {
-            borderColor: '#7C7164',
+            borderColor: theme.palette.mode === 'dark' ? '#FFFFFF' : '#7C7164',
         },
     },
     '& .MuiInputLabel-root.Mui-focused': {
-        color: '#7C7164',
+        color: theme.palette.mode === 'dark' ? '#FFFFFF' : '#7C7164',
     },
-});
+}));
 
-export const BrownButton = styled(Button)({
+export const BrownButton = styled(Button)(({ theme }) => ({
     backgroundColor: '#686159',
     color: 'white',
     '&:hover': {
         backgroundColor: '#5B504B',
     },
     '&.Mui-disabled': {
-        backgroundColor: '#E0E0E0',
-        color: '#A6A6A6'
+        backgroundColor: theme.palette.mode === 'dark' ? theme.palette.background.default : '#E0E0E0',
+        color: '#A6A6A6',
     },
-});
+}));
 
 export const BoldTableCell = styled(TableCell)({
     fontWeight: 'bold',
     backgroundColor: '#F8F8F8'
 });
 
-export const OutlinedBrownButton = styled(Button)({
-    color: '#493C30',
-    borderColor: '#83776B',
+
+export const OutlinedBrownButton = styled(Button)(({ theme }) => ({
+    color: theme.palette.mode === 'dark' ? theme.palette.text.primary : '#493C30',
+    borderColor: theme.palette.mode === 'dark' ? theme.palette.divider : '#83776B',
     borderWidth: '1px',
     borderStyle: 'solid',
     backgroundColor: 'transparent',
     '&:hover': {
-        borderColor: '#5B504B',
-        backgroundColor: 'rgba(0, 0, 0, 0.04)',
+        borderColor: theme.palette.mode === 'dark' ? theme.palette.primary.main : '#5B504B',
+        backgroundColor: theme.palette.action.hover,
     },
-});
+}));
 
-export const ActionButton = styled(Button)({
+export const ActionButton = styled(Button)(({ theme }) => ({
     position: 'relative',
     right: '10px',
     width: '30px',
     height: '30px',
     '&:hover': {
-        backgroundColor: '#F8F8F8',
+        backgroundColor: theme.palette.mode === 'dark' ? 'transparent' : '#F8F8F8',
     },
-});
+}));
 
 export const BrownCreateOutlinedIcon = styled(CreateOutlined)({
     color: '#493C30',
@@ -240,16 +279,16 @@ export const VisuallyHiddenInput = styled('input')({
     width: 1,
 });
 
-export const OutlinedBrownFormControl = styled(FormControl)({
+export const OutlinedBrownFormControl = styled(FormControl)(({ theme }) => ({
     '& .MuiOutlinedInput-root': {
         '&.Mui-focused fieldset': {
-            borderColor: '#7C7164',
+            borderColor: theme.palette.mode === 'dark' ? '#FFFFFF' : '#7C7164',
         },
     },
     '& .MuiInputLabel-root.Mui-focused': {
-        color: '#7C7164',
+        color: theme.palette.mode === 'dark' ? '#FFFFFF' : '#7C7164',
     },
-});
+}));
 
 export const drawerWidth = 250;
 
@@ -295,14 +334,23 @@ export const Drawer = styled(MuiDrawer, { shouldForwardProp: (prop) => prop !== 
 })
 );
 
-export const ActiveListItemButton = styled(ListItemButton, { shouldForwardProp: (prop) => prop !== 'isMainPage' })(({ selected, isMainPage = false }) => ({
-    backgroundColor: selected ? '#7C7164' : 'white',
-    color: selected ? 'black' : 'inherit',
-    borderRight: selected ? '4px solid #7C7164' : '',
+export const ActiveListItemButton = styled(ListItemButton, { shouldForwardProp: (prop) => prop !== 'isMainPage' && prop !== 'isDashboard', })(({ theme, selected, isMainPage = false, isDashboard = false }) => ({
+    backgroundColor: isDashboard ? selected ? theme.palette.primary.main : theme.palette.background.paper : selected ? '#7C7164' : 'white',
+    color: isDashboard ? selected ? theme.palette.primary.main : theme.palette.text.primary : selected ? 'black' : 'inherit',
+    borderRight: isDashboard
+        ? selected ? `4px solid ${theme.palette.primary.main}` : ''
+        : selected ? '4px solid #7C7164' : '',
     borderRadius: '6px',
     paddingLeft: isMainPage ? '16px !important' : '28px',
     '&:hover': {
-        backgroundColor: selected ? '#7C7164' : '#F8F8F8',
+        backgroundColor: isDashboard
+            ? selected ? theme.palette.mode === 'dark'
+                ? theme.palette.primary.dark
+                : theme.palette.primary.light
+                : theme.palette.action.hover
+            : selected
+                ? '#7C7164'
+                : '#F8F8F8',
     },
 }));
 
@@ -490,33 +538,29 @@ export const CustomPaper = (props) => (
     <Paper {...props} sx={{ maxHeight: 200, overflow: 'auto' }} />
 );
 
-export const StyledPersonIcon = styled(PersonOutlined)({
-    color: '#666666',
-});
+export const StyledPersonIcon = styled(PersonOutlined)(({ theme }) => ({
+    color: theme.palette.mode === 'dark' ? theme.palette.text.primary : '#666666',
+}));
 
-export const StyledDashboardIcon = styled(DashboardOutlined)({
-    color: '#666666',
-});
+export const StyledDashboardIcon = styled(DashboardOutlined)(({ theme }) => ({
+    color: theme.palette.mode === 'dark' ? theme.palette.text.primary : '#666666',
+}));
 
-export const StyledSettingsIcon = styled(Settings)({
-    color: '#666666',
-});
+export const StyledInboxIcon = styled(InboxOutlined)(({ theme }) => ({
+    color: theme.palette.mode === 'dark' ? theme.palette.text.primary : '#666666',
+}));
 
-export const StyledLogoutIcon = styled(Logout)({
-    color: '#666666',
-});
+export const StyledFavoriteIcon = styled(FavoriteBorderOutlined)(({ theme }) => ({
+    color: theme.palette.mode === 'dark' ? theme.palette.text.primary : '#666666',
+}));
 
-export const StyledFavoriteIcon = styled(FavoriteBorderOutlined)({
-    color: '#666666',
-});
+export const StyledLogoutIcon = styled(Logout)(({ theme }) => ({
+    color: theme.palette.mode === 'dark' ? theme.palette.text.primary : '#666666',
+}));
 
 export const StyledHomeIcon = styled(HomeOutlined)({
     color: '#666666',
 })
-
-export const StyledInboxIcon = styled(InboxOutlined)({
-    color: '#666666',
-});
 
 export const StyledMoveToInboxIcon = styled(MoveToInboxOutlined)({
     color: '#666666',
@@ -534,6 +578,196 @@ export const CustomOrdersIcon = ({ isActive }) => <Inbox style={{ color: isActiv
 export const CustomReturnIcon = ({ isActive }) => <MoveToInbox style={{ color: isActive ? activeColor : 'inherit' }} />;
 export const CustomWishlistIcon = ({ isActive }) => <Favorite style={{ color: isActive ? activeColor : 'inherit' }} />;
 export const CustomReviewsIcon = ({ isActive }) => <Star style={{ color: isActive ? activeColor : 'inherit' }} />;
+
+export const CreateIcon = ({ theme }) => (
+    <CreateOutlined sx={{ color: theme.palette.mode === 'dark' ? theme.palette.text.primary : 'inherit' }} />
+);
+
+export const VisibilityIcon = ({ theme }) => (
+    <Visibility sx={{ color: theme.palette.mode === 'dark' ? theme.palette.text.primary : 'inherit' }} />
+);
+
+export const EuroAdornment = () => {
+    return {
+        startAdornment: (
+            <InputAdornment position="start">
+                <EuroSymbol fontSize="10px" />
+            </InputAdornment>
+        ),
+    };
+};
+
+export const IdAdornment = () => {
+    return {
+        startAdornment: (
+            <InputAdornment position="start">
+                <Tag fontSize="10px" />
+            </InputAdornment>
+        ),
+    };
+};
+
+export const DateAdornment = () => {
+    return {
+        startAdornment: (
+            <InputAdornment position="start">
+                <CalendarMonth fontSize="10px" />
+            </InputAdornment>
+        ),
+    };
+};
+
+export const DescriptionAdornment = () => {
+    return {
+        startAdornment: (
+            <InputAdornment position="start">
+                <Description fontSize="10px" />
+            </InputAdornment>
+        ),
+    };
+};
+
+export const PersonAdornment = () => {
+    return {
+        startAdornment: (
+            <InputAdornment position="start">
+                <Person fontSize="10px" />
+            </InputAdornment>
+        ),
+    };
+};
+
+export const InventoryAdornment = () => {
+    return {
+        startAdornment: (
+            <InputAdornment position="start">
+                <InventoryOutlined fontSize="10px" />
+            </InputAdornment>
+        ),
+    };
+};
+
+export const ShippingAdornment = () => {
+    return {
+        startAdornment: (
+            <InputAdornment position="start">
+                <LocalShipping fontSize="10px" />
+            </InputAdornment>
+        ),
+    };
+};
+
+export const PaymentStatusAdornment = (status) => {
+    let icon;
+    switch (status) {
+        case 'completed':
+            icon = <CheckCircle fontSize="10px" />;
+            break;
+        case 'failed':
+            icon = <ErrorOutline fontSize="10px" />;
+            break;
+        default:
+            icon = <HourglassTop fontSize="10px" />;
+    }
+    return {
+        startAdornment: <InputAdornment position="start">{icon}</InputAdornment>,
+    };
+};
+
+export const PaymentMethodAdornment = (method) => {
+    let icon;
+    switch (method) {
+        case 'cash':
+            icon = <LocalAtm fontSize="10px" />;
+            break;
+        default:
+            icon = <CreditCard fontSize="10px" />;
+    }
+    return {
+        startAdornment: <InputAdornment position="start">{icon}</InputAdornment>,
+    };
+};
+
+export const DeliveryStatusAdornment = (status) => {
+    let icon;
+    switch (status) {
+        case 'processed':
+            icon = <HourglassBottom fontSize="10px" />;
+            break;
+        case 'shipped':
+            icon = <LocalShipping fontSize="10px" />;
+            break;
+        case 'delivered':
+            icon = <CheckCircle fontSize="10px" />;
+            break;
+        case 'canceled':
+            icon = <Cancel fontSize="10px" />;
+            break;
+        default:
+            icon = <HourglassTop fontSize="10px" />;
+    }
+    return {
+        startAdornment: <InputAdornment position="start">{icon}</InputAdornment>,
+    };
+};
+
+export const ReturnStatusAdornment = (status) => {
+    let icon;
+    switch (status) {
+        case 'approved':
+            icon = <HourglassBottom fontSize="10px" />;
+            break;
+        case 'processed':
+            icon = <CheckCircle fontSize="10px" />;
+            break;
+        case 'rejected':
+            icon = <Cancel fontSize="10px" />;
+            break;
+        default:
+            icon = <HourglassTop fontSize="10px" />;
+    }
+    return {
+        startAdornment: <InputAdornment position="start">{icon}</InputAdornment>,
+    };
+};
+
+export const RenderOrderDelStatus = ({ order }) => {
+    const adornment = DeliveryStatusAdornment(order.status);
+
+    return (
+        <div style={{ display: 'flex', alignItems: 'center' }}>
+            {adornment.startAdornment}
+            <span style={{ marginLeft: '8px' }}>{order.status}</span>
+        </div>
+    );
+};
+
+export const RenderReturnStatus = ({ returnRequest }) => {
+    const adornment = ReturnStatusAdornment(returnRequest.status);
+
+    return (
+        <div style={{ display: 'flex', alignItems: 'center' }}>
+            {adornment.startAdornment}
+            <span style={{ marginLeft: '8px' }}>{returnRequest.status}</span>
+        </div>
+    );
+};
+
+export const RenderOrderPaymentInfo = (order) => {
+    const { paymentMethod, paymentStatus } = order;
+    const paymentMethodAdornment = PaymentMethodAdornment(paymentMethod);
+    const paymentStatusAdornment = PaymentStatusAdornment(paymentStatus);
+
+    return (
+        <div style={{ display: 'flex', alignItems: 'center' }}>
+            {paymentMethodAdornment.startAdornment}
+            {paymentStatusAdornment.startAdornment}
+            <span style={{ marginLeft: '8px' }}>
+                {paymentMethod} - {paymentStatus}
+            </span>
+        </div>
+    );
+};
 
 export const WaveSkeleton = (props) => <Skeleton animation="wave" {...props} />;
 
@@ -831,14 +1065,14 @@ export const LoadingOrderDetails = ({ isOrder = true }) => {
             {/* Progress Card WaveSkeleton */}
             <Box className="bg-white shadow-md rounded-lg p-6 mb-4">
                 <div className='flex flex-col items-center'>
-                    <WaveSkeleton variant="text" width="60%" height={30} />
+                    <WaveSkeleton variant="text" width="20%" height={30} />
                     <WaveSkeleton variant="text" width="40%" height={20} />
                 </div>
                 <div className='flex flex-col items-center'>
                     <WaveSkeleton variant="text" width="50%" height={40} />
                 </div>
-                <Box className="flex justify-center gap-20">
-                    {Array.from({ length: 3 }).map((_, index) => (
+                <Box className={`flex justify-center ${isOrder ? "gap-7" : "gap-20"}`}>
+                    {Array.from({ length: isOrder ? 4 : 3 }).map((_, index) => (
                         <WaveSkeleton key={index} variant="text" width="10%" height={20} />
                     ))}
                 </Box>
@@ -956,21 +1190,39 @@ export const LoadingCategoryDropdown = () => (
 );
 
 export const LoadingDataGrid = () => {
+    const theme = useTheme();
     const rows = Array(10).fill(null);
     const columns = Array(6).fill({ width: [280, 220, 280, 220, 280, 110] });
 
     return (
         <>
             {/* Actions Header */}
-            <div className="bg-white p-4 flex items-center justify-between w-full mb-4 rounded-md">
-                <WaveSkeleton variant="text" width="10%" height={25} />
+            <div style={loadingDataGridContainerSx(theme)} className="p-4 flex items-center justify-between w-full mb-4 rounded-md">
+                <WaveSkeleton
+                    variant="text"
+                    width="10%"
+                    height={25}
+                    sx={loadingDataGridSkeletonSx(theme)}
+                />
                 <div className="flex items-center gap-3">
-                    <WaveSkeleton variant="rectangular" width={85} height={25} className="rounded-md" />
-                    <WaveSkeleton variant="circular" width={25} height={25} />
+                    <WaveSkeleton
+                        variant="rectangular"
+                        width={85}
+                        height={25}
+                        sx={loadingDataGridSkeletonSx(theme)}
+                        className="rounded-md"
+                    />
+                    <WaveSkeleton
+                        variant="circular"
+                        width={25}
+                        height={25}
+                        sx={loadingDataGridSkeletonSx(theme)}
+                    />
                 </div>
             </div>
 
-            <div className="bg-white p-4 rounded-md">
+            {/* Table Container */}
+            <div style={loadingDataGridContainerSx(theme)} className="p-4 rounded-md">
                 {/* Table Header */}
                 <div className="flex justify-end items-center pb-4 border-b gap-3">
                     {[...Array(4)].map((_, i) => (
@@ -979,6 +1231,7 @@ export const LoadingDataGrid = () => {
                             variant="rectangular"
                             width={60}
                             height={25}
+                            sx={loadingDataGridSkeletonSx(theme)}
                             className="rounded-md"
                         />
                     ))}
@@ -993,6 +1246,7 @@ export const LoadingDataGrid = () => {
                                 variant="rectangular"
                                 width={width}
                                 height={25}
+                                sx={loadingDataGridSkeletonSx(theme)}
                                 className="rounded-md"
                             />
                         ))}
@@ -1001,14 +1255,27 @@ export const LoadingDataGrid = () => {
 
                 {/* Footer */}
                 <div className="flex justify-end items-center mt-1 pt-4 gap-3">
-                    <WaveSkeleton variant="rectangular" width={150} height={25} className="rounded" />
-                    <WaveSkeleton variant="rectangular" width={50} height={25} className="rounded" />
+                    <WaveSkeleton
+                        variant="rectangular"
+                        width={150}
+                        height={25}
+                        sx={loadingDataGridSkeletonSx(theme)}
+                        className="rounded"
+                    />
+                    <WaveSkeleton
+                        variant="rectangular"
+                        width={50}
+                        height={25}
+                        sx={loadingDataGridSkeletonSx(theme)}
+                        className="rounded"
+                    />
                     {[...Array(2)].map((_, i) => (
                         <WaveSkeleton
                             key={`footer-${i}`}
                             variant="circular"
                             width={25}
                             height={25}
+                            sx={loadingDataGridSkeletonSx(theme)}
                             className="rounded"
                         />
                     ))}
@@ -1096,11 +1363,12 @@ export const CollapsibleListItem = ({ open, handleClick, icon, primary, children
     </>
 );
 
-export const ActiveListItem = ({ icon, primary, handleClick, selected, sx, isMainPage = false }) => (
+export const ActiveListItem = ({ icon, primary, handleClick, selected, sx, isMainPage = false, isDashboard = false }) => (
     <ActiveListItemButton
         onClick={handleClick}
         selected={selected}
         isMainPage={isMainPage}
+        isDashboard={isDashboard}
         sx={sx}
     >
         <ListItemIcon>{icon}</ListItemIcon>
@@ -1321,40 +1589,69 @@ export const BounceAnimation = forwardRef(({ children }, ref) => (
     </motion.div>
 ));
 
-export const CustomModal = ({ open, onClose, children, ...props }) => (
-    <AnimatePresence>
-        <Modal
-            open={open}
-            onClose={onClose}
-            disableAutoFocus
-            disableEnforceFocus
-            sx={customModalSx}
-            {...props}
-            className="flex items-center justify-center p-4 sm:p-0 outline-none"
-        >
-            <BounceAnimation>
-                <Box
-                    tabIndex="-1"
-                    sx={customBoxSx}
-                    className="bg-white rounded-lg shadow-lg w-full mx-auto max-w-[95vw] sm:max-w-md outline-none"
-                >
-                    {children}
-                </Box>
-            </BounceAnimation>
-        </Modal>
-    </AnimatePresence>
-);
+export const CustomModal = ({ open, onClose, children, ...props }) => {
+    const theme = useTheme();
 
-export const CustomBox = (props) => (
-    <Box className="bg-white p-3 sm:p-4 rounded-lg w-full !outline-none !focus:outline-none" {...props} />
-);
+    return (
+        <AnimatePresence>
+            <Modal
+                open={open}
+                onClose={onClose}
+                disableAutoFocus
+                disableEnforceFocus
+                sx={customModalSx}
+                className="flex items-center justify-center p-4 sm:p-0 outline-none"
+                {...props}
+            >
+                <BounceAnimation>
+                    <Box
+                        tabIndex="-1"
+                        sx={boxSx(theme)}
+                        className="rounded-lg shadow-lg w-full mx-auto max-w-[95vw] sm:max-w-md outline-none"
+                    >
+                        {children}
+                    </Box>
+                </BounceAnimation>
+            </Modal>
+        </AnimatePresence>
+    );
+};
+
+export const CustomBox = (props) => {
+    const theme = useTheme();
+
+    return (
+        <Box
+            sx={customBoxSx(theme)}
+            className={`p-3 sm:p-4 rounded-lg w-full !outline-none !focus:outline-none`}
+            {...props}
+        />
+    );
+};
+
 
 export const BoxBetween = (props) => (
     <Box sx={{ display: 'flex', justifyContent: 'space-between', gap: 2 }} {...props} />
 )
 
-export const CustomTypography = (props) => (
-    <Typography className="!text-xl !font-bold !mb-3" {...props} />
+export const CustomTypography = (props) => {
+    const { theme } = useDashboardTheme();
+
+    return (
+        <Typography
+            sx={{
+                color: theme.palette.text.primary,
+            }}
+            className="!text-xl !font-bold !mb-3"
+            {...props}
+        />
+    );
+};
+
+export const DrawerTypography = ({ theme, children }) => (
+    <Typography variant="body2" style={{ color: theme.palette.text.primary }}>
+        {children}
+    </Typography>
 );
 
 export const CloseButton = ({ onClose }) => (
@@ -1367,17 +1664,28 @@ export const CloseButton = ({ onClose }) => (
     </IconButton>
 );
 
-export const ReadOnlyTextField = (props) => (
-    <TextField
-        variant="outlined"
-        fullWidth
-        InputProps={{
-            readOnly: true,
-            ...props.InputProps
-        }}
-        {...props}
-    />
-);
+export const ReadOnlyTextField = styled((props) => {
+    return (
+        <TextField
+            variant="outlined"
+            fullWidth
+            InputProps={{
+                readOnly: true,
+                ...props.InputProps,
+            }}
+            {...props}
+        />
+    );
+})(({ theme }) => ({
+    '& .MuiOutlinedInput-root': {
+        '&.Mui-focused fieldset': {
+            borderColor: theme.palette.mode === 'dark' ? '#FFFFFF' : '#7C7164',
+        },
+    },
+    '& .MuiInputLabel-root.Mui-focused': {
+        color: theme.palette.mode === 'dark' ? '#FFFFFF' : '#7C7164',
+    },
+}));
 
 export const LoadingLabel = ({ loading, defaultLabel = 'Add', loadingLabel = 'Adding' }) => (
     <>
@@ -1468,31 +1776,54 @@ export const EditExportButtons = ({
     );
 };
 
-export const CustomDeleteModal = ({ open, onClose, onDelete, loading, title, message }) => (
-    <AnimatePresence>
-        <Modal open={open} onClose={onClose} className="flex items-center justify-center outline-none">
-            <BounceAnimation>
-                <Box className="bg-white p-4 rounded-lg shadow-lg w-full">
-                    <Typography variant="h6" className="text-xl font-bold mb-2">
-                        {title}
-                    </Typography>
-                    <Typography variant="body1" className="mb-4">
-                        {message}
-                    </Typography>
-                    <div className="flex justify-end mt-4">
-                        <OutlinedBrownButton onClick={onClose} variant="outlined" className="!mr-4">
-                            Cancel
-                        </OutlinedBrownButton>
-                        <BrownButton onClick={onDelete} variant="contained" color="error" disabled={loading}>
-                            <LoadingLabel loading={loading} defaultLabel="Delete" loadingLabel="Deleting" />
-                        </BrownButton>
-                    </div>
-                </Box>
-            </BounceAnimation>
-        </Modal>
-    </AnimatePresence>
-);
+export const CustomDeleteModal = ({ open, onClose, onDelete, loading, title, message }) => {
+    const theme = useTheme();
 
+    return (
+        <AnimatePresence>
+            <Modal open={open} onClose={onClose} className="flex items-center justify-center outline-none">
+                <BounceAnimation>
+                    <Box
+                        style={deleteModalBoxSx(theme)}
+                        className="p-4 rounded-lg shadow-lg w-full"
+                    >
+                        <Typography
+                            variant="h6"
+                            style={deleteModalTypographySx(theme)}
+                            className="text-xl font-bold mb-2"
+                        >
+                            {title}
+                        </Typography>
+                        <Typography
+                            variant="body1"
+                            style={deleteModalTypographySx(theme)}
+                            className="mb-4"
+                        >
+                            {message}
+                        </Typography>
+                        <div className="flex justify-end mt-4">
+                            <OutlinedBrownButton
+                                onClick={onClose}
+                                variant="outlined"
+                                sx={deleteModalButtonSx(theme)}
+                                className="!mr-4"
+                            >
+                                Cancel
+                            </OutlinedBrownButton>
+                            <BrownButton
+                                onClick={onDelete}
+                                variant="contained"
+                                disabled={loading}
+                            >
+                                <LoadingLabel loading={loading} defaultLabel="Delete" loadingLabel="Deleting" />
+                            </BrownButton>
+                        </div>
+                    </Box>
+                </BounceAnimation>
+            </Modal>
+        </AnimatePresence>
+    );
+};
 export const DetailsBreadcrumbs = ({ product }) => {
     const isMobile = useMediaQuery('(max-width:600px)');
 
@@ -1962,21 +2293,45 @@ export const ZOOM_FACTOR = 0.65;
 export const MAX_ZOOM_LEVEL = 1 + 2 * ZOOM_FACTOR;
 
 export const ImagePreviewControls = ({ scale, setScale, isFullscreen, adjustZoom, toggleFullscreen, resetAndClose }) => {
+    const theme = useTheme();
+
     return (
-        <div onClick={(e) => e.stopPropagation()} className="absolute top-2 right-2 flex gap-2 p-1 bg-white rounded">
-            <IconButton onClick={() => adjustZoom('out')} disabled={scale <= 1} className="text-gray-600 disabled:text-gray-400">
+        <div
+            onClick={(e) => e.stopPropagation()}
+            style={{ backgroundColor: theme.palette.background.paper, }}
+            className="absolute top-2 right-2 flex gap-2 p-1 rounded"
+        >
+            <IconButton
+                onClick={() => adjustZoom('out')}
+                disabled={scale <= 1}
+                style={{ color: theme.palette.text.secondary, }}
+            >
                 <ZoomOut />
             </IconButton>
-            <IconButton onClick={() => adjustZoom('in')} disabled={scale >= MAX_ZOOM_LEVEL} className="text-gray-600 disabled:text-gray-400">
+            <IconButton
+                onClick={() => adjustZoom('in')}
+                disabled={scale >= MAX_ZOOM_LEVEL}
+                style={{ color: theme.palette.text.secondary, }}
+            >
                 <ZoomIn />
             </IconButton>
-            <IconButton onClick={() => setScale(1)} disabled={scale === 1} className={`text-gray-600 ${scale === 1 ? 'disabled:text-gray-400' : ''}`}>
+            <IconButton
+                onClick={() => setScale(1)}
+                disabled={scale === 1}
+                style={{ color: scale === 1 ? theme.palette.text.disabled : theme.palette.text.secondary, }}
+            >
                 <Replay />
             </IconButton>
-            <IconButton onClick={toggleFullscreen} className={`text-${isFullscreen ? 'blue-500' : 'gray-600'}`}>
+            <IconButton
+                onClick={toggleFullscreen}
+                style={{ color: isFullscreen ? theme.palette.primary.main : theme.palette.text.secondary, }}
+            >
                 {isFullscreen ? <FullscreenExit /> : <Fullscreen />}
             </IconButton>
-            <IconButton onClick={resetAndClose} className="text-gray-600">
+            <IconButton
+                onClick={resetAndClose}
+                style={{ color: theme.palette.text.secondary }}
+            >
                 <Close />
             </IconButton>
         </div>
@@ -2686,31 +3041,43 @@ export const pluralize = (word, count) => {
     return word.endsWith('y') ? `${word.slice(0, -1)}ies` : `${word}s`;
 };
 
-export const DropdownMenu = ({ open, onClose, options, anchorEl }) => (
-    <Menu
-        open={open}
-        onClose={onClose}
-        anchorEl={anchorEl}
-        elevation={1}
-        anchorOrigin={{ vertical: 'bottom', horizontal: 'right' }}
-        transformOrigin={{ vertical: 'top', horizontal: 'right' }}
-    >
-        {options.map((option, index) => (
-            <MenuItem
-                key={index}
-                onClick={() => {
-                    option.onClick();
-                    onClose();
-                }}
-                autoFocus={false}
-            >
-                {option.label === "Export as Excel" && <Download className="mr-2 text-stone-600" />}
-                {option.label === "Export as JSON" && <FileCopy className="mr-2 text-stone-600" />}
-                {option.label}
-            </MenuItem>
-        ))}
-    </Menu>
-);
+const DownloadIcon = ({ theme }) => {
+    return <Download style={{ color: theme.palette.icon.main }} className="mr-2 text-stone-600" />
+};
+
+const FileCopyIcon = ({ theme }) => {
+    return <FileCopy style={{ color: theme.palette.icon.main }} className="mr-2 text-stone-600" />
+};
+
+export const DropdownMenu = ({ open, onClose, options, anchorEl }) => {
+    const theme = useTheme();
+
+    return (
+        <Menu
+            open={open}
+            onClose={onClose}
+            anchorEl={anchorEl}
+            elevation={1}
+            anchorOrigin={{ vertical: 'bottom', horizontal: 'right' }}
+            transformOrigin={{ vertical: 'top', horizontal: 'right' }}
+        >
+            {options.map((option, index) => (
+                <MenuItem
+                    key={index}
+                    onClick={() => {
+                        option.onClick();
+                        onClose();
+                    }}
+                    autoFocus={false}
+                >
+                    {option.label === "Export as Excel" && <DownloadIcon theme={theme} />}
+                    {option.label === "Export as JSON" && <FileCopyIcon theme={theme} />}
+                    {option.label}
+                </MenuItem>
+            ))}
+        </Menu>
+    );
+};
 
 export const exportOptions = (data, handleExport) => [
     { label: 'Export as Excel', onClick: () => handleExport(data, 'excel') },
@@ -2726,6 +3093,8 @@ export const DashboardHeader = ({
     itemName,
     showAddButton = true,
 }) => {
+    const { theme } = useDashboardTheme();
+
     const isMultipleSelected = selectedItems.length > 1;
     const itemNamePlural = pluralize(itemName, selectedItems.length);
     const [anchorEl, setAnchorEl] = useState(null);
@@ -2753,29 +3122,45 @@ export const DashboardHeader = ({
     };
 
     return (
-        <div className="bg-white sticky top-16 z-50 p-4 flex items-center justify-between w-full mb-4 rounded-md shadow-sm border-b">
+        <div
+            style={dashboardHeaderSx(theme)}
+            className="sticky top-16 z-50 p-4 flex items-center justify-between w-full mb-4 rounded-md shadow-sm border-b"
+        >
             <Tooltip title="Scroll to top" arrow>
-                <Button onClick={handleScrollToTop} sx={dashboardTitleSx}>
+                <Button
+                    onClick={handleScrollToTop}
+                    sx={dashboardTitleSx(theme)}
+                >
                     {title}
                 </Button>
             </Tooltip>
             <div>
                 {showAddButton && (
                     <Tooltip title="Shortcut: Alt + A" placement="top" arrow enterDelay={2000}>
-                        <OutlinedBrownButton onClick={() => setAddItemOpen(true)} className="!mr-4">
+                        <OutlinedBrownButton
+                            onClick={() => setAddItemOpen(true)}
+                            sx={addItemSx(theme)}
+                            className="!mr-4"
+                        >
                             Add {itemName}
                         </OutlinedBrownButton>
                     </Tooltip>
                 )}
                 {selectedItems.length > 0 && (
-                    <OutlinedBrownButton onClick={() => setDeleteItemOpen(true)}>
+                    <OutlinedBrownButton
+                        onClick={() => setDeleteItemOpen(true)}
+                        sx={deleteItemSx(theme)}
+                    >
                         {isMultipleSelected ? `Delete ${itemNamePlural}` : `Delete ${itemName}`}
                     </OutlinedBrownButton>
                 )}
 
                 <Tooltip title="Export options" placement="top" arrow>
-                    <IconButton onClick={handleDropdownToggle}>
-                        <MoreVert className="text-stone-600" />
+                    <IconButton
+                        onClick={handleDropdownToggle}
+                        sx={exportIconSx(theme)}
+                    >
+                        <MoreVert />
                     </IconButton>
                 </Tooltip>
             </div>
@@ -2902,7 +3287,8 @@ const DropdownAnimation = ({ isOpen, children }) => (
     </AnimatePresence>
 );
 
-export const ProfileDropdown = ({ isOpen, isAdmin, handleLogout }) => {
+export const ProfileDropdown = ({ isOpen, isAdmin, isOrderManager, isContentManager, isProductManager, handleLogout }) => {
+    const theme = useTheme();
     const navigate = useNavigate();
 
     const handleNavigate = (path) => {
@@ -2912,38 +3298,75 @@ export const ProfileDropdown = ({ isOpen, isAdmin, handleLogout }) => {
     return (
         <div
             tabIndex="0"
-            className="absolute right-0 mt-1 w-48 bg-white border shadow-lg rounded-lg p-2"
+            style={profileDropdownContainerSx(theme)}
+            className="absolute right-0 mt-1 w-48 border shadow-lg rounded-lg p-2"
         >
             <DropdownAnimation isOpen={isOpen}>
-                {isAdmin && (
+                {(isAdmin || isOrderManager || isContentManager || isProductManager) && (
                     <>
-                        <button
-                            onClick={() => handleNavigate('/dashboard/users')}
-                            className="flex items-center px-2 py-2 mb-2 text-stone-700 hover:bg-stone-100 no-underline w-full text-left"
-                        >
-                            <StyledDashboardIcon className="mr-2" />
-                            Dashboard
-                        </button>
+                        {isAdmin && (
+                            <button
+                                onClick={() => handleNavigate('/dashboard/users')}
+                                style={profileDropdownButtonSx(theme)}
+                                className={`flex items-center px-2 py-2 mb-2 ${theme.palette.mode === 'light' ? 'hover:bg-gray-100' : 'hover:bg-[#292929]'} no-underline w-full text-left`}
+                            >
+                                <StyledDashboardIcon className={`mr-2 ${theme.palette.mode === 'light' ? '' : 'text-white'}`} />
+                                Dashboard
+                            </button>
+                        )}
+                        {isOrderManager && (
+                            <button
+                                onClick={() => handleNavigate('/dashboard/orders')}
+                                style={profileDropdownButtonSx(theme)}
+                                className={`flex items-center px-2 py-2 mb-2 ${theme.palette.mode === 'light' ? 'hover:bg-gray-100' : 'hover:bg-[#292929]'} no-underline w-full text-left`}
+                            >
+                                <StyledDashboardIcon className="mr-2" />
+                                Orders
+                            </button>
+                        )}
+                        {isContentManager && (
+                            <button
+                                onClick={() => handleNavigate('/dashboard/images')}
+                                style={profileDropdownButtonSx(theme)}
+                                className={`flex items-center px-2 py-2 mb-2 ${theme.palette.mode === 'light' ? 'hover:bg-gray-100' : 'hover:bg-[#292929]'} no-underline w-full text-left`}
+                            >
+                                <StyledDashboardIcon className="mr-2" />
+                                Images
+                            </button>
+                        )}
+                        {isProductManager && (
+                            <button
+                                onClick={() => handleNavigate('/dashboard/products')}
+                                style={profileDropdownButtonSx(theme)}
+                                className={`flex items-center px-2 py-2 mb-2 ${theme.palette.mode === 'light' ? 'hover:bg-gray-100' : 'hover:bg-[#292929]'} no-underline w-full text-left`}
+                            >
+                                <StyledDashboardIcon className="mr-2" />
+                                Products
+                            </button>
+                        )}
                         <Divider className='!mb-2' />
                     </>
                 )}
                 <button
                     onClick={() => handleNavigate('/profile/me')}
-                    className="flex items-center px-2 py-2 text-stone-700 hover:bg-stone-100 no-underline w-full text-left"
+                    style={profileDropdownButtonSx(theme)}
+                    className={`flex items-center px-2 py-2 ${theme.palette.mode === 'light' ? 'hover:bg-gray-100' : 'hover:bg-[#292929]'} no-underline w-full text-left`}
                 >
                     <StyledPersonIcon className="mr-2" />
                     Profile
                 </button>
                 <button
                     onClick={() => handleNavigate('/profile/orders')}
-                    className="flex items-center px-2 py-2 text-stone-700 hover:bg-stone-100 no-underline w-full text-left"
+                    style={profileDropdownButtonSx(theme)}
+                    className={`flex items-center px-2 py-2 ${theme.palette.mode === 'light' ? 'hover:bg-gray-100' : 'hover:bg-[#292929]'} no-underline w-full text-left`}
                 >
                     <StyledInboxIcon className="mr-2" />
                     Orders
                 </button>
                 <button
                     onClick={() => handleNavigate('/profile/wishlist')}
-                    className="flex items-center px-2 py-2 mb-2 text-stone-700 hover:bg-stone-100 no-underline w-full text-left"
+                    style={profileDropdownButtonSx(theme)}
+                    className={`flex items-center px-2 py-2 mb-2 ${theme.palette.mode === 'light' ? 'hover:bg-gray-100' : 'hover:bg-[#292929]'} no-underline w-full text-left`}
                 >
                     <StyledFavoriteIcon className="mr-2" />
                     Wishlist
@@ -2951,7 +3374,8 @@ export const ProfileDropdown = ({ isOpen, isAdmin, handleLogout }) => {
                 <Divider className='!mb-2' />
                 <button
                     onClick={handleLogout}
-                    className="flex items-center w-full px-2 py-2 text-stone-700 hover:bg-stone-100 text-left"
+                    style={profileDropdownButtonSx(theme)}
+                    className={`flex items-center w-full px-2 py-2 ${theme.palette.mode === 'light' ? 'hover:bg-gray-100' : 'hover:bg-[#292929]'} text-left`}
                 >
                     <StyledLogoutIcon className="mr-2" />
                     Log Out
@@ -3060,7 +3484,15 @@ export const CartDropdown = ({
                         <div className="flex justify-between items-center mt-4 mb-4">
                             <div className="flex justify-start items-center space-x-1">
                                 <span className="font-semibold">Total:</span>
-                                <span className="font-semibold">{formatPrice(cartTotal)} €</span>
+                                <span className="font-semibold">
+                                    <CountUp
+                                        end={cartTotal}
+                                        duration={0.6}
+                                        separator=","
+                                        decimals={2}
+                                        prefix="€ "
+                                    />
+                                </span>
                             </div>
                         </div>
                         <BrownButton onClick={handleGoToCart} disabled={isLoading} fullWidth>
@@ -3096,7 +3528,7 @@ export const NavbarLogo = ({ dashboardStyling }) => {
             e.preventDefault();
             navigate('/');
         }}>
-            <div className={`flex items-center cursor-pointer ${dashboardStyling || ''}`}>
+            <div className={`flex items-center cursor-pointer ${dashboardStyling || ''}`}   >
                 <img src={logo} alt="logo" className="w-[132px] md:w-auto h-9" />
             </div>
         </a>
@@ -3104,6 +3536,8 @@ export const NavbarLogo = ({ dashboardStyling }) => {
 };
 
 export const ProfileIcon = ({ handleProfileDropdownToggle, isDropdownOpen }) => {
+    const theme = useTheme();
+
     const { user, loading } = useSelector((state) => state.auth);
 
     return (
@@ -3126,7 +3560,10 @@ export const ProfileIcon = ({ handleProfileDropdownToggle, isDropdownOpen }) => 
                     <WaveSkeleton variant="text" width={80} height={20} className="ml-2" />
                 ) : (
                     user?.firstName && (
-                        <span className="text-sm overflow-hidden text-ellipsis ml-2 ">
+                        <span
+                            style={profileIconSx(theme)}
+                            className="text-sm overflow-hidden text-ellipsis ml-2"
+                        >
                             {user.firstName}
                         </span>
                     )
@@ -3486,7 +3923,10 @@ export const AuthActions = ({
     isDropdownOpen,
     setIsProfileDropdownOpen,
     handleLogout,
-    isAdmin
+    isAdmin,
+    isOrderManager,
+    isContentManager,
+    isProductManager,
 }) => {
     const handleClickAway = () => {
         if (isDropdownOpen) {
@@ -3511,6 +3951,9 @@ export const AuthActions = ({
                                 <ProfileDropdown
                                     isOpen={isDropdownOpen}
                                     isAdmin={isAdmin}
+                                    isOrderManager={isOrderManager}
+                                    isContentManager={isContentManager}
+                                    isProductManager={isProductManager}
                                     handleLogout={handleLogout}
                                 />
                             )}
@@ -3567,14 +4010,20 @@ export const DashboardSearchSuggestions = ({
     handleSuggestionClick,
     searchTerm,
 }) => {
+    const theme = useTheme();
+
     return (
         <div
             ref={suggestionsRef}
-            className="absolute left-2 right-2 mt-1 max-h-72 overflow-y-auto z-50 mb-2 border border-gray-200 rounded-md bg-white shadow"
+            style={dashboardSearchSuggestionsSx(theme)}
+            className="absolute left-2 right-2 mt-1 max-h-72 overflow-y-auto z-50 mb-2 border rounded-md shadow"
         >
             {searchTerm && suggestions.length === 0 ? (
-                <div className="px-4 py-2 text-stone-500 flex items-center gap-2">
-                    <SearchOff className="w-5 h-5 text-stone-500" />
+                <div
+                    style={dashboardSearchItemSx(theme)}
+                    className="px-4 py-2 flex items-center gap-2"
+                >
+                    <SearchOff style={dashboardSearchItemSx(theme)} className="w-5 h-5" />
                     No items found
                 </div>
             ) : (
@@ -3582,12 +4031,13 @@ export const DashboardSearchSuggestions = ({
                     <div
                         key={item.id}
                         onClick={() => handleSuggestionClick(item)}
-                        className={`px-4 pt-[10px] pb-[10px] hover:bg-gray-100 cursor-pointer flex items-center gap-4 transition duration-150 ease-in-out ${index === selectedIndex ? 'bg-gray-100 border-l-4 border-stone-500 rounded' : ''}`}
+                        style={dashboardSearchItemsSx({ theme }, { index, selectedIndex })}
+                        className={`px-4 pt-[10px] pb-[10px] cursor-pointer flex items-center gap-4 transition duration-150 ease-in-out ${index === selectedIndex ? 'border-l-4 rounded' : ''}`}
                     >
                         {item.icon?.inactive && (
-                            <item.icon.inactive className="w-5 h-5 text-stone-500" />
+                            <item.icon.inactive style={dashboardSearchItemSx(theme)} className="w-5 h-5" />
                         )}
-                        <span className="text-stone-800">{item.label}</span>
+                        <span>{item.label}</span>
                     </div>
                 ))
             )}
@@ -3720,6 +4170,7 @@ export const DashboardSearchBar = ({ collapsed, onMenuItemClick, getAllMenuItems
 export const ImageUploadBox = ({ onFileSelect, initialPreview }) => {
     const [imagePreview, setImagePreview] = useState(initialPreview || null);
     const [isDragging, setIsDragging] = useState(false);
+    const theme = useTheme();
 
     useEffect(() => {
         setImagePreview(initialPreview || null);
@@ -3778,8 +4229,8 @@ export const ImageUploadBox = ({ onFileSelect, initialPreview }) => {
                 />
             ) : (
                 <>
-                    <UploadFile sx={{ fontSize: 45 }} className={`text-${isDragging ? 'stone-700' : 'stone-600'}`} />
-                    <CustomTypography variant="body1" className={`text-${isDragging ? 'brown-500' : 'brown-200'}`}>
+                    <UploadFile sx={{ fontSize: 45 }} className={`text-${theme.palette.mode === 'dark' ? 'white' : isDragging ? 'stone-700' : 'stone-600'}`} />
+                    <CustomTypography variant="body1" className={`text-${theme.palette.mode === 'dark' ? 'white' : isDragging ? 'brown-500' : 'brown-200'}`}>
                         Drag and drop an image here or click to select
                     </CustomTypography>
                 </>
@@ -3829,11 +4280,13 @@ export const DashboardImage = ({ item, handleImageClick }) => {
 };
 
 export const DashboardAppBar = ({ open, children }) => {
+    const { theme } = useDashboardTheme();
+
     return (
         <AppBar
             position="absolute"
             open={open}
-            sx={{ boxShadow: '1px 0px 3px rgba(0, 0, 0, 0.1)', display: 'flex' }}
+            sx={dashboardAppBarSx(theme)}
         >
             {children}
         </AppBar>
@@ -3841,11 +4294,21 @@ export const DashboardAppBar = ({ open, children }) => {
 };
 
 export const DashboardToolbar = ({ children }) => {
+    const { theme } = useDashboardTheme();
+
     return (
-        <Toolbar sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+        <Toolbar sx={dashboardToolBarSx(theme)} >
             {children}
         </Toolbar>
-    )
+    );
+};
+
+const ToggleDarkMode = ({ toggleTheme, mode }) => {
+    return (
+        <IconButton onClick={toggleTheme} color="inherit">
+            {mode === 'dark' ? <LightMode /> : <DarkMode className='text-stone-500' />}
+        </IconButton>
+    );
 };
 
 export const DashboardNavbar = ({
@@ -3854,9 +4317,13 @@ export const DashboardNavbar = ({
     auth,
     handleProfileDropdownToggle,
     handleLogout,
-    isAdmin
+    isAdmin,
+    isOrderManager,
+    isContentManager,
+    isProductManager,
 }) => {
     const [isProfileDropdownOpen, setIsProfileDropdownOpen] = useState(false);
+    const { toggleTheme, mode } = useDashboardTheme();
 
     return (
         <DashboardAppBar open={open}>
@@ -3867,15 +4334,21 @@ export const DashboardNavbar = ({
                     <div className="flex items-center mb-5">
                         <NavbarLogo dashboardStyling={'relative top-2 w-24 h-11 md:w-full md:h-full'} />
                     </div>
+                    <div className="flex items-center gap-4">
+                        <AuthActions
+                            auth={auth}
+                            isDropdownOpen={isProfileDropdownOpen}
+                            setIsProfileDropdownOpen={setIsProfileDropdownOpen}
+                            handleProfileDropdownToggle={handleProfileDropdownToggle}
+                            handleLogout={handleLogout}
+                            isAdmin={isAdmin}
+                            isOrderManager={isOrderManager}
+                            isContentManager={isContentManager}
+                            isProductManager={isProductManager}
+                        />
 
-                    <AuthActions
-                        auth={auth}
-                        isDropdownOpen={isProfileDropdownOpen}
-                        setIsProfileDropdownOpen={setIsProfileDropdownOpen}
-                        handleProfileDropdownToggle={handleProfileDropdownToggle}
-                        handleLogout={handleLogout}
-                        isAdmin={isAdmin}
-                    />
+                        <ToggleDarkMode toggleTheme={toggleTheme} mode={mode} />
+                    </div>
                 </div>
             </DashboardToolbar>
         </DashboardAppBar>

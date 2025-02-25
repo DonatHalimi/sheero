@@ -38,6 +38,25 @@ import {
   Wishlist,
 } from './assets/imports';
 
+const roles = ['admin', 'orderManager', 'contentManager', 'productManager'];
+
+const pageRoles = {
+  orders: ['admin', 'orderManager'],
+
+  faqs: ['admin', 'contentManager'],
+  images: ['admin', 'contentManager'],
+
+  reviews: ['admin', 'productManager'],
+  products: ['admin', 'productManager'],
+  categories: ['admin', 'productManager'],
+  subcategories: ['admin', 'productManager'],
+  subSubcategories: ['admin', 'productManager'],
+  productRestockSubscriptions: ['admin', 'productManager'],
+  suppliers: ['admin', 'productManager'],
+};
+
+const getAllowedRoles = (name) => pageRoles[name] || ['admin'];
+
 const App = () => (
   <Router>
     <ScrollToTop />
@@ -61,9 +80,24 @@ const App = () => (
         <Route path="/about-us" element={<AboutUs />} />
 
         {/* Protected Routes */}
-        <Route path="/dashboard" element={<ProtectedRoute adminOnly><DashboardLayout /></ProtectedRoute>}>
+        <Route
+          path="/dashboard"
+          element={
+            <ProtectedRoute allowedRoles={roles}>
+              <DashboardLayout />
+            </ProtectedRoute>
+          }
+        >
           {Object.entries(pages).map(([name, Page]) => (
-            <Route key={name} path={name} element={<ProtectedRoute adminOnly><Page /></ProtectedRoute>} />
+            <Route
+              key={name}
+              path={name}
+              element={
+                <ProtectedRoute allowedRoles={getAllowedRoles(name)} >
+                  <Page />
+                </ProtectedRoute>
+              }
+            />
           ))}
         </Route>
         <Route path="/cart" element={<ProtectedRoute><Cart /></ProtectedRoute>} />

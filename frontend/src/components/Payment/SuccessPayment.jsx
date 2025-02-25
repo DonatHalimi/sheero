@@ -4,16 +4,16 @@ import { motion } from 'framer-motion';
 import React, { useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 
-const SuccessPayment = () => {
+const SuccessPayment = ({ orderId }) => {
     const navigate = useNavigate();
 
     useEffect(() => {
         const timer = setTimeout(() => {
-            navigate('/profile/orders');
+            navigate(`/profile/orders/${orderId}`);
         }, 4000);
 
         return () => clearTimeout(timer);
-    }, [navigate]);
+    }, [navigate, orderId]);
 
     return (
         <Box

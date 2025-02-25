@@ -1,6 +1,6 @@
 import { Box, Drawer, Typography } from '@mui/material';
 import React from 'react';
-import { CloseButton, EditExportButtons, ReadOnlyTextField } from '../../../assets/CustomComponents';
+import { CloseButton, EditExportButtons, IdAdornment, ReadOnlyTextField } from '../../../assets/CustomComponents';
 import { downloadImageData } from '../../../assets/DataExport';
 import { drawerPaperSx } from '../../../assets/sx';
 import { getImageUrl } from '../../../utils/config';
@@ -30,6 +30,7 @@ const SlideshowDetailsDrawer = ({ open, onClose, image, onEdit }) => {
                         <ReadOnlyTextField
                             label="Image ID"
                             value={image?._id}
+                            InputProps={IdAdornment()}
                         />
 
                         <ReadOnlyTextField

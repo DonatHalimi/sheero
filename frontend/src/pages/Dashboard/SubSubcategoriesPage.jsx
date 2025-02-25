@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
-import { DashboardHeader, exportOptions, LoadingDataGrid } from '../../assets/CustomComponents';
+import { DashboardHeader, exportOptions, formatDate, LoadingDataGrid } from '../../assets/CustomComponents';
 import { exportToExcel, exportToJSON } from '../../assets/DataExport';
 import DashboardTable from '../../components/Dashboard/DashboardTable';
 import DeleteModal from '../../components/Modal/DeleteModal';
@@ -93,6 +93,8 @@ const SubSubcategoriesPage = () => {
     const columns = [
         { label: 'Name', key: 'name' },
         { label: 'Subcategory', key: 'subcategory.name' },
+        { key: 'createdAt', label: 'Created At', render: (item) => formatDate(item.createdAt) },
+        { key: 'updatedAt', label: 'Updated At', render: (item) => formatDate(item.updatedAt) },
         { label: 'Actions', key: 'actions' }
     ];
 

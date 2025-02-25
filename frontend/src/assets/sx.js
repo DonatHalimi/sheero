@@ -317,13 +317,102 @@ export const dashboardBoxSx = {
     overflow: 'auto',
 };
 
-export const dashboardTitleSx = {
+export const dashboardHeaderSx = (theme) => ({
+    backgroundColor: theme.palette.background.default,
+    borderColor: theme.palette.mode === 'dark' ? theme.palette.divider : '#e5e7eb',
+});
+
+export const dashboardTitleSx = (theme) => ({
     fontSize: '1.3rem',
     fontWeight: 500,
     padding: '4px 10px',
-}
+    color: theme.palette.text.primary,
+});
 
-export const dashboardTableSx = {
+export const addItemSx = (theme) => ({
+    borderColor: theme.palette.mode === 'dark' ? theme.palette.divider : '#7C7164',
+    color: theme.palette.mode === 'dark' ? theme.palette.text.primary : '#5b504b',
+    '&:hover': {
+        backgroundColor: theme.palette.action.hover,
+    },
+});
+
+export const deleteItemSx = (theme) => ({
+    borderColor: theme.palette.mode === 'dark' ? theme.palette.divider : '#7C7164',
+    color: theme.palette.mode === 'dark' ? theme.palette.text.primary : '#5b504b',
+    '&:hover': {
+        backgroundColor: theme.palette.action.hover,
+    },
+});
+
+export const exportIconSx = (theme) => ({ color: theme.palette.mode === 'dark' ? theme.palette.text.primary : '#6b7280' });
+
+export const profileDropdownContainerSx = (theme) => ({
+    backgroundColor: theme.palette.background.paper,
+    borderColor: theme.palette.divider,
+});
+
+export const profileDropdownButtonSx = (theme) => ({ color: theme.palette.text.primary });
+
+export const profileIconSx = (theme) => ({ color: theme.palette.text.primary });
+
+export const dashboardSearchSuggestionsSx = (theme) => ({
+    backgroundColor: theme.palette.background.paper,
+    borderColor: theme.palette.divider,
+});
+
+export const dashboardSearchItemsSx = ({ theme }, { index, selectedIndex }) => ({
+    backgroundColor: index === selectedIndex
+        ? theme.palette.action.selected
+        : 'transparent',
+    borderColor: index === selectedIndex
+        ? theme.palette.primary.main
+        : 'transparent',
+    color: theme.palette.text.primary,
+    '&:hover': {
+        backgroundColor: theme.palette.action.hover,
+    },
+})
+
+export const dashboardSearchItemSx = (theme) => ({ color: theme.palette.text.secondary });
+
+export const dashboardAppBarSx = (theme) => ({
+    boxShadow: '1px 0px 3px rgba(0, 0, 0, 0.1)',
+    display: 'flex',
+    backgroundColor: theme.palette.background.paper,
+    color: theme.palette.text.primary,
+});
+
+export const dashboardToolBarSx = (theme) => ({
+    display: 'flex',
+    justifyContent: 'space-between',
+    alignItems: 'center',
+    backgroundColor: theme.palette.background.paper,
+    color: theme.palette.text.primary,
+});
+
+export const dashboardTablePaperSx = (theme) => ({
+    backgroundColor: theme.palette.background.paper,
+    boxShadow: theme.shadows[1]
+});
+
+export const deleteModalBoxSx = (theme) => ({ backgroundColor: theme.palette.background.paper });
+
+export const deleteModalTypographySx = (theme) => ({ color: theme.palette.text.primary });
+
+export const deleteModalButtonSx = (theme) => ({
+    color: theme.palette.text.primary,
+    borderColor: theme.palette.divider,
+    '&:hover': {
+        backgroundColor: theme.palette.action.hover,
+    },
+});
+
+export const loadingDataGridContainerSx = (theme) => ({ backgroundColor: theme.palette.background.default });
+
+export const loadingDataGridSkeletonSx = (theme) => ({ backgroundColor: theme.palette.mode === 'dark' ? theme.palette.action.hover : undefined })
+
+export const dashboardTableSx = (theme) => ({
     border: 'none',
     '& .MuiDataGrid-main': {
         border: 'none',
@@ -341,7 +430,10 @@ export const dashboardTableSx = {
         outline: 'none',
     },
     '--DataGrid-overlayHeight': '300px',
-};
+    '& .MuiDataGrid-toolbarContainer button': {
+        color: theme.palette.mode === 'dark' ? theme.palette.text.primary : '#5B504B',
+    },
+});
 
 export const drawerPaperSx = {
     sx: {
@@ -359,7 +451,7 @@ export const iconButtonSx = {
     right: 10,
 }
 
-export const productChipSx = {
+export const chipSx = {
     width: '100%',
     padding: '4px 0',
     '& .MuiChip-root': {
@@ -381,11 +473,14 @@ export const productChipSx = {
 export const customModalSx = {
     "&:focus": { outline: "none !important" },
     "& *:focus": { outline: "none !important" }
-}
+};
 
-export const customBoxSx = {
-    "&:focus": { outline: "none !important" }
-}
+export const boxSx = (theme) => ({
+    "&:focus": { outline: "none !important" },
+    backgroundColor: theme.palette.background.paper,
+});
+
+export const customBoxSx = (theme) => ({ backgroundColor: theme.palette.background.paper })
 
 export const profileBoxSx = {
     display: 'flex',

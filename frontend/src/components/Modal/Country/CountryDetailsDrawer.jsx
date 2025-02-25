@@ -1,6 +1,6 @@
 import { Box, Drawer, Typography } from '@mui/material';
 import React from 'react';
-import { BoxBetween, CloseButton, EditExportButtons, ReadOnlyTextField } from '../../../assets/CustomComponents';
+import { BoxBetween, CloseButton, EditExportButtons, IdAdornment, ReadOnlyTextField } from '../../../assets/CustomComponents';
 import { downloadCountryData } from '../../../assets/DataExport';
 import { drawerPaperSx } from '../../../assets/sx';
 
@@ -29,6 +29,7 @@ const CountryDetailsDrawer = ({ open, onClose, country, onEdit }) => {
                         <ReadOnlyTextField
                             label="Country ID"
                             value={country._id}
+                            InputProps={IdAdornment()}
                         />
 
                         <BoxBetween>

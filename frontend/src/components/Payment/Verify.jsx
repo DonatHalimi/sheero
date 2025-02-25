@@ -43,7 +43,7 @@ const Verify = () => {
         return <LoadingOverlay />;
     }
 
-    return success ? <SuccessPayment /> : <CancelPayment />;
+    return success ? <SuccessPayment orderId={order_id} /> : <CancelPayment />;
 };
 
 export default Verify;

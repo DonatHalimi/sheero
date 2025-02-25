@@ -1,6 +1,6 @@
 import { Box, Drawer, Typography } from '@mui/material';
 import React from 'react';
-import { CloseButton, EditExportButtons, ReadOnlyTextField } from '../../../assets/CustomComponents';
+import { BoxBetween, CloseButton, DateAdornment, EditExportButtons, formatDate, IdAdornment, ReadOnlyTextField } from '../../../assets/CustomComponents';
 import { downloadCategoryData } from '../../../assets/DataExport';
 import { drawerPaperSx } from '../../../assets/sx';
 import { getImageUrl } from '../../../utils/config';
@@ -30,6 +30,7 @@ const CategoryDetailsDrawer = ({ open, onClose, category, onEdit }) => {
                         <ReadOnlyTextField
                             label="Category ID"
                             value={category._id}
+                            InputProps={IdAdornment()}
                         />
 
                         <ReadOnlyTextField
@@ -44,6 +45,19 @@ const CategoryDetailsDrawer = ({ open, onClose, category, onEdit }) => {
                                 className='w-1/3'
                             />
                         </Box>
+
+                        <BoxBetween>
+                            <ReadOnlyTextField
+                                label="Created At"
+                                value={formatDate(category.createdAt)}
+                                InputProps={DateAdornment()}
+                            />
+                            <ReadOnlyTextField
+                                label="Updated At"
+                                value={formatDate(category.updatedAt)}
+                                InputProps={DateAdornment()}
+                            />
+                        </BoxBetween>
 
                         <EditExportButtons
                             onEditClick={handleEditClick}

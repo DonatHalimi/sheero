@@ -4,7 +4,7 @@ const Contact = require('../models/Contact');
 const sendContactDetailsEmail = async (contact) => {
     try {
         await sendContactEmail(contact);
-        await sendContactEmailToAdmins(contact); // TODO: add role 'customerSupport' so that users with this role can receive emails of every contact details 
+        await sendContactEmailToAdmins(contact);
     } catch (error) {
         console.error(`Failed to send contact email to ${contact.email}:`, error);
     }
@@ -27,7 +27,7 @@ const createContact = async (req, res) => {
 
 const getContacts = async (req, res) => {
     try {
-        const contacts = await Contact.find().populate('userId', 'firstName lastName email');
+        const contacts = await Contact.find().populate('userId', 'firstName lastName email').sort({ createdAt: -1 });
         res.status(200).json(contacts);
     } catch (error) {
         res.status(500).json({ message: 'Server error', error: error.message });
