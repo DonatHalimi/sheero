@@ -33,23 +33,22 @@ const OTPVerification = () => {
     }, []);
 
     const handleChange = (element, index) => {
-        if (isNaN(element.value)) return;
-
+        const value = element.value.toUpperCase();
         const newOtpArray = [...otpArray];
-        newOtpArray[index] = element.value;
+        newOtpArray[index] = value;
         setOtpArray(newOtpArray);
 
-        if (element.value && index < 5) {
+        if (value && index < 5) {
             inputRefs.current[index + 1].focus();
         }
     };
 
     const handlePaste = (e) => {
         e.preventDefault();
-        const pastedData = e.clipboardData.getData('text').trim();
+        const pastedData = e.clipboardData.getData('text').trim().toUpperCase();
 
-        if (!/^\d+$/.test(pastedData)) {
-            toast.error('Please paste numbers only');
+        if (!/^[A-Z0-9]+$/.test(pastedData)) {
+            toast.error('Please paste numbers and letters only');
             return;
         }
 
@@ -173,7 +172,7 @@ const OTPVerification = () => {
                                 key={idx}
                                 ref={el => inputRefs.current[idx] = el}
                                 type="text"
-                                inputMode="numeric"
+                                inputMode="text"
                                 maxLength={1}
                                 value={digit}
                                 onChange={e => handleChange(e.target, idx)}

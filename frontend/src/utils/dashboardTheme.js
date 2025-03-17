@@ -34,7 +34,7 @@ export const getDashboardTheme = (mode) => createTheme({
             paper: mode === 'dark' ? '#1E1E1E' : '#FFFFFF',
         },
         text: {
-            primary: mode === 'dark' ? '#FFFFFF' : '#000000',
+            primary: mode === 'dark' ? '#FFFFFF' : '#5c504b',
             secondary: mode === 'dark' ? '#B0B0B0' : '#5F5F5F',
         },
         icon: {

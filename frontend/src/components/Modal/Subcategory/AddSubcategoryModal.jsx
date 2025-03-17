@@ -2,21 +2,21 @@ import { TextField } from '@mui/material';
 import Autocomplete from '@mui/material/Autocomplete';
 import React, { useEffect, useState } from 'react';
 import { toast } from 'react-toastify';
-import { BrownButton, BrownOutlinedTextField, CustomBox, CustomModal, CustomPaper, CustomTypography, handleApiError, ImageUploadBox, LoadingLabel } from '../../../assets/CustomComponents';
+import { BrownButton, CustomBox, CustomModal, CustomPaper, CustomTextField, CustomTypography, handleApiError, ImageUploadBox, LoadingLabel } from '../../../assets/CustomComponents';
 import { getCategoriesService } from '../../../services/categoryService';
 import { addSubcategoryService } from '../../../services/subcategoryService';
+import { SubcategoryValidations } from '../../../utils/validations/subcategory';
 
 const AddSubcategoryModal = ({ open, onClose, onAddSuccess }) => {
     const [name, setName] = useState('');
-    const [isValidName, setIsValidName] = useState(true);
     const [image, setImage] = useState(null);
     const [category, setCategory] = useState(null);
     const [categories, setCategories] = useState([]);
     const [loading, setLoading] = useState(false);
 
-    const validateName = (v) => /^[A-ZÇ][\sa-zA-ZëËçÇ\W]{3,27}$/.test(v);
+    const validateName = (v) => SubcategoryValidations.nameRules.pattern.test(v);
 
-    const isValidForm = name && isValidName && image && category;
+    const isFormValid = name && validateName(name) && image && category;
 
     useEffect(() => {
         const fetchCategories = async () => {
@@ -70,18 +70,14 @@ const AddSubcategoryModal = ({ open, onClose, onAddSuccess }) => {
             <CustomBox>
                 <CustomTypography variant="h5">Add Subcategory</CustomTypography>
 
-                <BrownOutlinedTextField
+                <CustomTextField
                     label="Name"
                     value={name}
-                    fullWidth
-                    onChange={(e) => {
-                        setName(e.target.value)
-                        setIsValidName(validateName(e.target.value));
-                    }}
-                    error={!isValidName}
-                    helperText={!isValidName ? 'Name must start with a capital letter and be 3-27 characters long' : ''}
-                    className='!mb-4'
+                    setValue={setName}
+                    validate={validateName}
+                    validationRule={SubcategoryValidations.nameRules}
                 />
+
                 <Autocomplete
                     id="category-autocomplete"
                     options={categories.sort((a, b) => -b.firstLetter.localeCompare(a.firstLetter))}
@@ -101,7 +97,7 @@ const AddSubcategoryModal = ({ open, onClose, onAddSuccess }) => {
                     onClick={handleAddSubcategory}
                     variant="contained"
                     color="primary"
-                    disabled={!isValidForm || loading}
+                    disabled={!isFormValid || loading}
                     className="w-full"
                 >
                     <LoadingLabel loading={loading} />

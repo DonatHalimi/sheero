@@ -1,24 +1,24 @@
-import { Box, Chip, Rating, Typography } from '@mui/material';
+import { Box, Chip, Rating, Typography, useTheme } from '@mui/material';
 import React, { useEffect, useState } from 'react';
 import { toast } from 'react-toastify';
-import { ActionButtons, BrownOutlinedTextField, CustomBox, CustomModal, CustomTypography, handleApiError, PersonAdornment, ReadOnlyTextField } from '../../../assets/CustomComponents';
+import { ActionButtons, CustomBox, CustomModal, CustomTextField, CustomTypography, DrawerTypography, handleApiError, PersonAdornment, ReadOnlyTextField } from '../../../assets/CustomComponents';
 import { chipSx } from '../../../assets/sx';
 import { editReviewService } from '../../../services/reviewService';
 import { getImageUrl } from '../../../utils/config';
+import { ReviewValidations } from '../../../utils/validations/review';
 
 const EditReviewModal = ({ open, onClose, review, onViewDetails, onEditSuccess }) => {
     const [title, setTitle] = useState('');
-    const [isValidTitle, setIsValidTitle] = useState(true);
     const [rating, setRating] = useState(null);
     const [comment, setComment] = useState('');
-    const [isValidComment, setIsValidComment] = useState(true);
     const [product, setProduct] = useState('');
     const [loading, setLoading] = useState(false);
+    const theme = useTheme();
 
-    const validateTitle = (v) => /^[A-Z][\Wa-zA-Z\s]{2,40}$/.test(v);
-    const validateComment = (v) => /^[A-Z][\Wa-zA-Z\s]{3,500}$/.test(v);
+    const validateTitle = (v) => ReviewValidations.titleRules.pattern.test(v);
+    const validateComment = (v) => ReviewValidations.commentRules.pattern.test(v);
 
-    const isValidForm = isValidTitle && isValidComment && rating && product;
+    const isFormValid = validateTitle(title) && rating && validateComment(comment) && product;
 
     const user = review?.user ? `${review.user.firstName} ${review.user.lastName} - ${review.user.email}` : 'Unknown User';
 
@@ -66,13 +66,13 @@ const EditReviewModal = ({ open, onClose, review, onViewDetails, onEditSuccess }
 
                 {review?.product ? (
                     <Box className="mb-4 !mt-[-8px]">
-                        <Typography variant="body2" className="!text-gray-700">Product</Typography>
+                        <DrawerTypography theme={theme}>Product</DrawerTypography>
                         <Box sx={chipSx}>
                             <Chip
                                 label={
                                     <Box display="flex" alignItems="center" gap={1}>
                                         <Box
-                                            onClick={() => window.open(`/product/${review.product._id}`, '_blank')}
+                                            onClick={() => window.open(`/${review.product.slug}`, '_blank')}
                                             display="flex"
                                             alignItems="center"
                                             gap={1}
@@ -98,17 +98,12 @@ const EditReviewModal = ({ open, onClose, review, onViewDetails, onEditSuccess }
                     <Typography variant="body2" className="!text-gray-700">No product associated with this review.</Typography>
                 )}
 
-                <BrownOutlinedTextField
+                <CustomTextField
                     label="Title"
                     value={title}
-                    fullWidth
-                    onChange={(e) => {
-                        setTitle(e.target.value)
-                        setIsValidTitle(validateTitle(e.target.value))
-                    }}
-                    error={!isValidTitle}
-                    helperText={!isValidTitle ? 'Title must start with a capital letter and be 2-40 characters long' : ''}
-                    className='!mb-4'
+                    setValue={setTitle}
+                    validate={validateTitle}
+                    validationRule={ReviewValidations.titleRules}
                 />
 
                 <Rating
@@ -123,19 +118,14 @@ const EditReviewModal = ({ open, onClose, review, onViewDetails, onEditSuccess }
                     className='mb-4'
                 />
 
-                <BrownOutlinedTextField
+                <CustomTextField
                     label="Comment"
                     value={comment}
+                    setValue={setComment}
+                    validate={validateComment}
+                    validationRule={ReviewValidations.commentRules}
                     multiline
                     rows={4}
-                    fullWidth
-                    onChange={(e) => {
-                        setComment(e.target.value)
-                        setIsValidComment(validateComment(e.target.value))
-                    }}
-                    error={!isValidComment}
-                    helperText={!isValidComment ? 'Comment must start with a capital letter and be 3-500 characters long' : ''}
-                    className='!mb-4'
                 />
 
                 <ActionButtons
@@ -147,7 +137,7 @@ const EditReviewModal = ({ open, onClose, review, onViewDetails, onEditSuccess }
                         onClose();
                     }}
                     primaryButtonProps={{
-                        disabled: !isValidForm || loading
+                        disabled: !isFormValid || loading
                     }}
                     loading={loading}
                 />

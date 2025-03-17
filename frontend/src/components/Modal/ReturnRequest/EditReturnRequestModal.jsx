@@ -1,7 +1,7 @@
-import { MenuItem } from '@mui/material';
+import { Box, MenuItem, Typography } from '@mui/material';
 import React, { useEffect, useState } from 'react';
 import { toast } from 'react-toastify';
-import { ActionButtons, BrownOutlinedTextField, CustomBox, CustomModal, CustomTypography, DescriptionAdornment, handleApiError, IdAdornment, PersonAdornment, ReadOnlyTextField, ReturnStatusAdornment } from '../../../assets/CustomComponents';
+import { ActionButtons, BrownOutlinedTextField, CustomBox, CustomModal, CustomTypography, DeliveryStatusAdornment, DescriptionAdornment, handleApiError, IdAdornment, PersonAdornment, ReadOnlyTextField, ReturnStatusAdornment } from '../../../assets/CustomComponents';
 import { editReturnRequestStatusService } from '../../../services/returnService';
 
 const EditReturnRequestModal = ({ open, onClose, returnRequest, onViewDetails, onEditSuccess }) => {
@@ -59,6 +59,13 @@ const EditReturnRequestModal = ({ open, onClose, returnRequest, onViewDetails, o
         }
     };
 
+    const statusOptions = [
+        { value: 'pending', label: 'Pending' },
+        { value: 'approved', label: 'Approved' },
+        { value: 'processed', label: 'Processed' },
+        { value: 'rejected', label: 'Rejected' },
+    ];
+
     return (
         <CustomModal open={open} onClose={onClose}>
             <CustomBox>
@@ -110,13 +117,16 @@ const EditReturnRequestModal = ({ open, onClose, returnRequest, onViewDetails, o
                     label="Return Request Status"
                     value={status}
                     onChange={(e) => setStatus(e.target.value)}
-                    InputProps={ReturnStatusAdornment(status)}
                     className="!mb-4"
                 >
-                    <MenuItem value="pending">Pending</MenuItem>
-                    <MenuItem value="approved">Approved</MenuItem>
-                    <MenuItem value="processed">Processed</MenuItem>
-                    <MenuItem value="rejected">Rejected</MenuItem>
+                    {statusOptions.map((option) => (
+                        <MenuItem key={option.value} value={option.value}>
+                            <Box display="flex" alignItems="center" gap={1}>
+                                {ReturnStatusAdornment(option.value).startAdornment}
+                                <Typography>{option.label}</Typography>
+                            </Box>
+                        </MenuItem>
+                    ))}
                 </BrownOutlinedTextField>
 
                 <ActionButtons

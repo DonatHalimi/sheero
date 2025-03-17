@@ -141,7 +141,7 @@ const OrderDetails = () => {
                                             {order.products.map(({ product, quantity, price }) => (
                                                 <TableRow key={product._id}>
                                                     <TableCell component="th" scope="row" className='w-10/12'>
-                                                        <Link to={`/product/${product._id}`} className="flex items-center">
+                                                        <Link to={`/${product.slug}`} className="flex items-center">
                                                             <img
                                                                 src={getImageUrl(product.image)}
                                                                 alt={product.name}
@@ -315,7 +315,7 @@ const OrderDetails = () => {
                 ) : (
                     <EmptyState
                         imageSrc={emptyOrdersImage}
-                        message="No orders found!"
+                        context='orders'
                     />
                 )}
             </ProfileLayout>

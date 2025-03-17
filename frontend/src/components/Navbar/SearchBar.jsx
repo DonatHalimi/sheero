@@ -34,9 +34,9 @@ const SearchBar = () => {
         );
     };
 
-    const handleSuggestionClick = (productId) => {
+    const handleSuggestionClick = (slug) => {
         setSuggestions([]);
-        navigate(`/product/${productId}`);
+        navigate(`/${slug}`);
     };
 
     const handleSubmit = (event) => {

@@ -67,7 +67,7 @@ const Returns = () => {
             <ProfileLayout>
 
                 <Header
-                    title="Returns"
+                    title="Return Requests"
                     searchTerm={searchTerm}
                     setSearchTerm={setSearchTerm}
                     showSearch={returns.length > 0}

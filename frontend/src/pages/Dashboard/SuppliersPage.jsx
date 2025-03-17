@@ -17,7 +17,8 @@ const SupplierPage = () => {
     const [selectedSuppliers, setSelectedSuppliers] = useState([]);
     const [addSupplierOpen, setAddSupplierOpen] = useState(false);
     const [editSupplierOpen, setEditSupplierOpen] = useState(false);
-    const [deleteSupplierOpen, setDeleteSupplierOpen] = useState(false);
+    const [deleteModalOpen, setDeleteModalOpen] = useState(false);
+    const [deletionContext, setDeletionContext] = useState(null);
     const [currentPage, setCurrentPage] = useState(0);
     const [viewDetailsOpen, setViewDetailsOpen] = useState(false);
 
@@ -40,22 +41,8 @@ const SupplierPage = () => {
         };
     }, [suppliers]);
 
-    const handleSelectSupplier = (supplierId) => {
-        const id = Array.isArray(supplierId) ? supplierId[0] : supplierId;
-
-        setSelectedSuppliers((prevSelected) =>
-            prevSelected.includes(id)
-                ? prevSelected.filter((selectedId) => selectedId !== id)
-                : [...prevSelected, id]
-        );
-    };
-
-    const handleSelectAll = (e) => {
-        if (e.target.checked) {
-            setSelectedSuppliers(suppliers.map(supplier => supplier._id));
-        } else {
-            setSelectedSuppliers([]);
-        }
+    const handleSelectSupplier = (newSelection) => {
+        setSelectedSuppliers(newSelection);
     };
 
     const handlePageClick = (event) => {
@@ -73,12 +60,6 @@ const SupplierPage = () => {
         setEditSupplierOpen(true);
     };
 
-    const getSelectedSuppliers = () => {
-        return selectedSuppliers
-            .map((id) => suppliers.find((supplier) => supplier._id === id))
-            .filter((supplier) => supplier);
-    };
-
     const handleDeleteSuccess = () => {
         dispatch(getSuppliers());
         setSelectedSuppliers([]);
@@ -92,6 +73,24 @@ const SupplierPage = () => {
     const closeDrawer = () => {
         setViewDetailsOpen(false);
         setSelectedSupplier(null);
+    };
+
+    const handleBulkDelete = () => {
+        if (selectedSuppliers.length > 0) {
+            setDeletionContext({
+                endpoint: '/suppliers/delete-bulk',
+                data: { ids: selectedSuppliers },
+            });
+            setDeleteModalOpen(true);
+        }
+    };
+
+    const handleSingleDelete = (supplier) => {
+        setDeletionContext({
+            endpoint: `/suppliers/delete/${supplier._id}`,
+            data: null,
+        });
+        setDeleteModalOpen(true);
     };
 
     const columns = [
@@ -121,7 +120,7 @@ const SupplierPage = () => {
                             title="Suppliers"
                             selectedItems={selectedSuppliers}
                             setAddItemOpen={setAddSupplierOpen}
-                            setDeleteItemOpen={setDeleteSupplierOpen}
+                            setDeleteItemOpen={handleBulkDelete}
                             itemName="Supplier"
                             exportOptions={exportOptions(suppliers, handleExport)}
                         />
@@ -131,28 +130,30 @@ const SupplierPage = () => {
                             data={suppliers}
                             selectedItems={selectedSuppliers}
                             onSelectItem={handleSelectSupplier}
-                            onSelectAll={handleSelectAll}
                             itemsPerPage={itemsPerPage}
                             currentPage={currentPage}
                             onPageChange={handlePageClick}
                             onEdit={handleEdit}
                             onViewDetails={handleViewDetails}
+                            onDelete={handleSingleDelete}
                         />
                     </>
-
                 )}
 
                 <AddSupplierModal open={addSupplierOpen} onClose={() => setAddSupplierOpen(false)} onAddSuccess={() => dispatch(getSuppliers())} />
                 <EditSupplierModal open={editSupplierOpen} onClose={() => setEditSupplierOpen(false)} supplier={selectedSupplier} onViewDetails={handleViewDetails} onEditSuccess={() => dispatch(getSuppliers())} />
                 <SupplierDetailsDrawer open={viewDetailsOpen} onClose={closeDrawer} supplier={selectedSupplier} onEdit={handleEditFromDrawer} />
+
                 <DeleteModal
-                    open={deleteSupplierOpen}
-                    onClose={() => setDeleteSupplierOpen(false)}
-                    items={getSelectedSuppliers()}
+                    open={deleteModalOpen}
+                    onClose={() => setDeleteModalOpen(false)}
+                    deletionContext={deletionContext}
                     onDeleteSuccess={handleDeleteSuccess}
-                    endpoint="/suppliers/delete-bulk"
-                    title="Delete Suppliers"
-                    message="Are you sure you want to delete the selected suppliers?"
+                    title={deletionContext?.endpoint.includes('bulk') ? 'Delete Suppliers' : 'Delete Supplier'}
+                    message={deletionContext?.endpoint.includes('bulk')
+                        ? 'Are you sure you want to delete the selected suppliers?'
+                        : 'Are you sure you want to delete this supplier?'
+                    }
                 />
             </div>
         </div>

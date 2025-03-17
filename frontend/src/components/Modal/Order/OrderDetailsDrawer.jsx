@@ -54,7 +54,7 @@ const OrderDetailsDrawer = ({ open, onClose, order, onEdit }) => {
                                             label={
                                                 <Box display="flex" alignItems="center" gap={1}>
                                                     <Box
-                                                        onClick={() => window.open(`/product/${item.product._id}`, '_blank')}
+                                                        onClick={() => window.open(`/${item.product.slug}`, '_blank')}
                                                         display="flex"
                                                         alignItems="center"
                                                         gap={1}
@@ -129,6 +129,14 @@ const OrderDetailsDrawer = ({ open, onClose, order, onEdit }) => {
                                 value={order.paymentIntentId}
                                 multiline
                                 rows={2}
+                            />
+                        )}
+
+                        {order.updatedBy && (
+                            <ReadOnlyTextField
+                                label="Updated By"
+                                value={`${order.updatedBy.firstName} ${order.updatedBy.lastName} - ${order.updatedBy.email}`}
+                                InputProps={PersonAdornment()}
                             />
                         )}
 

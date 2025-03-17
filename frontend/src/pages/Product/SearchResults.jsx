@@ -1,6 +1,6 @@
 import { Typography } from '@mui/material';
 import React, { useEffect, useState } from 'react';
-import { useLocation } from 'react-router-dom';
+import { useLocation, useNavigate } from 'react-router-dom';
 import { calculatePageCount, CustomPagination, getPaginatedItems, GoBackButton, handlePageChange, NotFound } from '../../assets/CustomComponents';
 import noResultsImage from '../../assets/img/empty/search-results.png';
 import Navbar from '../../components/Navbar/Navbar';
@@ -16,6 +16,7 @@ const SearchResults = () => {
     const [totalProducts, setTotalProducts] = useState(0);
     const [error, setError] = useState(null);
     const location = useLocation();
+    const navigate = useNavigate();
 
     const query = new URLSearchParams(location.search).get('query');
 
@@ -36,8 +37,20 @@ const SearchResults = () => {
         }
     }, [query]);
 
+    const handleProductClick = (slug) => {
+        if (slug) {
+            navigate(`/${slug}`);
+        }
+    };
+
     const renderProductItems = () => (
-        currentPageItems.map(product => <ProductItem key={product._id} product={product} />)
+        currentPageItems.map(product => (
+            <ProductItem
+                key={product._id}
+                product={product}
+                onClick={() => handleProductClick(product.slug)}
+            />
+        ))
     );
 
     if (error) {

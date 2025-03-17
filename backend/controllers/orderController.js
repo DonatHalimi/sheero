@@ -3,7 +3,7 @@ const Order = require('../models/Order');
 const Stripe = require('stripe');
 const Cart = require('../models/Cart');
 const { STRIPE_SECRET_KEY, NODE_ENV } = require('../config/dotenv');
-const { sendOrderUpdateEmail, sendProductInventoryUpdateEmail } = require('../config/emailService');
+const { sendOrderUpdateEmail, sendProductInventoryUpdateEmail, sendSuccessfulOrderUpdate } = require('../config/emailService');
 const Product = require('../models/Product');
 
 const stripe = Stripe(STRIPE_SECRET_KEY);
@@ -232,7 +232,8 @@ const getAllOrders = async (req, res) => {
     try {
         const orders = await Order.find()
             .populate('user', 'firstName lastName email')
-            .populate('products.product', 'name price image')
+            .populate('updatedBy', 'firstName lastName email')
+            .populate('products.product', 'name price image slug')
             .populate({
                 path: 'address',
                 select: 'name street phoneNumber city country',
@@ -261,7 +262,7 @@ const getUserOrders = async (req, res) => {
 
     try {
         const orders = await Order.find({ user: userId })
-            .populate('products.product', 'name price image')
+            .populate('products.product', 'name price image slug')
             .populate('address', 'name street phoneNumber city country')
             .sort({ createdAt: -1 })
             .exec();
@@ -282,7 +283,8 @@ const getOrderById = async (req, res) => {
 
     try {
         const order = await Order.findById(orderId)
-            .populate('products.product', 'name price image')
+            .select('-updatedBy')
+            .populate('products.product', 'name price image slug')
             .populate({
                 path: 'address',
                 select: 'name phoneNumber street comment',
@@ -293,9 +295,10 @@ const getOrderById = async (req, res) => {
             })
             .exec();
 
-        if (!order) {
-            return res.status(404).json({ success: false, message: 'Order not found.' });
-        }
+        const orderUserId = order.user.toString();
+        const authUserId = req.user.userId.toString();
+
+        if (orderUserId !== authUserId) return res.status(403).json({ success: false, message: 'Unauthorized access to order details' });
 
         res.json({ success: true, data: order });
     } catch (error) {
@@ -344,6 +347,7 @@ const updateDeliveryStatus = async (req, res) => {
         }
 
         order.status = status;
+        order.updatedBy = req.user.userId;
 
         if (paymentStatus) {
             order.paymentStatus = paymentStatus;
@@ -361,9 +365,18 @@ const updateDeliveryStatus = async (req, res) => {
         }
 
         await order.save();
+        await order.populate({
+            path: 'updatedBy',
+            select: 'firstName lastName role email',
+            populate: {
+                path: 'role',
+                select: 'name'
+            }
+        });
 
         if (order.user && order.user.email) {
             await sendOrderUpdateEmail(order);
+            await sendSuccessfulOrderUpdate(order);
         } else {
             console.warn(`Order ${orderId} has no user email associated.`);
         }
@@ -376,6 +389,15 @@ const updateDeliveryStatus = async (req, res) => {
     } catch (error) {
         console.error('Error updating order:', error);
         res.status(500).json({ success: false, message: 'Error updating order.' });
+    }
+};
+
+const deleteOrder = async (req, res) => {
+    try {
+        await Order.findByIdAndDelete(req.params.id);
+        res.status(200).json({ message: 'Order deleted successfully' });
+    } catch (error) {
+        res.status(500).json({ message: 'Server error' });
     }
 };
 
@@ -401,4 +423,4 @@ const deleteOrders = async (req, res) => {
     }
 };
 
-module.exports = { payWithStripe, verifyOrder, payWithCash, getAllOrders, getUserOrders, getOrderById, updateDeliveryStatus, deleteOrders };
+module.exports = { payWithStripe, verifyOrder, payWithCash, getAllOrders, getUserOrders, getOrderById, updateDeliveryStatus, deleteOrder, deleteOrders };

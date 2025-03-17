@@ -5,7 +5,9 @@ const SlideshowImageSchema = new mongoose.Schema({
     image: { type: String, required: true },
     description: { type: String },
     createdAt: { type: Date, default: Date.now },
-    updatedAt: { type: Date, default: Date.now }
+    updatedAt: { type: Date, default: Date.now },
+    createdBy: { type: mongoose.Schema.Types.ObjectId, ref: 'User' },
+    updatedBy: { type: mongoose.Schema.Types.ObjectId, ref: 'User' }
 });
 
 module.exports = mongoose.model('SlideshowImage', SlideshowImageSchema);

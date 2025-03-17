@@ -18,7 +18,8 @@ const CategoriesPage = () => {
     const [selectedCategories, setSelectedCategories] = useState([]);
     const [addCategoryOpen, setAddCategoryOpen] = useState(false);
     const [editCategoryOpen, setEditCategoryOpen] = useState(false);
-    const [deleteCategoryOpen, setDeleteCategoryOpen] = useState(false);
+    const [deleteModalOpen, setDeleteModalOpen] = useState(false);
+    const [deletionContext, setDeletionContext] = useState(null);
     const [imagePreviewOpen, setImagePreviewOpen] = useState(false);
     const [currentPage, setCurrentPage] = useState(0);
     const [viewDetailsOpen, setViewDetailsOpen] = useState(false);
@@ -42,19 +43,9 @@ const CategoriesPage = () => {
         };
     }, [categories]);
 
-    const handleSelectCategory = (categoryId) => {
-        const id = Array.isArray(categoryId) ? categoryId[0] : categoryId;
-
-        setSelectedCategories((prevSelected) =>
-            prevSelected.includes(id)
-                ? prevSelected.filter((selectedId) => selectedId !== id)
-                : [...prevSelected, id]
-        );
-    };
-
-    const handleSelectAll = (e) => {
-        setSelectedCategories(e.target.checked ? categories.map(category => category._id) : []);
-    };
+    const handleSelectCategory = (newSelection) => {
+        setSelectedCategories(newSelection);
+    }
 
     const handlePageClick = (event) => {
         setCurrentPage(event.selected);
@@ -76,12 +67,6 @@ const CategoriesPage = () => {
         setEditCategoryOpen(true);
     };
 
-    const getSelectedCategories = () => {
-        return selectedCategories
-            .map((id) => categories.find((category) => category._id === id))
-            .filter((category) => category);
-    };
-
     const handleDeleteSuccess = () => {
         dispatch(getCategories());
         setSelectedCategories([]);
@@ -95,6 +80,24 @@ const CategoriesPage = () => {
     const closeDrawer = () => {
         setViewDetailsOpen(false);
         setSelectedCategory(null);
+    };
+
+    const handleBulkDelete = () => {
+        if (selectedCategories.length > 0) {
+            setDeletionContext({
+                endpoint: '/categories/delete-bulk',
+                data: { ids: selectedCategories },
+            });
+            setDeleteModalOpen(true);
+        }
+    };
+
+    const handleSingleDelete = (category) => {
+        setDeletionContext({
+            endpoint: `/categories/delete/${category._id}`,
+            data: null,
+        });
+        setDeleteModalOpen(true);
     };
 
     const columns = [
@@ -111,7 +114,7 @@ const CategoriesPage = () => {
 
     const handleExport = (data, format) => {
         format === 'excel' ? exportToExcel(data, 'categories_data') : exportToJSON(data, 'categories_data');
-    }
+    };
 
     return (
         <div className='container mx-auto max-w-screen-2xl px-4 mt-20'>
@@ -124,7 +127,7 @@ const CategoriesPage = () => {
                             title="Categories"
                             selectedItems={selectedCategories}
                             setAddItemOpen={setAddCategoryOpen}
-                            setDeleteItemOpen={setDeleteCategoryOpen}
+                            setDeleteItemOpen={handleBulkDelete}
                             itemName="Category"
                             exportOptions={exportOptions(categories, handleExport)}
                         />
@@ -134,12 +137,12 @@ const CategoriesPage = () => {
                             data={categories}
                             selectedItems={selectedCategories}
                             onSelectItem={handleSelectCategory}
-                            onSelectAll={handleSelectAll}
                             itemsPerPage={itemsPerPage}
                             currentPage={currentPage}
                             onPageChange={handlePageClick}
                             onEdit={handleEdit}
                             onViewDetails={handleViewDetails}
+                            onDelete={handleSingleDelete}
                         />
                     </>
                 )}
@@ -147,14 +150,17 @@ const CategoriesPage = () => {
                 <AddCategoryModal open={addCategoryOpen} onClose={() => setAddCategoryOpen(false)} onAddSuccess={() => dispatch(getCategories())} />
                 <EditCategoryModal open={editCategoryOpen} onClose={() => setEditCategoryOpen(false)} category={selectedCategory} onViewDetails={handleViewDetails} onEditSuccess={() => dispatch(getCategories())} />
                 <CategoryDetailsDrawer open={viewDetailsOpen} onClose={closeDrawer} category={selectedCategory} onEdit={handleEditFromDrawer} />
+
                 <DeleteModal
-                    open={deleteCategoryOpen}
-                    onClose={() => setDeleteCategoryOpen(false)}
-                    items={getSelectedCategories()}
+                    open={deleteModalOpen}
+                    onClose={() => setDeleteModalOpen(false)}
+                    deletionContext={deletionContext}
                     onDeleteSuccess={handleDeleteSuccess}
-                    endpoint="/categories/delete-bulk"
-                    title="Delete Categories"
-                    message="Are you sure you want to delete the selected categories?"
+                    title={deletionContext?.endpoint.includes('bulk') ? 'Delete Categories' : 'Delete Category'}
+                    message={deletionContext?.endpoint.includes('bulk')
+                        ? 'Are you sure you want to delete the selected categories?'
+                        : 'Are you sure you want to delete this category?'
+                    }
                 />
                 <ImagePreviewModal open={imagePreviewOpen} onClose={() => setImagePreviewOpen(false)} imageUrl={selectedCategory} />
             </div>

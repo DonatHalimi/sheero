@@ -1,24 +1,25 @@
 import React, { useEffect, useState } from 'react';
 import { toast } from 'react-toastify';
-import { ActionButtons, BrownOutlinedTextField, CustomBox, CustomModal, CustomTypography, handleApiError, ImageUploadBox } from '../../../assets/CustomComponents';
+import { ActionButtons, CustomBox, CustomModal, CustomTextField, CustomTypography, handleApiError, ImageUploadBox } from '../../../assets/CustomComponents';
 import { editCategoryService } from '../../../services/categoryService';
 import { getImageUrl } from '../../../utils/config';
+import { CategoryValidations } from '../../../utils/validations/category';
 
 const EditCategoryModal = ({ open, onClose, category, onViewDetails, onEditSuccess }) => {
     const [name, setName] = useState('');
-    const [isValidName, setIsValidName] = useState(true);
     const [image, setImage] = useState(null);
+    const [hasExistingImage, setHasExistingImage] = useState(false);
     const [loading, setLoading] = useState(false);
 
-    const validateName = (v) => /^[A-ZÇ][\sa-zA-ZëËçÇ\W]{3,28}$/.test(v);
+    const validateName = (v) => CategoryValidations.nameRules.pattern.test(v);
 
-    const isValidForm = isValidName && name || image;
+    const isFormValid = validateName(name) && (image || hasExistingImage);
 
     useEffect(() => {
         if (category) {
             setName(category.name);
-            setIsValidName(true);
             setImage(null);
+            setHasExistingImage(!!category.image);
         }
     }, [category]);
 
@@ -45,6 +46,7 @@ const EditCategoryModal = ({ open, onClose, category, onViewDetails, onEditSucce
 
     const handleFileSelect = (file) => {
         setImage(file);
+        setHasExistingImage(!!file);
     };
 
     return (
@@ -52,17 +54,12 @@ const EditCategoryModal = ({ open, onClose, category, onViewDetails, onEditSucce
             <CustomBox>
                 <CustomTypography variant="h5">Edit Category</CustomTypography>
 
-                <BrownOutlinedTextField
+                <CustomTextField
                     label="Name"
                     value={name}
-                    onChange={(e) => {
-                        setName(e.target.value);
-                        setIsValidName(validateName(e.target.value));
-                    }}
-                    error={!isValidName}
-                    helperText={!isValidName ? 'Name must start with a capital letter and be 3-28 characters long' : ''}
-                    fullWidth
-                    className='!mb-4'
+                    setValue={setName}
+                    validate={validateName}
+                    validationRule={CategoryValidations.nameRules}
                 />
 
                 <ImageUploadBox onFileSelect={handleFileSelect} initialPreview={category?.image ? getImageUrl(category.image) : ''} />
@@ -76,7 +73,7 @@ const EditCategoryModal = ({ open, onClose, category, onViewDetails, onEditSucce
                         onClose();
                     }}
                     primaryButtonProps={{
-                        disabled: !isValidForm || loading,
+                        disabled: !isFormValid || loading,
                     }}
                     loading={loading}
                 />

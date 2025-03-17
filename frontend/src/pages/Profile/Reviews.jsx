@@ -86,8 +86,8 @@ const Reviews = () => {
         }
     };
 
-    const handleImageClick = (productId) => {
-        navigate(`/product/${productId}`);
+    const handleImageClick = (slug) => {
+        navigate(`/${slug}`);
     };
 
     const handlePaperClick = (review) => {

@@ -18,7 +18,8 @@ const ProductsPage = () => {
     const [selectedProducts, setSelectedProducts] = useState([]);
     const [addProductOpen, setAddProductOpen] = useState(false);
     const [editProductOpen, setEditProductOpen] = useState(false);
-    const [deleteProductOpen, setDeleteProductOpen] = useState(false);
+    const [deleteModalOpen, setDeleteModalOpen] = useState(false);
+    const [deletionContext, setDeletionContext] = useState(null);
     const [imagePreviewOpen, setImagePreviewOpen] = useState(false);
     const [currentPage, setCurrentPage] = useState(0);
     const [viewDetailsOpen, setViewDetailsOpen] = useState(false);
@@ -42,19 +43,8 @@ const ProductsPage = () => {
         };
     }, [products]);
 
-
-    const handleSelectProduct = (productId) => {
-        const id = Array.isArray(productId) ? productId[0] : productId;
-
-        setSelectedProducts((prevSelected) =>
-            prevSelected.includes(id)
-                ? prevSelected.filter((selectedId) => selectedId !== id)
-                : [...prevSelected, id]
-        );
-    };
-
-    const handleSelectAll = (e) => {
-        setSelectedProducts(e.target.checked ? products.map(product => product._id) : []);
+    const handleSelectProduct = (newSelection) => {
+        setSelectedProducts(newSelection);
     };
 
     const handlePageClick = (event) => {
@@ -77,12 +67,6 @@ const ProductsPage = () => {
         setEditProductOpen(true);
     };
 
-    const getSelectedProducts = () => {
-        return selectedProducts
-            .map((id) => products.find((product) => product._id === id))
-            .filter((product) => product);
-    };
-
     const handleDeleteSuccess = () => {
         dispatch(getProducts());
         setSelectedProducts([]);
@@ -96,6 +80,24 @@ const ProductsPage = () => {
     const closeDrawer = () => {
         setViewDetailsOpen(false);
         setSelectedProduct(null);
+    };
+
+    const handleBulkDelete = () => {
+        if (selectedProducts.length > 0) {
+            setDeletionContext({
+                endpoint: '/products/delete-bulk',
+                data: { ids: selectedProducts },
+            });
+            setDeleteModalOpen(true);
+        }
+    };
+
+    const handleSingleDelete = (product) => {
+        setDeletionContext({
+            endpoint: `/products/delete/${product._id}`,
+            data: null,
+        });
+        setDeleteModalOpen(true);
     };
 
     const columns = [
@@ -145,7 +147,7 @@ const ProductsPage = () => {
                             title="Products"
                             selectedItems={selectedProducts}
                             setAddItemOpen={setAddProductOpen}
-                            setDeleteItemOpen={setDeleteProductOpen}
+                            setDeleteItemOpen={handleBulkDelete}
                             itemName="Product"
                             exportOptions={exportOptions(products, handleExport)}
                         />
@@ -155,13 +157,13 @@ const ProductsPage = () => {
                             data={products}
                             selectedItems={selectedProducts}
                             onSelectItem={handleSelectProduct}
-                            onSelectAll={handleSelectAll}
                             itemsPerPage={itemsPerPage}
                             currentPage={currentPage}
                             onPageChange={handlePageClick}
                             onEdit={handleEdit}
                             containerClassName="max-w-full"
                             onViewDetails={handleViewDetails}
+                            onDelete={handleSingleDelete}
                         />
                     </>
                 )}
@@ -169,14 +171,17 @@ const ProductsPage = () => {
                 <AddProductModal open={addProductOpen} onClose={() => setAddProductOpen(false)} onAddSuccess={() => dispatch(getProducts())} />
                 <EditProductModal open={editProductOpen} onClose={() => setEditProductOpen(false)} product={selectedProduct} onViewDetails={handleViewDetails} onEditSuccess={() => dispatch(getProducts())} />
                 <ProductDetailsDrawer open={viewDetailsOpen} onClose={closeDrawer} product={selectedProduct} onEdit={handleEditFromDrawer} />
+
                 <DeleteModal
-                    open={deleteProductOpen}
-                    onClose={() => setDeleteProductOpen(false)}
-                    items={getSelectedProducts()}
+                    open={deleteModalOpen}
+                    onClose={() => setDeleteModalOpen(false)}
+                    deletionContext={deletionContext}
                     onDeleteSuccess={handleDeleteSuccess}
-                    endpoint="/products/delete-bulk"
-                    title="Delete Products"
-                    message="Are you sure you want to delete the selected products?"
+                    title={deletionContext?.endpoint.includes('bulk') ? 'Delete Products' : 'Delete Product'}
+                    message={deletionContext?.endpoint.includes('bulk')
+                        ? 'Are you sure you want to delete the selected products?'
+                        : 'Are you sure you want to delete this product?'
+                    }
                 />
                 <ImagePreviewModal open={imagePreviewOpen} onClose={() => setImagePreviewOpen(false)} imageUrl={selectedProduct} />
             </div>

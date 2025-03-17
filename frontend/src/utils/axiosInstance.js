@@ -6,16 +6,18 @@ const axiosInstance = axios.create({
     withCredentials: true,
 });
 
-// Response interceptor to handle 401 errors
+// Response interceptor for handling auth errors
 axiosInstance.interceptors.response.use(
     (response) => response,
     (error) => {
-        const isGetUserEndpoint = error.config?.url?.includes('/auth/me');
+        const { status, config } = error.response || {};
+        const isAuthEndpoint = config?.url?.includes('/auth/me');
+        const isUnauthorized = status === 401 || status === 403;
 
-        if (error.response?.status === 401 && !isGetUserEndpoint) {
+        if (isUnauthorized && !isAuthEndpoint) {
             const currentPath = window.location.pathname;
             if (currentPath !== '/') {
-                console.error('Unauthorized access - Please log in again.');
+                console.error('Unauthorized access - Redirecting to home page.');
                 window.location.href = '/';
             }
         }

@@ -1,24 +1,23 @@
 import { FormControl, InputLabel, MenuItem, Rating, Select } from '@mui/material';
 import React, { useEffect, useState } from 'react';
 import { toast } from 'react-toastify';
-import { BrownButton, BrownOutlinedTextField, CustomBox, CustomModal, CustomTypography, handleApiError, LoadingLabel } from '../../../assets/CustomComponents';
+import { BrownButton, CustomBox, CustomModal, CustomTextField, CustomTypography, handleApiError, LoadingLabel } from '../../../assets/CustomComponents';
 import { addReviewService, getProductNamesService, getReviewsService } from '../../../services/reviewService';
+import { ReviewValidations } from '../../../utils/validations/review';
 
 const AddReviewModal = ({ open, onClose, onAddSuccess }) => {
     const [title, setTitle] = useState('');
-    const [isValidTitle, setIsValidTitle] = useState(true);
     const [rating, setRating] = useState(0);
     const [comment, setComment] = useState('');
-    const [isValidComment, setIsValidComment] = useState(true);
     const [productId, setProductId] = useState(null);
     const [products, setProducts] = useState([]);
     const [userReviews, setUserReviews] = useState([]);
     const [loading, setLoading] = useState(false);
 
-    const validateTitle = (v) => /^[A-Z][\Wa-zA-Z\s]{2,40}$/.test(v);
-    const validateComment = (v) => /^[A-Z][\Wa-zA-Z\s]{3,500}$/.test(v);
+    const validateTitle = (v) => ReviewValidations.titleRules.pattern.test(v);
+    const validateComment = (v) => ReviewValidations.commentRules.pattern.test(v);
 
-    const isValidForm = isValidTitle && rating && isValidComment && productId;
+    const isFormValid = validateTitle(title) && rating && validateComment(comment) && productId;
 
     useEffect(() => {
         const fetchProducts = async () => {
@@ -98,17 +97,12 @@ const AddReviewModal = ({ open, onClose, onAddSuccess }) => {
                     </Select>
                 </FormControl>
 
-                <BrownOutlinedTextField
+                <CustomTextField
                     label="Title"
                     value={title}
-                    fullWidth
-                    onChange={(e) => {
-                        setTitle(e.target.value)
-                        setIsValidTitle(validateTitle(e.target.value));
-                    }}
-                    error={!isValidTitle}
-                    helperText={!isValidTitle ? 'Title must start with a capital letter and contain at least 3 characters' : ''}
-                    className='!mb-4'
+                    setValue={setTitle}
+                    validate={validateTitle}
+                    validationRule={ReviewValidations.titleRules}
                 />
 
                 <Rating
@@ -123,26 +117,21 @@ const AddReviewModal = ({ open, onClose, onAddSuccess }) => {
                     className='mb-4'
                 />
 
-                <BrownOutlinedTextField
+                <CustomTextField
                     label="Comment"
                     value={comment}
+                    setValue={setComment}
+                    validate={validateComment}
+                    validationRule={ReviewValidations.commentRules}
                     multiline
                     rows={4}
-                    fullWidth
-                    onChange={(e) => {
-                        setComment(e.target.value)
-                        setIsValidComment(validateComment(e.target.value));
-                    }}
-                    error={!isValidComment}
-                    helperText={!isValidComment ? 'Comment must start with a capital letter and be 3-500 characters long' : ''}
-                    className='!mb-4'
                 />
 
                 <BrownButton
                     onClick={handleAddReview}
                     variant="contained"
                     color="primary"
-                    disabled={!isValidForm || loading}
+                    disabled={!isFormValid || loading}
                     className="w-full"
                 >
                     <LoadingLabel loading={loading} />

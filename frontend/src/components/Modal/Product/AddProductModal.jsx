@@ -1,4 +1,4 @@
-import { Autocomplete, Box, InputLabel, MenuItem, Modal, Select, TextField, Typography } from '@mui/material';
+import { Autocomplete, Box, InputLabel, MenuItem, Modal, Select, TextField } from '@mui/material';
 import React, { useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { toast } from 'react-toastify';
@@ -141,9 +141,7 @@ const AddProductModal = ({ open, onClose, onAddSuccess }) => {
                 shipping: { weight, cost: shippingCost, packageSize },
                 details
             });
-            toast.success('Product details added successfully', {
-                onClick: () => navigate(`/product/${productId}`)
-            });
+            toast.success('Product details added successfully');
             onAddSuccess();
             setStep(1);
             onClose();
@@ -335,7 +333,7 @@ const AddProductModal = ({ open, onClose, onAddSuccess }) => {
             case 3:
                 return (
                     <>
-                        <Typography variant='h6' className="!text-lg !font-bold !mb-2">Dimensions</Typography>
+                        <CustomTypography variant='h6' className="!text-lg !font-bold !mb-2">Dimensions</CustomTypography>
                         <Box className="flex gap-4 mb-2">
                             <BrownOutlinedTextField
                                 fullWidth
@@ -366,7 +364,7 @@ const AddProductModal = ({ open, onClose, onAddSuccess }) => {
                                 className="!mb-4"
                             />
                         </Box>
-                        <Typography variant='h6' className="!text-lg !font-bold !mb-2">Variants</Typography>
+                        <CustomTypography variant='h6' className="!text-lg !font-bold !mb-2">Variants</CustomTypography>
                         {variants.map((variant, index) => (
                             <Box key={index} className="flex gap-4 mb-2">
                                 <BrownOutlinedTextField
@@ -385,7 +383,7 @@ const AddProductModal = ({ open, onClose, onAddSuccess }) => {
                             </Box>
                         ))}
                         <OutlinedBrownButton onClick={addVariant} className="mb-4">Add Variant</OutlinedBrownButton>
-                        <Typography variant='h6' className="!text-lg !font-bold !mb-2">Additional Details</Typography>
+                        <CustomTypography variant='h6' className="!text-lg !font-bold !mb-2">Additional Details</CustomTypography>
                         {details.map((detail, index) => (
                             <Box key={index} className="flex gap-4 mb-2">
                                 <BrownOutlinedTextField
@@ -404,7 +402,7 @@ const AddProductModal = ({ open, onClose, onAddSuccess }) => {
                             </Box>
                         ))}
                         <OutlinedBrownButton onClick={addDetail} className="!mb-4">Add Detail</OutlinedBrownButton>
-                        <Typography variant='h6' className="!text-lg !font-bold !mb-2">Shipping</Typography>
+                        <CustomTypography variant='h6' className="!text-lg !font-bold !mb-2">Shipping</CustomTypography>
                         <Box className="flex gap-4 mb-2">
                             <BrownOutlinedTextField
                                 fullWidth

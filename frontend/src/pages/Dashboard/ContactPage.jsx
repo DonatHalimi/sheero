@@ -15,7 +15,8 @@ const ContactPage = () => {
     const [selectedContacts, setSelectedContacts] = useState([]);
     const [selectedContact, setSelectedContact] = useState(null);
     const [addContactOpen, setAddContactOpen] = useState(false);
-    const [deleteContactOpen, setDeleteContactOpen] = useState(false);
+    const [deleteModalOpen, setDeleteModalOpen] = useState(false);
+    const [deletionContext, setDeletionContext] = useState(null);
     const [currentPage, setCurrentPage] = useState(0);
     const [viewDetailsOpen, setViewDetailsOpen] = useState(false);
 
@@ -38,28 +39,12 @@ const ContactPage = () => {
         };
     }, [contacts]);
 
-    const handleSelectContact = (contactId) => {
-        const id = Array.isArray(contactId) ? contactId[0] : contactId;
-
-        setSelectedContacts((prevSelected) =>
-            prevSelected.includes(id)
-                ? prevSelected.filter((selectedId) => selectedId !== id)
-                : [...prevSelected, id]
-        );
-    };
-
-    const handleSelectAll = (e) => {
-        setSelectedContacts(e.target.checked ? contacts.map(contact => contact._id) : []);
+    const handleSelectContact = (newSelection) => {
+        setSelectedContacts(newSelection);
     };
 
     const handlePageClick = (event) => {
         setCurrentPage(event.selected);
-    };
-
-    const getSelectedContacts = () => {
-        return selectedContacts
-            .map((id) => contacts.find((contact) => contact._id === id))
-            .filter((contact) => contact);
     };
 
     const handleDeleteSuccess = () => {
@@ -75,6 +60,24 @@ const ContactPage = () => {
     const closeDrawer = () => {
         setViewDetailsOpen(false);
         setSelectedContact(null);
+    };
+
+    const handleBulkDelete = () => {
+        if (selectedContacts.length > 0) {
+            setDeletionContext({
+                endpoint: '/contact/delete-bulk',
+                data: { ids: selectedContacts },
+            });
+            setDeleteModalOpen(true);
+        }
+    };
+
+    const handleSingleDelete = (contact) => {
+        setDeletionContext({
+            endpoint: `/contact/delete/${contact._id}`,
+            data: null,
+        });
+        setDeleteModalOpen(true);
     };
 
     const columns = [
@@ -105,7 +108,7 @@ const ContactPage = () => {
                             title="Contacts"
                             selectedItems={selectedContacts}
                             setAddItemOpen={setAddContactOpen}
-                            setDeleteItemOpen={setDeleteContactOpen}
+                            setDeleteItemOpen={handleBulkDelete}
                             itemName="Contact"
                             exportOptions={exportOptions(contacts, handleExport)}
                         />
@@ -115,11 +118,11 @@ const ContactPage = () => {
                             data={contacts}
                             selectedItems={selectedContacts}
                             onSelectItem={handleSelectContact}
-                            onSelectAll={handleSelectAll}
                             itemsPerPage={itemsPerPage}
                             currentPage={currentPage}
                             onPageChange={handlePageClick}
                             onViewDetails={handleViewDetails}
+                            onDelete={handleSingleDelete}
                             showEditButton={false}
                         />
                     </>
@@ -127,14 +130,17 @@ const ContactPage = () => {
 
                 <AddContactModal open={addContactOpen} onClose={() => setAddContactOpen(false)} onAddSuccess={() => dispatch(getContacts())} />
                 <ContactDetailsDrawer open={viewDetailsOpen} onClose={closeDrawer} contact={selectedContact} />
+
                 <DeleteModal
-                    open={deleteContactOpen}
-                    onClose={() => setDeleteContactOpen(false)}
-                    items={getSelectedContacts()}
+                    open={deleteModalOpen}
+                    onClose={() => setDeleteModalOpen(false)}
+                    deletionContext={deletionContext}
                     onDeleteSuccess={handleDeleteSuccess}
-                    endpoint="/contact/delete-bulk"
-                    title="Delete Contacts"
-                    message="Are you sure you want to delete the selected contacts?"
+                    title={deletionContext?.endpoint.includes('bulk') ? 'Delete Contacts' : 'Delete Contact'}
+                    message={deletionContext?.endpoint.includes('bulk')
+                        ? 'Are you sure you want to delete the selected contacts?'
+                        : 'Are you sure you want to delete this contact?'
+                    }
                 />
             </div>
         </div>

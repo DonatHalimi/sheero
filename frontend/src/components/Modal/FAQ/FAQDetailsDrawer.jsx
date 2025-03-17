@@ -1,6 +1,6 @@
 import { Box, Drawer, Typography } from '@mui/material';
 import React from 'react';
-import { CloseButton, EditExportButtons, IdAdornment, ReadOnlyTextField } from '../../../assets/CustomComponents';
+import { BoxBetween, CloseButton, DateAdornment, EditExportButtons, formatDate, IdAdornment, PersonAdornment, ReadOnlyTextField } from '../../../assets/CustomComponents';
 import { downloadFaqData } from '../../../assets/DataExport';
 import { drawerPaperSx } from '../../../assets/sx';
 
@@ -35,14 +35,45 @@ const FAQDetailsDrawer = ({ open, onClose, faq, onEdit }) => {
                         <ReadOnlyTextField
                             label="Question"
                             value={faq.question}
+                            multiline
+                            rows={3}
                         />
 
                         <ReadOnlyTextField
                             label="Answer"
                             value={faq.answer}
                             multiline
-                            rows={4}
+                            rows={3}
                         />
+
+                        <BoxBetween>
+                            <ReadOnlyTextField
+                                label="Created At"
+                                value={formatDate(faq.createdAt)}
+                                InputProps={DateAdornment()}
+                            />
+                            <ReadOnlyTextField
+                                label="Updated At"
+                                value={formatDate(faq.updatedAt)}
+                                InputProps={DateAdornment()}
+                            />
+                        </BoxBetween>
+
+                        {faq.createdBy && (
+                            <ReadOnlyTextField
+                                label="Created By"
+                                value={`${faq.createdBy.firstName} ${faq.createdBy.lastName} - ${faq.createdBy.email}`}
+                                InputProps={PersonAdornment()}
+                            />
+                        )}
+
+                        {faq.updatedBy && (
+                            <ReadOnlyTextField
+                                label="Updated By"
+                                value={`${faq.updatedBy.firstName} ${faq.updatedBy.lastName} - ${faq.updatedBy.email}`}
+                                InputProps={PersonAdornment()}
+                            />
+                        )}
 
                         <EditExportButtons
                             onEditClick={handleEditClick}

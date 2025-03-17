@@ -8,6 +8,7 @@ import { profileBoxSx } from '../../assets/sx';
 import Navbar from '../../components/Navbar/Navbar';
 import Footer from '../../components/Utils/Footer';
 import { addAddress, getAddressByUser, getCities, getCountries, updateAddress } from '../../store/actions/addressActions';
+import { AddressValidations } from '../../utils/validations/address';
 
 const AddressDetails = () => {
     const { user } = useSelector((state) => state.auth);
@@ -111,10 +112,10 @@ const AddressDetails = () => {
         }
     };
 
-    const validateName = (name) => /^[A-ZÇ][a-zA-ZëËçÇ]{1,9}$/.test(name);
-    const validateStreet = (street) => /^[A-Z][a-zA-Z0-9\s\-\.]{1,26}$/.test(street);
-    const validatePhoneNumber = (phoneNumber) => /^0(43|44|45|46|47|48|49)\d{6}$/.test(phoneNumber);
-    const validateComment = (comment) => /^[a-zA-Z0-9\s]{2,25}$/.test(comment);
+    const validateName = (v) => AddressValidations.nameRules.pattern.test(v);
+    const validateStreet = (v) => AddressValidations.streetRules.pattern.test(v);
+    const validatePhoneNumber = (v) => AddressValidations.phoneRules.pattern.test(v);
+    const validateComment = (v) => AddressValidations.commentRules.pattern.test(v);
 
     const handleNameChange = (e) => {
         const value = e.target.value;
@@ -201,8 +202,8 @@ const AddressDetails = () => {
                                     />
                                     {focusedField === 'name' && !nameValid && (
                                         <div className="absolute left-0 bottom-[-78px] bg-white text-red-500 text-sm p-2 rounded-lg shadow-md w-full z-10">
-                                            <span className="block text-xs font-semibold mb-1">Invalid Name</span>
-                                            Must start with a capital letter and be 2 to 10 characters long.
+                                            <span className="block text-xs font-semibold mb-1">{AddressValidations.nameRules.title}</span>
+                                            {AddressValidations.nameRules.message}
                                             <div className="absolute top-[-5px] left-[20px] w-0 h-0 border-l-[5px] border-r-[5px] border-b-[5px] border-transparent border-b-white"></div>
                                         </div>
                                     )}
@@ -224,8 +225,8 @@ const AddressDetails = () => {
                                     />
                                     {focusedField === 'street' && !streetValid && (
                                         <div className="absolute left-0 bottom-[-78px] bg-white text-red-500 text-sm p-2 rounded-lg shadow-md w-full z-10">
-                                            <span className="block text-xs font-semibold mb-1">Invalid Street</span>
-                                            Must start with a capital letter and be 2 to 27 characters long.
+                                            <span className="block text-xs font-semibold mb-1">{AddressValidations.streetRules.title}</span>
+                                            {AddressValidations.streetRules.message}
                                             <div className="absolute top-[-5px] left-[20px] w-0 h-0 border-l-[5px] border-r-[5px] border-b-[5px] border-transparent border-b-white"></div>
                                         </div>
                                     )}
@@ -248,8 +249,8 @@ const AddressDetails = () => {
                                     />
                                     {focusedField === 'phoneNumber' && !phoneNumberValid && (
                                         <div className="absolute left-0 top-[58px] bg-white text-red-500 text-sm p-2 rounded-lg shadow-md w-full z-10">
-                                            <span className="block text-xs font-semibold mb-1">Invalid Phone Number</span>
-                                            Must be in the format: 043/44/45/46/47/48/49 followed by 6 digits.
+                                            <span className="block text-xs font-semibold mb-1">{AddressValidations.phoneRules.title}</span>
+                                            {AddressValidations.phoneRules.message}
                                             <div className="absolute top-[-5px] left-[20px] w-0 h-0 border-l-[5px] border-r-[5px] border-b-[5px] border-transparent border-b-white"></div>
                                         </div>
                                     )}
@@ -311,8 +312,8 @@ const AddressDetails = () => {
                                 />
                                 {focusedField === 'comment' && !commentValid && (
                                     <div className="absolute left-0 bottom-[-58px] bg-white text-red-500 text-sm p-2 rounded-lg shadow-md w-full z-10">
-                                        <span className="block text-xs font-semibold mb-1">Invalid Comment</span>
-                                        Must be 2 to 25 characters long.
+                                        <span className="block text-xs font-semibold mb-1">{AddressValidations.commentRules.title}</span>
+                                        {AddressValidations.commentRules.message}
                                         <div className="absolute top-[-5px] left-[20px] w-0 h-0 border-l-[5px] border-r-[5px] border-b-[5px] border-transparent border-b-white"></div>
                                     </div>
                                 )}

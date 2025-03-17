@@ -46,6 +46,7 @@ const manageReturnRequest = async (req, res) => {
         const previousStatus = returnRequest.status;
 
         returnRequest.status = status;
+        returnRequest.updatedBy = req.user.userId;
 
         const savedReturnRequest = await returnRequest.save();
         if (!savedReturnRequest || !savedReturnRequest._id) {
@@ -56,9 +57,7 @@ const manageReturnRequest = async (req, res) => {
             .populate('user')
             .populate('products');
 
-        if (!populatedReturnRequest) {
-            return res.status(404).json({ message: 'Return request not found after saving' });
-        }
+        if (!populatedReturnRequest) return res.status(404).json({ message: 'Return request not found after saving' });
 
         if (populatedReturnRequest.user?.email) {
             await sendReturnRequestUpdateEmail(populatedReturnRequest);
@@ -79,7 +78,8 @@ const manageReturnRequest = async (req, res) => {
 const getAllReturnRequests = async (req, res) => {
     try {
         const returnRequests = await ReturnRequest.find()
-            .populate('products', '_id name image')
+            .populate('products', '_id name image slug')
+            .populate('updatedBy', 'firstName lastName email')
             .populate('user', '_id email firstName lastName')
             .sort({ createdAt: -1 });
 
@@ -94,10 +94,15 @@ const getReturnRequestById = async (req, res) => {
 
     try {
         const returnRequest = await ReturnRequest.findById(returnId)
-            .populate('products', 'name price image')
+            .populate('products', 'name price image slug')
             .populate({ path: 'order', select: 'status' })
             .populate({ path: 'user', select: '_id firstName lastName email' })
             .exec();
+
+        const returnRequestUserId = returnRequest.user._id.toString();
+        const authUserId = req.user.userId.toString();
+
+        if (returnRequestUserId !== authUserId) return res.status(403).json({ success: false, message: 'Unauthorized access to return request details.' });
 
         res.json({ success: true, data: returnRequest });
     } catch (error) {
@@ -110,7 +115,7 @@ const getReturnRequestsByUser = async (req, res) => {
 
     try {
         const returnRequests = await ReturnRequest.find({ user: userId })
-            .populate({ path: 'products', select: 'name image' })
+            .populate({ path: 'products', select: 'name image slug' })
             .populate({ path: 'order', select: 'status' })
             .populate({ path: 'user', select: '_id firstName lastName email' })
             .sort({ createdAt: -1 })

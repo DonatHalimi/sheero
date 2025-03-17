@@ -93,6 +93,15 @@ const ReturnRequestDetailsDrawer = ({ open, onClose, returnRequest, onEdit }) =>
                             value={formatDate(returnRequest.createdAt)}
                             InputProps={DateAdornment()}
                         />
+
+                        {returnRequest.updatedBy && (
+                            <ReadOnlyTextField
+                                label="Updated By"
+                                value={`${returnRequest.updatedBy.firstName} ${returnRequest.updatedBy.lastName} - ${returnRequest.updatedBy.email}`}
+                                InputProps={PersonAdornment()}
+                            />
+                        )}
+
                         <EditExportButtons
                             onEditClick={handleEditClick}
                             onExportClick={() => downloadReturnRequestData(returnRequest)}

@@ -56,7 +56,7 @@ const ReviewDetailsDrawer = ({ open, onClose, review, onEdit }) => {
                                     label={
                                         <Box display="flex" alignItems="center" gap={1}>
                                             <Box
-                                                onClick={() => window.open(`/product/${review.product?._id}`, '_blank')}
+                                                onClick={() => window.open(`/${review.product?.slug}`, '_blank')}
                                                 display="flex"
                                                 alignItems="center"
                                                 gap={1}

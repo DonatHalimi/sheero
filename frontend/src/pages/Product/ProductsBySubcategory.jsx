@@ -4,14 +4,14 @@ import { calculatePageCount, CustomPagination, FilterLayout, filterProductsByPri
 import noProducts from '../../assets/img/products/no-products.png';
 import Navbar from '../../components/Navbar/Navbar';
 import Footer from '../../components/Utils/Footer';
+import { getSubSubcategoriesBySubcategoryService } from '../../services/categoryService';
 import { getProductsBySubcategoryService } from '../../services/productService';
-import { getSubSubcategoriesBySubCategoryService } from '../../services/subSubcategoryService';
-import { getSubcategoryByIdService } from '../../services/subcategoryService';
+import { getSubcategoryBySlugService } from '../../services/subcategoryService';
 
 const itemsPerPage = 40;
 
 const ProductsBySubcategory = () => {
-    const { id } = useParams();
+    const { slug } = useParams();
 
     const [products, setProducts] = useState([]);
     const [filteredProducts, setFilteredProducts] = useState([]);
@@ -25,14 +25,14 @@ const ProductsBySubcategory = () => {
 
     const navigate = useNavigate();
 
-    const fetchSubSubcategories = async (subcategoryId) => {
+    const fetchSubSubcategories = async (subcategorySlug) => {
         setLoadingSubSubcategories(true);
-        if (!subsubcategories[subcategoryId]) {
+        if (!subsubcategories[subcategorySlug]) {
             try {
-                const { data } = await getSubSubcategoriesBySubCategoryService(subcategoryId);
-                setSubsubcategories(prev => ({ ...prev, [subcategoryId]: data }));
+                const { data } = await getSubSubcategoriesBySubcategoryService(subcategorySlug);
+                setSubsubcategories((prev) => ({ ...prev, [subcategorySlug]: data }));
             } catch (error) {
-                console.error('Error fetching subcategories:', error);
+                console.error('Error fetching subsubcategories:', error);
             } finally {
                 setLoadingSubSubcategories(false);
             }
@@ -45,12 +45,12 @@ const ProductsBySubcategory = () => {
         const fetchProductsAndSubcategory = async () => {
             setLoading(true);
             try {
-                const subcategoryResponse = await getSubcategoryByIdService(id);
+                const subcategoryResponse = await getSubcategoryBySlugService(slug);
                 setSubcategoryData(subcategoryResponse.data);
 
-                await fetchSubSubcategories(id);
+                await fetchSubSubcategories(slug);
 
-                const productsResponse = await getProductsBySubcategoryService(id);
+                const productsResponse = await getProductsBySubcategoryService(slug);
                 setProducts(productsResponse.data.products);
                 setFilteredProducts(productsResponse.data.products);
                 setCurrentPage(1);
@@ -62,11 +62,7 @@ const ProductsBySubcategory = () => {
         };
 
         fetchProductsAndSubcategory();
-    }, [id]);
-
-    useEffect(() => {
-        setFilteredProducts(products);
-    }, [products]);
+    }, [slug]);
 
     const handleApplyPriceFilter = (range) => {
         setPriceFilter(range);
@@ -89,22 +85,22 @@ const ProductsBySubcategory = () => {
     const pageCount = calculatePageCount(filteredProducts, itemsPerPage);
     const currentPageItems = getPaginatedItems(filteredProducts, currentPage, itemsPerPage);
 
-    const handleSubSubcategoryClick = (subSubcategoryId) => {
-        navigate(`/subSubcategory/${subSubcategoryId}`);
+    const handleSubSubcategoryClick = (subSubcategorySlug) => {
+        navigate(`/subSubcategory/${subSubcategorySlug}`);
     };
 
     const breadcrumbData = {
         name: subcategoryData?.name || '',
-        _id: id,
+        slug: slug,
         category: {
-            _id: subcategoryData?.category?._id || '',
+            slug: subcategoryData?.category?.slug || '',
             name: subcategoryData?.category?.name || '',
         },
-    }
+    };
 
     return (
         <>
-            <Navbar />
+            <Navbar activeCategory={subcategoryData?.category?.slug} />
             <FilterLayout
                 loading={loading}
                 products={filteredProducts}
@@ -116,7 +112,7 @@ const ProductsBySubcategory = () => {
                 <div className="mb-16 bg-gray-50">
                     <SplideList
                         items={subsubcategories}
-                        id={id}
+                        id={slug}
                         loading={loadingSubSubcategories}
                         showImage={false}
                         onCardClick={handleSubSubcategoryClick}

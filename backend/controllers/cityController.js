@@ -4,7 +4,7 @@ const createCity = async (req, res) => {
     const { name, country, zipCode } = req.body;
 
     try {
-        const city = new City({ name, country, zipCode });
+        const city = new City({ name, country, zipCode, createdBy: req.user.userId });
 
         await city.save();
         res.status(201).json({ message: 'City created successfully', city });
@@ -15,7 +15,10 @@ const createCity = async (req, res) => {
 
 const getCities = async (req, res) => {
     try {
-        const cities = await City.find().populate('country');
+        const cities = await City.find()
+            .populate('country')
+            .populate('createdBy', 'firstName lastName email')
+            .populate('updatedBy', 'firstName lastName email');
         res.status(200).json(cities);
     } catch (error) {
         res.status(500).json({ message: 'Server error' });
@@ -37,7 +40,7 @@ const updateCity = async (req, res) => {
     try {
         const city = await City.findByIdAndUpdate(
             req.params.id,
-            { name, country, zipCode, updatedAt: Date.now() },
+            { name, country, zipCode, updatedAt: Date.now(), updatedBy: req.user.userId },
             { new: true }
         );
         res.status(200).json({ message: 'City updated successfully', city });

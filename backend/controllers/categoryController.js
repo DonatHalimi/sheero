@@ -6,7 +6,7 @@ const createCategory = async (req, res) => {
     const image = req.file ? req.file.path : '';
 
     try {
-        const category = new Category({ name, image });
+        const category = new Category({ name, image, createdBy: req.user.userId });
         await category.save();
         res.status(201).json({ message: 'Category created successfully', category });
     } catch (error) {
@@ -16,16 +16,18 @@ const createCategory = async (req, res) => {
 
 const getCategories = async (req, res) => {
     try {
-        const categories = await Category.find();
+        const categories = await Category.find()
+            .populate('createdBy', 'firstName lastName email')
+            .populate('updatedBy', 'firstName lastName email');
         res.status(200).json(categories);
     } catch (error) {
         res.status(500).json({ message: 'Server error' });
     }
 };
 
-const getCategoryById = async (req, res) => {
+const getCategoryBySlug = async (req, res) => {
     try {
-        const category = await Category.findById(req.params.id);
+        const category = await Category.findOne({ slug: req.params.slug });
         if (!category) return res.status(404).json({ message: 'Category not found' });
         res.status(200).json(category);
     } catch (error) {
@@ -58,7 +60,7 @@ const updateCategory = async (req, res) => {
 
         const category = await Category.findByIdAndUpdate(
             req.params.id,
-            { name, image, updatedAt: Date.now() },
+            { name, image, updatedAt: Date.now(), updatedBy: req.user.userId },
             { new: true }
         );
         res.status(200).json({ message: 'Category updated successfully', category });
@@ -106,4 +108,4 @@ const deleteCategories = async (req, res) => {
     }
 };
 
-module.exports = { createCategory, getCategories, getCategoryById, updateCategory, deleteCategory, deleteCategories };
+module.exports = { createCategory, getCategories, getCategoryBySlug, updateCategory, deleteCategory, deleteCategories };

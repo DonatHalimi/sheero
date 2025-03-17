@@ -1,19 +1,19 @@
 import React, { useState } from 'react';
 import { toast } from 'react-toastify';
-import { BrownButton, BrownOutlinedTextField, CustomBox, CustomModal, CustomTypography, handleApiError, ImageUploadBox, LoadingLabel } from '../../../assets/CustomComponents';
+import { BrownButton, CustomBox, CustomModal, CustomTextField, CustomTypography, handleApiError, ImageUploadBox, LoadingLabel } from '../../../assets/CustomComponents';
 import { addSlideshowService } from '../../../services/slideshowService';
+import { SlideshowValidations } from '../../../utils/validations/slideshow';
 
 const AddSlideshowModal = ({ open, onClose, onAddSuccess }) => {
     const [title, setTitle] = useState('');
-    const [isValidTitle, setIsValidTitle] = useState(true);
     const [description, setDescription] = useState('');
-    const [isValidDescription, setIsValidDescription] = useState(true);
     const [image, setImage] = useState(null);
     const [loading, setLoading] = useState(false);
 
-    const isValid = (v) => /^[A-Z][\sa-zA-Z\W]{3,15}$/.test(v);
+    const validateTitle = (v) => SlideshowValidations.titleRules.pattern.test(v);
+    const validateDescription = (v) => SlideshowValidations.descriptionRules.pattern.test(v);
 
-    const isValidForm = title && isValidTitle && description && isValidDescription && image;
+    const isFormValid = title && validateTitle(title) && description && validateDescription(description) && image;
 
     const handleAddImage = async () => {
         setLoading(true);
@@ -41,7 +41,7 @@ const AddSlideshowModal = ({ open, onClose, onAddSuccess }) => {
     };
 
     const handleFileSelect = (file) => {
-        setImage(file); // Update the image state in the parent component
+        setImage(file);
     };
 
     return (
@@ -49,36 +49,29 @@ const AddSlideshowModal = ({ open, onClose, onAddSuccess }) => {
             <CustomBox>
                 <CustomTypography variant="h5">Add Slideshow Image</CustomTypography>
 
-                <BrownOutlinedTextField
+                <CustomTextField
                     label="Title"
                     value={title}
-                    fullWidth
-                    onChange={(e) => {
-                        setTitle(e.target.value);
-                        setIsValidTitle(isValid(e.target.value));
-                    }}
-                    error={!isValidTitle}
-                    helperText={!isValidTitle ? 'Title must start with a capital letter and be 3-15 characters long' : ''}
-                    className='!mb-4'
+                    setValue={setTitle}
+                    validate={validateTitle}
+                    validationRule={SlideshowValidations.titleRules}
                 />
-                <BrownOutlinedTextField
+
+                <CustomTextField
                     label="Description"
                     value={description}
-                    fullWidth
-                    onChange={(e) => {
-                        setDescription(e.target.value);
-                        setIsValidDescription(isValid(e.target.value));
-                    }}
-                    error={!isValidDescription}
-                    helperText={!isValidDescription ? 'Description must start with a capital letter and be 3-15 characters long' : ''}
-                    className='!mb-4'
+                    setValue={setDescription}
+                    validate={validateDescription}
+                    validationRule={SlideshowValidations.descriptionRules}
                 />
+
                 <ImageUploadBox onFileSelect={handleFileSelect} />
+
                 <BrownButton
                     onClick={handleAddImage}
                     variant="contained"
                     color="primary"
-                    disabled={!isValidForm || loading}
+                    disabled={!isFormValid || loading}
                     className="w-full"
                 >
                     <LoadingLabel loading={loading} />

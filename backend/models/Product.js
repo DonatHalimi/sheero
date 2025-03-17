@@ -1,7 +1,9 @@
 const mongoose = require('mongoose');
+const slugify = require('slugify');
 
 const productSchema = new mongoose.Schema({
     name: { type: String, default: null },
+    slug: { type: String, unique: true },
     description: { type: String, default: null },
     price: { type: Number, default: null },
     salePrice: { type: Number, default: null },
@@ -57,6 +59,13 @@ productSchema.pre('save', function (next) {
     if (this.salePrice && this.price) {
         const discountPercentage = Math.round(((this.price - this.salePrice) / this.price) * 100);
         this.discount.value = discountPercentage;
+    }
+    next();
+});
+
+productSchema.pre('save', function (next) {
+    if (this.isModified('name')) {
+        this.slug = slugify(this.name, { lower: true, strict: true });
     }
     next();
 });

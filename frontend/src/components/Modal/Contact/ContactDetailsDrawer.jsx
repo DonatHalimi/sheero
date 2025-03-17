@@ -21,7 +21,7 @@ const ContactDetailsDrawer = ({ open, onClose, contact, onEdit }) => {
                 {contact ? (
                     <>
                         <Typography className='!font-bold !text-lg'>
-                            {contact.name}'s Details
+                            Contact message from {contact.name}
                         </Typography>
 
                         <ReadOnlyTextField

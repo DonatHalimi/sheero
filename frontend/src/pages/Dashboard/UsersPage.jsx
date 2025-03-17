@@ -17,7 +17,8 @@ const UsersPage = () => {
     const [selectedUsers, setSelectedUsers] = useState([]);
     const [addUserOpen, setAddUserOpen] = useState(false);
     const [editUserOpen, setEditUserOpen] = useState(false);
-    const [deleteUserOpen, setDeleteUserOpen] = useState(false);
+    const [deleteModalOpen, setDeleteModalOpen] = useState(false);
+    const [deletionContext, setDeletionContext] = useState(null);
     const [currentPage, setCurrentPage] = useState(0);
     const [viewDetailsOpen, setViewDetailsOpen] = useState(false);
 
@@ -40,24 +41,8 @@ const UsersPage = () => {
         };
     }, [users]);
 
-    const handleSelectUser = (userId) => {
-        const id = Array.isArray(userId) ? userId[0] : userId;
-
-        setSelectedUsers((prevSelected) => {
-            if (prevSelected.includes(id)) {
-                return prevSelected.filter((selectedId) => selectedId !== id);
-            } else {
-                return [...prevSelected, id];
-            }
-        });
-    };
-
-    const handleSelectAll = (e) => {
-        if (e.target.checked) {
-            setSelectedUsers(users.map(user => user._id));
-        } else {
-            setSelectedUsers([]);
-        }
+    const handleSelectUser = (newSelection) => {
+        setSelectedUsers(newSelection);
     };
 
     const handlePageClick = (event) => {
@@ -90,10 +75,22 @@ const UsersPage = () => {
         setSelectedUser(null);
     };
 
-    const getSelectedUsers = () => {
-        return selectedUsers
-            .map((id) => users.find((user) => user._id === id))
-            .filter((user) => user);
+    const handleBulkDelete = () => {
+        if (selectedUsers.length > 0) {
+            setDeletionContext({
+                endpoint: '/users/delete-bulk',
+                data: { ids: selectedUsers },
+            });
+            setDeleteModalOpen(true);
+        }
+    };
+
+    const handleSingleDelete = (user) => {
+        setDeletionContext({
+            endpoint: `/users/delete/${user._id}`,
+            data: null,
+        });
+        setDeleteModalOpen(true);
     };
 
     const columns = [
@@ -135,7 +132,7 @@ const UsersPage = () => {
                             title="Users"
                             selectedItems={selectedUsers}
                             setAddItemOpen={setAddUserOpen}
-                            setDeleteItemOpen={setDeleteUserOpen}
+                            setDeleteItemOpen={handleBulkDelete}
                             itemName="User"
                             exportOptions={exportOptions(users, handleExport)}
                         />
@@ -145,13 +142,13 @@ const UsersPage = () => {
                             data={users}
                             selectedItems={selectedUsers}
                             onSelectItem={handleSelectUser}
-                            onSelectAll={handleSelectAll}
                             itemsPerPage={itemsPerPage}
                             currentPage={currentPage}
                             onPageChange={handlePageClick}
                             onEdit={handleEdit}
                             containerClassName='user'
                             onViewDetails={handleViewDetails}
+                            onDelete={handleSingleDelete}
                         />
                     </>
                 )}
@@ -159,14 +156,17 @@ const UsersPage = () => {
                 <AddUserModal open={addUserOpen} onClose={() => setAddUserOpen(false)} onAddSuccess={() => dispatch(getUsers())} />
                 <EditUserModal open={editUserOpen} onClose={() => setEditUserOpen(false)} user={selectedUser} onViewDetails={handleViewDetails} onEditSuccess={() => dispatch(getUsers())} />
                 <UserDetailsDrawer open={viewDetailsOpen} onClose={closeDrawer} user={selectedUser} onEdit={handleEditFromDrawer} />
+
                 <DeleteModal
-                    open={deleteUserOpen}
-                    onClose={() => setDeleteUserOpen(false)}
-                    items={getSelectedUsers()}
+                    open={deleteModalOpen}
+                    onClose={() => setDeleteModalOpen(false)}
+                    deletionContext={deletionContext}
                     onDeleteSuccess={handleDeleteSuccess}
-                    endpoint="/users/delete-bulk"
-                    title="Delete Users"
-                    message="Are you sure you want to delete the selected users?"
+                    title={deletionContext?.endpoint.includes('bulk') ? 'Delete Users' : 'Delete User'}
+                    message={deletionContext?.endpoint.includes('bulk')
+                        ? 'Are you sure you want to delete the selected users?'
+                        : 'Are you sure you want to delete this user?'
+                    }
                 />
             </div>
         </div>

@@ -1,19 +1,18 @@
 import React, { useEffect, useState } from 'react';
 import { toast } from 'react-toastify';
-import { ActionButtons, BrownOutlinedTextField, CustomBox, CustomModal, CustomTypography, handleApiError } from '../../../assets/CustomComponents';
+import { ActionButtons, CustomBox, CustomModal, CustomTextField, CustomTypography, handleApiError } from '../../../assets/CustomComponents';
 import { editCountryService } from '../../../services/countryService';
+import { CountryValidations } from '../../../utils/validations/country';
 
 const EditCountryModal = ({ open, onClose, country, onViewDetails, onEditSuccess }) => {
     const [name, setName] = useState('');
-    const [isValidName, setIsValidName] = useState(true);
     const [countryCode, setCountryCode] = useState('');
-    const [isValidCode, setIsValidCode] = useState(true);
     const [loading, setLoading] = useState(false);
 
-    const validateName = (v) => /^[A-ZÇ][a-zA-ZëËçÇ\s]{3,35}$/.test(v);
-    const validateCountryCode = (v) => /^[A-Z]{2,3}$/.test(v);
+    const validateName = (v) => CountryValidations.nameRules.pattern.test(v);
+    const validateCountryCode = (v) => CountryValidations.countryCodeRules.pattern.test(v);
 
-    const isValidForm = isValidName && isValidCode;
+    const isFormValid = validateName(name) && validateCountryCode(countryCode);
 
     useEffect(() => {
         if (country) {
@@ -52,32 +51,20 @@ const EditCountryModal = ({ open, onClose, country, onViewDetails, onEditSuccess
             <CustomBox>
                 <CustomTypography variant="h5">Edit Country</CustomTypography>
 
-                <BrownOutlinedTextField
-                    fullWidth
-                    required
+                <CustomTextField
                     label="Name"
                     value={name}
-                    onChange={(e) => {
-                        setName(e.target.value)
-                        setIsValidName(validateName(e.target.value))
-                    }}
-                    error={!isValidName}
-                    helperText={!isValidName ? 'Name must start with a capital letter and be 3-35 characters long' : ''}
-                    className="!mb-4"
+                    setValue={setName}
+                    validate={validateName}
+                    validationRule={CountryValidations.nameRules}
                 />
 
-                <BrownOutlinedTextField
-                    fullWidth
-                    required
+                <CustomTextField
                     label="Country Code"
                     value={countryCode}
-                    onChange={(e) => {
-                        setCountryCode(e.target.value);
-                        setIsValidCode(validateCountryCode(e.target.value));
-                    }}
-                    error={!isValidCode}
-                    helperText={!isValidCode ? 'Country Code must be capitalized and 2-3 capital letters' : ''}
-                    className='!mb-4'
+                    setValue={setCountryCode}
+                    validate={validateCountryCode}
+                    validationRule={CountryValidations.countryCodeRules}
                 />
 
                 <ActionButtons
@@ -89,7 +76,7 @@ const EditCountryModal = ({ open, onClose, country, onViewDetails, onEditSuccess
                         onClose();
                     }}
                     primaryButtonProps={{
-                        disabled: !isValidForm || loading
+                        disabled: !isFormValid || loading
                     }}
                     loading={loading}
                 />

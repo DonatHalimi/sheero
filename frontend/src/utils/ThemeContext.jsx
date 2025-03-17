@@ -1,5 +1,5 @@
 import { ThemeProvider as MuiThemeProvider } from '@mui/material/styles';
-import { createContext, useContext, useMemo, useState, useEffect } from 'react';
+import { createContext, useContext, useEffect, useMemo, useState } from 'react';
 import { getDashboardTheme } from './dashboardTheme';
 
 const ThemeContext = createContext();

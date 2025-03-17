@@ -70,10 +70,10 @@ const App = () => (
         <Route path="/reset-password/:token" element={<PublicRoute><ResetPassword /></PublicRoute>} />
         <Route path="/faqs" element={<FAQs />} />
         <Route path="/not-allowed" element={<NotAllowed />} />
-        <Route path="/category/:id/" element={<ProductsByCategory />} />
-        <Route path="/subcategory/:id/" element={<ProductsBySubcategory />} />
-        <Route path="/subSubcategory/:id/" element={<ProductsBySubSubCategory />} />
-        <Route path="/product/:id" element={<ProductDetails />} />
+        <Route path="/category/:slug/" element={<ProductsByCategory />} />
+        <Route path="/subcategory/:slug/" element={<ProductsBySubcategory />} />
+        <Route path="/subSubcategory/:slug/" element={<ProductsBySubSubCategory />} />
+        <Route path="/:slug" element={<ProductDetails />} />
         <Route path="/search" element={<SearchResults />} />
         <Route path="/wishlist/:userId" element={<SharedWishlist />} />
         <Route path="/contact-us" element={<ContactUs />} />
@@ -113,6 +113,7 @@ const App = () => (
 
         {/* Fallback Route */}
         <Route path="*" element={<NotFound />} />
+        <Route path="/not-found" element={<NotFound />} />
       </Routes>
     </Suspense>
 

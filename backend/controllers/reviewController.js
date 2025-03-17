@@ -6,7 +6,7 @@ const { sendReviewEmail } = require('../config/emailService');
 const populateR = (query) => {
     return query.populate([
         { path: 'user', select: '_id firstName lastName email' },
-        { path: 'product', select: 'name description price salePrice category subcategory image inventoryCount' },
+        { path: 'product', select: 'name slug description price salePrice category subcategory image inventoryCount' },
     ]);
 };
 
@@ -69,7 +69,7 @@ const checkReviewEligibility = async (req, res) => {
 
 const getReviews = async (req, res) => {
     try {
-        const reviews = await populateR(Review.find());
+        const reviews = await populateR(Review.find()).sort({ createdAt: -1 });
         res.status(200).json(reviews);
     } catch (error) {
         res.status(500).json({ message: 'Server error' });

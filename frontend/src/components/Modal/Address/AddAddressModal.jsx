@@ -1,36 +1,33 @@
 import { Autocomplete, TextField } from '@mui/material';
 import React, { useEffect, useState } from 'react';
 import { toast } from 'react-toastify';
-import { BrownButton, BrownOutlinedTextField, CustomBox, CustomModal, CustomPaper, CustomTypography, DashboardCountryFlag, handleApiError, LoadingLabel } from '../../../assets/CustomComponents';
+import { BrownButton, CustomBox, CustomModal, CustomPaper, CustomTextField, CustomTypography, DashboardCountryFlag, handleApiError, LoadingLabel } from '../../../assets/CustomComponents';
 import { addAddressService } from '../../../services/addressService';
 import { getCitiesByCountryService } from '../../../services/cityService';
 import { getCountriesService } from '../../../services/countryService';
+import { AddressValidations } from '../../../utils/validations/address';
 
 const AddAddressModal = ({ open, onClose, onAddSuccess }) => {
     const [name, setName] = useState('');
-    const [isValidName, setIsValidName] = useState(true);
     const [street, setStreet] = useState('');
-    const [isValidStreet, setIsValidStreet] = useState(true);
     const [phoneNumber, setPhoneNumber] = useState('');
-    const [isValidPhoneNumber, setIsValidPhoneNumber] = useState(true);
     const [comment, setComment] = useState('');
-    const [isValidComment, setIsValidComment] = useState(true);
     const [city, setCity] = useState(null);
     const [country, setCountry] = useState(null);
     const [cities, setCities] = useState([]);
     const [countries, setCountries] = useState([]);
     const [loading, setLoading] = useState(false);
 
-    const validateName = (v) => /^[A-ZÇ][a-zA-ZëËçÇ\s]{2,10}$/.test(v);
-    const validatePhoneNumber = (v) => /^0(43|44|45|46|47|48|49)\d{6}$/.test(v);
-    const validateStreet = (v) => /^[A-Z][a-zA-Z0-9\s]{2,27}$/.test(v);
-    const validateComment = (v) => !v || /^[a-zA-Z0-9\s]{2,25}$/.test(v);
+    const validateName = (v) => AddressValidations.nameRules.pattern.test(v);
+    const validatePhoneNumber = (v) => AddressValidations.phoneRules.pattern.test(v);
+    const validateStreet = (v) => AddressValidations.streetRules.pattern.test(v);
+    const validateComment = (v) => AddressValidations.commentRules.pattern.test(v);
 
     const isFormValid =
-        isValidName &&
-        isValidStreet &&
-        isValidPhoneNumber &&
-        isValidComment &&
+        validateName(name) &&
+        validatePhoneNumber(phoneNumber) &&
+        validateStreet(street) &&
+        validateComment(comment) &&
         city &&
         country;
 
@@ -103,63 +100,39 @@ const AddAddressModal = ({ open, onClose, onAddSuccess }) => {
             <CustomBox>
                 <CustomTypography variant="h5">Add Address</CustomTypography>
 
-                <BrownOutlinedTextField
-                    fullWidth
-                    required
+                <CustomTextField
                     label="Name"
                     value={name}
-                    onChange={(e) => {
-                        setName(e.target.value);
-                        setIsValidName(validateName(e.target.value));
-                    }}
-                    error={!isValidName}
-                    helperText={!isValidName ? "Name must start with a capital letter and be 2-10 characters long" : ""}
-                    className="!mb-4"
+                    setValue={setName}
+                    validate={validateName}
+                    validationRule={AddressValidations.nameRules}
                 />
 
-                <BrownOutlinedTextField
-                    fullWidth
-                    required
+                <CustomTextField
                     label="Street"
                     value={street}
-                    onChange={(e) => {
-                        setStreet(e.target.value);
-                        setIsValidStreet(validateStreet(e.target.value));
-                    }}
-                    error={!isValidStreet}
-                    helperText={!isValidStreet ? "Street must start with a capital letter and be 2-27 characters long" : ""}
-                    className="!mb-4"
+                    setValue={setStreet}
+                    validate={validateStreet}
+                    validationRule={AddressValidations.streetRules}
                 />
 
-                <BrownOutlinedTextField
-                    fullWidth
-                    required
+                <CustomTextField
                     label="Phone Number"
                     value={phoneNumber}
-                    onChange={(e) => {
-                        setPhoneNumber(e.target.value)
-                        setIsValidPhoneNumber(validatePhoneNumber(e.target.value));
-                    }}
+                    setValue={setPhoneNumber}
+                    validate={validatePhoneNumber}
+                    validationRule={AddressValidations.phoneRules}
                     placeholder="044/45/48 XXXXXX"
-                    error={!isValidPhoneNumber}
-                    helperText={!isValidPhoneNumber ? "Phone number must start with 043, 044, 045, 046, 047, 048 or 049 followed by 6 digits" : ""}
-                    className="!mb-4"
                 />
 
-                <BrownOutlinedTextField
-                    fullWidth
-                    required
+                <CustomTextField
                     label="Comment (Optional)"
                     value={comment}
-                    onChange={(e) => {
-                        setComment(e.target.value)
-                        setIsValidComment(validateComment(e.target.value));
-                    }}
-                    error={!isValidComment}
-                    helperText={!isValidComment ? "Comment must be 2-25 characters long" : ""}
+                    setValue={setComment}
+                    validate={validateComment}
+                    validationRule={AddressValidations.commentRules}
                     multiline
                     rows={4}
-                    className="!mb-4"
                 />
 
                 <Autocomplete

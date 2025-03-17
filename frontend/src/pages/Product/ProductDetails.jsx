@@ -1,4 +1,4 @@
-import { Add, LocalAtm, Payment, Remove } from '@mui/icons-material';
+import { Add, LocalAtm, Payment, Remove, RemoveShoppingCart } from '@mui/icons-material';
 import { IconButton } from '@mui/material';
 import React, { useEffect, useState } from 'react';
 import { useSelector } from 'react-redux';
@@ -11,13 +11,13 @@ import AddReviewModal from '../../components/Product/Modals/AddReviewModal';
 import ProductDetailsTabs from '../../components/Product/Utils/ProductDetailsTabs';
 import Footer from '../../components/Utils/Footer';
 import { addToCartService } from '../../services/cartService';
-import { getProductDetails, subscribeForRestockService } from '../../services/productService';
+import { checkUserRestockSubscriptionService, deleteUserRestockSubscriptionService, getProductDetails, subscribeForRestockService } from '../../services/productService';
 import { addToWishlistService } from '../../services/wishlistService';
 import { getImageUrl } from '../../utils/config';
 
 const ProductDetails = () => {
     const { isAuthenticated } = useSelector((state) => state.auth);
-    const { id } = useParams();
+    const { slug } = useParams();
     const navigate = useNavigate();
 
     const [product, setProduct] = useState(null);
@@ -29,6 +29,9 @@ const ProductDetails = () => {
     const [isRestockModalOpen, setIsRestockModalOpen] = useState(false);
     const [notifyEmail, setNotifyEmail] = useState('');
     const [isNotifyLoading, setIsNotifyLoading] = useState(false);
+    const [isSubscribed, setIsSubscribed] = useState(false);
+    const [isRemoving, setIsRemoving] = useState(false);
+
     const [quantity, setQuantity] = useState(1);
 
     const { name, image, price, salePrice, discount, inventoryCount } = product || {};
@@ -42,17 +45,26 @@ const ProductDetails = () => {
     useEffect(() => {
         const fetchProduct = async () => {
             try {
-                const response = await getProductDetails(id);
+                const response = await getProductDetails(slug);
+                if (!response.data) {
+                    navigate('/not-found', { replace: true });
+                    return;
+                }
                 setProduct(response.data);
             } catch (error) {
                 console.error('Error fetching product:', error);
-                toast.error('Failed to load product details');
+                if (error.response?.status === 404) {
+                    navigate('/not-found', { replace: true });
+                } else {
+                    toast.error('Failed to load product details');
+                }
             } finally {
                 setIsLoadingProduct(false);
             }
         };
+
         fetchProduct();
-    }, [id]);
+    }, [slug, navigate]);
 
     const openReviewModal = () => {
         if (!isAuthenticated) {
@@ -153,6 +165,30 @@ const ProductDetails = () => {
         }
     };
 
+    const checkSubscription = async (email) => {
+        try {
+            const { data } = await checkUserRestockSubscriptionService(email);
+            setIsSubscribed(data.isSubscribed);
+        } catch (error) {
+            console.error(`Failed to check restock subscription for email ${email}`, error);
+            setIsSubscribed(false);
+        }
+    };
+
+    const deleteSubscription = async (email) => {
+        setIsRemoving(true);
+        try {
+            const res = await deleteUserRestockSubscriptionService(email);
+            setIsSubscribed(false);
+            closeRestockNotificationModal();
+            toast.success(res.data.message);
+        } catch (error) {
+            console.error(`Failed to delete restock subscription for email: ${email}`, error);
+        } finally {
+            setIsRemoving(false);
+        }
+    };
+
     return (
         <>
             {(isCartLoading || isWishlistLoading) && <LoadingOverlay />}
@@ -215,37 +251,49 @@ const ProductDetails = () => {
                                 </div>
 
                                 <div className="mt-2 flex items-center">
-                                    <div className="flex items-center mr-4">
-                                        <IconButton
-                                            onClick={() => handleQuantityChange(-1)}
-                                            disabled={quantity <= 1}
-                                            size="small"
-                                            centerRipple={false}
-                                            className="px-3 py-1 bg-gray-100 hover:bg-gray-200 text-gray-600"
-                                        >
-                                            <Remove fontSize="small" />
-                                        </IconButton>
-                                        <span className="px-3 py-1">{quantity}</span>
-                                        <IconButton
-                                            onClick={() => handleQuantityChange(1)}
-                                            disabled={quantity >= product.inventoryCount}
-                                            size="small"
-                                            centerRipple={false}
-                                            className={`px-3 py-1 border rounded-r ${quantity >= product.inventoryCount ? 'opacity-50' : ''}`}
-                                        >
-                                            <Add fontSize="small" />
-                                        </IconButton>
-                                    </div>
-                                    <span className="text-sm font-semibold text-stone-600 bg-stone-100 rounded-md px-2">
-                                        {inventoryText}
-                                    </span>
-                                    {inventoryCount === 0 && (
-                                        <p
-                                            onClick={openRestockNotificationModal}
-                                            className="ml-auto underline cursor-pointer text-sm"
-                                        >
-                                            Notify me when available
-                                        </p>
+                                    {inventoryCount > 0 && (
+                                        <>
+                                            <div className="flex items-center mr-4">
+                                                <IconButton
+                                                    onClick={() => handleQuantityChange(-1)}
+                                                    disabled={quantity <= 1}
+                                                    size="small"
+                                                    centerRipple={false}
+                                                    className="px-3 py-1 bg-gray-100 hover:bg-gray-200 text-gray-600"
+                                                >
+                                                    <Remove fontSize="small" />
+                                                </IconButton>
+                                                <span className="px-3 py-1">{quantity}</span>
+                                                <IconButton
+                                                    onClick={() => handleQuantityChange(1)}
+                                                    disabled={quantity >= product.inventoryCount}
+                                                    size="small"
+                                                    centerRipple={false}
+                                                    className={`px-3 py-1 border rounded-r ${quantity >= product.inventoryCount ? 'opacity-50' : ''}`}
+                                                >
+                                                    <Add fontSize="small" />
+                                                </IconButton>
+                                            </div>
+                                            <span className="text-sm font-semibold text-stone-600 bg-stone-100 rounded-md px-2">
+                                                {inventoryText}
+                                            </span>
+                                        </>
+                                    )}
+
+                                    {!inventoryCount && (
+                                        <div className="flex items-center space-x-3">
+                                            <div className="bg-gray-100 p-1 rounded-md flex items-center justify-center">
+                                                <RemoveShoppingCart color="primary" />
+                                            </div>
+                                            <div className="flex flex-col items-start">
+                                                <span className="text-sm font-semibold text-stone-600">
+                                                    Out of stock
+                                                </span>
+                                                <p onClick={openRestockNotificationModal} className="underline cursor-pointer text-sm">
+                                                    Notify me when it's available
+                                                </p>
+                                            </div>
+                                        </div>
                                     )}
                                 </div>
 
@@ -289,6 +337,11 @@ const ProductDetails = () => {
                         notifyEmail={notifyEmail}
                         setNotifyEmail={setNotifyEmail}
                         loading={isNotifyLoading}
+                        loadingRemove={isRemoving}
+                        isSubscribed={isSubscribed}
+                        checkSubscription={checkSubscription}
+                        deleteSubscription={deleteSubscription}
+                        showEmailInput={isAuthenticated}
                     />
 
                     <ImagePreviewModal

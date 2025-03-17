@@ -6,7 +6,7 @@ const createImage = async (req, res) => {
     const image = req.file ? req.file.path : '';
 
     try {
-        const slideshowImage = new SlideshowImage({ title, image, description });
+        const slideshowImage = new SlideshowImage({ title, image, description, createdBy: req.user.userId });
         await slideshowImage.save();
         res.status(201).json({ message: 'Slideshow image created successfully', slideshowImage });
     } catch (error) {
@@ -16,7 +16,9 @@ const createImage = async (req, res) => {
 
 const getImages = async (req, res) => {
     try {
-        const images = await SlideshowImage.find();
+        const images = await SlideshowImage.find()
+            .populate('createdBy', 'firstName lastName email')
+            .populate('updatedBy', 'firstName lastName email');
         res.status(200).json(images);
     } catch (error) {
         res.status(500).json({ message: 'Server error' });
@@ -57,7 +59,7 @@ const updateImage = async (req, res) => {
 
         const updatedImage = await SlideshowImage.findByIdAndUpdate(
             req.params.id,
-            { title, image, description, updatedAt: Date.now() },
+            { title, image, description, updatedAt: Date.now(), updatedBy: req.user.userId },
             { new: true }
         );
         res.status(200).json({ message: 'Slideshow image updated successfully', updatedImage });

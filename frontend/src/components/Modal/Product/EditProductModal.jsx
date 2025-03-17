@@ -1,8 +1,8 @@
 import { ArrowBack } from '@mui/icons-material';
-import { Autocomplete, Box, MenuItem, Modal, TextField, Typography } from '@mui/material';
+import { Autocomplete, Box, MenuItem, Modal, TextField } from '@mui/material';
 import React, { useEffect, useState } from 'react';
 import { toast } from 'react-toastify';
-import { BrownButton, BrownOutlinedTextField, CustomPaper, ImageUploadBox, OutlinedBrownButton, OutlinedBrownFormControl } from '../../../assets/CustomComponents';
+import { BrownButton, BrownOutlinedTextField, CustomBox, CustomPaper, CustomTypography, ImageUploadBox, OutlinedBrownButton, OutlinedBrownFormControl } from '../../../assets/CustomComponents';
 import axiosInstance from '../../../utils/axiosInstance';
 import { getImageUrl } from '../../../utils/config';
 
@@ -221,7 +221,7 @@ const EditProductModal = ({ open, onClose, product, onEditSuccess }) => {
                 return (
                     <>
                         {/* Step 1: Basic Product Information */}
-                        <Typography variant='h5' className="!text-xl !font-bold !mb-4">Edit Basic Information</Typography>
+                        <CustomTypography variant='h5' className="!text-xl !font-bold !mb-4">Edit Basic Information</CustomTypography>
                         <BrownOutlinedTextField
                             fullWidth
                             required
@@ -331,7 +331,7 @@ const EditProductModal = ({ open, onClose, product, onEditSuccess }) => {
                     <>
                         {/* Step 2: Upload Image */}
                         <div className="flex items-center justify-between mb-4">
-                            <Typography variant='h5' className="!text-xl !font-bold">Update Product Image</Typography>
+                            <CustomTypography variant='h5' className="!text-xl !font-bold">Update Product Image</CustomTypography>
                             <OutlinedBrownButton
                                 onClick={handleBackToStep1}
                                 startIcon={<ArrowBack />}
@@ -351,7 +351,7 @@ const EditProductModal = ({ open, onClose, product, onEditSuccess }) => {
                 return (
                     <>
                         {/* Step 3: Variants, Dimensions, and Shipping */}
-                        <Typography variant='h5' className="!text-xl !font-bold !mb-4">Edit Dimensions, Variants, Details and Shipping</Typography>
+                        <CustomTypography variant='h5' className="!text-xl !font-bold !mb-4">Edit Dimensions, Variants, Details and Shipping</CustomTypography>
 
                         {/* Button to return to Step 1 */}
                         <OutlinedBrownButton
@@ -362,7 +362,7 @@ const EditProductModal = ({ open, onClose, product, onEditSuccess }) => {
                             Back to Basic Info
                         </OutlinedBrownButton>
 
-                        <Typography variant='h6' className="!text-lg !font-bold !mb-4">Dimensions</Typography>
+                        <CustomTypography variant='h6' className="!text-lg !font-bold !mb-4">Dimensions</CustomTypography>
                         <Box className="flex gap-4 mb-2">
                             <BrownOutlinedTextField
                                 fullWidth
@@ -396,7 +396,7 @@ const EditProductModal = ({ open, onClose, product, onEditSuccess }) => {
                                 className="!mb-4"
                             />
                         </Box>
-                        <Typography variant='h6' className="!text-lg !font-bold !mb-4">Variants</Typography>
+                        <CustomTypography variant='h6' className="!text-lg !font-bold !mb-4">Variants</CustomTypography>
                         {variants.map((variant, index) => (
                             <Box key={index} className="flex gap-4 mb-2">
                                 <BrownOutlinedTextField
@@ -417,7 +417,7 @@ const EditProductModal = ({ open, onClose, product, onEditSuccess }) => {
                         <OutlinedBrownButton onClick={addVariant} className="!mb-4">Add Variant</OutlinedBrownButton>
 
                         {/* Details Section */}
-                        <Typography variant='h6' className="!text-lg !font-bold !mb-4">Details</Typography>
+                        <CustomTypography variant='h6' className="!text-lg !font-bold !mb-4">Details</CustomTypography>
                         {details.map((detail, index) => (
                             <Box key={index} className="flex gap-4 mb-2">
                                 <BrownOutlinedTextField
@@ -441,7 +441,7 @@ const EditProductModal = ({ open, onClose, product, onEditSuccess }) => {
                             Add Detail
                         </OutlinedBrownButton>
 
-                        <Typography variant='h6' className="!text-lg !font-bold !mb-4">Shipping</Typography>
+                        <CustomTypography variant='h6' className="!text-lg !font-bold !mb-4">Shipping</CustomTypography>
                         <Box className="flex gap-4 mb-2">
                             <BrownOutlinedTextField
                                 fullWidth
@@ -485,9 +485,9 @@ const EditProductModal = ({ open, onClose, product, onEditSuccess }) => {
     return (
         <Modal open={open} onClose={onClose}>
             <div className="flex items-center justify-center h-screen">
-                <Box className="edit-modal bg-white p-4 rounded-lg shadow-lg max-w-md w-full max-h-[80vh] overflow-y-auto">
+                <CustomBox className="edit-modal bg-white p-4 rounded-lg shadow-lg max-w-md w-full max-h-[80vh] overflow-y-auto">
                     {renderStep()}
-                </Box>
+                </CustomBox>
             </div>
         </Modal>
     );

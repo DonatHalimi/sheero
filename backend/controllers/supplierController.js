@@ -1,40 +1,24 @@
 const Supplier = require('../models/Supplier');
 
-const validateEmail = (email) => {
-    const re = /^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$/;
-    return re.test(String(email).toLowerCase());
-};
-
 const createSupplier = async (req, res) => {
     const { name, contactInfo } = req.body;
 
-    if (!name || !contactInfo || !contactInfo.email || !contactInfo.phoneNumber) {
-        return res.status(400).json({ message: 'Please fill in all the fields' })
-    }
-
-    if (!validateEmail(contactInfo.email)) {
-        return res.status(400).json({ message: 'Email format is not correct' });
-    }
-
     try {
-        const supplier = new Supplier({ name, contactInfo });
+        const supplier = new Supplier({ name, contactInfo, createdBy: req.user.userId });
         await supplier.save();
         res.status(201).json({ message: 'Supplier created successfully', supplier });
     } catch (error) {
-        console.error('Error creating supplier:', error);
-        if (error.name === 'ValidationError') {
-            return res.status(400).json({ message: 'Validation error', error: error.message });
-        }
         res.status(500).json({ message: 'Server error', error: error.message });
     }
 };
 
 const getSuppliers = async (req, res) => {
     try {
-        const suppliers = await Supplier.find();
+        const suppliers = await Supplier.find()
+            .populate('createdBy', 'firstName lastName email')
+            .populate('updatedBy', 'firstName lastName email');
         res.status(200).json(suppliers);
     } catch (error) {
-        console.error('Error getting suppliers:', error);
         res.status(500).json({ message: 'Server error', error: error.message });
     }
 };
@@ -45,7 +29,6 @@ const getSupplierById = async (req, res) => {
         if (!supplier) return res.status(404).json({ message: 'Supplier not found' });
         res.status(200).json(supplier);
     } catch (error) {
-        console.error('Error getting supplier:', error);
         res.status(500).json({ message: 'Server error', error: error.message });
     }
 };
@@ -55,13 +38,12 @@ const updateSupplier = async (req, res) => {
     try {
         const supplier = await Supplier.findByIdAndUpdate(
             req.params.id,
-            { name, contactInfo, updatedAt: Date.now() },
+            { name, contactInfo, updatedAt: Date.now(), updatedBy: req.user.userId },
             { new: true, runValidators: true }
         );
-        if (!supplier) return res.status(404).json({ message: 'Supplier not found' });
+
         res.status(200).json({ message: 'Supplier updated successfully', supplier });
     } catch (error) {
-        console.error('Error updating supplier:', error);
         res.status(500).json({ message: 'Server error', error: error.message });
     }
 };

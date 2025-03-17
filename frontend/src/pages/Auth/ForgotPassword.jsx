@@ -1,8 +1,9 @@
 import { Typography } from '@mui/material';
 import React, { useState } from 'react';
 import { toast } from 'react-toastify';
-import { BrownButton, BrownOutlinedTextField, CustomBox, CustomModal, knownEmailProviders, LoadingLabel } from '../../assets/CustomComponents';
+import { BrownButton, BrownOutlinedTextField, CustomBox, CustomModal, LoadingLabel } from '../../assets/CustomComponents';
 import { forgotPasswordService } from '../../services/authService';
+import { UserValidations } from '../../utils/validations/user';
 
 const ForgotPassword = ({ open, onClose }) => {
     const [email, setEmail] = useState('');
@@ -10,7 +11,7 @@ const ForgotPassword = ({ open, onClose }) => {
     const [errorVisible, setErrorVisible] = useState(false);
     const [loading, setLoading] = useState(false);
 
-    const validateEmail = (v) => new RegExp(`^[a-zA-Z0-9._%+-]+@(${knownEmailProviders.join('|')})$`, 'i').test(v);
+    const validateEmail = (v) => UserValidations.emailRules.pattern.test(v);
 
     const handleSubmit = async (e) => {
         e.preventDefault();
@@ -44,15 +45,15 @@ const ForgotPassword = ({ open, onClose }) => {
     };
 
     return (
-        <CustomModal open={open} onClose={onClose} className="mt-20">
+        <CustomModal open={open} onClose={onClose}>
             <CustomBox>
-                <Typography variant="h6" align="left" className="font-extrabold text-stone-600">
+                <Typography variant="h6" align="left" className="!mb-2 text-stone-600">
                     Forgot Password
                 </Typography>
 
-                <Typography variant="body2" align="left" className="text-stone-600 !mb-3 !mt-1">
+                <p className="mb-2">
                     Provide the email address associated with your account to reset your password.
-                </Typography>
+                </p>
 
                 <form onSubmit={handleSubmit}>
                     <BrownOutlinedTextField
@@ -66,8 +67,8 @@ const ForgotPassword = ({ open, onClose }) => {
                     />
                     {!isValidEmail && email && errorVisible && (
                         <div className="absolute bottom-[11px] bg-white text-red-500 text-sm p-2 rounded-lg shadow-md w-[calc(100%-30px)]  z-10">
-                            <span className="block text-xs font-semibold mb-1">Invalid Email</span>
-                            Please provide a valid email address.
+                            <span className="block text-xs font-semibold mb-1">{UserValidations.emailRules.title}</span>
+                            {UserValidations.emailRules.message}
                             <div className="absolute top-[-5px] left-[20px] w-0 h-0 border-l-[5px] border-r-[5px] border-b-[5px] border-transparent border-b-white"></div>
                         </div>
                     )}

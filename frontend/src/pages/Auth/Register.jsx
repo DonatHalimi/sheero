@@ -8,6 +8,7 @@ import { BrownButton, BrownOutlinedTextField, ErrorTooltip, handleFacebookLogin,
 import Navbar from '../../components/Navbar/Navbar';
 import Footer from '../../components/Utils/Footer';
 import { registerUser } from '../../store/actions/authActions';
+import { UserValidations } from '../../utils/validations/user';
 
 const Register = () => {
     const dispatch = useDispatch();
@@ -27,31 +28,34 @@ const Register = () => {
     const handleMouseDownPassword = (event) => event.preventDefault();
 
     const validateField = (name, value) => {
-        const rules = {
-            firstName: /^[A-Z][a-zA-Z]{1,9}$/,
-            lastName: /^[A-Z][a-zA-Z]{1,9}$/,
-            email: new RegExp(`^[a-zA-Z0-9._%+-]+@(${knownEmailProviders.join('|')})$`, 'i'),
-            password: /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[@$!%*?&\(\)_\+\-.])[A-Za-z\d@$!%*?&\(\)_\+\-.]{8,}$/,
-        };
-        return rules[name]?.test(value);
+        if (name === 'firstName') {
+            return UserValidations.firstNameRules.pattern.test(value);
+        } else if (name === 'lastName') {
+            return UserValidations.lastNameRules.pattern.test(value);
+        } else if (name === 'email') {
+            return UserValidations.emailRules.pattern.test(value);
+        } else if (name === 'password') {
+            return UserValidations.passwordRules.pattern.test(value);
+        }
+        return true;
     };
 
     const errorMessages = {
         firstName: {
-            title: 'Invalid First Name',
-            details: 'Must start with a capital letter and be 2 to 10 characters long.'
+            title: UserValidations.firstNameRules.title,
+            details: UserValidations.firstNameRules.message
         },
         lastName: {
-            title: 'Invalid Last Name',
-            details: 'Must start with a capital letter and be 2 to 10 characters long.'
+            title: UserValidations.lastNameRules.title,
+            details: UserValidations.lastNameRules.message
         },
         email: {
-            title: 'Invalid Email',
-            details: 'Please provide a valid email address.'
+            title: UserValidations.emailRules.title,
+            details: UserValidations.emailRules.message
         },
         password: {
-            title: 'Invalid Password',
-            details: 'Must be 8 characters long with uppercase, lowercase, number, and special character.'
+            title: UserValidations.passwordRules.title,
+            details: UserValidations.passwordRules.message
         }
     };
 

@@ -17,7 +17,8 @@ const AddressesPage = () => {
     const [selectedAddresses, setSelectedAddresses] = useState([]);
     const [addAddressOpen, setAddAddressOpen] = useState(false);
     const [editAddressOpen, setEditAddressOpen] = useState(false);
-    const [deleteAddressOpen, setDeleteAddressOpen] = useState(false);
+    const [deleteModalOpen, setDeleteModalOpen] = useState(false);
+    const [deletionContext, setDeletionContext] = useState(null);
     const [currentPage, setCurrentPage] = useState(0);
     const [viewDetailsOpen, setViewDetailsOpen] = useState(false);
 
@@ -27,31 +28,8 @@ const AddressesPage = () => {
         dispatch(getAddresses());
     }, [dispatch]);
 
-    useEffect(() => {
-        const handleKeydown = (e) => {
-            if (e.altKey && e.key === 'a') {
-                setAddAddressOpen(prev => !prev);
-            }
-        };
-
-        window.addEventListener('keydown', handleKeydown);
-        return () => {
-            window.removeEventListener('keydown', handleKeydown);
-        };
-    }, [addresses]);
-
-    const handleSelectAddress = (addressId) => {
-        const id = Array.isArray(addressId) ? addressId[0] : addressId;
-
-        setSelectedAddresses((prevSelected) =>
-            prevSelected.includes(id)
-                ? prevSelected.filter((selectedId) => selectedId !== id)
-                : [...prevSelected, id]
-        );
-    };
-
-    const handleSelectAll = (e) => {
-        setSelectedAddresses(e.target.checked ? addresses.map(address => address._id) : []);
+    const handleSelectAddress = (newSelection) => {
+        setSelectedAddresses(newSelection);
     };
 
     const handleEdit = (address) => {
@@ -63,12 +41,6 @@ const AddressesPage = () => {
         setViewDetailsOpen(false);
         setSelectedAddress(address);
         setEditAddressOpen(true);
-    };
-
-    const getSelectedAddresses = () => {
-        return selectedAddresses
-            .map((id) => addresses.find((address) => address._id === id))
-            .filter((address) => address);
     };
 
     const handleDeleteSuccess = () => {
@@ -84,6 +56,24 @@ const AddressesPage = () => {
     const closeDrawer = () => {
         setViewDetailsOpen(false);
         setSelectedAddress(null);
+    };
+
+    const handleBulkDelete = () => {
+        if (selectedAddresses.length > 0) {
+            setDeletionContext({
+                endpoint: '/addresses/delete-bulk',
+                data: { ids: selectedAddresses },
+            });
+            setDeleteModalOpen(true);
+        }
+    };
+
+    const handleSingleDelete = (address) => {
+        setDeletionContext({
+            endpoint: `/addresses/delete/${address._id}`,
+            data: null,
+        });
+        setDeleteModalOpen(true);
     };
 
     const columns = [
@@ -105,10 +95,10 @@ const AddressesPage = () => {
             city: address.city.name,
             country: address.country.name,
             comment: address.comment || 'N/A'
-        }))
+        }));
 
         format === 'excel' ? exportToExcel(flattenedAddress, 'addresses_data') : exportToJSON(data, 'addresses_data');
-    }
+    };
 
     return (
         <div className='container mx-auto max-w-screen-2xl px-4 mt-20'>
@@ -121,7 +111,7 @@ const AddressesPage = () => {
                             title="Addresses"
                             selectedItems={selectedAddresses}
                             setAddItemOpen={setAddAddressOpen}
-                            setDeleteItemOpen={setDeleteAddressOpen}
+                            setDeleteItemOpen={handleBulkDelete}
                             itemName="Address"
                             exportOptions={exportOptions(addresses, handleExport)}
                         />
@@ -131,12 +121,12 @@ const AddressesPage = () => {
                             data={addresses}
                             selectedItems={selectedAddresses}
                             onSelectItem={handleSelectAddress}
-                            onSelectAll={handleSelectAll}
                             itemsPerPage={itemsPerPage}
                             currentPage={currentPage}
                             onPageChange={(event) => setCurrentPage(event.selected)}
                             onEdit={handleEdit}
                             onViewDetails={handleViewDetails}
+                            onDelete={handleSingleDelete}
                         />
                     </>
                 )}
@@ -144,14 +134,17 @@ const AddressesPage = () => {
                 <AddAddressModal open={addAddressOpen} onClose={() => setAddAddressOpen(false)} onAddSuccess={() => dispatch(getAddresses())} />
                 <EditAddressModal open={editAddressOpen} onClose={() => setEditAddressOpen(false)} address={selectedAddress} onViewDetails={handleViewDetails} onEditSuccess={() => dispatch(getAddresses())} />
                 <AddressDetailsDrawer open={viewDetailsOpen} onClose={closeDrawer} address={selectedAddress} onEdit={handleEditFromDrawer} />
+
                 <DeleteModal
-                    open={deleteAddressOpen}
-                    onClose={() => setDeleteAddressOpen(false)}
-                    items={getSelectedAddresses()}
+                    open={deleteModalOpen}
+                    onClose={() => setDeleteModalOpen(false)}
+                    deletionContext={deletionContext}
                     onDeleteSuccess={handleDeleteSuccess}
-                    endpoint="/addresses/delete-bulk"
-                    title="Delete Addresses"
-                    message="Are you sure you want to delete the selected addresses?"
+                    title={deletionContext?.endpoint.includes('bulk') ? 'Delete Addresses' : 'Delete Address'}
+                    message={deletionContext?.endpoint.includes('bulk')
+                        ? 'Are you sure you want to delete the selected addresses?'
+                        : 'Are you sure you want to delete this address?'
+                    }
                 />
             </div>
         </div>

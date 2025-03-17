@@ -37,7 +37,7 @@ const Cart = () => {
     const total = subtotal + shippingCost;
     const productLabel = cart?.items?.length > 1 ? 'Products' : 'Product';
 
-    const handleProductClick = (productId) => navigate(`/product/${productId}`);
+    const handleProductClick = (slug) => navigate(`/${slug}`);
 
     const fetchCart = async () => {
         try {
@@ -237,7 +237,7 @@ const Cart = () => {
                                                 <TableRow key={item.product._id}>
                                                     <TableCell component="th" scope="row">
                                                         <div className="flex items-center">
-                                                            <a href={`/product/${item.product._id}`} rel="noopener noreferrer">
+                                                            <a href={`/${item.product.slug}`} rel="noopener noreferrer">
                                                                 <img
                                                                     src={getImageUrl(item.product.image)}
                                                                     alt={item.product.name}
@@ -246,7 +246,7 @@ const Cart = () => {
                                                             </a>
                                                             <div>
                                                                 <a
-                                                                    href={`/product/${item.product._id}`}
+                                                                    href={`/${item.product.slug}`}
                                                                     rel="noopener noreferrer"
                                                                     className="text-base font-normal cursor-pointer hover:underline"
                                                                 >
@@ -317,14 +317,14 @@ const Cart = () => {
                                             <img
                                                 src={getImageUrl(item.product.image)}
                                                 alt={item.product.name}
-                                                className="w-24 h-24 object-contain rounded cursor-pointer"
-                                                onClick={() => handleProductClick(item.product._id)}
+                                                onClick={() => handleProductClick(item.product.slug)}
+                                                className="w-16 h-16 object-contain rounded cursor-pointer"
                                             />
                                             <div className="flex-1">
                                                 <div className="flex justify-between items-start">
                                                     <h3
+                                                        onClick={() => handleProductClick(item.product.slug)}
                                                         className="font-medium mb-2 cursor-pointer hover:underline"
-                                                        onClick={() => handleProductClick(item.product._id)}
                                                     >
                                                         {truncateText(item.product.name, 25)}
                                                     </h3>

@@ -1,19 +1,18 @@
 import React, { useEffect, useState } from 'react';
 import { toast } from 'react-toastify';
-import { ActionButtons, BrownOutlinedTextField, CustomBox, CustomModal, CustomTypography, handleApiError } from '../../../assets/CustomComponents';
+import { ActionButtons, CustomBox, CustomModal, CustomTextField, CustomTypography, handleApiError } from '../../../assets/CustomComponents';
 import { editRoleService } from '../../../services/roleService';
+import { RoleValidations } from '../../../utils/validations/role';
 
 const EditRoleModal = ({ open, onClose, role, onViewDetails, onEditSuccess }) => {
     const [name, setName] = useState('');
-    const [isValidName, setIsValidName] = useState(true);
     const [description, setDescription] = useState('');
-    const [isValidDescription, setIsValidDescription] = useState(true);
     const [loading, setLoading] = useState(false);
 
-    const validateName = (v) => /^[a-zA-Z\s]{2,15}$/.test(v);
-    const validateDescription = (v) => /^.{5,500}$/.test(v);
+    const validateName = (v) => RoleValidations.nameRules.pattern.test(v);
+    const validateDescription = (v) => RoleValidations.descriptionRules.pattern.test(v);
 
-    const isValidForm = name && isValidName && description && isValidDescription;
+    const isFormValid = name && validateName(name) && description && validateDescription(description);
 
     useEffect(() => {
         if (role) {
@@ -52,34 +51,24 @@ const EditRoleModal = ({ open, onClose, role, onViewDetails, onEditSuccess }) =>
             <CustomBox>
                 <CustomTypography variant="h5">Edit Role</CustomTypography>
 
-                <BrownOutlinedTextField
-                    fullWidth
-                    required
-                    label="Role Name"
+                <CustomTextField
+                    label="Name"
                     value={name}
-                    onChange={(e) => {
-                        setName(e.target.value)
-                        setIsValidName(validateName(e.target.value));
-                    }}
-                    error={!isValidName}
-                    helperText={!isValidName ? 'Role name must be 2-15 characters long' : ''}
-                    className="!mb-4"
+                    setValue={setName}
+                    validate={validateName}
+                    validationRule={RoleValidations.nameRules}
                 />
-                <BrownOutlinedTextField
-                    fullWidth
-                    required
+
+                <CustomTextField
                     label="Description"
                     value={description}
+                    setValue={setDescription}
+                    validate={validateDescription}
+                    validationRule={RoleValidations.descriptionRules}
                     multiline
                     rows={4}
-                    onChange={(e) => {
-                        setDescription(e.target.value)
-                        setIsValidDescription(validateDescription(e.target.value));
-                    }}
-                    error={!isValidDescription}
-                    helperText={!isValidDescription ? 'Description must be 5-500 characters long' : ''}
-                    className="!mb-4"
                 />
+
                 <ActionButtons
                     primaryButtonLabel="Save"
                     secondaryButtonLabel="View Details"
@@ -89,7 +78,7 @@ const EditRoleModal = ({ open, onClose, role, onViewDetails, onEditSuccess }) =>
                         onClose();
                     }}
                     primaryButtonProps={{
-                        disabled: !isValidForm || loading,
+                        disabled: !isFormValid || loading
                     }}
                     loading={loading}
                 />

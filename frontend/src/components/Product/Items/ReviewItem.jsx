@@ -14,7 +14,7 @@ const ReviewItem = ({ review, onImageClick, onMenuClick, onCardClick }) => {
                     alt={review.product.name}
                     onClick={(event) => {
                         event.stopPropagation();
-                        onImageClick(review.product._id);
+                        onImageClick(review.product.slug);
                     }}
                     className="object-contain w-full h-full rounded-md cursor-pointer hover:underline"
                 />
@@ -24,7 +24,7 @@ const ReviewItem = ({ review, onImageClick, onMenuClick, onCardClick }) => {
                     <h6
                         onClick={(event) => {
                             event.stopPropagation();
-                            onImageClick(review.product._id);
+                            onImageClick(review.product.slug);
                         }}
                         className="font-light mb-[2px] flex items-center hover:underline break-words text-lg"
                     >

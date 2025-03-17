@@ -39,30 +39,11 @@ router.get(
             const accessToken = req.user.generateAccessToken();
             res.cookie('accessToken', accessToken, cookieConfig);
 
-            const redirectScript = `
-                if (window.opener) {
-                    window.opener.postMessage(
-                        { type: 'GOOGLE_AUTH_SUCCESS' },
-                        '${redirectUrl}'
-                    );
-                    window.close();
-                } else {
-                    window.location.href = '${redirectUrl}';
-                }
-            `;
-
-            res.send(`
-                <script>
-                    ${redirectScript}
-                </script>
-            `);
+            // Redirect to the frontend with a success status
+            res.redirect(`${redirectUrl}?auth_status=success&provider=google`);
         } catch (error) {
-            res.status(500).send(`
-                <script>
-                    alert('Authentication Failed. Please try again.');
-                    window.close();
-                </script>
-            `);
+            // Redirect to the frontend with an error status
+            res.redirect(`${redirectUrl}?auth_status=error&provider=google`);
         }
     }
 );
@@ -78,30 +59,11 @@ router.get(
             const accessToken = req.user.generateAccessToken();
             res.cookie('accessToken', accessToken, cookieConfig);
 
-            const redirectScript = `
-                if (window.opener) {
-                    window.opener.postMessage(
-                        { type: 'FACEBOOK_AUTH_SUCCESS' },
-                        '${redirectUrl}'
-                    );
-                    window.close();
-                } else {
-                    window.location.href = '${redirectUrl}';
-                }
-            `;
-
-            res.send(`
-                <script>
-                    ${redirectScript}
-                </script>
-            `);
+            // Redirect to the frontend with a success status
+            res.redirect(`${redirectUrl}?auth_status=success&provider=facebook`);
         } catch (error) {
-            res.status(500).send(`
-                <script>
-                    alert('Authentication Failed. Please try again.');
-                    window.close();
-                </script>
-            `);
+            // Redirect to the frontend with an error status
+            res.redirect(`${redirectUrl}?auth_status=error&provider=facebook`);
         }
     }
 );

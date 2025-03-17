@@ -14,7 +14,8 @@ const ProductRestockSubscriptionsPage = () => {
 
     const [selectedSubscription, setSelectedSubscription] = useState(null);
     const [selectedSubscriptions, setSelectedSubscriptions] = useState([]);
-    const [deleteSubscriptionOpen, setDeleteSubscriptionOpen] = useState(false);
+    const [deleteModalOpen, setDeleteModalOpen] = useState(false);
+    const [deletionContext, setDeletionContext] = useState(null);
     const [currentPage, setCurrentPage] = useState(0);
     const [viewDetailsOpen, setViewDetailsOpen] = useState(false);
 
@@ -24,30 +25,45 @@ const ProductRestockSubscriptionsPage = () => {
         dispatch(getProductRestockSubscriptions());
     }, [dispatch]);
 
-    const handleSelectSubscription = (subscriptionId) => {
-        const id = Array.isArray(subscriptionId) ? subscriptionId[0] : subscriptionId;
-        setSelectedSubscriptions((prev) =>
-            prev.includes(id) ? prev.filter((selectedId) => selectedId !== id) : [...prev, id]
-        );
-    };
-
-    const handleSelectAll = (e) => {
-        setSelectedSubscriptions(e.target.checked ? productRestockSubscriptions.map((sub) => sub._id) : []);
+    const handleSelectSubscription = (newSelection) => {
+        setSelectedSubscriptions(newSelection);
     };
 
     const handlePageClick = (event) => {
         setCurrentPage(event.selected);
-    }
-
-    const getSelectedSubscriptions = () => {
-        return selectedSubscriptions
-            .map((id) => productRestockSubscriptions.find((sub) => sub._id === id))
-            .filter((sub) => sub);
     };
 
     const handleDeleteSuccess = () => {
         dispatch(getProductRestockSubscriptions());
         setSelectedSubscriptions([]);
+    };
+
+    const handleViewDetails = (sub) => {
+        setSelectedSubscription(sub);
+        setViewDetailsOpen(true);
+    };
+
+    const closeDrawer = () => {
+        setViewDetailsOpen(false);
+        setSelectedSubscription(null);
+    };
+
+    const handleBulkDelete = () => {
+        if (selectedSubscriptions.length > 0) {
+            setDeletionContext({
+                endpoint: '/products/subscriptions/delete-bulk',
+                data: { ids: selectedSubscriptions },
+            });
+            setDeleteModalOpen(true);
+        }
+    };
+
+    const handleSingleDelete = (subscription) => {
+        setDeletionContext({
+            endpoint: `/products/subscriptions/delete/${subscription._id}`,
+            data: null,
+        });
+        setDeleteModalOpen(true);
     };
 
     const flattenedData = productRestockSubscriptions.map((sub) => ({
@@ -62,16 +78,6 @@ const ProductRestockSubscriptionsPage = () => {
 
     const handleExport = (data, format) => {
         format === 'excel' ? exportToExcel(flattenedData, 'productRestockSubscriptions_data') : exportToJSON(data, 'productRestockSubscriptions_data');
-    };
-
-    const handleViewDetails = (sub) => {
-        setSelectedSubscription(sub);
-        setViewDetailsOpen(true);
-    };
-
-    const closeDrawer = () => {
-        setViewDetailsOpen(false);
-        setSelectedSubscription(null);
     };
 
     const columns = [
@@ -104,7 +110,7 @@ const ProductRestockSubscriptionsPage = () => {
                         <DashboardHeader
                             title="Product Restock Subscriptions"
                             selectedItems={selectedSubscriptions}
-                            setDeleteItemOpen={setDeleteSubscriptionOpen}
+                            setDeleteItemOpen={handleBulkDelete}
                             itemName="Subscription"
                             exportOptions={exportOptions(productRestockSubscriptions, handleExport)}
                             showAddButton={false}
@@ -114,24 +120,26 @@ const ProductRestockSubscriptionsPage = () => {
                             data={productRestockSubscriptions}
                             selectedItems={selectedSubscriptions}
                             onSelectItem={handleSelectSubscription}
-                            onSelectAll={handleSelectAll}
                             itemsPerPage={itemsPerPage}
                             currentPage={currentPage}
                             onPageChange={handlePageClick}
                             onViewDetails={handleViewDetails}
+                            onDelete={handleSingleDelete}
                             showEditButton={false}
                         />
                     </>
                 )}
 
                 <DeleteModal
-                    open={deleteSubscriptionOpen}
-                    onClose={() => setDeleteSubscriptionOpen(false)}
-                    items={getSelectedSubscriptions()}
+                    open={deleteModalOpen}
+                    onClose={() => setDeleteModalOpen(false)}
+                    deletionContext={deletionContext}
                     onDeleteSuccess={handleDeleteSuccess}
-                    endpoint="/products/subscriptions/delete-bulk"
-                    title="Delete Subscriptions"
-                    message="Are you sure you want to delete the selected subscriptions?"
+                    title={deletionContext?.endpoint.includes('bulk') ? 'Delete Subscriptions' : 'Delete Subscription'}
+                    message={deletionContext?.endpoint.includes('bulk')
+                        ? 'Are you sure you want to delete the selected subscriptions?'
+                        : 'Are you sure you want to delete this subscription?'
+                    }
                 />
 
                 <SubscriptionDetailsDrawer open={viewDetailsOpen} onClose={closeDrawer} subscription={selectedSubscription} />

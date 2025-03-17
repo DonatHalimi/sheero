@@ -4,18 +4,20 @@ import { calculatePageCount, CustomPagination, FilterLayout, filterProductsByPri
 import noProducts from '../../assets/img/products/no-products.png';
 import Navbar from '../../components/Navbar/Navbar';
 import Footer from '../../components/Utils/Footer';
-import { getCategoryByIdService } from '../../services/categoryService';
+import { getCategoryBySlugService } from '../../services/categoryService';
 import { getProductsBySubSubcategoryService } from '../../services/productService';
-import { getSubSubcategoriesService } from '../../services/subSubcategoryService';
+import { getSubcategoryBySlugService } from '../../services/subcategoryService';
+import { getSubSubcategoryBySlugService } from '../../services/subSubcategoryService';
 
 const itemsPerPage = 40;
 
 const ProductsBySubSubCategory = () => {
-    const { id } = useParams();
+    const { slug } = useParams();
 
     const [products, setProducts] = useState([]);
     const [filteredProducts, setFilteredProducts] = useState([]);
     const [subSubcategoryData, setSubsubcategoryData] = useState(null);
+    const [subcategoryData, setSubcategoryData] = useState(null);
     const [categoryData, setCategoryData] = useState(null);
     const [currentPage, setCurrentPage] = useState(1);
     const [loading, setLoading] = useState(true);
@@ -26,21 +28,20 @@ const ProductsBySubSubCategory = () => {
         const fetchData = async () => {
             setLoading(true);
             try {
-                const subSubcategoryResponse = await getSubSubcategoriesService(id);
-                const subSubcategories = subSubcategoryResponse.data;
+                const subSubcategoryResponse = await getSubSubcategoryBySlugService(slug);
+                setSubsubcategoryData(subSubcategoryResponse.data);
 
-                const subSubcategoryData = subSubcategories.find(
-                    (item) => item._id === id
-                );
+                if (subSubcategoryResponse.data?.subcategory?.slug) {
+                    const subcategoryResponse = await getSubcategoryBySlugService(subSubcategoryResponse.data.subcategory.slug);
+                    setSubcategoryData(subcategoryResponse.data);
 
-                setSubsubcategoryData(subSubcategoryData);
-
-                if (subSubcategoryData.subcategory?.category) {
-                    const categoryResponse = await getCategoryByIdService(subSubcategoryData.subcategory.category);
-                    setCategoryData(categoryResponse.data);
+                    if (subcategoryResponse.data?.category?.slug) {
+                        const categoryResponse = await getCategoryBySlugService(subcategoryResponse.data.category.slug);
+                        setCategoryData(categoryResponse.data);
+                    }
                 }
 
-                const productsResponse = await getProductsBySubSubcategoryService(id);
+                const productsResponse = await getProductsBySubSubcategoryService(slug);
                 setProducts(productsResponse.data.products);
                 setFilteredProducts(productsResponse.data.products);
                 setCurrentPage(1);
@@ -52,7 +53,7 @@ const ProductsBySubSubCategory = () => {
         };
 
         fetchData();
-    }, [id]);
+    }, [slug]);
 
     const handleApplyPriceFilter = (range) => {
         setPriceFilter(range);
@@ -77,20 +78,20 @@ const ProductsBySubSubCategory = () => {
 
     const breadcrumbData = {
         name: subSubcategoryData?.name || '',
-        _id: id,
+        slug: subSubcategoryData?.slug || '',
         category: {
-            _id: categoryData?._id || '',
+            slug: categoryData?.slug || '',
             name: categoryData?.name || '',
         },
         subcategory: {
-            _id: subSubcategoryData?.subcategory?._id || '',
-            name: subSubcategoryData?.subcategory?.name || '',
+            slug: subcategoryData?.slug || '',
+            name: subcategoryData?.name || '',
         },
     };
 
     return (
         <>
-            <Navbar />
+            <Navbar activeCategory={categoryData?.slug} />
             <FilterLayout
                 loading={loading}
                 products={filteredProducts}

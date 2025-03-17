@@ -17,7 +17,8 @@ const FAQPage = () => {
     const [selectedFaqs, setSelectedFaqs] = useState([]);
     const [addFaqOpen, setAddFaqOpen] = useState(false);
     const [editFaqOpen, setEditFaqOpen] = useState(false);
-    const [deleteFaqOpen, setDeleteFaqOpen] = useState(false);
+    const [deleteModalOpen, setDeleteModalOpen] = useState(false);
+    const [deletionContext, setDeletionContext] = useState(null);
     const [currentPage, setCurrentPage] = useState(0);
     const [viewDetailsOpen, setViewDetailsOpen] = useState(false);
 
@@ -40,18 +41,8 @@ const FAQPage = () => {
         };
     }, [faqs]);
 
-    const handleSelectFaq = (faqId) => {
-        const id = Array.isArray(faqId) ? faqId[0] : faqId;
-
-        setSelectedFaqs((prevSelected) =>
-            prevSelected.includes(id)
-                ? prevSelected.filter((selectedId) => selectedId !== id)
-                : [...prevSelected, id]
-        );
-    };
-
-    const handleSelectAll = (e) => {
-        setSelectedFaqs(e.target.checked ? faqs.map(faq => faq._id) : []);
+    const handleSelectFaq = (newSelection) => {
+        setSelectedFaqs(newSelection);
     };
 
     const handlePageClick = (event) => {
@@ -69,12 +60,6 @@ const FAQPage = () => {
         setEditFaqOpen(true);
     };
 
-    const getSelectedFaqs = () => {
-        return selectedFaqs
-            .map((id) => faqs.find((faq) => faq._id === id))
-            .filter((faq) => faq);
-    };
-
     const handleDeleteSuccess = () => {
         dispatch(getFAQs());
         setSelectedFaqs([]);
@@ -88,6 +73,24 @@ const FAQPage = () => {
     const closeDrawer = () => {
         setViewDetailsOpen(false);
         setSelectedFaq(null);
+    };
+
+    const handleBulkDelete = () => {
+        if (selectedFaqs.length > 0) {
+            setDeletionContext({
+                endpoint: '/faqs/delete-bulk',
+                data: { ids: selectedFaqs },
+            });
+            setDeleteModalOpen(true);
+        }
+    };
+
+    const handleSingleDelete = (faq) => {
+        setDeletionContext({
+            endpoint: `/faqs/delete/${faq._id}`,
+            data: null,
+        });
+        setDeleteModalOpen(true);
     };
 
     const columns = [
@@ -111,7 +114,7 @@ const FAQPage = () => {
                             title="FAQs"
                             selectedItems={selectedFaqs}
                             setAddItemOpen={setAddFaqOpen}
-                            setDeleteItemOpen={setDeleteFaqOpen}
+                            setDeleteItemOpen={handleBulkDelete}
                             itemName="FAQ"
                             exportOptions={exportOptions(faqs, handleExport)}
                         />
@@ -121,12 +124,12 @@ const FAQPage = () => {
                             data={faqs}
                             selectedItems={selectedFaqs}
                             onSelectItem={handleSelectFaq}
-                            onSelectAll={handleSelectAll}
                             itemsPerPage={itemsPerPage}
                             currentPage={currentPage}
                             onPageChange={handlePageClick}
                             onEdit={handleEdit}
                             onViewDetails={handleViewDetails}
+                            onDelete={handleSingleDelete}
                         />
                     </>
                 )}
@@ -134,14 +137,17 @@ const FAQPage = () => {
                 <AddFAQModal open={addFaqOpen} onClose={() => setAddFaqOpen(false)} onAddSuccess={() => dispatch(getFAQs())} />
                 <EditFAQModal open={editFaqOpen} onClose={() => setEditFaqOpen(false)} faq={selectedFaq} onViewDetails={handleViewDetails} onEditSuccess={() => dispatch(getFAQs())} />
                 <FAQDetailsDrawer open={viewDetailsOpen} onClose={closeDrawer} faq={selectedFaq} onEdit={handleEditFromDrawer} />
+
                 <DeleteModal
-                    open={deleteFaqOpen}
-                    onClose={() => setDeleteFaqOpen(false)}
-                    items={getSelectedFaqs()}
+                    open={deleteModalOpen}
+                    onClose={() => setDeleteModalOpen(false)}
+                    deletionContext={deletionContext}
                     onDeleteSuccess={handleDeleteSuccess}
-                    endpoint="/faqs/delete-bulk"
-                    title="Delete FAQs"
-                    message="Are you sure you want to delete the FAQ items?"
+                    title={deletionContext?.endpoint.includes('bulk') ? 'Delete FAQs' : 'Delete FAQ'}
+                    message={deletionContext?.endpoint.includes('bulk')
+                        ? 'Are you sure you want to delete the selected FAQs?'
+                        : 'Are you sure you want to delete this FAQ?'
+                    }
                 />
             </div>
         </div>

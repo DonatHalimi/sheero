@@ -7,7 +7,7 @@ import { editOrderService } from '../../../services/orderService';
 import { getImageUrl } from '../../../utils/config';
 
 const EditOrderModal = ({ open, onClose, order, onViewDetails, onEditSuccess }) => {
-    const [newStatus, setNewStatus] = useState(order?.status || '');
+    const [status, setStatus] = useState(order?.status || '');
     const [loading, setLoading] = useState(false);
     const theme = useTheme();
 
@@ -17,7 +17,7 @@ const EditOrderModal = ({ open, onClose, order, onViewDetails, onEditSuccess }) 
 
     useEffect(() => {
         if (order) {
-            setNewStatus(order.status);
+            setStatus(order.status);
         }
     }, [order]);
 
@@ -29,22 +29,22 @@ const EditOrderModal = ({ open, onClose, order, onViewDetails, onEditSuccess }) 
 
     const handleEditOrder = async () => {
         setLoading(true);
-        if (!newStatus) {
+        if (!status) {
             toast.error('Please select a status');
             return;
         }
 
         const updateData = {
             orderId: order._id,
-            status: newStatus
+            status: status
         };
 
         if (order.paymentMethod === 'cash') {
-            if (newStatus === 'delivered') {
+            if (status === 'delivered') {
                 updateData.paymentStatus = 'completed';
-            } else if (newStatus === 'canceled') {
+            } else if (status === 'canceled') {
                 updateData.paymentStatus = 'failed';
-            } else if (['pending', 'processed', 'shipped'].includes(newStatus)) {
+            } else if (['pending', 'processed', 'shipped'].includes(status)) {
                 updateData.paymentStatus = 'pending';
             }
         }
@@ -65,6 +65,14 @@ const EditOrderModal = ({ open, onClose, order, onViewDetails, onEditSuccess }) 
             setLoading(false);
         }
     };
+
+    const statusOptions = [
+        { value: 'pending', label: 'Pending' },
+        { value: 'processed', label: 'Processed' },
+        { value: 'shipped', label: 'Shipped' },
+        { value: 'delivered', label: 'Delivered' },
+        { value: 'canceled', label: 'Canceled' }
+    ];
 
     return (
         <CustomModal open={open} onClose={onClose}>
@@ -98,7 +106,7 @@ const EditOrderModal = ({ open, onClose, order, onViewDetails, onEditSuccess }) 
                                     label={
                                         <Box display="flex" alignItems="center" gap={1}>
                                             <Box
-                                                onClick={() => window.open(`/product/${item.product?._id}`, '_blank')}
+                                                onClick={() => window.open(`/${item.product?.slug}`, '_blank')}
                                                 display="flex"
                                                 alignItems="center"
                                                 gap={1}
@@ -165,16 +173,18 @@ const EditOrderModal = ({ open, onClose, order, onViewDetails, onEditSuccess }) 
                     select
                     fullWidth
                     label="Order Status"
-                    value={newStatus}
-                    onChange={(e) => setNewStatus(e.target.value)}
-                    InputProps={DeliveryStatusAdornment(newStatus)}
+                    value={status}
+                    onChange={(e) => setStatus(e.target.value)}
                     className="!mb-4"
                 >
-                    <MenuItem value="pending">Pending</MenuItem>
-                    <MenuItem value="processed">Processed</MenuItem>
-                    <MenuItem value="shipped">Shipped</MenuItem>
-                    <MenuItem value="delivered">Delivered</MenuItem>
-                    <MenuItem value="canceled">Canceled</MenuItem>
+                    {statusOptions.map((option) => (
+                        <MenuItem key={option.value} value={option.value}>
+                            <Box display="flex" alignItems="center" gap={1}>
+                                {DeliveryStatusAdornment(option.value).startAdornment}
+                                <Typography>{option.label}</Typography>
+                            </Box>
+                        </MenuItem>
+                    ))}
                 </BrownOutlinedTextField>
 
                 <ActionButtons

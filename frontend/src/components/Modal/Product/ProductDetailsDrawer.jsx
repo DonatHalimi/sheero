@@ -65,7 +65,7 @@ const ProductDetailsDrawer = ({ open, onClose, product, onEdit }) => {
                             value={product?.name}
                             multiline
                             rows={3}
-                            onClick={() => window.open(`/product/${product._id}`, '_blank')}
+                            onClick={() => window.open(`/${product.slug}`, '_blank')}
                             className='cursor-pointer hover:underline'
                         />
 
@@ -73,7 +73,7 @@ const ProductDetailsDrawer = ({ open, onClose, product, onEdit }) => {
                             <img
                                 src={getImageUrl(product.image)}
                                 alt={`${product.name} image`}
-                                onClick={() => window.open(`/product/${product._id}`, '_blank')}
+                                onClick={() => window.open(`/${product.slug}`, '_blank')}
                                 className='w-1/3 cursor-pointer'
                             />
                         </Box>

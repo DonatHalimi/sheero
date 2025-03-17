@@ -1,17 +1,18 @@
 import React, { useState } from 'react';
 import { toast } from 'react-toastify';
-import { BrownButton, BrownOutlinedTextField, CustomBox, CustomModal, CustomTypography, handleApiError, LoadingLabel } from '../../../assets/CustomComponents';
+import { BrownButton, CustomBox, CustomModal, CustomTextField, CustomTypography, handleApiError, LoadingLabel } from '../../../assets/CustomComponents';
 import { addFAQService } from '../../../services/faqService';
+import { FAQValidations } from '../../../utils/validations/faq';
 
 const AddFAQModal = ({ open, onClose, onAddSuccess }) => {
     const [question, setQuestion] = useState('');
-    const [isValidQuestion, setIsValidQuestion] = useState(true);
     const [answer, setAnswer] = useState('');
-    const [isValidAnswer, setIsValidAnswer] = useState(true);
     const [loading, setLoading] = useState(false);
 
-    const validateFAQ = (v) => /^[A-Z][\s\S]{10,50}$/.test(v);
-    const isValidForm = isValidQuestion && isValidAnswer && question && answer;
+    const validateQuestion = (v) => FAQValidations.questionRules.pattern.test(v);
+    const validateAnswer = (v) => FAQValidations.answerRules.pattern.test(v);
+
+    const isFormValid = validateQuestion(question) && validateAnswer(answer) && question && answer;
 
     const handleAddFAQ = async () => {
         setLoading(true);
@@ -43,42 +44,30 @@ const AddFAQModal = ({ open, onClose, onAddSuccess }) => {
             <CustomBox>
                 <CustomTypography variant="h5">Add FAQ</CustomTypography>
 
-                <BrownOutlinedTextField
-                    fullWidth
-                    required
+                <CustomTextField
                     label="Question"
                     value={question}
+                    setValue={setQuestion}
+                    validate={validateQuestion}
+                    validationRule={FAQValidations.questionRules}
                     multiline
-                    rows={2}
-                    onChange={(e) => {
-                        setQuestion(e.target.value)
-                        setIsValidQuestion(validateFAQ(e.target.value));
-                    }}
-                    error={!isValidQuestion}
-                    helperText={!isValidQuestion ? 'Question must start with a capital letter and be between 10 and 50 characters long' : ''}
-                    className="!mb-4"
+                    rows={3}
                 />
 
-                <BrownOutlinedTextField
-                    fullWidth
-                    required
+                <CustomTextField
                     label="Answer"
                     value={answer}
+                    setValue={setAnswer}
+                    validate={validateAnswer}
+                    validationRule={FAQValidations.answerRules}
                     multiline
-                    rows={4}
-                    onChange={(e) => {
-                        setAnswer(e.target.value);
-                        setIsValidAnswer(validateFAQ(e.target.value));
-                    }}
-                    error={!isValidAnswer}
-                    helperText={!isValidAnswer ? 'Answer must start with a capital letter and be between 10 and 50 characters long' : ''}
-                    className="!mb-4"
+                    rows={3}
                 />
                 <BrownButton
                     onClick={handleAddFAQ}
                     variant="contained"
                     color="primary"
-                    disabled={!isValidForm || loading}
+                    disabled={!isFormValid || loading}
                     className="w-full"
                 >
                     <LoadingLabel loading={loading} />

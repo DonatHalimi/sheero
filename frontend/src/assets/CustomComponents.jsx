@@ -47,6 +47,7 @@ import {
     Login,
     Logout,
     Menu as MenuIcon,
+    MoreHoriz,
     MoreVert,
     MoveToInbox,
     MoveToInboxOutlined,
@@ -65,6 +66,7 @@ import {
     Star,
     StarBorder,
     Tag,
+    TramSharp,
     UploadFile,
     Visibility,
     ZoomIn,
@@ -864,6 +866,13 @@ export const LoadingReturn = () => (
     </Box>
 );
 
+export const LoadingRestock = () => (
+    <Box sx={{ p: 1, width: '100%', display: 'flex', flexDirection: 'column', gap: 2 }} >
+        <WaveSkeleton variant="rectangular" width={400} height={47} className='rounded' />
+        <WaveSkeleton variant="rectangular" width="100%" height={40} className='rounded' />
+    </Box>
+);
+
 export const LoadingCart = () => {
     return (
         <>
@@ -1635,7 +1644,7 @@ export const BoxBetween = (props) => (
 )
 
 export const CustomTypography = (props) => {
-    const { theme } = useDashboardTheme();
+    const theme = useTheme();
 
     return (
         <Typography
@@ -1644,6 +1653,29 @@ export const CustomTypography = (props) => {
             }}
             className="!text-xl !font-bold !mb-3"
             {...props}
+        />
+    );
+};
+
+export const CustomTextField = ({ label, value, setValue, validate, validationRule, ...props }) => {
+    const [isValid, setIsValid] = useState(true);
+
+    const handleChange = (e) => {
+        const newValue = e.target.value;
+        setValue(newValue);
+        setIsValid(validate(newValue));
+    };
+
+    return (
+        <BrownOutlinedTextField
+            label={label}
+            value={value}
+            onChange={handleChange}
+            error={!isValid}
+            helperText={!isValid ? validationRule.message : ""}
+            fullWidth
+            {...props}
+            className='!mb-4'
         />
     );
 };
@@ -1705,7 +1737,7 @@ export const ActionButtons = ({
     secondaryButtonLabel,
     onPrimaryClick,
     onSecondaryClick,
-    isValidForm,
+    isFormValid,
     primaryButtonProps = {},
     secondaryButtonProps = {},
     gap = 20,
@@ -1719,6 +1751,7 @@ export const ActionButtons = ({
                 variant="outlined"
                 color="primary"
                 style={{ width: `${width}px` }}
+                disabled={loading}
                 {...secondaryButtonProps}
             >
                 {secondaryButtonLabel}
@@ -1728,8 +1761,9 @@ export const ActionButtons = ({
                 onClick={onPrimaryClick}
                 variant="contained"
                 color="primary"
-                isValidForm={isValidForm}
+                isFormValid={isFormValid}
                 style={{ width: `${width}px` }}
+                disabled={loading}
                 {...primaryButtonProps}
             >
                 <LoadingLabel
@@ -1836,17 +1870,17 @@ export const DetailsBreadcrumbs = ({ product }) => {
                     <HomeBreadCrumb className="text-stone-500 hover:text-stone-700" />
                 </Link>
                 {product.category && (
-                    <Link component={RouterLink} to={`/category/${product.category._id}`} color="inherit" underline="none" className='hover:underline cursor-pointer'>
+                    <Link component={RouterLink} to={`/category/${product.category.slug}`} color="inherit" underline="none" className='hover:underline cursor-pointer'>
                         {product.category.name}
                     </Link>
                 )}
                 {product.subcategory && (
-                    <Link component={RouterLink} to={`/subcategory/${product.subcategory._id}`} color="inherit" underline="none" className='hover:underline cursor-pointer'>
+                    <Link component={RouterLink} to={`/subcategory/${product.subcategory.slug}`} color="inherit" underline="none" className='hover:underline cursor-pointer'>
                         {product.subcategory.name}
                     </Link>
                 )}
                 {product.subSubcategory && (
-                    <Link component={RouterLink} to={`/subSubcategory/${product.subSubcategory._id}`} color="inherit" underline="none" className='hover:underline cursor-pointer'>
+                    <Link component={RouterLink} to={`/subSubcategory/${product.subSubcategory.slug}`} color="inherit" underline="none" className='hover:underline cursor-pointer'>
                         {product.subSubcategory.name}
                     </Link>
                 )}
@@ -1902,7 +1936,7 @@ export const Breadcrumb = ({ type, data }) => {
                 key="category"
                 onClick={(e) => {
                     e.preventDefault();
-                    navigate(`/category/${data.category._id}`);
+                    navigate(`/category/${data.category.slug}`);
                 }}
             >
                 {data.category.name}
@@ -1918,7 +1952,7 @@ export const Breadcrumb = ({ type, data }) => {
                     key="category"
                     onClick={(e) => {
                         e.preventDefault();
-                        navigate(`/category/${data.category._id}`);
+                        navigate(`/category/${data.category.slug}`);
                     }}
                 >
                     {data.category.name}
@@ -1932,7 +1966,7 @@ export const Breadcrumb = ({ type, data }) => {
                     key="subcategory"
                     onClick={(e) => {
                         e.preventDefault();
-                        navigate(`/subcategory/${data.subcategory._id}`);
+                        navigate(`/subcategory/${data.subcategory.slug}`);
                     }}
                 >
                     {data.subcategory.name}
@@ -2076,9 +2110,9 @@ export const ReviewModal = ({ open, handleClose, selectedReview, onImageClick })
                             <img
                                 src={getImageUrl(selectedReview.product.image)}
                                 alt={selectedReview.product.name}
-                                onClick={() => onImageClick(selectedReview.product._id)}
-                                className="w-full h-auto object-contain rounded-md cursor-pointer"
+                                onClick={() => onImageClick(selectedReview.product.slug)}
                                 style={{ maxHeight: '200px' }}
+                                className="w-full h-auto object-contain rounded-md cursor-pointer"
                             />
                         </Box>
 
@@ -2150,18 +2184,26 @@ export const ProductRestockNotificationModal = ({
     notifyEmail,
     setNotifyEmail,
     loading,
+    loadingRemove,
+    isSubscribed,
+    checkSubscription,
+    deleteSubscription,
+    showEmailInput = false,
 }) => {
+    const { user } = useSelector((state) => state.auth);
     const [isValidEmail, setIsValidEmail] = useState(true);
     const [errorVisible, setErrorVisible] = useState(false);
-    const { user } = useSelector((state) => state.auth);
+    const [isCheckingSubscription, setIsCheckingSubscription] = useState(true);
 
     const userEmail = user?.email;
 
     useEffect(() => {
         if (userEmail && open) {
             setNotifyEmail(userEmail);
+            setIsCheckingSubscription(true);
+            checkSubscription(userEmail).finally(() => setIsCheckingSubscription(false));
         }
-    }, [userEmail, open, setNotifyEmail]);
+    }, [userEmail, open, setNotifyEmail, checkSubscription]);
 
     const validateEmail = (email) => /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email);
 
@@ -2173,7 +2215,7 @@ export const ProductRestockNotificationModal = ({
     };
 
     const handleSubmit = () => {
-        if (!validateEmail(notifyEmail)) {
+        if (showEmailInput && !validateEmail(notifyEmail)) {
             setIsValidEmail(false);
             setErrorVisible(true);
             return;
@@ -2181,42 +2223,62 @@ export const ProductRestockNotificationModal = ({
         handleNotifySubmit();
     };
 
-    const handleBlur = () => {
-        if (!isValidEmail && notifyEmail) setErrorVisible(true);
-    };
-
     return (
         <CustomModal open={open} onClose={onClose}>
             <CustomBox>
-                <Typography variant="h6" className="!mb-2">Get Notified</Typography>
-                <p className="mb-2">Enter your email address below, and we will notify you once the product is back in stock.</p>
-                <BrownOutlinedTextField
-                    autoFocus
-                    margin="dense"
-                    label="Email"
-                    type="email"
-                    fullWidth
-                    variant="outlined"
-                    value={notifyEmail}
-                    onChange={handleChange}
-                    onBlur={handleBlur}
-                />
-                {!isValidEmail && notifyEmail && errorVisible && (
-                    <div className="absolute bottom-[11px] bg-white text-red-500 text-sm p-2 rounded-lg shadow-md w-[calc(100%-30px)] z-10">
-                        <span className="block text-xs font-semibold mb-1">Invalid Email</span>
-                        Please enter a valid email address.
-                        <div className="absolute top-[-5px] left-[20px] w-0 h-0 border-l-[5px] border-r-[5px] border-b-[5px] border-transparent border-b-white"></div>
-                    </div>
+                <Typography variant="h6" className="!mb-2">
+                    {isCheckingSubscription ? "Checking Subscription..." : isSubscribed ? "Already Subscribed" : "Get Notified"}
+                </Typography>
+
+                {isCheckingSubscription ? (
+                    <LoadingRestock />
+                ) : isSubscribed ? (
+                    <>
+                        <p className="mb-2">You have already subscribed to restock notifications for this product. You will be notified via email when this product is back in stock.</p>
+                        <BrownButton
+                            onClick={() => deleteSubscription(notifyEmail)}
+                            variant="contained"
+                            color="secondary"
+                            disabled={loadingRemove}
+                            className="w-full !mt-3"
+                        >
+                            <LoadingLabel loading={loadingRemove} defaultLabel="Remove Subscription" loadingLabel="Removing" />
+                        </BrownButton>
+                    </>
+                ) : (
+                    <>
+                        <p className="mb-2">We will notify you once this product is back in stock. We won't use your email address for any other purpose, including promotional offers.</p>
+                        {!showEmailInput && (
+                            <>
+                                <BrownOutlinedTextField
+                                    autoFocus
+                                    margin="dense"
+                                    label="Email"
+                                    type="email"
+                                    fullWidth
+                                    variant="outlined"
+                                    value={notifyEmail}
+                                    onChange={handleChange}
+                                />
+                                {!isValidEmail && notifyEmail && errorVisible && (
+                                    <div className="absolute bottom-[11px] bg-white text-red-500 text-sm p-2 rounded-lg shadow-md w-[calc(100%-30px)] z-10">
+                                        <span className="block text-xs font-semibold mb-1">Invalid Email</span>
+                                        Please provide a valid email address
+                                    </div>
+                                )}
+                            </>
+                        )}
+                        <BrownButton
+                            onClick={handleSubmit}
+                            variant="contained"
+                            color="primary"
+                            disabled={loading}
+                            className="w-full !mt-3"
+                        >
+                            <LoadingLabel loading={loading} defaultLabel="Notify Me" loadingLabel="Subscribing" />
+                        </BrownButton>
+                    </>
                 )}
-                <BrownButton
-                    onClick={handleSubmit}
-                    variant="contained"
-                    color="primary"
-                    disabled={loading}
-                    className="w-full !mt-3"
-                >
-                    <LoadingLabel loading={loading} defaultLabel="Submit" loadingLabel="Submitting" />
-                </BrownButton>
             </CustomBox>
         </CustomModal>
     );
@@ -2365,14 +2427,21 @@ export const GoBackButton = () => {
     );
 };
 
-export const CategoryDropdown = ({ category, subcategories, subsubcategories, navigate, dropdownStyle, loading }) => (
+export const CategoryDropdown = ({
+    category,
+    subcategories,
+    subsubcategories,
+    navigate,
+    dropdownStyle,
+    loading,
+}) => (
     <div style={dropdownStyle()} className="fixed bg-white shadow-xl rounded-md p-4 z-50">
         {loading ? (
             <LoadingCategoryDropdown />
         ) : (
             <div className="grid grid-cols-1 lg:grid-cols-3 gap-2">
-                {subcategories[category._id]?.map((subcategory) => (
-                    <div key={subcategory._id} className="flex items-left">
+                {subcategories[category.slug]?.map((subcategory) => (
+                    <div key={subcategory.slug} className="flex items-left">
                         <img
                             src={getImageUrl(subcategory.image)}
                             alt=""
@@ -2380,17 +2449,17 @@ export const CategoryDropdown = ({ category, subcategories, subsubcategories, na
                         />
                         <div>
                             <button
-                                onClick={() => navigate(`/subcategory/${subcategory._id}`, category._id)}
+                                onClick={() => navigate(`/subcategory/${subcategory.slug}`, category.slug)}
                                 className="block py-2 px-2 mr-1 rounded text-gray-700 hover:bg-gray-100 font-semibold"
                             >
                                 {subcategory.name}
                             </button>
-                            {subsubcategories[subcategory._id]?.length > 0 && (
+                            {subsubcategories[subcategory.slug]?.length > 0 && (
                                 <div className="flex flex-wrap lg:flex-wrap text-start lg:text-left">
-                                    {subsubcategories[subcategory._id].map((subsubcategory) => (
-                                        <div key={subsubcategory._id} className="text-start">
+                                    {subsubcategories[subcategory.slug].map((subsubcategory) => (
+                                        <div key={subsubcategory.slug} className="text-start">
                                             <button
-                                                onClick={() => navigate(`/subSubcategory/${subsubcategory._id}`, category._id)}
+                                                onClick={() => navigate(`/subSubcategory/${subsubcategory.slug}`, category.slug)}
                                                 className="block py-1 px-2 ml-1 rounded text-gray-500 hover:bg-gray-100"
                                             >
                                                 {subsubcategory.name}
@@ -2483,20 +2552,20 @@ export const CategoryList = ({
                             className='object-contain w-6 h-6'
                         />
                         <button
-                            onClick={() => handleNavigation(`/category/${category._id}`, category._id)}
-                            className={`flex-grow text-left p-2 ml-2 ${activeCategory === category._id ? 'bg-gray-100' : ''}`}
+                            onClick={() => handleNavigation(`/category/${category.slug}`, category.slug)}
+                            className={`flex-grow text-left p-1 ml-2 ${activeCategory === category.slug ? 'bg-gray-100 rounded-lg text-stone-700' : ''}`}
                         >
                             {category.name}
                         </button>
                         <button
-                            onClick={(e) => toggleSubcategories(category._id, e)}
-                            className={`p-2 text-gray-500 hover:bg-gray-100 rounded-lg transition duration-200 ${openCategory === category._id ? 'rotate-90' : ''}`}
+                            onClick={(e) => toggleSubcategories(category.slug, e)}
+                            className={`p-2 text-gray-500 hover:bg-gray-100 rounded-lg transition duration-200 ${openCategory === category.slug ? 'rotate-90' : ''}`}
                         >
                             <ChevronRight />
                         </button>
                     </div>
                     <AnimatePresence initial={false}>
-                        {openCategory === category._id && (
+                        {openCategory === category.slug && (
                             <motion.ul
                                 initial={{ height: 0, opacity: 0 }}
                                 animate={{ height: 'auto', opacity: 1 }}
@@ -2504,7 +2573,7 @@ export const CategoryList = ({
                                 transition={{ duration: 0.3 }}
                                 className="ml-2 overflow-hidden"
                             >
-                                {subcategories[category._id]?.map((subcategory) => (
+                                {subcategories[category.slug]?.map((subcategory) => (
                                     <li key={subcategory._id} className='mb-2 ml-3'>
                                         <div className="flex items-center">
                                             <img
@@ -2513,14 +2582,14 @@ export const CategoryList = ({
                                                 className='object-contain w-6 h-6'
                                             />
                                             <button
-                                                onClick={() => handleNavigation(`/subcategory/${subcategory._id}`, category._id)}
+                                                onClick={() => handleNavigation(`/subcategory/${subcategory.slug}`, category.slug)}
                                                 className="block py-1 px-2 mt-[2px] text-gray-700 hover:bg-gray-100"
                                             >
                                                 {subcategory.name}
                                             </button>
                                         </div>
                                         <AnimatePresence initial={false}>
-                                            {subsubcategories[subcategory._id]?.length > 0 && (
+                                            {subsubcategories[subcategory.slug]?.length > 0 && (
                                                 <motion.ul
                                                     initial={{ height: 0, opacity: 0 }}
                                                     animate={{ height: 'auto', opacity: 1 }}
@@ -2528,11 +2597,11 @@ export const CategoryList = ({
                                                     transition={{ duration: 0.3 }}
                                                     className="pl-4 overflow-hidden"
                                                 >
-                                                    {subsubcategories[subcategory._id].map((subsubcategory) => (
+                                                    {subsubcategories[subcategory.slug].map((subsubcategory) => (
                                                         <div key={subsubcategory._id} className="flex items-center mb-1">
                                                             <div className="rounded-md mr-9" />
                                                             <button
-                                                                onClick={() => handleNavigation(`/subSubcategory/${subsubcategory._id}`, category._id)}
+                                                                onClick={() => handleNavigation(`/subSubcategory/${subsubcategory.slug}`, category.slug)}
                                                                 className="block py-1 text-gray-500 hover:bg-gray-100"
                                                             >
                                                                 {subsubcategory.name}
@@ -2910,55 +2979,9 @@ export const Header = ({
     );
 };
 
-const BACKEND_URL =
-    process.env.NODE_ENV === 'production'
-        ? 'https://sheero-backend.onrender.com'
-        : 'http://localhost:5000';
-
-const openAuthWindow = ({ url, title, width = 1000, height = 750, successType }) => {
-    return new Promise((resolve, reject) => {
-        try {
-            // Adjust width and height based on screen size
-            const isMobile = window.innerWidth <= 768;
-            const adjustedWidth = isMobile ? 500 : width;
-            const adjustedHeight = isMobile ? 600 : height;
-
-            const left = window.screenX + (window.outerWidth - adjustedWidth) / 2;
-            const top = window.screenY + (window.outerHeight - adjustedHeight) / 2;
-
-            const authWindow = window.open(
-                url,
-                title,
-                `width=${adjustedWidth},height=${adjustedHeight},left=${left},top=${top},toolbar=0,scrollbars=0,status=0,resizable=0,location=0,menuBar=0`
-            );
-
-            const handleMessage = (event) => {
-                if (event.origin !== BACKEND_URL) return;
-
-                if (event.data.type === successType) {
-                    if (authWindow) authWindow.close();
-                    window.removeEventListener('message', handleMessage);
-                    resolve();
-                }
-            };
-
-            window.addEventListener('message', handleMessage);
-        } catch (error) {
-            reject(error);
-        }
-    });
-};
-
 export const handleGoogleLogin = async () => {
     try {
-        await openAuthWindow({
-            url: getApiUrl('/auth/google'),
-            title: 'Google Sign In',
-            successType: 'GOOGLE_AUTH_SUCCESS',
-        });
-
-        toast.success('Successfully logged in using Google!');
-        window.location.href = '/';
+        window.location.href = getApiUrl('/auth/google');
     } catch (error) {
         console.error('Google authentication error:', error);
         toast.error('Failed to authenticate with Google');
@@ -2967,14 +2990,7 @@ export const handleGoogleLogin = async () => {
 
 export const handleFacebookLogin = async () => {
     try {
-        await openAuthWindow({
-            url: getApiUrl('/auth/facebook'),
-            title: 'Facebook Sign In',
-            successType: 'FACEBOOK_AUTH_SUCCESS',
-        });
-
-        toast.success('Successfully logged in using Facebook!');
-        window.location.href = '/';
+        window.location.href = getApiUrl('/auth/facebook');
     } catch (error) {
         console.error('Facebook authentication error:', error);
         toast.error('Failed to authenticate with Facebook');
@@ -3175,6 +3191,75 @@ export const DashboardHeader = ({
     );
 };
 
+export const ActionsCell = ({ row, theme, onViewDetails, onEdit, onDelete, showEditButton }) => {
+    const [anchorEl, setAnchorEl] = useState(null);
+    const open = Boolean(anchorEl);
+
+    const handleClick = (event) => {
+        event.stopPropagation();
+        setAnchorEl(event.currentTarget);
+    };
+
+    const handleClose = (event) => {
+        event.stopPropagation();
+        setAnchorEl(null);
+    };
+
+    const handleView = (event) => {
+        event.stopPropagation();
+        if (onViewDetails) onViewDetails(row);
+        setAnchorEl(null);
+    };
+
+    const handleEdit = (event) => {
+        event.stopPropagation();
+        if (onEdit) onEdit(row);
+        setAnchorEl(null);
+    };
+
+    const handleDelete = (event) => {
+        event.stopPropagation();
+        if (onDelete) onDelete(row);
+        setAnchorEl(null);
+    };
+
+    return (
+        <div>
+            <IconButton onClick={handleClick} size="small">
+                <MoreHoriz />
+            </IconButton>
+            <Menu
+                anchorEl={anchorEl}
+                open={open}
+                onClose={handleClose}
+                onClick={(e) => e.stopPropagation()}
+                anchorOrigin={{ vertical: 'bottom', horizontal: 'right' }}
+                transformOrigin={{ vertical: 'top', horizontal: 'right' }}
+                elevation={1}
+                PaperProps={{ sx: { minWidth: 100 } }}
+            >
+                {showEditButton && (
+                    <MenuItem onClick={handleEdit}>
+                        <CreateIcon theme={theme} fontSize="small" />
+                        <span className='ml-2'>Edit</span>
+                    </MenuItem>
+                )}
+                <MenuItem onClick={handleView}>
+                    <VisibilityIcon theme={theme} fontSize="small" />
+                    <span className='ml-2'>View</span>
+                </MenuItem>
+                <MenuItem
+                    onClick={handleDelete}
+                    sx={{ '&:hover': { backgroundColor: 'rgba(255, 0, 0, 0.05)' } }}
+                >
+                    <Delete theme={theme} fontSize="small" className='text-red-500' />
+                    <span className='ml-2 text-red-500'>Delete</span>
+                </MenuItem>
+            </Menu>
+        </div>
+    );
+};
+
 export const SearchDropdown = ({ results, onClickSuggestion }) => {
     const maxTitleLength = 45;
 
@@ -3308,7 +3393,7 @@ export const ProfileDropdown = ({ isOpen, isAdmin, isOrderManager, isContentMana
                             <button
                                 onClick={() => handleNavigate('/dashboard/users')}
                                 style={profileDropdownButtonSx(theme)}
-                                className={`flex items-center px-2 py-2 mb-2 ${theme.palette.mode === 'light' ? 'hover:bg-gray-100' : 'hover:bg-[#292929]'} no-underline w-full text-left`}
+                                className={`flex items-center px-2 py-2 mb-2 ${theme.palette.mode === 'light' ? 'hover:bg-gray-100' : 'hover:bg-[#474646]'} no-underline w-full text-left`}
                             >
                                 <StyledDashboardIcon className={`mr-2 ${theme.palette.mode === 'light' ? '' : 'text-white'}`} />
                                 Dashboard
@@ -3318,7 +3403,7 @@ export const ProfileDropdown = ({ isOpen, isAdmin, isOrderManager, isContentMana
                             <button
                                 onClick={() => handleNavigate('/dashboard/orders')}
                                 style={profileDropdownButtonSx(theme)}
-                                className={`flex items-center px-2 py-2 mb-2 ${theme.palette.mode === 'light' ? 'hover:bg-gray-100' : 'hover:bg-[#292929]'} no-underline w-full text-left`}
+                                className={`flex items-center px-2 py-2 mb-2 ${theme.palette.mode === 'light' ? 'hover:bg-gray-100' : 'hover:bg-[#474646]'} no-underline w-full text-left`}
                             >
                                 <StyledDashboardIcon className="mr-2" />
                                 Orders
@@ -3328,7 +3413,7 @@ export const ProfileDropdown = ({ isOpen, isAdmin, isOrderManager, isContentMana
                             <button
                                 onClick={() => handleNavigate('/dashboard/images')}
                                 style={profileDropdownButtonSx(theme)}
-                                className={`flex items-center px-2 py-2 mb-2 ${theme.palette.mode === 'light' ? 'hover:bg-gray-100' : 'hover:bg-[#292929]'} no-underline w-full text-left`}
+                                className={`flex items-center px-2 py-2 mb-2 ${theme.palette.mode === 'light' ? 'hover:bg-gray-100' : 'hover:bg-[#474646]'} no-underline w-full text-left`}
                             >
                                 <StyledDashboardIcon className="mr-2" />
                                 Images
@@ -3338,7 +3423,7 @@ export const ProfileDropdown = ({ isOpen, isAdmin, isOrderManager, isContentMana
                             <button
                                 onClick={() => handleNavigate('/dashboard/products')}
                                 style={profileDropdownButtonSx(theme)}
-                                className={`flex items-center px-2 py-2 mb-2 ${theme.palette.mode === 'light' ? 'hover:bg-gray-100' : 'hover:bg-[#292929]'} no-underline w-full text-left`}
+                                className={`flex items-center px-2 py-2 mb-2 ${theme.palette.mode === 'light' ? 'hover:bg-gray-100' : 'hover:bg-[#474646]'} no-underline w-full text-left`}
                             >
                                 <StyledDashboardIcon className="mr-2" />
                                 Products
@@ -3350,7 +3435,7 @@ export const ProfileDropdown = ({ isOpen, isAdmin, isOrderManager, isContentMana
                 <button
                     onClick={() => handleNavigate('/profile/me')}
                     style={profileDropdownButtonSx(theme)}
-                    className={`flex items-center px-2 py-2 ${theme.palette.mode === 'light' ? 'hover:bg-gray-100' : 'hover:bg-[#292929]'} no-underline w-full text-left`}
+                    className={`flex items-center px-2 py-2 ${theme.palette.mode === 'light' ? 'hover:bg-gray-100' : 'hover:bg-[#474646]'} no-underline w-full text-left`}
                 >
                     <StyledPersonIcon className="mr-2" />
                     Profile
@@ -3358,7 +3443,7 @@ export const ProfileDropdown = ({ isOpen, isAdmin, isOrderManager, isContentMana
                 <button
                     onClick={() => handleNavigate('/profile/orders')}
                     style={profileDropdownButtonSx(theme)}
-                    className={`flex items-center px-2 py-2 ${theme.palette.mode === 'light' ? 'hover:bg-gray-100' : 'hover:bg-[#292929]'} no-underline w-full text-left`}
+                    className={`flex items-center px-2 py-2 ${theme.palette.mode === 'light' ? 'hover:bg-gray-100' : 'hover:bg-[#474646]'} no-underline w-full text-left`}
                 >
                     <StyledInboxIcon className="mr-2" />
                     Orders
@@ -3366,7 +3451,7 @@ export const ProfileDropdown = ({ isOpen, isAdmin, isOrderManager, isContentMana
                 <button
                     onClick={() => handleNavigate('/profile/wishlist')}
                     style={profileDropdownButtonSx(theme)}
-                    className={`flex items-center px-2 py-2 mb-2 ${theme.palette.mode === 'light' ? 'hover:bg-gray-100' : 'hover:bg-[#292929]'} no-underline w-full text-left`}
+                    className={`flex items-center px-2 py-2 mb-2 ${theme.palette.mode === 'light' ? 'hover:bg-gray-100' : 'hover:bg-[#474646]'} no-underline w-full text-left`}
                 >
                     <StyledFavoriteIcon className="mr-2" />
                     Wishlist
@@ -3375,7 +3460,7 @@ export const ProfileDropdown = ({ isOpen, isAdmin, isOrderManager, isContentMana
                 <button
                     onClick={handleLogout}
                     style={profileDropdownButtonSx(theme)}
-                    className={`flex items-center w-full px-2 py-2 ${theme.palette.mode === 'light' ? 'hover:bg-gray-100' : 'hover:bg-[#292929]'} text-left`}
+                    className={`flex items-center w-full px-2 py-2 ${theme.palette.mode === 'light' ? 'hover:bg-gray-100' : 'hover:bg-[#474646]'} text-left`}
                 >
                     <StyledLogoutIcon className="mr-2" />
                     Log Out
@@ -3426,12 +3511,12 @@ export const CartDropdown = ({
                                     <img
                                         src={getImageUrl(item.product.image)}
                                         alt={item.product.name}
-                                        onClick={() => handleProductClick(item.product._id)}
+                                        onClick={() => handleProductClick(item.product.slug)}
                                         className="w-12 h-12 object-contain rounded cursor-pointer"
                                     />
                                     <div className="ml-4 flex-grow">
                                         <span
-                                            onClick={() => handleProductClick(item.product._id)}
+                                            onClick={() => handleProductClick(item.product.slug)}
                                             className="block font-semibold cursor-pointer hover:underline truncate max-w-[calc(22ch)]"
                                         >
                                             {item.product.name}
@@ -3621,6 +3706,8 @@ export const CollapseIcon = ({ toggleDrawer }) => {
 };
 
 export const ExtendIcon = ({ toggleDrawer, open }) => {
+    const theme = useTheme();
+
     return (
         <Tooltip title="Extend" arrow>
             <IconButton
@@ -3631,16 +3718,18 @@ export const ExtendIcon = ({ toggleDrawer, open }) => {
                 sx={{ ...(open && { display: 'none' }) }}
                 className='mr-36'
             >
-                <MenuIcon className="text-stone-500" />
+                <MenuIcon className={`text-${theme.palette.mode === 'dark' ? 'white' : 'stone-700'}`} />
             </IconButton>
         </Tooltip>
     );
 };
 
 export const DashboardCollapse = ({ toggleDrawer }) => {
+    const theme = useTheme();
+
     return (
         <Toolbar sx={{ display: 'flex', alignItems: 'center', justifyContent: 'flex-end', px: [1] }}>
-            <CollapseIcon toggleDrawer={toggleDrawer} className="text-stone-500" />
+            <CollapseIcon toggleDrawer={toggleDrawer} className={`text-${theme.palette.mode === 'dark' ? 'white' : 'stone-700'}`} />
         </Toolbar>
     );
 };
@@ -3743,7 +3832,7 @@ const SplideSlides = ({ items, onCardClick, showImage, splideRef }) => (
         {items.map(item => (
             <SplideSlide key={item._id}>
                 <div
-                    onClick={() => onCardClick(item._id)}
+                    onClick={() => onCardClick(item.slug)}
                     className="flex items-center p-4 bg-white rounded-md cursor-pointer hover:underline hover:shadow-lg transition-shadow duration-300"
                 >
                     {showImage && (

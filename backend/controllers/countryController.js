@@ -5,7 +5,7 @@ const createCountry = async (req, res) => {
     const { name, countryCode } = req.body;
 
     try {
-        const country = new Country({ name, countryCode });
+        const country = new Country({ name, countryCode, createdBy: req.user.userId });
         await country.save();
         res.status(201).json({ message: 'Country created successfully', country });
     } catch (error) {
@@ -15,7 +15,9 @@ const createCountry = async (req, res) => {
 
 const getCountries = async (req, res) => {
     try {
-        const countries = await Country.find();
+        const countries = await Country.find()
+            .populate('createdBy', 'firstName lastName email')
+            .populate('updatedBy', 'firstName lastName email');
         res.status(200).json(countries);
     } catch (error) {
         res.status(500).json({ message: 'Server error', error: error.message });
@@ -37,7 +39,7 @@ const updateCountry = async (req, res) => {
     try {
         const country = await Country.findByIdAndUpdate(
             req.params.id,
-            { name, countryCode, updatedAt: Date.now() },
+            { name, countryCode, updatedAt: Date.now(), updatedBy: req.user.userId },
             { new: true }
         );
         res.status(200).json({ message: 'Country updated successfully', country });
@@ -63,7 +65,7 @@ const deleteCountries = async (req, res) => {
 
         for (const country of countries) {
             const cities = await City.find({ country: country._id });
-            
+
             if (cities.length > 0) {
                 return res.status(400).json({ message: `Cannot delete country '${country.name}' as it has associated cities` });
             }

@@ -14,7 +14,7 @@ const ProductItem = ({ product }) => {
 
     const [isLoading, setIsLoading] = useState({ cart: false, wishlist: false });
 
-    const { _id, name, image, price, salePrice, inventoryCount } = product || {};
+    const { slug, name, image, price, salePrice, inventoryCount } = product || {};
     const imageUrl = getImageUrl(image);
     const discountPercentage = salePrice && price > 0 ? Math.round(((price - salePrice) / price) * 100) : 0;
     const finalPrice = salePrice > 0 ? salePrice : price;
@@ -22,7 +22,7 @@ const ProductItem = ({ product }) => {
     const formattedFinalPrice = formatPrice(finalPrice);
     const formattedPrice = formatPrice(price);
 
-    const handleClick = () => { if (_id) navigate(`/product/${_id}`); };
+    const handleClick = () => { if (slug) navigate(`/${slug}`); };
 
     const handleAction = (action) => async (e) => {
         e.stopPropagation();

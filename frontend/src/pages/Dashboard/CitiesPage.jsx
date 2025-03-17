@@ -17,7 +17,8 @@ const CitiesPage = () => {
     const [selectedCities, setSelectedCities] = useState([]);
     const [addCityOpen, setAddCityOpen] = useState(false);
     const [editCityOpen, setEditCityOpen] = useState(false);
-    const [deleteCityOpen, setDeleteCityOpen] = useState(false);
+    const [deleteModalOpen, setDeleteModalOpen] = useState(false);
+    const [deletionContext, setDeletionContext] = useState(null);
     const [currentPage, setCurrentPage] = useState(0);
     const [viewDetailsOpen, setViewDetailsOpen] = useState(false);
 
@@ -40,17 +41,8 @@ const CitiesPage = () => {
         };
     }, [cities]);
 
-    const handleSelectCity = (cityId) => {
-        const id = Array.isArray(cityId) ? cityId[0] : cityId;
-        setSelectedCities((prevSelected) =>
-            prevSelected.includes(id)
-                ? prevSelected.filter((selectedId) => selectedId !== id)
-                : [...prevSelected, id]
-        );
-    };
-
-    const handleSelectAll = (e) => {
-        setSelectedCities(e.target.checked ? cities.map(city => city._id) : []);
+    const handleSelectCity = (newSelection) => {
+        setSelectedCities(newSelection);
     };
 
     const handlePageClick = (event) => {
@@ -68,12 +60,6 @@ const CitiesPage = () => {
         setEditCityOpen(true);
     };
 
-    const getSelectedCities = () => {
-        return selectedCities
-            .map((id) => cities.find((city) => city._id === id))
-            .filter((city) => city);
-    };
-
     const handleDeleteSuccess = () => {
         dispatch(getCities());
         setSelectedCities([]);
@@ -87,6 +73,24 @@ const CitiesPage = () => {
     const closeDrawer = () => {
         setViewDetailsOpen(false);
         setSelectedCity(null);
+    };
+
+    const handleBulkDelete = () => {
+        if (selectedCities.length > 0) {
+            setDeletionContext({
+                endpoint: '/cities/delete-bulk',
+                data: { ids: selectedCities },
+            });
+            setDeleteModalOpen(true);
+        }
+    };
+
+    const handleSingleDelete = (city) => {
+        setDeletionContext({
+            endpoint: `/cities/delete/${city._id}`,
+            data: null,
+        });
+        setDeleteModalOpen(true);
     };
 
     const columns = [
@@ -104,10 +108,10 @@ const CitiesPage = () => {
         const flattenedCities = data.map(city => ({
             ...city,
             country: city.country.name
-        }))
+        }));
 
         format === 'excel' ? exportToExcel(flattenedCities, 'cities_data') : exportToJSON(data, 'cities_data');
-    }
+    };
 
     return (
         <div className='container mx-auto max-w-screen-2xl px-4 mt-20'>
@@ -120,7 +124,7 @@ const CitiesPage = () => {
                             title="Cities"
                             selectedItems={selectedCities}
                             setAddItemOpen={setAddCityOpen}
-                            setDeleteItemOpen={setDeleteCityOpen}
+                            setDeleteItemOpen={handleBulkDelete}
                             itemName="City"
                             exportOptions={exportOptions(cities, handleExport)}
                         />
@@ -130,12 +134,12 @@ const CitiesPage = () => {
                             data={cities}
                             selectedItems={selectedCities}
                             onSelectItem={handleSelectCity}
-                            onSelectAll={handleSelectAll}
                             itemsPerPage={itemsPerPage}
                             currentPage={currentPage}
                             onPageChange={handlePageClick}
                             onEdit={handleEdit}
                             onViewDetails={handleViewDetails}
+                            onDelete={handleSingleDelete}
                         />
                     </>
                 )}
@@ -143,14 +147,17 @@ const CitiesPage = () => {
                 <AddCityModal open={addCityOpen} onClose={() => setAddCityOpen(false)} onAddSuccess={() => dispatch(getCities())} />
                 <EditCityModal open={editCityOpen} onClose={() => setEditCityOpen(false)} city={selectedCity} onViewDetails={handleViewDetails} onEditSuccess={() => dispatch(getCities())} />
                 <CityDetailsDrawer open={viewDetailsOpen} onClose={closeDrawer} city={selectedCity} onEdit={handleEditFromDrawer} />
+
                 <DeleteModal
-                    open={deleteCityOpen}
-                    onClose={() => setDeleteCityOpen(false)}
-                    items={getSelectedCities()}
+                    open={deleteModalOpen}
+                    onClose={() => setDeleteModalOpen(false)}
+                    deletionContext={deletionContext}
                     onDeleteSuccess={handleDeleteSuccess}
-                    endpoint="/cities/delete-bulk"
-                    title="Delete Cities"
-                    message="Are you sure you want to delete the selected cities?"
+                    title={deletionContext?.endpoint.includes('bulk') ? 'Delete Cities' : 'Delete City'}
+                    message={deletionContext?.endpoint.includes('bulk')
+                        ? 'Are you sure you want to delete the selected cities?'
+                        : 'Are you sure you want to delete this city?'
+                    }
                 />
             </div>
         </div>

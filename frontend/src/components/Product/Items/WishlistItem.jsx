@@ -10,7 +10,7 @@ import { getImageUrl } from '../../../utils/config';
 const WishlistItem = ({ product, onRemove }) => {
     const { isAuthenticated } = useSelector(state => state.auth);
 
-    const { _id, name, image, price, discount, salePrice, inventoryCount } = product || {};
+    const { _id, name, slug, image, price, discount, salePrice, inventoryCount } = product || {};
     const imageUrl = getImageUrl(image);
     const [isActionLoading, setIsActionLoading] = useState(false);
 
@@ -21,7 +21,7 @@ const WishlistItem = ({ product, onRemove }) => {
     const formattedPrice = formatPrice(price);
 
     const navigate = useNavigate();
-    const handleClick = () => { if (_id) navigate(`/product/${_id}`); };
+    const handleClick = () => { if (slug) navigate(`/${slug}`); };
 
     const handleAddToCart = async (e) => {
         e.stopPropagation();

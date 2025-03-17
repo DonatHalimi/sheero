@@ -6,27 +6,36 @@ import { useSwipeable } from 'react-swipeable';
 import { CategoryDropdown, CategoryList, SidebarFooter, SidebarHeader } from '../../assets/CustomComponents';
 import { getSubcategoriesAndSubsubcategories } from '../../store/actions/categoryActions';
 
-const CategoryNavbar = ({ isSidebarOpen, toggleSidebar }) => {
+const CategoryNavbar = ({ isSidebarOpen, toggleSidebar, activeCategory: propActiveCategory }) => {
     const { categories, subcategories, subsubcategories, loading } = useSelector((state) => state.categories);
     const { isAuthenticated } = useSelector(state => state.auth);
     const dispatch = useDispatch();
 
     const [openCategory, setOpenCategory] = useState(null);
-    const [activeCategory, setActiveCategory] = useState('');
+    const [activeCategory, setActiveCategory] = useState(propActiveCategory || '');
     const [dropdownLoading, setDropdownLoading] = useState(true);
 
     const categoryListRef = useRef(null);
     const navigate = useNavigate();
     const location = useLocation();
 
-    const handleCategoryHover = (categoryId) => {
-        setOpenCategory(categoryId);
+    useEffect(() => {
+        if (propActiveCategory) {
+            setActiveCategory(propActiveCategory);
+        }
+    }, [propActiveCategory]);
 
-        const categoryData = subcategories[categoryId];
-        if (!categoryData) {
+    useEffect(() => {
+        const pathArray = location.pathname.split('/');
+        const parentCategorySlug = pathArray[2] || '';
+        setActiveCategory(parentCategorySlug);
+    }, [location]);
+
+    const handleCategoryHover = (categorySlug) => {
+        setOpenCategory(categorySlug);
+        if (!subcategories[categorySlug]) {
             setDropdownLoading(true);
-            dispatch(getSubcategoriesAndSubsubcategories(categoryId))
-                .finally(() => setDropdownLoading(false));
+            dispatch(getSubcategoriesAndSubsubcategories(categorySlug));
         } else {
             setDropdownLoading(false);
         }
@@ -36,25 +45,20 @@ const CategoryNavbar = ({ isSidebarOpen, toggleSidebar }) => {
         setOpenCategory(null);
     };
 
-    useEffect(() => {
-        const pathArray = location.pathname.split('/');
-        const categoryId = pathArray[3] || '';
-        setActiveCategory(categoryId);
-    }, [location]);
+    const handleNavigation = (path, categorySlug) => {
+        const pathArray = path.split('/');
+        const parentCategorySlug = pathArray[2];
 
-    const handleNavigation = (path, categoryId) => {
-        setActiveCategory(categoryId);
+        setActiveCategory(parentCategorySlug || categorySlug);
         navigate(path);
 
-        if (isSidebarOpen) {
-            toggleSidebar();
-        }
+        if (isSidebarOpen) toggleSidebar();
     };
 
-    const toggleSubcategories = (categoryId, event) => {
+    const toggleSubcategories = (categorySlug, event) => {
         event.stopPropagation();
-        setOpenCategory(openCategory === categoryId ? null : categoryId);
-        dispatch(getSubcategoriesAndSubsubcategories(categoryId))
+        setOpenCategory(openCategory === categorySlug ? null : categorySlug);
+        dispatch(getSubcategoriesAndSubsubcategories(categorySlug));
     };
 
     const calculateDropdownStyle = () => {
@@ -115,18 +119,18 @@ const CategoryNavbar = ({ isSidebarOpen, toggleSidebar }) => {
                             ) : (
                                 categories.map((category) => (
                                     <div
-                                        key={category._id}
-                                        onMouseEnter={() => handleCategoryHover(category._id)}
+                                        key={category.slug}
+                                        onMouseEnter={() => handleCategoryHover(category.slug)}
                                         onMouseLeave={handleCategoryLeave}
-                                        className="relative"
+                                        className={`relative ${activeCategory === category.slug ? 'bg-stone-100 rounded-lg' : ''}`}
                                     >
                                         <button
-                                            className={`flex items-center justify-between w-full py-2 px-3 text-gray-900 rounded md:w-auto md:border-0 md:p-0 ${activeCategory === category._id ? 'bg-gray-200 px-4' : 'hover:bg-stone-400 md:hover:bg-transparent md:hover:text-stone-600'}`}
-                                            onClick={() => handleNavigation(`/category/${category._id}`, category._id)}
+                                            onClick={() => handleNavigation(`/category/${category.slug}`, category.slug)}
+                                            className={`flex items-center justify-between w-full text-gray-900 rounded md:w-auto md:border-0 md:p-0 ${activeCategory === category.slug ? 'font-semibold text-stone-700' : 'hover:text-stone-600'}`}
                                         >
                                             {category.name}
                                         </button>
-                                        {openCategory === category._id && (
+                                        {openCategory === category.slug && (
                                             <CategoryDropdown
                                                 category={category}
                                                 subcategories={subcategories}
@@ -166,7 +170,7 @@ const CategoryNavbar = ({ isSidebarOpen, toggleSidebar }) => {
                 <Divider className='!mb-5' />
 
                 <SidebarFooter />
-            </div >
+            </div>
         </>
     );
 };

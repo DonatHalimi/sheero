@@ -25,7 +25,7 @@ export default function (state = initialState, action) {
                 ...state,
                 subcategories: {
                     ...state.subcategories,
-                    [action.payload.categoryId]: action.payload.subcategories,
+                    [action.payload.categorySlug]: action.payload.subcategories,
                 },
                 loading: false,
                 error: null,
@@ -36,7 +36,7 @@ export default function (state = initialState, action) {
                 ...state,
                 subsubcategories: {
                     ...state.subsubcategories,
-                    [action.payload.subcategoryId]: action.payload.subsubcategories,
+                    [action.payload.subcategorySlug]: action.payload.subsubcategories,
                 },
                 loading: false,
                 error: null,

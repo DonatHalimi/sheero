@@ -4,7 +4,7 @@ const createFAQ = async (req, res) => {
     const { question, answer } = req.body;
 
     try {
-        const faq = new FAQ({ question, answer });
+        const faq = new FAQ({ question, answer, createdBy: req.user.userId });
         await faq.save();
         res.status(201).json({ message: 'FAQ item created successfully', faq });
     } catch (error) {
@@ -14,7 +14,9 @@ const createFAQ = async (req, res) => {
 
 const getFAQs = async (req, res) => {
     try {
-        const faqs = await FAQ.find();
+        const faqs = await FAQ.find()
+            .populate('createdBy', 'firstName lastName email')
+            .populate('updatedBy', 'firstName lastName email');
         res.status(200).json(faqs);
     } catch (error) {
         res.status(500).json({ message: 'Server error' });
@@ -36,7 +38,7 @@ const updateFAQ = async (req, res) => {
     try {
         const faq = await FAQ.findByIdAndUpdate(
             req.params.id,
-            { question, answer, updatedAt: Date.now() },
+            { question, answer, updatedAt: Date.now(), updatedBy: req.user.userId },
             { new: true }
         );
         res.status(200).json({ message: 'FAQ item updated successfully', faq });

@@ -1,7 +1,7 @@
 import { Paper, useTheme } from '@mui/material';
 import { DataGrid } from '@mui/x-data-grid';
 import React from 'react';
-import { ActionButton, CreateIcon, CustomNoRowsOverlay, CustomToolbar, VisibilityIcon } from '../../assets/CustomComponents';
+import { ActionsCell, CustomNoRowsOverlay, CustomToolbar } from '../../assets/CustomComponents';
 import { dashboardTablePaperSx, dashboardTableSx } from '../../assets/sx';
 
 const getNestedValue = (obj, path) => {
@@ -20,6 +20,7 @@ const getNestedValue = (obj, path) => {
  * @param {Function} onPageChange - A callback function for when the page changes.
  * @param {Function} renderTableActions - A function that returns the table actions.
  * @param {Function} onEdit - A callback function for the edit action.
+ * @param {Function} onDelete - A callback function for the delete action.
  * @param {String} containerClassName - A class name for the container element.
  * @return {JSX.Element} The table component.
  */
@@ -33,6 +34,7 @@ const DashboardTable = ({
     onPageChange,
     renderTableActions,
     onEdit,
+    onDelete,
     containerClassName,
     onViewDetails,
     showEditButton = true,
@@ -48,14 +50,14 @@ const DashboardTable = ({
             if (column.key === 'actions') {
                 return (
                     <div onClick={(e) => e.stopPropagation()}>
-                        {showEditButton && (
-                            <ActionButton onClick={() => onEdit(params.row)}>
-                                <CreateIcon theme={theme} />
-                            </ActionButton>
-                        )}
-                        <ActionButton onClick={() => onViewDetails(params.row)}>
-                            <VisibilityIcon theme={theme} />
-                        </ActionButton>
+                        <ActionsCell
+                            row={params.row}
+                            theme={theme}
+                            onViewDetails={onViewDetails}
+                            onEdit={onEdit}
+                            onDelete={onDelete}
+                            showEditButton={showEditButton}
+                        />
                     </div>
                 );
             } else if (column.key === 'image') {
@@ -81,8 +83,18 @@ const DashboardTable = ({
 
     const handleRowClick = (params, event) => {
         if (!event.target.closest('.MuiDataGrid-actionsCell') && !event.target.closest('.MuiDataGrid-imageCell')) {
-            onSelectItem([params.id]);
+            let newSelection;
+            if (selectedItems.includes(params.id)) {
+                newSelection = selectedItems.filter(id => id !== params.id);
+            } else {
+                newSelection = [...selectedItems, params.id];
+            }
+            onSelectItem(newSelection);
         }
+    };
+
+    const handleSelectionModelChange = (newSelectionModel) => {
+        onSelectItem(newSelectionModel);
     };
 
     return (
@@ -96,7 +108,8 @@ const DashboardTable = ({
                 <DataGrid
                     rows={gridRows}
                     columns={gridColumns}
-                    onSelectionModelChange={(newSelection) => onSelectItem(newSelection)}
+                    onRowSelectionModelChange={handleSelectionModelChange}
+                    rowSelectionModel={selectedItems}
                     onRowClick={handleRowClick}
                     pageSize={itemsPerPage}
                     page={currentPage}
@@ -106,6 +119,7 @@ const DashboardTable = ({
                     disableColumnResize
                     autoHeight
                     disableSelectionOnClick
+                    keepNonExistentRowsSelected
                     initialState={{
                         density: 'comfortable',
                     }}

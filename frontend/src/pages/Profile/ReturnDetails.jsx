@@ -60,7 +60,7 @@ const ReturnDetails = () => {
             <Navbar />
             <ProfileLayout>
                 <Header
-                    title="Return:"
+                    title="Return Request:"
                     returnId={returnId}
                     isReturnDetails={isReturnProcessed}
                     onDownloadReturn={handleDownloadReturn}
@@ -74,10 +74,10 @@ const ReturnDetails = () => {
                         <div className="grid grid-cols-1 gap-4 mb-4">
                             <div className="bg-white shadow rounded-md p-6">
                                 <p className="font-semibold text-center text-lg mb-1">
-                                    Return Status
+                                    Return Request Status
                                 </p>
                                 <p className="font-semilight mb-3 text-center text-gray-500 text-md">
-                                    Request Date: {formatDate(returnRequest.createdAt)}
+                                    Return Request Date: {formatDate(returnRequest.createdAt)}
                                 </p>
                                 <LinearProgress
                                     variant="determinate"
@@ -110,10 +110,10 @@ const ReturnDetails = () => {
                                             </TableRow>
                                         </TableHead>
                                         <TableBody>
-                                            {returnRequest.products.map(({ _id, name, image }) => (
+                                            {returnRequest.products.map(({ _id, name, slug, image }) => (
                                                 <TableRow key={_id}>
                                                     <TableCell component="th" scope="row" className='w-10/12'>
-                                                        <Link to={`/product/${_id}`} className="flex items-center">
+                                                        <Link to={`/${slug}`} className="flex items-center">
                                                             <img
                                                                 src={getImageUrl(image)}
                                                                 alt={name}
@@ -134,7 +134,10 @@ const ReturnDetails = () => {
                         </div>
                     </>
                 ) : (
-                    <EmptyState imageSrc={emptyReturnsImage} message="No return request found!" />
+                    <EmptyState
+                        imageSrc={emptyReturnsImage}
+                        context='returns'
+                    />
                 )}
             </ProfileLayout>
 

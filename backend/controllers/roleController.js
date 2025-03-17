@@ -2,7 +2,7 @@ const Role = require('../models/Role');
 
 const createRole = async (req, res) => {
     try {
-        const role = new Role(req.body);
+        const role = new Role({ ...req.body, createdBy: req.user.userId, createdBy: req.user.userId });
         await role.save();
         res.status(201).json({ message: 'Role created successfully', role });
     } catch (error) {
@@ -12,7 +12,9 @@ const createRole = async (req, res) => {
 
 const getRoles = async (req, res) => {
     try {
-        const roles = await Role.find();
+        const roles = await Role.find()
+            .populate('createdBy', 'firstName lastName email')
+            .populate('updatedBy', 'firstName lastName email');
         res.status(200).json(roles);
     } catch (error) {
         res.status(500).send(error);
@@ -30,7 +32,7 @@ const getRoleById = async (req, res) => {
 
 const updateRole = async (req, res) => {
     try {
-        const role = await Role.findByIdAndUpdate(req.params.id, req.body, { new: true, runValidators: true });
+        const role = await Role.findByIdAndUpdate(req.params.id, { ...req.body, updatedAt: Date.now(), updatedBy: req.user.userId }, { new: true, runValidators: true });
         res.status(200).json({ message: 'Role updated successfully', role });
     } catch (error) {
         res.status(400).send(error);

@@ -17,7 +17,8 @@ const SubSubcategoriesPage = () => {
     const [selectedSubSubcategories, setSelectedSubSubcategories] = useState([]);
     const [addSubSubcategoryOpen, setAddSubSubcategoryOpen] = useState(false);
     const [editSubSubcategoryOpen, setEditSubSubcategoryOpen] = useState(false);
-    const [deleteSubSubcategoryOpen, setDeleteSubSubcategoryOpen] = useState(false);
+    const [deleteModalOpen, setDeleteModalOpen] = useState(false);
+    const [deletionContext, setDeletionContext] = useState(null);
     const [currentPage, setCurrentPage] = useState(0);
     const [viewDetailsOpen, setViewDetailsOpen] = useState(false);
 
@@ -40,18 +41,8 @@ const SubSubcategoriesPage = () => {
         };
     }, [subSubcategories]);
 
-    const handleSelectSubSubcategory = (subsubcategoryId) => {
-        const id = Array.isArray(subsubcategoryId) ? subsubcategoryId[0] : subsubcategoryId;
-
-        setSelectedSubSubcategories((prevSelected) =>
-            prevSelected.includes(id)
-                ? prevSelected.filter((selectedId) => selectedId !== id)
-                : [...prevSelected, id]
-        );
-    };
-
-    const handleSelectAll = (e) => {
-        setSelectedSubSubcategories(e.target.checked ? subSubcategories.map(subSubcategory => subSubcategory._id) : []);
+    const handleSelectSubSubcategory = (newSelection) => {
+        setSelectedSubSubcategories(newSelection);    
     };
 
     const handlePageClick = (event) => {
@@ -69,12 +60,6 @@ const SubSubcategoriesPage = () => {
         setEditSubSubcategoryOpen(true);
     };
 
-    const getSelectedSubSubcategories = () => {
-        return selectedSubSubcategories
-            .map((id) => subSubcategories.find((subSubcategory) => subSubcategory._id === id))
-            .filter((subSubcategory) => subSubcategory);
-    };
-
     const handleDeleteSuccess = () => {
         dispatch(getSubSubcategories());
         setSelectedSubSubcategories([]);
@@ -90,6 +75,24 @@ const SubSubcategoriesPage = () => {
         setSelectedSubSubcategory(null);
     };
 
+    const handleBulkDelete = () => {
+        if (selectedSubSubcategories.length > 0) {
+            setDeletionContext({
+                endpoint: '/subsubcategories/delete-bulk',
+                data: { ids: selectedSubSubcategories },
+            });
+            setDeleteModalOpen(true);
+        }
+    };
+
+    const handleSingleDelete = (subSubcategory) => {
+        setDeletionContext({
+            endpoint: `/subsubcategories/delete/${subSubcategory._id}`,
+            data: null,
+        });
+        setDeleteModalOpen(true);
+    };
+
     const columns = [
         { label: 'Name', key: 'name' },
         { label: 'Subcategory', key: 'subcategory.name' },
@@ -102,10 +105,10 @@ const SubSubcategoriesPage = () => {
         const flattenedSubSubcategories = data.map(subSubcategory => ({
             ...subSubcategory,
             subcategory: subSubcategory.subcategory ? subSubcategory.subcategory.name : 'N/A',
-        }))
+        }));
 
         format === 'excel' ? exportToExcel(flattenedSubSubcategories, 'subSubcategories_data') : exportToJSON(data, 'subSubcategories_data');
-    }
+    };
 
     return (
         <div className='container mx-auto max-w-screen-2xl px-4 mt-20'>
@@ -118,7 +121,7 @@ const SubSubcategoriesPage = () => {
                             title="SubSubcategories"
                             selectedItems={selectedSubSubcategories}
                             setAddItemOpen={setAddSubSubcategoryOpen}
-                            setDeleteItemOpen={setDeleteSubSubcategoryOpen}
+                            setDeleteItemOpen={handleBulkDelete}
                             itemName="SubSubcategory"
                             exportOptions={exportOptions(subSubcategories, handleExport)}
                         />
@@ -128,12 +131,12 @@ const SubSubcategoriesPage = () => {
                             data={subSubcategories}
                             selectedItems={selectedSubSubcategories}
                             onSelectItem={handleSelectSubSubcategory}
-                            onSelectAll={handleSelectAll}
                             itemsPerPage={itemsPerPage}
                             currentPage={currentPage}
                             onPageChange={handlePageClick}
                             onEdit={handleEdit}
                             onViewDetails={handleViewDetails}
+                            onDelete={handleSingleDelete}
                         />
                     </>
                 )}
@@ -141,14 +144,17 @@ const SubSubcategoriesPage = () => {
                 <AddSubSubcategoryModal open={addSubSubcategoryOpen} onClose={() => setAddSubSubcategoryOpen(false)} onAddSuccess={() => dispatch(getSubSubcategories())} />
                 <EditSubSubcategoryModal open={editSubSubcategoryOpen} onClose={() => setEditSubSubcategoryOpen(false)} subSubcategory={selectedSubSubcategory} onViewDetails={handleViewDetails} onEditSuccess={() => dispatch(getSubSubcategories())} />
                 <SubSubcategoryDetailsDrawer open={viewDetailsOpen} onClose={closeDrawer} subSubcategory={selectedSubSubcategory} onEdit={handleEditFromDrawer} />
+
                 <DeleteModal
-                    open={deleteSubSubcategoryOpen}
-                    onClose={() => setDeleteSubSubcategoryOpen(false)}
-                    items={getSelectedSubSubcategories()}
+                    open={deleteModalOpen}
+                    onClose={() => setDeleteModalOpen(false)}
+                    deletionContext={deletionContext}
                     onDeleteSuccess={handleDeleteSuccess}
-                    endpoint="/subsubcategories/delete-bulk"
-                    title="Delete SubSubcategories"
-                    message="Are you sure you want to delete the selected subsubcategories?"
+                    title={deletionContext?.endpoint.includes('bulk') ? 'Delete SubSubcategories' : 'Delete SubSubcategory'}
+                    message={deletionContext?.endpoint.includes('bulk')
+                        ? 'Are you sure you want to delete the selected subsubcategories?'
+                        : 'Are you sure you want to delete this subsubcategory?'
+                    }
                 />
             </div>
         </div>

@@ -92,6 +92,7 @@ The backend provides APIs that are documented and accessible through Postman. Yo
     "passport": "^0.7.0",
     "passport-facebook": "^3.0.0",
     "passport-google-oauth20": "^2.0.0",
+    "slugify": "^1.6.6",
     "stripe": "^16.12.0",
     "yup": "^1.4.0"
   },
@@ -122,6 +123,7 @@ The backend provides APIs that are documented and accessible through Postman. Yo
 - **[Nodemon](https://www.npmjs.com/package/nodemon)**: A development utility that automatically restarts the server when changes are detected in the source code.
 - **[Stripe](https://www.npmjs.com/package/stripe)**: A library for integrating with the Stripe payment system, allowing the backend to handle payments securely.
 - **[Yup](https://www.npmjs.com/package/yup)**: A JavaScript schema validator used for validating and parsing data to ensure it conforms to expected structures.
+- **[Slugify](https://www.npmjs.com/package/slugify)**: A library for generating slugs (URL-friendly strings) from text, ensuring URLs are user-friendly and SEO-friendly.
 
 ## **Frontend**
 

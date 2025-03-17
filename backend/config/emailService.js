@@ -4,7 +4,8 @@ const { statusImages, returnStatusImages, createAttachments, generateEmailVerifi
     generateProductInventoryEmailHtml, generateResetPasswordEmailHtml, generatePasswordResetSuccessEmailHtml,
     generateEnable2FAEmailHtml, generateDisable2FAEmailHtml, generateLogin2FAEmailHtml,
     generateProductInventoryUpdateHtml, generateProductRestockSubHtml,
-    generateContactHtml, generateContactToCustomerSupportHtml
+    generateContactHtml, generateContactToCustomerSupportHtml,
+    generateSuccessfulOrderUpdateHtml
 } = require('./emailUtils');
 const transporter = require('./mailer');
 const Role = require('../models/Role');
@@ -29,11 +30,16 @@ async function sendEmail(userEmail, subject, text, html, attachments = []) {
 }
 
 async function sendVerificationEmail(userEmail, otp) {
+    const { orderAttachments, returnRequestAttachments } = createAttachments(otp, undefined);
+    const attachments = [...orderAttachments, ...returnRequestAttachments];
+
     const subject = 'OTP Verification Code for sheero';
     const text = `Hello ${userEmail},\n\nYour OTP is: ${otp}\n\nIt will expire in 2 minutes.`;
-    const html = generateEmailVerificationHtml(userEmail, otp);
+    const html = generateEmailVerificationHtml(userEmail, otp, {
+        brandImages
+    });
 
-    return sendEmail(userEmail, subject, text, html);
+    return sendEmail(userEmail, subject, text, html, attachments);
 };
 
 async function sendOrderUpdateEmail(order) {
@@ -164,14 +170,19 @@ async function sendProductInventoryUpdateEmail(order) {
 }
 
 async function sendResetPasswordEmail(user, resetToken) {
+    const { orderAttachments, returnRequestAttachments } = createAttachments(user, undefined);
+    const attachments = [...orderAttachments, ...returnRequestAttachments];
+
     const frontendURL = NODE_ENV === 'production' ? 'https://sheero.onrender.com' : 'http://localhost:3000';
 
     const resetUrl = `${frontendURL}/reset-password/${resetToken}`;
     const subject = 'Password Reset Request';
     const text = `Hello ${user.email},\n\nPlease click the following link to reset your password:\n\n${resetUrl}\n\nIf you did not request a password reset, please ignore this email.`;
-    const html = generateResetPasswordEmailHtml(user, resetUrl);
+    const html = generateResetPasswordEmailHtml(user, resetUrl, {
+        brandImages,
+    });
 
-    await sendEmail(user.email, subject, text, html);
+    await sendEmail(user.email, subject, text, html, attachments);
 }
 
 async function sendPasswordResetSuccessEmail(user) {
@@ -307,8 +318,27 @@ async function sendContactEmailToAdmins(contact) {
     }
 }
 
+async function sendSuccessfulOrderUpdate(order) {
+    const { orderAttachments, returnRequestAttachments, reviewAttachments, productInventoryAttachments } = createAttachments(order, undefined, undefined, undefined);
+    const attachments = [...orderAttachments, ...returnRequestAttachments, ...reviewAttachments, ...productInventoryAttachments];
+
+    const subject = `Order #${order._id} has been successfully updated!`;
+    const text = `Order #${order._id} has been successfully updated.`;
+
+    const html = generateSuccessfulOrderUpdateHtml(order, {
+        brandImages,
+        statusImages,
+    });
+
+    if (order.updatedBy && order.updatedBy.email) {
+        await sendEmail(order.updatedBy.email, subject, text, html, attachments);
+    } else {
+        console.warn(`Order ${order._id} has no updatedBy email associated.`);
+    }
+}
+
 module.exports = {
     sendVerificationEmail, sendOrderUpdateEmail, sendReturnRequestUpdateEmail, sendReviewEmail, sendProductInventoryUpdateEmail,
     sendResetPasswordEmail, sendPasswordResetSuccessEmail, sendEnable2FAEmail, sendDisable2FAEmail, sendLogin2FAEmail, sendProductRestockNotificationEmail, sendProductRestockSubscriptionEmail,
-    sendContactEmail, sendContactEmailToAdmins
+    sendContactEmail, sendContactEmailToAdmins, sendSuccessfulOrderUpdate
 };

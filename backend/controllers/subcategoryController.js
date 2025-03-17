@@ -1,3 +1,4 @@
+const Category = require('../models/Category');
 const Subcategory = require('../models/Subcategory');
 const fs = require('fs');
 
@@ -6,7 +7,7 @@ const createSubcategory = async (req, res) => {
     const image = req.file ? req.file.path : '';
 
     try {
-        const subcategory = new Subcategory({ name, category, image });
+        const subcategory = new Subcategory({ name, category, image, createdBy: req.user.userId });
         await subcategory.save();
         res.status(201).json({ message: 'Subcategory created successfully', subcategory });
     } catch (error) {
@@ -16,26 +17,33 @@ const createSubcategory = async (req, res) => {
 
 const getSubcategories = async (req, res) => {
     try {
-        const subcategories = await Subcategory.find().populate('category');
+        const subcategories = await Subcategory.find()
+            .populate('category')
+            .populate('createdBy', 'firstName lastName email')
+            .populate('updatedBy', 'firstName lastName email');
         res.status(200).json(subcategories);
     } catch (error) {
         res.status(500).json({ message: 'Server error' });
     }
 };
 
-const getSubcategoryById = async (req, res) => {
+const getSubcategoryBySlug = async (req, res) => {
     try {
-        const subcategory = await Subcategory.findById(req.params.id).populate('category');
+        const subcategory = await Subcategory.findOne({ slug: req.params.slug }).populate('category');
+        if (!subcategory) return res.status(404).json({ message: 'Subcategory not found' });
+
         res.status(200).json(subcategory);
     } catch (error) {
-        res.status(500).json({ message: 'Server error' });
+        res.status(500).json({ message: 'Server error', error: error.message });
     }
 };
 
 const getSubcategoriesByCategory = async (req, res) => {
     try {
-        const subcategories = await Subcategory.find({ category: req.params.categoryId });
-        if (!subcategories || subcategories.length == 0) return res.status(404).json({ message: 'Subcategory not found' });
+        const category = await Category.findOne({ slug: req.params.slug });
+        if (!category) return res.status(404).json([]);
+
+        const subcategories = await Subcategory.find({ category: category._id });
         res.status(200).json(subcategories);
     } catch (error) {
         res.status(500).json({ message: 'Server error' });
@@ -67,7 +75,7 @@ const updateSubcategory = async (req, res) => {
 
         const subcategory = await Subcategory.findByIdAndUpdate(
             req.params.id,
-            { name, image, category, updatedAt: Date.now() },
+            { name, image, category, updatedAt: Date.now(), updatedBy: req.user.userId },
             { new: true }
         );
         if (!subcategory) return res.status(404).json({ message: 'Subcategory not found' });
@@ -117,4 +125,4 @@ const deleteSubcategories = async (req, res) => {
     }
 };
 
-module.exports = { createSubcategory, getSubcategories, getSubcategoryById, getSubcategoriesByCategory, updateSubcategory, deleteSubcategory, deleteSubcategories };
+module.exports = { createSubcategory, getSubcategories, getSubcategoryBySlug, getSubcategoriesByCategory, updateSubcategory, deleteSubcategory, deleteSubcategories };

@@ -61,10 +61,10 @@ const Orders = () => {
     const renderProductImages = (products) => {
         if (!Array.isArray(products)) return null;
         return products.map(product => {
-            const { _id, image, name } = product.product || {};
-            if (!_id || !image || !name) return null;
+            const { _id, image, name, slug } = product.product || {};
+            if (!_id || !image || !name || !slug) return null;
             return (
-                <Link key={_id} to={`/product/${_id}`}>
+                <Link key={_id} to={`/${slug}`}>
                     <img
                         src={getImageUrl(image)}
                         alt={name}

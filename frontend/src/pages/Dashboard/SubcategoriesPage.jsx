@@ -18,7 +18,8 @@ const SubcategoriesPage = () => {
     const [selectedSubcategories, setSelectedSubcategories] = useState([]);
     const [addSubcategoryOpen, setAddSubcategoryOpen] = useState(false);
     const [editSubcategoryOpen, setEditSubcategoryOpen] = useState(false);
-    const [deleteSubcategoryOpen, setDeleteSubcategoryOpen] = useState(false);
+    const [deleteModalOpen, setDeleteModalOpen] = useState(false);
+    const [deletionContext, setDeletionContext] = useState(null);
     const [imagePreviewOpen, setImagePreviewOpen] = useState(false);
     const [currentPage, setCurrentPage] = useState(0);
     const [viewDetailsOpen, setViewDetailsOpen] = useState(false);
@@ -42,22 +43,8 @@ const SubcategoriesPage = () => {
         };
     }, [subcategories]);
 
-    const handleSelectSubcategory = (subcategoryId) => {
-        const id = Array.isArray(subcategoryId) ? subcategoryId[0] : subcategoryId;
-
-        setSelectedSubcategories((prevSelected) =>
-            prevSelected.includes(id)
-                ? prevSelected.filter((selectedId) => selectedId !== id)
-                : [...prevSelected, id]
-        );
-    };
-
-    const handleSelectAll = (e) => {
-        if (e.target.checked) {
-            setSelectedSubcategories(subcategories.map(subcategory => subcategory._id));
-        } else {
-            setSelectedSubcategories([]);
-        }
+    const handleSelectSubcategory = (newSelection) => {
+        setSelectedSubcategories(newSelection);
     };
 
     const handlePageClick = (event) => {
@@ -74,17 +61,10 @@ const SubcategoriesPage = () => {
         setEditSubcategoryOpen(true);
     };
 
-
     const handleEditFromDrawer = (subcategory) => {
         setViewDetailsOpen(false);
         setSelectedSubcategory(subcategory);
         setEditSubcategoryOpen(true);
-    };
-
-    const getSelectedSubcategories = () => {
-        return selectedSubcategories
-            .map((id) => subcategories.find((subcategory) => subcategory._id === id))
-            .filter((subcategory) => subcategory);
     };
 
     const handleDeleteSuccess = () => {
@@ -100,6 +80,24 @@ const SubcategoriesPage = () => {
     const closeDrawer = () => {
         setViewDetailsOpen(false);
         setSelectedSubcategory(null);
+    };
+
+    const handleBulkDelete = () => {
+        if (selectedSubcategories.length > 0) {
+            setDeletionContext({
+                endpoint: '/subcategories/delete-bulk',
+                data: { ids: selectedSubcategories },
+            });
+            setDeleteModalOpen(true);
+        }
+    };
+
+    const handleSingleDelete = (subcategory) => {
+        setDeletionContext({
+            endpoint: `/subcategories/delete/${subcategory._id}`,
+            data: null,
+        });
+        setDeleteModalOpen(true);
     };
 
     const columns = [
@@ -135,7 +133,7 @@ const SubcategoriesPage = () => {
                             title="Subcategories"
                             selectedItems={selectedSubcategories}
                             setAddItemOpen={setAddSubcategoryOpen}
-                            setDeleteItemOpen={setDeleteSubcategoryOpen}
+                            setDeleteItemOpen={handleBulkDelete}
                             itemName="Subcategory"
                             exportOptions={exportOptions(subcategories, handleExport)}
                         />
@@ -145,12 +143,12 @@ const SubcategoriesPage = () => {
                             data={subcategories}
                             selectedItems={selectedSubcategories}
                             onSelectItem={handleSelectSubcategory}
-                            onSelectAll={handleSelectAll}
                             itemsPerPage={itemsPerPage}
                             currentPage={currentPage}
                             onPageChange={handlePageClick}
                             onEdit={handleEdit}
                             onViewDetails={handleViewDetails}
+                            onDelete={handleSingleDelete}
                         />
                     </>
                 )}
@@ -158,14 +156,17 @@ const SubcategoriesPage = () => {
                 <AddSubcategoryModal open={addSubcategoryOpen} onClose={() => setAddSubcategoryOpen(false)} onAddSuccess={() => dispatch(getSubcategories())} />
                 <EditSubcategoryModal open={editSubcategoryOpen} onClose={() => setEditSubcategoryOpen(false)} subcategory={selectedSubcategory} onViewDetails={handleViewDetails} onEditSuccess={() => dispatch(getSubcategories())} />
                 <SubcategoryDetailsDrawer open={viewDetailsOpen} onClose={closeDrawer} subcategory={selectedSubcategory} onEdit={handleEditFromDrawer} />
+
                 <DeleteModal
-                    open={deleteSubcategoryOpen}
-                    onClose={() => setDeleteSubcategoryOpen(false)}
-                    items={getSelectedSubcategories()}
+                    open={deleteModalOpen}
+                    onClose={() => setDeleteModalOpen(false)}
+                    deletionContext={deletionContext}
                     onDeleteSuccess={handleDeleteSuccess}
-                    endpoint="/subcategories/delete-bulk"
-                    title="Delete Subcategories"
-                    message="Are you sure you want to delete the selected subcategories?"
+                    title={deletionContext?.endpoint.includes('bulk') ? 'Delete Subcategories' : 'Delete Subcategory'}
+                    message={deletionContext?.endpoint.includes('bulk')
+                        ? 'Are you sure you want to delete the selected subcategories?'
+                        : 'Are you sure you want to delete this subcategory?'
+                    }
                 />
                 <ImagePreviewModal open={imagePreviewOpen} onClose={() => setImagePreviewOpen(false)} imageUrl={selectedSubcategory} />
             </div>

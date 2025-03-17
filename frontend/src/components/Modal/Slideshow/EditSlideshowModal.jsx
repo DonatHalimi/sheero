@@ -1,8 +1,9 @@
 import React, { useEffect, useState } from 'react';
 import { toast } from 'react-toastify';
-import { ActionButtons, BrownOutlinedTextField, CustomBox, CustomModal, CustomTypography, handleApiError, ImageUploadBox } from '../../../assets/CustomComponents';
+import { ActionButtons, CustomBox, CustomModal, CustomTextField, CustomTypography, handleApiError, ImageUploadBox } from '../../../assets/CustomComponents';
 import { editSlideshowService } from '../../../services/slideshowService';
 import { getImageUrl } from '../../../utils/config';
+import { SlideshowValidations } from '../../../utils/validations/slideshow';
 
 const EditSlideshowModal = ({ open, onClose, image, onViewDetails, onEditSuccess }) => {
     const [title, setTitle] = useState('');
@@ -12,9 +13,10 @@ const EditSlideshowModal = ({ open, onClose, image, onViewDetails, onEditSuccess
     const [newImage, setNewImage] = useState(null);
     const [loading, setLoading] = useState(false);
 
-    const isValid = (v) => /^[A-Z][\sa-zA-Z\W]{3,15}$/.test(v);
+    const validateTitle = (v) => SlideshowValidations.titleRules.pattern.test(v);
+    const validateDescription = (v) => SlideshowValidations.descriptionRules.pattern.test(v);
 
-    const isValidForm = title && isValidTitle && description && isValidDescription && (newImage || image?.image);
+    const isFormValid = title && validateTitle(title) && description && validateDescription(description) && image;
 
     useEffect(() => {
         if (image) {
@@ -55,29 +57,20 @@ const EditSlideshowModal = ({ open, onClose, image, onViewDetails, onEditSuccess
             <CustomBox>
                 <CustomTypography variant="h5">Edit Slideshow Image</CustomTypography>
 
-                <BrownOutlinedTextField
+                <CustomTextField
                     label="Title"
                     value={title}
-                    fullWidth
-                    onChange={(e) => {
-                        setTitle(e.target.value);
-                        setIsValidTitle(isValid(e.target.value));
-                    }}
-                    error={!isValidTitle}
-                    helperText={!isValidTitle ? 'Title must start with a capital letter and be 3-15 characters long' : ''}
-                    className='!mb-4'
+                    setValue={setTitle}
+                    validate={validateTitle}
+                    validationRule={SlideshowValidations.titleRules}
                 />
-                <BrownOutlinedTextField
+
+                <CustomTextField
                     label="Description"
                     value={description}
-                    fullWidth
-                    onChange={(e) => {
-                        setDescription(e.target.value);
-                        setIsValidDescription(isValid(e.target.value));
-                    }}
-                    error={!isValidDescription}
-                    helperText={!isValidDescription ? 'Description must start with a capital letter and be 3-15 characters long' : ''}
-                    className='!mb-4'
+                    setValue={setDescription}
+                    validate={validateDescription}
+                    validationRule={SlideshowValidations.descriptionRules}
                 />
 
                 <ImageUploadBox onFileSelect={handleFileSelect} initialPreview={image?.image ? getImageUrl(image.image) : ''} />
@@ -91,7 +84,7 @@ const EditSlideshowModal = ({ open, onClose, image, onViewDetails, onEditSuccess
                         onClose();
                     }}
                     primaryButtonProps={{
-                        disabled: !isValidForm || loading,
+                        disabled: !isFormValid || loading,
                     }}
                     loading={loading}
                 />

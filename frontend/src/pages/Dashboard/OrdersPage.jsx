@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
-import { DashboardHeader, exportOptions, formatAddress, formatArrivalDateRange, formatPaymentInfo, formatProducts, formatQuantity, formatTotalAmount, formatUser, LoadingDataGrid, RenderOrderDelStatus, RenderOrderPaymentInfo } from '../../assets/CustomComponents';
+import { DashboardHeader, exportOptions, formatAddress, formatArrivalDateRange, formatProducts, formatQuantity, formatTotalAmount, formatUser, LoadingDataGrid, RenderOrderDelStatus, RenderOrderPaymentInfo } from '../../assets/CustomComponents';
 import { exportToExcel, exportToJSON } from '../../assets/DataExport';
 import DashboardTable from '../../components/Dashboard/DashboardTable';
 import DeleteModal from '../../components/Modal/DeleteModal';
@@ -15,7 +15,8 @@ const OrdersPage = () => {
     const [selectedOrder, setSelectedOrder] = useState(null);
     const [selectedOrders, setSelectedOrders] = useState([]);
     const [editOrderOpen, setEditOrderOpen] = useState(false);
-    const [deleteOrderOpen, setDeleteOrderOpen] = useState(false);
+    const [deleteModalOpen, setDeleteModalOpen] = useState(false);
+    const [deletionContext, setDeletionContext] = useState(null);
     const [currentPage, setCurrentPage] = useState(0);
     const [viewDetailsOpen, setViewDetailsOpen] = useState(false);
 
@@ -25,18 +26,8 @@ const OrdersPage = () => {
         dispatch(getOrders());
     }, [dispatch]);
 
-    const handleSelectOrder = (orderId) => {
-        const id = Array.isArray(orderId) ? orderId[0] : orderId;
-
-        setSelectedOrders((prevSelected) =>
-            prevSelected.includes(id)
-                ? prevSelected.filter((selectedId) => selectedId !== id)
-                : [...prevSelected, id]
-        );
-    };
-
-    const handleSelectAll = (e) => {
-        setSelectedOrders(e.target.checked ? orders.map(order => order._id) : []);
+    const handleSelectOrder = (newSelection) => {
+        setSelectedOrders(newSelection);
     };
 
     const handlePageClick = (event) => {
@@ -54,12 +45,6 @@ const OrdersPage = () => {
         setEditOrderOpen(true);
     };
 
-    const getSelectedOrders = () => {
-        return selectedOrders
-            .map((id) => orders.find((order) => order._id === id))
-            .filter((order) => order);
-    };
-
     const handleDeleteSuccess = () => {
         dispatch(getOrders());
         setSelectedOrders([]);
@@ -73,6 +58,24 @@ const OrdersPage = () => {
     const closeDrawer = () => {
         setViewDetailsOpen(false);
         setSelectedOrder(null);
+    };
+
+    const handleBulkDelete = () => {
+        if (selectedOrders.length > 0) {
+            setDeletionContext({
+                endpoint: '/orders/delete-bulk',
+                data: { ids: selectedOrders },
+            });
+            setDeleteModalOpen(true);
+        }
+    };
+
+    const handleSingleDelete = (order) => {
+        setDeletionContext({
+            endpoint: `/orders/delete/${order._id}`,
+            data: null,
+        });
+        setDeleteModalOpen(true);
     };
 
     const columns = [
@@ -104,7 +107,7 @@ const OrdersPage = () => {
             quantity: formatQuantity(order),
             totalAmount: formatTotalAmount(order),
             address: formatAddress(order)
-        }))
+        }));
 
         format === 'excel' ? exportToExcel(flattenedOrders, 'orders_data') : exportToJSON(data, 'orders_data');
     };
@@ -119,7 +122,7 @@ const OrdersPage = () => {
                         <DashboardHeader
                             title="Orders"
                             selectedItems={selectedOrders}
-                            setDeleteItemOpen={setDeleteOrderOpen}
+                            setDeleteItemOpen={handleBulkDelete}
                             itemName="Order"
                             exportOptions={exportOptions(orders, handleExport)}
                             showAddButton={false}
@@ -130,26 +133,29 @@ const OrdersPage = () => {
                             data={orders}
                             selectedItems={selectedOrders}
                             onSelectItem={handleSelectOrder}
-                            onSelectAll={handleSelectAll}
                             itemsPerPage={itemsPerPage}
                             currentPage={currentPage}
                             onPageChange={handlePageClick}
                             onEdit={handleEdit}
                             onViewDetails={handleViewDetails}
+                            onDelete={handleSingleDelete}
                         />
                     </>
                 )}
 
                 <EditOrderModal open={editOrderOpen} onClose={() => setEditOrderOpen(false)} order={selectedOrder} onViewDetails={handleViewDetails} onEditSuccess={() => dispatch(getOrders())} />
                 <OrderDetailsDrawer open={viewDetailsOpen} onClose={closeDrawer} order={selectedOrder} onEdit={handleEditFromDrawer} />
+
                 <DeleteModal
-                    open={deleteOrderOpen}
-                    onClose={() => setDeleteOrderOpen(false)}
-                    items={getSelectedOrders()}
+                    open={deleteModalOpen}
+                    onClose={() => setDeleteModalOpen(false)}
+                    deletionContext={deletionContext}
                     onDeleteSuccess={handleDeleteSuccess}
-                    endpoint="/orders/delete-bulk"
-                    title="Delete Orders"
-                    message="Are you sure you want to delete the selected orders?"
+                    title={deletionContext?.endpoint.includes('bulk') ? 'Delete Orders' : 'Delete Order'}
+                    message={deletionContext?.endpoint.includes('bulk')
+                        ? 'Are you sure you want to delete the selected orders?'
+                        : 'Are you sure you want to delete this order?'
+                    }
                 />
             </div>
         </div>

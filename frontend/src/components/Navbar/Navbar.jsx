@@ -10,7 +10,7 @@ import { logoutUser, selectIsAdmin, selectIsContentManager, selectIsOrderManager
 import CategoryNavbar from './CategoryNavbar';
 import SearchBar from './SearchBar';
 
-const Navbar = () => {
+const Navbar = ({ activeCategory }) => {
     const { isAuthenticated } = useSelector((state) => state.auth);
     const isAdmin = useSelector(selectIsAdmin);
     const isOrderManager = useSelector(selectIsOrderManager);
@@ -142,7 +142,7 @@ const Navbar = () => {
         }
     };
 
-    const handleProductClick = (productId) => navigate(`/product/${productId}`);
+    const handleProductClick = (slug) => navigate(`/${slug}`);
 
     const toggleSidebar = () => {
         setIsSidebarOpen(!isSidebarOpen);
@@ -236,7 +236,7 @@ const Navbar = () => {
             </nav>
 
             <div className="mt-20 bg-white">
-                <CategoryNavbar isSidebarOpen={isSidebarOpen} toggleSidebar={toggleSidebar} />
+                <CategoryNavbar isSidebarOpen={isSidebarOpen} toggleSidebar={toggleSidebar} activeCategory={activeCategory} />
             </div>
         </>
     );

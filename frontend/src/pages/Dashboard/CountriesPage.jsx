@@ -17,7 +17,8 @@ const CountriesPage = () => {
     const [selectedCountries, setSelectedCountries] = useState([]);
     const [addCountryOpen, setAddCountryOpen] = useState(false);
     const [editCountryOpen, setEditCountryOpen] = useState(false);
-    const [deleteCountryOpen, setDeleteCountryOpen] = useState(false);
+    const [deleteModalOpen, setDeleteModalOpen] = useState(false);
+    const [deletionContext, setDeletionContext] = useState(null);
     const [currentPage, setCurrentPage] = useState(0);
     const [viewDetailsOpen, setViewDetailsOpen] = useState(false);
 
@@ -40,18 +41,8 @@ const CountriesPage = () => {
         };
     }, [countries]);
 
-    const handleSelectCountry = (countryId) => {
-        const id = Array.isArray(countryId) ? countryId[0] : countryId;
-
-        setSelectedCountries((prevSelected) =>
-            prevSelected.includes(id)
-                ? prevSelected.filter((selectedId) => selectedId !== id)
-                : [...prevSelected, id]
-        );
-    };
-
-    const handleSelectAll = (e) => {
-        setSelectedCountries(e.target.checked ? countries.map(country => country._id) : []);
+    const handleSelectCountry = (newSelection) => {
+        setSelectedCountries(newSelection);
     };
 
     const handlePageClick = (event) => {
@@ -69,12 +60,6 @@ const CountriesPage = () => {
         setEditCountryOpen(true);
     };
 
-    const getSelectedCountries = () => {
-        return selectedCountries
-            .map((id) => countries.find((country) => country._id === id))
-            .filter((country) => country);
-    };
-
     const handleDeleteSuccess = () => {
         dispatch(getCountries());
         setSelectedCountries([]);
@@ -90,6 +75,24 @@ const CountriesPage = () => {
         setSelectedCountry(null);
     };
 
+    const handleBulkDelete = () => {
+        if (selectedCountries.length > 0) {
+            setDeletionContext({
+                endpoint: '/countries/delete-bulk',
+                data: { ids: selectedCountries },
+            });
+            setDeleteModalOpen(true);
+        }
+    };
+
+    const handleSingleDelete = (country) => {
+        setDeletionContext({
+            endpoint: `/countries/delete/${country._id}`,
+            data: null,
+        });
+        setDeleteModalOpen(true);
+    };
+
     const columns = [
         { key: 'countryCode', label: 'Code' },
         {
@@ -102,7 +105,7 @@ const CountriesPage = () => {
 
     const handleExport = (data, format) => {
         format === 'excel' ? exportToExcel(data, 'countries_data') : exportToJSON(data, 'countries_data');
-    }
+    };
 
     return (
         <div className='container mx-auto max-w-screen-2xl px-4 mt-20'>
@@ -115,7 +118,7 @@ const CountriesPage = () => {
                             title="Countries"
                             selectedItems={selectedCountries}
                             setAddItemOpen={setAddCountryOpen}
-                            setDeleteItemOpen={setDeleteCountryOpen}
+                            setDeleteItemOpen={handleBulkDelete}
                             itemName="Country"
                             exportOptions={exportOptions(countries, handleExport)}
                         />
@@ -125,12 +128,12 @@ const CountriesPage = () => {
                             data={countries}
                             selectedItems={selectedCountries}
                             onSelectItem={handleSelectCountry}
-                            onSelectAll={handleSelectAll}
                             itemsPerPage={itemsPerPage}
                             currentPage={currentPage}
                             onPageChange={handlePageClick}
                             onEdit={handleEdit}
                             onViewDetails={handleViewDetails}
+                            onDelete={handleSingleDelete}
                         />
                     </>
                 )}
@@ -138,14 +141,17 @@ const CountriesPage = () => {
                 <AddCountryModal open={addCountryOpen} onClose={() => setAddCountryOpen(false)} onAddSuccess={() => dispatch(getCountries())} />
                 <EditCountryModal open={editCountryOpen} onClose={() => setEditCountryOpen(false)} country={selectedCountry} onViewDetails={handleViewDetails} onEditSuccess={() => dispatch(getCountries())} />
                 <CountryDetailsDrawer open={viewDetailsOpen} onClose={closeDrawer} country={selectedCountry} onEdit={handleEditFromDrawer} />
+
                 <DeleteModal
-                    open={deleteCountryOpen}
-                    onClose={() => setDeleteCountryOpen(false)}
-                    items={getSelectedCountries()}
+                    open={deleteModalOpen}
+                    onClose={() => setDeleteModalOpen(false)}
+                    deletionContext={deletionContext}
                     onDeleteSuccess={handleDeleteSuccess}
-                    endpoint="/countries/delete-bulk"
-                    title="Delete Countries"
-                    message="Are you sure you want to delete the selected countries?"
+                    title={deletionContext?.endpoint.includes('bulk') ? 'Delete Countries' : 'Delete Country'}
+                    message={deletionContext?.endpoint.includes('bulk')
+                        ? 'Are you sure you want to delete the selected countries?'
+                        : 'Are you sure you want to delete this country?'
+                    }
                 />
             </div>
         </div>

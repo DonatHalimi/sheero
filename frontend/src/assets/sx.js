@@ -348,7 +348,7 @@ export const deleteItemSx = (theme) => ({
 export const exportIconSx = (theme) => ({ color: theme.palette.mode === 'dark' ? theme.palette.text.primary : '#6b7280' });
 
 export const profileDropdownContainerSx = (theme) => ({
-    backgroundColor: theme.palette.background.paper,
+    backgroundColor: theme.palette.background.default,
     borderColor: theme.palette.divider,
 });
 

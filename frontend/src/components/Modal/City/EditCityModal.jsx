@@ -1,23 +1,22 @@
 import { Autocomplete, TextField } from '@mui/material';
 import React, { useEffect, useState } from 'react';
 import { toast } from 'react-toastify';
-import { ActionButtons, BrownOutlinedTextField, CustomBox, CustomModal, CustomPaper, CustomTypography, DashboardCountryFlag, handleApiError } from '../../../assets/CustomComponents';
+import { ActionButtons, CustomBox, CustomModal, CustomPaper, CustomTextField, CustomTypography, DashboardCountryFlag, handleApiError } from '../../../assets/CustomComponents';
 import { editCityService } from '../../../services/cityService';
 import { getCountriesService } from '../../../services/countryService';
+import { CityValidations } from '../../../utils/validations/city';
 
 const EditCityModal = ({ open, onClose, city, onViewDetails, onEditSuccess }) => {
     const [name, setName] = useState('');
-    const [isValidName, setIsValidName] = useState(true);
     const [country, setCountry] = useState('');
     const [zipCode, setZipCode] = useState('');
-    const [isValidZipCode, setIsValidZipCode] = useState(true);
     const [countriesWithGroups, setCountriesWithGroups] = useState([]);
     const [loading, setLoading] = useState(false);
 
-    const validateName = (v) => /^[A-ZÇ][a-zA-ZëËçÇ\s]{2,15}$/.test(v);
-    const validateZipCode = (v) => /^[0-9]{4,5}$/.test(v);
+    const validateName = (v) => CityValidations.nameRules.pattern.test(v);
+    const validateZipCode = (v) => CityValidations.zipCodeRules.pattern.test(v);
 
-    const isValidForm = isValidName && country && isValidZipCode;
+    const isFormValid = validateName(name) && country && validateZipCode(zipCode);
 
     useEffect(() => {
         if (city) {
@@ -68,18 +67,12 @@ const EditCityModal = ({ open, onClose, city, onViewDetails, onEditSuccess }) =>
             <CustomBox>
                 <CustomTypography variant="h5">Edit City</CustomTypography>
 
-                <BrownOutlinedTextField
-                    fullWidth
-                    required
+                <CustomTextField
                     label="Name"
                     value={name}
-                    onChange={(e) => {
-                        setName(e.target.value)
-                        setIsValidName(validateName(e.target.value));
-                    }}
-                    error={!isValidName}
-                    helperText={!isValidName ? 'Name must start with a capital letter and be 3-15 characters long' : ''}
-                    className="!mb-4"
+                    setValue={setName}
+                    validate={validateName}
+                    validationRule={CityValidations.nameRules}
                 />
 
                 <Autocomplete
@@ -100,18 +93,12 @@ const EditCityModal = ({ open, onClose, city, onViewDetails, onEditSuccess }) =>
                     className='!mb-4'
                 />
 
-                <BrownOutlinedTextField
-                    fullWidth
-                    required
+                <CustomTextField
                     label="Zip Code"
                     value={zipCode}
-                    onChange={(e) => {
-                        setZipCode(e.target.value);
-                        setIsValidZipCode(validateZipCode(e.target.value));
-                    }}
-                    error={!isValidZipCode}
-                    helperText={!isValidZipCode ? 'Zip code must be 4-5 digits long' : ''}
-                    className="!mb-4"
+                    setValue={setZipCode}
+                    validate={validateZipCode}
+                    validationRule={CityValidations.zipCodeRules}
                 />
 
                 <ActionButtons
@@ -123,7 +110,7 @@ const EditCityModal = ({ open, onClose, city, onViewDetails, onEditSuccess }) =>
                         onClose();
                     }}
                     primaryButtonProps={{
-                        disabled: !isValidForm || loading
+                        disabled: !isFormValid || loading
                     }}
                     loading={loading}
                 />

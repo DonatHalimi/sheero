@@ -49,7 +49,7 @@ const SubscriptionDetailsDrawer = ({ open, onClose, subscription }) => {
                                     label={
                                         <Box display="flex" alignItems="center" gap={1}>
                                             <Box
-                                                onClick={() => window.open(`/product/${subscription.productId._id}`, '_blank')}
+                                                onClick={() => window.open(`/${subscription.productId.slug}`, '_blank')}
                                                 display="flex"
                                                 alignItems="center"
                                                 gap={1}

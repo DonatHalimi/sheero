@@ -1,8 +1,8 @@
 import React, { useEffect, useState } from 'react';
+import { useParams } from 'react-router-dom';
 import { toast } from 'react-toastify';
 import { CustomPagination, EmptyState, Header, LoadingProductItem } from '../../../assets/CustomComponents';
 import emptyWishlistImage from '../../../assets/img/empty/wishlist.png';
-import { loadUserService } from '../../../services/authService';
 import { getSharedUserWishlistService } from '../../../services/wishlistService';
 import Navbar from '../../Navbar/Navbar';
 import Footer from '../../Utils/Footer';
@@ -11,6 +11,8 @@ import ProductItem from '../Items/ProductItem';
 const itemsPerPage = 12;
 
 const SharedWishlist = () => {
+    const { userId } = useParams();
+
     const [wishlistItems, setWishlistItems] = useState([]);
     const [fullName, setFullName] = useState('');
     const [currentPage, setCurrentPage] = useState(1);
@@ -21,9 +23,6 @@ const SharedWishlist = () => {
         const fetchWishlist = async () => {
             setLoading(true);
             try {
-                const userResponse = await loadUserService();
-                const userId = userResponse.data.id;
-
                 const { data } = await getSharedUserWishlistService(userId);
                 setWishlistItems(data.items);
                 setFullName(`${data.firstName} ${data.lastName}`);
@@ -37,7 +36,7 @@ const SharedWishlist = () => {
         };
 
         fetchWishlist();
-    }, []);
+    }, [userId]);
 
     const pageCount = Math.ceil(totalItems / itemsPerPage);
     const getCurrentPageItems = () => {

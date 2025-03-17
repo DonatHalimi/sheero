@@ -1,20 +1,20 @@
 import { InputLabel, MenuItem, Select } from '@mui/material';
 import React, { useEffect, useState } from 'react';
 import { toast } from 'react-toastify';
-import { ActionButtons, BrownOutlinedTextField, CustomBox, CustomModal, CustomTypography, handleApiError, OutlinedBrownFormControl } from '../../../assets/CustomComponents';
+import { ActionButtons, CustomBox, CustomModal, CustomTextField, CustomTypography, handleApiError, OutlinedBrownFormControl } from '../../../assets/CustomComponents';
 import { getSubcategoriesService } from '../../../services/subcategoryService';
 import { editSubSubcategoryService } from '../../../services/subSubcategoryService';
+import { SubSubcategoryValidations } from '../../../utils/validations/subSubcategory';
 
 const EditSubSubcategoryModal = ({ open, onClose, subSubcategory, onViewDetails, onEditSuccess }) => {
     const [name, setName] = useState('');
-    const [isValidName, setIsValidName] = useState(true);
     const [subcategory, setSubcategory] = useState('');
     const [subcategories, setSubcategories] = useState([]);
     const [loading, setLoading] = useState(false);
 
-    const validateName = (v) => /^[A-ZÇ][\sa-zA-ZëËçÇ\W]{3,27}$/.test(v);
+    const validateName = (v) => SubSubcategoryValidations.nameRules.pattern.test(v);
 
-    const isValidForm = name && isValidName && subcategory;
+    const isFormValid = name && validateName(name) && subcategory;
 
     useEffect(() => {
         if (subSubcategory) {
@@ -60,16 +60,12 @@ const EditSubSubcategoryModal = ({ open, onClose, subSubcategory, onViewDetails,
             <CustomBox>
                 <CustomTypography variant="h5">Edit SubSubcategory</CustomTypography>
 
-                <BrownOutlinedTextField
+                <CustomTextField
                     label="Name"
                     value={name}
-                    fullWidth
-                    onChange={(e) => {
-                        setName(e.target.value);
-                        setIsValidName(validateName(e.target.value));
-                    }}
-                    error={!isValidName}
-                    helperText={!isValidName ? 'Name must start with a capital letter and be 3-27 characters long' : ''}
+                    setValue={setName}
+                    validate={validateName}
+                    validationRule={SubSubcategoryValidations.nameRules}
                 />
 
                 <OutlinedBrownFormControl fullWidth margin="normal">
@@ -95,7 +91,7 @@ const EditSubSubcategoryModal = ({ open, onClose, subSubcategory, onViewDetails,
                         onClose();
                     }}
                     primaryButtonProps={{
-                        disabled: !isValidForm || loading
+                        disabled: !isFormValid || loading
                     }}
                     loading={loading}
                 />

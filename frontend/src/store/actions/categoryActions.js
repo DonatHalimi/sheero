@@ -11,7 +11,7 @@ export const getCategories = () => async (dispatch) => {
         });
 
         res.data.forEach((category) => {
-            dispatch(getSubcategoriesAndSubsubcategories(category._id));
+            dispatch(getSubcategoriesAndSubsubcategories(category.slug));
         });
     } catch (error) {
         dispatch({
@@ -21,23 +21,23 @@ export const getCategories = () => async (dispatch) => {
     }
 };
 
-export const getSubcategoriesAndSubsubcategories = (categoryId) => async (dispatch) => {
+export const getSubcategoriesAndSubsubcategories = (categorySlug) => async (dispatch) => {
     try {
-        const res = await getSubcategoriesByCategoryService(categoryId);
+        const res = await getSubcategoriesByCategoryService(categorySlug);
 
         dispatch({
             type: GET_SUBCATEGORIES_BY_CATEGORY,
-            payload: { categoryId, subcategories: res.data },
+            payload: { categorySlug, subcategories: res.data },
         });
 
         const subsubPromises = res.data.map(async (subcategory) => {
             try {
-                const subsubRes = await getSubSubcategoriesBySubcategoryService(subcategory._id);
-                return { subcategoryId: subcategory._id, subsubcategories: subsubRes.data };
+                const subsubRes = await getSubSubcategoriesBySubcategoryService(subcategory.slug);
+                return { subcategorySlug: subcategory.slug, subsubcategories: subsubRes.data };
             } catch (error) {
                 dispatch({
                     type: GET_SUBSUBCATEGORIES_BY_SUBCATEGORY_ERROR,
-                    payload: { subcategoryId: subcategory._id, error: error.response?.data?.message || 'Failed to fetch subsubcategories' },
+                    payload: { subcategorySlug: subcategory.slug, error: error.response?.data?.message || 'Failed to fetch subsubcategories' },
                 });
                 return null;
             }
@@ -47,10 +47,10 @@ export const getSubcategoriesAndSubsubcategories = (categoryId) => async (dispat
 
         subsubResults.forEach((result) => {
             if (result) {
-                const { subcategoryId, subsubcategories } = result;
+                const { subcategorySlug, subsubcategories } = result;
                 dispatch({
                     type: GET_SUBSUBCATEGORIES_BY_SUBCATEGORY,
-                    payload: { subcategoryId, subsubcategories },
+                    payload: { subcategorySlug, subsubcategories },
                 });
             }
         });

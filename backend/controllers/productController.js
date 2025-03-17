@@ -32,13 +32,13 @@ const getProducts = async (req, res) => {
     }
 };
 
-const getProduct = async (req, res) => {
+const getProductBySlug = async (req, res) => {
     try {
-        const product = await Product.findById(req.params.id).populate('category subcategory subSubcategory supplier');
+        const product = await Product.findOne({ slug: req.params.slug }).populate('category subcategory subSubcategory supplier');
         if (!product) return res.status(404).json({ message: 'Product not found' });
         res.status(200).json(product);
     } catch (error) {
-        res.status(500).json({ message: 'Server error', error: error.message });
+        res.status(500).json({ message: 'Server error' });
     }
 };
 
@@ -59,33 +59,39 @@ const getProductsByCategory = async (req, res) => {
 
 const getProductsBySubCategory = async (req, res) => {
     try {
-        const subcategory = await Subcategory.findById(req.params.id);
-        if (!subcategory) return res.status(404).json({ message: 'Subcategory not found' });
+        const subcategory = await Subcategory.findOne({ slug: req.params.slug });
+        if (!subcategory) {
+            return res.status(404).json({ message: 'Subcategory not found' });
+        }
 
         const products = await Product.find({ subcategory: subcategory._id }).populate('category subcategory subSubcategory');
+
         if (!products || products.length === 0) {
-            return res.status(404).json({ message: `No products found with subcategory: ${subcategory.name}` });
+            return res.status(404).json({ message: `No products found for subcategory: ${subcategory.name}` });
         }
+
         res.status(200).json({ products });
     } catch (error) {
         res.status(500).json({ message: 'Server error', error: error.message });
     }
-}
+};
 
 const getProductsBySubSubCategory = async (req, res) => {
     try {
-        const subSubcategory = await SubSubcategory.findById(req.params.id);
-        if (!subSubcategory) return res.status(404).json({ message: 'SubSubcategory not found' });
+        const subSubcategory = await SubSubcategory.findOne({ slug: req.params.slug });
+        if (!subSubcategory) {
+            return res.status(404).json({ message: 'SubSubcategory not found' });
+        }
 
         const products = await Product.find({ subSubcategory: subSubcategory._id }).populate('category subcategory subSubcategory');
         if (!products || products.length === 0) {
-            return res.status(404).json({ message: `No products found with subSubcategory: ${subSubcategory.name}` });
+            return res.status(404).json({ message: `No products found for subsubcategory: ${subSubcategory.name}` });
         }
         res.status(200).json({ products });
     } catch (error) {
         res.status(500).json({ message: 'Server error', error: error.message });
     }
-}
+};
 
 const updateProduct = async (req, res) => {
     const { name, description, price, salePrice, category, subcategory, subSubcategory, inventoryCount, dimensions, variants, discount, supplier, shipping, details } = req.body;
@@ -180,15 +186,55 @@ const subscribeForRestock = async (req, res) => {
     }
 };
 
+const getUserRestockSubscription = async (req, res) => {
+    try {
+        const email = req.query.email || req.user?.email;
+        if (!email) return res.status(400).json({ message: "Email is required" });
+
+        const subscription = await ProductRestockSubscription.findOne({ email });
+
+        res.json({ isSubscribed: !!subscription });
+    } catch (error) {
+        res.status(500).json({ message: "Server error" });
+    }
+};
+
+const deleteUserRestockSubscription = async (req, res) => {
+    try {
+        if (!req.user?.userId) return res.status(400).json({ message: "User ID is required" });
+
+        const user = await User.findById(req.user.userId);
+        if (!user) return res.status(404).json({ message: "User not found" });
+
+        const subscription = await ProductRestockSubscription.findOneAndDelete({ email: user.email });
+
+        res.json({ isSubscribed: !!subscription, message: "Product restock subscription deleted successfully" });
+    } catch (error) {
+        res.status(500).json({ message: "Server error" });
+    }
+};
+
 const getAllRestockSubscriptions = async (req, res) => {
     try {
         const subscriptions = await ProductRestockSubscription.find()
-            .populate('productId', 'name image inventoryCount')
+            .populate('productId', 'name slug image inventoryCount')
             .exec();
 
         res.status(200).json(subscriptions);
     } catch (error) {
         res.status(500).json({ message: 'Error fetching subscriptions.', error: error.message });
+    }
+};
+
+const deleteRestockSubscription = async (req, res) => {
+    try {
+        const subscription = await ProductRestockSubscription.findByIdAndDelete(req.params.id);
+
+        if (!subscription) return res.status(404).json({ message: 'Subscription not found' });
+
+        res.status(200).json({ message: 'Subscription deleted successfully' });
+    } catch (error) {
+        res.status(500).json({ message: 'Error deleting subscription.', error: error.message });
     }
 };
 
@@ -402,7 +448,7 @@ const addProductVariantsAndDetails = async (req, res) => {
 };
 
 module.exports = {
-    createProduct, getProducts, getProduct, updateProduct, subscribeForRestock, getAllRestockSubscriptions, deleteRestockSubscriptions,
+    createProduct, getProducts, getProductBySlug, updateProduct, subscribeForRestock, getUserRestockSubscription, deleteUserRestockSubscription, getAllRestockSubscriptions, deleteRestockSubscription, deleteRestockSubscriptions,
     getProductsByCategory, getProductsBySubCategory, getProductsBySubSubCategory,
     deleteProduct, deleteProducts, searchProducts, createProductBasic, uploadProductImage, addProductVariantsAndDetails
 };

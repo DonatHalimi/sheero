@@ -2,11 +2,11 @@ import axiosInstance from "../utils/axiosInstance";
 
 export const getCategoriesService = () => axiosInstance.get('/categories/get');
 
-export const getCategoryByIdService = (categoryId) => axiosInstance.get(`/categories/get/${categoryId}`);
+export const getCategoryBySlugService = (slug) => axiosInstance.get(`/categories/get-by-slug/${slug}`);
 
-export const getSubcategoriesByCategoryService = (categoryId) => axiosInstance.get(`/subcategories/get-by-category/${categoryId}`);
+export const getSubcategoriesByCategoryService = (slug) => axiosInstance.get(`/subcategories/get-by-category/${slug}`);
 
-export const getSubSubcategoriesBySubcategoryService = (subcategoryId) => axiosInstance.get(`/subsubcategories/get-by-subcategory/${subcategoryId}`);
+export const getSubSubcategoriesBySubcategoryService = (slug) => axiosInstance.get(`/subsubcategories/get-by-subcategory/${slug}`);
 
 export const addCategoryService = (categoryData) => axiosInstance.post('/categories/create', categoryData);
 

@@ -1,17 +1,17 @@
 import React, { useState } from 'react';
 import { toast } from 'react-toastify';
-import { BrownButton, BrownOutlinedTextField, CustomBox, CustomModal, CustomTypography, handleApiError, ImageUploadBox, LoadingLabel } from '../../../assets/CustomComponents';
+import { BrownButton, CustomBox, CustomModal, CustomTextField, CustomTypography, handleApiError, ImageUploadBox, LoadingLabel } from '../../../assets/CustomComponents';
 import { addCategoryService } from '../../../services/categoryService';
+import { CategoryValidations } from '../../../utils/validations/category';
 
 const AddCategoryModal = ({ open, onClose, onAddSuccess }) => {
     const [name, setName] = useState('');
-    const [isValidName, setIsValidName] = useState(true);
     const [image, setImage] = useState(null);
     const [loading, setLoading] = useState(false);
 
-    const validateName = (v) => /^[A-ZÇ][\sa-zA-ZëËçÇ\W]{3,28}$/.test(v);
+    const validateName = (v) => CategoryValidations.nameRules.pattern.test(v);
 
-    const isValidForm = isValidName && image;
+    const isFormValid = validateName(name) && image;
 
     const handleAddCategory = async () => {
         setLoading(true);
@@ -46,17 +46,12 @@ const AddCategoryModal = ({ open, onClose, onAddSuccess }) => {
             <CustomBox>
                 <CustomTypography variant="h5">Add Category</CustomTypography>
 
-                <BrownOutlinedTextField
+                <CustomTextField
                     label="Name"
                     value={name}
-                    onChange={(e) => {
-                        setName(e.target.value)
-                        setIsValidName(validateName(e.target.value));
-                    }}
-                    error={!isValidName}
-                    helperText={!isValidName ? 'Name must start with a capital letter and be 3-28 characters long' : ''}
-                    fullWidth
-                    className='!mb-4'
+                    setValue={setName}
+                    validate={validateName}
+                    validationRule={CategoryValidations.nameRules}
                 />
 
                 <ImageUploadBox onFileSelect={handleFileSelect} />
@@ -65,7 +60,7 @@ const AddCategoryModal = ({ open, onClose, onAddSuccess }) => {
                     onClick={handleAddCategory}
                     variant="contained"
                     color="primary"
-                    disabled={!isValidForm || loading}
+                    disabled={!isFormValid || loading}
                     className="w-full"
                 >
                     <LoadingLabel loading={loading} />

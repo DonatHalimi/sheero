@@ -12,6 +12,7 @@ import Navbar from '../../components/Navbar/Navbar';
 import Footer from '../../components/Utils/Footer';
 import { disable2faService, enable2faService } from '../../services/authService';
 import { loadUser, updateUserProfile } from '../../store/actions/authActions';
+import { UserValidations } from '../../utils/validations/user';
 
 const ProfileDetails = () => {
     const { user, loading } = useSelector(state => state.auth);
@@ -72,30 +73,23 @@ const ProfileDetails = () => {
     };
 
     const disableTwoFactor = async () => {
-        console.log('Disabling 2FA');
         setIs2faLoading(true);
 
         try {
             const response = await disable2faService();
-            console.log('Disable 2FA response:', response);
 
             if (response.data.disableOtpPending) {
                 toast.success(response.data.message);
-                console.log('Redirecting to OTP verification page');
-                console.log('Navigation State:', { email: user.email, action: 'disable' }); // Debugging
                 navigate('/verify-otp', { state: { email: user.email, action: 'disable' } });
             } else if (response.data.success) {
                 toast.success('Two-factor authentication disabled successfully.');
-                console.log('2FA disabled successfully');
                 setIs2faOn(false);
                 dispatch(loadUser());
             }
         } catch (error) {
-            console.error('Error disabling 2FA:', error);
             toast.error(error.response?.data?.message || 'Failed to disable 2FA');
         } finally {
             setIs2faLoading(false);
-            console.log('2FA state:', is2faOn ? 'enabled' : 'disabled');
         }
     };
 
@@ -103,13 +97,10 @@ const ProfileDetails = () => {
     const handleClickShowNewPassword = () => setShowNewPassword(!showNewPassword);
     const handleMouseDownPassword = (event) => event.preventDefault();
 
-    const validateFirstName = (name) => /^[A-Z][a-zA-Z]{1,9}$/.test(name);
-    const validateLastName = (name) => /^[A-Z][a-zA-Z]{1,9}$/.test(name);
-    const validatePassword = (v) => /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[@$!%*?&\(\)_\+\-.])[A-Za-z\d@$!%*?&\(\)_\+\-.]{8,}$/.test(v);
-    const validateEmail = (email) => {
-        const regex = new RegExp(`^[a-zA-Z0-9._%+-]+@(${knownEmailProviders.join('|')})$`, 'i');
-        return regex.test(email);
-    };
+    const validateFirstName = (v) => UserValidations.firstNameRules.pattern.test(v);
+    const validateLastName = (v) => UserValidations.lastNameRules.pattern.test(v);
+    const validateEmail = (v) => UserValidations.emailRules.pattern.test(v);
+    const validatePassword = (v) => UserValidations.passwordRules.pattern.test(v);
 
     const handleFirstNameChange = (e) => {
         const value = e.target.value;
@@ -206,7 +197,7 @@ const ProfileDetails = () => {
                 : '';
 
     const title = isDisabled
-        ? `Profile details cannot be changed because you've logged in using ${provider}.`
+        ? `Profile details cannot be changed because you've logged in using ${provider}`
         : '';
 
     const isSubmitDisabled = isFormUnchanged || !isFormValid || isSubmitting;
@@ -223,12 +214,7 @@ const ProfileDetails = () => {
                 />
 
                 <Tooltip title={title} placement="top" arrow>
-                    <Box
-                        sx={{
-                            p: { xs: 3, md: 3 },
-                        }}
-                        className="bg-white rounded-md shadow-sm mb-4"
-                    >
+                    <Box sx={{ p: { xs: 3, md: 3 }, }} className="bg-white rounded-md shadow-sm mb-4">
                         {loading ? (
                             <LoadingDetails />
                         ) : (
@@ -250,8 +236,8 @@ const ProfileDetails = () => {
                                         />
                                         {focusedField === 'firstName' && !firstNameValid && (
                                             <div className="absolute left-0 bottom-[-78px] bg-white text-red-500 text-sm p-2 rounded-lg shadow-md w-full z-10">
-                                                <span className="block text-xs font-semibold mb-1">Invalid First Name</span>
-                                                Must start with a capital letter and be 2 to 10 characters long.
+                                                <span className="block text-xs font-semibold mb-1">{UserValidations.firstNameRules.title}</span>
+                                                {UserValidations.firstNameRules.message}
                                                 <div className="absolute top-[-5px] left-[20px] w-0 h-0 border-l-[5px] border-r-[5px] border-b-[5px] border-transparent border-b-white"></div>
                                             </div>
                                         )}
@@ -273,8 +259,8 @@ const ProfileDetails = () => {
                                         />
                                         {focusedField === 'lastName' && !lastNameValid && (
                                             <div className="absolute left-0 bottom-[-78px] bg-white text-red-500 text-sm p-2 rounded-lg shadow-md w-full z-10">
-                                                <span className="block text-xs font-semibold mb-1">Invalid Last Name</span>
-                                                Must start with a capital letter and be 2 to 10 characters long.
+                                                <span className="block text-xs font-semibold mb-1">{UserValidations.lastNameRules.title}</span>
+                                                {UserValidations.lastNameRules.message}
                                                 <div className="absolute top-[-5px] left-[20px] w-0 h-0 border-l-[5px] border-r-[5px] border-b-[5px] border-transparent border-b-white"></div>
                                             </div>
                                         )}
@@ -297,8 +283,8 @@ const ProfileDetails = () => {
                                         />
                                         {focusedField === 'email' && !emailValid && (
                                             <div className="absolute left-0 bottom-[-58px] bg-white text-red-500 text-sm p-2 rounded-lg shadow-md w-full z-10">
-                                                <span className="block text-xs font-semibold mb-1">Invalid Email</span>
-                                                Please provide a valid email address.
+                                                <span className="block text-xs font-semibold mb-1">{UserValidations.emailRules.title}</span>
+                                                {UserValidations.emailRules.message}
                                                 <div className="absolute top-[-5px] left-[20px] w-0 h-0 border-l-[5px] border-r-[5px] border-b-[5px] border-transparent border-b-white"></div>
                                             </div>
                                         )}
@@ -339,9 +325,9 @@ const ProfileDetails = () => {
                                             disabled={isDisabled}
                                         />
                                         {focusedField === 'password' && !passwordValid && (
-                                            <div className="absolute left-0 bottom-[-70px] bg-white text-red-500 text-sm p-2 rounded-lg shadow-md w-full z-10">
-                                                <span className="block text-xs font-semibold mb-1">Invalid Password</span>
-                                                Must be 8 characters long with uppercase, lowercase, number, and special character.
+                                            <div className="absolute left-0 bottom-[-90px] bg-white text-red-500 text-sm p-2 rounded-lg shadow-md w-full z-10">
+                                                <span className="block text-xs font-semibold mb-1">{UserValidations.passwordRules.title}</span>
+                                                {UserValidations.passwordRules.message}
                                                 <div className="absolute top-[-5px] left-[20px] w-0 h-0 border-l-[5px] border-r-[5px] border-b-[5px] border-transparent border-b-white"></div>
                                             </div>
                                         )}
@@ -378,9 +364,9 @@ const ProfileDetails = () => {
                                             disabled={isDisabled}
                                         />
                                         {focusedField === 'newPassword' && !newPasswordValid && (
-                                            <div className="absolute left-0 bottom-[-70px] bg-white text-red-500 text-sm p-2 rounded-lg shadow-md w-full z-10">
-                                                <span className="block text-xs font-semibold mb-1">Invalid New Password</span>
-                                                Must be 8 characters long with uppercase, lowercase, number, and special character.
+                                            <div className="absolute left-0 bottom-[-90px] bg-white text-red-500 text-sm p-2 rounded-lg shadow-md w-full z-10">
+                                                <span className="block text-xs font-semibold mb-1">{UserValidations.newPasswordRules.title}</span>
+                                                {UserValidations.newPasswordRules.message}
                                                 <div className="absolute top-[-5px] left-[20px] w-0 h-0 border-l-[5px] border-r-[5px] border-b-[5px] border-transparent border-b-white"></div>
                                             </div>
                                         )}
@@ -401,19 +387,14 @@ const ProfileDetails = () => {
                     </Box>
                 </Tooltip>
 
-                <Box
-                    sx={{
-                        p: { xs: 3, md: 3 }
-                    }}
-                    className="bg-white rounded-md shadow-sm mb-5 !p-5"
-                >
+                <Box sx={{ p: { xs: 3, md: 3 } }} className="bg-white rounded-md shadow-sm mb-5 !p-5">
                     {loading ? (
                         <LoadingDetails />
                     ) : (
                         <>
                             <div className="flex items-center justify-between">
                                 <div className="flex items-center space-x-2">
-                                    <h2 className="text-base">Two-Factor Authentication</h2>
+                                    <h2 className="text-base">{UserValidations.twoFactorRules.title}</h2>
                                     <p className={`text-sm bg-stone-50 rounded-md px-2 ${is2faOn ? 'text-green-500' : 'text-red-500'}`}>
                                         {is2faOn ? 'Enabled' : 'Disabled'}
                                     </p>
@@ -425,7 +406,7 @@ const ProfileDetails = () => {
                                 />
                             </div>
                             <p className="mt-2 text-sm text-gray-600">
-                                You'll need to verify an OTP code sent to your email each login for added security.
+                                {UserValidations.twoFactorRules.message}
                             </p>
                         </>
                     )}

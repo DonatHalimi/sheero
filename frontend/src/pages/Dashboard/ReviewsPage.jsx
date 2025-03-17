@@ -17,7 +17,8 @@ const ReviewsPage = () => {
     const [selectedReviews, setSelectedReviews] = useState([]);
     const [addReviewOpen, setAddReviewOpen] = useState(false);
     const [editReviewOpen, setEditReviewOpen] = useState(false);
-    const [deleteReviewOpen, setDeleteReviewOpen] = useState(false);
+    const [deleteModalOpen, setDeleteModalOpen] = useState(false);
+    const [deletionContext, setDeletionContext] = useState(null);
     const [currentPage, setCurrentPage] = useState(0);
     const [viewDetailsOpen, setViewDetailsOpen] = useState(false);
 
@@ -40,18 +41,8 @@ const ReviewsPage = () => {
         };
     }, [reviews]);
 
-    const handleSelectReview = (reviewId) => {
-        const id = Array.isArray(reviewId) ? reviewId[0] : reviewId;
-
-        setSelectedReviews((prevSelected) =>
-            prevSelected.includes(id)
-                ? prevSelected.filter((selectedId) => selectedId !== id)
-                : [...prevSelected, id]
-        );
-    };
-
-    const handleSelectAll = (e) => {
-        setSelectedReviews(e.target.checked ? reviews.map(review => review._id) : []);
+    const handleSelectReview = (newSelection) => {
+        setSelectedReviews(newSelection);
     };
 
     const handlePageClick = (event) => {
@@ -69,12 +60,6 @@ const ReviewsPage = () => {
         setEditReviewOpen(true);
     };
 
-    const getSelectedReviews = () => {
-        return selectedReviews
-            .map((id) => reviews.find((review) => review._id === id))
-            .filter((review) => review);
-    };
-
     const handleDeleteSuccess = () => {
         dispatch(getReviews());
         setSelectedReviews([]);
@@ -90,12 +75,26 @@ const ReviewsPage = () => {
         setSelectedReview(null);
     };
 
+    const handleBulkDelete = () => {
+        if (selectedReviews.length > 0) {
+            setDeletionContext({
+                endpoint: '/reviews/delete-bulk',
+                data: { ids: selectedReviews },
+            });
+            setDeleteModalOpen(true);
+        }
+    };
+
+    const handleSingleDelete = (review) => {
+        setDeletionContext({
+            endpoint: `/reviews/delete/${review._id}`,
+            data: null,
+        });
+        setDeleteModalOpen(true);
+    };
+
     const columns = [
-        {
-            key: 'user',
-            label: 'User',
-            render: (review) => `${review.user.firstName} ${review.user.lastName} - ${review.user.email}`
-        },
+        { key: 'user', label: 'User', render: (review) => `${review.user.firstName} ${review.user.lastName} - ${review.user.email}` },
         { key: 'product.name', label: 'Product' },
         { key: 'title', label: 'Title' },
         {
@@ -107,11 +106,7 @@ const ReviewsPage = () => {
                 </div>
             )
         },
-        {
-            key: 'comment',
-            label: 'Comment',
-            render: (review) => review.comment ? review.comment : 'N/A'
-        },
+        { key: 'comment', label: 'Comment', render: (review) => review.comment ? review.comment : 'N/A' },
         { key: 'actions', label: 'Actions' }
     ];
 
@@ -136,7 +131,7 @@ const ReviewsPage = () => {
                             title="Reviews"
                             selectedItems={selectedReviews}
                             setAddItemOpen={setAddReviewOpen}
-                            setDeleteItemOpen={setDeleteReviewOpen}
+                            setDeleteItemOpen={handleBulkDelete}
                             itemName="Review"
                             exportOptions={exportOptions(reviews, handleExport)}
                         />
@@ -146,12 +141,12 @@ const ReviewsPage = () => {
                             data={reviews}
                             selectedItems={selectedReviews}
                             onSelectItem={handleSelectReview}
-                            onSelectAll={handleSelectAll}
                             itemsPerPage={itemsPerPage}
                             currentPage={currentPage}
                             onPageChange={handlePageClick}
                             onEdit={handleEdit}
                             onViewDetails={handleViewDetails}
+                            onDelete={handleSingleDelete}
                         />
                     </>
                 )}
@@ -159,14 +154,17 @@ const ReviewsPage = () => {
                 <AddReviewModal open={addReviewOpen} onClose={() => setAddReviewOpen(false)} onAddSuccess={() => dispatch(getReviews())} />
                 <EditReviewModal open={editReviewOpen} onClose={() => setEditReviewOpen(false)} review={selectedReview} onViewDetails={handleViewDetails} onEditSuccess={() => dispatch(getReviews())} />
                 <ReviewDetailsDrawer open={viewDetailsOpen} onClose={closeDrawer} review={selectedReview} onEdit={handleEditFromDrawer} />
+
                 <DeleteModal
-                    open={deleteReviewOpen}
-                    onClose={() => setDeleteReviewOpen(false)}
-                    items={getSelectedReviews()}
+                    open={deleteModalOpen}
+                    onClose={() => setDeleteModalOpen(false)}
+                    deletionContext={deletionContext}
                     onDeleteSuccess={handleDeleteSuccess}
-                    endpoint="/reviews/delete-bulk"
-                    title="Delete Reviews"
-                    message="Are you sure you want to delete the selected reviews?"
+                    title={deletionContext?.endpoint.includes('bulk') ? 'Delete Reviews' : 'Delete Review'}
+                    message={deletionContext?.endpoint.includes('bulk')
+                        ? 'Are you sure you want to delete the selected reviews?'
+                        : 'Are you sure you want to delete this review?'
+                    }
                 />
             </div>
         </div>

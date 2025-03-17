@@ -3,8 +3,9 @@ import React, { useEffect, useState } from 'react';
 import { useSelector } from 'react-redux';
 import { useNavigate } from 'react-router-dom';
 import { toast } from 'react-toastify';
-import { BrownButton, BrownOutlinedTextField, CustomBox, CustomModal, CustomTypography, LoadingLabel } from '../../../assets/CustomComponents';
+import { BrownButton, BrownOutlinedTextField, CustomBox, CustomModal, CustomTextField, CustomTypography, LoadingLabel } from '../../../assets/CustomComponents';
 import { addReviewService, checkReviewEligibilityService } from '../../../services/reviewService';
+import { ReviewValidations } from '../../../utils/validations/review';
 
 const AddReviewModal = ({ open, onClose, product, onReviewSuccess }) => {
     const { isAuthenticated } = useSelector((state) => state.auth);
@@ -18,8 +19,8 @@ const AddReviewModal = ({ open, onClose, product, onReviewSuccess }) => {
     const [focusedField, setFocusedField] = useState(null);
     const [loading, setLoading] = useState(false);
 
-    const validateTitle = (v) => /^[A-Z][\Wa-zA-Z\s]{2,40}$/.test(v);
-    const validateComment = (v) => /^[A-Z][\Wa-zA-Z\s]{3,500}$/.test(v);
+    const validateTitle = (v) => ReviewValidations.titleRules.pattern.test(v);
+    const validateComment = (v) => ReviewValidations.commentRules.pattern.test(v);
 
     const navigate = useNavigate();
 
@@ -70,11 +71,6 @@ const AddReviewModal = ({ open, onClose, product, onReviewSuccess }) => {
             return;
         }
 
-        if (title.length > 60) {
-            toast.error('Title cannot exceed 60 characters');
-            return;
-        }
-
         if (!title || rating === null || !comment) {
             toast.error('Please fill in all the fields');
             return;
@@ -108,7 +104,7 @@ const AddReviewModal = ({ open, onClose, product, onReviewSuccess }) => {
         }
     };
 
-    const isDisabled = !title || !rating || !comment || !titleValid || !commentValid;
+    const isDisabled = !title || !rating || !comment || !validateTitle(title) || !validateComment(comment);
 
     return (
         <CustomModal open={open} onClose={onClose}>
@@ -136,7 +132,7 @@ const AddReviewModal = ({ open, onClose, product, onReviewSuccess }) => {
                     className="!mb-4"
                 />
 
-                <TextField
+                {/* <TextField
                     label="Title"
                     value={title}
                     onChange={handleTitleChange}
@@ -151,7 +147,15 @@ const AddReviewModal = ({ open, onClose, product, onReviewSuccess }) => {
                         Must start with a capital letter and be 2 to 40 characters long.
                         <div className="absolute top-[-5px] left-[20px] w-0 h-0 border-l-[5px] border-r-[5px] border-b-[5px] border-transparent border-b-white"></div>
                     </div>
-                )}
+                )} */}
+
+                <CustomTextField
+                    label="Title"
+                    value={title}
+                    setValue={setTitle}
+                    validate={validateTitle}
+                    validationRule={ReviewValidations.titleRules}
+                />
 
                 <Rating
                     name="product-rating"
@@ -169,24 +173,15 @@ const AddReviewModal = ({ open, onClose, product, onReviewSuccess }) => {
                     className="mb-6"
                 />
 
-                <BrownOutlinedTextField
+                <CustomTextField
                     label="Comment"
                     value={comment}
-                    onChange={handleCommentChange}
-                    onFocus={() => setFocusedField('comment')}
-                    onBlur={() => setFocusedField(null)}
-                    fullWidth
+                    setValue={setComment}
+                    validate={validateComment}
+                    validationRule={ReviewValidations.commentRules}
                     multiline
                     rows={4}
-                    className="!mb-4"
                 />
-                {focusedField === 'comment' && !commentValid && (
-                    <div className="absolute left-4 right-4 bottom-[13px] bg-white text-red-500 text-sm p-2 rounded-lg shadow-md z-10">
-                        <span className="block text-xs font-semibold mb-1">Invalid Comment</span>
-                        Must start with a capital letter and be 3 to 500 characters long.
-                        <div className="absolute top-[-5px] left-[20px] w-0 h-0 border-l-[5px] border-r-[5px] border-b-[5px] border-transparent border-b-white"></div>
-                    </div>
-                )}
 
                 <BrownButton
                     onClick={handleAddReview}

@@ -1,6 +1,7 @@
 import { jsPDF } from "jspdf";
 import "jspdf-autotable";
 import * as XLSX from 'xlsx';
+import { getImageUrl } from "../utils/config";
 
 const createDownloadLink = (data, fileName) => {
     const link = document.createElement('a');
@@ -18,6 +19,28 @@ export const generateOrderPDF = async (order) => {
     if (!order) return;
 
     const doc = new jsPDF();
+
+    const loadImage = (url) => {
+        return new Promise((resolve) => {
+            const img = new Image();
+            img.src = getImageUrl(url);
+            img.onload = () => resolve(img);
+            img.onerror = () => resolve(null);
+        });
+    };
+
+    const productImages = await Promise.all(
+        order.products.map(async (item) => {
+            const img = await loadImage(item.product.image);
+            return {
+                img,
+                width: 10,
+                height: 10,
+                x: 0,
+                y: 0
+            };
+        })
+    );
 
     const pagePadding = 10;
     const lineSpacing = 7;
@@ -95,12 +118,19 @@ export const generateOrderPDF = async (order) => {
     }
 
     doc.autoTable({
-        head: [['Product', 'Quantity', 'Price', 'Subtotal']],
-        body: order.products.map(({ product, quantity, price, discount = 0 }) => [
-            product.name,
+        head: [['Image', 'Product', 'Quantity', 'Price', 'Subtotal']],
+        body: order.products.map(({ product, quantity, price, discount = 0 }, index) => [
+            {
+                content: productImages[index]?.img ? '' : 'No Image',
+                styles: { minCellHeight: 20 }
+            },
+            {
+                content: product.name,
+                styles: { minCellHeight: 20 }
+            },
             quantity,
-            `€${price.toFixed(2)}`,
-            `€${(quantity * price - discount).toFixed(2)}`
+            `€ ${price.toFixed(2)}`,
+            `€ ${(quantity * price - discount).toFixed(2)}`
         ]),
         startY: tableStartY,
         theme: 'grid',
@@ -113,7 +143,22 @@ export const generateOrderPDF = async (order) => {
             fontSize: 9,
             cellPadding: 3,
         },
-        margin: { left: pagePadding, right: pagePadding }
+        margin: { left: pagePadding, right: pagePadding },
+        didDrawCell: (data) => {
+            if (data.column.index === 0 && data.cell.section === 'body') {
+                const imgData = productImages[data.row.index];
+                if (imgData?.img) {
+                    doc.addImage(
+                        imgData.img,
+                        'JPEG',
+                        data.cell.x + 5,
+                        data.cell.y + 5,
+                        imgData.width,
+                        imgData.height
+                    );
+                }
+            }
+        }
     });
 
     // Totals
@@ -123,17 +168,17 @@ export const generateOrderPDF = async (order) => {
 
     doc.text("Subtotal:", totalsLabelX, finalY);
     const subtotal = order.products.reduce((total, { price, quantity }) => total + price * quantity, 0);
-    doc.text(`€${subtotal.toFixed(2)}`, totalsValueX, finalY);
+    doc.text(`€ ${subtotal.toFixed(2)}`, totalsValueX, finalY);
 
     doc.text("Transport:", totalsLabelX, finalY + lineSpacing);
-    doc.text(`€${order.shipping?.toFixed(2) || '2.00'}`, totalsValueX, finalY + lineSpacing);
+    doc.text(`€ ${order.shipping?.toFixed(2) || '2.00'}`, totalsValueX, finalY + lineSpacing);
 
     // Totals Divider Line
     doc.setDrawColor(224, 224, 224);
     doc.line(pagePadding + 120, finalY + lineSpacing * 2, pageWidth - pagePadding, finalY + lineSpacing * 2);
 
     doc.text("Total:", totalsLabelX, finalY + lineSpacing * 3);
-    doc.text(`€${order.totalAmount?.toFixed(2) || '0.00'}`, totalsValueX, finalY + lineSpacing * 3);
+    doc.text(`€ ${order.totalAmount?.toFixed(2) || '0.00'}`, totalsValueX, finalY + lineSpacing * 3);
 
     // Save PDF
     doc.save(`order_${order._id}.pdf`);

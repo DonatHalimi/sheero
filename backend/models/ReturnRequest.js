@@ -23,7 +23,8 @@ const returnRequestSchema = new mongoose.Schema({
     reason: { type: String, enum: reasons, required: true },
     customReason: { type: String, required: function () { return this.reason === 'Other'; } },
     status: { type: String, enum: ['pending', 'approved', 'processed', 'rejected'], default: 'pending' },
-    createdAt: { type: Date, default: Date.now }
+    createdAt: { type: Date, default: Date.now },
+    updatedBy: { type: mongoose.Schema.Types.ObjectId, ref: 'User' }
 });
 
 // Pre-save hook to ensure unique custom ID

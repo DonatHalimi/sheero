@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
-import { DashboardHeader, exportOptions, formatDate, LoadingDataGrid, RenderReturnStatus } from '../../assets/CustomComponents';
+import { DashboardHeader, exportOptions, LoadingDataGrid, RenderReturnStatus } from '../../assets/CustomComponents';
 import { exportToExcel, exportToJSON } from '../../assets/DataExport';
 import DashboardTable from '../../components/Dashboard/DashboardTable';
 import DeleteModal from '../../components/Modal/DeleteModal';
@@ -17,7 +17,8 @@ const ReturnsPage = () => {
     const [selectedReturnRequests, setSelectedReturnRequests] = useState([]);
     const [addReturnRequestOpen, setAddReturnRequestOpen] = useState(false);
     const [editReturnRequestOpen, setEditReturnRequestOpen] = useState(false);
-    const [deleteReturnRequestOpen, setDeleteReturnRequestOpen] = useState(false);
+    const [deleteModalOpen, setDeleteModalOpen] = useState(false);
+    const [deletionContext, setDeletionContext] = useState(null);
     const [currentPage, setCurrentPage] = useState(0);
     const [viewDetailsOpen, setViewDetailsOpen] = useState(false);
 
@@ -27,21 +28,8 @@ const ReturnsPage = () => {
         dispatch(getReturnRequests());
     }, [dispatch]);
 
-    const handleSelectReturnRequest = (requestId) => {
-        const id = Array.isArray(requestId) ? requestId[0] : requestId;
-        setSelectedReturnRequests((prevSelected) =>
-            prevSelected.includes(id)
-                ? prevSelected.filter((selectedId) => selectedId !== id)
-                : [...prevSelected, id]
-        );
-    };
-
-    const handleSelectAll = (e) => {
-        if (e.target.checked) {
-            setSelectedReturnRequests(returnRequests.map(request => request._id));
-        } else {
-            setSelectedReturnRequests([]);
-        }
+    const handleSelectReturnRequest = (newSelection) => {
+        setSelectedReturnRequests(newSelection);
     };
 
     const handlePageClick = (event) => {
@@ -59,12 +47,6 @@ const ReturnsPage = () => {
         setEditReturnRequestOpen(true);
     };
 
-    const getSelectedReturnRequests = () => {
-        return selectedReturnRequests
-            .map((id) => returnRequests.find((returnRequest) => returnRequest._id === id))
-            .filter((returnRequest) => returnRequest);
-    };
-
     const handleDeleteSuccess = () => {
         dispatch(getReturnRequests());
         setSelectedReturnRequests([]);
@@ -78,6 +60,24 @@ const ReturnsPage = () => {
     const closeDrawer = () => {
         setViewDetailsOpen(false);
         setSelectedReturnRequest(null);
+    };
+
+    const handleBulkDelete = () => {
+        if (selectedReturnRequests.length > 0) {
+            setDeletionContext({
+                endpoint: '/returns/delete-bulk',
+                data: { ids: selectedReturnRequests },
+            });
+            setDeleteModalOpen(true);
+        }
+    };
+
+    const handleSingleDelete = (returnRequest) => {
+        setDeletionContext({
+            endpoint: `/returns/delete/${returnRequest._id}`,
+            data: null,
+        });
+        setDeleteModalOpen(true);
     };
 
     const columns = [
@@ -121,7 +121,7 @@ const ReturnsPage = () => {
                             title="Return Requests"
                             selectedItems={selectedReturnRequests}
                             setAddItemOpen={setAddReturnRequestOpen}
-                            setDeleteItemOpen={setDeleteReturnRequestOpen}
+                            setDeleteItemOpen={handleBulkDelete}
                             itemName="Return Request"
                             exportOptions={exportOptions(returnRequests, handleExport)}
                         />
@@ -134,12 +134,12 @@ const ReturnsPage = () => {
                             }))}
                             selectedItems={selectedReturnRequests}
                             onSelectItem={handleSelectReturnRequest}
-                            onSelectAll={handleSelectAll}
                             itemsPerPage={itemsPerPage}
                             currentPage={currentPage}
                             onPageChange={handlePageClick}
                             onEdit={handleEdit}
                             onViewDetails={handleViewDetails}
+                            onDelete={handleSingleDelete}
                         />
                     </>
                 )}
@@ -147,14 +147,18 @@ const ReturnsPage = () => {
                 <AddReturnRequestModal open={addReturnRequestOpen} onClose={() => setAddReturnRequestOpen(false)} onAddSuccess={() => dispatch(getReturnRequests())} />
                 <EditReturnRequestModal open={editReturnRequestOpen} onClose={() => setEditReturnRequestOpen(false)} returnRequest={selectedReturnRequest} onViewDetails={handleViewDetails} onEditSuccess={() => dispatch(getReturnRequests())} />
                 <ReturnDetailsDrawer open={viewDetailsOpen} onClose={closeDrawer} returnRequest={selectedReturnRequest} onEdit={handleEditFromDrawer} />
+
                 <DeleteModal
-                    open={deleteReturnRequestOpen}
-                    onClose={() => setDeleteReturnRequestOpen(false)}
-                    items={getSelectedReturnRequests()}
+                    open={deleteModalOpen}
+                    onClose={() => setDeleteModalOpen(false)}
+                    deletionContext={deletionContext}
                     onDeleteSuccess={handleDeleteSuccess}
-                    endpoint="/returns/delete-bulk"
-                    title="Delete Return Requests"
-                    message="Are you sure you want to delete the selected return requests?"
+                    title={deletionContext?.endpoint.includes('bulk') ? 'Delete Return Requests' : 'Delete Return Request'}
+                    message={
+                        deletionContext?.endpoint.includes('bulk')
+                            ? 'Are you sure you want to delete the selected return requests?'
+                            : 'Are you sure you want to delete this return request?'
+                    }
                 />
             </div>
         </div>

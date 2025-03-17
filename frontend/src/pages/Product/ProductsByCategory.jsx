@@ -4,13 +4,13 @@ import { calculatePageCount, CustomPagination, FilterLayout, filterProductsByPri
 import noProducts from '../../assets/img/products/no-products.png';
 import Navbar from '../../components/Navbar/Navbar';
 import Footer from '../../components/Utils/Footer';
-import { getCategoryByIdService, getSubcategoriesByCategoryService } from '../../services/categoryService';
+import { getCategoryBySlugService, getSubcategoriesByCategoryService } from '../../services/categoryService';
 import { getProductsByCategoryService } from '../../services/productService';
 
 const itemsPerPage = 40;
 
 const ProductsByCategory = () => {
-    const { id } = useParams();
+    const { slug } = useParams();
 
     const [products, setProducts] = useState([]);
     const [subcategories, setSubcategories] = useState([]);
@@ -24,12 +24,12 @@ const ProductsByCategory = () => {
 
     const navigate = useNavigate();
 
-    const fetchSubcategories = async (categoryId) => {
+    const fetchSubcategories = async (categorySlug) => {
         setLoadingSubcategories(true);
-        if (!subcategories[categoryId]) {
+        if (!subcategories[categorySlug]) {
             try {
-                const { data } = await getSubcategoriesByCategoryService(categoryId);
-                setSubcategories(prev => ({ ...prev, [categoryId]: data }));
+                const { data } = await getSubcategoriesByCategoryService(categorySlug);
+                setSubcategories((prev) => ({ ...prev, [categorySlug]: data }));
             } catch (error) {
                 console.error('Error fetching subcategories:', error);
             } finally {
@@ -44,12 +44,12 @@ const ProductsByCategory = () => {
         const fetchProductsAndCategory = async () => {
             setLoading(true);
             try {
-                const categoryResponse = await getCategoryByIdService(id);
+                const categoryResponse = await getCategoryBySlugService(slug);
                 setCategoryName(categoryResponse.data.name);
 
-                await fetchSubcategories(id);
+                await fetchSubcategories(slug);
 
-                const productsResponse = await getProductsByCategoryService(id);
+                const productsResponse = await getProductsByCategoryService(categoryResponse.data._id);
                 setProducts(productsResponse.data.products);
                 setFilteredProducts(productsResponse.data.products);
                 setCurrentPage(1);
@@ -61,7 +61,7 @@ const ProductsByCategory = () => {
         };
 
         fetchProductsAndCategory();
-    }, [id]);
+    }, [slug]);
 
     const handleApplyPriceFilter = (range) => {
         setPriceFilter(range);
@@ -84,11 +84,11 @@ const ProductsByCategory = () => {
     const pageCount = calculatePageCount(filteredProducts, itemsPerPage);
     const currentPageItems = getPaginatedItems(filteredProducts, currentPage, itemsPerPage);
 
-    const handleSubcategoryClick = (subcategoryId) => {
-        navigate(`/subcategory/${subcategoryId}`);
+    const handleSubcategoryClick = (subcategorySlug) => {
+        navigate(`/subcategory/${subcategorySlug}`);
     };
 
-    const breadcrumbData = { name: categoryName, _id: id }
+    const breadcrumbData = { name: categoryName, slug: slug };
 
     return (
         <>
@@ -104,7 +104,7 @@ const ProductsByCategory = () => {
                 <div className="mb-16 bg-gray-50">
                     <SplideList
                         items={subcategories}
-                        id={id}
+                        id={slug}
                         loading={loadingSubcategories}
                         onCardClick={handleSubcategoryClick}
                         showImage={true}

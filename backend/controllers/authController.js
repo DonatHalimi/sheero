@@ -8,7 +8,20 @@ const { JWT_SECRET } = require('../config/dotenv');
 const { sendVerificationEmail, sendResetPasswordEmail, sendPasswordResetSuccessEmail, sendEnable2FAEmail, sendDisable2FAEmail, sendLogin2FAEmail } = require('../config/emailService');
 const MemoryStore = require('../models/MemoryStore');
 
-const generateOTP = () => Math.floor(100000 + Math.random() * 900000).toString();
+const shuffleOTP = (str) => str.split('').sort(() => Math.random() - 0.5).join('');
+
+const generateOTP = () => {
+    const numbers = '0123456789';
+    const letters = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ';
+    let otp = '';
+
+    for (let i = 0; i < 3; i++) {
+        otp += letters[Math.floor(Math.random() * letters.length)];
+        otp += numbers[Math.floor(Math.random() * numbers.length)];
+    }
+
+    return shuffleOTP(otp);
+};
 
 const generateAccessToken = (user) => {
     return jwt.sign({

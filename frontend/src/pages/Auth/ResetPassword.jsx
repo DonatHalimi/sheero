@@ -5,6 +5,7 @@ import { useNavigate, useParams } from 'react-router-dom';
 import { toast } from 'react-toastify';
 import { BrownButton, BrownOutlinedTextField, LoadingLabel, LoadingOverlay } from '../../assets/CustomComponents';
 import { resetPasswordService, validateResetTokenService } from '../../services/authService';
+import { UserValidations } from '../../utils/validations/user';
 
 const ResetPassword = () => {
     const { token } = useParams();
@@ -50,7 +51,7 @@ const ResetPassword = () => {
         validateToken();
     }, [token, navigate]);
 
-    const validatePassword = (v) => /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[@$!%*?&\(\)_\+\-.])[A-Za-z\d@$!%*?&\(\)_\+\-.]{8,}$/.test(v);
+    const validatePassword = (v) => UserValidations.passwordRules.pattern.test(v);
 
     const handleClickShowPassword = () => setShowPassword(!showPassword);
     const handleClickShowConfirmPassword = () => setShowConfirmPassword(!showConfirmPassword);
@@ -153,8 +154,8 @@ const ResetPassword = () => {
                         />
                         {(!passwordValid && password && errorVisible) && (
                             <div className="absolute top-[74px] bg-white text-red-500 text-sm p-2 rounded-lg shadow-md w-full z-10">
-                                <span className="block text-xs font-semibold mb-1">Invalid Password</span>
-                                Must be 8 characters long with uppercase, lowercase, number, and special character.
+                                <span className="block text-xs font-semibold mb-1">{UserValidations.passwordRules.title}</span>
+                                {UserValidations.passwordRules.message}
                                 <div className="absolute top-[-5px] left-[20px] w-0 h-0 border-l-[5px] border-r-[5px] border-b-[5px] border-transparent border-b-white"></div>
                             </div>
                         )}

@@ -1,6 +1,6 @@
 import { Box, Drawer, Typography } from '@mui/material';
 import React from 'react';
-import { CloseButton, EditExportButtons, IdAdornment, ReadOnlyTextField } from '../../../assets/CustomComponents';
+import { CloseButton, EditExportButtons, IdAdornment, PersonAdornment, ReadOnlyTextField } from '../../../assets/CustomComponents';
 import { downloadImageData } from '../../../assets/DataExport';
 import { drawerPaperSx } from '../../../assets/sx';
 import { getImageUrl } from '../../../utils/config';
@@ -50,6 +50,22 @@ const SlideshowDetailsDrawer = ({ open, onClose, image, onEdit }) => {
                                 className='rounded'
                             />
                         </Box>
+
+                        {image.createdBy && (
+                            <ReadOnlyTextField
+                                label="Created By"
+                                value={`${image.createdBy.firstName} ${image.createdBy.lastName} - ${image.createdBy.email}`}
+                                InputProps={PersonAdornment()}
+                            />
+                        )}
+
+                        {image.updatedBy && (
+                            <ReadOnlyTextField
+                                label="Updated By"
+                                value={`${image.updatedBy.firstName} ${image.updatedBy.lastName} - ${image.updatedBy.email}`}
+                                InputProps={PersonAdornment()}
+                            />
+                        )}
 
                         <EditExportButtons
                             onEditClick={handleEditClick}

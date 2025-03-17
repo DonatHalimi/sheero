@@ -32,11 +32,12 @@ const orderSchema = new mongoose.Schema({
         start: { type: Date, default: null },
         end: { type: Date, default: null }
     },
-    createdAt: { type: Date, default: Date.now }
+    createdAt: { type: Date, default: Date.now },
+    updatedBy: { type: mongoose.Schema.Types.ObjectId, ref: 'User' }
 });
 
 // Pre-save hook to set arrival date range
-orderSchema.pre('save', function(next) {
+orderSchema.pre('save', function (next) {
     if (!this.arrivalDateRange.start && !this.arrivalDateRange.end) {
         const startDate = new Date(this.createdAt);
         const endDate = new Date(this.createdAt);
@@ -51,7 +52,7 @@ orderSchema.pre('save', function(next) {
 });
 
 // Pre-save hook to ensure unique custom ID
-orderSchema.pre('save', async function(next) {
+orderSchema.pre('save', async function (next) {
     if (this.isNew) {
         const exists = await this.constructor.findOne({ _id: this._id });
         if (exists) {

@@ -1,6 +1,6 @@
 import { Box, Drawer, Typography } from '@mui/material';
 import React from 'react';
-import { BoxBetween, CloseButton, DateAdornment, EditExportButtons, formatDate, IdAdornment, ReadOnlyTextField } from '../../../assets/CustomComponents';
+import { BoxBetween, CloseButton, DateAdornment, EditExportButtons, formatDate, IdAdornment, PersonAdornment, ReadOnlyTextField } from '../../../assets/CustomComponents';
 import { downloadCategoryData } from '../../../assets/DataExport';
 import { drawerPaperSx } from '../../../assets/sx';
 import { getImageUrl } from '../../../utils/config';
@@ -58,6 +58,22 @@ const CategoryDetailsDrawer = ({ open, onClose, category, onEdit }) => {
                                 InputProps={DateAdornment()}
                             />
                         </BoxBetween>
+
+                        {category.createdBy && (
+                            <ReadOnlyTextField
+                                label="Created By"
+                                value={`${category.createdBy.firstName} ${category.createdBy.lastName} - ${category.createdBy.email}`}
+                                InputProps={PersonAdornment()}
+                            />
+                        )}
+
+                        {category.updatedBy && (
+                            <ReadOnlyTextField
+                                label="Updated By"
+                                value={`${category.updatedBy.firstName} ${category.updatedBy.lastName} - ${category.updatedBy.email}`}
+                                InputProps={PersonAdornment()}
+                            />
+                        )}
 
                         <EditExportButtons
                             onEditClick={handleEditClick}

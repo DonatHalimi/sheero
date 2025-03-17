@@ -1,9 +1,10 @@
-import { Rating, TextField } from '@mui/material';
+import { Rating } from '@mui/material';
 import React, { useEffect, useState } from 'react';
 import { useDispatch } from 'react-redux';
 import { toast } from 'react-toastify';
-import { BrownButton, BrownOutlinedTextField, CustomBox, CustomModal, CustomTypography, LoadingLabel } from '../../../assets/CustomComponents';
+import { BrownButton, CustomBox, CustomModal, CustomTextField, CustomTypography, LoadingLabel, ReadOnlyTextField } from '../../../assets/CustomComponents';
 import { editUserReview, getUserReviews } from '../../../store/actions/reviewActions';
+import { ReviewValidations } from '../../../utils/validations/review';
 
 const EditReviewModal = ({ open, onClose, review, onEditSuccess }) => {
     const [title, setTitle] = useState('');
@@ -11,13 +12,11 @@ const EditReviewModal = ({ open, onClose, review, onEditSuccess }) => {
     const [comment, setComment] = useState('');
     const [loading, setLoading] = useState(false);
 
-    const [titleValid, setTitleValid] = useState(true);
-    const [commentValid, setCommentValid] = useState(true);
     const [focusedField, setFocusedField] = useState(null);
     const dispatch = useDispatch();
 
-    const validateTitle = (v) => /^[A-Z][\Wa-zA-Z\s]{2,40}$/.test(v);
-    const validateComment = (v) => /^[A-Z][\Wa-zA-z\s]{3,500}$/.test(v);
+    const validateTitle = (v) => ReviewValidations.titleRules.pattern.test(v);
+    const validateComment = (v) => ReviewValidations.commentRules.pattern.test(v);
 
     useEffect(() => {
         if (review) {
@@ -26,18 +25,6 @@ const EditReviewModal = ({ open, onClose, review, onEditSuccess }) => {
             setComment(review.comment);
         }
     }, [review]);
-
-    const handleTitleChange = (event) => {
-        const value = event.target.value;
-        setTitle(value);
-        setTitleValid(validateTitle(value));
-    };
-
-    const handleCommentChange = (event) => {
-        const value = event.target.value;
-        setComment(value);
-        setCommentValid(validateComment(value));
-    };
 
     const handleEditReview = async () => {
         setLoading(true);
@@ -71,19 +58,16 @@ const EditReviewModal = ({ open, onClose, review, onEditSuccess }) => {
         }
     };
 
-    const isDisabled = !title || !rating || !comment || !titleValid || !commentValid;
+    const isDisabled = !title || !rating || !comment || !validateTitle(title) || !validateComment(comment);
 
     return (
         <CustomModal open={open} onClose={onClose}>
             <CustomBox>
                 <CustomTypography variant="h5" className="!text-gray-800 !font-semilight">Edit Review</CustomTypography>
 
-                <TextField
+                <ReadOnlyTextField
                     label="Product"
                     value={review?.product?.name || ''}
-                    InputProps={{
-                        readOnly: true,
-                    }}
                     fullWidth
                     multiline
                     rows={3}
@@ -93,22 +77,16 @@ const EditReviewModal = ({ open, onClose, review, onEditSuccess }) => {
                     className="!mb-4"
                 />
 
-                <TextField
+                <CustomTextField
                     label="Title"
                     value={title}
-                    onChange={handleTitleChange}
+                    setValue={setTitle}
+                    validate={validateTitle}
+                    validationRule={ReviewValidations.titleRules}
                     onFocus={() => setFocusedField('title')}
                     onBlur={() => setFocusedField(null)}
-                    fullWidth
                     className="!mb-4"
                 />
-                {focusedField === 'title' && !titleValid && (
-                    <div className="absolute left-4 right-4 bottom-[206px] bg-white text-red-500 text-sm p-2 rounded-lg shadow-md z-10">
-                        <span className="block text-xs font-semibold mb-1">Invalid Title</span>
-                        Must start with a capital letter and be 2 to 40 characters long.
-                        <div className="absolute top-[-5px] left-[20px] w-0 h-0 border-l-[5px] border-r-[5px] border-b-[5px] border-transparent border-b-white"></div>
-                    </div>
-                )}
 
                 <Rating
                     name="product-rating"
@@ -122,24 +100,19 @@ const EditReviewModal = ({ open, onClose, review, onEditSuccess }) => {
                     className="mb-6"
                 />
 
-                <BrownOutlinedTextField
+                <CustomTextField
                     label="Comment"
                     value={comment}
-                    onChange={handleCommentChange}
+                    setValue={setComment}
+                    validate={validateComment}
+                    validationRule={ReviewValidations.commentRules}
                     onFocus={() => setFocusedField('comment')}
                     onBlur={() => setFocusedField(null)}
-                    fullWidth
                     multiline
                     rows={4}
-                    className="!mb-4"
+                    error={!validateComment(comment) && comment !== ''}
+                    helperText={!validateComment(comment) && comment !== '' ? ReviewValidations.commentRules.message : ''}
                 />
-                {focusedField === 'comment' && !commentValid && (
-                    <div className="absolute left-4 right-4 bottom-[13px] bg-white text-red-500 text-sm p-2 rounded-lg shadow-md z-10">
-                        <span className="block text-xs font-semibold mb-1">Invalid Comment</span>
-                        Must start with a capital letter and be 3 to 500 characters long.
-                        <div className="absolute top-[-5px] left-[20px] w-0 h-0 border-l-[5px] border-r-[5px] border-b-[5px] border-transparent border-b-white"></div>
-                    </div>
-                )}
 
                 <BrownButton onClick={handleEditReview} disabled={isDisabled} fullWidth>
                     <LoadingLabel loading={loading} defaultLabel="Save" loadingLabel="Saving" />

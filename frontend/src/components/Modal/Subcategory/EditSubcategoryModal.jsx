@@ -1,28 +1,30 @@
 import { InputLabel, MenuItem, Select } from '@mui/material';
 import React, { useEffect, useState } from 'react';
 import { toast } from 'react-toastify';
-import { ActionButtons, BrownOutlinedTextField, CustomBox, CustomModal, CustomTypography, handleApiError, ImageUploadBox, OutlinedBrownFormControl } from '../../../assets/CustomComponents';
+import { ActionButtons, CustomBox, CustomModal, CustomTextField, CustomTypography, handleApiError, ImageUploadBox, OutlinedBrownFormControl } from '../../../assets/CustomComponents';
 import { getCategoriesService } from '../../../services/categoryService';
 import { editSubcategoryService } from '../../../services/subcategoryService';
 import { getImageUrl } from '../../../utils/config';
+import { SubcategoryValidations } from '../../../utils/validations/subcategory';
 
 const EditSubcategoryModal = ({ open, onClose, subcategory, onViewDetails, onEditSuccess }) => {
     const [name, setName] = useState('');
-    const [isValidName, setIsValidName] = useState(true);
     const [image, setImage] = useState(null);
+    const [hasExistingImage, setHasExistingImage] = useState(false);
     const [category, setCategory] = useState('');
     const [categories, setCategories] = useState([]);
     const [loading, setLoading] = useState(false);
 
-    const validateName = (v) => /^[A-ZÇ][\sa-zA-ZëËçÇ\W]{3,27}$/.test(v);
+    const validateName = (v) => SubcategoryValidations.nameRules.pattern.test(v);
 
-    const isValidForm = name && isValidName && category;
+    const isFormValid = name && validateName(name) && category && (image || hasExistingImage);
 
     useEffect(() => {
         if (subcategory) {
             setName(subcategory.name || '');
             setCategory(subcategory.category?._id || '');
             setImage(null);
+            setHasExistingImage(!!subcategory.image);
         }
     }, [subcategory]);
 
@@ -64,6 +66,7 @@ const EditSubcategoryModal = ({ open, onClose, subcategory, onViewDetails, onEdi
 
     const handleFileSelect = (file) => {
         setImage(file);
+        setHasExistingImage(!!file);
     };
 
     return (
@@ -71,18 +74,14 @@ const EditSubcategoryModal = ({ open, onClose, subcategory, onViewDetails, onEdi
             <CustomBox>
                 <CustomTypography variant="h5">Edit Subcategory</CustomTypography>
 
-                <BrownOutlinedTextField
+                <CustomTextField
                     label="Name"
                     value={name}
-                    fullWidth
-                    onChange={(e) => {
-                        setName(e.target.value)
-                        setIsValidName(validateName(e.target.value));
-                    }}
-                    error={!isValidName}
-                    helperText={!isValidName ? 'Name must start with a capital letter and be 3-27 characters long' : ''}
-                    className="!mb-4"
+                    setValue={setName}
+                    validate={validateName}
+                    validationRule={SubcategoryValidations.nameRules}
                 />
+
                 <OutlinedBrownFormControl fullWidth>
                     <InputLabel>Category</InputLabel>
                     <Select
@@ -110,7 +109,7 @@ const EditSubcategoryModal = ({ open, onClose, subcategory, onViewDetails, onEdi
                         onClose();
                     }}
                     primaryButtonProps={{
-                        disabled: !isValidForm || loading,
+                        disabled: !isFormValid || loading,
                     }}
                     loading={loading}
                 />

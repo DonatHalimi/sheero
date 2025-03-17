@@ -1,7 +1,7 @@
 import { Visibility, VisibilityOff } from '@mui/icons-material';
 import { Box, Container, IconButton, InputAdornment, Typography } from '@mui/material';
 import React, { useState } from 'react';
-import { useDispatch, useSelector } from 'react-redux';
+import { useDispatch } from 'react-redux';
 import { useNavigate } from 'react-router-dom';
 import { toast } from 'react-toastify';
 import { BrownButton, BrownOutlinedTextField, ErrorTooltip, handleFacebookLogin, handleGoogleLogin, knownEmailProviders, LoadingLabel, SocialLoginButtons } from '../../assets/CustomComponents';
@@ -9,10 +9,9 @@ import Navbar from '../../components/Navbar/Navbar';
 import Footer from '../../components/Utils/Footer';
 import { loginUser } from '../../store/actions/authActions';
 import ForgotPassword from './ForgotPassword';
+import { UserValidations } from '../../utils/validations/user';
 
 const Login = () => {
-    const auth = useSelector((state) => state.auth);
-
     const dispatch = useDispatch();
     const navigate = useNavigate();
 
@@ -31,21 +30,22 @@ const Login = () => {
     const handleMouseDownPassword = (event) => event.preventDefault();
 
     const validateField = (name, value) => {
-        const rules = {
-            email: new RegExp(`^[a-zA-Z0-9._%+-]+@(${knownEmailProviders.join('|')})$`, 'i'),
-            password: /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[@$!%*?&\(\)_\+\-.])[A-Za-z\d@$!%*?&\(\)_\+\-.]{8,}$/,
-        };
-        return rules[name]?.test(value);
+        if (name === 'email') {
+            return UserValidations.emailRules.pattern.test(value);
+        } else if (name === 'password') {
+            return UserValidations.passwordRules.pattern.test(value);
+        }
+        return true;
     };
 
     const errorMessages = {
         email: {
-            title: 'Invalid Email',
-            details: 'Please provide a valid email address.'
+            title: UserValidations.emailRules.title,
+            details: UserValidations.emailRules.message
         },
         password: {
-            title: 'Invalid Password',
-            details: 'Must be 8 characters long with uppercase, lowercase, number, and special character.'
+            title: UserValidations.passwordRules.title,
+            details: UserValidations.passwordRules.message
         }
     };
 
