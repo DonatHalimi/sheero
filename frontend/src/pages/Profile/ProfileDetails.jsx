@@ -2,22 +2,19 @@ import { Visibility, VisibilityOff } from '@mui/icons-material';
 import { Box, IconButton, InputAdornment, TextField, Tooltip } from '@mui/material';
 import React, { useEffect, useState } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
-import { useNavigate } from 'react-router-dom';
 import { toast } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
-import { BrownButton, BrownOutlinedTextField, Header, knownEmailProviders, LoadingDetails, LoadingLabel, ProfileLayout, TwoFactorButton } from '../../assets/CustomComponents';
+import { BrownButton, BrownOutlinedTextField, Header, LoadingDetails, LoadingLabel, ProfileLayout, TwoFactorButton, TwoFactorModal } from '../../assets/CustomComponents';
 import { downloadUserData } from '../../assets/DataExport';
 import { profileBoxSx } from '../../assets/sx';
 import Navbar from '../../components/Navbar/Navbar';
 import Footer from '../../components/Utils/Footer';
-import { disable2faService, enable2faService } from '../../services/authService';
-import { loadUser, updateUserProfile } from '../../store/actions/authActions';
-import { UserValidations } from '../../utils/validations/user';
+import { updateUserProfile } from '../../store/actions/authActions';
+import { EMAIL_VALIDATION, FIRST_NAME_VALIDATION, LAST_NAME_VALIDATION, PASSWORD_VALIDATION, TWO_FACTOR_VALIDATION } from '../../utils/constants/validations/user';
 
 const ProfileDetails = () => {
     const { user, loading } = useSelector(state => state.auth);
     const dispatch = useDispatch();
-    const navigate = useNavigate();
 
     const [initialData, setInitialData] = useState({ firstName: '', lastName: '', email: '' });
     const [firstName, setFirstName] = useState('');
@@ -29,7 +26,7 @@ const ProfileDetails = () => {
     const [showNewPassword, setShowNewPassword] = useState(false);
     const [isSubmitting, setIsSubmitting] = useState(false);
     const [is2faOn, setIs2faOn] = useState(user?.twoFactorEnabled || false);
-    const [is2faLoading, setIs2faLoading] = useState(false);
+    const [modalOpen, setModalOpen] = useState(false);
 
     const [firstNameValid, setFirstNameValid] = useState(true);
     const [lastNameValid, setLastNameValid] = useState(true);
@@ -53,54 +50,14 @@ const ProfileDetails = () => {
         }
     }, [user]);
 
-    const enableTwoFactor = async () => {
-        setIs2faLoading(true);
-
-        try {
-            const response = await enable2faService();
-
-            if (response.data.success) {
-                toast.success(response.data.message);
-                navigate('/verify-otp', { state: { email: response.data.email, action: 'enable' } });
-            } else {
-                toast.error(response.data.message || 'Failed to enable 2FA');
-            }
-        } catch (error) {
-            toast.error(error.response?.data?.message || 'Failed to enable 2FA');
-        } finally {
-            setIs2faLoading(false);
-        }
-    };
-
-    const disableTwoFactor = async () => {
-        setIs2faLoading(true);
-
-        try {
-            const response = await disable2faService();
-
-            if (response.data.disableOtpPending) {
-                toast.success(response.data.message);
-                navigate('/verify-otp', { state: { email: user.email, action: 'disable' } });
-            } else if (response.data.success) {
-                toast.success('Two-factor authentication disabled successfully.');
-                setIs2faOn(false);
-                dispatch(loadUser());
-            }
-        } catch (error) {
-            toast.error(error.response?.data?.message || 'Failed to disable 2FA');
-        } finally {
-            setIs2faLoading(false);
-        }
-    };
-
     const handleClickShowPassword = () => setShowPassword(!showPassword);
     const handleClickShowNewPassword = () => setShowNewPassword(!showNewPassword);
     const handleMouseDownPassword = (event) => event.preventDefault();
 
-    const validateFirstName = (v) => UserValidations.firstNameRules.pattern.test(v);
-    const validateLastName = (v) => UserValidations.lastNameRules.pattern.test(v);
-    const validateEmail = (v) => UserValidations.emailRules.pattern.test(v);
-    const validatePassword = (v) => UserValidations.passwordRules.pattern.test(v);
+    const validateFirstName = (v) => FIRST_NAME_VALIDATION.regex.test(v);
+    const validateLastName = (v) => LAST_NAME_VALIDATION.regex.test(v);
+    const validateEmail = (v) => EMAIL_VALIDATION.regex.test(v);
+    const validatePassword = (v) => PASSWORD_VALIDATION.regex.test(v);
 
     const handleFirstNameChange = (e) => {
         const value = e.target.value;
@@ -236,8 +193,8 @@ const ProfileDetails = () => {
                                         />
                                         {focusedField === 'firstName' && !firstNameValid && (
                                             <div className="absolute left-0 bottom-[-78px] bg-white text-red-500 text-sm p-2 rounded-lg shadow-md w-full z-10">
-                                                <span className="block text-xs font-semibold mb-1">{UserValidations.firstNameRules.title}</span>
-                                                {UserValidations.firstNameRules.message}
+                                                <span className="block text-xs font-semibold mb-1">{FIRST_NAME_VALIDATION.title}</span>
+                                                {FIRST_NAME_VALIDATION.message}
                                                 <div className="absolute top-[-5px] left-[20px] w-0 h-0 border-l-[5px] border-r-[5px] border-b-[5px] border-transparent border-b-white"></div>
                                             </div>
                                         )}
@@ -259,8 +216,8 @@ const ProfileDetails = () => {
                                         />
                                         {focusedField === 'lastName' && !lastNameValid && (
                                             <div className="absolute left-0 bottom-[-78px] bg-white text-red-500 text-sm p-2 rounded-lg shadow-md w-full z-10">
-                                                <span className="block text-xs font-semibold mb-1">{UserValidations.lastNameRules.title}</span>
-                                                {UserValidations.lastNameRules.message}
+                                                <span className="block text-xs font-semibold mb-1">{LAST_NAME_VALIDATION.title}</span>
+                                                {LAST_NAME_VALIDATION.message}
                                                 <div className="absolute top-[-5px] left-[20px] w-0 h-0 border-l-[5px] border-r-[5px] border-b-[5px] border-transparent border-b-white"></div>
                                             </div>
                                         )}
@@ -283,8 +240,8 @@ const ProfileDetails = () => {
                                         />
                                         {focusedField === 'email' && !emailValid && (
                                             <div className="absolute left-0 bottom-[-58px] bg-white text-red-500 text-sm p-2 rounded-lg shadow-md w-full z-10">
-                                                <span className="block text-xs font-semibold mb-1">{UserValidations.emailRules.title}</span>
-                                                {UserValidations.emailRules.message}
+                                                <span className="block text-xs font-semibold mb-1">{EMAIL_VALIDATION.title}</span>
+                                                {EMAIL_VALIDATION.message}
                                                 <div className="absolute top-[-5px] left-[20px] w-0 h-0 border-l-[5px] border-r-[5px] border-b-[5px] border-transparent border-b-white"></div>
                                             </div>
                                         )}
@@ -326,8 +283,8 @@ const ProfileDetails = () => {
                                         />
                                         {focusedField === 'password' && !passwordValid && (
                                             <div className="absolute left-0 bottom-[-90px] bg-white text-red-500 text-sm p-2 rounded-lg shadow-md w-full z-10">
-                                                <span className="block text-xs font-semibold mb-1">{UserValidations.passwordRules.title}</span>
-                                                {UserValidations.passwordRules.message}
+                                                <span className="block text-xs font-semibold mb-1">{PASSWORD_VALIDATION.title}</span>
+                                                {PASSWORD_VALIDATION.message}
                                                 <div className="absolute top-[-5px] left-[20px] w-0 h-0 border-l-[5px] border-r-[5px] border-b-[5px] border-transparent border-b-white"></div>
                                             </div>
                                         )}
@@ -365,8 +322,8 @@ const ProfileDetails = () => {
                                         />
                                         {focusedField === 'newPassword' && !newPasswordValid && (
                                             <div className="absolute left-0 bottom-[-90px] bg-white text-red-500 text-sm p-2 rounded-lg shadow-md w-full z-10">
-                                                <span className="block text-xs font-semibold mb-1">{UserValidations.newPasswordRules.title}</span>
-                                                {UserValidations.newPasswordRules.message}
+                                                <span className="block text-xs font-semibold mb-1">{PASSWORD_VALIDATION.title}</span>
+                                                {PASSWORD_VALIDATION.message}
                                                 <div className="absolute top-[-5px] left-[20px] w-0 h-0 border-l-[5px] border-r-[5px] border-b-[5px] border-transparent border-b-white"></div>
                                             </div>
                                         )}
@@ -394,24 +351,22 @@ const ProfileDetails = () => {
                         <>
                             <div className="flex items-center justify-between">
                                 <div className="flex items-center space-x-2">
-                                    <h2 className="text-base">{UserValidations.twoFactorRules.title}</h2>
+                                    <h2 className="text-base">{TWO_FACTOR_VALIDATION.title}</h2>
                                     <p className={`text-sm bg-stone-50 rounded-md px-2 ${is2faOn ? 'text-green-500' : 'text-red-500'}`}>
                                         {is2faOn ? 'Enabled' : 'Disabled'}
                                     </p>
                                 </div>
-                                <TwoFactorButton
-                                    is2faOn={is2faOn}
-                                    is2faLoading={is2faLoading}
-                                    onClick={is2faOn ? disableTwoFactor : enableTwoFactor}
-                                />
+                                <TwoFactorButton onClick={() => setModalOpen(true)} />
                             </div>
                             <p className="mt-2 text-sm text-gray-600">
-                                {UserValidations.twoFactorRules.message}
+                                {TWO_FACTOR_VALIDATION.message}
                             </p>
                         </>
                     )}
                 </Box>
-            </ProfileLayout >
+            </ProfileLayout>
+
+            <TwoFactorModal open={modalOpen} onClose={() => setModalOpen(false)} />
             <Footer />
         </>
     );

@@ -39,6 +39,9 @@ export const getDashboardTheme = (mode) => createTheme({
         },
         icon: {
             main: mode === 'dark' ? '#FFFFFF' : '#5b504b'
+        },
+        border: {
+            default: mode === 'dark' ? '#393939' : '#e0e0e0',
         }
     },
     components: {

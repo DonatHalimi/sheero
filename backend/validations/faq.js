@@ -1,7 +1,7 @@
 const yup = require('yup');
 const FAQ = require('../models/FAQ');
 
-const isValid = (v) => /^[A-Z][a-zA-Z\s]{10,50}$/.test(v);
+const isValid = (v) => /^[A-Z][\s\S]{10,50}$/.test(v);
 
 const createSchema = yup.object({
     question: yup

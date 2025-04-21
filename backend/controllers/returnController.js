@@ -1,4 +1,4 @@
-const { sendReturnRequestUpdateEmail } = require('../config/emailService');
+const { sendReturnRequestUpdateEmail } = require('../config/email/emailService');
 const ReturnRequest = require('../models/ReturnRequest');
 
 const createReturnRequest = async (req, res) => {
@@ -78,7 +78,7 @@ const manageReturnRequest = async (req, res) => {
 const getAllReturnRequests = async (req, res) => {
     try {
         const returnRequests = await ReturnRequest.find()
-            .populate('products', '_id name image slug')
+            .populate('products', '_id name price salePrice inventoryCount image slug')
             .populate('updatedBy', 'firstName lastName email')
             .populate('user', '_id email firstName lastName')
             .sort({ createdAt: -1 });

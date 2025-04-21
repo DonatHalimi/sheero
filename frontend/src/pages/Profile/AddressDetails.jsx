@@ -8,7 +8,7 @@ import { profileBoxSx } from '../../assets/sx';
 import Navbar from '../../components/Navbar/Navbar';
 import Footer from '../../components/Utils/Footer';
 import { addAddress, getAddressByUser, getCities, getCountries, updateAddress } from '../../store/actions/addressActions';
-import { AddressValidations } from '../../utils/validations/address';
+import { COMMENT_VALIDATION, NAME_VALIDATION, PHONE_NUMBER_VALIDATION, STREET_VALIDATION } from '../../utils/constants/validations/address';
 
 const AddressDetails = () => {
     const { user } = useSelector((state) => state.auth);
@@ -112,10 +112,10 @@ const AddressDetails = () => {
         }
     };
 
-    const validateName = (v) => AddressValidations.nameRules.pattern.test(v);
-    const validateStreet = (v) => AddressValidations.streetRules.pattern.test(v);
-    const validatePhoneNumber = (v) => AddressValidations.phoneRules.pattern.test(v);
-    const validateComment = (v) => AddressValidations.commentRules.pattern.test(v);
+    const validateName = (v) => NAME_VALIDATION.regex.test(v);
+    const validateStreet = (v) => STREET_VALIDATION.regex.test(v);
+    const validatePhoneNumber = (v) => PHONE_NUMBER_VALIDATION.regex.test(v);
+    const validateComment = (v) => COMMENT_VALIDATION.regex.test(v);
 
     const handleNameChange = (e) => {
         const value = e.target.value;
@@ -202,8 +202,8 @@ const AddressDetails = () => {
                                     />
                                     {focusedField === 'name' && !nameValid && (
                                         <div className="absolute left-0 bottom-[-78px] bg-white text-red-500 text-sm p-2 rounded-lg shadow-md w-full z-10">
-                                            <span className="block text-xs font-semibold mb-1">{AddressValidations.nameRules.title}</span>
-                                            {AddressValidations.nameRules.message}
+                                            <span className="block text-xs font-semibold mb-1">{NAME_VALIDATION.title}</span>
+                                            {NAME_VALIDATION.message}
                                             <div className="absolute top-[-5px] left-[20px] w-0 h-0 border-l-[5px] border-r-[5px] border-b-[5px] border-transparent border-b-white"></div>
                                         </div>
                                     )}
@@ -225,8 +225,8 @@ const AddressDetails = () => {
                                     />
                                     {focusedField === 'street' && !streetValid && (
                                         <div className="absolute left-0 bottom-[-78px] bg-white text-red-500 text-sm p-2 rounded-lg shadow-md w-full z-10">
-                                            <span className="block text-xs font-semibold mb-1">{AddressValidations.streetRules.title}</span>
-                                            {AddressValidations.streetRules.message}
+                                            <span className="block text-xs font-semibold mb-1">{STREET_VALIDATION.title}</span>
+                                            {STREET_VALIDATION.message}
                                             <div className="absolute top-[-5px] left-[20px] w-0 h-0 border-l-[5px] border-r-[5px] border-b-[5px] border-transparent border-b-white"></div>
                                         </div>
                                     )}
@@ -249,8 +249,8 @@ const AddressDetails = () => {
                                     />
                                     {focusedField === 'phoneNumber' && !phoneNumberValid && (
                                         <div className="absolute left-0 top-[58px] bg-white text-red-500 text-sm p-2 rounded-lg shadow-md w-full z-10">
-                                            <span className="block text-xs font-semibold mb-1">{AddressValidations.phoneRules.title}</span>
-                                            {AddressValidations.phoneRules.message}
+                                            <span className="block text-xs font-semibold mb-1">{PHONE_NUMBER_VALIDATION.title}</span>
+                                            {PHONE_NUMBER_VALIDATION.message}
                                             <div className="absolute top-[-5px] left-[20px] w-0 h-0 border-l-[5px] border-r-[5px] border-b-[5px] border-transparent border-b-white"></div>
                                         </div>
                                     )}
@@ -312,8 +312,8 @@ const AddressDetails = () => {
                                 />
                                 {focusedField === 'comment' && !commentValid && (
                                     <div className="absolute left-0 bottom-[-58px] bg-white text-red-500 text-sm p-2 rounded-lg shadow-md w-full z-10">
-                                        <span className="block text-xs font-semibold mb-1">{AddressValidations.commentRules.title}</span>
-                                        {AddressValidations.commentRules.message}
+                                        <span className="block text-xs font-semibold mb-1">{COMMENT_VALIDATION.title}</span>
+                                        {COMMENT_VALIDATION.message}
                                         <div className="absolute top-[-5px] left-[20px] w-0 h-0 border-l-[5px] border-r-[5px] border-b-[5px] border-transparent border-b-white"></div>
                                     </div>
                                 )}

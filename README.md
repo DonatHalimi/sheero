@@ -246,23 +246,11 @@ Once the application is running, you can access it in your web browser at `http:
 - **User Authentication and Authorization**:
   - [Authentication](https://auth0.com/intro-to-iam/what-is-authentication) and [authorization](https://auth0.com/intro-to-iam/what-is-authorization) using [JSON Web Tokens](https://jwt.io/introduction) through [cookies](https://www.cloudflare.com/learning/privacy/what-are-cookies/).
   - [Google](https://developers.google.com) and [Facebook](https://developers.facebook.com) login options for seamless authentication.
-  - [OTP](https://en.wikipedia.org/wiki/One-time_password) account verification through email for enhanced security, via local SMTP configuration.
+  - [OTP](https://en.wikipedia.org/wiki/One-time_password) account verification through email during the registration process for enhanced security, via local SMTP configuration.
   - Users can reset their password with a reset link sent through their email.
-  - Users can add 2FA to their account for enhanced security.
-
-- **Role-Based Access Control**:
-  - **admin**:
-    - Full access to the admin dashboard.
-  - **user**:
-    - Can browse products, add items to their cart, make purchases, and view their order history.
-  - **customerSupport**:
-    - Receives the contact details of users who send contact emails through the contact form so that they can reply to them as soon as possible.
-  - **orderManager**:
-    - Receives the order details in their email so that they can set the order status as `processed` in the admin dashboard based on the item availability.
-  - **contentManager**:
-    - Can create, read, update, and delete slideshow images and FAQs in the admin dashboard.
-  - **productManager**:
-    - Can create, read, update, and delete products, categories, subcategories, sub-subcategories, reviews, product restock subscriptions, and suppliers in the admin dashboard.
+  - Users can add 2FA to their account for enhanced security. They have two options:  
+    - **Email-based 2FA**: A one-time code is sent to their registered email during login.  
+    - **Authenticator app-based 2FA**: Users can scan a QR code or enter a secret key into an authenticator app (e.g., Google Authenticator, Microsoft Authenticator or Authy). A time-based code from the app will be required at each login.
 
 - **Core Functionality**:
   - [Redux state management](https://redux.js.org/introduction/getting-started) for handling application state.
@@ -277,6 +265,20 @@ Once the application is running, you can access it in your web browser at `http:
   - Export user and address data as JSON, order and return request data as PDF, and all admin dashboard data as Excel or JSON.
   - Users can subscribe to product restock notifications and then will receive an email when the product is restocked.
   - Users will receive an email when they send a contact email through the contact form.
+
+- **Role-Based Access Control**:
+  - **admin**:
+    - Full access to the admin dashboard.
+  - **user**:
+    - Can browse products, add items to their cart, make purchases, and view their order history.
+  - **customerSupport**:
+    - Receives the contact details of users who send contact emails through the contact form so that they can reply to them as soon as possible.
+  - **orderManager**:
+    - Receives the order details in their email so that they can set the order status as `processed` in the admin dashboard based on the item availability.
+  - **contentManager**:
+    - Can create, read, update, and delete slideshow images and FAQs in the admin dashboard.
+  - **productManager**:
+    - Can create, read, update, and delete products, categories, subcategories, sub-subcategories, reviews, product restock subscriptions and suppliers in the admin dashboard.
 
 ### Technologies Used
 

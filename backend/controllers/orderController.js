@@ -2,8 +2,8 @@ const Address = require('../models/Address');
 const Order = require('../models/Order');
 const Stripe = require('stripe');
 const Cart = require('../models/Cart');
-const { STRIPE_SECRET_KEY, NODE_ENV } = require('../config/dotenv');
-const { sendOrderUpdateEmail, sendProductInventoryUpdateEmail, sendSuccessfulOrderUpdate } = require('../config/emailService');
+const { STRIPE_SECRET_KEY, NODE_ENV } = require('../config/core/dotenv');
+const { sendOrderUpdateEmail, sendProductInventoryUpdateEmail, sendSuccessfulOrderUpdate } = require('../config/email/emailService');
 const Product = require('../models/Product');
 
 const stripe = Stripe(STRIPE_SECRET_KEY);
@@ -129,6 +129,15 @@ const verifyOrder = async (req, res) => {
     try {
         const isSuccess = String(success) === 'true';
 
+        if (!order_id) {
+            return res.status(400).json({ success: false, sessionValid: false, message: 'Missing order ID.' });
+        }
+
+        const existingOrder = await Order.findById(order_id);
+        if (!existingOrder) {
+            return res.status(404).json({ success: false, sessionValid: false, message: 'Order not found.' });
+        }
+
         if (isSuccess) {
             const updatedOrder = await Order.findByIdAndUpdate(order_id, { paymentStatus: 'completed' }, { new: true })
                 .populate('user')
@@ -141,20 +150,16 @@ const verifyOrder = async (req, res) => {
                     ]
                 });
 
-            if (!updatedOrder) {
-                return res.status(404).json({ success: false, message: 'Order not found.' });
-            }
-
             sendOrderEmails(updatedOrder);
 
-            return res.json({ success: true, message: 'Payment completed successfully', order: updatedOrder });
+            return res.json({ success: true, sessionValid: true, message: 'Payment completed successfully', order: updatedOrder });
         } else {
             await Order.findByIdAndDelete(order_id);
 
-            return res.json({ success: false, message: 'Payment failed. Order has been deleted.' });
+            return res.json({ success: false, sessionValid: true, message: 'Payment cancelled. Order deleted.' });
         }
     } catch (error) {
-        return res.status(500).json({ success: false, message: 'An error occurred during verification.', error: error.message });
+        return res.status(500).json({ success: false, sessionValid: false, message: 'Server error.', error: error.message });
     }
 };
 
@@ -219,7 +224,7 @@ const payWithCash = async (req, res) => {
 
         res.json({
             success: true,
-            message: 'Order created successfully. Please pay with cash on delivery.',
+            message: 'Order created successfully. Please pay with cash on delivery',
             order: populatedOrder,
         });
     } catch (error) {
@@ -233,7 +238,7 @@ const getAllOrders = async (req, res) => {
         const orders = await Order.find()
             .populate('user', 'firstName lastName email')
             .populate('updatedBy', 'firstName lastName email')
-            .populate('products.product', 'name price image slug')
+            .populate('products.product', 'name price salePrice inventoryCount image slug')
             .populate({
                 path: 'address',
                 select: 'name street phoneNumber city country',

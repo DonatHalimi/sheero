@@ -3,7 +3,7 @@ import React, { useState } from 'react';
 import { toast } from 'react-toastify';
 import { BrownButton, BrownOutlinedTextField, CustomBox, CustomModal, LoadingLabel } from '../../assets/CustomComponents';
 import { forgotPasswordService } from '../../services/authService';
-import { UserValidations } from '../../utils/validations/user';
+import { EMAIL_VALIDATION } from '../../utils/constants/validations/user';
 
 const ForgotPassword = ({ open, onClose }) => {
     const [email, setEmail] = useState('');
@@ -11,7 +11,7 @@ const ForgotPassword = ({ open, onClose }) => {
     const [errorVisible, setErrorVisible] = useState(false);
     const [loading, setLoading] = useState(false);
 
-    const validateEmail = (v) => UserValidations.emailRules.pattern.test(v);
+    const validateEmail = (v) => EMAIL_VALIDATION.regex.test(v);
 
     const handleSubmit = async (e) => {
         e.preventDefault();
@@ -65,13 +65,15 @@ const ForgotPassword = ({ open, onClose }) => {
                         onBlur={handleBlur}
                         className="!mt-3 !mb-4"
                     />
+
                     {!isValidEmail && email && errorVisible && (
                         <div className="absolute bottom-[11px] bg-white text-red-500 text-sm p-2 rounded-lg shadow-md w-[calc(100%-30px)]  z-10">
-                            <span className="block text-xs font-semibold mb-1">{UserValidations.emailRules.title}</span>
-                            {UserValidations.emailRules.message}
+                            <span className="block text-xs font-semibold mb-1">{EMAIL_VALIDATION.title}</span>
+                            {EMAIL_VALIDATION.message}
                             <div className="absolute top-[-5px] left-[20px] w-0 h-0 border-l-[5px] border-r-[5px] border-b-[5px] border-transparent border-b-white"></div>
                         </div>
                     )}
+
                     <BrownButton
                         type="submit"
                         fullWidth

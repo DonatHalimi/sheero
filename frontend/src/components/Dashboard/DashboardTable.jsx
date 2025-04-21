@@ -1,6 +1,6 @@
 import { Paper, useTheme } from '@mui/material';
 import { DataGrid } from '@mui/x-data-grid';
-import React from 'react';
+import React, { useEffect, useRef } from 'react';
 import { ActionsCell, CustomNoRowsOverlay, CustomToolbar } from '../../assets/CustomComponents';
 import { dashboardTablePaperSx, dashboardTableSx } from '../../assets/sx';
 
@@ -22,6 +22,9 @@ const getNestedValue = (obj, path) => {
  * @param {Function} onEdit - A callback function for the edit action.
  * @param {Function} onDelete - A callback function for the delete action.
  * @param {String} containerClassName - A class name for the container element.
+ * @param {Number} focusedItemIndex - The index of the currently focused item.
+ * @param {Function} setFocusedItemIndex - Function to set the focused item index.
+ * @param {Function} setItems - Function to set the items reference.
  * @return {JSX.Element} The table component.
  */
 const DashboardTable = ({
@@ -38,8 +41,12 @@ const DashboardTable = ({
     containerClassName,
     onViewDetails,
     showEditButton = true,
+    focusedItemIndex,
+    setFocusedItemIndex,
+    setItems,
 }) => {
     const theme = useTheme();
+    const dataGridRef = useRef(null);
 
     const gridColumns = columns.map((column) => ({
         field: column.key,
@@ -66,7 +73,7 @@ const DashboardTable = ({
                         {column.render(params.row)}
                     </div>
                 );
-            } else if (column.key === 'password' && containerClassName === 'user') {
+            } else if (column.key === 'password') {
                 return '●●●●●●●●●●';
             } else {
                 return column.render
@@ -76,25 +83,54 @@ const DashboardTable = ({
         },
     }));
 
-    const gridRows = data.map((item) => ({
+    const gridRows = data.map((item, index) => ({
         id: item._id,
         ...item,
+        className: index === focusedItemIndex ? 'focused-row' : '',
     }));
 
     const handleRowClick = (params, event) => {
         if (!event.target.closest('.MuiDataGrid-actionsCell') && !event.target.closest('.MuiDataGrid-imageCell')) {
-            let newSelection;
-            if (selectedItems.includes(params.id)) {
-                newSelection = selectedItems.filter(id => id !== params.id);
-            } else {
-                newSelection = [...selectedItems, params.id];
+            const clickedIndex = data.findIndex(item => item._id === params.id);
+            if (clickedIndex !== -1) {
+                toggleItemSelection(data[clickedIndex]);
             }
-            onSelectItem(newSelection);
         }
     };
 
     const handleSelectionModelChange = (newSelectionModel) => {
+        if (!newSelectionModel.includes(focusedItemIndex)) {
+            setFocusedItemIndex(-1);
+        }
         onSelectItem(newSelectionModel);
+    };
+
+    useEffect(() => {
+        if (setItems) {
+            setItems(data);
+        }
+    }, [data, setItems]);
+
+    useEffect(() => {
+        if (focusedItemIndex >= 0 && dataGridRef.current && data.length > focusedItemIndex) {
+            const apiRef = dataGridRef.current;
+            if (apiRef && typeof apiRef.scrollToIndexes === 'function') {
+                apiRef.scrollToIndexes({
+                    rowIndex: focusedItemIndex,
+                });
+            }
+        }
+    }, [focusedItemIndex, data]);
+
+    const toggleItemSelection = (item) => {
+        if (!item) return;
+        const itemId = item._id;
+        const isSelected = selectedItems.includes(itemId);
+
+        onSelectItem(isSelected
+            ? selectedItems.filter(id => id !== itemId)
+            : [...selectedItems, itemId]
+        );
     };
 
     return (
@@ -106,6 +142,7 @@ const DashboardTable = ({
                 className={`${containerClassName || 'max-w-screen-2xl mx-auto'} mb-20`}
             >
                 <DataGrid
+                    apiRef={dataGridRef}
                     rows={gridRows}
                     columns={gridColumns}
                     onRowSelectionModelChange={handleSelectionModelChange}
@@ -130,6 +167,7 @@ const DashboardTable = ({
                     sx={{
                         ...dashboardTableSx(theme),
                     }}
+                    getRowClassName={(params) => params.row.className}
                 />
             </Paper>
         </>

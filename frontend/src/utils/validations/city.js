@@ -1,11 +1,24 @@
-export const CityValidations = {
-    nameRules: {
-        pattern: /^[A-ZÇ][a-zA-ZëËçÇ\s]{2,15}$/,
-        message: "Name must start with a capital letter and be 2-15 characters long"
-    },
+import * as yup from "yup";
+import { COUNTRY_VALIDATION, NAME_VALIDATION, ZIP_CODE_VALIDATION } from "../constants/validations/city";
 
-    zipCodeRules: {
-        pattern: /^[0-9]{4,5}$/,
-        message: "Zip code must be 4-5 digits long"
-    }
-};
+export const initialValues = (city = null) => ({
+    name: city?.name || "",
+    country: city?.country || "",
+    zipCode: city?.zipCode || "",
+});
+
+export const validationSchema = yup.object().shape({
+    name: yup
+        .string()
+        .matches(NAME_VALIDATION.regex, NAME_VALIDATION.message)
+        .required(NAME_VALIDATION.required),
+
+    country: yup
+        .object()
+        .required(COUNTRY_VALIDATION.required),
+
+    zipCode: yup
+        .string()
+        .matches(ZIP_CODE_VALIDATION.regex, ZIP_CODE_VALIDATION.message)
+        .required(ZIP_CODE_VALIDATION.required)
+});

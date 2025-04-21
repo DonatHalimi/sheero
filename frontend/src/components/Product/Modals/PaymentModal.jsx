@@ -37,7 +37,6 @@ const PaymentModal = ({ open, onClose, onStripePayment, onCashPayment }) => {
                         <span className="text-green-600 bg-green-100 py-1 px-2 rounded text-sm">Pay upon order receipt</span>
                     </div>
                 </div>
-
             </CustomModal>
         </>
     );

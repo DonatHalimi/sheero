@@ -9,7 +9,7 @@ const SuccessPayment = ({ orderId }) => {
 
     useEffect(() => {
         const timer = setTimeout(() => {
-            navigate(`/profile/orders/${orderId}`);
+            navigate(`/profile/orders/${orderId}`, { replace: true });
         }, 4000);
 
         return () => clearTimeout(timer);

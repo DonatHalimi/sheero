@@ -69,6 +69,8 @@ The frontend serves as the user interface layer of the application, interacting 
 
   - **utils/**  
     Contains utility functions and helper methods used throughout the application. Key files include:
+    - **constants/validations/**: Contains objects with REGEX patterns, title and message for each module ensuring consistency and centrality of validation.
+    - **validations/**: Contains validation schemas for different modules.
     - **axiosInstance.js**: Configures and exports an Axios instance for making API requests, with cookie-based authentication.
     - **checkEnv.js**: Verifies that all required environment variables are set, ensuring the app runs with the correct configuration.
     - **config.js**: Centralized configuration file for setting base URLs and other global settings across the app.
@@ -114,6 +116,7 @@ The frontend serves as the user interface layer of the application, interacting 
     "autoprefixer": "^10.4.19",
     "axios": "^1.7.2",
     "dotenv": "^16.4.7",
+    "formik": "^2.4.6",
     "framer-motion": "^11.3.12",
     "jspdf": "^2.5.2",
     "jspdf-autotable": "^3.8.4",
@@ -122,6 +125,7 @@ The frontend serves as the user interface layer of the application, interacting 
     "react": "^18.3.1",
     "react-countup": "^6.5.3",
     "react-dom": "^18.3.1",
+    "react-hotkeys-hook": "^4.6.1",
     "react-intersection-observer": "^9.13.1",
     "react-redux": "^9.1.2",
     "react-router-dom": "^6.24.1",
@@ -130,7 +134,8 @@ The frontend serves as the user interface layer of the application, interacting 
     "redux": "^5.0.1",
     "tailwindcss": "^3.4.4",
     "vite": "^5.3.1",
-    "xlsx": "^0.18.5"
+    "xlsx": "^0.18.5",
+    "yup": "^1.6.1"
   },
   "devDependencies": {
     "@types/react": "^18.3.3",
@@ -149,9 +154,12 @@ The frontend serves as the user interface layer of the application, interacting 
 
 - **[Material UI](https://mui.com):** Prebuilt React components such as buttons, icons, and grids.
 - **[Axios](https://www.npmjs.com/package/axios):** Simplifies making HTTP requests to the backend API.
+- **[Formik](https://www.npmjs.com/package/formik):** For form management and validation.
+- **[Yup](https://www.npmjs.com/package/yup):** For form validation schema.
 - **[React Router DOM](https://www.npmjs.com/package/react-router-dom):** Used for routing between different pages of the app.
 - **[React Redux](https://www.npmjs.com/package/react-redux):** Provides bindings to manage state with Redux in React apps.
 - **[React Intersection Observer](https://www.npmjs.com/package/react-intersection-observer):** Detects when elements (like products) are visible in the viewport, useful for infinite scroll.
+- **[React Hotkeys](https://www.npmjs.com/package/react-hotkeys-hook):** For adding keyboard shortcuts to the app.
 - **[Tailwind CSS](https://tailwindcss.com):** A utility-first CSS framework for fast and responsive UI design.
 - **[Framer Motion](https://www.npmjs.com/package/framer-motion):** For adding animations to the UI.
 - **[Vite](https://vite.dev/guide/):** A fast build tool, used for frontend development and bundling.

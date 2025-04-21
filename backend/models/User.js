@@ -1,5 +1,5 @@
 const mongoose = require('mongoose');
-const { JWT_SECRET } = require('../config/dotenv');
+const { JWT_SECRET } = require('../config/core/dotenv');
 
 const userSchema = new mongoose.Schema({
     googleId: { type: String, unique: true, sparse: true },
@@ -20,6 +20,14 @@ const userSchema = new mongoose.Schema({
     resetPasswordToken: { type: String, default: null },
     resetPasswordExpires: { type: Date, default: null },
     twoFactorEnabled: { type: Boolean, default: false },
+    twoFactorMethods: {
+        type: [{
+            type: String,
+            enum: ['email', 'authenticator']
+        }],
+        default: []
+    },
+    twoFactorSecret: { type: String, default: null, select: false },
 });
 
 // Change profilePicture text on first name change

@@ -9,7 +9,7 @@ const CancelPayment = () => {
 
     useEffect(() => {
         const timer = setTimeout(() => {
-            navigate('/profile/orders');
+            navigate(`/profile/orders`, { replace: true });
         }, 4000);
 
         return () => clearTimeout(timer);

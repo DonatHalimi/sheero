@@ -3,9 +3,9 @@ import React, { useEffect, useState } from 'react';
 import { useSelector } from 'react-redux';
 import { useNavigate } from 'react-router-dom';
 import { toast } from 'react-toastify';
-import { BrownButton, BrownOutlinedTextField, CustomBox, CustomModal, CustomTextField, CustomTypography, LoadingLabel } from '../../../assets/CustomComponents';
+import { BrownButton, BrownOutlinedTextField, CustomBox, CustomModal, CustomTypography, LoadingLabel } from '../../../assets/CustomComponents';
 import { addReviewService, checkReviewEligibilityService } from '../../../services/reviewService';
-import { ReviewValidations } from '../../../utils/validations/review';
+import { COMMENT_VALIDATION, TITLE_VALIDATION } from '../../../utils/constants/validations/review';
 
 const AddReviewModal = ({ open, onClose, product, onReviewSuccess }) => {
     const { isAuthenticated } = useSelector((state) => state.auth);
@@ -19,8 +19,8 @@ const AddReviewModal = ({ open, onClose, product, onReviewSuccess }) => {
     const [focusedField, setFocusedField] = useState(null);
     const [loading, setLoading] = useState(false);
 
-    const validateTitle = (v) => ReviewValidations.titleRules.pattern.test(v);
-    const validateComment = (v) => ReviewValidations.commentRules.pattern.test(v);
+    const validateTitle = (v) => TITLE_VALIDATION.regex.test(v);
+    const validateComment = (v) => COMMENT_VALIDATION.regex.test(v);
 
     const navigate = useNavigate();
 
@@ -132,7 +132,7 @@ const AddReviewModal = ({ open, onClose, product, onReviewSuccess }) => {
                     className="!mb-4"
                 />
 
-                {/* <TextField
+                <BrownOutlinedTextField
                     label="Title"
                     value={title}
                     onChange={handleTitleChange}
@@ -143,19 +143,11 @@ const AddReviewModal = ({ open, onClose, product, onReviewSuccess }) => {
                 />
                 {focusedField === 'title' && !titleValid && (
                     <div className="absolute left-4 right-4 bottom-[206px] bg-white text-red-500 text-sm p-2 rounded-lg shadow-md z-10">
-                        <span className="block text-xs font-semibold mb-1">Invalid Title</span>
-                        Must start with a capital letter and be 2 to 40 characters long.
+                        <span className="block text-xs font-semibold mb-1">{TITLE_VALIDATION.title}</span>
+                        {TITLE_VALIDATION.message}
                         <div className="absolute top-[-5px] left-[20px] w-0 h-0 border-l-[5px] border-r-[5px] border-b-[5px] border-transparent border-b-white"></div>
                     </div>
-                )} */}
-
-                <CustomTextField
-                    label="Title"
-                    value={title}
-                    setValue={setTitle}
-                    validate={validateTitle}
-                    validationRule={ReviewValidations.titleRules}
-                />
+                )}
 
                 <Rating
                     name="product-rating"
@@ -173,15 +165,24 @@ const AddReviewModal = ({ open, onClose, product, onReviewSuccess }) => {
                     className="mb-6"
                 />
 
-                <CustomTextField
+                <BrownOutlinedTextField
                     label="Comment"
                     value={comment}
-                    setValue={setComment}
-                    validate={validateComment}
-                    validationRule={ReviewValidations.commentRules}
+                    onChange={handleCommentChange}
+                    onFocus={() => setFocusedField('comment')}
+                    onBlur={() => setFocusedField(null)}
+                    fullWidth
                     multiline
                     rows={4}
+                    className="!mb-4"
                 />
+                {focusedField === 'comment' && !commentValid && (
+                    <div className="absolute left-4 right-4 bottom-[200px] bg-white text-red-500 text-sm p-2 rounded-lg shadow-md z-10">
+                        <span className="block text-xs font-semibold mb-1">{COMMENT_VALIDATION.title}</span>
+                        {COMMENT_VALIDATION.message}
+                        <div className="absolute top-[-5px] left-[20px] w-0 h-0 border-l-[5px] border-r-[5px] border-b-[5px] border-transparent border-b-white"></div>
+                    </div>
+                )}
 
                 <BrownButton
                     onClick={handleAddReview}

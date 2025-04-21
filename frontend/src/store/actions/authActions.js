@@ -78,7 +78,8 @@ export const loginUser = (email, password) => async dispatch => {
             success: true,
             message: res.data.message,
             requires2FA: res.data.requires2FA || false,
-            email: res.data.email
+            email: res.data.email,
+            twoFactorMethods: res.data.twoFactorMethods || [] // Add this line
         };
 
     } catch (error) {

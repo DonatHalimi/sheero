@@ -326,6 +326,7 @@ export const dashboardTitleSx = (theme) => ({
     fontSize: '1.3rem',
     fontWeight: 500,
     padding: '4px 10px',
+    marginRight: '10px',
     color: theme.palette.text.primary,
 });
 
@@ -340,6 +341,7 @@ export const addItemSx = (theme) => ({
 export const deleteItemSx = (theme) => ({
     borderColor: theme.palette.mode === 'dark' ? theme.palette.divider : '#7C7164',
     color: theme.palette.mode === 'dark' ? theme.palette.text.primary : '#5b504b',
+    marginRight: '10px',
     '&:hover': {
         backgroundColor: theme.palette.action.hover,
     },
@@ -356,25 +358,49 @@ export const profileDropdownButtonSx = (theme) => ({ color: theme.palette.text.p
 
 export const profileIconSx = (theme) => ({ color: theme.palette.text.primary });
 
-export const dashboardSearchSuggestionsSx = (theme) => ({
-    backgroundColor: theme.palette.background.paper,
-    borderColor: theme.palette.divider,
-});
-
-export const dashboardSearchItemsSx = ({ theme }, { index, selectedIndex }) => ({
-    backgroundColor: index === selectedIndex
-        ? theme.palette.action.selected
-        : 'transparent',
-    borderColor: index === selectedIndex
-        ? theme.palette.primary.main
-        : 'transparent',
-    color: theme.palette.text.primary,
+export const dashboardSearchSuggestionsSx = (index, selectedIndex, theme) => ({
+    borderRadius: index === selectedIndex ? 2 : 0,
+    backgroundColor: selectedIndex === index ? theme.palette.action.hover : 'transparent',
+    transition: 'background-color 0.2s ease-in-out',
     '&:hover': {
         backgroundColor: theme.palette.action.hover,
+        borderRadius: 2
     },
-})
+    color: theme.palette.text.primary,
+});
 
-export const dashboardSearchItemSx = (theme) => ({ color: theme.palette.text.secondary });
+export const dashboardSearchBoxSx = (theme) => ({
+    backgroundColor: theme.palette.background.paper,
+    color: theme.palette.text.primary,
+    boxShadow: `0px 4px 20px ${theme.palette.mode === 'dark' ? 'rgba(0, 0, 0, 0.6)' : 'rgba(0, 0, 0, 0.1)'}`,
+});
+
+export const dashboardSearchHintBarSx = (theme) => ({
+    backgroundColor: theme.palette.background.paper,
+    borderColor: theme.palette.divider,
+    color: theme.palette.text.primary,
+});
+
+export const dashboardSearchLabelSx = (theme) => ({
+    backgroundColor: theme.palette.mode === 'dark'
+        ? theme.palette.primary.main
+        : theme.palette.secondary.main,
+    color: theme.palette.mode === 'dark'
+        ? theme.palette.text.primary
+        : theme.palette.text.secondary,
+});
+
+export const dashboardSearchTextSx = (theme, hasSuggestions) => ({
+    mb: hasSuggestions ? 2 : 0,
+    '& .MuiOutlinedInput-root': {
+        borderRadius: 1,
+        backgroundColor: theme.palette.background.default,
+        color: theme.palette.text.primary,
+        '& fieldset': { borderColor: theme.palette.secondary.main },
+        '&:hover fieldset': { borderColor: theme.palette.primary.main },
+        '&.Mui-focused fieldset': { borderColor: theme.palette.primary.main },
+    },
+});
 
 export const dashboardAppBarSx = (theme) => ({
     boxShadow: '1px 0px 3px rgba(0, 0, 0, 0.1)',
@@ -396,17 +422,7 @@ export const dashboardTablePaperSx = (theme) => ({
     boxShadow: theme.shadows[1]
 });
 
-export const deleteModalBoxSx = (theme) => ({ backgroundColor: theme.palette.background.paper });
-
 export const deleteModalTypographySx = (theme) => ({ color: theme.palette.text.primary });
-
-export const deleteModalButtonSx = (theme) => ({
-    color: theme.palette.text.primary,
-    borderColor: theme.palette.divider,
-    '&:hover': {
-        backgroundColor: theme.palette.action.hover,
-    },
-});
 
 export const loadingDataGridContainerSx = (theme) => ({ backgroundColor: theme.palette.background.default });
 
@@ -433,6 +449,32 @@ export const dashboardTableSx = (theme) => ({
     '& .MuiDataGrid-toolbarContainer button': {
         color: theme.palette.mode === 'dark' ? theme.palette.text.primary : '#5B504B',
     },
+    '& .focused-row': {
+        backgroundColor: theme.palette.action.selected,
+        transition: 'background-color 0.1s ease',
+        borderLeft: `3px solid ${theme.palette.primary.main}`,
+        borderRadius: '6px',
+        '&.Mui-selected': {
+            backgroundColor: theme.palette.mode === 'dark'
+                ? theme.palette.action.selected
+                : theme.palette.action.hover,
+        }
+    },
+    '& .MuiDataGrid-row:hover': {
+        backgroundColor: theme.palette.action.hover,
+        '&.focused-row': {
+            backgroundColor: theme.palette.action.selected,
+        }
+    }
+});
+
+export const keyboardKeySx = (theme) => ({
+    color: theme.palette.text.primary,
+    fontSize: '0.7rem',
+    px: '2px',
+    py: '2px',
+    display: 'inline-block',
+    fontFamily: 'monospace',
 });
 
 export const drawerPaperSx = {
@@ -480,7 +522,15 @@ export const boxSx = (theme) => ({
     backgroundColor: theme.palette.background.paper,
 });
 
-export const customBoxSx = (theme) => ({ backgroundColor: theme.palette.background.paper })
+export const customBoxSx = (theme, isScrollable) => ({
+    backgroundColor: theme.palette.background.paper,
+    ...(isScrollable && {
+        maxHeight: "80vh",
+        overflow: "auto",
+        display: "flex",
+        flexDirection: "column",
+    })
+});
 
 export const profileBoxSx = {
     display: 'flex',

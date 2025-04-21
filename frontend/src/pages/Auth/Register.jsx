@@ -4,11 +4,11 @@ import React, { useState } from 'react';
 import { useDispatch } from 'react-redux';
 import { useNavigate } from 'react-router-dom';
 import { toast } from 'react-toastify';
-import { BrownButton, BrownOutlinedTextField, ErrorTooltip, handleFacebookLogin, handleGoogleLogin, knownEmailProviders, LoadingLabel, SocialLoginButtons } from '../../assets/CustomComponents';
+import { BrownButton, BrownOutlinedTextField, ErrorTooltip, handleFacebookLogin, handleGoogleLogin, LoadingLabel, SocialLoginButtons } from '../../assets/CustomComponents';
 import Navbar from '../../components/Navbar/Navbar';
 import Footer from '../../components/Utils/Footer';
 import { registerUser } from '../../store/actions/authActions';
-import { UserValidations } from '../../utils/validations/user';
+import { EMAIL_VALIDATION, FIRST_NAME_VALIDATION, LAST_NAME_VALIDATION, PASSWORD_VALIDATION } from '../../utils/constants/validations/user';
 
 const Register = () => {
     const dispatch = useDispatch();
@@ -29,33 +29,33 @@ const Register = () => {
 
     const validateField = (name, value) => {
         if (name === 'firstName') {
-            return UserValidations.firstNameRules.pattern.test(value);
+            return FIRST_NAME_VALIDATION.regex.test(value);
         } else if (name === 'lastName') {
-            return UserValidations.lastNameRules.pattern.test(value);
+            return LAST_NAME_VALIDATION.regex.test(value);
         } else if (name === 'email') {
-            return UserValidations.emailRules.pattern.test(value);
+            return EMAIL_VALIDATION.regex.test(value);
         } else if (name === 'password') {
-            return UserValidations.passwordRules.pattern.test(value);
+            return PASSWORD_VALIDATION.regex.test(value);
         }
         return true;
     };
 
     const errorMessages = {
         firstName: {
-            title: UserValidations.firstNameRules.title,
-            details: UserValidations.firstNameRules.message
+            title: FIRST_NAME_VALIDATION.title,
+            details: FIRST_NAME_VALIDATION.message
         },
         lastName: {
-            title: UserValidations.lastNameRules.title,
-            details: UserValidations.lastNameRules.message
+            title: LAST_NAME_VALIDATION.title,
+            details: LAST_NAME_VALIDATION.message
         },
         email: {
-            title: UserValidations.emailRules.title,
-            details: UserValidations.emailRules.message
+            title: EMAIL_VALIDATION.title,
+            details: EMAIL_VALIDATION.message
         },
         password: {
-            title: UserValidations.passwordRules.title,
-            details: UserValidations.passwordRules.message
+            title: PASSWORD_VALIDATION.title,
+            details: PASSWORD_VALIDATION.message
         }
     };
 

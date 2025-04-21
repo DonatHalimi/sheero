@@ -288,7 +288,7 @@ export const mainListItems = ({ setCurrentView, collapsed }) => {
 
   return (
     <>
-      {!(isOrderManager || isContentManager || isProductManager) && (
+      {!(isOrderManager || isContentManager || isProductManager) && !collapsed && (
         <>
           <DashboardSearchBar
             collapsed={collapsed}

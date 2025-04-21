@@ -825,3 +825,19 @@ export const exportToJSON = (data, fileName = 'exported_data') => {
     link.download = `${fileName}_${date}.json`;
     link.click();
 };
+
+export const exportToCSV = (data, fileName = 'exported_data') => {
+    const date = formatDownloadDate(new Date());
+
+    const header = Object.keys(data[0] || {}).join(',') + '\n';
+    const rows = data.map(row =>
+        Object.values(row).map(value => `"${value}"`).join(',')
+    ).join('\n');
+
+    const csvContent = header + rows;
+    const blob = new Blob([csvContent], { type: 'text/csv;charset=utf-8;' });
+    const link = document.createElement('a');
+    link.href = URL.createObjectURL(blob);
+    link.download = `${fileName}_${date}.csv`;
+    link.click();
+};

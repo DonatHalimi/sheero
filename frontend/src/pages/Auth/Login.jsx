@@ -4,12 +4,12 @@ import React, { useState } from 'react';
 import { useDispatch } from 'react-redux';
 import { useNavigate } from 'react-router-dom';
 import { toast } from 'react-toastify';
-import { BrownButton, BrownOutlinedTextField, ErrorTooltip, handleFacebookLogin, handleGoogleLogin, knownEmailProviders, LoadingLabel, SocialLoginButtons } from '../../assets/CustomComponents';
+import { BrownButton, BrownOutlinedTextField, ErrorTooltip, handleFacebookLogin, handleGoogleLogin, LoadingLabel, SocialLoginButtons } from '../../assets/CustomComponents';
 import Navbar from '../../components/Navbar/Navbar';
 import Footer from '../../components/Utils/Footer';
 import { loginUser } from '../../store/actions/authActions';
+import { EMAIL_VALIDATION, PASSWORD_VALIDATION } from '../../utils/constants/validations/user';
 import ForgotPassword from './ForgotPassword';
-import { UserValidations } from '../../utils/validations/user';
 
 const Login = () => {
     const dispatch = useDispatch();
@@ -31,21 +31,21 @@ const Login = () => {
 
     const validateField = (name, value) => {
         if (name === 'email') {
-            return UserValidations.emailRules.pattern.test(value);
+            return EMAIL_VALIDATION.regex.test(value);
         } else if (name === 'password') {
-            return UserValidations.passwordRules.pattern.test(value);
+            return PASSWORD_VALIDATION.regex.test(value);
         }
         return true;
     };
 
     const errorMessages = {
         email: {
-            title: UserValidations.emailRules.title,
-            details: UserValidations.emailRules.message
+            title: EMAIL_VALIDATION.title,
+            details: EMAIL_VALIDATION.message
         },
         password: {
-            title: UserValidations.passwordRules.title,
-            details: UserValidations.passwordRules.message
+            title: PASSWORD_VALIDATION.title,
+            details: PASSWORD_VALIDATION.message
         }
     };
 
@@ -68,14 +68,17 @@ const Login = () => {
 
         if (!email || !password) {
             toast.error('Please fill in all fields');
+            setLoading(false);
             return;
         }
         if (!emailValid) {
             toast.error('Invalid email format');
+            setLoading(false);
             return;
         }
         if (!passwordValid) {
             toast.error('Password does not meet requirements');
+            setLoading(false);
             return;
         }
 
@@ -85,7 +88,14 @@ const Login = () => {
             if (result.success) {
                 if (result.requires2FA) {
                     toast.success(result.message);
-                    navigate('/verify-otp', { state: { email: result.email, action: 'login' } });
+                    navigate('/verify-otp', {
+                        state: {
+                            email: result.email,
+                            action: 'login',
+                            twoFactorMethods: result.twoFactorMethods || [],
+                            isAuthenticator: result.twoFactorMethods?.includes('authenticator') || false
+                        }
+                    });
                 } else {
                     toast.success(result.message);
                     navigate('/');

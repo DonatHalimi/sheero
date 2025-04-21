@@ -9,6 +9,8 @@ const reasons = [
     'Other'
 ];
 
+const status = ['pending', 'approved', 'processed', 'rejected'];
+
 function generateCustomId() {
     const timestamp = Date.now().toString().slice(-6);
     const randomPart = Math.floor(Math.random() * 1000).toString().padStart(3, '0');
@@ -22,7 +24,7 @@ const returnRequestSchema = new mongoose.Schema({
     user: { type: mongoose.Schema.Types.ObjectId, ref: 'User', required: true },
     reason: { type: String, enum: reasons, required: true },
     customReason: { type: String, required: function () { return this.reason === 'Other'; } },
-    status: { type: String, enum: ['pending', 'approved', 'processed', 'rejected'], default: 'pending' },
+    status: { type: String, enum: status, default: 'pending' },
     createdAt: { type: Date, default: Date.now },
     updatedBy: { type: mongoose.Schema.Types.ObjectId, ref: 'User' }
 });

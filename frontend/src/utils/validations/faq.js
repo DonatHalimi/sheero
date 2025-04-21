@@ -1,11 +1,19 @@
-export const FAQValidations = {
-    questionRules: {
-        pattern: /^[A-Z][\s\S]{10,50}$/,
-        message: "Question must start with a capital letter and be 10-50 characters long"
-    },
+import * as yup from "yup";
+import { ANSWER_VALIDATION, QUESTION_VALIDATION } from "../constants/validations/faq";
 
-    answerRules: {
-        pattern: /^[A-Z][\s\S]{10,50}$/,
-        message: "Answer must start with a capital letter and be 10-50 characters long"
-    },
-};
+export const initialValues = (faq = null) => ({
+    question: faq?.question || "",
+    answer: faq?.answer || "",
+});
+
+export const validationSchema = yup.object().shape({
+    question: yup
+        .string()
+        .matches(QUESTION_VALIDATION.regex, QUESTION_VALIDATION.message)
+        .required(QUESTION_VALIDATION.required),
+
+    answer: yup
+        .string()
+        .matches(ANSWER_VALIDATION.regex, ANSWER_VALIDATION.message)
+        .required(ANSWER_VALIDATION.required)
+});

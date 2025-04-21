@@ -1,7 +1,7 @@
 const bcrypt = require('bcryptjs');
 const Role = require('../models/Role');
 const User = require('../models/User');
-const { ADMIN_FIRST_NAME, ADMIN_LAST_NAME, ADMIN_EMAIL, ADMIN_PASSWORD, SEED_DB } = require('../config/dotenv');
+const { ADMIN_FIRST_NAME, ADMIN_LAST_NAME, ADMIN_EMAIL, ADMIN_PASSWORD, SEED_DB } = require('../config/core/dotenv');
 
 const seedRoles = async () => {
     const roles = ['user', 'admin'];

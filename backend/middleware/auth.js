@@ -1,6 +1,6 @@
 const jwt = require('jsonwebtoken');
 const User = require('../models/User');
-const { JWT_SECRET, JWT_REFRESH_SECRET } = require('../config/dotenv');
+const { JWT_SECRET, JWT_REFRESH_SECRET } = require('../config/core/dotenv');
 
 const authenticateToken = (req, res, next) => {
     const token = req.cookies.accessToken;

@@ -2,7 +2,8 @@ import Box from '@mui/material/Box';
 import Divider from '@mui/material/Divider';
 import List from '@mui/material/List';
 import Toolbar from '@mui/material/Toolbar';
-import React, { useEffect, useState } from 'react';
+import React, { useState } from 'react';
+import { useHotkeys } from 'react-hotkeys-hook';
 import { useDispatch, useSelector } from 'react-redux';
 import { Outlet } from 'react-router-dom';
 import { DashboardCollapse, DashboardNavbar, Drawer, getLocalStorageState, saveLocalStorageState } from '../../assets/CustomComponents';
@@ -55,19 +56,7 @@ const DashboardLayout = () => {
         setIsDropdownOpen(false);
     };
 
-    useEffect(() => {
-        const handleKeyPress = (event) => {
-            if (event.key === '[') {
-                toggleDrawer();
-            }
-        };
-
-        window.addEventListener('keydown', handleKeyPress);
-
-        return () => {
-            window.removeEventListener('keydown', handleKeyPress);
-        };
-    }, [open]);
+    useHotkeys('[', toggleDrawer);
 
     return (
         <DashboardThemeProvider>

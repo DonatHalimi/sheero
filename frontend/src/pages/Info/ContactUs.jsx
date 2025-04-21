@@ -6,6 +6,7 @@ import { BrownButton, ErrorTooltip, LoadingLabel } from '../../assets/CustomComp
 import Navbar from '../../components/Navbar/Navbar';
 import Footer from '../../components/Utils/Footer';
 import { addContactService } from '../../services/contactService';
+import { EMAIL_VALIDATION, MESSAGE_VALIDATION, NAME_VALIDATION, SUBJECT_VALIDATION } from '../../utils/constants/validations/contact';
 
 const ContactUs = () => {
     const { user } = useSelector((state) => state.auth);
@@ -33,10 +34,10 @@ const ContactUs = () => {
 
     const validateField = (name, value) => {
         const rules = {
-            name: /^[A-Z][\sa-zA-Z\W]{3,15}$/,
-            email: /^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$/,
-            subject: /^[\sa-zA-Z0-9\W]{5,50}$/,
-            message: /^[\sa-zA-Z\W]{10,200}$/
+            name: NAME_VALIDATION.regex,
+            email: EMAIL_VALIDATION.regex,
+            subject: SUBJECT_VALIDATION.regex,
+            message: MESSAGE_VALIDATION.regex
         };
         return rules[name]?.test(value);
     };
@@ -78,20 +79,20 @@ const ContactUs = () => {
 
     const errorMessages = {
         name: {
-            title: 'Invalid Name',
-            details: 'Must start with a capital letter and be 3 to 15 characters long.'
+            title: NAME_VALIDATION.title,
+            details: NAME_VALIDATION.message
         },
         email: {
-            title: 'Invalid Email',
-            details: 'Please provide a valid email address.'
+            title: EMAIL_VALIDATION.title,
+            details: EMAIL_VALIDATION.message
         },
         subject: {
-            title: 'Invalid Subject',
-            details: 'Must start with a capital letter and be 5 to 50 characters long.'
+            title: SUBJECT_VALIDATION.title,
+            details: SUBJECT_VALIDATION.message
         },
         message: {
-            title: 'Invalid Message',
-            details: 'Must start with a capital letter and be 10 to 200 characters long.'
+            title: MESSAGE_VALIDATION.title,
+            details: MESSAGE_VALIDATION.message
         }
     };
 

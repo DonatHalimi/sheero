@@ -5,10 +5,7 @@ import notAllowed from '../../assets/img/errors/not-allowed.png';
 const NotAllowed = () => {
     return (
         <>
-            <ErrorPage
-                errorType={403}
-                imageSrc={notAllowed}
-            />
+            <ErrorPage errorType={403} imageSrc={notAllowed} />
         </>
     );
 };

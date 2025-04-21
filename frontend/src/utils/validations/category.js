@@ -1,6 +1,18 @@
-export const CategoryValidations = {
-    nameRules: {
-        pattern: /^[A-ZÇ][\sa-zA-ZëËçÇ\W]{3,28}$/,
-        message: "Name must start with a capital letter and be 3-28 characters long"
-    },
-};
+import * as yup from "yup";
+import { IMAGE_VALIDATION, NAME_VALIDATION } from "../constants/validations/category";
+
+export const initialValues = (category = null) => ({
+    name: category?.name || "",
+    image: category?.image || null,
+});
+
+export const validationSchema = yup.object().shape({
+    name: yup
+        .string()
+        .matches(NAME_VALIDATION.regex, NAME_VALIDATION.message)
+        .required(NAME_VALIDATION.required),
+
+    image: yup
+        .mixed()
+        .required(IMAGE_VALIDATION.required)
+});

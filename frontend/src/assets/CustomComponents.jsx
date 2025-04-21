@@ -16,6 +16,7 @@ import {
     CreditCard,
     DarkMode,
     DashboardOutlined,
+    DataObject,
     Delete,
     DeleteOutline,
     DeleteOutlined,
@@ -28,17 +29,22 @@ import {
     Facebook,
     Favorite,
     FavoriteBorderOutlined,
-    FileCopy,
     Fullscreen,
     FullscreenExit,
     Google,
+    GppGood,
     Home,
     HomeOutlined,
     HourglassBottom,
     HourglassTop,
     Inbox,
     InboxOutlined,
+    Info,
+    InfoOutlined,
     InventoryOutlined,
+    KeyboardArrowDown,
+    KeyboardArrowUp,
+    KeyboardReturn,
     LightMode,
     LocalAtm,
     LocalShipping,
@@ -46,6 +52,7 @@ import {
     LockOpen,
     Login,
     Logout,
+    Mail,
     Menu as MenuIcon,
     MoreHoriz,
     MoreVert,
@@ -56,17 +63,14 @@ import {
     QuestionAnswerOutlined,
     Remove,
     Replay,
-    ReportProblem,
     Search,
     SearchOff,
-    Settings,
     Share,
     ShoppingCart,
     ShoppingCartOutlined,
     Star,
     StarBorder,
     Tag,
-    TramSharp,
     UploadFile,
     Visibility,
     ZoomIn,
@@ -77,6 +81,7 @@ import {
     Box,
     Breadcrumbs,
     Button,
+    Chip,
     CircularProgress,
     ClickAwayListener,
     Collapse,
@@ -84,6 +89,7 @@ import {
     FormControl,
     IconButton,
     InputAdornment,
+    InputBase,
     InputLabel,
     Link,
     List,
@@ -140,8 +146,6 @@ import {
     customModalSx,
     dashboardAppBarSx,
     dashboardHeaderSx,
-    dashboardSearchItemSx,
-    dashboardSearchItemsSx,
     dashboardSearchSuggestionsSx,
     dashboardTitleSx,
     dashboardToolBarSx,
@@ -155,8 +159,6 @@ import {
     headerSearchSx,
     iconButtonSx,
     layoutContainerSx,
-    deleteModalBoxSx,
-    deleteModalButtonSx,
     deleteModalTypographySx,
     paginationStackSx,
     paginationStyling,
@@ -179,10 +181,20 @@ import {
     sidebarLayoutSx,
     slideShowSkeletonSx,
     loadingDataGridSkeletonSx,
-    loadingDataGridContainerSx
+    loadingDataGridContainerSx,
+    chipSx,
+    dashboardSearchBoxSx,
+    dashboardSearchTextSx,
+    dashboardSearchHintBarSx,
+    dashboardSearchLabelSx,
+    keyboardKeySx
 } from './sx';
 import CountUp from 'react-countup';
 import { useDashboardTheme } from '../utils/ThemeContext';
+import { useField } from 'formik';
+import { useHotkeys } from 'react-hotkeys-hook';
+import { QRCodeSVG } from 'qrcode.react';
+import { disable2faService, enable2faService, enableAuthenticator2FAService, getExistingSecretService } from '../services/authService';
 const FilterSidebar = React.lazy(() => import('../components/Product/Utils/FilterSidebar'));
 const ProfileSidebar = React.lazy(() => import('../pages/Profile/ProfileSidebar'));
 
@@ -582,7 +594,7 @@ export const CustomWishlistIcon = ({ isActive }) => <Favorite style={{ color: is
 export const CustomReviewsIcon = ({ isActive }) => <Star style={{ color: isActive ? activeColor : 'inherit' }} />;
 
 export const CreateIcon = ({ theme }) => (
-    <CreateOutlined sx={{ color: theme.palette.mode === 'dark' ? theme.palette.text.primary : 'inherit' }} />
+    <Create sx={{ color: theme.palette.mode === 'dark' ? theme.palette.text.primary : 'inherit' }} />
 );
 
 export const VisibilityIcon = ({ theme }) => (
@@ -1206,17 +1218,27 @@ export const LoadingDataGrid = () => {
     return (
         <>
             {/* Actions Header */}
-            <div style={loadingDataGridContainerSx(theme)} className="p-4 flex items-center justify-between w-full mb-4 rounded-md">
-                <WaveSkeleton
-                    variant="text"
-                    width="10%"
-                    height={25}
-                    sx={loadingDataGridSkeletonSx(theme)}
-                />
+            <div style={loadingDataGridContainerSx(theme)} className="p-4 flex items-center justify-between w-full mt-2 mb-4 rounded-md">
                 <div className="flex items-center gap-3">
                     <WaveSkeleton
                         variant="rectangular"
-                        width={85}
+                        width={90}
+                        height={25}
+                        sx={loadingDataGridSkeletonSx(theme)}
+                        className="rounded-md"
+                    />
+
+                    <WaveSkeleton
+                        variant="circular"
+                        width={25}
+                        height={25}
+                        sx={loadingDataGridSkeletonSx(theme)}
+                    />
+                </div>
+                <div className="flex items-center gap-3">
+                    <WaveSkeleton
+                        variant="rectangular"
+                        width={70}
                         height={25}
                         sx={loadingDataGridSkeletonSx(theme)}
                         className="rounded-md"
@@ -1308,13 +1330,13 @@ export const LoadingDetails = ({ showAdditionalField }) => {
             </Box>
             {showAdditionalField && (
                 <>
-                    <div className='relative bottom-7'>
+                    <div className='relative bottom-8'>
                         <WaveSkeleton variant="text" width="100%" height={80} className='rounded' />
                     </div>
                 </>
             )}
-            <div className='relative bottom-9'>
-                <WaveSkeleton variant="text" width={90} height={60} className='rounded' />
+            <div className='absolute bottom-16'>
+                <WaveSkeleton variant="text" width={120} height={60} className='rounded' />
             </div>
         </Box>
     );
@@ -1343,7 +1365,13 @@ export const LoadingCartDropdown = () => {
 
 export const LoadingOverlay = () => (
     <div className="fixed inset-0 z-[1000] flex items-center justify-center bg-black bg-opacity-50">
-        <CircularProgress size={60} style={{ color: '#FFFFFF' }} />
+        <div className="spinner">
+            <div />
+            <div />
+            <div />
+            <div />
+            <div />
+        </div>
     </div>
 );
 
@@ -1606,8 +1634,9 @@ export const CustomModal = ({ open, onClose, children, ...props }) => {
             <Modal
                 open={open}
                 onClose={onClose}
-                disableAutoFocus
-                disableEnforceFocus
+                disableAutoFocus={false}
+                disableEnforceFocus={false}
+                disableRestoreFocus={false}
                 sx={customModalSx}
                 className="flex items-center justify-center p-4 sm:p-0 outline-none"
                 {...props}
@@ -1626,18 +1655,19 @@ export const CustomModal = ({ open, onClose, children, ...props }) => {
     );
 };
 
-export const CustomBox = (props) => {
+export const CustomBox = ({ isScrollable, children, ...props }) => {
     const theme = useTheme();
 
     return (
         <Box
-            sx={customBoxSx(theme)}
-            className={`p-3 sm:p-4 rounded-lg w-full !outline-none !focus:outline-none`}
+            sx={customBoxSx(theme, isScrollable)}
+            className="p-3 sm:p-4 rounded-lg w-full !outline-none !focus:outline-none"
             {...props}
-        />
+        >
+            {children}
+        </Box>
     );
 };
-
 
 export const BoxBetween = (props) => (
     <Box sx={{ display: 'flex', justifyContent: 'space-between', gap: 2 }} {...props} />
@@ -1657,26 +1687,71 @@ export const CustomTypography = (props) => {
     );
 };
 
-export const CustomTextField = ({ label, value, setValue, validate, validationRule, ...props }) => {
-    const [isValid, setIsValid] = useState(true);
+export const CustomTextField = ({ label, ...props }) => {
+    const [field, meta] = useField(props);
+    const [isFocused, setIsFocused] = useState(false);
 
-    const handleChange = (e) => {
-        const newValue = e.target.value;
-        setValue(newValue);
-        setIsValid(validate(newValue));
+    const handleFocus = () => {
+        setIsFocused(true);
     };
+
+    const handleBlur = (e) => {
+        field.onBlur(e);
+        setIsFocused(false);
+    };
+
+    const showError = (isFocused || meta.touched) && !!meta.error;
 
     return (
         <BrownOutlinedTextField
+            onFocus={handleFocus}
+            onBlur={handleBlur}
             label={label}
-            value={value}
-            onChange={handleChange}
-            error={!isValid}
-            helperText={!isValid ? validationRule.message : ""}
+            error={showError}
+            helperText={showError ? meta.error : ""}
             fullWidth
+            {...field}
             {...props}
             className='!mb-4'
         />
+    );
+};
+
+export const FormSubmitButtons = ({
+    isEdit,
+    onViewDetails,
+    submitForm,
+    isDisabled,
+    loading,
+    item,
+    onClose
+}) => {
+    if (isEdit && onViewDetails) {
+        return (
+            <ActionButtons
+                primaryButtonLabel="Save"
+                secondaryButtonLabel="View Details"
+                onPrimaryClick={submitForm}
+                onSecondaryClick={() => {
+                    onViewDetails(item);
+                    onClose();
+                }}
+                primaryButtonProps={{
+                    disabled: isDisabled
+                }}
+                loading={loading}
+            />
+        );
+    }
+
+    return (
+        <BrownButton
+            onClick={submitForm}
+            disabled={isDisabled}
+            className="w-full"
+        >
+            <LoadingLabel loading={loading} />
+        </BrownButton>
     );
 };
 
@@ -1776,37 +1851,107 @@ export const ActionButtons = ({
     );
 };
 
-export const EditExportButtons = ({
-    onEditClick,
-    onExportClick,
-    editButtonLabel = 'Edit',
-    exportButtonLabel = 'Export as JSON',
-    editButtonProps = {},
-    exportButtonProps = {},
-    width = 220,
+export const TitleActions = ({
+    onEdit,
+    onDelete,
+    onExport,
+    showEditButton = true,
+}) => {
+    const [anchorEl, setAnchorEl] = useState(null);
+    const theme = useTheme();
+    const open = Boolean(anchorEl);
+
+    const handleClick = (event) => {
+        event.stopPropagation();
+        setAnchorEl(event.currentTarget);
+    };
+
+    const handleClose = (event) => {
+        if (event) event.stopPropagation();
+        setAnchorEl(null);
+    };
+
+    const handleEdit = (event) => {
+        event.stopPropagation();
+        if (onEdit) onEdit();
+        handleClose();
+    };
+
+    const handleDelete = (event) => {
+        event.stopPropagation();
+        if (onDelete) onDelete();
+        handleClose();
+    };
+
+    const handleExport = (event) => {
+        event.stopPropagation();
+        if (onExport) onExport();
+        handleClose();
+    };
+
+    return (
+        <div>
+            <IconButton onClick={handleClick} size="small">
+                <MoreHoriz />
+            </IconButton>
+            <Menu
+                anchorEl={anchorEl}
+                open={open}
+                onClose={handleClose}
+                onClick={(e) => e.stopPropagation()}
+                anchorOrigin={{ vertical: 'bottom', horizontal: 'right' }}
+                transformOrigin={{ vertical: 'top', horizontal: 'right' }}
+                elevation={1}
+                sx={{ zIndex: 99999 }}
+                container={document.body}
+            >
+                {showEditButton && (
+                    <MenuItem onClick={handleEdit}>
+                        <CreateIcon theme={theme} />
+                        <span className='ml-2'>Edit</span>
+                    </MenuItem>
+                )}
+
+                {onExport && (
+                    <MenuItem onClick={handleExport}>
+                        <Download theme={theme} />
+                        <span className='ml-2'>Export</span>
+                    </MenuItem>
+                )}
+
+                <MenuItem
+                    onClick={handleDelete}
+                    sx={{ '&:hover': { backgroundColor: 'rgba(255, 0, 0, 0.05)' } }}
+                >
+                    <Delete theme={theme} className='text-red-500' />
+                    <span className='ml-2 text-red-500'>Delete</span>
+                </MenuItem>
+            </Menu>
+        </div>
+    );
+};
+
+export const DetailsTitle = ({
+    entityName,
+    handleEdit,
+    handleDelete,
+    handleExport,
+    handleView,
+    showEditButton = true,
 }) => {
     return (
-        <BoxBetween>
-            <BrownButton
-                variant="contained"
-                startIcon={<Create />}
-                onClick={onEditClick}
-                style={{ width: `${width}px` }}
-                {...editButtonProps}
-            >
-                {editButtonLabel}
-            </BrownButton>
-
-            <OutlinedBrownButton
-                variant="contained"
-                startIcon={<Download />}
-                onClick={onExportClick}
-                style={{ width: `${width}px` }}
-                {...exportButtonProps}
-            >
-                {exportButtonLabel}
-            </OutlinedBrownButton>
-        </BoxBetween>
+        <div className='flex items-center gap-4'>
+            <Typography className="!font-bold !text-lg">
+                {entityName} Details
+            </Typography>
+            <TitleActions
+                onEdit={handleEdit}
+                onDelete={handleDelete}
+                onExport={handleExport}
+                onView={handleView}
+                showEditButton={showEditButton}
+            />
+        </div>
     );
 };
 
@@ -1814,50 +1959,38 @@ export const CustomDeleteModal = ({ open, onClose, onDelete, loading, title, mes
     const theme = useTheme();
 
     return (
-        <AnimatePresence>
-            <Modal open={open} onClose={onClose} className="flex items-center justify-center outline-none">
-                <BounceAnimation>
-                    <Box
-                        style={deleteModalBoxSx(theme)}
-                        className="p-4 rounded-lg shadow-lg w-full"
+        <CustomModal open={open} onClose={onClose}>
+            <CustomBox>
+                <Typography
+                    variant="h6"
+                    style={deleteModalTypographySx(theme)}
+                    className="text-xl font-bold mb-2"
+                >
+                    {title}
+                </Typography>
+                <Typography
+                    variant="body1"
+                    style={deleteModalTypographySx(theme)}
+                    className="mb-4"
+                >
+                    {message}
+                </Typography>
+                <div className="flex justify-end mt-4">
+                    <OutlinedBrownButton onClick={onClose} className="!mr-3">
+                        Cancel
+                    </OutlinedBrownButton>
+                    <BrownButton
+                        onClick={onDelete}
+                        disabled={loading}
                     >
-                        <Typography
-                            variant="h6"
-                            style={deleteModalTypographySx(theme)}
-                            className="text-xl font-bold mb-2"
-                        >
-                            {title}
-                        </Typography>
-                        <Typography
-                            variant="body1"
-                            style={deleteModalTypographySx(theme)}
-                            className="mb-4"
-                        >
-                            {message}
-                        </Typography>
-                        <div className="flex justify-end mt-4">
-                            <OutlinedBrownButton
-                                onClick={onClose}
-                                variant="outlined"
-                                sx={deleteModalButtonSx(theme)}
-                                className="!mr-4"
-                            >
-                                Cancel
-                            </OutlinedBrownButton>
-                            <BrownButton
-                                onClick={onDelete}
-                                variant="contained"
-                                disabled={loading}
-                            >
-                                <LoadingLabel loading={loading} defaultLabel="Delete" loadingLabel="Deleting" />
-                            </BrownButton>
-                        </div>
-                    </Box>
-                </BounceAnimation>
-            </Modal>
-        </AnimatePresence>
+                        <LoadingLabel loading={loading} defaultLabel="Delete" loadingLabel="Deleting" />
+                    </BrownButton>
+                </div>
+            </CustomBox>
+        </CustomModal>
     );
 };
+
 export const DetailsBreadcrumbs = ({ product }) => {
     const isMobile = useMediaQuery('(max-width:600px)');
 
@@ -2198,10 +2331,14 @@ export const ProductRestockNotificationModal = ({
     const userEmail = user?.email;
 
     useEffect(() => {
-        if (userEmail && open) {
-            setNotifyEmail(userEmail);
-            setIsCheckingSubscription(true);
-            checkSubscription(userEmail).finally(() => setIsCheckingSubscription(false));
+        if (open) {
+            if (userEmail) {
+                setNotifyEmail(userEmail);
+                setIsCheckingSubscription(true);
+                checkSubscription(userEmail).finally(() => setIsCheckingSubscription(false));
+            } else {
+                setIsCheckingSubscription(false);
+            }
         }
     }, [userEmail, open, setNotifyEmail, checkSubscription]);
 
@@ -2762,8 +2899,17 @@ export const CustomMenu = ({
             {...customMenuProps}
             disableScrollLock
         >
-            <MenuItem onClick={handleEditClick}>Edit</MenuItem>
-            <MenuItem onClick={handleDeleteClick}>Delete</MenuItem>
+            <MenuItem onClick={handleEditClick}>
+                <Create className='text-stone-500' />
+                <span className='ml-2'>Edit</span>
+            </MenuItem>
+            <MenuItem
+                onClick={handleDeleteClick}
+                sx={{ '&:hover': { backgroundColor: 'rgba(255, 0, 0, 0.05)' } }}
+            >
+                <Delete className='text-red-500' />
+                <span className='ml-2 text-red-500'>Delete</span>
+            </MenuItem>
         </Menu>
     );
 };
@@ -2997,13 +3143,13 @@ export const handleFacebookLogin = async () => {
     }
 };
 
-export const AccountLinkStatusIcon = ({ hasId, platform }) => {
+export const AccountLinkStatusIcon = ({ hasId }) => {
     return (
         <>
             {hasId ? (
-                <Check style={{ color: green[500] }} />
+                <Check style={{ color: green[500], marginRight: 8 }} />
             ) : (
-                <Clear style={{ color: red[500] }} />
+                <Clear style={{ color: red[500], marginRight: 8 }} />
             )}
         </>
     );
@@ -3011,10 +3157,13 @@ export const AccountLinkStatusIcon = ({ hasId, platform }) => {
 
 export const AccountLinkStatus = ({ hasId, platform }) => {
     return (
-        <Box className="flex items-center gap-2">
-            <AccountLinkStatusIcon hasId={hasId} platform={platform} />
-            {hasId ? <Typography>Linked with {platform}</Typography> : <Typography>Not linked with {platform}</Typography>}
-        </Box>
+        <ReadOnlyTextField
+            label={`${platform} Account`}
+            value={hasId ? `Linked` : `Not linked`}
+            InputProps={{
+                startAdornment: <AccountLinkStatusIcon hasId={hasId} />
+            }}
+        />
     );
 };
 
@@ -3061,8 +3210,12 @@ const DownloadIcon = ({ theme }) => {
     return <Download style={{ color: theme.palette.icon.main }} className="mr-2 text-stone-600" />
 };
 
-const FileCopyIcon = ({ theme }) => {
-    return <FileCopy style={{ color: theme.palette.icon.main }} className="mr-2 text-stone-600" />
+const DescriptionIcon = ({ theme }) => {
+    return <Description style={{ color: theme.palette.icon.main }} className="mr-2 text-stone-600" />
+}
+
+const DataObjectIcon = ({ theme }) => {
+    return <DataObject style={{ color: theme.palette.icon.main }} className="mr-2 text-stone-600" />
 };
 
 export const DropdownMenu = ({ open, onClose, options, anchorEl }) => {
@@ -3087,7 +3240,8 @@ export const DropdownMenu = ({ open, onClose, options, anchorEl }) => {
                     autoFocus={false}
                 >
                     {option.label === "Export as Excel" && <DownloadIcon theme={theme} />}
-                    {option.label === "Export as JSON" && <FileCopyIcon theme={theme} />}
+                    {option.label === "Export as CSV" && <DescriptionIcon theme={theme} />}
+                    {option.label === "Export as JSON" && <DataObjectIcon theme={theme} />}
                     {option.label}
                 </MenuItem>
             ))}
@@ -3097,6 +3251,7 @@ export const DropdownMenu = ({ open, onClose, options, anchorEl }) => {
 
 export const exportOptions = (data, handleExport) => [
     { label: 'Export as Excel', onClick: () => handleExport(data, 'excel') },
+    { label: 'Export as CSV', onClick: () => handleExport(data, 'csv') },
     { label: 'Export as JSON', onClick: () => handleExport(data, 'json') }
 ];
 
@@ -3126,6 +3281,7 @@ export const DashboardHeader = ({
     };
 
     const [dropdownOpen, setDropdownOpen] = useState(false);
+    const [helpOpen, setHelpOpen] = useState(false);
 
     const handleDropdownToggle = (event) => {
         setAnchorEl(event.currentTarget);
@@ -3137,30 +3293,45 @@ export const DashboardHeader = ({
         setAnchorEl(null);
     };
 
+    useHotkeys('alt+i', (e) => {
+        e.preventDefault();
+        setHelpOpen((prev) => !prev);
+    });
+
     return (
         <div
             style={dashboardHeaderSx(theme)}
             className="sticky top-16 z-50 p-4 flex items-center justify-between w-full mb-4 rounded-md shadow-sm border-b"
         >
-            <Tooltip title="Scroll to top" arrow>
-                <Button
-                    onClick={handleScrollToTop}
-                    sx={dashboardTitleSx(theme)}
-                >
-                    {title}
-                </Button>
-            </Tooltip>
+            <div className="flex items-center">
+                <Tooltip title="Scroll to top" arrow>
+                    <Button
+                        onClick={handleScrollToTop}
+                        sx={dashboardTitleSx(theme)}
+                    >
+                        {title}
+                    </Button>
+                </Tooltip>
+
+                <Tooltip title="Keyboard shortcuts" arrow>
+                    <IconButton
+                        onClick={() => setHelpOpen(true)}
+                        sx={{ color: theme.palette.text.secondary }}
+                    >
+                        <InfoOutlined fontSize="small" />
+                    </IconButton>
+                </Tooltip>
+            </div>
+
             <div>
                 {showAddButton && (
-                    <Tooltip title="Shortcut: Alt + A" placement="top" arrow enterDelay={2000}>
-                        <OutlinedBrownButton
-                            onClick={() => setAddItemOpen(true)}
-                            sx={addItemSx(theme)}
-                            className="!mr-4"
-                        >
-                            Add {itemName}
-                        </OutlinedBrownButton>
-                    </Tooltip>
+                    <OutlinedBrownButton
+                        onClick={() => setAddItemOpen(true)}
+                        sx={addItemSx(theme)}
+                        className="!mr-3"
+                    >
+                        Add {itemName}
+                    </OutlinedBrownButton>
                 )}
                 {selectedItems.length > 0 && (
                     <OutlinedBrownButton
@@ -3171,15 +3342,19 @@ export const DashboardHeader = ({
                     </OutlinedBrownButton>
                 )}
 
-                <Tooltip title="Export options" placement="top" arrow>
-                    <IconButton
-                        onClick={handleDropdownToggle}
-                        sx={exportIconSx(theme)}
-                    >
-                        <MoreVert />
-                    </IconButton>
-                </Tooltip>
+                <IconButton
+                    onClick={handleDropdownToggle}
+                    sx={exportIconSx(theme)}
+                >
+                    <MoreVert />
+                </IconButton>
             </div>
+
+            <KeyboardShortcutsHelp
+                open={helpOpen}
+                onClose={() => setHelpOpen(false)}
+                theme={theme}
+            />
 
             <DropdownMenu
                 open={dropdownOpen}
@@ -3188,6 +3363,182 @@ export const DashboardHeader = ({
                 anchorEl={anchorEl}
             />
         </div>
+    );
+};
+
+export const KeyboardShortcutsHelp = ({ open, onClose, theme }) => {
+    const [expandedGroups, setExpandedGroups] = useState({
+        'Table Navigation': true,
+        'Table Actions': true,
+        'Application Shortcuts': true
+    });
+
+    const toggleGroup = (groupTitle) => {
+        setExpandedGroups(prev => ({
+            ...prev,
+            [groupTitle]: !prev[groupTitle]
+        }));
+    };
+
+    const shortcutGroups = [
+        {
+            title: "Table Navigation",
+            shortcuts: [
+                { keys: ['↑', '↓'], action: 'Navigate between items' },
+                { keys: ['Shift+↑', 'Shift+↓'], action: 'Select while navigating' },
+                { keys: ['Enter'], action: 'View details (when 1 item is selected or focused)' },
+                { keys: ['Escape'], action: 'Clear selection or navigation focus' },
+                { keys: ['Space', 'Shift+Enter'], action: 'Toggle selection' },
+                { keys: ['Ctrl+Shift+A'], action: 'Select all items' },
+            ]
+        },
+        {
+            title: "Table Actions",
+            shortcuts: [
+                { keys: ['Alt+A'], action: 'Add new item' },
+                { keys: ['Alt+E'], action: 'Edit selected or focused item' },
+                { keys: ['Alt+D'], action: 'Delete selected items' },
+            ]
+        },
+        {
+            title: "Application Shortcuts",
+            shortcuts: [
+                { keys: ['['], action: 'Toggle sidebar' },
+                { keys: ['Ctrl+K'], action: 'Search items' },
+                { keys: ['Alt+T'], action: 'Toggle theme' },
+                { keys: ['Alt+I'], action: 'Toggle keyboard shortcuts help' },
+            ]
+        }
+    ];
+
+    const containerVariants = {
+        hidden: { opacity: 1 },
+        visible: {
+            opacity: 1,
+            transition: {
+                staggerChildren: 0.05
+            }
+        }
+    };
+
+    const itemVariants = {
+        hidden: { opacity: 0, y: 10 },
+        visible: {
+            opacity: 1,
+            y: 0,
+            transition: {
+                type: "spring",
+                stiffness: 300,
+                damping: 24
+            }
+        },
+        exit: {
+            opacity: 0,
+            y: -10,
+            transition: {
+                duration: 0.2
+            }
+        }
+    };
+
+    return (
+        <CustomModal open={open} onClose={onClose}>
+            <Box sx={customBoxSx(theme, true)} className="p-3 w-[700px] max-w-full rounded-md">
+                <CustomTypography variant="h6" className='!mb-[-2px]'>Keyboard Shortcuts</CustomTypography>
+
+                <List>
+                    {shortcutGroups.map((group) => (
+                        <div key={group.title}>
+                            <ListItem
+                                button
+                                onClick={() => toggleGroup(group.title)}
+                                component={motion.div}
+                                layout
+                                className='group !p-2 !rounded-md hover:bg-gray-100'
+                            >
+                                <Box className="flex items-center justify-between w-full">
+                                    <Typography
+                                        variant="subtitle2"
+                                        sx={{ color: theme.palette.text.secondary }}
+                                        className="font-extrabold uppercase tracking-wide"
+                                    >
+                                        {group.title}
+                                    </Typography>
+                                    <motion.div
+                                        animate={{ rotate: expandedGroups[group.title] ? 180 : 0 }}
+                                        transition={{ duration: 0.3 }}
+                                        className="opacity-0 group-hover:opacity-100 transition-opacity flex items-center"
+                                    >
+                                        <KeyboardArrowUp fontSize="small" style={{ color: theme.palette.text.secondary }} />
+                                    </motion.div>
+                                </Box>
+                            </ListItem>
+
+                            <AnimatePresence initial={false}>
+                                <motion.div
+                                    key={expandedGroups[group.title] ? 'open' : 'closed'}
+                                    initial={{ height: 0, opacity: 0 }}
+                                    animate={expandedGroups[group.title] ? { height: 'auto', opacity: 1 } : {}}
+                                    exit={{ height: 0, opacity: 0 }}
+                                    transition={{ duration: 0.3, ease: [0.4, 0, 0.2, 1] }}
+                                    style={{ overflow: 'hidden' }}
+                                >
+                                    {expandedGroups[group.title] && (
+                                        <motion.div
+                                            variants={containerVariants}
+                                            initial="hidden"
+                                            animate="visible"
+                                            exit="hidden"
+                                        >
+                                            {group.shortcuts.map((shortcut, index) => (
+                                                <motion.div key={index} variants={itemVariants}>
+                                                    <ListItem className='!py-2 !pl-2'>
+                                                        <Box className="flex items-center w-full gap-1">
+                                                            <Box className="flex flex-wrap items-center gap-1.5">
+                                                                {shortcut.keys.map((key, i) => (
+                                                                    <>
+                                                                        {key.split('+').map((part, j) => (
+                                                                            <>
+                                                                                <KeyboardKey theme={theme}>
+                                                                                    <Box component="span" sx={keyboardKeySx(theme)}>
+                                                                                        {part}
+                                                                                    </Box>
+                                                                                </KeyboardKey>
+                                                                                {j < key.split('+').length - 1 && (
+                                                                                    <Box component="span" sx={{ color: theme.palette.text.primary }}>
+                                                                                        +
+                                                                                    </Box>
+                                                                                )}
+                                                                            </>
+                                                                        ))}
+                                                                        {i < shortcut.keys.length - 1 && (
+                                                                            <Box component="span" sx={{ color: theme.palette.text.primary, fontSize: '0.85rem' }}>
+                                                                                or
+                                                                            </Box>
+                                                                        )}
+                                                                    </>
+                                                                ))}
+                                                            </Box>
+                                                            <Typography
+                                                                variant="body2"
+                                                                component="span"
+                                                                style={{ color: theme.palette.text.secondary }}
+                                                            >
+                                                                {shortcut.action}
+                                                            </Typography>
+                                                        </Box>
+                                                    </ListItem>
+                                                </motion.div>
+                                            ))}
+                                        </motion.div>
+                                    )}
+                                </motion.div>
+                            </AnimatePresence>
+                        </div>
+                    ))}
+                </List>
+            </Box>
+        </CustomModal>
     );
 };
 
@@ -3240,19 +3591,19 @@ export const ActionsCell = ({ row, theme, onViewDetails, onEdit, onDelete, showE
             >
                 {showEditButton && (
                     <MenuItem onClick={handleEdit}>
-                        <CreateIcon theme={theme} fontSize="small" />
+                        <CreateIcon theme={theme} />
                         <span className='ml-2'>Edit</span>
                     </MenuItem>
                 )}
                 <MenuItem onClick={handleView}>
-                    <VisibilityIcon theme={theme} fontSize="small" />
+                    <VisibilityIcon theme={theme} />
                     <span className='ml-2'>View</span>
                 </MenuItem>
                 <MenuItem
                     onClick={handleDelete}
                     sx={{ '&:hover': { backgroundColor: 'rgba(255, 0, 0, 0.05)' } }}
                 >
-                    <Delete theme={theme} fontSize="small" className='text-red-500' />
+                    <Delete theme={theme} className='text-red-500' />
                     <span className='ml-2 text-red-500'>Delete</span>
                 </MenuItem>
             </Menu>
@@ -3270,24 +3621,23 @@ export const SearchDropdown = ({ results, onClickSuggestion }) => {
     const [selectedIndex, setSelectedIndex] = useState(-1);
     const listRef = useRef(null);
 
-    useEffect(() => {
-        const handleKeyDown = (e) => {
-            if (results.length === 0) return;
+    useHotkeys('down', (e) => {
+        e.preventDefault();
+        if (results.length === 0) return;
+        setSelectedIndex((prevIndex) => (prevIndex + 1) % results.length);
+    }, { enableOnFormTags: true });
 
-            if (e.key === 'ArrowDown') {
-                setSelectedIndex((prevIndex) => (prevIndex + 1) % results.length);
-            } else if (e.key === 'ArrowUp') {
-                setSelectedIndex((prevIndex) => (prevIndex - 1 + results.length) % results.length);
-            } else if (e.key === 'Enter' && selectedIndex !== -1) {
-                onClickSuggestion(results[selectedIndex]._id);
-            }
-        };
+    useHotkeys('up', (e) => {
+        e.preventDefault();
+        if (results.length === 0) return;
+        setSelectedIndex((prevIndex) => (prevIndex - 1 + results.length) % results.length);
+    }, { enableOnFormTags: true });
 
-        window.addEventListener('keydown', handleKeyDown);
-        return () => {
-            window.removeEventListener('keydown', handleKeyDown);
-        };
-    }, [selectedIndex, results, onClickSuggestion]);
+    useHotkeys('enter', (e) => {
+        if (results.length === 0 || selectedIndex === -1) return;
+        e.preventDefault();
+        onClickSuggestion(results[selectedIndex].slug);
+    }, { enableOnFormTags: true });
 
     useEffect(() => {
         if (listRef.current && selectedIndex !== -1) {
@@ -3314,7 +3664,7 @@ export const SearchDropdown = ({ results, onClickSuggestion }) => {
                 <ListItem
                     key={result._id}
                     button
-                    onClick={() => onClickSuggestion(result._id)}
+                    onClick={() => onClickSuggestion(result.slug)}
                     sx={{
                         ...searchDropdownItemSx,
                         backgroundColor: index === selectedIndex ? '#e0e0e0' : 'transparent',
@@ -3697,30 +4047,23 @@ export const CartIcon = ({ totalQuantity, handleCartDropdownToggle, isDropdownOp
 
 export const CollapseIcon = ({ toggleDrawer }) => {
     return (
-        <Tooltip title="Collapse" arrow>
-            <IconButton onClick={toggleDrawer}>
-                <ChevronLeft />
-            </IconButton>
-        </Tooltip>
+        <IconButton onClick={toggleDrawer}>
+            <ChevronLeft />
+        </IconButton>
     );
 };
 
 export const ExtendIcon = ({ toggleDrawer, open }) => {
-    const theme = useTheme();
-
     return (
-        <Tooltip title="Extend" arrow>
-            <IconButton
-                edge="start"
-                color="primary"
-                aria-label="open drawer"
-                onClick={toggleDrawer}
-                sx={{ ...(open && { display: 'none' }) }}
-                className='mr-36'
-            >
-                <MenuIcon className={`text-${theme.palette.mode === 'dark' ? 'white' : 'stone-700'}`} />
-            </IconButton>
-        </Tooltip>
+        <IconButton
+            edge="start"
+            aria-label="open drawer"
+            onClick={toggleDrawer}
+            sx={{ ...(open && { display: 'none' }) }}
+            className='mr-36'
+        >
+            <MenuIcon />
+        </IconButton>
     );
 };
 
@@ -3731,6 +4074,145 @@ export const DashboardCollapse = ({ toggleDrawer }) => {
         <Toolbar sx={{ display: 'flex', alignItems: 'center', justifyContent: 'flex-end', px: [1] }}>
             <CollapseIcon toggleDrawer={toggleDrawer} className={`text-${theme.palette.mode === 'dark' ? 'white' : 'stone-700'}`} />
         </Toolbar>
+    );
+};
+
+export const CollapsibleProductList = ({ products, label, isOrder = true }) => {
+    const [showAll, setShowAll] = useState(false);
+    const theme = useTheme();
+
+    const initialDisplayCount = 3;
+    const hasMoreProducts = products.length > initialDisplayCount;
+
+    const displayedProducts = showAll
+        ? products
+        : products.slice(0, initialDisplayCount);
+
+    const toggleShowAll = () => {
+        setShowAll(prev => !prev);
+    };
+
+    const containerVariants = {
+        hidden: { opacity: 1 },
+        visible: {
+            opacity: 1,
+            transition: {
+                staggerChildren: 0.1
+            }
+        }
+    };
+
+    const itemVariants = {
+        hidden: { opacity: 0, y: 20 },
+        visible: {
+            opacity: 1,
+            y: 0,
+            transition: {
+                type: "spring",
+                stiffness: 300,
+                damping: 24
+            }
+        },
+        exit: {
+            opacity: 0,
+            y: -10,
+            transition: {
+                duration: 0.2
+            }
+        }
+    };
+
+    return (
+        <Box>
+            <DrawerTypography theme={theme}>
+                {label} {isOrder ? '+ (Quantity)' : ''}
+            </DrawerTypography>
+
+            {products && products.length > 0 ? (
+                <>
+                    <motion.div
+                        variants={containerVariants}
+                        initial="hidden"
+                        animate="visible"
+                    >
+                        {displayedProducts.map((item, index) => (
+                            <motion.div
+                                key={index}
+                                variants={itemVariants}
+                                layout
+                            >
+                                <Box sx={chipSx} className="mb-1">
+                                    <Chip
+                                        label={
+                                            <Box display="flex" alignItems="center" gap={1}>
+                                                <Box
+                                                    onClick={() => window.open(`/${item.product.slug}`, '_blank')}
+                                                    display="flex"
+                                                    alignItems="center"
+                                                    gap={1}
+                                                    sx={{ cursor: 'pointer' }}
+                                                >
+                                                    <img
+                                                        src={getImageUrl(item.product?.image)}
+                                                        alt={item.product.name}
+                                                        className="w-10 h-10 object-contain"
+                                                    />
+                                                    <Typography
+                                                        variant="body2"
+                                                        style={{ color: theme.palette.text.primary }}
+                                                        className="!font-semibold hover:underline"
+                                                    >
+                                                        {`${item.product.name} ${isOrder ? `+ (${item.quantity})` : ''}`}
+                                                    </Typography>
+                                                </Box>
+                                            </Box>
+                                        }
+                                        variant="outlined"
+                                        className="w-full !justify-start"
+                                    />
+                                </Box>
+                            </motion.div>
+                        ))}
+                    </motion.div>
+
+                    {hasMoreProducts && (
+                        <motion.div
+                            layout
+                            initial={{ opacity: 0 }}
+                            animate={{ opacity: 1 }}
+                            transition={{ delay: 0.2 }}
+                        >
+                            <OutlinedBrownButton
+                                onClick={toggleShowAll}
+                                variant="text"
+                                size="small"
+                                fullWidth
+                                startIcon={
+                                    <motion.div
+                                        animate={{ rotate: showAll ? 180 : 0 }}
+                                        transition={{ duration: 0.3 }}
+                                        style={{
+                                            display: "flex",
+                                            alignItems: "center",
+                                            justifyContent: "center"
+                                        }}
+                                    >
+                                        <ExpandMore />
+                                    </motion.div>
+                                }
+                                className='mt-2'
+                            >
+                                {showAll ? `Show Less` : `Show ${products.length - initialDisplayCount} More`}
+                            </OutlinedBrownButton>
+                        </motion.div>
+                    )}
+                </>
+            ) : (
+                <Typography variant="body2" component="li" style={{ color: theme.palette.text.primary }}>
+                    No products found
+                </Typography>
+            )}
+        </Box>
     );
 };
 
@@ -4056,106 +4538,255 @@ export const AuthActions = ({
     );
 };
 
-export const DashboardSearchInput = ({ searchTerm, setSearchTerm, handleFocus, handleKeyDown, clearSearch }) => {
+export const KeyboardKey = ({ theme, children, customStyle = "" }) => {
     return (
-        <TextField
-            size="small"
-            fullWidth
-            placeholder="Search items..."
-            value={searchTerm}
-            onChange={(e) => setSearchTerm(e.target.value)}
-            onFocus={handleFocus}
-            onKeyDown={handleKeyDown}
-            InputProps={{
-                startAdornment: (
-                    <InputAdornment position="start">
-                        <Search color='primary' />
-                    </InputAdornment>
-                ),
-                endAdornment: (
-                    searchTerm && (
-                        <InputAdornment position="end">
-                            <IconButton
-                                onClick={clearSearch}
-                                sx={{
-                                    width: '24px',
-                                    height: '24px',
-                                }}
-                            >
-                                <Clear className="text-stone-500" sx={{ fontSize: '16px' }} />
-                            </IconButton>
-                        </InputAdornment>
-                    )
-                ),
-            }}
-        />
-    )
-}
+        <Box
+            component="span"
+            sx={{ borderColor: theme.palette.border.default }}
+            className={`inline-block px-2 py-[2px] mx-[2.6px] border rounded-md font-mono text-xs bg-transparent ${customStyle}`}
+        >
+            {children}
+        </Box>
+    );
+};
+
+export const DashboardSearchInput = ({ openModal }) => {
+    const theme = useTheme();
+
+    return (
+        <Box className="relative px-4 my-3">
+            <Box onClick={openModal} tabIndex={0} role="button" className="relative">
+                <InputBase
+                    fullWidth
+                    readOnly
+                    disableUnderline
+                    inputProps={{ className: "cursor-pointer focus:outline-none" }}
+                    sx={{ borderColor: theme.palette.border.default }}
+                    className="border rounded-md px-1 py-1.5 cursor-pointer focus:outline-none"
+                />
+                <Box className="absolute top-0 left-0 w-full h-full flex items-center pointer-events-none pl-3">
+                    <Search className='mr-2' />
+                    <Typography variant="body2" color="textSecondary" className='flex items-center'>
+                        Search
+                        <div className='ml-[6px]'>
+                            <KeyboardKey theme={theme}>Ctrl</KeyboardKey>
+                            <KeyboardKey theme={theme}>K</KeyboardKey>
+                        </div>
+                    </Typography>
+                </Box>
+            </Box>
+        </Box>
+    );
+};
+
+export const DashboardSearchEmpty = () => {
+    return (
+        <Box className="flex items-center justify-center p-1 mt-4">
+            <SearchOff className='mr-1 text-xl' />
+            <Typography>No results found</Typography>
+        </Box>
+    );
+};
+
+export const DashboardSearchHintBar = ({ theme }) => {
+    return (
+        <Box sx={dashboardSearchHintBarSx(theme)} className="sticky top-0 z-10 pb-3 flex justify-between items-center border-b">
+            <div className="flex items-center gap-0.5 text-sm">
+                <KeyboardKey theme={theme} customStyle="py-[0.5px]">
+                    <span className='text-base'>↑</span>
+                </KeyboardKey>
+                <KeyboardKey theme={theme} customStyle="py-[0.5px]">
+                    <span className='text-base'>↓</span>
+                </KeyboardKey>
+                <span className='ml-0.5'>Navigate</span>
+            </div>
+            <div className="flex items-center gap-2 text-sm">
+                <KeyboardKey theme={theme}>
+                    <KeyboardReturn fontSize="small" />
+                </KeyboardKey>
+                <span>Open</span>
+            </div>
+        </Box>
+    );
+};
 
 export const DashboardSearchSuggestions = ({
     suggestionsRef,
     suggestions,
     selectedIndex,
     handleSuggestionClick,
-    searchTerm,
 }) => {
     const theme = useTheme();
 
     return (
-        <div
-            ref={suggestionsRef}
-            style={dashboardSearchSuggestionsSx(theme)}
-            className="absolute left-2 right-2 mt-1 max-h-72 overflow-y-auto z-50 mb-2 border rounded-md shadow"
-        >
-            {searchTerm && suggestions.length === 0 ? (
-                <div
-                    style={dashboardSearchItemSx(theme)}
-                    className="px-4 py-2 flex items-center gap-2"
-                >
-                    <SearchOff style={dashboardSearchItemSx(theme)} className="w-5 h-5" />
-                    No items found
-                </div>
-            ) : (
-                suggestions.map((item, index) => (
-                    <div
+        <div className="flex flex-col max-h-[500px]">
+            <DashboardSearchHintBar theme={theme} />
+            <div ref={suggestionsRef} className="overflow-y-auto">
+                {suggestions.map((item, index) => (
+                    <Box
                         key={item.id}
                         onClick={() => handleSuggestionClick(item)}
-                        style={dashboardSearchItemsSx({ theme }, { index, selectedIndex })}
-                        className={`px-4 pt-[10px] pb-[10px] cursor-pointer flex items-center gap-4 transition duration-150 ease-in-out ${index === selectedIndex ? 'border-l-4 rounded' : ''}`}
+                        tabIndex={0}
+                        role="button"
+                        sx={dashboardSearchSuggestionsSx(index, selectedIndex, theme)}
+                        className="p-3 cursor-pointer flex items-center gap-4"
                     >
                         {item.icon?.inactive && (
-                            <item.icon.inactive style={dashboardSearchItemSx(theme)} className="w-5 h-5" />
+                            <span className="w-5 h-5 flex items-center justify-center">
+                                <item.icon.inactive className="w-full h-full" />
+                            </span>
                         )}
-                        <span>{item.label}</span>
-                    </div>
-                ))
-            )}
+                        <p className="flex items-center">{item.label}</p>
+
+                        <span
+                            sx={dashboardSearchLabelSx(theme)}
+                            className={`ml-auto mr-2 text-xs py-0.5 px-2 rounded-md ${theme.palette.mode === 'dark' ? 'bg-gray-700 text-white' : 'bg-gray-100 text-gray-700'}`}
+                        >
+                            Entity
+                        </span>
+                    </Box>
+                ))}
+            </div>
         </div>
     );
 };
 
-export const DashboardSearchBar = ({ collapsed, onMenuItemClick, getAllMenuItems }) => {
+export const DashboardSearchModal = ({
+    isModalOpen,
+    handleClose,
+    handleKeyDown,
+    searchTerm,
+    setSearchTerm,
+    modalInputRef,
+    suggestions,
+    selectedIndex,
+    handleSuggestionClick,
+    suggestionsRef,
+}) => {
+    const theme = useTheme();
+    const hasSearched = searchTerm.trim().length > 0;
+
+    const handleCloseClick = () => {
+        setSearchTerm('');
+        modalInputRef.current.focus();
+    };
+
+    const InputProps = {
+        startAdornment: (
+            <InputAdornment position="start">
+                <Search />
+            </InputAdornment>
+        ),
+        endAdornment: searchTerm && (
+            <InputAdornment position="end">
+                <IconButton size="small" onClick={handleCloseClick}>
+                    <Close fontSize="small" />
+                </IconButton>
+            </InputAdornment>
+        ),
+    };
+
+    return (
+        <Modal
+            open={isModalOpen}
+            onClose={handleClose}
+            className="flex items-start justify-center bg-[rgba(0,0,0,0.3)] backdrop-blur-md"
+        >
+            <AnimatePresence>
+                {isModalOpen && (
+                    <motion.div
+                        initial={{ opacity: 0, scale: 0.95, y: 20 }}
+                        animate={{ opacity: 1, scale: 1, y: 0 }}
+                        exit={{ opacity: 0, scale: 0.95, y: 20 }}
+                        transition={{ duration: 0.2, ease: 'easeOut' }}
+                        className="w-full max-w-[600px] mt-48"
+                    >
+                        <Box sx={dashboardSearchBoxSx(theme)} className="w-full rounded-md shadow-lg p-4 max-h-[80vh] overflow-y-auto">
+                            <TextField
+                                fullWidth
+                                variant="outlined"
+                                placeholder="Search dashboard..."
+                                value={searchTerm}
+                                onChange={(e) => setSearchTerm(e.target.value)}
+                                onKeyDown={handleKeyDown}
+                                inputRef={modalInputRef}
+                                autoFocus
+                                InputProps={InputProps}
+                                sx={dashboardSearchTextSx(theme, suggestions.length > 0)}
+                            />
+
+                            {suggestions.length > 0 ? (
+                                <DashboardSearchSuggestions
+                                    suggestions={suggestions}
+                                    selectedIndex={selectedIndex}
+                                    handleSuggestionClick={handleSuggestionClick}
+                                    suggestionsRef={suggestionsRef}
+                                />
+                            ) : hasSearched ? (
+                                <DashboardSearchEmpty />
+                            ) : null}
+                        </Box>
+                    </motion.div>
+                )}
+            </AnimatePresence>
+        </Modal>
+    );
+};
+
+export const DashboardSearchBar = ({ onMenuItemClick, getAllMenuItems }) => {
     const [searchTerm, setSearchTerm] = useState('');
     const [showSuggestions, setShowSuggestions] = useState(false);
     const [suggestions, setSuggestions] = useState([]);
     const [selectedIndex, setSelectedIndex] = useState(-1);
+    const [isModalOpen, setIsModalOpen] = useState(false);
+
     const location = useLocation();
     const suggestionsRef = useRef(null);
+    const modalInputRef = useRef(null);
+
+    const isNavigable = () => isModalOpen && showSuggestions && suggestions.length > 0;
+    const isSelectable = () => isNavigable() && selectedIndex >= 0;
+
+    const navigateSuggestions = (direction) =>
+        setSelectedIndex((prev) => {
+            const next = Math.max(0, Math.min(prev + direction, suggestions.length - 1));
+            scrollToSuggestion(next);
+            return next;
+        });
+
+    const handleClose = () => {
+        setIsModalOpen(false);
+        setSearchTerm('');
+        setShowSuggestions(false);
+        setSelectedIndex(-1);
+    };
+
+    const hotkeysConfig = [
+        { keys: 'ctrl+k', action: (e) => (e.preventDefault(), openModal()) },
+        { keys: 'down', action: (e) => isNavigable() && navigateSuggestions(1) },
+        { keys: 'up', action: (e) => isNavigable() && navigateSuggestions(-1) },
+        { keys: 'enter', action: (e) => isSelectable() && handleSuggestionClick(suggestions[selectedIndex]) },
+        { keys: 'esc', action: handleClose },
+    ];
+
+    hotkeysConfig.forEach(({ keys, action }) =>
+        useHotkeys(keys, (e) => (e.preventDefault(), action(e)), { enableOnFormTags: true },
+            [isModalOpen, showSuggestions, suggestions, selectedIndex])
+    );
+
+    useEffect(() => {
+        if (isModalOpen && modalInputRef.current) modalInputRef.current.focus();
+    }, [isModalOpen]);
 
     useEffect(() => {
         const allItems = getAllMenuItems();
-        if (!searchTerm) {
-            setSuggestions([]);
-            return;
-        }
+        if (!searchTerm) return setSuggestions([]);
 
         const searchLower = searchTerm.toLowerCase();
-        const matchingItems = allItems.filter(item =>
+        setSuggestions(allItems.filter(item =>
             item.id.toLowerCase().includes(searchLower) ||
             item.label.toLowerCase().includes(searchLower)
-        );
-
-        setSuggestions(matchingItems);
+        ));
         setSelectedIndex(-1);
     }, [searchTerm, getAllMenuItems]);
 
@@ -4163,96 +4794,41 @@ export const DashboardSearchBar = ({ collapsed, onMenuItemClick, getAllMenuItems
         setSearchTerm('');
         setShowSuggestions(false);
         setSelectedIndex(-1);
+        setIsModalOpen(false);
     }, [location]);
+
+    const openModal = () => {
+        setIsModalOpen(true);
+        setShowSuggestions(true);
+        setTimeout(() => modalInputRef.current?.focus(), 0);
+    };
 
     const handleSuggestionClick = (item) => {
         onMenuItemClick(item.id);
-        setSearchTerm('');
-        setShowSuggestions(false);
-        setSelectedIndex(-1);
-    };
-
-    const handleKeyDown = (e) => {
-        if (!showSuggestions || suggestions.length === 0) return;
-
-        switch (e.key) {
-            case 'ArrowDown':
-                e.preventDefault();
-                setSelectedIndex((prevIndex) => {
-                    const nextIndex = Math.min(prevIndex + 1, suggestions.length - 1);
-                    scrollToSuggestion(nextIndex);
-                    return nextIndex;
-                });
-                break;
-            case 'ArrowUp':
-                e.preventDefault();
-                setSelectedIndex((prevIndex) => {
-                    const nextIndex = Math.max(prevIndex - 1, 0);
-                    scrollToSuggestion(nextIndex);
-                    return nextIndex;
-                });
-                break;
-            case 'Enter':
-                e.preventDefault();
-                if (selectedIndex >= 0 && selectedIndex < suggestions.length) {
-                    handleSuggestionClick(suggestions[selectedIndex]);
-                }
-                break;
-            case 'Escape':
-                setShowSuggestions(false);
-                setSelectedIndex(-1);
-                break;
-            default:
-                break;
-        }
+        handleClose();
     };
 
     const scrollToSuggestion = (index) => {
-        if (suggestionsRef.current) {
-            const suggestionElement = suggestionsRef.current.children[index];
-            if (suggestionElement) {
-                suggestionElement.scrollIntoView({
-                    block: 'nearest',
-                });
-            }
-        }
-    };
-
-    const handleFocus = () => {
-        setShowSuggestions(true);
-    };
-
-    if (collapsed) return null;
-
-    const clearSearch = () => {
-        setSearchTerm('');
-        setShowSuggestions(false);
+        const child = suggestionsRef.current?.children[index];
+        if (child) child.scrollIntoView({ block: 'nearest' });
     };
 
     return (
-        <ClickAwayListener onClickAway={() => {
-            setShowSuggestions(false);
-            setSelectedIndex(-1);
-        }}>
-            <div className="relative px-3 py-2">
-                <DashboardSearchInput
-                    searchTerm={searchTerm}
-                    setSearchTerm={setSearchTerm}
-                    handleFocus={handleFocus}
-                    handleKeyDown={handleKeyDown}
-                    clearSearch={clearSearch}
-                />
-                {searchTerm && showSuggestions && (
-                    <DashboardSearchSuggestions
-                        suggestionsRef={suggestionsRef}
-                        suggestions={suggestions}
-                        selectedIndex={selectedIndex}
-                        handleSuggestionClick={handleSuggestionClick}
-                        searchTerm={searchTerm}
-                    />
-                )}
-            </div>
-        </ClickAwayListener>
+        <>
+            <DashboardSearchInput openModal={openModal} />
+
+            <DashboardSearchModal
+                isModalOpen={isModalOpen}
+                handleClose={handleClose}
+                searchTerm={searchTerm}
+                setSearchTerm={setSearchTerm}
+                modalInputRef={modalInputRef}
+                suggestions={suggestions}
+                selectedIndex={selectedIndex}
+                handleSuggestionClick={handleSuggestionClick}
+                suggestionsRef={suggestionsRef}
+            />
+        </>
     );
 };
 
@@ -4392,9 +4968,9 @@ export const DashboardToolbar = ({ children }) => {
     );
 };
 
-const ToggleDarkMode = ({ toggleTheme, mode }) => {
+const ToggleDarkMode = ({ toggleTheme, mode, theme }) => {
     return (
-        <IconButton onClick={toggleTheme} color="inherit">
+        <IconButton onClick={toggleTheme} color="inherit" >
             {mode === 'dark' ? <LightMode /> : <DarkMode className='text-stone-500' />}
         </IconButton>
     );
@@ -4413,6 +4989,7 @@ export const DashboardNavbar = ({
 }) => {
     const [isProfileDropdownOpen, setIsProfileDropdownOpen] = useState(false);
     const { toggleTheme, mode } = useDashboardTheme();
+    const theme = useTheme();
 
     return (
         <DashboardAppBar open={open}>
@@ -4436,7 +5013,7 @@ export const DashboardNavbar = ({
                             isProductManager={isProductManager}
                         />
 
-                        <ToggleDarkMode toggleTheme={toggleTheme} mode={mode} />
+                        <ToggleDarkMode toggleTheme={toggleTheme} mode={mode} theme={theme} />
                     </div>
                 </div>
             </DashboardToolbar>
@@ -4444,35 +5021,292 @@ export const DashboardNavbar = ({
     );
 };
 
-export const TwoFactorButton = ({ is2faOn, is2faLoading, onClick }) => {
+export const TwoFactorButton = ({ is2faLoading, onClick }) => {
     return (
         <BrownButton onClick={onClick} disabled={is2faLoading}>
-            <LoadingLabel
-                loading={is2faLoading}
-                defaultLabel={
-                    is2faOn ? (
-                        <>
-                            <LockOpen className="mr-2" /> Disable
-                        </>
-                    ) : (
-                        <>
-                            <Lock className="mr-2" /> Enable
-                        </>
-                    )
-                }
-                loadingLabel={
-                    is2faOn ? (
-                        <>
-                            <LockOpen className="mr-2" /> Disabling
-                        </>
-                    ) : (
-                        <>
-                            <Lock className="mr-2" /> Enabling
-                        </>
-                    )
-                }
-            />
+            <Typography variant="button">
+                <>
+                    <Lock className="mr-2" /> Manage
+                </>
+            </Typography>
         </BrownButton>
+    );
+};
+
+export const TwoFactorOptions = ({
+    handleEmailAuth,
+    handleAuthenticatorSetup,
+    hasEmail2FA,
+    hasAuthenticator2FA,
+    getEmailButtonText,
+    getAuthenticatorButtonText
+}) => {
+    const emailDescription = hasEmail2FA
+        ? "Email 2FA is currently enabled. Click to disable this security method"
+        : "Receive one-time codes via email for secure account access";
+
+    const authenticatorDescription = hasAuthenticator2FA
+        ? "Authenticator app is currently enabled. Click to disable this security method"
+        : "Receive one-time codes via authenticator app for secure account access";
+
+    return (
+        <div className="flex flex-col sm:flex-row justify-between gap-5 py-1 mt-2">
+            <div
+                onClick={handleEmailAuth}
+                className={`w-full border rounded-lg p-4 cursor-pointer ${hasEmail2FA
+                    ? "hover:border-red-500 hover:bg-red-50 border-gray-200"
+                    : "hover:border-stone-600 border-gray-200"
+                    } transition-all flex flex-col items-center text-center shadow-sm`}
+            >
+                <Mail className="text-stone-500 mb-2" />
+                <h2 className="text-lg font-semibold mb-1">{getEmailButtonText()}</h2>
+                <p className="text-gray-600 text-sm">
+                    {emailDescription}
+                </p>
+            </div>
+            <div
+                onClick={handleAuthenticatorSetup}
+                className={`w-full border rounded-lg p-4 cursor-pointer ${hasAuthenticator2FA
+                    ? "hover:border-red-500 hover:bg-red-50 border-gray-200"
+                    : "hover:border-stone-600 border-gray-200"
+                    } transition-all flex flex-col items-center text-center shadow-sm`}
+            >
+                <GppGood className="text-stone-500 mb-2" />
+                <h2 className="text-lg font-semibold mb-1">{getAuthenticatorButtonText()}</h2>
+                <p className="text-gray-600 text-sm">
+                    {authenticatorDescription}
+                </p>
+            </div>
+        </div>
+    );
+};
+
+export const Authenticator2FASetup = ({ user, secretKey, qrImageUrl, setShowQRCode, isLoading }) => {
+    const navigate = useNavigate();
+
+    const setupDescription = (
+        <div className="space-y-2">
+            <div className="flex items-start">
+                <CheckCircle fontSize="small" className="text-stone-500 mt-0.5 mr-2 flex-shrink-0" />
+                <p className="text-sm">
+                    Open your authenticator app and scan the QR code with your camera.
+                </p>
+            </div>
+            <div className="flex items-start">
+                <CheckCircle fontSize="small" className="text-stone-500 mt-0.5 mr-2 flex-shrink-0" />
+                <p className="text-sm">
+                    Click continue to verify by entering the one-time password from your authenticator app.
+                </p>
+            </div>
+            <div className="flex items-start">
+                <CheckCircle fontSize="small" className="text-stone-500 mt-0.5 mr-2 flex-shrink-0" />
+                <p className="text-sm">
+                    After verifying, you will use the app to input the one-time password each time you log in for extra security.
+                </p>
+            </div>
+            <div className="flex items-start !mt-4">
+                <InfoOutlined fontSize="small" className="text-stone-500 mt-0.5 mr-2 flex-shrink-0" />
+                <p className="text-sm text-left">
+                    If you don't have access to your camera, you can enter this code in your chosen authenticator app:
+                    <br />
+                    <span className="text-stone-600 break-all">{secretKey}</span>
+                </p>
+            </div>
+        </div>
+    );
+
+    const handleClick = (user, secretKey, navigate) => {
+        if (!user?.email) {
+            console.error("User email is missing");
+            return;
+        }
+        navigate('/verify-otp', {
+            state: {
+                email: user.email,
+                action: 'enable',
+                method: 'authenticator',
+                isAuthenticator: true,
+                secretKey
+            }
+        });
+    };
+
+    const QRCodeValue = `otpauth://totp/sheero:${user?.email}?secret=${secretKey}&issuer=sheero`;
+
+    return (
+        <>
+            <Typography variant="h6">Authenticator Setup</Typography>
+
+            <div className='text-center'>
+                {qrImageUrl ? (
+                    <img src={qrImageUrl} alt="QR Code" className='mx-auto w-[70%]' />
+                ) : (
+                    <QRCodeSVG value={QRCodeValue} size={200} className='mx-auto' />
+                )}
+            </div>
+
+            <div className='text-align !mb-4 !text-sm'>
+                {setupDescription}
+            </div>
+
+            <div className='flex gap-3 !mt-2'>
+                <Button
+                    fullWidth
+                    variant="outlined"
+                    onClick={() => setShowQRCode(false)}
+                    disabled={isLoading}
+                >
+                    Back
+                </Button>
+                <Button
+                    fullWidth
+                    variant="contained"
+                    onClick={() => handleClick(user, secretKey, navigate)}
+                >
+                    Continue
+                </Button>
+            </div>
+        </>
+    );
+};
+
+export const TwoFactorModal = ({ open, onClose }) => {
+    const navigate = useNavigate();
+    const { user } = useSelector(state => state.auth);
+    const [showQRCode, setShowQRCode] = useState(false);
+    const [secretKey, setSecretKey] = useState("");
+    const [qrImageUrl, setQrImageUrl] = useState("");
+    const [isLoading, setIsLoading] = useState(false);
+
+    const is2faEnabled = user?.twoFactorEnabled || false;
+    const hasEmail2FA = user?.twoFactorMethods?.includes('email');
+    const hasAuthenticator2FA = user?.twoFactorMethods?.includes('authenticator');
+
+    useEffect(() => {
+        if (open) {
+            setShowQRCode(false);
+            setSecretKey("");
+            setQrImageUrl("");
+        }
+    }, [open]);
+
+    const handleEmailAuth = async () => {
+        setIsLoading(true);
+        try {
+            if (hasEmail2FA) {
+                const response = await disable2faService();
+                if (response.data.disableOtpPending) {
+                    navigate('/verify-otp', {
+                        state: {
+                            email: user.email,
+                            action: 'disable',
+                            method: 'email'
+                        }
+                    });
+                }
+            } else {
+                const response = await enable2faService();
+                if (response.data.success) {
+                    navigate('/verify-otp', {
+                        state: {
+                            email: response.data.email,
+                            action: 'enable',
+                            method: 'email'
+                        }
+                    });
+                }
+            }
+        } catch (error) {
+            toast.error(error.response?.data?.message || `Failed to ${hasEmail2FA ? 'disable' : 'enable'} email 2FA`);
+        } finally {
+            setIsLoading(false);
+            onClose();
+        }
+    };
+
+    const handleAuthenticatorSetup = async () => {
+        if (hasAuthenticator2FA) {
+            setIsLoading(true);
+            try {
+                navigate('/verify-otp', {
+                    state: {
+                        email: user.email,
+                        action: 'disable',
+                        method: 'authenticator',
+                        isAuthenticator: true
+                    }
+                });
+            } catch (error) {
+                toast.error(error.response?.data?.message || 'Failed to disable authenticator');
+            } finally {
+                setIsLoading(false);
+            }
+            return;
+        }
+
+        setIsLoading(true);
+        try {
+            const response = user?.twoFactorSecret && !showQRCode
+                ? await getExistingSecretService()
+                : await enableAuthenticator2FAService();
+
+            setQrImageUrl(response.data.imageUrl);
+            setSecretKey(response.data.secret);
+            setShowQRCode(true);
+        } catch (error) {
+            toast.error(error.response?.data?.message || 'Failed to set up authenticator app.');
+        } finally {
+            setIsLoading(false);
+        }
+    };
+
+    const getModalTitle = () => {
+        return is2faEnabled ? "Manage Two-Factor Authentication" : "Enable Two-Factor Authentication";
+    };
+
+    const getEmailButtonText = () => {
+        return hasEmail2FA ? "Disable Email 2FA" : "Enable Email 2FA";
+    };
+
+    const getAuthenticatorButtonText = () => {
+        return hasAuthenticator2FA ? "Disable Auth 2FA" : "Enable Auth 2FA";
+    };
+
+    return (
+        <CustomModal open={open} onClose={onClose}>
+            {isLoading && <LoadingOverlay />}
+            <CustomBox>
+                {!showQRCode ? (
+                    <>
+                        <Box className="flex items-center gap-3">
+                            <Typography variant="h6" align="center" className="!mb-2">
+                                {getModalTitle()}
+                            </Typography>
+                            <p className={`text-sm bg-stone-50 rounded-md px-2 ${is2faEnabled ? 'text-green-500' : 'text-red-500'}`}>
+                                {is2faEnabled ? 'Enabled' : 'Disabled'}
+                            </p>
+                        </Box>
+
+                        <TwoFactorOptions
+                            handleEmailAuth={handleEmailAuth}
+                            handleAuthenticatorSetup={handleAuthenticatorSetup}
+                            hasEmail2FA={hasEmail2FA}
+                            hasAuthenticator2FA={hasAuthenticator2FA}
+                            getEmailButtonText={getEmailButtonText}
+                            getAuthenticatorButtonText={getAuthenticatorButtonText}
+                        />
+                    </>
+                ) : (
+                    <Authenticator2FASetup
+                        user={user}
+                        qrImageUrl={qrImageUrl}
+                        secretKey={secretKey}
+                        showQRCode={showQRCode}
+                        setShowQRCode={setShowQRCode}
+                    />
+                )}
+            </CustomBox>
+        </CustomModal>
     );
 };
 

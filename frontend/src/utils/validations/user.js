@@ -1,38 +1,38 @@
-import { knownEmailProviders } from "../../assets/CustomComponents";
+import * as yup from "yup";
+import { EMAIL_VALIDATION, FIRST_NAME_VALIDATION, LAST_NAME_VALIDATION, PASSWORD_VALIDATION, ROLE_VALIDATION } from "../constants/validations/user";
 
-export const UserValidations = {
-    firstNameRules: {
-        pattern: /^[A-ZÇ][\sa-zA-ZëËçÇ\W]{2,10}$/,
-        title: 'Invalid First Name',
-        message: "First name must start with a capital letter and be 2-10 characters long"
-    },
+export const initialValues = (user = null) => ({
+    firstName: user?.firstName || "",
+    lastName: user?.lastName || "",
+    email: user?.email || "",
+    password: "",
+    role: user?.role?._id || null,
+});
 
-    lastNameRules: {
-        pattern: /^[A-ZÇ][\sa-zA-ZëËçÇ\W]{2,10}$/,
-        title: 'Invalid Last Name',
-        message: "Last name must start with a capital letter and be 2-10 characters long"
-    },
 
-    emailRules: {
-        pattern: new RegExp(`^[a-zA-Z0-9._%+-]+@(${knownEmailProviders.join('|')})$`, 'i'),
-        title: 'Invalid Email',
-        message: "Please provide a valid email address"
-    },
+export const validationSchema = yup.object().shape({
+    firstName: yup
+        .string()
+        .matches(FIRST_NAME_VALIDATION.regex, FIRST_NAME_VALIDATION.message)
+        .required(FIRST_NAME_VALIDATION.required),
 
-    passwordRules: {
-        pattern: /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[@$!%*?&\(\)_\+\-.])[A-Za-z\d@$!%*?&\(\)_\+\-.]{8,}$/,
-        title: 'Invalid Password',
-        message: "Password must contain at least 8 characters, one uppercase letter, one lowercase letter, one number and one special character"
-    },
+    lastName: yup
+        .string()
+        .matches(LAST_NAME_VALIDATION.regex, LAST_NAME_VALIDATION.message)
+        .required(LAST_NAME_VALIDATION.required),
 
-    newPasswordRules: {
-        pattern: /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[@$!%*?&\(\)_\+\-.])[A-Za-z\d@$!%*?&\(\)_\+\-.]{8,}$/,
-        title: 'Invalid New Password',
-        message: "Password must contain at least 8 characters, one uppercase letter, one lowercase letter, one number and one special character"
-    },
+    email: yup
+        .string()
+        .email(EMAIL_VALIDATION.message)
+        .matches(EMAIL_VALIDATION.regex, EMAIL_VALIDATION.message)
+        .required(EMAIL_VALIDATION.required),
 
-    twoFactorRules: {
-        title: 'Two-Factor Authentication',
-        message: "You'll need to verify an OTP code sent to your email each login for enhanced security"
-    },
-};
+    password: yup
+        .string()
+        .matches(PASSWORD_VALIDATION.regex, PASSWORD_VALIDATION.message)
+        .required(PASSWORD_VALIDATION.required),
+
+    role: yup
+        .string()
+        .required(ROLE_VALIDATION.required),
+});

@@ -1,7 +1,7 @@
 const Review = require('../models/Review');
 const Product = require('../models/Product');
 const Order = require('../models/Order');
-const { sendReviewEmail } = require('../config/emailService');
+const { sendReviewEmail } = require('../config/email/emailService');
 
 const populateR = (query) => {
     return query.populate([

@@ -5,7 +5,7 @@ import { useSelector } from 'react-redux';
 import { useNavigate, useParams } from 'react-router-dom';
 import { toast } from 'react-toastify';
 import { DetailsBreadcrumbs, DetailsCartWishlistButtons, formatPrice, LoadingOverlay, LoadingProductDetails, OutOfStock, ProductRestockNotificationModal, } from '../../assets/CustomComponents';
-import ImagePreviewModal from '../../components/Modal/ImagePreviewModal';
+import ImagePreviewModal from '../../components/Dashboard/Modal/ImagePreviewModal';
 import Navbar from '../../components/Navbar/Navbar';
 import AddReviewModal from '../../components/Product/Modals/AddReviewModal';
 import ProductDetailsTabs from '../../components/Product/Utils/ProductDetailsTabs';

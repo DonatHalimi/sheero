@@ -1,23 +1,32 @@
-import { knownEmailProviders } from "../../assets/CustomComponents";
+import * as yup from "yup";
+import { EMAIL_VALIDATION, MESSAGE_VALIDATION, NAME_VALIDATION, SUBJECT_VALIDATION } from "../constants/validations/contact";
 
-export const ContactValidations = {
-    nameRules: {
-        pattern: /^[A-ZÇ][a-zA-ZëËçÇ\s]{3,15}$/,
-        message: "Name must start with a capital letter and be 3-15 characters long"
-    },
+export const initialValues = (contact = null) => ({
+    name: contact?.name || "",
+    email: contact?.email || "",
+    subject: contact?.subject || "",
+    message: contact?.message || "",
+});
 
-    emailRules: {
-        pattern: new RegExp(`^[a-zA-Z0-9._%+-]+@(${knownEmailProviders.join('|')})$`, 'i'),
-        message: "Please provide a valid email address"
-    },
+export const validationSchema = yup.object().shape({
+    name: yup
+        .string()
+        .matches(NAME_VALIDATION.regex, NAME_VALIDATION.message)
+        .required(NAME_VALIDATION.required),
 
-    subjectRules: {
-        pattern: /^[A-Z][\sa-zA-Z\W]{5,50}$/,
-        message: "Subject must start with a capital letter and be 5-50 characters long"
-    },
+    email: yup
+        .string()
+        .email(EMAIL_VALIDATION.message)
+        .matches(EMAIL_VALIDATION.regex, EMAIL_VALIDATION.message)
+        .required(EMAIL_VALIDATION.required),
 
-    messageRules: {
-        pattern: /^[A-Z][\sa-zA-Z\W]{10,200}$/,
-        message: "Message must start with a capital letter and be 10-200 characters long"
-    }
-};
+    subject: yup
+        .string()
+        .matches(SUBJECT_VALIDATION.regex, SUBJECT_VALIDATION.message)
+        .required(SUBJECT_VALIDATION.required),
+
+    message: yup
+        .string()
+        .matches(MESSAGE_VALIDATION.regex, MESSAGE_VALIDATION.message)
+        .required(MESSAGE_VALIDATION.required)
+});

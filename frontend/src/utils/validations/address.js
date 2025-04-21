@@ -1,25 +1,41 @@
-export const AddressValidations = {
-    nameRules: {
-        pattern: /^[A-ZÇ][a-zA-ZëËçÇ\s]{2,15}$/,
-        title: 'Invalid Name',
-        message: "Name must start with a capital letter and be 2-15 characters long"
-    },
+import * as yup from "yup";
+import { CITY_VALIDATION, COMMENT_VALIDATION, COUNTRY_VALIDATION, NAME_VALIDATION, PHONE_NUMBER_VALIDATION, STREET_VALIDATION } from "../constants/validations/address";
 
-    streetRules: {
-        pattern: /^[A-Z][a-zA-Z0-9\s]{2,27}$/,
-        title: 'Invalid Street',
-        message: "Street must start with a capital letter and be 2-27 characters"
-    },
+export const initialValues = (address = null) => ({
+    name: address?.name || "",
+    street: address?.street || "",
+    phoneNumber: address?.phoneNumber || "",
+    comment: address?.comment || "",
+    country: address?.country || null,
+    city: address?.city || null
+});
 
-    phoneRules: {
-        pattern: /^0(43|44|45|46|47|48|49)\d{6}$/,
-        title: 'Invalid Phone Number',
-        message: "Phone number start with 043, 044, 045, 046, 047, 048 or 049 followed by 6 digits"
-    },
+export const validationSchema = yup.object().shape({
+    name: yup
+        .string()
+        .matches(NAME_VALIDATION.regex, NAME_VALIDATION.message)
+        .required(NAME_VALIDATION.required),
 
-    commentRules: {
-        pattern: /^[a-zA-Z0-9\s]{2,25}$/,
-        title: 'Invalid Comment',
-        message: "Comment must be 2-25 characters when provided"
-    }
-};
+    street: yup
+        .string()
+        .matches(STREET_VALIDATION.regex, STREET_VALIDATION.message)
+        .required(STREET_VALIDATION.required),
+
+    phoneNumber: yup
+        .string()
+        .matches(PHONE_NUMBER_VALIDATION.regex, PHONE_NUMBER_VALIDATION.message)
+        .required(PHONE_NUMBER_VALIDATION.required),
+
+    comment: yup
+        .string()
+        .nullable(true)
+        .matches(COMMENT_VALIDATION.regex, COMMENT_VALIDATION.message),
+
+    country: yup
+        .object()
+        .required(COUNTRY_VALIDATION.required),
+
+    city: yup
+        .object()
+        .required(CITY_VALIDATION.required)
+});

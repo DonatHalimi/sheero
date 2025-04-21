@@ -3,9 +3,9 @@ const City = require('../models/City');
 const Country = require('../models/Country');
 const Address = require('../models/Address');
 
-const isValidName = (v) => /^[A-Z][a-zA-Z]{2,10}$/.test(v);
-const isValidPhone = (v) => /^0(43|44|45|46|47|48|49)\d{6}$/.test(v);
+const isValidName = (v) => /^[A-ZÇ][a-zA-ZëËçÇ\s]{2,10}$/.test(v);
 const isValidStreet = (v) => /^[A-Z][a-zA-Z0-9\s]{2,27}$/.test(v);
+const isValidPhone = (v) => /^0(43|44|45|46|47|48|49)\d{6}$/.test(v);
 const isValidComment = (v) => /^[a-zA-Z0-9\s]{2,25}$/.test(v);
 
 const createSchema = yup.object({

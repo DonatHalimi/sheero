@@ -1,4 +1,4 @@
-const { sendContactEmail, sendContactEmailToAdmins } = require('../config/emailService');
+const { sendContactEmail, sendContactEmailToAdmins } = require('../config/email/emailService');
 const Contact = require('../models/Contact');
 
 const sendContactDetailsEmail = async (contact) => {

@@ -1,5 +1,6 @@
 import { ThemeProvider as MuiThemeProvider } from '@mui/material/styles';
 import { createContext, useContext, useEffect, useMemo, useState } from 'react';
+import { useHotkeys } from 'react-hotkeys-hook';
 import { getDashboardTheme } from './dashboardTheme';
 
 const ThemeContext = createContext();
@@ -29,6 +30,8 @@ export const DashboardThemeProvider = ({ children }) => {
             return newMode;
         });
     };
+
+    useHotkeys('alt+t', toggleTheme);
 
     return (
         <ThemeContext.Provider value={{ toggleTheme, mode, theme }}>

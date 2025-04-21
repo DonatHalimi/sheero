@@ -1,112 +1,55 @@
-import React, { useEffect, useState } from 'react';
-import { useDispatch, useSelector } from 'react-redux';
-import { DashboardHeader, DashboardImage, exportOptions, formatDetails, formatDimensions, formatDiscount, formatName, formatReviews, formatShipping, formatSupplier, formatVariants, LoadingDataGrid } from '../../assets/CustomComponents';
-import { exportToExcel, exportToJSON } from '../../assets/DataExport';
+import React, { useState } from 'react';
+import { useSelector } from 'react-redux';
+import {
+    DashboardHeader, DashboardImage, exportOptions, formatDetails,
+    formatDimensions, formatDiscount, formatName, formatReviews,
+    formatShipping, formatSupplier, formatVariants, LoadingDataGrid
+} from '../../assets/CustomComponents';
 import DashboardTable from '../../components/Dashboard/DashboardTable';
-import DeleteModal from '../../components/Modal/DeleteModal';
-import ImagePreviewModal from '../../components/Modal/ImagePreviewModal';
-import AddProductModal from '../../components/Modal/Product/AddProductModal';
-import EditProductModal from '../../components/Modal/Product/EditProductModal';
-import ProductDetailsDrawer from '../../components/Modal/Product/ProductDetailsDrawer';
+import DeleteModal from '../../components/Dashboard/Modal/DeleteModal';
+import ImagePreviewModal from '../../components/Dashboard/Modal/ImagePreviewModal';
+import AddProductModal from '../../components/Dashboard/Modal/Product/AddProductModal';
+import EditProductModal from '../../components/Dashboard/Modal/Product/EditProductModal';
+import ProductDetailsDrawer from '../../components/Dashboard/Modal/Product/ProductDetailsDrawer';
+import useDashboardPage from '../../hooks/useDashboardPage';
 import { getProducts } from '../../store/actions/productActions';
 
 const ProductsPage = () => {
     const { products, loading } = useSelector((state) => state.products);
-    const dispatch = useDispatch();
 
-    const [selectedProduct, setSelectedProduct] = useState(null);
-    const [selectedProducts, setSelectedProducts] = useState([]);
-    const [addProductOpen, setAddProductOpen] = useState(false);
-    const [editProductOpen, setEditProductOpen] = useState(false);
-    const [deleteModalOpen, setDeleteModalOpen] = useState(false);
-    const [deletionContext, setDeletionContext] = useState(null);
+    const dashboard = useDashboardPage({
+        fetchAction: getProducts,
+        entityName: 'product',
+        itemsPerPage: 6
+    });
+
+    const [selectedImage, setSelectedImage] = useState(null);
     const [imagePreviewOpen, setImagePreviewOpen] = useState(false);
-    const [currentPage, setCurrentPage] = useState(0);
-    const [viewDetailsOpen, setViewDetailsOpen] = useState(false);
-
-    const itemsPerPage = 6;
-
-    useEffect(() => {
-        dispatch(getProducts());
-    }, [dispatch]);
-
-    useEffect(() => {
-        const handleKeydown = (e) => {
-            if (e.altKey && e.key === 'a') {
-                setAddProductOpen(prev => !prev);
-            }
-        };
-
-        window.addEventListener('keydown', handleKeydown);
-        return () => {
-            window.removeEventListener('keydown', handleKeydown);
-        };
-    }, [products]);
-
-    const handleSelectProduct = (newSelection) => {
-        setSelectedProducts(newSelection);
-    };
-
-    const handlePageClick = (event) => {
-        setCurrentPage(event.selected);
-    };
 
     const handleImageClick = (imageUrl) => {
-        setSelectedProduct(imageUrl);
+        setSelectedImage(imageUrl);
         setImagePreviewOpen(true);
     };
 
-    const handleEdit = (product) => {
-        setSelectedProduct(product);
-        setEditProductOpen(true);
-    };
+    const transformProductForExport = (product) => ({
+        ...product,
+        dimensions: formatDimensions(product.dimensions),
+        discount: formatDiscount(product.discount),
+        category: formatName(product.category),
+        subcategory: formatName(product.subcategory),
+        subSubcategory: formatName(product.subSubcategory),
+        variants: formatVariants(product.variants),
+        supplier: formatSupplier(product.supplier),
+        details: formatDetails(product.details),
+        reviews: formatReviews(product.reviews),
+        shipping: formatShipping(product.shipping),
+    });
 
-    const handleEditFromDrawer = (product) => {
-        setViewDetailsOpen(false);
-        setSelectedProduct(product);
-        setEditProductOpen(true);
-    };
-
-    const handleDeleteSuccess = () => {
-        dispatch(getProducts());
-        setSelectedProducts([]);
-    };
-
-    const handleViewDetails = (product) => {
-        setSelectedProduct(product);
-        setViewDetailsOpen(true);
-    };
-
-    const closeDrawer = () => {
-        setViewDetailsOpen(false);
-        setSelectedProduct(null);
-    };
-
-    const handleBulkDelete = () => {
-        if (selectedProducts.length > 0) {
-            setDeletionContext({
-                endpoint: '/products/delete-bulk',
-                data: { ids: selectedProducts },
-            });
-            setDeleteModalOpen(true);
-        }
-    };
-
-    const handleSingleDelete = (product) => {
-        setDeletionContext({
-            endpoint: `/products/delete/${product._id}`,
-            data: null,
-        });
-        setDeleteModalOpen(true);
-    };
+    const handleExport = dashboard.createExportHandler('products_data', transformProductForExport);
 
     const columns = [
         { key: 'name', label: 'Name' },
-        {
-            key: 'image',
-            label: 'Image',
-            render: (item) => <DashboardImage item={item} handleImageClick={handleImageClick} />
-        },
+        { key: 'image', label: 'Image', render: (item) => <DashboardImage item={item} handleImageClick={handleImageClick} /> },
         { key: 'description', label: 'Description' },
         { key: 'price', label: 'Price', render: (item) => `€  ${item.price.toFixed(2)}` },
         { key: 'salePrice', label: 'Sale Price', render: (item) => item.salePrice ? `€  ${item.salePrice.toFixed(2)}` : 'N/A' },
@@ -117,25 +60,6 @@ const ProductsPage = () => {
         { key: 'actions', label: 'Actions' }
     ];
 
-    const handleExport = (data, format) => {
-
-        const flattenedProducts = data.map((product) => ({
-            ...product,
-            dimensions: formatDimensions(product.dimensions),
-            discount: formatDiscount(product.discount),
-            category: formatName(product.category),
-            subcategory: formatName(product.subcategory),
-            subSubcategory: formatName(product.subSubcategory),
-            variants: formatVariants(product.variants),
-            supplier: formatSupplier(product.supplier),
-            details: formatDetails(product.details),
-            reviews: formatReviews(product.reviews),
-            shipping: formatShipping(product.shipping),
-        }))
-
-        format === 'excel' ? exportToExcel(flattenedProducts, 'products_data') : exportToJSON(data, 'products_data');
-    }
-
     return (
         <div className='container mx-auto max-w-full mt-20'>
             <div className='w-full px-4'>
@@ -145,9 +69,9 @@ const ProductsPage = () => {
                     <>
                         <DashboardHeader
                             title="Products"
-                            selectedItems={selectedProducts}
-                            setAddItemOpen={setAddProductOpen}
-                            setDeleteItemOpen={handleBulkDelete}
+                            selectedItems={dashboard.selectedItems}
+                            setAddItemOpen={dashboard.openAddForm}
+                            setDeleteItemOpen={dashboard.handleBulkDelete}
                             itemName="Product"
                             exportOptions={exportOptions(products, handleExport)}
                         />
@@ -155,35 +79,52 @@ const ProductsPage = () => {
                         <DashboardTable
                             columns={columns}
                             data={products}
-                            selectedItems={selectedProducts}
-                            onSelectItem={handleSelectProduct}
-                            itemsPerPage={itemsPerPage}
-                            currentPage={currentPage}
-                            onPageChange={handlePageClick}
-                            onEdit={handleEdit}
+                            selectedItems={dashboard.selectedItems}
+                            onSelectItem={dashboard.handleSelectItems}
+                            itemsPerPage={dashboard.itemsPerPage}
+                            currentPage={dashboard.currentPage}
+                            onEdit={dashboard.openEditForm}
                             containerClassName="max-w-full"
-                            onViewDetails={handleViewDetails}
-                            onDelete={handleSingleDelete}
+                            onViewDetails={dashboard.handleViewDetails}
+                            onDelete={dashboard.handleSingleDelete}
                         />
                     </>
                 )}
 
-                <AddProductModal open={addProductOpen} onClose={() => setAddProductOpen(false)} onAddSuccess={() => dispatch(getProducts())} />
-                <EditProductModal open={editProductOpen} onClose={() => setEditProductOpen(false)} product={selectedProduct} onViewDetails={handleViewDetails} onEditSuccess={() => dispatch(getProducts())} />
-                <ProductDetailsDrawer open={viewDetailsOpen} onClose={closeDrawer} product={selectedProduct} onEdit={handleEditFromDrawer} />
+                <AddProductModal
+                    open={dashboard.formModalOpen && !dashboard.isEditing}
+                    onClose={() => dashboard.setFormModalOpen(false)}
+                    onAddSuccess={dashboard.handleFormSuccess}
+                />
+
+                <EditProductModal
+                    open={dashboard.formModalOpen && dashboard.isEditing}
+                    onClose={() => dashboard.setFormModalOpen(false)}
+                    product={dashboard.selectedItem}
+                    onViewDetails={dashboard.handleViewDetails}
+                    onEditSuccess={dashboard.handleFormSuccess}
+                />
+
+                <ProductDetailsDrawer
+                    open={dashboard.viewDetailsOpen}
+                    onClose={dashboard.closeDrawer}
+                    product={dashboard.selectedItem}
+                    onEdit={dashboard.handleEditFromDrawer}
+                />
 
                 <DeleteModal
-                    open={deleteModalOpen}
-                    onClose={() => setDeleteModalOpen(false)}
-                    deletionContext={deletionContext}
-                    onDeleteSuccess={handleDeleteSuccess}
-                    title={deletionContext?.endpoint.includes('bulk') ? 'Delete Products' : 'Delete Product'}
-                    message={deletionContext?.endpoint.includes('bulk')
+                    open={dashboard.deleteModalOpen}
+                    onClose={() => dashboard.setDeleteModalOpen(false)}
+                    deletionContext={dashboard.deletionContext}
+                    onDeleteSuccess={dashboard.handleDeleteSuccess}
+                    title={dashboard.deletionContext?.endpoint.includes('bulk') ? 'Delete Products' : 'Delete Product'}
+                    message={dashboard.deletionContext?.endpoint.includes('bulk')
                         ? 'Are you sure you want to delete the selected products?'
                         : 'Are you sure you want to delete this product?'
                     }
                 />
-                <ImagePreviewModal open={imagePreviewOpen} onClose={() => setImagePreviewOpen(false)} imageUrl={selectedProduct} />
+
+                <ImagePreviewModal open={imagePreviewOpen} onClose={() => setImagePreviewOpen(false)} imageUrl={selectedImage} />
             </div>
         </div>
     );

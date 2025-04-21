@@ -1,11 +1,19 @@
-export const CountryValidations = {
-    nameRules: {
-        pattern: /^[A-ZÇ][a-zA-ZëËçÇ\s]{3,35}$/,
-        message: "Name must start with a capital letter and be 3-35 characters long"
-    },
+import * as yup from "yup";
+import { COUNTRY_CODE_VALIDATION, NAME_VALIDATION } from "../constants/validations/country";
 
-    countryCodeRules: {
-        pattern: /^[A-Z]{2,3}$/,
-        message: "Country code must be capitalized and 2-3 capital letters"
-    },
-};
+export const initialValues = (country = null) => ({
+    name: country?.name || "",
+    countryCode: country?.countryCode || "",
+});
+
+export const validationSchema = yup.object().shape({
+    name: yup
+        .string()
+        .matches(NAME_VALIDATION.regex, NAME_VALIDATION.message)
+        .required(NAME_VALIDATION.required),
+
+    countryCode: yup
+        .string()
+        .matches(COUNTRY_CODE_VALIDATION.regex, COUNTRY_CODE_VALIDATION.message)
+        .required(COUNTRY_CODE_VALIDATION.required)
+});

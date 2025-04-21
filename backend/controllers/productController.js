@@ -6,7 +6,7 @@ const Review = require('../models/Review');
 const fs = require('fs');
 const User = require('../models/User');
 const ProductRestockSubscription = require('../models/ProductRestockSubscription');
-const { sendProductRestockNotificationEmail, sendProductRestockSubscriptionEmail } = require('../config/emailService');
+const { sendProductRestockNotificationEmail, sendProductRestockSubscriptionEmail } = require('../config/email/emailService');
 
 const createProduct = async (req, res) => {
     const { name, description, price, salePrice, category, subcategory, subSubcategory, inventoryCount, dimensions, variants, discount, supplier, shipping, details } = req.body;
@@ -353,6 +353,7 @@ const searchProducts = async (req, res) => {
                     subSubcategory: 1,
                     price: 1,
                     salePrice: 1,
+                    slug: 1,
                 },
             },
         ]);
