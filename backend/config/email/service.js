@@ -1,19 +1,23 @@
 const {
     brandImages, createAttachments, headerMessages,
     orderBodyMessages, orderStatusMessages, returnBodyMessages,
-    returnStatusImages, returnStatusMessages, statusImages
-} = require('../email/emailUtils');
+    returnStatusImages, returnStatusMessages, statusImages,
+    formatLoginMethod,
+    loginLocation
+} = require('./utils');
 const {
     generateContactHtml, generateContactToCustomerSupportHtml, generateDisable2FAEmailHtml,
     generateEmailVerificationHtml, generateEnable2FAEmailHtml, generateLogin2FAEmailHtml,
     generateOrderEmailHtml, generatePasswordResetSuccessEmailHtml, generateProductInventoryEmailHtml,
     generateProductInventoryUpdateHtml, generateProductRestockSubHtml, generateResetPasswordEmailHtml,
-    generateReturnRequestEmailHtml, generateReviewEmailHtml, generateSuccessfulOrderUpdateHtml
-} = require('../email/emailContent');
+    generateReturnRequestEmailHtml, generateReviewEmailHtml, generateSuccessfulOrderUpdateHtml,
+    generateLoginNotificationHtml
+} = require('./content');
 const { NODE_ENV, SMTP_USER } = require('../core/dotenv');
 const Role = require('../../models/Role');
-const transporter = require('../email/mailer');
+const transporter = require('./mailer');
 const User = require('../../models/User');
+const { parseUserAgent } = require('../auth/loginNotifications');
 
 async function sendEmail(userEmail, subject, text, html, attachments = []) {
     const mailOptions = {
@@ -190,35 +194,55 @@ async function sendResetPasswordEmail(user, resetToken) {
 };
 
 async function sendPasswordResetSuccessEmail(user) {
+    const { orderAttachments, returnRequestAttachments } = createAttachments(undefined, undefined);
+    const attachments = [...orderAttachments, ...returnRequestAttachments];
+
     const subject = 'Password Reset Success';
     const text = `Hello ${user.email},\n\nYour password has been successfully reset.`;
-    const html = generatePasswordResetSuccessEmailHtml(user);
+    const html = generatePasswordResetSuccessEmailHtml(user, {
+        brandImages
+    });
 
-    await sendEmail(user.email, subject, text, html);
+    await sendEmail(user.email, subject, text, html, attachments);
 };
 
 async function sendEnable2FAEmail(userEmail, otp) {
+    const { orderAttachments, returnRequestAttachments } = createAttachments(undefined, undefined);
+    const attachments = [...orderAttachments, ...returnRequestAttachments];
+
     const subject = 'Enabling Two-Factor Authentication Code';
     const text = `Hello ${userEmail},\n\nYour One-Time Password (OTP) for enabling two-factor authentication is: ${otp}\n\nIt will expire in 10 minutes.`;
 
-    const html = generateEnable2FAEmailHtml(userEmail, otp);
-    await sendEmail(userEmail, subject, text, html);
+    const html = generateEnable2FAEmailHtml(userEmail, otp, {
+        brandImages
+    });
+    await sendEmail(userEmail, subject, text, html, attachments);
 };
 
 async function sendDisable2FAEmail(userEmail, otp) {
+    const { orderAttachments, returnRequestAttachments } = createAttachments(undefined, undefined);
+    const attachments = [...orderAttachments, ...returnRequestAttachments];
+
     const subject = 'Disabling Two-Factor Authentication Code';
     const text = `Hello ${userEmail},\n\nYour One-Time Password (OTP) for disabling two-factor authentication is: ${otp}\n\nIt will expire in 10 minutes.`;
 
-    const html = generateDisable2FAEmailHtml(userEmail, otp);
-    await sendEmail(userEmail, subject, text, html);
+    const html = generateDisable2FAEmailHtml(userEmail, otp, {
+        brandImages
+    });
+    await sendEmail(userEmail, subject, text, html, attachments);
 };
 
 async function sendLogin2FAEmail(userEmail, otp) {
+    const { orderAttachments, returnRequestAttachments } = createAttachments(undefined, undefined);
+    const attachments = [...orderAttachments, ...returnRequestAttachments];
+
     const subject = 'Login Two-Factor Authentication Code';
     const text = `Hello ${userEmail},\n\nYour two-factor authentication OTP is: ${otp}\n\nIt will expire in 5 minutes.`;
 
-    const html = generateLogin2FAEmailHtml(userEmail, otp);
-    await sendEmail(userEmail, subject, text, html);
+    const html = generateLogin2FAEmailHtml(userEmail, otp, {
+        brandImages
+    });
+    await sendEmail(userEmail, subject, text, html, attachments);
 };
 
 async function sendProductRestockNotificationEmail(email, product) {
@@ -285,7 +309,7 @@ async function sendContactEmail(contact) {
     await sendEmail(contact.email, subject, text, html, attachments);
 };
 
-async function sendContactEmailToAdmins(contact) {
+async function sendContactEmailToCustomerSupport(contact) {
     const { orderAttachments, returnRequestAttachments, reviewAttachments, productInventoryAttachments } = createAttachments(undefined, undefined, undefined, contact);
     const attachments = [...orderAttachments, ...returnRequestAttachments, ...reviewAttachments, ...productInventoryAttachments];
 
@@ -340,9 +364,49 @@ async function sendSuccessfulOrderUpdate(order) {
         console.warn(`Order ${order._id} has no updatedBy email associated.`);
     }
 };
+async function sendLoginNotificationEmail(user, loginData) {
+    const { orderAttachments, returnRequestAttachments, reviewAttachments, productInventoryAttachments } = createAttachments(undefined, undefined, undefined, undefined);
+    const attachments = [...orderAttachments, ...returnRequestAttachments, ...reviewAttachments, ...productInventoryAttachments];
+
+    if (!user.loginNotifications) {
+        return { success: false, message: 'User has disabled login notifications' };
+    }
+
+    if (!loginData.location) {
+        loginData.location = {
+            country: 'Unknown',
+            city: 'Unknown',
+            region: 'Unknown'
+        };
+    }
+
+    let methodDisplay = formatLoginMethod(loginData.method);
+
+    if (loginData.provider && loginData.provider !== loginData.method) {
+        methodDisplay += ` (${formatLoginMethod(loginData.provider)})`;
+    }
+
+    const subject = 'Security Alert: New Login to your sheero Account';
+
+    const text = `Hello ${user.firstName},\n\n` +
+        `We detected a ${loginData.isNewDevice ? 'new device ' : ''}login to your sheero account.\n\n` +
+        `Date & Time: ${new Date(loginData.timestamp).toLocaleString()}\n` +
+        `IP Address: ${loginData.ipAddress}\n` +
+        `Location: ${loginLocation.city}, ${loginLocation.region}, ${loginLocation.country}\n` +
+        `Device: ${parseUserAgent(loginData.userAgent)}\n` +
+        `Login Method: ${methodDisplay}\n\n` +
+        `If this wasn't you, please change your password immediately and contact support.\n\n`;
+
+    const html = generateLoginNotificationHtml(user, { ...loginData, loginLocation, methodDisplay }, {
+        brandImages,
+    });
+
+    await sendEmail(user.email, subject, text, html, attachments);
+};
 
 module.exports = {
     sendVerificationEmail, sendOrderUpdateEmail, sendReturnRequestUpdateEmail, sendReviewEmail, sendProductInventoryUpdateEmail,
-    sendResetPasswordEmail, sendPasswordResetSuccessEmail, sendEnable2FAEmail, sendDisable2FAEmail, sendLogin2FAEmail, sendProductRestockNotificationEmail, sendProductRestockSubscriptionEmail,
-    sendContactEmail, sendContactEmailToAdmins, sendSuccessfulOrderUpdate
+    sendResetPasswordEmail, sendPasswordResetSuccessEmail, sendEnable2FAEmail, sendDisable2FAEmail, sendLogin2FAEmail,
+    sendProductRestockNotificationEmail, sendProductRestockSubscriptionEmail, sendContactEmail, sendContactEmailToCustomerSupport,
+    sendSuccessfulOrderUpdate, sendLoginNotificationEmail
 };

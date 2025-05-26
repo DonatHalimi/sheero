@@ -1,11 +1,10 @@
 import { Box, Drawer, Typography } from '@mui/material';
-import React from 'react';
-import {
-    BoxBetween, CloseButton, CollapsibleProductList, DateAdornment, DescriptionAdornment,
-    formatDate, IdAdornment, PersonAdornment, ReadOnlyTextField, ReturnStatusAdornment, TitleActions
-} from '../../../../assets/CustomComponents';
-import { downloadReturnRequestData } from '../../../../assets/DataExport';
 import { drawerPaperSx } from '../../../../assets/sx';
+import { DateAdornment, DescriptionAdornment, IdAdornment, PersonAdornment, ReturnStatusAdornment } from '../../../custom/Adornments';
+import { CollapsibleProductList, TitleActions } from '../../../custom/Dashboard';
+import { BoxBetween, CloseButton, ReadOnlyTextField } from '../../../custom/MUI';
+import { formatDate } from '../../../custom/utils';
+import { downloadReturnRequestData } from '../../../Product/Utils/DataExport';
 
 const ReturnRequestDetailsDrawer = ({ open, onClose, returnRequest, onEdit, onDelete }) => {
     const header = `Return Request for Order #<strong>${returnRequest?.order}</strong>`;

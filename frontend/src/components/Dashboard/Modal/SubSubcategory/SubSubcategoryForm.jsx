@@ -2,10 +2,12 @@ import { Autocomplete, TextField } from '@mui/material';
 import { Form, Formik } from 'formik';
 import { useEffect, useState } from 'react';
 import { toast } from 'react-toastify';
-import { CustomBox, CustomModal, CustomPaper, CustomTextField, CustomTypography, FormSubmitButtons } from '../../../../assets/CustomComponents';
 import { getSubcategoriesService } from '../../../../services/subcategoryService';
 import { addSubSubcategoryService, editSubSubcategoryService } from '../../../../services/subSubcategoryService';
 import { initialValues, validationSchema } from '../../../../utils/validations/subSubcategory';
+import { FormSubmitButtons } from '../../../custom/Dashboard';
+import { CustomBox, CustomModal, CustomPaper, CustomTextField, CustomTypography } from '../../../custom/MUI';
+import { handleApiError } from '../../../custom/utils';
 
 const SubSubcategoryForm = ({
     open,
@@ -69,7 +71,7 @@ const SubSubcategoryForm = ({
     return (
         <CustomModal open={open} onClose={onClose}>
             <div style={{ width: '400px' }}>
-                <CustomBox>
+                <CustomBox isScrollable>
                     <CustomTypography variant="h5"> {isEdit ? 'Edit SubSubcategory' : 'Add SubSubcategory'}</CustomTypography>
 
                     <Formik

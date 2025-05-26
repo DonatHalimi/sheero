@@ -7,7 +7,7 @@ const validate = require('../middleware/validation');
 const router = express.Router();
 
 router.post('/create', requireAuthAndRole(['admin', 'productManager']), validate(createSchema), createSupplier);
-router.get('/get', requireAuthAndRole(['admin', 'productManager']), getSuppliers);
+router.get('/get', requireAuthAndRole(['admin', 'productManager', 'orderManager']), getSuppliers);
 router.get('/get/:id', requireAuthAndRole(['admin', 'productManager']), validate(getByIdSchema), getSupplierById);
 router.put('/update/:id', requireAuthAndRole(['admin', 'productManager']), validate(updateSchema), updateSupplier);
 router.delete('/delete/:id', requireAuthAndRole(['admin', 'productManager']), validate(deleteSchema), deleteSupplier);

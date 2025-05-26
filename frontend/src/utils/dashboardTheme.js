@@ -31,7 +31,7 @@ export const getDashboardTheme = (mode) => createTheme({
         },
         background: {
             default: mode === 'dark' ? '#292929' : '#FFFFFF',
-            paper: mode === 'dark' ? '#1E1E1E' : '#FFFFFF',
+            paper: mode === 'dark' ? '#292929' : '#FFFFFF',
         },
         text: {
             primary: mode === 'dark' ? '#FFFFFF' : '#5c504b',
@@ -42,6 +42,18 @@ export const getDashboardTheme = (mode) => createTheme({
         },
         border: {
             default: mode === 'dark' ? '#393939' : '#e0e0e0',
+        },
+        button: {
+            main: mode === 'dark' ? '#545454' : '#5b504b',
+            disabled: mode === 'dark' ? '#393939' : '#e0e0e0',
+            hover: mode === 'dark' ? '#5e5d5d' : '#5B504B',
+            text: mode === 'dark' ? '#e0dede' : '#FFFFFF',
+        },
+        scrollbar: {
+            thumb: mode === 'dark' ? '#4A4A4A' : '#CACFCD',
+            thumbHover: mode === 'dark' ? '#6A6A6A' : '#acb2b0',
+            track: mode === 'dark' ? '#2D2D2D' : '#F8F9FA',
+            corner: mode === 'dark' ? '#1E1E1E' : '#FFFFFF',
         }
     },
     components: {

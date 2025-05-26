@@ -1,6 +1,6 @@
-import React, { useState } from 'react';
+import { useState } from 'react';
 import { toast } from 'react-toastify';
-import { CustomDeleteModal } from '../../../assets/CustomComponents';
+import { CustomDeleteModal } from '../../../components/custom/MUI';
 import axiosInstance from '../../../utils/axiosInstance';
 
 const DeleteModal = ({ open, onClose, deletionContext, onDeleteSuccess, title, message }) => {

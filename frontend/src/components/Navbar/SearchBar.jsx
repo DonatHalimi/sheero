@@ -1,7 +1,8 @@
 import { ClickAwayListener } from '@mui/material';
-import React, { useState } from 'react';
+import { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { SearchBarInput, SearchDropdown } from '../../assets/CustomComponents';
+import { SearchBarInput } from '../../components/custom/MUI';
+import { SearchDropdown } from '../../components/custom/Product';
 import { fetchSearchResultsService } from '../../services/productService';
 
 const SearchBar = () => {

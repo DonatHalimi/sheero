@@ -1,6 +1,7 @@
 import { combineReducers } from '@reduxjs/toolkit';
 import addressReducer from './reducers/addressReducer';
 import authReducer from './reducers/authReducer';
+import cartReducer from './reducers/cartReducer';
 import categoryReducer from './reducers/categoryReducer';
 import dashboardReducer from './reducers/dashboardReducer';
 import orderReducer from './reducers/orderReducer';
@@ -16,6 +17,7 @@ const rootReducer = (state, action) => {
         state = {
             auth: undefined,
             address: undefined,
+            cart: undefined,
             orders: undefined,
             returns: undefined,
             wishlist: undefined,
@@ -27,6 +29,7 @@ const rootReducer = (state, action) => {
     return combineReducers({
         auth: authReducer,
         address: addressReducer,
+        cart: cartReducer,
         orders: orderReducer,
         returns: returnReducer,
         wishlist: wishlistReducer,

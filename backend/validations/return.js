@@ -10,8 +10,8 @@ const reasons = [
     'Other',
 ];
 
-// Check if the order ID is a valid 9-digit number representing the custom order ID using regex
-const isValidId = (id) => /^\d{9}$/.test(id);
+// Check if the order ID is a valid 7-digit number representing the custom order ID using regex
+const isValidId = (id) => /^\d{7}$/.test(id);
 const validCustomReason = (v) => /^[A-Z][a-zA-Z\s]{5,20}$/.test(v);
 
 const createSchema = yup.object({

@@ -45,7 +45,6 @@ The frontend serves as the user interface layer of the application, interacting 
 
   - **assets/**  
     Stores static assets like images and other resources used throughout the app. Additionally, this folder contains:
-    - **CustomComponents.jsx**: Contains reusable components that can be utilized across various parts of the frontend.
     - **dashboardPages.js**: Contains components or pages specifically for the dashboard view.
     - **imports.js**: Includes modules or files that are imported and shared across multiple components or views.
     - **sx.js**: Exports **sx** (style) classes for styling components, typically using the `sx` prop from the [MUI](https://mui.com/system/the-sx-prop/) library for consistent styling.
@@ -64,7 +63,7 @@ The frontend serves as the user interface layer of the application, interacting 
     - **actions/**: Contains action creators that define the actions dispatched to the Redux store, modifying the state.
     - **reducers/**: Houses reducers that define how the state should change in response to dispatched actions. Each reducer manages a slice of the overall state.
     - **rootReducer.js**: Combines all individual reducers into a single root reducer, providing a unified state structure for the app.
-    - **store.js**: Central configuration for the Redux store, integrating the root reducer, middleware, and other Redux settings to manage the app’s state.
+    - **store.js**: Central configuration for the Redux store, integrating the root reducer, middleware and other Redux settings to manage the app’s state.
     - **types.js**: Defines constants for action types to ensure consistency and prevent typo-related bugs in action names and reducers.
 
   - **utils/**  
@@ -122,6 +121,7 @@ The frontend serves as the user interface layer of the application, interacting 
     "jspdf-autotable": "^3.8.4",
     "npm": "^11.0.0",
     "postcss": "^8.4.39",
+    "qrcode.react": "^4.2.0",
     "react": "^18.3.1",
     "react-countup": "^6.5.3",
     "react-dom": "^18.3.1",
@@ -152,7 +152,7 @@ The frontend serves as the user interface layer of the application, interacting 
 
 ### **Frontend Dependencies**
 
-- **[Material UI](https://mui.com):** Prebuilt React components such as buttons, icons, and grids.
+- **[Material UI](https://mui.com):** Prebuilt React components such as buttons, icons and grids.
 - **[Axios](https://www.npmjs.com/package/axios):** Simplifies making HTTP requests to the backend API.
 - **[Formik](https://www.npmjs.com/package/formik):** For form management and validation.
 - **[Yup](https://www.npmjs.com/package/yup):** For form validation schema.
@@ -163,6 +163,8 @@ The frontend serves as the user interface layer of the application, interacting 
 - **[Tailwind CSS](https://tailwindcss.com):** A utility-first CSS framework for fast and responsive UI design.
 - **[Framer Motion](https://www.npmjs.com/package/framer-motion):** For adding animations to the UI.
 - **[Vite](https://vite.dev/guide/):** A fast build tool, used for frontend development and bundling.
+- **[Splide](https://splidejs.com):** A lightweight, responsive, touch-friendly slider library, used for image carousels.
+- **[QrCode](https://www.npmjs.com/package/qrcode.react):** For generating QR codes for two-factor authentication with Google Authenticator, Microsoft Authenticator or Authy.
 - **[React Toastify](https://www.npmjs.com/package/react-toastify):** Provides notifications in the UI.
 - **[XLSX](https://www.npmjs.com/package/xlsx):** For exporting data as Excel files.
 - **[JSPDF](https://www.npmjs.com/package/jspdf):** For exporting data as PDF files.
@@ -172,5 +174,5 @@ The frontend serves as the user interface layer of the application, interacting 
 
 ## **Backend**
 
-This frontend communicates with a robust backend API, which is fully documented and accessible through Postman. For detailed information on the API endpoints, request/response formats, and usage examples, please refer to the official [API documentation](https://documenter.getpostman.com/view/31736145/2sA3kRL56j) for sheero.
+This frontend communicates with a robust backend API, which is fully documented and accessible through Postman. For detailed information on the API endpoints, request/response formats and usage examples, please refer to the official [API documentation](https://documenter.getpostman.com/view/31736145/2sA3kRL56j) for sheero.
 For more information on the backend setup and usage, you can refer to the [README](backend/README.md) in the backend repository.

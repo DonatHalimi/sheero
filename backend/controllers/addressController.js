@@ -63,16 +63,21 @@ const getAddressByUser = async (req, res) => {
 
 const updateAddress = async (req, res) => {
     const addressId = req.params.id;
-    const { name, street, city, country, phoneNumber, comment } = req.body;
+    const { userId, role } = req.user;
 
     try {
-        const address = await Address.findOne({ _id: addressId, user: req.user.userId });
+        const address = await Address.findById(addressId);
+        if (!address) return res.status(404).json({ success: false, message: 'Address not found' });
 
-        const updatedAddress = await Address.findByIdAndUpdate(
-            address._id,
-            { name, street, city, country, phoneNumber, comment },
-            { new: true, runValidators: true }
-        );
+        const isOwner = address.user.toString() === userId;
+        const isAdmin = role?.name === 'admin';
+
+        if (!isOwner && !isAdmin) return res.status(403).json({ success: false, message: 'Unauthorized to update this address' });
+
+        const updatedAddress = await Address.findByIdAndUpdate(addressId, req.body, {
+            new: true,
+            runValidators: true
+        });
 
         res.status(200).json({ message: 'Address updated successfully', updatedAddress });
     } catch (error) {

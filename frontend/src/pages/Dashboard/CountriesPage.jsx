@@ -1,5 +1,4 @@
-import React from 'react';
-import { DashboardCountryFlag } from '../../assets/CustomComponents';
+import { DashboardCountryFlag } from '../../components/custom/Dashboard';
 import DashboardPage from '../../components/Dashboard/DashboardPage';
 import CountryDetailsDrawer from '../../components/Dashboard/Modal/Country/CountryDetailsDrawer';
 import CountryForm from '../../components/Dashboard/Modal/Country/CountryForm';

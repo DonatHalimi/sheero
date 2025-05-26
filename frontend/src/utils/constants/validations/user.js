@@ -1,4 +1,4 @@
-import { knownEmailProviders } from "../../../assets/CustomComponents";
+import { knownEmailProviders } from "../../../components/custom/utils";
 
 export const FIRST_NAME_VALIDATION = {
     regex: /^[A-ZÇ][\sa-zA-ZëËçÇ\W]{2,10}$/,
@@ -35,4 +35,9 @@ export const ROLE_VALIDATION = {
 export const TWO_FACTOR_VALIDATION = {
     title: 'Two-Factor Authentication',
     message: "You'll need to verify an OTP code sent to your email or authenticator app each login for enhanced security"
+};
+
+export const LOGIN_NOTIFICATIONS_VALIDATION = {
+    title: 'Login Notifications',
+    message: "You'll be notified via email on each login to your account for enhanced security"
 };

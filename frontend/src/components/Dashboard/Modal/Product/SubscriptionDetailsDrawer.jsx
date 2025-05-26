@@ -1,9 +1,10 @@
 import { Box, Chip, Drawer, Typography, useTheme } from '@mui/material';
-import React from 'react';
-import { CloseButton, DetailsTitle, DrawerTypography, IdAdornment, ReadOnlyTextField } from '../../../../assets/CustomComponents';
-import { downloadSubscriptionData } from '../../../../assets/DataExport';
 import { chipSx, drawerPaperSx } from '../../../../assets/sx';
 import { getImageUrl } from '../../../../utils/config';
+import { IdAdornment } from '../../../custom/Adornments';
+import { DetailsTitle } from '../../../custom/Dashboard';
+import { CloseButton, DrawerTypography, ReadOnlyTextField } from '../../../custom/MUI';
+import { downloadSubscriptionData } from '../../../Product/Utils/DataExport';
 
 const SubscriptionDetailsDrawer = ({ open, onClose, subscription, onDelete }) => {
     const theme = useTheme();

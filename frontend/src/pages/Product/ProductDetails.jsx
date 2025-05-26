@@ -1,10 +1,13 @@
 import { Add, LocalAtm, Payment, Remove, RemoveShoppingCart } from '@mui/icons-material';
 import { IconButton } from '@mui/material';
-import React, { useEffect, useState } from 'react';
-import { useSelector } from 'react-redux';
+import { useEffect, useState } from 'react';
+import { useDispatch, useSelector } from 'react-redux';
 import { useNavigate, useParams } from 'react-router-dom';
 import { toast } from 'react-toastify';
-import { DetailsBreadcrumbs, DetailsCartWishlistButtons, formatPrice, LoadingOverlay, LoadingProductDetails, OutOfStock, ProductRestockNotificationModal, } from '../../assets/CustomComponents';
+import { LoadingOverlay, LoadingProductDetails } from '../../components/custom/LoadingSkeletons';
+import { DetailsCartWishlistButtons } from '../../components/custom/MUI';
+import { DetailsBreadcrumbs, OutOfStock, ProductRestockNotificationModal } from '../../components/custom/Product';
+import { formatPrice } from '../../components/custom/utils';
 import ImagePreviewModal from '../../components/Dashboard/Modal/ImagePreviewModal';
 import Navbar from '../../components/Navbar/Navbar';
 import AddReviewModal from '../../components/Product/Modals/AddReviewModal';
@@ -13,10 +16,13 @@ import Footer from '../../components/Utils/Footer';
 import { addToCartService } from '../../services/cartService';
 import { checkUserRestockSubscriptionService, deleteUserRestockSubscriptionService, getProductDetails, subscribeForRestockService } from '../../services/productService';
 import { addToWishlistService } from '../../services/wishlistService';
+import { getCartCount } from '../../store/actions/cartActions';
 import { getImageUrl } from '../../utils/config';
 
 const ProductDetails = () => {
     const { isAuthenticated } = useSelector((state) => state.auth);
+    const dispatch = useDispatch();
+
     const { slug } = useParams();
     const navigate = useNavigate();
 
@@ -120,8 +126,13 @@ const ProductDetails = () => {
                 onClick: () => navigate(`/${action === 'wishlist' ? 'profile/wishlist' : 'cart'}`),
             });
 
+            if (action === 'wishlist') {
+                document.dispatchEvent(new Event('wishlistUpdated'));
+            }
+
             if (action === 'cart') {
                 document.dispatchEvent(new CustomEvent('cartUpdated', { detail: product._id }));
+                dispatch(getCartCount());
 
                 if (quantity > product.inventoryCount) {
                     toast.error(`Cannot add more than ${product.inventoryCount} items to cart.`);

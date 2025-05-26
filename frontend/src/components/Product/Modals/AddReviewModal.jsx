@@ -1,9 +1,10 @@
 import { Rating, TextField } from '@mui/material';
-import React, { useEffect, useState } from 'react';
+import { useEffect, useState } from 'react';
 import { useSelector } from 'react-redux';
 import { useNavigate } from 'react-router-dom';
 import { toast } from 'react-toastify';
-import { BrownButton, BrownOutlinedTextField, CustomBox, CustomModal, CustomTypography, LoadingLabel } from '../../../assets/CustomComponents';
+import { LoadingLabel } from '../../../components/custom/LoadingSkeletons';
+import { BrownButton, BrownOutlinedTextField, CustomBox, CustomModal, CustomTypography } from '../../../components/custom/MUI';
 import { addReviewService, checkReviewEligibilityService } from '../../../services/reviewService';
 import { COMMENT_VALIDATION, TITLE_VALIDATION } from '../../../utils/constants/validations/review';
 
@@ -109,9 +110,7 @@ const AddReviewModal = ({ open, onClose, product, onReviewSuccess }) => {
     return (
         <CustomModal open={open} onClose={onClose}>
             <CustomBox>
-                <CustomTypography variant="h5" className="!text-gray-800 !font-semilight">
-                    Add Review
-                </CustomTypography>
+                <CustomTypography variant="h5" className="!text-gray-800 !font-semilight">Add Review</CustomTypography>
 
                 {canReview === false && (
                     <CustomTypography variant="body2" className="!text-red-600">

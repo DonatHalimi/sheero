@@ -1,4 +1,3 @@
-import React from 'react';
 import DashboardPage from '../../components/Dashboard/DashboardPage';
 import SupplierDetailsDrawer from '../../components/Dashboard/Modal/Supplier/SupplierDetailsDrawer';
 import SupplierForm from '../../components/Dashboard/Modal/Supplier/SupplierForm';

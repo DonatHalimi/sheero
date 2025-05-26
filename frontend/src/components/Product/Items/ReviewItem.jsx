@@ -1,5 +1,6 @@
-import React from 'react';
-import { CenteredMoreVertIcon, RatingStars, truncateText } from '../../../assets/CustomComponents';
+import { CenteredMoreVertIcon } from '../../../components/custom/Icons';
+import { RatingStars } from '../../../components/custom/Product';
+import { truncateText } from '../../../components/custom/utils';
 import { getImageUrl } from '../../../utils/config';
 
 const ReviewItem = ({ review, onImageClick, onMenuClick, onCardClick }) => {

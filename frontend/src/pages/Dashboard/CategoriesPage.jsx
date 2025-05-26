@@ -1,5 +1,6 @@
-import React, { useState } from 'react';
-import { DashboardImage, formatDate } from '../../assets/CustomComponents';
+import { useState } from 'react';
+import { DashboardImage } from '../../components/custom/Dashboard';
+import { formatDate } from '../../components/custom/utils';
 import DashboardPage from '../../components/Dashboard/DashboardPage';
 import CategoryDetailsDrawer from '../../components/Dashboard/Modal/Category/CategoryDetailsDrawer';
 import CategoryForm from '../../components/Dashboard/Modal/Category/CategoryForm';

@@ -358,6 +358,26 @@ export const profileDropdownButtonSx = (theme) => ({ color: theme.palette.text.p
 
 export const profileIconSx = (theme) => ({ color: theme.palette.text.primary });
 
+export const dashboardSearchSuggestionsBoxSx = (theme) => ({
+    overflowY: 'auto',
+    '&::-webkit-scrollbar': {
+        width: '7px'
+    },
+    '&::-webkit-scrollbar-thumb': {
+        backgroundColor: theme.palette.scrollbar.thumb,
+        borderRadius: '6px',
+    },
+    '&::-webkit-scrollbar-thumb:hover': {
+        backgroundColor: theme.palette.scrollbar.thumbHover,
+    },
+    '&::-webkit-scrollbar-track': {
+        backgroundColor: theme.palette.scrollbar.track,
+    },
+    '&::-webkit-scrollbar-corner': {
+        backgroundColor: theme.palette.scrollbar.corner,
+    },
+});
+
 export const dashboardSearchSuggestionsSx = (index, selectedIndex, theme) => ({
     borderRadius: index === selectedIndex ? 2 : 0,
     backgroundColor: selectedIndex === index ? theme.palette.action.hover : 'transparent',
@@ -370,13 +390,13 @@ export const dashboardSearchSuggestionsSx = (index, selectedIndex, theme) => ({
 });
 
 export const dashboardSearchBoxSx = (theme) => ({
-    backgroundColor: theme.palette.background.paper,
+    backgroundColor: theme.palette.background.default,
     color: theme.palette.text.primary,
     boxShadow: `0px 4px 20px ${theme.palette.mode === 'dark' ? 'rgba(0, 0, 0, 0.6)' : 'rgba(0, 0, 0, 0.1)'}`,
 });
 
 export const dashboardSearchHintBarSx = (theme) => ({
-    backgroundColor: theme.palette.background.paper,
+    backgroundColor: theme.palette.background.default,
     borderColor: theme.palette.divider,
     color: theme.palette.text.primary,
 });
@@ -396,16 +416,25 @@ export const dashboardSearchTextSx = (theme, hasSuggestions) => ({
         borderRadius: 1,
         backgroundColor: theme.palette.background.default,
         color: theme.palette.text.primary,
-        '& fieldset': { borderColor: theme.palette.secondary.main },
-        '&:hover fieldset': { borderColor: theme.palette.primary.main },
-        '&.Mui-focused fieldset': { borderColor: theme.palette.primary.main },
+        '& fieldset': {
+            borderColor:
+                theme.palette.mode === 'dark'
+                    ? theme.palette.primary.main
+                    : theme.palette.secondary.main,
+        },
+        '&:hover fieldset': {
+            borderColor: theme.palette.primary.main,
+        },
+        '&.Mui-focused fieldset': {
+            borderColor: theme.palette.primary.main,
+        },
     },
 });
 
 export const dashboardAppBarSx = (theme) => ({
     boxShadow: '1px 0px 3px rgba(0, 0, 0, 0.1)',
     display: 'flex',
-    backgroundColor: theme.palette.background.paper,
+    backgroundColor: theme.palette.background.default,
     color: theme.palette.text.primary,
 });
 
@@ -429,6 +458,7 @@ export const loadingDataGridContainerSx = (theme) => ({ backgroundColor: theme.p
 export const loadingDataGridSkeletonSx = (theme) => ({ backgroundColor: theme.palette.mode === 'dark' ? theme.palette.action.hover : undefined })
 
 export const dashboardTableSx = (theme) => ({
+    backgroundColor: theme.palette.background.paper,
     border: 'none',
     '& .MuiDataGrid-main': {
         border: 'none',
@@ -475,6 +505,19 @@ export const keyboardKeySx = (theme) => ({
     py: '2px',
     display: 'inline-block',
     fontFamily: 'monospace',
+});
+
+export const formSubmitSx = (theme) => ({
+    backgroundColor: theme.palette.button.main,
+    color: theme.palette.button.text,
+    '&:hover': {
+        backgroundColor: theme.palette.button.hover,
+    },
+    '&.Mui-disabled': {
+        backgroundColor: theme.palette.button.disabled,
+        border: `1px solid ${theme.palette.border.default}`,
+        color: theme.palette.text.secondary,
+    },
 });
 
 export const drawerPaperSx = {
@@ -536,4 +579,24 @@ export const profileBoxSx = {
     display: 'flex',
     flexDirection: { xs: 'column', md: 'row' },
     gap: { xs: 3, md: 2 }
-}
+};
+
+export const orderDetailsModalSx = {
+    display: 'flex',
+    alignItems: 'center',
+    justifyContent: 'center',
+    outline: 'none'
+};
+
+export const orderDetailsBoxSx = {
+    width: '800px',
+    maxWidth: '95vw',
+    maxHeight: '80vh',
+    bgcolor: 'white',
+    borderRadius: 2,
+    boxShadow: 24,
+    p: 2,
+    outline: 'none',
+    display: "flex",
+    flexDirection: "column",
+};

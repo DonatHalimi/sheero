@@ -1,5 +1,4 @@
 const cookieParser = require('cookie-parser');
-const connectDB = require('./config/core/db');
 const cors = require('cors');
 const corsOptions = require('./config/core/cors');
 const express = require('express');
@@ -10,6 +9,8 @@ const session = require('express-session');
 const { NODE_ENV, SESSION_SECRET } = require('./config/core/dotenv');
 
 const app = express();
+
+app.set('corsOrigin', corsOptions.origin);
 
 app.use(express.json());
 app.use(cookieParser());
@@ -35,5 +36,4 @@ app.use(passport.session());
 app.use('/uploads', express.static('uploads'));
 app.use('/api', routes);
 
-connectDB();
 launchServer(app);

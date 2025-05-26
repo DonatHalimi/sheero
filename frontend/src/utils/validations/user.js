@@ -9,7 +9,6 @@ export const initialValues = (user = null) => ({
     role: user?.role?._id || null,
 });
 
-
 export const validationSchema = yup.object().shape({
     firstName: yup
         .string()

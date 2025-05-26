@@ -1,5 +1,6 @@
-import React from 'react';
-import { formatAddress, formatArrivalDateRange, formatProducts, formatQuantity, formatTotalAmount, formatUser, RenderOrderDelStatus, RenderOrderPaymentInfo } from '../../assets/CustomComponents';
+import { RenderOrderDelStatus } from '../../components/custom/Adornments';
+import { RenderOrderPaymentInfo } from '../../components/custom/Dashboard';
+import { formatAddress, formatArrivalDateRange, formatProducts, formatQuantity, formatTotalAmount, formatUser } from '../../components/custom/utils';
 import DashboardPage from '../../components/Dashboard/DashboardPage';
 import OrderDetailsDrawer from '../../components/Dashboard/Modal/Order/OrderDetailsDrawer';
 import OrderForm from '../../components/Dashboard/Modal/Order/OrderForm';

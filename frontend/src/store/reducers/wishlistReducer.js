@@ -1,7 +1,8 @@
-import { CLEAR_WISHLIST, GET_WISHLIST_ITEMS, GET_WISHLIST_ITEMS_ERROR, REMOVE_FROM_WISHLIST, } from '../types';
+import { CLEAR_WISHLIST, GET_WISHLIST_COUNT, GET_WISHLIST_ITEMS, GET_WISHLIST_ITEMS_ERROR, REMOVE_FROM_WISHLIST, } from '../types';
 
 const initialState = {
     wishlistItems: [],
+    wishlistCount: 0,
     loading: true,
     error: null,
 };
@@ -14,6 +15,12 @@ export default function (state = initialState, action) {
                 wishlistItems: action.payload,
                 loading: false,
                 error: null
+            };
+
+        case GET_WISHLIST_COUNT:
+            return {
+                ...state,
+                wishlistCount: action.payload
             };
 
         case GET_WISHLIST_ITEMS_ERROR:

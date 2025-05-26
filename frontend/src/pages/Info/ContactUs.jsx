@@ -1,8 +1,9 @@
 import { Container, TextField, Typography } from '@mui/material';
-import React, { useEffect, useRef, useState } from 'react';
+import { useEffect, useRef, useState } from 'react';
 import { useSelector } from 'react-redux';
 import { toast } from 'react-toastify';
-import { BrownButton, ErrorTooltip, LoadingLabel } from '../../assets/CustomComponents';
+import { LoadingLabel } from '../../components/custom/LoadingSkeletons';
+import { BrownButton, ErrorTooltip } from '../../components/custom/MUI';
 import Navbar from '../../components/Navbar/Navbar';
 import Footer from '../../components/Utils/Footer';
 import { addContactService } from '../../services/contactService';

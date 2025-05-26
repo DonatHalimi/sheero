@@ -1,16 +1,19 @@
 import { Visibility, VisibilityOff } from '@mui/icons-material';
-import { Box, IconButton, InputAdornment, TextField, Tooltip } from '@mui/material';
-import React, { useEffect, useState } from 'react';
+import { Box, IconButton, InputAdornment, Switch, TextField, Tooltip } from '@mui/material';
+import { useEffect, useState } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 import { toast } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
-import { BrownButton, BrownOutlinedTextField, Header, LoadingDetails, LoadingLabel, ProfileLayout, TwoFactorButton, TwoFactorModal } from '../../assets/CustomComponents';
-import { downloadUserData } from '../../assets/DataExport';
 import { profileBoxSx } from '../../assets/sx';
+import { LoadingDetails, LoadingLabel } from '../../components/custom/LoadingSkeletons';
+import { BrownButton, BrownOutlinedTextField, DetailsBox } from '../../components/custom/MUI';
+import { Header, ProfileLayout, TwoFactorButton, TwoFactorModal } from '../../components/custom/Profile';
 import Navbar from '../../components/Navbar/Navbar';
+import { downloadUserData } from '../../components/Product/Utils/DataExport';
 import Footer from '../../components/Utils/Footer';
-import { updateUserProfile } from '../../store/actions/authActions';
-import { EMAIL_VALIDATION, FIRST_NAME_VALIDATION, LAST_NAME_VALIDATION, PASSWORD_VALIDATION, TWO_FACTOR_VALIDATION } from '../../utils/constants/validations/user';
+import { toggleLoginNotificationsService } from '../../services/authService';
+import { loadUser, updateUserProfile } from '../../store/actions/authActions';
+import { EMAIL_VALIDATION, FIRST_NAME_VALIDATION, LAST_NAME_VALIDATION, LOGIN_NOTIFICATIONS_VALIDATION, PASSWORD_VALIDATION, TWO_FACTOR_VALIDATION } from '../../utils/constants/validations/user';
 
 const ProfileDetails = () => {
     const { user, loading } = useSelector(state => state.auth);
@@ -26,6 +29,7 @@ const ProfileDetails = () => {
     const [showNewPassword, setShowNewPassword] = useState(false);
     const [isSubmitting, setIsSubmitting] = useState(false);
     const [is2faOn, setIs2faOn] = useState(user?.twoFactorEnabled || false);
+    const [loginNotifications, setLoginNotifications] = useState(user?.loginNotifications || false);
     const [modalOpen, setModalOpen] = useState(false);
 
     const [firstNameValid, setFirstNameValid] = useState(true);
@@ -111,6 +115,9 @@ const ProfileDetails = () => {
 
             if (result.success) {
                 toast.success('Profile updated successfully!');
+                if (updatedData.firstName) {
+                    await dispatch(loadUser());
+                }
             } else {
                 toast.error(result.error || 'Profile update failed');
             }
@@ -118,6 +125,19 @@ const ProfileDetails = () => {
             toast.error('Profile update failed');
         } finally {
             setIsSubmitting(false);
+        }
+    };
+
+    const handleToggle = async () => {
+        const newValue = !loginNotifications;
+        try {
+            const response = await toggleLoginNotificationsService(newValue);
+            setLoginNotifications(response.data.loginNotifications);
+            if (response.data.success) {
+                toast.success(response.data.message);
+            }
+        } catch (err) {
+            toast.error('Could not update setting');
         }
     };
 
@@ -163,7 +183,6 @@ const ProfileDetails = () => {
         <>
             <Navbar />
             <ProfileLayout>
-
                 <Header
                     title="Profile Details"
                     isUserData={true}
@@ -171,7 +190,7 @@ const ProfileDetails = () => {
                 />
 
                 <Tooltip title={title} placement="top" arrow>
-                    <Box sx={{ p: { xs: 3, md: 3 }, }} className="bg-white rounded-md shadow-sm mb-4">
+                    <DetailsBox hasPadding={false}>
                         {loading ? (
                             <LoadingDetails />
                         ) : (
@@ -341,10 +360,10 @@ const ProfileDetails = () => {
                                 </BrownButton>
                             </form>
                         )}
-                    </Box>
+                    </DetailsBox>
                 </Tooltip>
 
-                <Box sx={{ p: { xs: 3, md: 3 } }} className="bg-white rounded-md shadow-sm mb-5 !p-5">
+                <DetailsBox>
                     {loading ? (
                         <LoadingDetails />
                     ) : (
@@ -363,8 +382,34 @@ const ProfileDetails = () => {
                             </p>
                         </>
                     )}
-                </Box>
-            </ProfileLayout>
+                </DetailsBox>
+
+                <DetailsBox>
+                    {loading ? (
+                        <LoadingDetails />
+                    ) : (
+                        <>
+                            <div className="flex items-center justify-between">
+                                <div className="flex items-center space-x-2">
+                                    <span>{LOGIN_NOTIFICATIONS_VALIDATION.title}</span>
+                                    <p className={`text-sm bg-stone-50 rounded-md px-2 ${loginNotifications ? 'text-green-500' : 'text-red-500'}`}>
+                                        {loginNotifications ? 'Enabled' : 'Disabled'}
+                                    </p>
+                                </div>
+                                <Switch
+                                    checked={loginNotifications}
+                                    onChange={handleToggle}
+                                    color="primary"
+                                />
+                            </div>
+                            <p className="mt-2 text-sm text-gray-600">
+                                {LOGIN_NOTIFICATIONS_VALIDATION.message}
+                            </p>
+                        </>
+                    )}
+                </DetailsBox>
+
+            </ProfileLayout >
 
             <TwoFactorModal open={modalOpen} onClose={() => setModalOpen(false)} />
             <Footer />

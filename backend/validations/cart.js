@@ -60,15 +60,4 @@ const removeSchema = yup.object({
         }),
 });
 
-const clearSchema = yup.object({
-    productId: yup
-        .string()
-        .test('cart-empty', 'No products found in the cart', async function (value) {
-            const user = this.options.context.user;
-            const cart = await Cart.findOne({ user: user.userId });
-            if (!cart || cart.items.length === 0) return false;
-            return true;
-        }),
-});
-
-module.exports = { addSchema, updateSchema, removeSchema, clearSchema };
+module.exports = { addSchema, updateSchema, removeSchema };

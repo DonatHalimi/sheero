@@ -2,11 +2,12 @@ import { Autocomplete, TextField } from '@mui/material';
 import { Form, Formik } from 'formik';
 import { useEffect, useState } from 'react';
 import { toast } from 'react-toastify';
-import { CustomBox, CustomModal, CustomPaper, CustomTextField, CustomTypography, FormSubmitButtons } from '../../../../assets/CustomComponents';
 import { addAddressService, editAddressService } from '../../../../services/addressService';
 import { getCitiesByCountryService } from '../../../../services/cityService';
 import { getCountriesService } from '../../../../services/countryService';
 import { initialValues, validationSchema } from '../../../../utils/validations/address';
+import { FormSubmitButtons } from '../../../custom/Dashboard';
+import { CustomBox, CustomModal, CustomPaper, CustomTextField, CustomTypography } from '../../../custom/MUI';
 
 const AddressForm = ({
     open,

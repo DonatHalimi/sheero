@@ -1,11 +1,13 @@
 import { Box, FormControl, InputLabel, MenuItem, Select, TextField } from '@mui/material';
-import React, { useEffect, useState } from 'react';
+import { useEffect, useState } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 import { toast } from 'react-toastify';
-import { BrownButton, Header, LoadingDetails, LoadingLabel, ProfileLayout } from '../../assets/CustomComponents';
-import { downloadAddress } from '../../assets/DataExport';
 import { profileBoxSx } from '../../assets/sx';
+import { LoadingDetails, LoadingLabel } from '../../components/custom/LoadingSkeletons';
+import { BrownButton, DetailsBox } from '../../components/custom/MUI';
+import { Header, ProfileLayout } from '../../components/custom/Profile';
 import Navbar from '../../components/Navbar/Navbar';
+import { downloadAddress } from '../../components/Product/Utils/DataExport';
 import Footer from '../../components/Utils/Footer';
 import { addAddress, getAddressByUser, getCities, getCountries, updateAddress } from '../../store/actions/addressActions';
 import { COMMENT_VALIDATION, NAME_VALIDATION, PHONE_NUMBER_VALIDATION, STREET_VALIDATION } from '../../utils/constants/validations/address';
@@ -174,12 +176,7 @@ const AddressDetails = () => {
                     onDownloadAddress={handleDownloadAddress}
                 />
 
-                <Box
-                    sx={{
-                        p: { xs: 3, md: 3 }
-                    }}
-                    className='bg-white rounded-md shadow-sm mb-3'
-                >
+                <DetailsBox hasPadding={false}>
                     {loadingUserAddress ? (
                         <LoadingDetails showAdditionalField={true} />
                     ) : (
@@ -334,7 +331,7 @@ const AddressDetails = () => {
                             </BrownButton>
                         </form>
                     )}
-                </Box>
+                </DetailsBox>
             </ProfileLayout >
             <Footer />
         </>

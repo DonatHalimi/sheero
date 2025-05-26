@@ -1,5 +1,4 @@
-import React from 'react';
-import { RenderReturnStatus } from '../../assets/CustomComponents';
+import { RenderReturnStatus } from '../../components/custom/Adornments';
 import DashboardPage from '../../components/Dashboard/DashboardPage';
 import ReturnDetailsDrawer from '../../components/Dashboard/Modal/ReturnRequest/ReturnDetailsDrawer';
 import ReturnRequestForm from '../../components/Dashboard/Modal/ReturnRequest/ReturnRequestForm';

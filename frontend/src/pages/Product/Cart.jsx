@@ -1,17 +1,20 @@
 import { Add, DeleteOutline, Remove } from '@mui/icons-material';
 import { IconButton, Table, TableBody, TableCell, TableContainer, TableHead, TableRow, Tooltip } from '@mui/material';
-import React, { useEffect, useState } from 'react';
+import { useEffect, useState } from 'react';
 import CountUp from 'react-countup';
 import { useDispatch, useSelector } from 'react-redux';
 import { useNavigate } from 'react-router-dom';
 import { toast } from 'react-toastify';
-import { CheckoutButton, CustomDeleteModal, LoadingCart, LoadingOverlay, NotFound, RoundIconButton, formatPrice, truncateText } from '../../assets/CustomComponents';
 import emptyCartImage from '../../assets/img/empty/cart.png';
+import { LoadingCart, LoadingOverlay } from '../../components/custom/LoadingSkeletons';
+import { CheckoutButton, CustomDeleteModal, NotFound, RoundIconButton } from '../../components/custom/MUI';
+import { formatPrice, truncateText } from '../../components/custom/utils';
 import Navbar from '../../components/Navbar/Navbar';
 import PaymentModal from '../../components/Product/Modals/PaymentModal';
 import Footer from '../../components/Utils/Footer';
 import { clearCartService, createStripeSessionService, getCartService, makeCashPaymentService, removeFromCartService, updateQuantityService } from '../../services/cartService';
 import { getAddressByUser } from '../../store/actions/addressActions';
+import { getCartCount } from '../../store/actions/cartActions';
 import { getImageUrl } from '../../utils/config';
 
 const Cart = () => {
@@ -78,6 +81,7 @@ const Cart = () => {
             const { data } = await updateQuantityService(cartData);
             setCart(data);
             document.dispatchEvent(new CustomEvent('cartUpdated', { detail: data }));
+            dispatch(getCartCount());
         } catch (error) {
             console.error('Failed to update quantity:', error?.response?.data?.message || error.message);
         } finally {
@@ -98,6 +102,7 @@ const Cart = () => {
             }
 
             document.dispatchEvent(new CustomEvent('cartUpdated', { detail: data }));
+            dispatch(getCartCount());
         } catch (error) {
             console.error('Failed to remove product:', error?.response?.data?.message || error.message);
         } finally {
@@ -111,6 +116,7 @@ const Cart = () => {
             const { data } = await clearCartService();
             setCart(data);
             document.dispatchEvent(new CustomEvent('cartUpdated', { detail: data }));
+            dispatch(getCartCount());
 
             toast.success('Cart cleared successfully!', {
                 onClick: () => navigate('/'),
@@ -151,7 +157,6 @@ const Cart = () => {
         try {
             const { data } = await createStripeSessionService(cartData);
 
-            await clearCartService();
             setShowPaymentModal(false);
             window.location.href = data.url;
         } catch (error) {

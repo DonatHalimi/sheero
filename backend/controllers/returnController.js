@@ -1,13 +1,11 @@
-const { sendReturnRequestUpdateEmail } = require('../config/email/emailService');
+const { returnEmailQueue } = require('../config/email/queues');
 const ReturnRequest = require('../models/ReturnRequest');
 
 const createReturnRequest = async (req, res) => {
     const { orderId, productIds, reason, customReason } = req.body;
     const userId = req.user?.userId;
 
-    if (!orderId || !productIds?.length || !userId || !reason) {
-        return res.status(400).json({ message: 'Missing required fields' });
-    }
+    if (!orderId || !productIds?.length || !userId || !reason) return res.status(400).json({ message: 'Missing required fields' });
 
     try {
         const returnRequest = new ReturnRequest({
@@ -24,13 +22,13 @@ const createReturnRequest = async (req, res) => {
             .populate('user')
             .populate('products');
 
+        res.status(201).json({ message: 'Return request submitted successfully', returnRequest: savedReturnRequest });
+
         if (populatedReturnRequest.user?.email) {
-            await sendReturnRequestUpdateEmail(populatedReturnRequest);
+            returnEmailQueue.add({ returnRequest: populatedReturnRequest })
         } else {
             console.warn(`Return request ${savedReturnRequest._id} has no associated email.`);
         }
-
-        res.status(201).json({ message: 'Return request submitted successfully', returnRequest: savedReturnRequest });
     } catch (error) {
         console.error('Error creating return request:', error);
         res.status(500).json({ message: error.message || 'An unexpected error occurred' });
@@ -59,17 +57,18 @@ const manageReturnRequest = async (req, res) => {
 
         if (!populatedReturnRequest) return res.status(404).json({ message: 'Return request not found after saving' });
 
-        if (populatedReturnRequest.user?.email) {
-            await sendReturnRequestUpdateEmail(populatedReturnRequest);
-        } else {
-            console.warn(`Return request ${savedReturnRequest._id} has no associated email.`);
-        }
-
         res.json({
             success: true,
             message: `The status of Return Request #${requestId} has been successfully updated from '${previousStatus}' to '${status}'. Click to copy the return request ID.`,
             savedReturnRequest,
         });
+
+        if (populatedReturnRequest.user?.email) {
+            returnEmailQueue.add({ returnRequest: populatedReturnRequest })
+        } else {
+            console.warn(`Return request ${requestId} has no email; skipping queue`);
+        }
+
     } catch (error) {
         res.status(500).json({ message: 'Server error', error: error.message });
     }

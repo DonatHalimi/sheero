@@ -180,8 +180,23 @@ function getEmailFooterHtml() {
   `;
 };
 
+const loginLocation = (loginData) => ({
+  country: loginData.country || 'Unknown',
+  city: loginData.city || 'Unknown',
+  region: loginData.region || 'Unknown'
+});
+
+const formatLoginMethod = (method) => {
+  if (method === 'google') return 'Google';
+  if (method === 'facebook') return 'Facebook';
+  if (method === 'otp') return 'Email Code';
+  if (method === 'authenticator') return 'Authenticator App';
+  if (method === 'password') return 'Password';
+  return method.charAt(0).toUpperCase() + method.slice(1);
+};
+
 module.exports = {
-  formatDate, formatPrice, statusImages, returnStatusImages, createAttachments, brandImages,
-  headerMessages, orderStatusMessages, orderBodyMessages, returnStatusMessages, returnBodyMessages,
-  getBrandHeaderHtml, getEmailFooterHtml
+  formatDate, formatPrice, statusImages, returnStatusImages, createAttachments, brandImages, headerMessages,
+  orderStatusMessages, orderBodyMessages, returnStatusMessages, returnBodyMessages, getBrandHeaderHtml,
+  getEmailFooterHtml, loginLocation, formatLoginMethod
 };

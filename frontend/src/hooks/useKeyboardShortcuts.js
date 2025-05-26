@@ -1,5 +1,27 @@
 import { useHotkeys } from 'react-hotkeys-hook';
 
+/**
+ * Handles keyboard shortcuts for the dashboard.
+ * 
+ * @param {Object} obj - object with the following properties:
+ * - itemsRef: React ref to the list of items
+ * - focusedItemIndex: current focused item index
+ * - selectedItems: array of selected items
+ * - setSelectedItems: function to set the selected items
+ * - setFocusedItemIndex: function to set the focused item index
+ * - openAddForm: function to open the add form
+ * - openEditForm: function to open the edit form
+ * - handleBulkDelete: function to handle bulk delete
+ * - handleViewDetails: function to handle view details
+ * - toggleItemSelection: function to toggle item selection
+ * - setFormModalOpen: function to set the form modal open
+ * - setViewDetailsOpen: function to set the view details modal open
+ * - formModalOpen: boolean indicating if the form modal is open
+ * - deleteModalOpen: boolean indicating if the delete modal is open
+ * - viewDetailsOpen: boolean indicating if the view details modal is open
+ * - showAddButton: boolean indicating if the add button should be shown (default: true)
+ * - showEditButton: boolean indicating if the edit button should be shown (default: true)
+ */
 export const useKeyboardShortcuts = ({
     itemsRef,
     focusedItemIndex,

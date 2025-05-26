@@ -1,14 +1,19 @@
-import React, { useState } from 'react';
-import { useSelector } from 'react-redux';
+import { useState } from 'react';
+import { useDispatch, useSelector } from 'react-redux';
 import { useNavigate } from 'react-router-dom';
 import { toast } from 'react-toastify';
-import { CartDeleteButtons, DiscountPercentage, formatPrice, LoadingOverlay, OutOfStock } from '../../../assets/CustomComponents';
 import NoImage from '../../../assets/img/errors/product-not-found.png';
+import { LoadingOverlay } from '../../../components/custom/LoadingSkeletons';
+import { CartDeleteButtons } from '../../../components/custom/MUI';
+import { DiscountPercentage, OutOfStock } from '../../../components/custom/Product';
+import { formatPrice } from '../../../components/custom/utils';
 import { addToCartService } from '../../../services/cartService';
+import { getCartCount } from '../../../store/actions/cartActions';
 import { getImageUrl } from '../../../utils/config';
 
 const WishlistItem = ({ product, onRemove }) => {
     const { isAuthenticated } = useSelector(state => state.auth);
+    const dispatch = useDispatch();
 
     const { _id, name, slug, image, price, discount, salePrice, inventoryCount } = product || {};
     const imageUrl = getImageUrl(image);
@@ -43,6 +48,7 @@ const WishlistItem = ({ product, onRemove }) => {
             toast.success('Product added to cart', { onClick: () => navigate('/cart') });
 
             document.dispatchEvent(new CustomEvent('cartUpdated', { detail: _id }));
+            dispatch(getCartCount());
         } catch (error) {
             const errorMsg = error.response?.data?.message || 'Failed to add product to cart.';
             toast.error(errorMsg, { onClick: () => navigate('/cart') });
@@ -54,6 +60,7 @@ const WishlistItem = ({ product, onRemove }) => {
     const handleRemove = async (e) => {
         e.stopPropagation();
         await onRemove(_id);
+        document.dispatchEvent(new Event('wishlistUpdated'));
     };
 
     return (

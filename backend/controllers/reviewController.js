@@ -1,7 +1,7 @@
 const Review = require('../models/Review');
 const Product = require('../models/Product');
 const Order = require('../models/Order');
-const { sendReviewEmail } = require('../config/email/emailService');
+const { reviewEmailQueue } = require('../config/email/queues');
 
 const populateR = (query) => {
     return query.populate([
@@ -30,15 +30,15 @@ const createReview = async (req, res) => {
             .populate('user')
             .populate('product');
 
-        if (populatedReview.user?.email) {
-            await sendReviewEmail(populatedReview);
-        } else {
-            console.warn(`Review ${savedReview._id} has no associated email.`);
-        }
+        res.status(201).json({ message: 'Review created successfully', review });
 
         await Product.findByIdAndUpdate(productId, { $push: { reviews: review._id } });
 
-        res.status(201).json({ message: 'Review created successfully', review });
+        if (populatedReview.user?.email) {
+            reviewEmailQueue.add({ review: populatedReview });
+        } else {
+            console.warn(`Review ${savedReview._id} has no associated email.`);
+        }
     } catch (error) {
         console.error('Error creating review:', error);
         res.status(500).json({ message: 'Server error', error: error.message, stack: error.stack });

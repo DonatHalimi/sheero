@@ -12,7 +12,7 @@
 
 ## **Backend**
 
-The backend provides APIs that are documented and accessible through Postman. You can refer to the official [API documentation](https://documenter.getpostman.com/view/31736145/2sA3kRL56j) for detailed information on endpoints, request/response formats, and usage examples for **sheero**.
+The backend provides APIs that are documented and accessible through Postman. You can refer to the official [API documentation](https://documenter.getpostman.com/view/31736145/2sA3kRL56j) for detailed information on endpoints, request/response formats and usage examples for **sheero**.
 
 ### **File Structure of Backend**
 
@@ -36,6 +36,7 @@ The backend provides APIs that are documented and accessible through Postman. Yo
 #### `config/`
 - **`auth/`**
   - `cookie.js`: Configures cookie settings for JWT token management, ensuring secure handling of authentication tokens.
+  - `loginNotification.js`: Sends login notifications to users when they log in, using [nodemailer](https://www.npmjs.com/package/nodemailer) and [geoip-lite](https://www.npmjs.com/package/geoip-lite) for geolocation.
   - `passport.js`: Sets up authentication strategies for third-party services (Google, Facebook) using Passport.js.
 
 - **`core/`**
@@ -46,10 +47,11 @@ The backend provides APIs that are documented and accessible through Postman. Yo
   - `server.js`: Handles Express server initialization and startup.
 
 - **`email/`**
-  - `emailContent/`: Contains all HTML email templates and generators.
-  - `emailService.js`: Main service for sending various types of emails.
-  - `emailUtils.js`: Utility functions supporting email operations.
-  - `mailer.js`: Configures the SMTP transporter (using nodemailer) for email delivery.
+  - `content/`: Contains all HTML email templates and generators.
+  - `service.js`: Main service for sending various types of emails.
+  - `utils.js`: Utility functions supporting email operations.
+  - `mailer.js`: Configures the SMTP transporter using [nodemailer](https://www.npmjs.com/package/nodemailer) for email delivery.
+  - `queues.js`: Centralized queue manager using [Bull](https://github.com/OptimalBits/bull) and [Redis](https://redis.io) to manage and process all email-related background jobs efficiently.
 
 #### `controllers/`
 - Contains the core business logic for each API endpoint, with each controller corresponding to specific route definitions.
@@ -89,11 +91,13 @@ The backend provides APIs that are documented and accessible through Postman. Yo
   },
   "dependencies": {
     "bcryptjs": "^2.4.3",
+    "bull": "^4.16.5",
     "cookie-parser": "^1.4.7",
     "cors": "^2.8.5",
     "dotenv": "^16.4.5",
     "express": "^4.19.2",
     "express-session": "^1.18.1",
+    "geoip-lite": "^1.4.10",
     "jsonwebtoken": "^9.0.2",
     "mongoose": "^8.5.1",
     "multer": "^1.4.5-lts.1",
@@ -121,22 +125,26 @@ The backend provides APIs that are documented and accessible through Postman. Yo
 ### **Backend Dependencies**
 
 - **[Bcrypt.js](https://www.npmjs.com/package/bcryptjs)**: A library used for securely hashing passwords before storing them, ensuring they are never saved in plain text.
+- **[Bull](https://github.com/OptimalBits/bull)**: A framework for creating and managing background jobs, like sending emails.
 - **[Cookie Parser](https://www.npmjs.com/package/cookie-parser)**: Middleware that helps manage and parse cookies in HTTP requests. This is especially useful for handling authentication tokens in cookies.
 - **[CORS](https://www.npmjs.com/package/cors)**: A middleware for handling Cross-Origin Resource Sharing, enabling or restricting API access based on the origin of the request.
+- **[Dotenv](https://www.npmjs.com/package/dotenv)**: A simple zero-dependency module that loads environment variables from a .env file into process.env.
 - **[Express.js](https://www.npmjs.com/package/express)**: A flexible web framework for Node.js that simplifies the creation of RESTful APIs and routing.
-- **[JWT (jsonwebtoken)](https://jwt.io/introduction)**: A package that provides methods for creating, signing, and verifying JSON Web Tokens, used to secure API endpoints.
+- **[Express-Session](https://www.npmjs.com/package/express-session)**: Middleware for managing user sessions, including cookie-based authentication.
+- **[GeoIP](https://www.npmjs.com/package/geoip-lite)**: A library that provides geo-location information based on IP addresses, useful for tracking user locations.
+- **[JWT (jsonwebtoken)](https://jwt.io/introduction)**: A package that provides methods for creating, signing and verifying JSON Web Tokens, used to secure API endpoints.
 - **[Mongoose](https://www.npmjs.com/package/mongoose)**: An Object Document Mapper (ODM) that simplifies interactions with MongoDB by providing schema-based models for documents.
 - **[Multer](https://www.npmjs.com/package/multer)**: Middleware used for handling multipart form data, commonly used for handling file uploads (like images).
 - **[Nodemailer](https://www.npmjs.com/package/nodemailer)**: A library for sending emails using a SMTP transport, allowing the backend to send verification emails and other notifications.
+- **[Nodemon](https://www.npmjs.com/package/nodemon)**: A development utility that automatically restarts the server when changes are detected in the source code.
 - **[Passport](https://www.npmjs.com/package/passport)**: A middleware for handling authentication strategies, including Facebook and Google OAuth.
 - **[Passport-Facebook](https://www.npmjs.com/package/passport-facebook)**: A strategy for authenticating users using Facebook OAuth.
 - **[Passport-Google-OAuth20](https://www.npmjs.com/package/passport-google-oauth20)**: A strategy for authenticating users using Google OAuth.
 - **[Qrcode](https://www.npmjs.com/package/qrcode)**: A library for generating QR codes, used for generating QR codes for 2FA user authentication.
+- **[Slugify](https://www.npmjs.com/package/slugify)**: A library for generating slugs (URL-friendly strings) from text, ensuring URLs are user-friendly and SEO-friendly.
 - **[Speakeasy](https://www.npmjs.com/package/speakeasy)**: A library for generating and verifying one-time passwords (OTPs), used for 2FA in user authentication with authenticator applications.
-- **[Nodemon](https://www.npmjs.com/package/nodemon)**: A development utility that automatically restarts the server when changes are detected in the source code.
 - **[Stripe](https://www.npmjs.com/package/stripe)**: A library for integrating with the Stripe payment system, allowing the backend to handle payments securely.
 - **[Yup](https://www.npmjs.com/package/yup)**: A JavaScript schema validator used for validating and parsing data to ensure it conforms to expected structures.
-- **[Slugify](https://www.npmjs.com/package/slugify)**: A library for generating slugs (URL-friendly strings) from text, ensuring URLs are user-friendly and SEO-friendly.
 
 ## **Frontend**
 

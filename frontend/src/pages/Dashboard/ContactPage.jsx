@@ -1,4 +1,3 @@
-import React from 'react';
 import DashboardPage from '../../components/Dashboard/DashboardPage';
 import ContactDetailsDrawer from '../../components/Dashboard/Modal/Contact/ContactDetailsDrawer';
 import ContactForm from '../../components/Dashboard/Modal/Contact/ContactForm';

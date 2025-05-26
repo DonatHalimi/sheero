@@ -1,8 +1,10 @@
-import React, { useEffect, useState } from 'react';
+import { useEffect, useState } from 'react';
 import { useParams } from 'react-router-dom';
 import { toast } from 'react-toastify';
-import { CustomPagination, EmptyState, Header, LoadingProductItem } from '../../../assets/CustomComponents';
 import emptyWishlistImage from '../../../assets/img/empty/wishlist.png';
+import { LoadingProductItem } from '../../../components/custom/LoadingSkeletons';
+import { CustomPagination, EmptyState } from '../../../components/custom/MUI';
+import { Header } from '../../../components/custom/Profile';
 import { getSharedUserWishlistService } from '../../../services/wishlistService';
 import Navbar from '../../Navbar/Navbar';
 import Footer from '../../Utils/Footer';

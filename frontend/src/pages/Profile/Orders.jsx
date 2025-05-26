@@ -1,9 +1,12 @@
-import React, { useEffect, useState } from 'react';
+import { useEffect, useState } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 import { Link } from 'react-router-dom';
-import { calculatePageCount, CustomPagination, EmptyState, getPaginatedItems, handlePageChange, Header, LoadingOrderItem, ProfileLayout } from '../../assets/CustomComponents';
 import emptyOrdersImage from '../../assets/img/empty/orders.png';
 import { paginationSx } from '../../assets/sx';
+import { LoadingOrderItem } from '../../components/custom/LoadingSkeletons';
+import { CustomPagination, EmptyState } from '../../components/custom/MUI';
+import { Header, ProfileLayout } from '../../components/custom/Profile';
+import { calculatePageCount, getPaginatedItems, handlePageChange } from '../../components/custom/utils';
 import Navbar from '../../components/Navbar/Navbar';
 import OrderItem from '../../components/Product/Items/OrderItem';
 import Footer from '../../components/Utils/Footer';
@@ -100,7 +103,6 @@ const Orders = () => {
         <>
             <Navbar />
             <ProfileLayout>
-
                 <Header
                     title='Orders'
                     searchTerm={searchTerm}

@@ -2,9 +2,10 @@ import { FormControl, InputLabel, MenuItem, Rating, Select } from '@mui/material
 import { Form, Formik } from 'formik';
 import { useEffect, useState } from 'react';
 import { toast } from 'react-toastify';
-import { CustomBox, CustomModal, CustomTextField, CustomTypography, FormSubmitButtons } from '../../../../assets/CustomComponents';
 import { addReviewService, editReviewService, getProductNamesService, getReviewsService } from '../../../../services/reviewService';
 import { initialValues, validationSchema } from '../../../../utils/validations/review';
+import { FormSubmitButtons } from '../../../custom/Dashboard';
+import { CustomBox, CustomModal, CustomTextField, CustomTypography } from '../../../custom/MUI';
 
 const ReviewForm = ({
     open,

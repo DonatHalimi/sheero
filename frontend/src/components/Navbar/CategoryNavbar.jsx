@@ -1,9 +1,9 @@
 import { Divider, Skeleton } from '@mui/material';
-import React, { useEffect, useRef, useState } from 'react';
+import { useEffect, useRef, useState } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 import { useLocation, useNavigate } from 'react-router-dom';
 import { useSwipeable } from 'react-swipeable';
-import { CategoryDropdown, CategoryList, SidebarFooter, SidebarHeader } from '../../assets/CustomComponents';
+import { CategoryDropdown, CategoryList, SidebarFooter, SidebarHeader } from '../../components/custom/Product';
 import { getSubcategoriesAndSubsubcategories } from '../../store/actions/categoryActions';
 
 const CategoryNavbar = ({ isSidebarOpen, toggleSidebar, activeCategory: propActiveCategory }) => {

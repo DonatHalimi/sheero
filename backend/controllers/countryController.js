@@ -66,9 +66,7 @@ const deleteCountries = async (req, res) => {
         for (const country of countries) {
             const cities = await City.find({ country: country._id });
 
-            if (cities.length > 0) {
-                return res.status(400).json({ message: `Cannot delete country '${country.name}' as it has associated cities` });
-            }
+            if (cities.length > 0) return res.status(400).json({ message: `Cannot delete country '${country.name}' as it has associated cities` });
         }
 
         await Country.deleteMany({ _id: { $in: ids } });

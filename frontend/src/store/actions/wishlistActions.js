@@ -1,5 +1,5 @@
 import { clearWishlistService, getUsersWishlistService, removeFromWishlistService } from '../../services/wishlistService';
-import { CLEAR_WISHLIST, GET_WISHLIST_ITEMS, GET_WISHLIST_ITEMS_ERROR, REMOVE_FROM_WISHLIST } from '../types';
+import { CLEAR_WISHLIST, GET_WISHLIST_COUNT, GET_WISHLIST_ITEMS, GET_WISHLIST_ITEMS_ERROR, REMOVE_FROM_WISHLIST } from '../types';
 
 export const getWishlistItems = () => async (dispatch) => {
     try {
@@ -14,6 +14,20 @@ export const getWishlistItems = () => async (dispatch) => {
             type: GET_WISHLIST_ITEMS_ERROR,
             payload: error.response?.data?.message || 'Failed to get wishlist items',
         });
+    }
+};
+
+export const getWishlistCount = () => async dispatch => {
+    try {
+        const { data } = await getUsersWishlistService();
+        const count = (data.items || []).reduce(
+            (sum, item) => sum + (item.quantity || 1),
+            0
+        );
+        dispatch({ type: GET_WISHLIST_COUNT, payload: count });
+    } catch (err) {
+        console.error('Error fetching wishlist count', err);
+        dispatch({ type: GET_WISHLIST_COUNT, payload: 0 });
     }
 };
 

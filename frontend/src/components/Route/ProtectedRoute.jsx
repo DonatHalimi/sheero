@@ -1,12 +1,11 @@
-import React from 'react';
 import { useSelector } from 'react-redux';
 import { Navigate } from 'react-router-dom';
-import { LoadingOverlay } from '../../assets/CustomComponents';
+import { LoadingOverlay } from '../../components/custom/LoadingSkeletons';
 
 /**
  * A wrapper component for protected routes that ensures only authenticated users
  * with the appropriate roles can access the wrapped component. It handles loading
- * states, redirects unauthenticated users to the login page, and restricts access
+ * states, redirects unauthenticated users to the login page and restricts access
  * based on user roles.
  *
  * @param {React.ReactNode} children - The component to be rendered if access is granted.

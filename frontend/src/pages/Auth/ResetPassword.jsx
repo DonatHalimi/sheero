@@ -1,9 +1,10 @@
 import { Https, Visibility, VisibilityOff } from '@mui/icons-material';
 import { IconButton, InputAdornment } from '@mui/material';
-import React, { useEffect, useState } from 'react';
+import { useEffect, useState } from 'react';
 import { useNavigate, useParams } from 'react-router-dom';
 import { toast } from 'react-toastify';
-import { BrownButton, BrownOutlinedTextField, LoadingLabel, LoadingOverlay } from '../../assets/CustomComponents';
+import { LoadingLabel, LoadingOverlay } from '../../components/custom/LoadingSkeletons';
+import { BrownButton, BrownOutlinedTextField } from '../../components/custom/MUI';
 import { resetPasswordService, validateResetTokenService } from '../../services/authService';
 import { PASSWORD_VALIDATION } from '../../utils/constants/validations/user';
 

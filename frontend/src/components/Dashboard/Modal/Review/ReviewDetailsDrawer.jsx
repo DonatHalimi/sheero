@@ -1,9 +1,12 @@
 import { Box, Chip, Drawer, Typography, useTheme } from '@mui/material';
-import React from 'react';
-import { BoxBetween, CloseButton, DateAdornment, DetailsTitle, DrawerTypography, formatDate, IdAdornment, PersonAdornment, RatingStars, ReadOnlyTextField } from '../../../../assets/CustomComponents';
-import { downloadReviewData } from '../../../../assets/DataExport';
 import { chipSx, drawerPaperSx } from '../../../../assets/sx';
 import { getImageUrl } from '../../../../utils/config';
+import { DateAdornment, IdAdornment, PersonAdornment } from '../../../custom/Adornments';
+import { DetailsTitle } from '../../../custom/Dashboard';
+import { BoxBetween, CloseButton, DrawerTypography, ReadOnlyTextField } from '../../../custom/MUI';
+import { RatingStars } from '../../../custom/Product';
+import { formatDate } from '../../../custom/utils';
+import { downloadReviewData } from '../../../Product/Utils/DataExport';
 
 const ReviewDetailsDrawer = ({ open, onClose, review, onEdit, onDelete }) => {
     const theme = useTheme();

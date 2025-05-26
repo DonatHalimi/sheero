@@ -1,5 +1,5 @@
-import React, { useState } from 'react';
-import { DashboardImage } from '../../assets/CustomComponents';
+import { useState } from 'react';
+import { DashboardImage } from '../../components/custom/Dashboard';
 import DashboardPage from '../../components/Dashboard/DashboardPage';
 import ImagePreviewModal from '../../components/Dashboard/Modal/ImagePreviewModal';
 import SlideshowDetailsDrawer from '../../components/Dashboard/Modal/Slideshow/SlideshowDetailsDrawer';

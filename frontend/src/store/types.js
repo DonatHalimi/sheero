@@ -26,6 +26,7 @@ export const GET_USER_RETURNS_ERROR = 'GET_USER_RETURNS_ERROR';
 
 // User wishlist action types
 export const GET_WISHLIST_ITEMS = 'GET_WISHLIST_ITEMS';
+export const GET_WISHLIST_COUNT = 'GET_WISHLIST_COUNT';
 export const GET_WISHLIST_ITEMS_ERROR = 'GET_WISHLIST_ITEMS_ERROR';
 export const REMOVE_FROM_WISHLIST = 'REMOVE_FROM_WISHLIST';
 export const CLEAR_WISHLIST = 'CLEAR_WISHLIST';
@@ -39,6 +40,9 @@ export const REMOVE_CART_ITEM = 'REMOVE_CART_ITEM';
 export const REMOVE_CART_ITEM_ERROR = 'REMOVE_CART_ITEM_ERROR';
 export const CLEAR_CART = 'CLEAR_CART';
 export const CLEAR_CART_ERROR = 'CLEAR_CART_ERROR';
+
+export const GET_CART_COUNT = 'GET_CART_COUNT';
+export const GET_USER_CART = 'GET_USER_CART';
 
 // User reviews action types
 export const GET_USER_REVIEWS = 'GET_USER_REVIEWS';

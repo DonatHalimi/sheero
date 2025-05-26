@@ -1,5 +1,4 @@
-import React, { Suspense } from 'react';
-import { LoadingOverlay, ScrollToTop } from './assets/CustomComponents';
+import { Suspense } from 'react';
 import pages from './assets/dashboardPages';
 import {
   AboutUs,
@@ -37,6 +36,8 @@ import {
   Verify,
   Wishlist,
 } from './assets/imports';
+import { LoadingOverlay } from './components/custom/LoadingSkeletons';
+import { ScrollToTop } from './components/custom/utils';
 
 const roles = ['admin', 'orderManager', 'contentManager', 'productManager'];
 
@@ -47,7 +48,7 @@ const pageRoles = {
   images: ['admin', 'contentManager'],
 
   reviews: ['admin', 'productManager'],
-  products: ['admin', 'productManager'],
+  products: ['admin', 'productManager', 'orderManager'],
   categories: ['admin', 'productManager'],
   subcategories: ['admin', 'productManager'],
   subSubcategories: ['admin', 'productManager'],

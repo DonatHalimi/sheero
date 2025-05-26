@@ -1,22 +1,21 @@
 import { HomeOutlined, StarBorderOutlined } from '@mui/icons-material';
 import { Divider, List, Typography } from '@mui/material';
-import React, { useEffect, useState } from 'react';
+import { useEffect, useState } from 'react';
 import { useSelector } from 'react-redux';
 import { useLocation, useNavigate } from 'react-router-dom';
 import {
-    ActiveListItem,
     CustomAddressIcon,
     CustomOrdersIcon,
     CustomProfileIcon,
     CustomReturnIcon,
     CustomReviewsIcon,
     CustomWishlistIcon,
-    SidebarLayout,
     StyledFavoriteIcon,
     StyledInboxIcon,
     StyledMoveToInboxIcon,
     StyledPersonIcon
-} from '../../assets/CustomComponents';
+} from '../../components/custom/Icons';
+import { ActiveListItem, SidebarLayout } from '../../components/custom/MUI';
 
 const ProfileSidebar = () => {
     const { user, loading } = useSelector((state) => state.auth);

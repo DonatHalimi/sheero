@@ -1,8 +1,10 @@
 import { Box, Drawer } from '@mui/material';
-import React from 'react';
-import { BoxBetween, CloseButton, DetailsTitle, IdAdornment, ReadOnlyTextField } from '../../../../assets/CustomComponents';
-import { downloadContactData } from '../../../../assets/DataExport';
 import { drawerPaperSx } from '../../../../assets/sx';
+import { IdAdornment } from '../../../custom/Adornments';
+import { DetailsTitle } from '../../../custom/Dashboard';
+import { BoxBetween, CloseButton, ReadOnlyTextField } from '../../../custom/MUI';
+import { formatDate } from '../../../custom/utils';
+import { downloadContactData } from '../../../Product/Utils/DataExport';
 
 const ContactDetailsDrawer = ({ open, onClose, contact, onDelete }) => {
     const user = `${contact?.userId?.firstName} ${contact?.userId?.lastName} - ${contact?.userId?.email}`;
@@ -61,8 +63,17 @@ const ContactDetailsDrawer = ({ open, onClose, contact, onDelete }) => {
 
                         <ReadOnlyTextField
                             label="Message"
+                            multiline
+                            rows={4}
                             value={contact.message}
                         />
+
+                        {contact.createdAt &&
+                            <ReadOnlyTextField
+                                label="Created At"
+                                value={formatDate(contact.createdAt)}
+                            />
+                        }
 
                         {contact.userId?._id &&
                             <ReadOnlyTextField

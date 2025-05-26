@@ -27,7 +27,7 @@ const registerSchema = yup.object({
     password: yup
         .string()
         .required('Password is required')
-        .test('is-valid-password', 'Password must be at least 8 characters long, include at least one uppercase letter, one lowercase letter, one number, and one special character (@$!%*()?&)', isValidPassword),
+        .test('is-valid-password', 'Password must be at least 8 characters long, include at least one uppercase letter, one lowercase letter, one number and one special character (@$!%*()?&)', isValidPassword),
     role: yup
         .string()
         .optional()

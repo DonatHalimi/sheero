@@ -6,44 +6,14 @@ const cookieConfig = require('../config/auth/cookie');
 const crypto = require('crypto');
 const speakeasy = require('speakeasy');
 const QRCode = require('qrcode');
-const { JWT_SECRET, NODE_ENV } = require('../config/core/dotenv');
-const { sendVerificationEmail, sendResetPasswordEmail, sendPasswordResetSuccessEmail, sendEnable2FAEmail, sendDisable2FAEmail, sendLogin2FAEmail } = require('../config/email/emailService');
-const MemoryStore = require('../models/MemoryStore');
-
-const redirectUrl = NODE_ENV === 'production'
-    ? 'https://sheero.onrender.com'
-    : 'http://localhost:3000';
-
-const shuffleOTP = (str) => str.split('').sort(() => Math.random() - 0.5).join('');
-
-const generateOTP = () => {
-    const secret = speakeasy.generateSecret({ length: 20 }).base32;
-    const token = speakeasy.totp({
-        secret,
-        encoding: 'base32',
-        digits: 3
-    });
-
-    const numbers = token.padStart(3, '0');
-    const letters = Array.from({ length: 3 }, () =>
-        String.fromCharCode(65 + Math.floor(Math.random() * 26))
-    ).join('');
-
-    return shuffleOTP(letters + numbers);
-};
-
-const generateAccessToken = (user) => {
-    return jwt.sign({
-        userId: user._id,
-        role: user.role
-    }, JWT_SECRET, { expiresIn: '7d' });
-};
-
-const verificationCodeStore = new MemoryStore();
-const pendingUsersStore = new MemoryStore();
-const rateLimitStore = new MemoryStore();
-const twoFactorRateLimitStore = new MemoryStore();
-const twoFactorOtpStore = new MemoryStore();
+const { JWT_SECRET } = require('../config/core/dotenv');
+const {
+    sendVerificationEmail, sendResetPasswordEmail,
+    sendPasswordResetSuccessEmail, sendEnable2FAEmail,
+    sendDisable2FAEmail, sendLogin2FAEmail, sendLoginNotificationEmail
+} = require('../config/email/service');
+const { getLocationFromIP, getClientIp, getClientUserAgent } = require('../config/auth/loginNotifications');
+const { frontendUrl, generateOTP, generateAccessToken, verificationCodeStore, pendingUsersStore, rateLimitStore, twoFactorRateLimitStore, twoFactorOtpStore } = require('../config/core/utils');
 
 const registerUser = async (req, res) => {
     const { firstName, lastName, email, password, role } = req.body;
@@ -195,33 +165,71 @@ const resendOTP = async (req, res) => {
 };
 
 const loginUser = async (req, res) => {
-    const { email } = req.body;
+    const { email, password } = req.body;
+    const ipAddress = getClientIp(req);
+    const userAgent = getClientUserAgent(req);
 
     try {
         const user = await User.findOne({ email }).populate('role');
+        if (!user) return res.status(401).json({ message: 'Invalid credentials' });
+
+        const match = await bcrypt.compare(password, user.password);
+        if (!match) {
+            await user.addLoginAttempt({
+                ipAddress,
+                userAgent,
+                status: 'failed',
+                method: 'password',
+                ...getLocationFromIP(ipAddress)
+            });
+            return res.status(401).json({ message: 'Invalid credentials' });
+        }
 
         if (user.twoFactorEnabled) {
             const usingEmail = user.twoFactorMethods.includes('email');
 
             if (usingEmail) {
-                const newOtp = generateOTP();
-                twoFactorOtpStore.set(email, newOtp.toString(), 10 * 60 * 1000);
-                await sendLogin2FAEmail(email, newOtp);
+                const otp = generateOTP();
+                twoFactorOtpStore.set(email, otp.toString(), 10 * 60 * 1000);
+                await sendLogin2FAEmail(email, otp);
             }
 
             return res.status(206).json({
                 success: true,
                 message: usingEmail
-                    ? `OTP code sent to ${email} for two-factor authentication`
+                    ? `OTP sent to ${email}`
                     : 'Please use your authenticator app to complete login',
-                email: email,
+                email,
                 requires2FA: true,
                 twoFactorMethods: user.twoFactorMethods,
             });
         }
 
+        const locationInfo = getLocationFromIP(ipAddress);
+        const deviceKey = `${userAgent.substring(0, 50)}:${ipAddress}`;
+        const isNewDevice = !user.deviceHistory.has(deviceKey);
+
+        await user.addLoginAttempt({
+            ipAddress,
+            userAgent,
+            status: 'success',
+            method: 'password',
+            isNewDevice,
+            ...locationInfo
+        });
+
         const accessToken = generateAccessToken(user);
         res.cookie('accessToken', accessToken, cookieConfig);
+
+        sendLoginNotificationEmail(user, {
+            ipAddress,
+            userAgent,
+            status: 'success',
+            method: 'password',
+            isNewDevice,
+            timestamp: new Date(),
+            ...locationInfo
+        }).catch(console.error);
 
         return res.status(200).json({
             success: true,
@@ -232,9 +240,10 @@ const loginUser = async (req, res) => {
                 lastName: user.lastName,
                 email: user.email,
                 role: user.role.name,
-                accessToken: accessToken,
-                twoFactorMethods: user.twoFactorMethods
-            }
+                accessToken,
+                twoFactorMethods: user.twoFactorMethods,
+                lastLogin: user.lastLogin,
+            },
         });
     } catch (error) {
         return res.status(500).json({ message: 'Server error', error: error.message });
@@ -269,10 +278,8 @@ const sendOTPForTwoFactor = async (user, action, isResend = false) => {
 };
 
 const enable2FA = async (req, res) => {
-    if (!req.user) return res.status(401).json({ message: 'Unauthorized. User not found' });
-
     const user = await User.findById(req.user.userId);
-    if (!user) return res.status(404).json({ message: 'User not found.' });
+    if (!user) return res.status(404).json({ message: 'User not found' });
 
     try {
         const result = await sendOTPForTwoFactor(user, 'enable');
@@ -289,15 +296,13 @@ const enable2FA = async (req, res) => {
             email: user.email
         });
     } catch (error) {
-        res.status(500).json({ success: false, message: 'Internal server error.' });
+        res.status(500).json({ success: false, message: 'Internal server error' });
     }
 };
 
 const disable2FA = async (req, res) => {
-    if (!req.user) return res.status(401).json({ message: 'Unauthorized. User not found' });
-
     const user = await User.findById(req.user.userId);
-    if (!user) return res.status(404).json({ message: 'User not found.' });
+    if (!user) return res.status(404).json({ message: 'User not found' });
 
     if (!user.twoFactorEnabled) return res.status(400).json({ message: 'Two-factor authentication is already disabled' });
 
@@ -333,22 +338,22 @@ const resend2FAOTP = async (req, res) => {
 
         if (lastRequestTime && currentTime - lastRequestTime < rateLimitDuration) {
             const waitTime = Math.ceil((rateLimitDuration - (currentTime - lastRequestTime)) / 1000);
-            return res.status(429).json({ success: false, message: `Too many requests. Please wait ${waitTime} seconds before trying again.` });
+            return res.status(429).json({ success: false, message: `Too many requests. Please wait ${waitTime} seconds before trying again` });
         }
 
         if (action === 'login') {
             user = await User.findOne({ email });
-            if (!user) return res.status(404).json({ success: false, message: 'User not found.' });
+            if (!user) return res.status(404).json({ success: false, message: 'User not found' });
 
-            if (!user.twoFactorEnabled) return res.status(400).json({ success: false, message: 'Two-factor authentication is not enabled for this account.' });
+            if (!user.twoFactorEnabled) return res.status(400).json({ success: false, message: 'Two-factor authentication is not enabled for this account' });
 
         } else {
             if (!user) {
                 user = await User.findById(req.user.userId);
-                if (!user) return res.status(404).json({ success: false, message: 'User not found.' });
+                if (!user) return res.status(404).json({ success: false, message: 'User not found' });
             }
 
-            if (action === 'disable' && !user.twoFactorEnabled) return res.status(400).json({ success: false, message: 'Two-factor authentication is already disabled.' });
+            if (action === 'disable' && !user.twoFactorEnabled) return res.status(400).json({ success: false, message: 'Two-factor authentication is already disabled' });
         }
 
         const result = await sendOTPForTwoFactor(user, action, true);
@@ -367,8 +372,10 @@ const resend2FAOTP = async (req, res) => {
 
 const verifyTwoFactorOTP = async (req, res) => {
     const { email, otp, action } = req.body;
+    const ipAddress = getClientIp(req);
+    const userAgent = getClientUserAgent(req);
 
-    if (!email || !otp || !action) return res.status(400).json({ message: 'Email, OTP, and action are required' });
+    if (!email || !otp || !action) return res.status(400).json({ message: 'Email, OTP and action are required' });
 
     const storedOtp = twoFactorOtpStore.get(email);
 
@@ -405,18 +412,39 @@ const verifyTwoFactorOTP = async (req, res) => {
                     message: "Two-factor authentication has been disabled successfully"
                 });
             case 'login':
+                const locationInfo = getLocationFromIP(ipAddress);
+                const deviceKey = `${userAgent.substring(0, 50)}:${ipAddress}`;
+                const isNewDevice = !user.deviceHistory.has(deviceKey);
+
+                const loginData = {
+                    ipAddress,
+                    userAgent,
+                    status: 'success',
+                    method: 'otp',
+                    isNewDevice,
+                    ...locationInfo
+                };
+
+                await user.addLoginAttempt(loginData);
+
                 const accessToken = generateAccessToken(user);
                 res.cookie('accessToken', accessToken, cookieConfig);
+
+                sendLoginNotificationEmail(user, {
+                    ...loginData,
+                    timestamp: new Date()
+                }).catch(err => console.error('Failed to send login notification:', err));
+
                 return res.status(200).json({
                     success: true,
                     message: "OTP verification successful. Successfully logged in",
                     user: { id: user._id, email: user.email, accessToken }
                 });
             default:
-                return res.status(400).json({ message: "Invalid action." });
+                return res.status(400).json({ message: "Invalid action" });
         }
     } catch (error) {
-        return res.status(500).json({ message: "Internal server error." });
+        return res.status(500).json({ message: "Internal server error" });
     }
 };
 
@@ -450,13 +478,14 @@ const enableAuthenticator2FA = async (req, res) => {
             });
         });
     } catch (error) {
-        console.error('Enable Authenticator Error:', error);
         res.status(500).json({ message: 'Server error during authenticator setup' });
     }
 };
 
 const verifyAuthenticator2FA = async (req, res) => {
     const { email, token, action, isAuthenticator } = req.body;
+    const ipAddress = getClientIp(req);
+    const userAgent = getClientUserAgent(req);
 
     try {
         const user = await User.findOne({ email }).select('+twoFactorSecret');
@@ -486,8 +515,28 @@ const verifyAuthenticator2FA = async (req, res) => {
 
                 if (!verified) return res.status(400).json({ message: 'Invalid authenticator code' });
 
+                const locationInfo = getLocationFromIP(ipAddress);
+                const deviceKey = `${userAgent.substring(0, 50)}:${ipAddress}`;
+                const isNewDevice = !user.deviceHistory.has(deviceKey);
+
+                const loginData = {
+                    ipAddress,
+                    userAgent,
+                    status: 'success',
+                    method: 'otp',
+                    isNewDevice,
+                    ...locationInfo
+                };
+
+                await user.addLoginAttempt(loginData);
+
                 const accessToken = generateAccessToken(user);
                 res.cookie('accessToken', accessToken, cookieConfig);
+
+                sendLoginNotificationEmail(user, {
+                    ...loginData,
+                    timestamp: new Date()
+                }).catch(err => console.error('Failed to send login notification:', err));
 
                 return res.json({
                     success: true,
@@ -595,6 +644,9 @@ const getExistingSecret = async (req, res) => {
 const handleSocialLogin = async (req, res) => {
     try {
         const user = req.user;
+        const provider = req.query.provider;
+        const ipAddress = getClientIp(req);
+        const userAgent = getClientUserAgent(req);
 
         if (user.twoFactorEnabled) {
             const usingEmail = user.twoFactorMethods.includes('email');
@@ -606,27 +658,52 @@ const handleSocialLogin = async (req, res) => {
             }
 
             const tempToken = jwt.sign(
-                { userId: user._id, provider: req.query.provider, pending2FA: true },
+                { userId: user._id, provider: provider, pending2FA: true },
                 JWT_SECRET,
                 { expiresIn: '10m' }
             );
 
             return res.redirect(
-                `${redirectUrl}/verify-otp?email=${encodeURIComponent(user.email)}&action=login&social=true&temp=${tempToken}&methods=${encodeURIComponent(JSON.stringify(user.twoFactorMethods))}`
+                `${frontendUrl}/verify-otp?email=${encodeURIComponent(user.email)}&action=login&social=true&temp=${tempToken}&methods=${encodeURIComponent(JSON.stringify(user.twoFactorMethods))}`
             );
         }
+
+        const locationInfo = getLocationFromIP(ipAddress);
+        const deviceKey = `${userAgent.substring(0, 50)}:${ipAddress}`;
+        const isNewDevice = !user.deviceHistory.has(deviceKey);
+
+        const loginMethod = ['google', 'facebook'].includes(provider) ? provider : 'password';
+
+        const loginData = {
+            ipAddress,
+            userAgent,
+            status: 'success',
+            method: loginMethod,
+            provider: provider,
+            isNewDevice,
+            ...locationInfo
+        };
+
+        await user.addLoginAttempt(loginData);
 
         const accessToken = generateAccessToken(user);
         res.cookie('accessToken', accessToken, cookieConfig);
 
-        return res.redirect(`${redirectUrl}?auth_status=success&provider=${req.query.provider}`);
+        sendLoginNotificationEmail(user, {
+            ...loginData,
+            timestamp: new Date()
+        }).catch(err => console.error('Failed to send login notification:', err));
+
+        return res.redirect(`${frontendUrl}?auth_status=success&provider=${provider}`);
     } catch (error) {
-        return res.redirect(`${redirectUrl}?auth_status=error&provider=${req.query.provider}&message=${encodeURIComponent(error.message)}`);
+        return res.redirect(`${frontendUrl}?auth_status=error&provider=${req.query.provider}&message=${encodeURIComponent(error.message)}`);
     }
 };
 
 const verifySocialLogin2FA = async (req, res) => {
     const { email, otp, tempToken, isAuthenticator } = req.body;
+    const ipAddress = getClientIp(req);
+    const userAgent = getClientUserAgent(req);
 
     if (!email || !tempToken) return res.status(400).json({ message: 'Email and temporary token are required' });
 
@@ -658,6 +735,7 @@ const verifySocialLogin2FA = async (req, res) => {
             if (!verified) return res.status(400).json({ message: 'Invalid authenticator code' });
 
         } else if (hasEmail) {
+            // TODO: fix security alert email not being sent for email 2fa option on social login
             const storedOtp = twoFactorOtpStore.get(email);
             const invalidOtp = storedOtp.toString() !== otp.toString();
 
@@ -669,8 +747,35 @@ const verifySocialLogin2FA = async (req, res) => {
             return res.status(400).json({ message: 'No valid 2FA method found' });
         }
 
+        const locationInfo = getLocationFromIP(ipAddress);
+        const deviceKey = `${userAgent.substring(0, 50)}:${ipAddress}`;
+        const isNewDevice = !user.deviceHistory.has(deviceKey);
+        const provider = decoded.provider || 'password';
+        const twoFAMethod = shouldUseAuthenticator ? 'authenticator' : 'email';
+
+        const loginMethod = ['google', 'facebook'].includes(provider)
+            ? `${provider} (with ${twoFAMethod} 2FA)`
+            : `otp (with ${twoFAMethod} 2FA)`;
+
+        const loginData = {
+            ipAddress,
+            userAgent,
+            status: 'success',
+            method: loginMethod,
+            provider: provider,
+            isNewDevice,
+            ...locationInfo
+        };
+
+        await user.addLoginAttempt(loginData);
+
         const accessToken = generateAccessToken(user);
         res.cookie('accessToken', accessToken, cookieConfig);
+
+        sendLoginNotificationEmail(user, {
+            ...loginData,
+            timestamp: new Date()
+        }).catch(err => console.error('Failed to send login notification:', err));
 
         return res.status(200).json({
             success: true,
@@ -705,7 +810,8 @@ const getCurrentUser = async (req, res) => {
             googleId: user.googleId,
             facebookId: user.facebookId,
             twoFactorEnabled: user.twoFactorEnabled,
-            twoFactorMethods: user.twoFactorMethods
+            twoFactorMethods: user.twoFactorMethods,
+            loginNotifications: user.loginNotifications
         });
     } catch (error) {
         res.status(500).json({ message: 'Server error' });
@@ -809,6 +915,20 @@ const validateResetToken = async (req, res) => {
     }
 };
 
+const toggleLoginNotification = async (req, res) => {
+    const { loginNotifications } = req.body;
+
+    try {
+        const user = await User.findById(req.user.userId);
+        user.loginNotifications = loginNotifications;
+
+        await user.save();
+        res.status(200).json({ success: true, message: `Login notifications ${user.loginNotifications ? 'enabled' : 'disabled'} successfully`, loginNotifications });
+    } catch (error) {
+        res.status(500).json({ message: 'Server error' });
+    }
+};
+
 const logoutUser = (req, res) => {
     res.clearCookie('accessToken', {
         ...cookieConfig,
@@ -826,5 +946,5 @@ const logoutUser = (req, res) => {
 module.exports = {
     registerUser, verifyOTP, resendOTP, loginUser, enable2FA, disable2FA, resend2FAOTP, verifyTwoFactorOTP,
     enableAuthenticator2FA, verifyAuthenticator2FA, getExistingSecret, handleSocialLogin, verifySocialLogin2FA,
-    getCurrentUser, updateUserProfile, forgotPassword, resetPassword, validateResetToken, logoutUser
+    getCurrentUser, updateUserProfile, forgotPassword, resetPassword, validateResetToken, toggleLoginNotification, logoutUser
 };

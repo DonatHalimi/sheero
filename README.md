@@ -1,3 +1,5 @@
+![sheero logo](frontend/src/assets/img/brand/logo.png)
+
 # sheero
 
 ## Table of Contents
@@ -20,7 +22,7 @@
 
 ## Overview
 
-This is a full-stack e-commerce platform built using the MERN (MongoDB, Express.js, React.js, Node.js) stack. The project provides a user-friendly interface for shopping, managing products, and interacting with the platform efficiently.
+This is a full-stack e-commerce platform built using the MERN (MongoDB, Express.js, React.js, Node.js) stack. The project provides a user-friendly interface for shopping, managing products and interacting with the platform efficiently.
 
 You can check out the live demo of sheero [here](https://sheero.onrender.com).
 
@@ -67,6 +69,7 @@ To set up the project locally, follow these steps:
    FACEBOOK_CLIENT_SECRET=your_facebook_client_secret
    SMTP_USER=your_smtp_user
    SMTP_PASS=your_smtp_pass
+   REDIS_URL=your_redis_url
    ```
 
    **Frontend (`frontend/.env`)**
@@ -83,9 +86,10 @@ To set up the project locally, follow these steps:
   - **SEED_DB**: Set to `true` to enable initial database seeding (e.g., creating the default roles and the admin user). Useful for the first-time setup or resetting the database. Leave it empty or set to `false` to skip seeding.
   - **ADMIN_FIRST_NAME**, **ADMIN_LAST_NAME**, **ADMIN_EMAIL**, **ADMIN_PASSWORD**: Credentials for the default admin user to be created during database seeding.
   - **SESSION_SECRET**: A secret key used for signing session cookies for google and facebook login.
-  - **GOOGLE_CLIENT_ID**, **GOOGLE_CLIENT_SECRET**: Client IDs and secrets for Google OAuth integration.
-  - **FACEBOOK_CLIENT_ID**, **FACEBOOK_CLIENT_SECRET**: Client IDs and secrets for Facebook OAuth integration.
-  - **SMTP_USER**, **SMTP_PASS**: SMTP credentials for sending emails.
+  - **GOOGLE_CLIENT_ID**, **GOOGLE_CLIENT_SECRET**: Client IDs and secrets for Google OAuth integration - follow the **Google Client ID and Client Secret** section for detailed instructions.
+  - **FACEBOOK_CLIENT_ID**, **FACEBOOK_CLIENT_SECRET**: Client IDs and secrets for Facebook OAuth integration - follow the **Facebook App ID and App Secret** section for detailed instructions.
+  - **SMTP_USER**, **SMTP_PASS**: SMTP credentials for sending emails - follow the **Setting Up SMTP with Gmail** section for detailed instructions.
+  - **REDIS_URL**: Redis URL for caching purposes (e.g., `redis://default:password@redis-12345-abcde.us-east-1-1.ec2.cloud.redislabs.com:12345`).
 
 ## Setting up Google and Facebook OAuth
 
@@ -140,7 +144,7 @@ Facebook credentials are needed for enabling Facebook login in your app. Follow 
    - Log in and click **Get Started**.
    - Go to the **My Apps** section and click **Create App**.
    - Choose **Consumer** as the app type and click **Next**.
-   - Provide an **App Name**, **Contact Email**, and click **Create App**.
+   - Provide an **App Name**, **Contact Email** and click **Create App**.
 
 3. **Add Facebook Login to Your App:**
    - In the app dashboard, click **Add Product** in the left sidebar.
@@ -148,7 +152,7 @@ Facebook credentials are needed for enabling Facebook login in your app. Follow 
    - Follow the setup instructions to configure Facebook Login for your app, including adding the domain where your frontend or backend is hosted.
 
 4. **Configure Basic Settings:**
-   - Go to **Settings** > **Basic**, and fill in the following:
+   - Go to **Settings** > **Basic** and fill in the following:
      - **App Domains**: Add domains where the frontend and backend are hosted (e.g., `frontend.example.com`, `api.example.com`).
      - **Privacy Policy URL**: Provide a valid link to your app's privacy policy.
      - **Terms of Service URL**: Optionally add a terms of service URL.
@@ -221,7 +225,7 @@ The root `package.json` should look like this:
   "main": "index.js",
   "scripts": {
     "check-frontend-env": "node frontend/src/utils/checkEnv.js",
-    "check-backend-env": "node backend/config/checkEnv.js",
+    "check-backend-env": "node backend/config/core/checkEnv.js",
     "start": "npm run check-frontend-env && npm run check-backend-env && concurrently --kill-others \"npm run start-frontend\" \"npm run start-backend\"",
     "start-frontend": "cd frontend && npm run dev",
     "start-backend": "cd backend && npm run dev"
@@ -261,8 +265,8 @@ Once the application is running, you can access it in your web browser at `http:
   - Simple payment options with [Stripe](https://stripe.com) or cash.
   - Real-time order tracking for updates on your purchases.
   - Users can submit reviews and request returns for products in their orders with the status marked as `delivered`.
-  - Personalized email notifications for order status updates, return request status updates, and product reviews.
-  - Export user and address data as JSON, order and return request data as PDF, and all admin dashboard data as Excel or JSON.
+  - Personalized email notifications for order status updates, return request status updates and product reviews.
+  - Export user and address data as JSON, order and return request data as PDF and all admin dashboard data as Excel or JSON.
   - Users can subscribe to product restock notifications and then will receive an email when the product is restocked.
   - Users will receive an email when they send a contact email through the contact form.
 
@@ -270,24 +274,24 @@ Once the application is running, you can access it in your web browser at `http:
   - **admin**:
     - Full access to the admin dashboard.
   - **user**:
-    - Can browse products, add items to their cart, make purchases, and view their order history.
+    - Can browse products, add items to their cart, make purchases and view their order history.
   - **customerSupport**:
     - Receives the contact details of users who send contact emails through the contact form so that they can reply to them as soon as possible.
   - **orderManager**:
-    - Receives the order details in their email so that they can set the order status as `processed` in the admin dashboard based on the item availability.
+    - Processes incoming orders through real-time notifications and email alerts, verifying inventory before updating order status.
   - **contentManager**:
-    - Can create, read, update, and delete slideshow images and FAQs in the admin dashboard.
+    - Can create, read, update and delete slideshow images and FAQs in the admin dashboard.
   - **productManager**:
-    - Can create, read, update, and delete products, categories, subcategories, sub-subcategories, reviews, product restock subscriptions and suppliers in the admin dashboard.
+    - Can create, read, update and delete products, categories, subcategories, sub-subcategories, reviews, product restock subscriptions and suppliers in the admin dashboard.
 
 ### Technologies Used
 
 #### Frontend
-The frontend is built with modern web technologies that focus on UI/UX, routing, and handling API requests efficiently.  
+The frontend is built with modern web technologies that focus on UI/UX, routing and handling API requests efficiently.  
 Follow the documentation in the [frontend/README.md](frontend/README.md) file to learn more about the structure of the frontend directory and its `package.json`.
 
 #### Backend
-The backend is a Node.js API server designed to handle requests, manage authentication, and interact with the MongoDB database. It uses JWT tokens for secure access and authorization, along with Stripe for payment integration.  
+The backend is a Node.js API server designed to handle requests, manage authentication and interact with the MongoDB database. It uses JWT tokens for secure access and authorization, along with Stripe for payment integration.  
 Follow the documentation in the [backend/README.md](backend/README.md) file to learn more about the structure of the backend directory and its `package.json`.
 
 ## Stripe Payment Testing
@@ -318,4 +322,4 @@ You can use the following test card details to simulate payments in Stripe. If a
 ---
 ## API Documentation
 
-The frontend communicates with a robust backend API, which is fully documented and accessible through Postman. For detailed information on the API endpoints, request/response formats, and usage examples, refer to the official [API documentation](https://documenter.getpostman.com/view/31736145/2sA3kRL56j) for sheero.
+The frontend communicates with a robust backend API, which is fully documented and accessible through Postman. For detailed information on the API endpoints, request/response formats and usage examples, refer to the official [API documentation](https://documenter.getpostman.com/view/31736145/2sA3kRL56j) for sheero.

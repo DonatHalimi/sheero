@@ -38,6 +38,7 @@
     "react-swipeable": "^7.0.1",
     "react-toastify": "^10.0.5",
     "redux": "^5.0.1",
+    "socket.io-client": "^4.8.1",
     "tailwindcss": "^3.4.4",
     "vite": "^5.3.1",
     "xlsx": "^0.18.5",

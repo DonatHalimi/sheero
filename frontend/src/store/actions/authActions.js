@@ -79,7 +79,7 @@ export const loginUser = (email, password) => async dispatch => {
             message: res.data.message,
             requires2FA: res.data.requires2FA || false,
             email: res.data.email,
-            twoFactorMethods: res.data.twoFactorMethods || [] // Add this line
+            twoFactorMethods: res.data.twoFactorMethods || []
         };
 
     } catch (error) {

@@ -32,6 +32,8 @@ export const verify2faAuthService = (email, token, action) => axiosInstance.post
 
 export const verifySocialLogin2FAService = (data) => axiosInstance.post('/auth/verify-social-2fa', data);
 
+export const toggleLoginNotificationsService = (loginNotifications) => axiosInstance.post('/auth/notifications/toggle', { loginNotifications });
+
 export const logoutUserService = () => axiosInstance.post('/auth/logout');
 
 export const editUserService = (userData) => axiosInstance.put('/auth/profile', userData);

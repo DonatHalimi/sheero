@@ -1,9 +1,9 @@
-import React, { useEffect, useState } from 'react';
+import { useEffect, useState } from 'react';
 import { useLocation, useNavigate } from 'react-router-dom';
-import { LoadingOverlay } from '../../assets/CustomComponents';
+import { LoadingOverlay } from '../../components/custom/LoadingSkeletons';
+import { clearCartService } from '../../services/cartService';
 import { verifyStripeOrderService } from '../../services/orderService';
-import CancelPayment from './CancelPayment';
-import SuccessPayment from './SuccessPayment';
+import PaymentStatus from './PaymentStatus';
 
 const Verify = () => {
     const location = useLocation();
@@ -29,9 +29,13 @@ const Verify = () => {
                     return;
                 }
 
-                setSuccess(response.data.success);
-            } catch (err) {
-                console.error(err);
+                if (response.data.success) {
+                    setSuccess(true);
+                    await clearCartService();
+                } else {
+                    setSuccess(false);
+                }
+            } catch {
                 navigate('/', { replace: true });
             } finally {
                 setLoading(false);
@@ -47,7 +51,7 @@ const Verify = () => {
 
     if (loading) return <LoadingOverlay />;
 
-    return success ? <SuccessPayment orderId={order_id} /> : <CancelPayment />;
+    return <PaymentStatus success={success} orderId={order_id} />;
 };
 
 export default Verify;

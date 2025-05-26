@@ -1,19 +1,25 @@
-import CheckCircleIcon from '@mui/icons-material/CheckCircle';
+import { Cancel, CheckCircle } from '@mui/icons-material';
 import { Box, Typography } from '@mui/material';
 import { motion } from 'framer-motion';
-import React, { useEffect } from 'react';
+import { useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 
-const SuccessPayment = ({ orderId }) => {
+const PaymentStatus = ({ success, orderId }) => {
     const navigate = useNavigate();
 
     useEffect(() => {
         const timer = setTimeout(() => {
-            navigate(`/profile/orders/${orderId}`, { replace: true });
-        }, 4000);
+            const path = success ? `/profile/orders/${orderId}` : '/cart';
+            navigate(path, { replace: true });
+        }, 3000);
 
         return () => clearTimeout(timer);
-    }, [navigate, orderId]);
+    }, [navigate, success, orderId]);
+
+    const Icon = success ? CheckCircle : Cancel;
+    const color = success ? 'success' : 'error';
+    const title = success ? 'Payment Successful!' : 'Payment Cancelled';
+    const message = success ? 'Redirecting to order details...' : 'Redirecting to cart...';
 
     return (
         <Box
@@ -29,19 +35,14 @@ const SuccessPayment = ({ orderId }) => {
             <motion.div
                 initial={{ scale: 0, rotate: 0 }}
                 animate={{ scale: 1.1, rotate: 360 }}
-                transition={{
-                    type: 'spring',
-                    stiffness: 260,
-                    damping: 20,
-                    duration: 1.5
-                }}
+                transition={{ type: 'spring', stiffness: 260, damping: 20, duration: 1.5 }}
                 style={{ marginBottom: '1rem' }}
             >
-                <CheckCircleIcon color="success" style={{ fontSize: 50 }} />
+                <Icon color={color} style={{ fontSize: 50 }} />
             </motion.div>
 
-            <Typography variant="h4" fontWeight="bold" color="success" gutterBottom>
-                Payment Successful!
+            <Typography variant="h4" fontWeight="bold" color={color} gutterBottom>
+                {title}
             </Typography>
 
             <motion.div
@@ -50,11 +51,11 @@ const SuccessPayment = ({ orderId }) => {
                 transition={{ duration: 0.5, delay: 0.5 }}
             >
                 <Typography variant="body1" fontWeight="500" color="textSecondary">
-                    Redirecting to your orders...
+                    {message}
                 </Typography>
             </motion.div>
         </Box>
     );
 };
 
-export default SuccessPayment;
+export default PaymentStatus;

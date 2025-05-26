@@ -1,9 +1,10 @@
 import { KeyboardArrowDown } from '@mui/icons-material';
 import { CircularProgress, Typography } from '@mui/material';
-import React, { useEffect, useState } from 'react';
+import { useEffect, useState } from 'react';
 import { useInView } from 'react-intersection-observer';
 import { useSelector } from 'react-redux';
-import { BrownButton, ProductGrid } from '../../assets/CustomComponents';
+import { BrownButton } from '../../components/custom/MUI';
+import { ProductGrid } from '../../components/custom/Product';
 
 const initialItems = 49;
 

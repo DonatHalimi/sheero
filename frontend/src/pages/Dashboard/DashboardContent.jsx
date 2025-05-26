@@ -1,7 +1,6 @@
 import Container from '@mui/material/Container';
 import Grid from '@mui/material/Grid';
 import Paper from '@mui/material/Paper';
-import * as React from 'react';
 
 export default function DashboardContent() {
   return (

@@ -1,5 +1,4 @@
-import React from 'react';
-import { RatingStars } from '../../assets/CustomComponents';
+import { RatingStars } from '../../components/custom/Product';
 import DashboardPage from '../../components/Dashboard/DashboardPage';
 import ReviewDetailsDrawer from '../../components/Dashboard/Modal/Review/ReviewDetailsDrawer';
 import ReviewForm from '../../components/Dashboard/Modal/Review/ReviewForm';

@@ -1,4 +1,4 @@
-const BASE_URL = process.env.NODE_ENV === 'production'
+export const BASE_URL = process.env.NODE_ENV === 'production'
     ? 'https://sheero-backend.onrender.com'
     : 'http://localhost:5000';
 

@@ -1,10 +1,11 @@
 import { Lock, Mail } from '@mui/icons-material';
 import { Button } from '@mui/material';
-import React, { useEffect, useRef, useState } from 'react';
+import { useEffect, useRef, useState } from 'react';
 import { useDispatch } from 'react-redux';
 import { useLocation, useNavigate, useSearchParams } from 'react-router-dom';
 import { toast } from 'react-toastify';
-import { BrownButton, LoadingLabel } from '../../assets/CustomComponents';
+import { LoadingLabel } from '../../components/custom/LoadingSkeletons';
+import { BrownButton } from '../../components/custom/MUI';
 import { resend2faService, resendOTPService, verify2faAuthService, verifyOTPService, verifySocialLogin2FAService } from '../../services/authService';
 import { loadUser } from '../../store/actions/authActions';
 

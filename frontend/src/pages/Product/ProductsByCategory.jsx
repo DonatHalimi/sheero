@@ -1,7 +1,10 @@
-import React, { useEffect, useState } from 'react';
+import { useEffect, useState } from 'react';
 import { useNavigate, useParams } from 'react-router-dom';
-import { calculatePageCount, CustomPagination, FilterLayout, filterProductsByPrice, getPaginatedItems, handlePageChange, ProductGrid, sortProducts, SplideList } from '../../assets/CustomComponents';
 import noProducts from '../../assets/img/products/no-products.png';
+import { CustomPagination } from '../../components/custom/MUI';
+import { FilterLayout, ProductGrid } from '../../components/custom/Product';
+import { SplideList } from '../../components/custom/Splide';
+import { calculatePageCount, filterProductsByPrice, getPaginatedItems, handlePageChange, sortProducts } from '../../components/custom/utils';
 import Navbar from '../../components/Navbar/Navbar';
 import Footer from '../../components/Utils/Footer';
 import { getCategoryBySlugService, getSubcategoriesByCategoryService } from '../../services/categoryService';

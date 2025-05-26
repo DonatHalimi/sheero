@@ -1,11 +1,13 @@
 import { ExpandLess, ExpandMore } from '@mui/icons-material';
 import { Button } from '@mui/material';
 import { motion } from 'framer-motion';
-import React, { useEffect, useState } from 'react';
+import { useEffect, useState } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
-import { FAQItem, GoBackButton, LoadingFaq } from '../../assets/CustomComponents';
 import { getExpandIconProps } from '../../assets/sx';
+import { LoadingFaq } from '../../components/custom/LoadingSkeletons';
+import { GoBackButton } from '../../components/custom/MUI';
 import Navbar from '../../components/Navbar/Navbar';
+import { FAQItem } from '../../components/Product/Items/FAQItem';
 import Footer from '../../components/Utils/Footer';
 import { getFAQs } from '../../store/actions/dashboardActions';
 

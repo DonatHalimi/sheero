@@ -21,6 +21,7 @@ module.exports = {
     FACEBOOK_CLIENT_SECRET: checkEnvVar('FACEBOOK_CLIENT_SECRET'),
     SMTP_USER: checkEnvVar('SMTP_USER'),
     SMTP_PASS: checkEnvVar('SMTP_PASS'),
+    REDIS_URL: checkEnvVar('REDIS_URL'),
     JWT_REFRESH_SECRET: process.env.JWT_REFRESH_SECRET,
     SEED_DB: process.env.SEED_DB,
     ADMIN_FIRST_NAME: process.env.ADMIN_FIRST_NAME,

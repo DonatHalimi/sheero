@@ -1,6 +1,6 @@
 import { Modal, useTheme } from '@mui/material';
-import React, { useEffect, useRef, useState } from 'react';
-import { ImagePreviewControls, MAX_ZOOM_LEVEL, StyledImage, ZOOM_FACTOR } from '../../../assets/CustomComponents';
+import { useEffect, useRef, useState } from 'react';
+import { ImagePreviewControls, MAX_ZOOM_LEVEL, StyledImage, ZOOM_FACTOR } from '../../../components/custom/MUI';
 
 const ImagePreviewModal = ({ open, onClose, imageUrl }) => {
     const theme = useTheme();

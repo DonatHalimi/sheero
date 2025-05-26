@@ -1,12 +1,15 @@
 import { LinearProgress, Table, TableBody, TableCell, TableContainer, TableHead, TableRow, Typography } from '@mui/material';
-import React, { useEffect, useState } from 'react';
+import { useEffect, useState } from 'react';
 import { Link, useParams } from 'react-router-dom';
 import 'react-toastify/dist/ReactToastify.css';
-import { EmptyState, formatDate, formatPrice, Header, LoadingOrderDetails, ProfileLayout } from '../../assets/CustomComponents';
-import { generateOrderPDF } from '../../assets/DataExport';
 import emptyOrdersImage from '../../assets/img/empty/orders.png';
+import { LoadingOrderDetails } from '../../components/custom/LoadingSkeletons';
+import { EmptyState } from '../../components/custom/MUI';
+import { Header, ProfileLayout } from '../../components/custom/Profile';
+import { formatDate, formatPrice } from '../../components/custom/utils';
 import Navbar from '../../components/Navbar/Navbar';
 import ReturnModal from '../../components/Product/Modals/ReturnModal';
+import { generateOrderPDF } from '../../components/Product/Utils/DataExport';
 import Footer from '../../components/Utils/Footer';
 import { getOrderDetailsService } from '../../services/orderService';
 import { getImageUrl } from '../../utils/config';
@@ -313,10 +316,7 @@ const OrderDetails = () => {
                         </div>
                     </>
                 ) : (
-                    <EmptyState
-                        imageSrc={emptyOrdersImage}
-                        context='orders'
-                    />
+                    <EmptyState imageSrc={emptyOrdersImage} context='orders' />
                 )}
             </ProfileLayout>
             <ReturnModal

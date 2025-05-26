@@ -1,10 +1,11 @@
 import { ArrowBack } from '@mui/icons-material';
 import { Autocomplete, Box, MenuItem, Modal, TextField } from '@mui/material';
-import React, { useEffect, useState } from 'react';
+import { useEffect, useState } from 'react';
 import { toast } from 'react-toastify';
-import { BrownButton, BrownOutlinedTextField, CustomBox, CustomPaper, CustomTypography, ImageUploadBox, OutlinedBrownButton, OutlinedBrownFormControl } from '../../../../assets/CustomComponents';
 import axiosInstance from '../../../../utils/axiosInstance';
 import { getImageUrl } from '../../../../utils/config';
+import { ImageUploadBox } from '../../../custom/Dashboard';
+import { BrownButton, BrownOutlinedTextField, CustomBox, CustomPaper, CustomTypography, OutlinedBrownButton, OutlinedBrownFormControl } from '../../../custom/MUI';
 
 const EditProductModal = ({ open, onClose, product, onEditSuccess }) => {
     const [step, setStep] = useState(1);
@@ -343,14 +344,14 @@ const EditProductModal = ({ open, onClose, product, onEditSuccess }) => {
                         <ImageUploadBox onFileSelect={handleFileSelect} initialPreview={product?.image ? getImageUrl(product.image) : ''} />
 
                         <BrownButton onClick={() => setStep(3)} variant="contained" color="primary" className="w-full">
-                            Next: Edit Variants, Dimensions, and Shipping
+                            Next: Edit Variants, Dimensions and Shipping
                         </BrownButton>
                     </>
                 );
             case 3:
                 return (
                     <>
-                        {/* Step 3: Variants, Dimensions, and Shipping */}
+                        {/* Step 3: Variants, Dimensions and Shipping */}
                         <CustomTypography variant='h5' className="!text-xl !font-bold !mb-4">Edit Dimensions, Variants, Details and Shipping</CustomTypography>
 
                         {/* Button to return to Step 1 */}

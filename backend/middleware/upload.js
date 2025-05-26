@@ -17,7 +17,7 @@ const fileFilter = (req, file, cb) => {
     if (mimeType && extname) {
         return cb(null, true);
     }
-    req.fileValidationError = 'Invalid file type. Only JPEG, JPG, and PNG are allowed';
+    req.fileValidationError = 'Invalid file type. Only JPEG, JPG and PNG are allowed';
     cb(null, false);
 };
 

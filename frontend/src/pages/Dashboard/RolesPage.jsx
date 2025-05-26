@@ -1,4 +1,3 @@
-import React from 'react';
 import DashboardPage from '../../components/Dashboard/DashboardPage';
 import RoleDetailsDrawer from '../../components/Dashboard/Modal/Role/RoleDetailsDrawer';
 import RoleForm from '../../components/Dashboard/Modal/Role/RoleForm';

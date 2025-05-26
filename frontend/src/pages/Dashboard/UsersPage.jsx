@@ -1,5 +1,5 @@
 import { Check, Clear } from '@mui/icons-material';
-import { AccountLinkStatusIcon } from '../../assets/CustomComponents';
+import { AccountLinkStatusIcon } from '../../components/custom/Icons';
 import DashboardPage from '../../components/Dashboard/DashboardPage';
 import UserDetailsDrawer from '../../components/Dashboard/Modal/User/UserDetailsDrawer';
 import UserForm from '../../components/Dashboard/Modal/User/UserForm';

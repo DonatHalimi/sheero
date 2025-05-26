@@ -1,48 +1,30 @@
 const express = require('express');
 const router = express.Router();
 
-// Import routes
-const addressRoutes = require('./address');
-const authRoutes = require('./auth');
-const cartRoutes = require('./cart');
-const categoryRoutes = require('./category');
-const cityRoutes = require('./city');
-const contactRoutes = require('./contact');
-const countryRoutes = require('./country');
-const faqRoutes = require('./faq');
-const orderRoutes = require('./order');
-const productRoutes = require('./product');
-const protectedRoutes = require('./protected');
-const returnRoutes = require('./return');
-const reviewRoutes = require('./review');
-const roleRoutes = require('./role');
-const slideshowRoutes = require('./slideshow');
-const subcategoryRoutes = require('./subcategory');
-const subSubcategoryRoutes = require('./subSubcategory');
-const supplierRoutes = require('./supplier');
-const userRoutes = require('./user');
-const wishlistRoutes = require('./wishlist');
+const routes = [
+    { path: '/addresses', route: require('./address') },
+    { path: '/auth', route: require('./auth') },
+    { path: '/cart', route: require('./cart') },
+    { path: '/categories', route: require('./category') },
+    { path: '/cities', route: require('./city') },
+    { path: '/contact', route: require('./contact') },
+    { path: '/countries', route: require('./country') },
+    { path: '/faqs', route: require('./faq') },
+    { path: '/orders', route: require('./order') },
+    { path: '/protected', route: require('./protected') },
+    { path: '/products', route: require('./product') },
+    { path: '/returns', route: require('./return') },
+    { path: '/reviews', route: require('./review') },
+    { path: '/roles', route: require('./role') },
+    { path: '/slideshow', route: require('./slideshow') },
+    { path: '/subcategories', route: require('./subcategory') },
+    { path: '/subsubcategories', route: require('./subSubcategory') },
+    { path: '/suppliers', route: require('./supplier') },
+    { path: '/users', route: require('./user') },
+    { path: '/wishlist', route: require('./wishlist') },
+    { path: '/notifications', route: require('./notification') },
+];
 
-// Define routes
-router.use('/addresses', addressRoutes);
-router.use('/auth', authRoutes);
-router.use('/cart', cartRoutes);
-router.use('/categories', categoryRoutes);
-router.use('/cities', cityRoutes);
-router.use('/contact', contactRoutes);
-router.use('/countries', countryRoutes);
-router.use('/faqs', faqRoutes);
-router.use('/orders', orderRoutes);
-router.use('/protected', protectedRoutes);
-router.use('/products', productRoutes);
-router.use('/returns', returnRoutes)
-router.use('/reviews', reviewRoutes);
-router.use('/roles', roleRoutes)
-router.use('/slideshow', slideshowRoutes);
-router.use('/subcategories', subcategoryRoutes);
-router.use('/subsubcategories', subSubcategoryRoutes);
-router.use('/suppliers', supplierRoutes);
-router.use('/users', userRoutes);
-router.use('/wishlist', wishlistRoutes);
+routes.forEach(({ path, route }) => router.use(path, route));
 
 module.exports = router;

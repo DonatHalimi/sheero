@@ -1,9 +1,10 @@
 import { Autocomplete, Box, InputLabel, MenuItem, Modal, Select, TextField } from '@mui/material';
-import React, { useEffect, useState } from 'react';
+import { useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { toast } from 'react-toastify';
-import { BrownButton, BrownOutlinedTextField, CustomBox, CustomPaper, CustomTypography, ImageUploadBox, OutlinedBrownButton, OutlinedBrownFormControl } from '../../../../assets/CustomComponents';
 import axiosInstance from '../../../../utils/axiosInstance';
+import { ImageUploadBox } from '../../../custom/Dashboard';
+import { BrownButton, BrownOutlinedTextField, CustomBox, CustomPaper, CustomTypography, OutlinedBrownButton, OutlinedBrownFormControl } from '../../../custom/MUI';
 
 const AddProductModal = ({ open, onClose, onAddSuccess }) => {
     const [step, setStep] = useState(1);

@@ -1,10 +1,13 @@
 import { LinearProgress, Table, TableBody, TableCell, TableContainer, TableHead, TableRow } from '@mui/material';
-import React, { useEffect, useState } from 'react';
+import { useEffect, useState } from 'react';
 import { Link, useParams } from 'react-router-dom';
-import { EmptyState, formatDate, Header, LoadingOrderDetails, ProfileLayout } from '../../assets/CustomComponents';
-import { generateReturnPDF } from '../../assets/DataExport';
 import emptyReturnsImage from '../../assets/img/empty/orders.png';
+import { LoadingOrderDetails } from '../../components/custom/LoadingSkeletons';
+import { EmptyState } from '../../components/custom/MUI';
+import { Header, ProfileLayout } from '../../components/custom/Profile';
+import { formatDate } from '../../components/custom/utils';
 import Navbar from '../../components/Navbar/Navbar';
+import { generateReturnPDF } from '../../components/Product/Utils/DataExport';
 import Footer from '../../components/Utils/Footer';
 import { getReturnDetailsService } from '../../services/returnService';
 import { getImageUrl } from '../../utils/config';
@@ -134,10 +137,7 @@ const ReturnDetails = () => {
                         </div>
                     </>
                 ) : (
-                    <EmptyState
-                        imageSrc={emptyReturnsImage}
-                        context='returns'
-                    />
+                    <EmptyState imageSrc={emptyReturnsImage} context='returns' />
                 )}
             </ProfileLayout>
 

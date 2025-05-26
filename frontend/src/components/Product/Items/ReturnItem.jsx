@@ -1,6 +1,5 @@
-import React from 'react';
 import { Link } from 'react-router-dom';
-import { formatDate } from '../../../assets/CustomComponents';
+import { formatDate } from '../../../components/custom/utils';
 import { getImageUrl } from '../../../utils/config';
 
 const ReturnItem = ({ returnRequest, getStatusColor }) => {

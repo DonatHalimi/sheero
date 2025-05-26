@@ -1,8 +1,9 @@
 import { Paper, useTheme } from '@mui/material';
 import { DataGrid } from '@mui/x-data-grid';
-import React, { useEffect, useRef } from 'react';
-import { ActionsCell, CustomNoRowsOverlay, CustomToolbar } from '../../assets/CustomComponents';
+import { useEffect, useRef } from 'react';
 import { dashboardTablePaperSx, dashboardTableSx } from '../../assets/sx';
+import { ActionsCell } from '../../components/custom/Dashboard';
+import { CustomNoRowsOverlay, CustomToolbar } from '../../components/custom/MUI';
 
 const getNestedValue = (obj, path) => {
     return path.split('.').reduce((acc, part) => acc && acc[part], obj);
@@ -130,7 +131,7 @@ const DashboardTable = ({
         onSelectItem(isSelected
             ? selectedItems.filter(id => id !== itemId)
             : [...selectedItems, itemId]
-        );
+        )
     };
 
     return (

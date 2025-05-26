@@ -23,7 +23,7 @@ class EnvValidator {
             },
             ADMIN_PASSWORD: {
                 validate: (value) => /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[@$!%*()?&])[A-Za-z\d@$!%*()?&]{8,}$/.test(value),
-                message: () => 'ADMIN_PASSWORD must be at least 8 characters and include uppercase, lowercase, number, and special character'
+                message: () => 'ADMIN_PASSWORD must be at least 8 characters and include uppercase, lowercase, number and special character'
             }
         };
 

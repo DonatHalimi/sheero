@@ -1,6 +1,6 @@
 import { useEffect, useRef, useState } from 'react';
 import { useDispatch } from 'react-redux';
-import { exportToCSV, exportToExcel, exportToJSON } from '../assets/DataExport';
+import { exportToCSV, exportToExcel, exportToJSON } from '../components/Product/Utils/DataExport';
 import { getApiEndpoint } from '../utils/getApiEndpoint';
 import { useKeyboardShortcuts } from './useKeyboardShortcuts';
 

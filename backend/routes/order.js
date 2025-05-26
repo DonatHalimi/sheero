@@ -11,7 +11,7 @@ router.get('/get', requireAuthAndRole(['admin', 'orderManager']), getAllOrders);
 router.get('/user/:userId', requireAuth, getUserOrders);
 router.get('/:orderId', requireAuth, getOrderById);
 router.put('/status/update', requireAuthAndRole(['admin', 'orderManager']), updateDeliveryStatus);
-router.delete('/delete/:id', requireAuthAndRole('admin'), deleteOrder);
-router.delete('/delete-bulk', requireAuthAndRole('admin'), deleteOrders);
+router.delete('/delete/:id', requireAuthAndRole(['admin', 'orderManager']), deleteOrder);
+router.delete('/delete-bulk', requireAuthAndRole(['admin', 'orderManager']), deleteOrders);
 
 module.exports = router;

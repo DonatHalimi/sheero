@@ -1,9 +1,11 @@
 import { Form, Formik } from 'formik';
 import { toast } from 'react-toastify';
-import { CustomBox, CustomModal, CustomTextField, CustomTypography, FormSubmitButtons, handleApiError, ImageUploadBox } from '../../../../assets/CustomComponents';
 import { addCategoryService, editCategoryService } from '../../../../services/categoryService';
 import { getImageUrl } from '../../../../utils/config';
 import { initialValues, validationSchema } from '../../../../utils/validations/category';
+import { FormSubmitButtons, ImageUploadBox } from '../../../custom/Dashboard';
+import { CustomBox, CustomModal, CustomTextField, CustomTypography } from '../../../custom/MUI';
+import { handleApiError } from '../../../custom/utils';
 
 const CategoryForm = ({
     open,
@@ -43,7 +45,7 @@ const CategoryForm = ({
 
     return (
         <CustomModal open={open} onClose={onClose}>
-            <CustomBox>
+            <CustomBox isScrollable>
                 <CustomTypography variant="h5">{isEdit ? 'Edit Category' : 'Add Category'}</CustomTypography>
 
                 <Formik

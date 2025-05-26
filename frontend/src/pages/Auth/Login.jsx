@@ -1,10 +1,12 @@
 import { Visibility, VisibilityOff } from '@mui/icons-material';
 import { Box, Container, IconButton, InputAdornment, Typography } from '@mui/material';
-import React, { useState } from 'react';
+import { useState } from 'react';
 import { useDispatch } from 'react-redux';
 import { useNavigate } from 'react-router-dom';
 import { toast } from 'react-toastify';
-import { BrownButton, BrownOutlinedTextField, ErrorTooltip, handleFacebookLogin, handleGoogleLogin, LoadingLabel, SocialLoginButtons } from '../../assets/CustomComponents';
+import { LoadingLabel } from '../../components/custom/LoadingSkeletons';
+import { BrownButton, BrownOutlinedTextField, ErrorTooltip } from '../../components/custom/MUI';
+import { handleFacebookLogin, handleGoogleLogin, SocialLoginButtons } from '../../components/custom/Profile';
 import Navbar from '../../components/Navbar/Navbar';
 import Footer from '../../components/Utils/Footer';
 import { loginUser } from '../../store/actions/authActions';
@@ -176,6 +178,7 @@ const Login = () => {
                             }
                             return null;
                         })}
+
                         <BrownButton
                             type="submit"
                             fullWidth
@@ -185,6 +188,7 @@ const Login = () => {
                         >
                             <LoadingLabel loading={loading} defaultLabel='Log In' loadingLabel='Logging in' />
                         </BrownButton>
+
                         <div className='text-left text-sm text-stone-500'>
                             Don't have an account?{' '}
                             <span
@@ -203,7 +207,9 @@ const Login = () => {
                     </Box>
                 </div>
             </Container>
+
             <ForgotPassword open={forgotPasswordOpen} onClose={() => setForgotPasswordOpen(false)} />
+
             <Footer />
         </Box>
     );

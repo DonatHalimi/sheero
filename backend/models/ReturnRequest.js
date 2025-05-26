@@ -12,10 +12,10 @@ const reasons = [
 const status = ['pending', 'approved', 'processed', 'rejected'];
 
 function generateCustomId() {
-    const timestamp = Date.now().toString().slice(-6);
-    const randomPart = Math.floor(Math.random() * 1000).toString().padStart(3, '0');
+    const timestamp = Date.now().toString().slice(-5);
+    const randomPart = Math.floor(Math.random() * 100).toString().padStart(2, '0');
     return timestamp + randomPart;
-}
+};
 
 const returnRequestSchema = new mongoose.Schema({
     _id: { type: String, default: generateCustomId },

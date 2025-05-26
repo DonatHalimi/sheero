@@ -1,14 +1,13 @@
 import { ThemeProvider as MuiThemeProvider } from '@mui/material/styles';
 import { createContext, useContext, useEffect, useMemo, useState } from 'react';
 import { useHotkeys } from 'react-hotkeys-hook';
+import { getLocalStorageState, saveLocalStorageState } from '../components/custom/utils';
 import { getDashboardTheme } from './dashboardTheme';
 
 const ThemeContext = createContext();
 
 export const DashboardThemeProvider = ({ children }) => {
-    const [mode, setMode] = useState(() => {
-        return localStorage.getItem('dashboardTheme') || 'light';
-    });
+    const [mode, setMode] = useState(() => getLocalStorageState('dashboardTheme', 'light'));
 
     const theme = useMemo(() => getDashboardTheme(mode), [mode]);
 
@@ -26,7 +25,7 @@ export const DashboardThemeProvider = ({ children }) => {
     const toggleTheme = () => {
         setMode((prev) => {
             const newMode = prev === 'light' ? 'dark' : 'light';
-            localStorage.setItem('dashboardTheme', newMode);
+            saveLocalStorageState('dashboardTheme', newMode);
             return newMode;
         });
     };

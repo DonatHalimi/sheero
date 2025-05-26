@@ -1,15 +1,13 @@
 import { Box, MenuItem, Typography } from '@mui/material';
 import { Form, Formik } from 'formik';
-import React from 'react';
 import { toast } from 'react-toastify';
-import {
-    ActionButtons, BoxBetween, BrownOutlinedTextField, CollapsibleProductList, CustomBox, CustomModal,
-    CustomTypography, DateAdornment, DeliveryStatusAdornment, EuroAdornment, formatDate, handleApiError,
-    IdAdornment, PaymentMethodAdornment, PersonAdornment, ReadOnlyTextField
-} from '../../../../assets/CustomComponents';
 import { editOrderService } from '../../../../services/orderService';
 import { statusOptions } from '../../../../utils/constants/validations/order';
 import { initialValues, validationSchema } from '../../../../utils/validations/order';
+import { DateAdornment, DeliveryStatusAdornment, EuroAdornment, IdAdornment, PaymentMethodAdornment, PersonAdornment } from '../../../custom/Adornments';
+import { ActionButtons, CollapsibleProductList } from '../../../custom/Dashboard';
+import { BoxBetween, BrownOutlinedTextField, CustomBox, CustomModal, CustomTypography, ReadOnlyTextField } from '../../../custom/MUI';
+import { formatDate, handleApiError } from '../../../custom/utils';
 
 const OrderForm = ({
     open,

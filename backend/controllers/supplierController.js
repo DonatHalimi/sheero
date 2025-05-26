@@ -69,9 +69,7 @@ const deleteSuppliers = async (req, res) => {
     try {
         const suppliers = await Supplier.find({ _id: { $in: ids } });
 
-        if (suppliers.length !== ids.length) {
-            return res.status(404).json({ message: 'One or more suppliers not found' });
-        }
+        if (suppliers.length !== ids.length) return res.status(404).json({ message: 'One or more suppliers not found' });
 
         await Supplier.deleteMany({ _id: { $in: ids } });
 

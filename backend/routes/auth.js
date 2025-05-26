@@ -3,6 +3,7 @@ const passport = require('passport');
 const { registerUser, verifyOTP, resendOTP, loginUser, enable2FA, disable2FA, resend2FAOTP, verifyTwoFactorOTP,
     enableAuthenticator2FA, verifyAuthenticator2FA, handleSocialLogin, verifySocialLogin2FA, getExistingSecret,
     getCurrentUser, updateUserProfile, forgotPassword, resetPassword, validateResetToken, logoutUser,
+    toggleLoginNotification,
 } = require('../controllers/authController.js');
 const { registerSchema, loginSchema } = require('../validations/auth');
 const { requireAuth, conditionalRequireAuth } = require('../middleware/auth.js');
@@ -25,6 +26,7 @@ router.post('/verify-social-2fa', verifySocialLogin2FA);
 router.post('/forgot-password', forgotPassword);
 router.post('/reset-password/:token', resetPassword);
 router.get('/validate-token/:token', validateResetToken);
+router.post('/notifications/toggle', requireAuth, toggleLoginNotification);
 router.post('/logout', logoutUser);
 router.get('/me', requireAuth, getCurrentUser);
 router.put('/profile', requireAuth, updateUserProfile);

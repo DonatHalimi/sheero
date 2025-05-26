@@ -9,7 +9,7 @@ const router = express.Router();
 
 router.get('/orders/check-review/:productId', requireAuth, checkReviewEligibility);
 router.post('/product/:productId', requireAuth, validate(createSchema), createReview);
-router.get('/get', requireAuthAndRole(['admin', 'productManager']), getReviews);
+router.get('/get', requireAuthAndRole(['admin', 'productManager', 'orderManager']), getReviews);
 router.get('/get/:id', requireAuthAndRole(['admin', 'productManager']), validate(getByIdSchema), getReviewById);
 router.get('/products/:productId', validate(getByProductSchema), getReviewsByProduct);
 router.get('/user/:userId', requireAuth, validate(getByUserSchema), getReviewsByUser);

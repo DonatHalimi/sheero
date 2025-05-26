@@ -1,6 +1,7 @@
 import { Typography } from '@mui/material';
-import React, { useEffect, useState } from 'react';
-import { ProductDetailsBox, ProductTabs, ReviewModal, ReviewsList, TabPanel } from '../../../assets/CustomComponents';
+import { useEffect, useState } from 'react';
+import { ProductDetailsBox } from '../../../components/custom/MUI';
+import { ProductTabs, ReviewModal, ReviewsList, TabPanel } from '../../../components/custom/Product';
 import { getProductReviewsService } from '../../../services/reviewService';
 
 const ProductDetailsTabs = ({ product }) => {

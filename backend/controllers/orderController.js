@@ -1,14 +1,12 @@
 const Address = require('../models/Address');
 const Order = require('../models/Order');
-const Stripe = require('stripe');
 const Cart = require('../models/Cart');
-const { STRIPE_SECRET_KEY, NODE_ENV } = require('../config/core/dotenv');
-const { sendOrderUpdateEmail, sendProductInventoryUpdateEmail, sendSuccessfulOrderUpdate } = require('../config/email/emailService');
 const Product = require('../models/Product');
-
-const stripe = Stripe(STRIPE_SECRET_KEY);
-
-const frontendUrl = NODE_ENV === 'production' ? 'https://sheero.onrender.com' : 'http://localhost:3000';
+const { orderEmailQueue } = require('../config/email/queues');
+const { frontendUrl, stripe } = require('../config/core/utils');
+const Notification = require('../models/Notification');
+const Role = require('../models/Role');
+const User = require('../models/User');
 
 const payWithStripe = async (req, res) => {
     try {
@@ -109,62 +107,105 @@ const payWithStripe = async (req, res) => {
     }
 };
 
-const sendOrderEmails = async (order) => {
-    try {
-        if (!order.user?.email) {
-            console.warn(`Order ${order._id} has no user email associated.`);
-            return;
-        }
+const getOrderNotificationData = (order, additionalData = {}) => ({
+    orderId: order._id.toString(),
+    orderStatus: order.status,
+    products: order.products.map(p => ({
+        productName: p.product?.name || 'N/A',
+        productImage: p.product?.image || null,
+        productId: p.product?._id || null,
+        quantity: p.quantity,
+        price: p.price,
+        previousInventory: p.previousInventory,
+        updatedInventory: p.updatedInventory,
+    })),
+    user: {
+        firstName: order.user?.firstName || 'Customer',
+        lastName: order.user?.lastName || '',
+        email: order.user?.email || '',
+        profilePicture: order.user?.profilePicture || null,
+    },
+    address: {
+        name: order.address.name,
+        street: order.address.street,
+        phoneNumber: order.address.phoneNumber,
+        country: order.address.country.name,
+        city: order.address.city.name
+    },
+    total: order.totalAmount,
+    createdAt: order.createdAt,
+    ...additionalData
+});
 
-        await sendOrderUpdateEmail(order);
-        await sendProductInventoryUpdateEmail(order);
-    } catch (error) {
-        console.error(`Error sending emails for order ${order._id}:`, error);
+const notifyOrderManagers = async (io, order) => {
+    const role = await Role.findOne({ name: 'orderManager' });
+    if (!role) return;
+
+    const managers = await User.find({ role: role._id });
+    const notificationData = getOrderNotificationData(order);
+
+    for (const mgr of managers) {
+        const notif = await Notification.create({
+            user: mgr._id,
+            type: 'newOrder',
+            isRead: false,
+            data: notificationData
+        });
+
+        io.to(`user:${mgr._id}`).emit('notification', notif);
+        console.log(`New order notification sent to ${mgr._id}: ${mgr.email}`);
     }
 };
 
 const verifyOrder = async (req, res) => {
     const { order_id, success } = req.body;
+    const isSuccess = String(success) === 'true';
+    const io = req.app.get('io');
 
     try {
-        const isSuccess = String(success) === 'true';
-
-        if (!order_id) {
-            return res.status(400).json({ success: false, sessionValid: false, message: 'Missing order ID.' });
-        }
+        if (!order_id) return res.json({ success: false, sessionValid: false, message: 'Missing order ID' });
 
         const existingOrder = await Order.findById(order_id);
-        if (!existingOrder) {
-            return res.status(404).json({ success: false, sessionValid: false, message: 'Order not found.' });
-        }
+        if (!existingOrder) return res.json({ success: false, sessionValid: true, message: 'Order not found. Treating payment as cancelled' });
 
-        if (isSuccess) {
-            const updatedOrder = await Order.findByIdAndUpdate(order_id, { paymentStatus: 'completed' }, { new: true })
-                .populate('user')
-                .populate('products.product')
-                .populate({
-                    path: 'address',
-                    populate: [
-                        { path: 'city', select: 'name zipCode' },
-                        { path: 'country', select: 'name' }
-                    ]
-                });
-
-            sendOrderEmails(updatedOrder);
-
-            return res.json({ success: true, sessionValid: true, message: 'Payment completed successfully', order: updatedOrder });
-        } else {
+        if (!isSuccess) {
             await Order.findByIdAndDelete(order_id);
-
-            return res.json({ success: false, sessionValid: true, message: 'Payment cancelled. Order deleted.' });
+            return res.json({ success: false, sessionValid: true, message: 'Payment cancelled. Order deleted' });
         }
+
+        const updatedOrder = await Order.findByIdAndUpdate(
+            order_id,
+            { paymentStatus: 'completed' },
+            { new: true }
+        )
+            .populate('user')
+            .populate('products.product')
+            .populate({
+                path: 'address',
+                populate: [
+                    { path: 'city', select: 'name zipCode' },
+                    { path: 'country', select: 'name' }
+                ]
+            });
+
+        await orderEmailQueue.add({ order: updatedOrder });
+
+        await notifyOrderManagers(io, updatedOrder);
+
+        return res.json({
+            success: true,
+            sessionValid: true,
+            message: 'Payment completed successfully',
+            order: updatedOrder
+        });
     } catch (error) {
-        return res.status(500).json({ success: false, sessionValid: false, message: 'Server error.', error: error.message });
+        return res.status(500).json({ success: false, sessionValid: false, message: 'Server error', error: error.message });
     }
 };
 
 const payWithCash = async (req, res) => {
     const { cartId, addressId, userId } = req.body;
+    const io = req.app.get('io');
 
     try {
         const cart = await Cart.findById(cartId).populate('items.product');
@@ -172,9 +213,7 @@ const payWithCash = async (req, res) => {
             .populate('city', 'name zipCode')
             .populate('country', 'name');
 
-        if (!cart || !address) {
-            return res.status(404).send('Cart or address not found');
-        }
+        if (!cart || !address) return res.status(404).send('Cart or address not found');
 
         const subtotal = await cart.calculateTotalPrice();
         const shippingCost = 2;
@@ -220,7 +259,9 @@ const payWithCash = async (req, res) => {
                 ]
             });
 
-        sendOrderEmails(populatedOrder);
+        await orderEmailQueue.add({ order: populatedOrder });
+
+        await notifyOrderManagers(io, populatedOrder);
 
         res.json({
             success: true,
@@ -228,7 +269,6 @@ const payWithCash = async (req, res) => {
             order: populatedOrder,
         });
     } catch (error) {
-        console.error('Error processing cash order', error);
         res.status(500).json({ error: 'Server error', details: error.message });
     }
 };
@@ -236,12 +276,13 @@ const payWithCash = async (req, res) => {
 const getAllOrders = async (req, res) => {
     try {
         const orders = await Order.find()
+            .lean()
             .populate('user', 'firstName lastName email')
             .populate('updatedBy', 'firstName lastName email')
             .populate('products.product', 'name price salePrice inventoryCount image slug')
             .populate({
                 path: 'address',
-                select: 'name street phoneNumber city country',
+                select: 'name street phoneNumber city country comment',
                 populate: [
                     {
                         path: 'country',
@@ -267,6 +308,7 @@ const getUserOrders = async (req, res) => {
 
     try {
         const orders = await Order.find({ user: userId })
+            .lean()
             .populate('products.product', 'name price image slug')
             .populate('address', 'name street phoneNumber city country')
             .sort({ createdAt: -1 })
@@ -313,11 +355,10 @@ const getOrderById = async (req, res) => {
 
 const updateDeliveryStatus = async (req, res) => {
     const { orderId, status, paymentStatus } = req.body;
+    const io = req.app.get('io');
 
     try {
-        if (!orderId || !status) {
-            return res.status(400).json({ success: false, message: 'orderId and status are required.' });
-        }
+        if (!orderId || !status) return res.status(400).json({ success: false, message: 'Order ID and status are required' });
 
         const order = await Order.findById(orderId)
             .populate('products.product')
@@ -330,9 +371,7 @@ const updateDeliveryStatus = async (req, res) => {
                 ]
             });
 
-        if (!order) {
-            return res.status(404).json({ success: false, message: 'Order not found.' });
-        }
+        if (!order) return res.status(404).json({ success: false, message: 'Order not found' });
 
         const previousStatus = order.status;
 
@@ -379,18 +418,46 @@ const updateDeliveryStatus = async (req, res) => {
             }
         });
 
-        if (order.user && order.user.email) {
-            await sendOrderUpdateEmail(order);
-            await sendSuccessfulOrderUpdate(order);
-        } else {
-            console.warn(`Order ${orderId} has no user email associated.`);
+        if (status !== previousStatus) {
+            const role = await Role.findOne({ name: 'orderManager' });
+            if (role) {
+                const managers = await User.find({ role: role._id });
+
+                for (const mgr of managers) {
+                    const existingNotification = await Notification.findOneAndUpdate(
+                        {
+                            'data.orderId': order._id.toString(),
+                            'user': mgr._id,
+                            'type': 'newOrder'
+                        },
+                        {
+                            $set: {
+                                'data.orderStatus': status,
+                                'data.updatedAt': new Date(),
+                                'isRead': false
+                            }
+                        },
+                        { new: true }
+                    );
+
+                    if (existingNotification) {
+                        io.to(`user:${mgr._id}`).emit('notification', existingNotification);
+                    }
+                }
+            }
         }
 
         res.json({
             success: true,
-            message: `The status of order #${orderId} has been successfully updated from '${previousStatus}' to '${status}'. Click to copy the order ID.`,
+            message: `The status of order #${orderId} has been successfully updated from '${previousStatus}' to '${status}'. Click to copy the order ID`,
             order,
         });
+
+        if (order.user && order.user.email) {
+            await orderEmailQueue.add({ order: order });
+        } else {
+            console.warn(`Order ${orderId} has no user email associated.`);
+        }
     } catch (error) {
         console.error('Error updating order:', error);
         res.status(500).json({ success: false, message: 'Error updating order.' });
@@ -409,16 +476,12 @@ const deleteOrder = async (req, res) => {
 const deleteOrders = async (req, res) => {
     const { ids } = req.body;
 
-    if (!ids || !Array.isArray(ids) || ids.length === 0) {
-        return res.status(400).json({ message: 'Invalid or empty ids array' });
-    }
+    if (!ids || !Array.isArray(ids) || ids.length === 0) return res.status(400).json({ message: 'Invalid or empty ids array' });
 
     try {
         const orders = await Order.find({ _id: { $in: ids } });
 
-        if (orders.length !== ids.length) {
-            return res.status(404).json({ message: 'One or more orders not found' });
-        }
+        if (orders.length !== ids.length) return res.status(404).json({ message: 'One or more orders not found' });
 
         await Order.deleteMany({ _id: { $in: ids } });
 

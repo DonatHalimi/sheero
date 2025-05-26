@@ -1,12 +1,10 @@
 import { Box, Drawer, Typography } from '@mui/material';
-import React from 'react';
-import {
-    BoxBetween, CloseButton, CollapsibleProductList, DateAdornment,
-    DeliveryStatusAdornment, EuroAdornment, formatDate, IdAdornment, PaymentMethodAdornment, PaymentStatusAdornment,
-    PersonAdornment, ReadOnlyTextField, TitleActions
-} from '../../../../assets/CustomComponents';
-import { downloadOrderData } from '../../../../assets/DataExport';
 import { drawerPaperSx } from '../../../../assets/sx';
+import { CityAdornment, CommentAdornment, CountryAdornment, DateAdornment, DeliveryStatusAdornment, EuroAdornment, IdAdornment, PaymentMethodAdornment, PaymentStatusAdornment, PersonAdornment, PhoneAdornment, StreetAdornment } from '../../../custom/Adornments';
+import { CollapsibleProductList, TitleActions } from '../../../custom/Dashboard';
+import { BoxBetween, CloseButton, ReadOnlyTextField } from '../../../custom/MUI';
+import { formatDate } from '../../../custom/utils';
+import { downloadOrderData } from '../../../Product/Utils/DataExport';
 
 const OrderDetailsDrawer = ({ open, onClose, order, onEdit, onDelete }) => {
     const productLabel = order?.products?.length > 1 ? 'Products' : 'Product';
@@ -89,6 +87,51 @@ const OrderDetailsDrawer = ({ open, onClose, order, onEdit, onDelete }) => {
 
                         <BoxBetween>
                             <ReadOnlyTextField
+                                label="Country"
+                                value={order.address.country.name}
+                                InputProps={CountryAdornment()}
+                            />
+
+                            <ReadOnlyTextField
+                                label="City"
+                                value={order.address.city.name}
+                                InputProps={CityAdornment()}
+                            />
+                        </BoxBetween>
+                        <ReadOnlyTextField
+                            label="Street"
+                            value={order.address.street}
+                            InputProps={StreetAdornment()}
+                        />
+
+                        <ReadOnlyTextField
+                            label="Phone Number"
+                            value={order.address.phoneNumber}
+                            InputProps={PhoneAdornment()}
+                        />
+
+                        {order.address.comment && (
+                            <ReadOnlyTextField
+                                label="Comment"
+                                value={order.address.comment}
+                                multiline
+                                rows={2}
+                                InputProps={CommentAdornment()}
+                            />
+                        )}
+
+                        {order.paymentIntentId && (
+                            <ReadOnlyTextField
+                                label="Payment Intent Id"
+                                value={order.paymentIntentId}
+                                multiline
+                                rows={2}
+                                InputProps={IdAdornment()}
+                            />
+                        )}
+
+                        <BoxBetween>
+                            <ReadOnlyTextField
                                 label="Arrival Date Start"
                                 value={formatDate(order.arrivalDateRange?.start)}
                                 InputProps={DateAdornment()}
@@ -100,16 +143,6 @@ const OrderDetailsDrawer = ({ open, onClose, order, onEdit, onDelete }) => {
                                 InputProps={DateAdornment()}
                             />
                         </BoxBetween>
-
-                        {order.paymentIntentId && (
-                            <ReadOnlyTextField
-                                label="Payment Intent Id"
-                                value={order.paymentIntentId}
-                                multiline
-                                rows={2}
-                                InputProps={IdAdornment()}
-                            />
-                        )}
 
                         {order.updatedBy && (
                             <ReadOnlyTextField

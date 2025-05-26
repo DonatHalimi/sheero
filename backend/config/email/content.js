@@ -1,4 +1,5 @@
-const { getEmailFooterHtml, getBrandHeaderHtml, formatDate, formatPrice } = require("../email/emailUtils");
+const { parseUserAgent } = require("../auth/loginNotifications");
+const { getEmailFooterHtml, getBrandHeaderHtml, formatDate, formatPrice } = require("./utils");
 
 function generateEmailVerificationHtml(userEmail, otp, options = {}) {
   const { brandImages } = options;
@@ -21,7 +22,7 @@ function generateEmailVerificationHtml(userEmail, otp, options = {}) {
           <p style="font-size: 14px; color: #57534E; margin-top: 10px;">This code will expire in <strong>10 minutes</strong>.</p>
   
           <p style="font-size: 16px; color: #333; line-height: 1.5; margin-bottom: 20px;">
-            If you did not request this, you can safely ignore this email.
+            If you did not request this, you can ignore this email.
           </p>
   
           ${getEmailFooterHtml()}
@@ -561,12 +562,12 @@ function generateResetPasswordEmailHtml(user, resetUrl, options = {}) {
   
         <!-- Greeting Section -->
         <p style="font-size: 18px; color: #333; margin-bottom: 16px;">
-          Hello <strong style="color: #57534E;">${user.email}</strong>,
+          Hello <strong style="color: #57534E;">${user.firstName} ${user.lastName}</strong>,
         </p>
         
         <!-- Password Reset Link -->
         <p style="font-size: 16px; color: #333; line-height: 1.5; margin-bottom: 20px;">
-          We have received a request to reset your password. If you didn't make this request, simply ignore this email.
+          We have received a request to reset your password for <strong style="color: #57534E;">${user.email}</strong>. If you didn't make this request, simply ignore this email.
           <br/>
           To reset your password, please <a href="${resetUrl}" style="color: #57534E; font-weight: bold; text-decoration: underline;">click here</a>.
           <br/><br/>
@@ -578,12 +579,16 @@ function generateResetPasswordEmailHtml(user, resetUrl, options = {}) {
     `;
 };
 
-function generatePasswordResetSuccessEmailHtml(user) {
+function generatePasswordResetSuccessEmailHtml(user, options = {}) {
+  const { brandImages } = options;
+
   return `
       <div style="font-family: 'Outfit', sans-serif; background-color: #f4f4f4; padding: 20px; border-radius: 8px; max-width: 600px; margin: 0 auto;">
+        ${getBrandHeaderHtml(brandImages)}
+
         <!-- Greeting Section -->
         <p style="font-size: 18px; color: #333; margin-bottom: 16px;">
-          Hello <strong>${user.email}</strong>,
+          Hello <strong style="color: #57534E;">${user.firstName} ${user.lastName}</strong>,
         </p>
         
         <!-- Password Reset Success Message -->
@@ -597,10 +602,14 @@ function generatePasswordResetSuccessEmailHtml(user) {
     `;
 };
 
-function generateEnable2FAEmailHtml(userEmail, otp) {
+function generateEnable2FAEmailHtml(userEmail, otp, options = {}) {
+  const { brandImages } = options;
+
   return `
       <div style="font-family: 'Outfit', sans-serif; background-color: #f4f4f4; padding: 20px; border-radius: 8px; max-width: 600px; margin: 0 auto;">
-          <p style="font-size: 18px; color: #57534E; margin-bottom: 16px;">Hello, <strong>${userEmail}</strong>,</p>
+          ${getBrandHeaderHtml(brandImages)}
+
+          <p style="font-size: 18px; color: #57534E; margin-bottom: 16px;">Hello <strong>${userEmail}</strong>,</p>
           <p style="font-size: 16px; color: #57534E; line-height: 1.5; margin-bottom: 20px;">
             We have received a request to enable Two-Factor Authentication for your account.
             <br/>
@@ -616,7 +625,7 @@ function generateEnable2FAEmailHtml(userEmail, otp) {
           <p style="font-size: 14px; color: #57534E; margin-top: 10px;">This code will expire in <strong>10 minutes</strong>.</p>
   
           <p style="font-size: 16px; color: #333; line-height: 1.5; margin-bottom: 20px;">
-            If you did not request this, you can safely ignore this email.
+            If you did not request this, you can ignore this email.
           </p>
   
           ${getEmailFooterHtml()}
@@ -624,10 +633,14 @@ function generateEnable2FAEmailHtml(userEmail, otp) {
       `;
 };
 
-function generateDisable2FAEmailHtml(userEmail, otp) {
+function generateDisable2FAEmailHtml(userEmail, otp, options = {}) {
+  const { brandImages } = options;
+
   return `
       <div style="font-family: 'Outfit', sans-serif; background-color: #f4f4f4; padding: 20px; border-radius: 8px; max-width: 600px; margin: 0 auto;">
-          <p style="font-size: 18px; color: #57534E; margin-bottom: 16px;">Hello, <strong>${userEmail}</strong>,</p>
+          ${getBrandHeaderHtml(brandImages)}
+
+          <p style="font-size: 18px; color: #57534E; margin-bottom: 16px;">Hello <strong>${userEmail}</strong>,</p>
           <p style="font-size: 16px; color: #57534E; line-height: 1.5; margin-bottom: 20px;">
             We have received a request to disable Two-Factor Authentication for your account.
             <br/>
@@ -643,7 +656,7 @@ function generateDisable2FAEmailHtml(userEmail, otp) {
           <p style="font-size: 14px; color: #57534E; margin-top: 10px;">This code will expire in <strong>10 minutes</strong>.</p>
   
           <p style="font-size: 16px; color: #333; line-height: 1.5; margin-bottom: 20px;">
-            If you did not request this, you can safely ignore this email.
+            If you did not request this, you can ignore this email.
           </p>
   
         ${getEmailFooterHtml()}
@@ -651,10 +664,14 @@ function generateDisable2FAEmailHtml(userEmail, otp) {
       `;
 };
 
-function generateLogin2FAEmailHtml(userEmail, otp) {
+function generateLogin2FAEmailHtml(userEmail, otp, options = {}) {
+  const { brandImages } = options;
+
   return `
       <div style="font-family: 'Outfit', sans-serif; background-color: #f4f4f4; padding: 20px; border-radius: 8px; max-width: 600px; margin: 0 auto;">
-          <p style="font-size: 18px; color: #57534E; margin-bottom: 16px;">Hello, <strong>${userEmail}</strong>,</p>
+          ${getBrandHeaderHtml(brandImages)}
+
+          <p style="font-size: 18px; color: #57534E; margin-bottom: 16px;">Hello <strong>${userEmail}</strong>,</p>
           <p style="font-size: 16px; color: #57534E; line-height: 1.5; margin-bottom: 20px;">
             Since you have enabled Two-Factor Authentication, you must log in using your One-Time Password (OTP). 
             <br/>
@@ -670,7 +687,7 @@ function generateLogin2FAEmailHtml(userEmail, otp) {
           <p style="font-size: 14px; color: #57534E; margin-top: 10px;">This code will expire in <strong>10 minutes</strong>.</p>
   
           <p style="font-size: 16px; color: #333; line-height: 1.5; margin-bottom: 20px;">
-            If you did not request this, you can safely ignore this email.
+            If you did not request this, you can ignore this email.
           </p>
   
           ${getEmailFooterHtml()}
@@ -1032,9 +1049,52 @@ function generateSuccessfulOrderUpdateHtml(order, options = {}) {
       `;
 };
 
+function generateLoginNotificationHtml(user, loginData, options = {}) {
+  const { brandImages } = options;
+  const date = new Date(loginData.timestamp).toLocaleString();
+  const deviceInfo = parseUserAgent(loginData.userAgent);
+
+  let methodDisplay = 'Password';
+  switch (loginData.method) {
+    case 'google': methodDisplay = 'Google Account'; break;
+    case 'facebook': methodDisplay = 'Facebook Account'; break;
+    case 'otp': methodDisplay = 'One-Time Password'; break;
+    case 'authenticator': methodDisplay = 'Authenticator App'; break;
+  }
+
+  return `
+  <div style="font-family: Outfit, sans-serif; max-width: 700px; margin: 0 auto; padding: 35px; background-color: #f5f5f5; position: relative; border-radius: 8px;">
+      ${getBrandHeaderHtml(brandImages)}
+
+      <div style="background-color: #ffffff; border-radius: 12px; padding: 20px; text-align: left; margin: 20px 0; box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1); margin-top: 20px auto;">
+          <p style="font-size: 18px; color: #57534E; margin-bottom: 16px;">Hello <strong>${user.firstName} ${user.lastName}</strong>,</p>
+          
+          <p style="font-size: 16px; color: #57534E; line-height: 1.5; margin-bottom: 20px;">
+              We detected a recent login to your sheero account with the email address <strong>${user.email}</strong>. If this was you, no action is needed.
+              If this isn't you, please change your password as soon as possible.
+          </p>
+
+          <div style="background-color: #f9f9f9; padding: 15px; border-radius: 6px; margin-bottom: 20px;">
+              <h3 style="color: #57534E; margin-top: 0; font-size: 16px;">Login Details:</h3>
+              <ul style="color: #57534E; padding-left: 20px;">
+                  <li><strong>Date & Time:</strong> ${date}</li>
+                  <li><strong>IP Address:</strong> ${loginData.ipAddress}</li>
+                  <li><strong>Location:</strong> ${loginData.location.city || 'Unknown'}, ${loginData.location.region || ''}, ${loginData.location.country || 'Unknown'}</li>
+                  <li><strong>Device:</strong> ${deviceInfo}</li>
+                  <li><strong>Login Method:</strong> ${methodDisplay}</li>
+              </ul>
+          </div>
+          
+        ${getEmailFooterHtml()}
+      </div>
+  </div>
+  `;
+};
+
 module.exports = {
   generateEmailVerificationHtml, generateOrderEmailHtml, generateReturnRequestEmailHtml, generateReviewEmailHtml,
   generateProductInventoryEmailHtml, generateResetPasswordEmailHtml, generatePasswordResetSuccessEmailHtml,
   generateEnable2FAEmailHtml, generateDisable2FAEmailHtml, generateLogin2FAEmailHtml, generateProductInventoryUpdateHtml,
-  generateProductRestockSubHtml, generateContactHtml, generateContactToCustomerSupportHtml, generateSuccessfulOrderUpdateHtml
+  generateProductRestockSubHtml, generateContactHtml, generateContactToCustomerSupportHtml, generateSuccessfulOrderUpdateHtml,
+  generateLoginNotificationHtml
 };

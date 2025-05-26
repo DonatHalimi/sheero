@@ -1,10 +1,10 @@
-import React from 'react';
 import { useSelector } from 'react-redux';
-import { DashboardHeader, exportOptions, LoadingDataGrid } from '../../assets/CustomComponents';
 import DashboardTable from '../../components/Dashboard/DashboardTable';
 import DeleteModal from '../../components/Dashboard/Modal/DeleteModal';
 import useDashboardPage from '../../hooks/useDashboardPage';
 import { getApiEndpoint } from '../../utils/getApiEndpoint';
+import { DashboardHeader, exportOptions } from '../custom/Dashboard';
+import { LoadingDataGrid } from '../custom/LoadingSkeletons';
 
 /**
  * A component for displaying a list of items in a dashboard with keyboard navigation.

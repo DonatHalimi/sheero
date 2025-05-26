@@ -1,7 +1,7 @@
 import { jsPDF } from "jspdf";
 import "jspdf-autotable";
 import * as XLSX from 'xlsx';
-import { getImageUrl } from "../utils/config";
+import { getImageUrl } from "../../../utils/config";
 
 const createDownloadLink = (data, fileName) => {
     const link = document.createElement('a');

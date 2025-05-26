@@ -43,10 +43,12 @@ import {
   WidgetsOutlined
 } from '@mui/icons-material';
 import { Tooltip } from '@mui/material';
-import React, { useEffect, useState } from 'react';
+import { useEffect, useState } from 'react';
 import { useSelector } from 'react-redux';
 import { useNavigate } from 'react-router-dom';
-import { ActiveListItem, CollapsibleListItem, DashboardSearchBar, getLocalStorageState, saveLocalStorageState } from '../../assets/CustomComponents';
+import { DashboardSearchBar } from '../../components/custom/Dashboard';
+import { ActiveListItem, CollapsibleListItem } from '../../components/custom/MUI';
+import { getLocalStorageState, saveLocalStorageState } from '../../components/custom/utils';
 import { selectIsContentManager, selectIsOrderManager, selectIsProductManager } from '../../store/actions/authActions';
 
 // User related pages
@@ -204,7 +206,7 @@ export const mainListItems = ({ setCurrentView, collapsed }) => {
     reportsOpen: true
   };
 
-  const [menuState, setMenuState] = useState(getLocalStorageState('menuState', defaultState));
+  const [menuState, setMenuState] = useState(() => getLocalStorageState('menuState', defaultState));
   const [activeItem, setActiveItem] = useState('');
   const navigate = useNavigate();
   const isOrderManager = useSelector(selectIsOrderManager);
@@ -221,7 +223,7 @@ export const mainListItems = ({ setCurrentView, collapsed }) => {
 
     switch (true) {
       case isOrderManager:
-        allowedItems = ['orders'];
+        allowedItems = ['orders', 'products'];
         break;
       case isContentManager:
         allowedItems = ['faqs', 'images'];

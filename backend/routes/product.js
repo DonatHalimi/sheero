@@ -1,10 +1,11 @@
 const express = require('express');
 const { createProduct, getProducts, getProductBySlug, getProductsByCategory,
     getProductsBySubCategory, getProductsBySubSubCategory, updateProduct,
-    subscribeForRestock, getUserRestockSubscription, deleteUserRestockSubscription, getAllRestockSubscriptions, deleteRestockSubscription, deleteRestockSubscriptions,
     deleteProduct, deleteProducts, searchProducts, createProductBasic, uploadProductImage, addProductVariantsAndDetails,
 } = require('../controllers/productController');
-
+const { subscribeForRestock, getUserRestockSubscription, deleteUserRestockSubscription, getAllRestockSubscriptions,
+    deleteRestockSubscription, deleteRestockSubscriptions
+} = require('../controllers/restockSubController');
 const upload = require('../middleware/upload');
 const { requireAuthAndRole, requireAuth } = require('../middleware/auth');
 

@@ -1,26 +1,24 @@
 import { ArrowUpward } from '@mui/icons-material';
-import React, { useEffect, useState } from 'react';
+import { animate } from 'framer-motion';
+import { useEffect, useState } from 'react';
 
 const ToTop = () => {
     const [isVisible, setIsVisible] = useState(false);
 
     useEffect(() => {
-        const handleScroll = () => {
-            setIsVisible(window.scrollY > 100);
-        };
-
-        window.addEventListener('scroll', handleScroll);
-        return () => window.removeEventListener('scroll', handleScroll);
+        const onScroll = () => setIsVisible(window.scrollY > 100);
+        window.addEventListener('scroll', onScroll);
+        return () => window.removeEventListener('scroll', onScroll);
     }, []);
 
     const scrollToTop = () => {
-        const scrollPosition = window.scrollY || document.body.scrollTop;
-        if (scrollPosition > 0) {
-            window.requestAnimationFrame(() => {
-                window.scrollTo(0, scrollPosition - scrollPosition / 25);
-                scrollToTop();
-            });
-        }
+        animate(window.scrollY, 0, {
+            duration: 0.8,
+            ease: [0.22, 1, 0.36, 1],
+            onUpdate(latest) {
+                window.scrollTo(0, latest);
+            },
+        });
     };
 
     return (

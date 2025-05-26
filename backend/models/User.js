@@ -1,5 +1,18 @@
 const mongoose = require('mongoose');
-const { JWT_SECRET } = require('../config/core/dotenv');
+const crypto = require('crypto');
+
+const loginHistorySchema = new mongoose.Schema({
+    timestamp: { type: Date, default: Date.now },
+    ipAddress: { type: String, required: true },
+    userAgent: { type: String, required: true },
+    location: {
+        country: { type: String, default: null },
+        city: { type: String, default: null },
+        region: { type: String, default: null }
+    },
+    status: { type: String, enum: ['success', 'failed', '2fa_required'], default: 'success' },
+    method: { type: String, enum: ['password', 'google', 'facebook', 'otp', 'authenticator'], required: true }
+}, { _id: true });
 
 const userSchema = new mongoose.Schema({
     googleId: { type: String, unique: true, sparse: true },
@@ -28,6 +41,11 @@ const userSchema = new mongoose.Schema({
         default: []
     },
     twoFactorSecret: { type: String, default: null, select: false },
+    loginHistory: [loginHistorySchema],
+    lastLogin: { type: Date, default: null },
+    loginCount: { type: Number, default: 0 },
+    loginNotifications: { type: Boolean, default: true },
+    deviceHistory: { type: Map, of: String, default: new Map() }
 });
 
 // Change profilePicture text on first name change
@@ -40,18 +58,36 @@ userSchema.pre('save', function (next) {
     next();
 });
 
-userSchema.methods.updateProfilePicture = async function (newPictureUrl) {
-    this.profilePicture = newPictureUrl;
-    await this.save();
-};
+userSchema.methods.addLoginAttempt = async function (data) {
+    const loginEntry = {
+        timestamp: new Date(),
+        ipAddress: data.ipAddress || '0.0.0.0',
+        userAgent: data.userAgent || 'Unknown',
+        location: {
+            country: data.country || null,
+            city: data.city || null,
+            region: data.region || null
+        },
+        status: data.status || 'success',
+        method: data.method || 'password'
+    };
 
-// function for generateAccessToken to work in routes/auth.js
-userSchema.methods.generateAccessToken = function () {
-    const jwt = require('jsonwebtoken');
-    return jwt.sign({
-        userId: this._id,
-        role: this.role,
-    }, JWT_SECRET, { expiresIn: '7d' });
+    this.loginHistory.unshift(loginEntry);
+    if (this.loginHistory.length > 50) {
+        this.loginHistory = this.loginHistory.slice(0, 50);
+    }
+
+    if (data.status === 'success') {
+        this.lastLogin = loginEntry.timestamp;
+        this.loginCount += 1;
+
+        const deviceInfo = `${data.userAgent || 'Unknown'}_${data.ipAddress || '0.0.0.0'}`;
+        const deviceKey = crypto.createHash('md5').update(deviceInfo).digest('hex');
+
+        this.deviceHistory.set(deviceKey, loginEntry.timestamp.toISOString());
+    }
+
+    return this.save();
 };
 
 module.exports = mongoose.model('User', userSchema);

@@ -1,5 +1,4 @@
-import React from 'react';
-import { formatDate } from '../../assets/CustomComponents';
+import { formatDate } from '../../components/custom/utils';
 import DashboardPage from '../../components/Dashboard/DashboardPage';
 import SubscriptionDetailsDrawer from '../../components/Dashboard/Modal/Product/SubscriptionDetailsDrawer';
 import { getProductRestockSubscriptions } from '../../store/actions/dashboardActions';

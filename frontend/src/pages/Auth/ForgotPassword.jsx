@@ -1,7 +1,8 @@
 import { Typography } from '@mui/material';
-import React, { useState } from 'react';
+import { useState } from 'react';
 import { toast } from 'react-toastify';
-import { BrownButton, BrownOutlinedTextField, CustomBox, CustomModal, LoadingLabel } from '../../assets/CustomComponents';
+import { LoadingLabel } from '../../components/custom/LoadingSkeletons';
+import { BrownButton, BrownOutlinedTextField, CustomBox, CustomModal } from '../../components/custom/MUI';
 import { forgotPasswordService } from '../../services/authService';
 import { EMAIL_VALIDATION } from '../../utils/constants/validations/user';
 

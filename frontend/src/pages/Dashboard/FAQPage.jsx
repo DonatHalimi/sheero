@@ -1,4 +1,3 @@
-import React from 'react';
 import DashboardPage from '../../components/Dashboard/DashboardPage';
 import FAQDetailsDrawer from '../../components/Dashboard/Modal/FAQ/FAQDetailsDrawer';
 import FAQForm from '../../components/Dashboard/Modal/FAQ/FAQForm';

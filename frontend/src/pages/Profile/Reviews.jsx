@@ -1,10 +1,14 @@
-import React, { useEffect, useState } from 'react';
+import { useEffect, useState } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 import { useNavigate } from 'react-router-dom';
 import { toast } from 'react-toastify';
-import { calculatePageCount, CustomDeleteModal, CustomMenu, CustomPagination, EmptyState, getPaginatedItems, handlePageChange, Header, LoadingOverlay, LoadingReviewItem, ProfileLayout, ReviewModal } from '../../assets/CustomComponents';
 import emptyReviewsImage from '../../assets/img/empty/reviews.png';
 import { paginationSx } from '../../assets/sx';
+import { LoadingOverlay, LoadingReviewItem } from '../../components/custom/LoadingSkeletons';
+import { CustomDeleteModal, CustomPagination, EmptyState } from '../../components/custom/MUI';
+import { CustomMenu, ReviewModal } from '../../components/custom/Product';
+import { Header, ProfileLayout } from '../../components/custom/Profile';
+import { calculatePageCount, getPaginatedItems, handlePageChange } from '../../components/custom/utils';
 import Navbar from '../../components/Navbar/Navbar';
 import ReviewItem from '../../components/Product/Items/ReviewItem';
 import EditReviewModal from '../../components/Product/Modals/EditReviewModal';

@@ -1,10 +1,8 @@
-import React, { useState } from 'react';
+import { useState } from 'react';
 import { useSelector } from 'react-redux';
-import {
-    DashboardHeader, DashboardImage, exportOptions, formatDetails,
-    formatDimensions, formatDiscount, formatName, formatReviews,
-    formatShipping, formatSupplier, formatVariants, LoadingDataGrid
-} from '../../assets/CustomComponents';
+import { DashboardHeader, DashboardImage, exportOptions } from '../../components/custom/Dashboard';
+import { LoadingDataGrid } from '../../components/custom/LoadingSkeletons';
+import { formatDetails, formatDimensions, formatDiscount, formatName, formatReviews, formatShipping, formatSupplier, formatVariants } from '../../components/custom/utils';
 import DashboardTable from '../../components/Dashboard/DashboardTable';
 import DeleteModal from '../../components/Dashboard/Modal/DeleteModal';
 import ImagePreviewModal from '../../components/Dashboard/Modal/ImagePreviewModal';
@@ -48,7 +46,7 @@ const ProductsPage = () => {
     const handleExport = dashboard.createExportHandler('products_data', transformProductForExport);
 
     const columns = [
-        { key: 'name', label: 'Name' },
+        { key: '_id', label: 'Product ID' },
         { key: 'image', label: 'Image', render: (item) => <DashboardImage item={item} handleImageClick={handleImageClick} /> },
         { key: 'description', label: 'Description' },
         { key: 'price', label: 'Price', render: (item) => `€  ${item.price.toFixed(2)}` },

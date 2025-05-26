@@ -1,7 +1,10 @@
-import React, { useEffect, useState } from 'react';
+import { useEffect, useState } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
-import { calculatePageCount, CustomPagination, EmptyState, getPaginatedItems, handlePageChange, Header, LoadingOrderItem, ProfileLayout } from '../../assets/CustomComponents';
 import emptyReturnsImage from '../../assets/img/empty/orders.png';
+import { LoadingOrderItem } from '../../components/custom/LoadingSkeletons';
+import { CustomPagination, EmptyState } from '../../components/custom/MUI';
+import { Header, ProfileLayout } from '../../components/custom/Profile';
+import { calculatePageCount, getPaginatedItems, handlePageChange } from '../../components/custom/utils';
 import Navbar from '../../components/Navbar/Navbar';
 import ReturnItem from '../../components/Product/Items/ReturnItem';
 import Footer from '../../components/Utils/Footer';
@@ -65,7 +68,6 @@ const Returns = () => {
         <>
             <Navbar />
             <ProfileLayout>
-
                 <Header
                     title="Return Requests"
                     searchTerm={searchTerm}

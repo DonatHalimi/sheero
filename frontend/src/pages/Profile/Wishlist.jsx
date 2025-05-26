@@ -1,12 +1,15 @@
-import React, { useEffect, useState } from 'react';
+import { useEffect, useState } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 import { toast } from 'react-toastify';
-import { calculatePageCount, CustomDeleteModal, CustomPagination, EmptyState, getPaginatedItems, handlePageChange, Header, LoadingOverlay, LoadingProductItem, ProfileLayout } from '../../assets/CustomComponents';
 import emptyWishlistImage from '../../assets/img/empty/wishlist.png';
+import { LoadingOverlay, LoadingProductItem } from '../../components/custom/LoadingSkeletons';
+import { CustomDeleteModal, CustomPagination, EmptyState } from '../../components/custom/MUI';
+import { Header, ProfileLayout } from '../../components/custom/Profile';
+import { calculatePageCount, getPaginatedItems, handlePageChange } from '../../components/custom/utils';
 import Navbar from '../../components/Navbar/Navbar';
 import WishlistItem from '../../components/Product/Items/WishlistItem';
 import Footer from '../../components/Utils/Footer';
-import { clearWishlist, getWishlistItems, removeFromWishlist } from '../../store/actions/wishlistActions';
+import { clearWishlist, getWishlistCount, getWishlistItems, removeFromWishlist } from '../../store/actions/wishlistActions';
 
 const itemsPerPage = 12;
 
@@ -40,6 +43,8 @@ const Wishlist = () => {
     const handleClearWishlist = () => {
         dispatch(clearWishlist(() => setIsModalOpen(false)));
         toast.success('Wishlist cleared successfully');
+        dispatch(getWishlistCount());
+        document.dispatchEvent(new CustomEvent('wishlistUpdated'));
     };
 
     const handleShareWishlist = () => {
@@ -85,10 +90,7 @@ const Wishlist = () => {
                         <LoadingProductItem count={6} />
                     </div>
                 ) : !wishlistItems.length ? (
-                    <EmptyState
-                        imageSrc={emptyWishlistImage}
-                        context="wishlist"
-                    />
+                    <EmptyState imageSrc={emptyWishlistImage} context="wishlist" />
                 ) : (
                     <>
                         <div className="grid grid-cols-2 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-3 xl:grid-cols-3 gap-4">

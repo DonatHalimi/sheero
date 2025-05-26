@@ -1,10 +1,12 @@
 import { Visibility, VisibilityOff } from '@mui/icons-material';
 import { Box, Container, IconButton, InputAdornment, Typography } from '@mui/material';
-import React, { useState } from 'react';
+import { useState } from 'react';
 import { useDispatch } from 'react-redux';
 import { useNavigate } from 'react-router-dom';
 import { toast } from 'react-toastify';
-import { BrownButton, BrownOutlinedTextField, ErrorTooltip, handleFacebookLogin, handleGoogleLogin, LoadingLabel, SocialLoginButtons } from '../../assets/CustomComponents';
+import { LoadingLabel } from '../../components/custom/LoadingSkeletons';
+import { BrownButton, BrownOutlinedTextField, ErrorTooltip } from '../../components/custom/MUI';
+import { handleFacebookLogin, handleGoogleLogin, SocialLoginButtons } from '../../components/custom/Profile';
 import Navbar from '../../components/Navbar/Navbar';
 import Footer from '../../components/Utils/Footer';
 import { registerUser } from '../../store/actions/authActions';

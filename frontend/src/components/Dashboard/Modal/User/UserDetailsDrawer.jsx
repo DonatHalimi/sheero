@@ -1,9 +1,11 @@
 import { Check, Clear } from '@mui/icons-material';
 import { Box, Chip, Drawer, Typography } from '@mui/material';
-import React from 'react';
-import { AccountLinkStatus, BoxBetween, CloseButton, DetailsTitle, IdAdornment, ReadOnlyTextField } from '../../../../assets/CustomComponents';
-import { downloadUserDetails } from '../../../../assets/DataExport';
 import { drawerPaperSx } from '../../../../assets/sx';
+import { IdAdornment } from '../../../custom/Adornments';
+import { DetailsTitle } from '../../../custom/Dashboard';
+import { AccountLinkStatus, BoxBetween, CloseButton, ReadOnlyTextField } from '../../../custom/MUI';
+import { formatDateTime } from '../../../custom/utils';
+import { downloadUserDetails } from '../../../Product/Utils/DataExport';
 
 const UserDetailsDrawer = ({ open, onClose, user, onEdit, onDelete }) => {
     const handleEdit = () => {
@@ -110,6 +112,18 @@ const UserDetailsDrawer = ({ open, onClose, user, onEdit, onDelete }) => {
                                 </Box>
                             </Box>
                         )}
+
+                        <BoxBetween>
+                            <ReadOnlyTextField
+                                label="Login Count"
+                                value={user.loginCount}
+                            />
+
+                            <ReadOnlyTextField
+                                label="Last Login"
+                                value={formatDateTime(user.lastLogin)}
+                            />
+                        </BoxBetween>
 
                         <Box className="flex flex-col items-center mt-3 mb-3 rounded-full">
                             <img

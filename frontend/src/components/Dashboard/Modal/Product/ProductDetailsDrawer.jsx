@@ -1,38 +1,13 @@
 import { Box, Drawer } from '@mui/material';
-import React from 'react';
-import { BoxBetween, CloseButton, DetailsTitle, EuroAdornment, IdAdornment, InventoryAdornment, ReadOnlyTextField, ShippingAdornment } from '../../../../assets/CustomComponents';
-import { downloadProductData } from '../../../../assets/DataExport';
 import { drawerPaperSx } from '../../../../assets/sx';
 import { getImageUrl } from '../../../../utils/config';
+import { DetailsTitle } from '../../../custom/Dashboard';
+import { BoxBetween, CloseButton, ReadOnlyTextField } from '../../../custom/MUI';
+import { EuroAdornment, IdAdornment, InventoryAdornment, ShippingAdornment } from '../../../custom/Adornments';
+import { formatDimensions, formatProductDetails, formatProductDiscount, formatProductShipping, formatProductVariants } from '../../../custom/utils';
+import { downloadProductData } from '../../../Product/Utils/DataExport';
 
 const ProductDetailsDrawer = ({ open, onClose, product, onEdit, onDelete }) => {
-    const formatDimensions = (dimensions) => {
-        if (!dimensions || !dimensions.length || !dimensions.width || !dimensions.height || !dimensions.unit) {
-            return 'N/A';
-        }
-        return `${dimensions.length} x ${dimensions.width} x ${dimensions.height} ${dimensions.unit}`;
-    };
-
-    const formatShipping = (shipping) => {
-        if (!shipping) return 'N/A';
-        return `${shipping.weight} kg, ${shipping.cost}€, ${shipping.packageSize}`;
-    };
-
-    const formatDiscount = (discount) => {
-        if (!discount) return 'N/A';
-        return `${discount.value}${discount.type === 'percentage' ? '%' : ''}`;
-    };
-
-    const formatVariants = (variants) => {
-        if (!variants || variants.length === 0) return 'N/A';
-        return variants.map(variant => `Color: ${variant.color}, Size: ${variant.size}`).join(', ');
-    };
-
-    const formatDetails = (details) => {
-        if (!details || details.length === 0) return 'N/A';
-        return details.map(detail => `${detail.attribute}: ${detail.value}`).join(', ');
-    };
-
     const handleEdit = () => {
         onClose();
         onEdit(product);
@@ -113,13 +88,13 @@ const ProductDetailsDrawer = ({ open, onClose, product, onEdit, onDelete }) => {
 
                             <ReadOnlyTextField
                                 label="Discount"
-                                value={formatDiscount(product.discount)}
+                                value={formatProductDiscount(product.discount)}
                             />
                         </BoxBetween>
 
                         <ReadOnlyTextField
                             label="Shipping"
-                            value={formatShipping(product.shipping)}
+                            value={formatProductShipping(product.shipping)}
                             InputProps={ShippingAdornment()}
                         />
 
@@ -161,13 +136,13 @@ const ProductDetailsDrawer = ({ open, onClose, product, onEdit, onDelete }) => {
 
                             <ReadOnlyTextField
                                 label="Variants"
-                                value={formatVariants(product.variants)}
+                                value={formatProductVariants(product.variants)}
                             />
                         </BoxBetween>
 
                         <ReadOnlyTextField
                             label="Details"
-                            value={formatDetails(product.details)}
+                            value={formatProductDetails(product.details)}
                         />
                     </>
                 ) : (

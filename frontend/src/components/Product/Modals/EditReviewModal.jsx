@@ -1,8 +1,9 @@
 import { Rating } from '@mui/material';
-import React, { useEffect, useState } from 'react';
+import { useEffect, useState } from 'react';
 import { useDispatch } from 'react-redux';
 import { toast } from 'react-toastify';
-import { BrownButton, BrownOutlinedTextField, CustomBox, CustomModal, CustomTypography, LoadingLabel, ReadOnlyTextField } from '../../../assets/CustomComponents';
+import { LoadingLabel } from '../../../components/custom/LoadingSkeletons';
+import { BrownButton, BrownOutlinedTextField, CustomBox, CustomModal, CustomTypography, ReadOnlyTextField } from '../../../components/custom/MUI';
 import { editUserReview, getUserReviews } from '../../../store/actions/reviewActions';
 import { COMMENT_VALIDATION, TITLE_VALIDATION } from '../../../utils/constants/validations/review';
 

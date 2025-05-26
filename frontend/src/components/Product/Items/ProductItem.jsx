@@ -1,15 +1,21 @@
-import React, { useState } from 'react';
-import { useSelector } from 'react-redux';
+import { useState } from 'react';
+import { useDispatch, useSelector } from 'react-redux';
 import { useNavigate } from 'react-router-dom';
 import { toast } from 'react-toastify';
-import { CartWishlistButtons, DiscountPercentage, formatPrice, LoadingOverlay, OutOfStock } from '../../../assets/CustomComponents';
 import NoImage from '../../../assets/img/errors/product-not-found.png';
+import { LoadingOverlay } from '../../../components/custom/LoadingSkeletons';
+import { CartWishlistButtons } from '../../../components/custom/MUI';
+import { DiscountPercentage, OutOfStock } from '../../../components/custom/Product';
+import { formatPrice } from '../../../components/custom/utils';
 import { addToCartService } from '../../../services/cartService';
 import { addToWishlistService } from '../../../services/wishlistService';
+import { getCartCount } from '../../../store/actions/cartActions';
 import { getImageUrl } from '../../../utils/config';
 
 const ProductItem = ({ product }) => {
     const { isAuthenticated } = useSelector(state => state.auth) || {};
+    const dispatch = useDispatch();
+
     const navigate = useNavigate();
 
     const [isLoading, setIsLoading] = useState({ cart: false, wishlist: false });
@@ -45,12 +51,17 @@ const ProductItem = ({ product }) => {
                 onClick: () => navigate(`/${action === 'wishlist' ? 'profile/wishlist' : 'cart'}`),
             });
 
+            if (action === 'wishlist') {
+                document.dispatchEvent(new Event('wishlistUpdated'));
+            }
+
             if (action === 'cart') {
                 document.dispatchEvent(new CustomEvent('cartUpdated', { detail: product._id }));
                 if (1 > product.inventoryCount) {
                     toast.error(`Cannot add more than ${product.inventoryCount} items to cart.`);
                     return;
                 }
+                dispatch(getCartCount());
             }
         } catch (error) {
             if (error.response?.data?.errors) {

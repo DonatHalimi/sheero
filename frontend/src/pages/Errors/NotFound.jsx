@@ -1,6 +1,5 @@
-import React from 'react';
-import { ErrorPage } from '../../assets/CustomComponents';
 import notFound from '../../assets/img/errors/not-found.png';
+import { ErrorPage } from '../../components/custom/MUI';
 
 const NotFound = () => {
     return (

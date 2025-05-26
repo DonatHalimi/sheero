@@ -1,5 +1,4 @@
-import React from 'react';
-import { DashboardCountryFlag } from '../../assets/CustomComponents';
+import { DashboardCountryFlag } from '../../components/custom/Dashboard';
 import DashboardPage from '../../components/Dashboard/DashboardPage';
 import CityDetailsDrawer from '../../components/Dashboard/Modal/City/CityDetailsDrawer';
 import CityForm from '../../components/Dashboard/Modal/City/CityForm';

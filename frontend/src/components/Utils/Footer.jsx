@@ -1,5 +1,4 @@
 import { ContactMail, Email, Facebook, GitHub, Instagram, LinkedIn, Phone } from '@mui/icons-material';
-import React from 'react';
 import { Link } from 'react-router-dom';
 
 const Footer = () => {

@@ -1,7 +1,8 @@
 import { Splide } from '@splidejs/react-splide';
-import React, { useEffect, useRef } from 'react';
+import { useEffect, useRef } from 'react';
 import { useSelector } from 'react-redux';
-import { ImageSlide, LoadingSlideshow, splideOptions } from '../../assets/CustomComponents';
+import { LoadingSlideshow } from '../../components/custom/LoadingSkeletons';
+import { ImageSlide, splideOptions } from '../../components/custom/Splide';
 
 const Slideshow = () => {
     const { images, loading } = useSelector((state) => state.slideshow);

@@ -1,9 +1,11 @@
 import { Form, Formik } from 'formik';
 import { useSelector } from 'react-redux';
 import { toast } from 'react-toastify';
-import { BrownButton, CustomBox, CustomModal, CustomTextField, CustomTypography, handleApiError, LoadingLabel } from '../../../../assets/CustomComponents';
 import { addContactService } from '../../../../services/contactService';
 import { initialValues, validationSchema } from '../../../../utils/validations/contact';
+import { LoadingLabel } from '../../../custom/LoadingSkeletons';
+import { BrownButton, CustomBox, CustomModal, CustomTextField, CustomTypography } from '../../../custom/MUI';
+import { handleApiError } from '../../../custom/utils';
 
 const ContactForm = ({
     open,

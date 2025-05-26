@@ -1,8 +1,10 @@
 import { Box, Drawer } from '@mui/material';
-import React from 'react';
-import { BoxBetween, CloseButton, DateAdornment, DetailsTitle, formatDate, IdAdornment, PersonAdornment, ReadOnlyTextField } from '../../../../assets/CustomComponents';
-import { downloadSupplierData } from '../../../../assets/DataExport';
 import { drawerPaperSx } from '../../../../assets/sx';
+import { DateAdornment, IdAdornment, PersonAdornment } from '../../../custom/Adornments';
+import { DetailsTitle } from '../../../custom/Dashboard';
+import { BoxBetween, CloseButton, ReadOnlyTextField } from '../../../custom/MUI';
+import { formatDate } from '../../../custom/utils';
+import { downloadSupplierData } from '../../../Product/Utils/DataExport';
 
 const SupplierDetailsDrawer = ({ open, onClose, supplier, onEdit, onDelete }) => {
     const handleEdit = () => {

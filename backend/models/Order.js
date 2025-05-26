@@ -2,10 +2,10 @@ const mongoose = require('mongoose');
 
 // Custom ID generation function
 function generateCustomId() {
-    const timestamp = Date.now().toString().slice(-6);
-    const randomPart = Math.floor(Math.random() * 1000).toString().padStart(3, '0');
+    const timestamp = Date.now().toString().slice(-5);
+    const randomPart = Math.floor(Math.random() * 100).toString().padStart(2, '0');
     return timestamp + randomPart;
-}
+};
 
 const paymentStatus = ['pending', 'completed', 'failed'];
 const paymentMethod = ['stripe', 'cash'];
