@@ -4,7 +4,7 @@ import { useEffect, useState } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 import { useNavigate, useParams } from 'react-router-dom';
 import { toast } from 'react-toastify';
-import { LoadingOverlay, LoadingProductDetails } from '../../components/custom/LoadingSkeletons';
+import { LoadingProductDetails } from '../../components/custom/LoadingSkeletons';
 import { DetailsCartWishlistButtons } from '../../components/custom/MUI';
 import { DetailsBreadcrumbs, OutOfStock, ProductRestockNotificationModal } from '../../components/custom/Product';
 import { formatPrice } from '../../components/custom/utils';
@@ -178,8 +178,8 @@ const ProductDetails = () => {
 
     const checkSubscription = async (email) => {
         try {
-            const { data } = await checkUserRestockSubscriptionService(email);
-            setIsSubscribed(data.isSubscribed);
+            const response = await checkUserRestockSubscriptionService(email);
+            setIsSubscribed(response.data.isSubscribed);
         } catch (error) {
             console.error(`Failed to check restock subscription for email ${email}`, error);
             setIsSubscribed(false);
@@ -189,10 +189,10 @@ const ProductDetails = () => {
     const deleteSubscription = async (email) => {
         setIsRemoving(true);
         try {
-            const res = await deleteUserRestockSubscriptionService(email);
+            const response = await deleteUserRestockSubscriptionService(email);
             setIsSubscribed(false);
             closeRestockNotificationModal();
-            toast.success(res.data.message);
+            toast.success(response.data.message);
         } catch (error) {
             console.error(`Failed to delete restock subscription for email: ${email}`, error);
         } finally {
@@ -202,8 +202,6 @@ const ProductDetails = () => {
 
     return (
         <>
-            {(isCartLoading || isWishlistLoading) && <LoadingOverlay />}
-
             <Navbar />
             {isLoadingProduct ? (
                 <LoadingProductDetails />

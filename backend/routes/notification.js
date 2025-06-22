@@ -1,5 +1,8 @@
 const express = require('express');
-const { getNotifications, getArchivedNotifications, markAsRead, markAsUnread, archiveNotification, markAllAsUnread, markAllAsRead, unarchiveNotification } = require('../controllers/notificationController');
+const {
+    getNotifications, getArchivedNotifications, markAsRead, markAsUnread, archiveNotification,
+    markAllAsUnread, markAllAsRead, unarchiveNotification, archiveAll, unarchiveAll
+} = require('../controllers/notificationController');
 const { requireAuthAndRole } = require('../middleware/auth');
 const router = express.Router();
 
@@ -11,5 +14,7 @@ router.put('/read-all', requireAuthAndRole('orderManager'), markAllAsRead);
 router.put('/unread-all', requireAuthAndRole('orderManager'), markAllAsUnread);
 router.put('/archive/:id', requireAuthAndRole('orderManager'), archiveNotification);
 router.put('/unarchive/:id', requireAuthAndRole('orderManager'), unarchiveNotification);
+router.put('/archive-all', requireAuthAndRole('orderManager'), archiveAll);
+router.put('/unarchive-all', requireAuthAndRole('orderManager'), unarchiveAll);
 
 module.exports = router;

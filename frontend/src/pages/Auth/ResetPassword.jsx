@@ -107,9 +107,7 @@ const ResetPassword = () => {
         }
     };
 
-    if (loading) {
-        return <LoadingOverlay />;
-    }
+    if (loading) return <LoadingOverlay />;
 
     return (
         <div className="min-h-screen flex items-center justify-center bg-[#F9FAFB] p-4">

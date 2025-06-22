@@ -9,9 +9,9 @@ const createSubcategory = async (req, res) => {
     try {
         const subcategory = new Subcategory({ name, category, image, createdBy: req.user.userId });
         await subcategory.save();
-        res.status(201).json({ message: 'Subcategory created successfully', subcategory });
+        res.status(201).json({ success: true, message: 'Subcategory created successfully', subcategory });
     } catch (error) {
-        res.status(500).json({ message: 'Server error' });
+        res.status(500).json({ success: false, message: 'Error creating subcategory', error: error.message });
     }
 };
 
@@ -23,7 +23,7 @@ const getSubcategories = async (req, res) => {
             .populate('updatedBy', 'firstName lastName email');
         res.status(200).json(subcategories);
     } catch (error) {
-        res.status(500).json({ message: 'Server error' });
+        res.status(500).json({ success: false, message: 'Error getting subcategories', error: error.message });
     }
 };
 
@@ -34,7 +34,7 @@ const getSubcategoryBySlug = async (req, res) => {
 
         res.status(200).json(subcategory);
     } catch (error) {
-        res.status(500).json({ message: 'Server error', error: error.message });
+        res.status(500).json({ success: false, message: 'Error getting subcategory', error: error.message });
     }
 };
 
@@ -46,7 +46,7 @@ const getSubcategoriesByCategory = async (req, res) => {
         const subcategories = await Subcategory.find({ category: category._id });
         res.status(200).json(subcategories);
     } catch (error) {
-        res.status(500).json({ message: 'Server error' });
+        res.status(500).json({ success: false, message: 'Error getting subcategories by category', error: error.message });
     }
 };
 
@@ -79,9 +79,9 @@ const updateSubcategory = async (req, res) => {
             { new: true }
         );
         if (!subcategory) return res.status(404).json({ message: 'Subcategory not found' });
-        res.status(200).json({ message: 'Subcategory updated successfully', subcategory });
+        res.status(200).json({ success: true, message: 'Subcategory updated successfully', subcategory });
     } catch (error) {
-        res.status(500).json({ message: 'Server error' });
+        res.status(500).json({ success: false, message: 'Error updating subcategory', error: error.message });
     }
 };
 
@@ -96,9 +96,9 @@ const deleteSubcategory = async (req, res) => {
         }
 
         await Subcategory.findByIdAndDelete(req.params.id);
-        res.status(200).json({ message: 'Subcategory deleted' });
+        res.status(200).json({ success: true, message: 'Subcategory deleted' });
     } catch (error) {
-        res.status(500).json({ message: 'Server error' });
+        res.status(500).json({ success: false, message: 'Error deleting subcategory', error: error.message });
     }
 };
 
@@ -118,10 +118,9 @@ const deleteSubcategories = async (req, res) => {
 
         await Subcategory.deleteMany({ _id: { $in: ids } });
 
-        res.status(200).json({ message: 'Subcategories deleted successfully' });
+        res.status(200).json({ success: true, message: 'Subcategories deleted successfully' });
     } catch (error) {
-        console.error('Server error:', error);
-        res.status(500).json({ message: 'Server error', error: error.message });
+        res.status(500).json({ success: false, message: 'Error deleting subcategories', error: error.message });
     }
 };
 

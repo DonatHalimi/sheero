@@ -4,7 +4,7 @@ export const slideShowSkeletonSx = {
     left: '20px',
     transform: 'translateY(-50%)',
     zIndex: 10
-}
+};
 
 export const goBackButtonSx = {
     display: 'flex',
@@ -20,7 +20,7 @@ export const goBackButtonSx = {
     boxShadow: 'none',
     width: '50%',
     margin: '0 auto',
-}
+};
 
 export const reviewTitleSx = {
     maxWidth: '200px',
@@ -28,14 +28,14 @@ export const reviewTitleSx = {
     textOverflow: 'ellipsis',
     whiteSpace: 'nowrap',
     fontWeight: 600
-}
+};
 
 export const reviewCommentSx = {
     maxWidth: '200px',
     overflow: 'hidden',
     textOverflow: 'ellipsis',
     whiteSpace: 'nowrap',
-}
+};
 
 export const reviewContainerSx = {
     position: 'relative',
@@ -51,7 +51,7 @@ export const reviewContainerSx = {
     flexDirection: { xs: 'column', sm: 'row' },
     p: 2,
     outline: 'none',
-}
+};
 
 export const reviewImageSx = {
     width: { xs: '100%', sm: '40%' },
@@ -61,7 +61,7 @@ export const reviewImageSx = {
     display: 'flex',
     alignItems: 'center',
     justifyContent: 'center'
-}
+};
 
 export const reviewContentSx = {
     flexGrow: 1,
@@ -69,7 +69,7 @@ export const reviewContentSx = {
     flexDirection: 'column',
     justifyContent: 'space-between',
     textAlign: 'justify'
-}
+};
 
 export const reviewTitleContainerSx = {
     textAlign: 'justify',
@@ -80,7 +80,7 @@ export const reviewTitleContainerSx = {
     fontWeight: 600,
     marginTop: '4px',
     overflowWrap: 'break-word'
-}
+};
 
 export const reviewTextAreaSx = {
     width: '90%',
@@ -97,14 +97,14 @@ export const reviewTextAreaSx = {
     marginTop: '6px',
     outline: 'none',
     textAlign: 'left'
-}
+};
 
 export const paginationStackSx = (customSx = {}) => ({
     marginTop: 1,
     alignItems: 'center',
     justifyContent: 'center',
     ...customSx,
-})
+});
 
 export const paginationStyling = (customSx = {}) => ({
     '& .MuiPaginationItem-page': {
@@ -142,7 +142,7 @@ export const searchBarInputSx = {
         height: '40px',
         lineHeight: '40px',
     },
-}
+};
 
 export const headerSearchSx = {
     '& .MuiOutlinedInput-root': {
@@ -156,7 +156,7 @@ export const headerSearchSx = {
             borderColor: 'rgba(0, 0, 0, 0.23)',
         },
     },
-}
+};
 
 export const headerFilterSx = {
     width: 120,
@@ -169,7 +169,7 @@ export const headerFilterSx = {
     '&.Mui-focused .MuiOutlinedInput-notchedOutline': {
         borderColor: 'rgba(0, 0, 0, 0.23)',
     },
-}
+};
 
 export const searchDropdownSx = {
     position: 'absolute',
@@ -186,7 +186,7 @@ export const searchDropdownSx = {
     zIndex: 99,
     top: '41px',
     padding: '9px',
-}
+};
 
 export const searchDropdownItemSx = {
     bgcolor: 'white',
@@ -198,7 +198,7 @@ export const searchDropdownItemSx = {
         backgroundColor: '#e0e0e0',
     },
     transition: 'border-color 0.2s ease',
-}
+};
 
 export const searchDropdownImageSx = {
     width: '40px',
@@ -206,7 +206,7 @@ export const searchDropdownImageSx = {
     marginLeft: '-10px',
     marginRight: '10px',
     objectFit: 'contain',
-}
+};
 
 export const sidebarLayoutSx = {
     position: { xs: 'static', md: 'sticky' },
@@ -269,7 +269,7 @@ export const filterLayoutSx = {
     position: 'relative',
     mb: 10,
     mt: 5,
-}
+};
 
 export const getMotionDivProps = (isOpen) => ({
     initial: { opacity: 0, height: 0 },
@@ -289,7 +289,7 @@ export const paginationSx = {
     '& .MuiPagination-ul': {
         justifyContent: 'flex-start',
     },
-}
+};
 
 export const dashboardDrawerSx = (open) => ({
     width: open ? 250 : 78,
@@ -455,7 +455,7 @@ export const deleteModalTypographySx = (theme) => ({ color: theme.palette.text.p
 
 export const loadingDataGridContainerSx = (theme) => ({ backgroundColor: theme.palette.background.default });
 
-export const loadingDataGridSkeletonSx = (theme) => ({ backgroundColor: theme.palette.mode === 'dark' ? theme.palette.action.hover : undefined })
+export const loadingDataGridSkeletonSx = (theme) => ({ backgroundColor: theme.palette.mode === 'dark' ? theme.palette.action.hover : undefined });
 
 export const dashboardTableSx = (theme) => ({
     backgroundColor: theme.palette.background.paper,
@@ -528,13 +528,13 @@ export const drawerPaperSx = {
         padding: 3,
         zIndex: 9999,
     }
-}
+};
 
 export const iconButtonSx = {
     position: 'absolute',
     top: 10,
     right: 10,
-}
+};
 
 export const chipSx = {
     width: '100%',
@@ -553,7 +553,7 @@ export const chipSx = {
             textAlign: 'left',
         },
     },
-}
+};
 
 export const customModalSx = {
     "&:focus": { outline: "none !important" },

@@ -1,10 +1,10 @@
 import { Box, Drawer } from '@mui/material';
 import { drawerPaperSx } from '../../../../assets/sx';
 import { getImageUrl } from '../../../../utils/config';
-import { formatDate } from '../../../custom/utils';
 import { DateAdornment, IdAdornment, PersonAdornment } from '../../../custom/Adornments';
 import { DetailsTitle } from '../../../custom/Dashboard';
 import { BoxBetween, CloseButton, ReadOnlyTextField } from '../../../custom/MUI';
+import { formatDate } from '../../../custom/utils';
 import { downloadCategoryData } from '../../../Product/Utils/DataExport';
 
 const CategoryDetailsDrawer = ({ open, onClose, category, onEdit, onDelete }) => {

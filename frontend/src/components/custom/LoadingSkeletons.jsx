@@ -1,4 +1,4 @@
-import { Box, Breadcrumbs, Skeleton, Table, TableBody, TableCell, TableContainer, TableHead, TableRow, Tabs, useTheme } from "@mui/material";
+import { Box, Breadcrumbs, CircularProgress, Skeleton, Table, TableBody, TableCell, TableContainer, TableHead, TableRow, Tabs, useTheme } from "@mui/material";
 import { Link, Link as RouterLink } from "react-router-dom";
 import { loadingDataGridContainerSx, loadingDataGridSkeletonSx, profileBoxSx, slideShowSkeletonSx } from "../../assets/sx";
 import Navbar from "../../components/Navbar/Navbar";
@@ -160,7 +160,7 @@ export const LoadingCart = () => {
                                                 </TableCell>
                                                 <TableCell align="center">
                                                     <div className="flex justify-center items-center">
-                                                        <WaveSkeleton variant="rectangular" width={100} height={36} />
+                                                        <WaveSkeleton variant="rectangular" width={100} height={36} className="rounded" />
                                                     </div>
                                                 </TableCell>
                                                 <TableCell align="center">
@@ -285,11 +285,11 @@ export const LoadingReviewItem = () => (
     </>
 );
 
-export const LoadingOrderItem = () => {
+export const LoadingOrderItem = ({ length }) => {
     return (
         <>
             <Box className="grid grid-cols-1 gap-4 rounded-md">
-                {Array.from({ length: 3 }).map((_, index) => (
+                {Array.from({ length: length }).map((_, index) => (
                     <Box key={index} className="bg-white shadow-md rounded-lg p-6 relative h-[181px]">
                         <Box className="flex justify-between items-center mb-4">
                             <WaveSkeleton variant="text" width="40%" />
@@ -603,6 +603,12 @@ export const LoadingOverlay = () => (
         </div>
     </div>
 );
+
+export const LoadingAction = ({ size = 24, sx = {} }) => {
+    return (
+        <CircularProgress size={size} sx={{ ...sx }} className="text-stone-700" />
+    );
+};
 
 export const LoadingSplide = ({ count }) => (
     <div className="grid grid-cols-1 md:grid-cols-3 gap-4">

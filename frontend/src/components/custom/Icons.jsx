@@ -1,4 +1,5 @@
 import {
+    Archive,
     Check,
     ChevronLeft,
     Clear,
@@ -15,7 +16,9 @@ import {
     HomeOutlined,
     Inbox,
     InboxOutlined,
+    Lock,
     Logout,
+    Mail,
     MarkEmailRead,
     MarkEmailUnread,
     Menu as MenuIcon,
@@ -29,9 +32,10 @@ import {
     ShoppingCart,
     ShoppingCartOutlined,
     Star,
+    Unarchive,
     Visibility
 } from "@mui/icons-material";
-import { Badge, Box, IconButton, SvgIcon, Tooltip, useTheme } from "@mui/material";
+import { Badge, Box, IconButton, SvgIcon, useTheme } from "@mui/material";
 import { green, red } from '@mui/material/colors';
 import { styled } from '@mui/material/styles';
 import { useSelector } from "react-redux";
@@ -69,7 +73,7 @@ export const StyledLogoutIcon = styled(Logout)(({ theme }) => ({
 
 export const StyledHomeIcon = styled(HomeOutlined)({
     color: '#666666',
-})
+});
 
 export const StyledMoveToInboxIcon = styled(MoveToInboxOutlined)({
     color: '#666666',
@@ -81,7 +85,7 @@ export const StyledShoppingCartIcon = styled(ShoppingCartOutlined)({
 
 export const StyledNotificationsIcon = styled(Notifications)({
     color: '#666666',
-})
+});
 
 const activeColor = '#7C7164';
 
@@ -106,7 +110,7 @@ export const DownloadIcon = ({ theme }) => {
 
 export const DescriptionIcon = ({ theme }) => {
     return <Description style={{ color: theme.palette.icon.main }} className="mr-2 text-stone-600" />
-}
+};
 
 export const DataObjectIcon = ({ theme }) => {
     return <DataObject style={{ color: theme.palette.icon.main }} className="mr-2 text-stone-600" />
@@ -284,17 +288,25 @@ export const NotificationIcon = ({ unreadCount, handleNotifDropdownToggle, isDro
 
 export const MarkAllReadIcon = () => {
     return (
-        <Tooltip title="Mark all as read" arrow placement="right" enterDelay={300} enterNextDelay={3000}>
-            <MarkEmailRead className='text-stone-600' />
-        </Tooltip>
+        <MarkEmailRead className='text-stone-600' />
     );
 };
 
 export const MarkAllUnreadIcon = () => {
     return (
-        <Tooltip title="Mark all as unread" arrow placement="right" enterDelay={300} enterNextDelay={3000}>
-            <MarkEmailUnread className='text-stone-600' />
-        </Tooltip>
+        <MarkEmailUnread className='text-stone-600' />
+    );
+};
+
+export const UnarchiveAllIcon = () => {
+    return (
+        <Unarchive className='text-stone-600' />
+    );
+};
+
+export const ArchiveAllIcon = () => {
+    return (
+        <Archive className='text-stone-600' />
     );
 };
 
@@ -317,5 +329,19 @@ export const ExtendIcon = ({ toggleDrawer, open }) => {
         >
             <MenuIcon />
         </IconButton>
+    );
+};
+
+export const OTPIcon = ({ isAuthenticator, twoFactorMethods }) => {
+    return (
+        <div className="flex items-center justify-center mb-4">
+            <div className="bg-stone-100 p-3 rounded-full">
+                {isAuthenticator || (twoFactorMethods.includes('authenticator') && !twoFactorMethods.includes('email')) ? (
+                    <Lock className="w-6 h-6 text-stone-600" />
+                ) : (
+                    <Mail className="w-6 h-6 text-stone-600" />
+                )}
+            </div>
+        </div>
     );
 };

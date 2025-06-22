@@ -26,7 +26,7 @@ const ReturnItem = ({ returnRequest, getStatusColor }) => {
 
                 <div className="mt-4 flex space-x-2">
                     {Array.isArray(products) && products.map((product, index) => (
-                        <Link to={`/${product.slug}`} key={index}>
+                        <Link key={index} to={`/${product.slug}`}>
                             <img
                                 src={getImageUrl(product.image)}
                                 alt={product.name}

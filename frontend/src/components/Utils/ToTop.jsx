@@ -13,7 +13,7 @@ const ToTop = () => {
 
     const scrollToTop = () => {
         animate(window.scrollY, 0, {
-            duration: 0.8,
+            duration: 0.9,
             ease: [0.22, 1, 0.36, 1],
             onUpdate(latest) {
                 window.scrollTo(0, latest);

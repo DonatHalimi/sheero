@@ -13,8 +13,8 @@ const ProductDetailsTabs = ({ product }) => {
   useEffect(() => {
     const getProductReviews = async () => {
       try {
-        const { data } = await getProductReviewsService(product._id);
-        setReviews(data);
+        const response = await getProductReviewsService(product._id);
+        setReviews(response.data);
       } catch (error) {
         console.error('Error fetching reviews', error);
       }

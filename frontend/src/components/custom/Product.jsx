@@ -1,17 +1,22 @@
 import {
     Add,
     Archive,
+    ArrowDropDown,
     Check,
     ChevronRight,
     Close,
     Create,
     Delete,
+    DeleteOutline,
+    DoneAll,
     ExpandLess,
     ExpandMore,
     Inbox,
     LocationOn,
     MarkEmailRead,
     MarkEmailUnread,
+    Markunread,
+    MoreVert,
     Person,
     Phone,
     Remove,
@@ -30,12 +35,19 @@ import {
     List,
     ListItem,
     ListItemAvatar,
+    ListItemIcon,
     ListItemText,
     Menu,
     MenuItem,
     Modal,
     Skeleton,
     Stack,
+    Table,
+    TableBody,
+    TableCell,
+    TableContainer,
+    TableHead,
+    TableRow,
     Tabs,
     Tooltip,
     Typography,
@@ -68,10 +80,10 @@ import {
 import ProductItem from "../../components/Product/Items/ProductItem";
 import FilterSidebar from "../../components/Product/Utils/FilterSidebar";
 import { getImageUrl } from "../../utils/config";
-import { BrownDeleteOutlinedIcon, CartIcon, HomeBreadCrumbIcon, HomeIcon, MarkAllReadIcon, MarkAllUnreadIcon, WishlistIcon } from "./Icons";
-import { LoadingCartDropdown, LoadingCategoryDropdown, LoadingLabel, LoadingProductItem, LoadingRestock, WaveSkeleton } from "./LoadingSkeletons";
-import { BrownButton, CustomBox, CustomModal, CustomTab, DropdownAnimation, NotFound, ReviewCard, RoundIconButton } from "./MUI";
-import { formatFullDate, formatPrice, formatTimeAgo, truncateText } from "./utils";
+import { ArchiveAllIcon, BrownDeleteOutlinedIcon, CartIcon, HomeBreadCrumbIcon, HomeIcon, MarkAllReadIcon, MarkAllUnreadIcon, UnarchiveAllIcon, WishlistIcon } from "./Icons";
+import { LoadingAction, LoadingCartDropdown, LoadingCategoryDropdown, LoadingLabel, LoadingProductItem, LoadingRestock, WaveSkeleton } from "./LoadingSkeletons";
+import { BrownButton, CheckoutButton, CustomBox, CustomModal, CustomTab, DropdownAnimation, NotFound, ReviewCard, RoundIconButton } from "./MUI";
+import { formatFullDate, formatPrice, formatTimeAgo, getStatusColor, truncateText } from "./utils";
 
 /**
  * @file Product.jsx
@@ -96,7 +108,7 @@ export const OutOfStock = ({ inventoryCount }) => {
 export const DiscountPercentage = ({ discountPercentage }) => {
     if (discountPercentage > 0) {
         return (
-            <span className="absolute top-0 right-0 bg-stone-500 text-white px-2 py-1 rounded text-xs">
+            <span className="ml-1 text-sm font-semibold text-stone-600 bg-stone-100 rounded-md px-1">
                 -{discountPercentage}%
             </span>
         )
@@ -585,7 +597,7 @@ export const SidebarFooter = () => {
             <span
                 onClick={() => navigate('/contact-us')}
                 className="text-sm ml-4 underline">Contact us:</span>
-            <span className="text-sm ml-4">Email: support@sheero.com</span>
+            <span className="text-sm ml-4">Email: sheero.info@gmail.com</span>
             <span className="text-sm ml-4 mb-10">Tel.: 044888999</span>
         </div>
     );
@@ -698,15 +710,20 @@ export const CartDropdown = ({
     cartTotal,
     handleRemoveItem,
     handleGoToCart,
-    isLoading,
+    isFetchingCart,
+    loadingState,
     handleProductClick,
     handleClearCart,
     handleUpdateQuantity
 }) => {
+    const { removingItem, clearingCart, updatingQuantity } = loadingState;
+
+    const isAnyLoading = !!removingItem || clearingCart || !!(updatingQuantity && updatingQuantity.productId);
+
     return (
         <div tabIndex="0" className="absolute right-0 mt-1 w-96 bg-white border shadow-lg rounded-lg p-4">
             <DropdownAnimation isOpen={isOpen}>
-                {isLoading ? (
+                {isFetchingCart ? (
                     <LoadingCartDropdown />
                 ) : cartItems.length === 0 ? (
                     <div className="text-sm text-left">You have no products in your cart</div>
@@ -718,7 +735,7 @@ export const CartDropdown = ({
                             </span>
                             <button
                                 onClick={handleClearCart}
-                                disabled={isLoading}
+                                disabled={clearingCart}
                                 className="text-sm text-gray-500 hover:text-gray-700 hover:underline"
                             >
                                 Clear Cart
@@ -756,30 +773,34 @@ export const CartDropdown = ({
                                                         ? handleUpdateQuantity(item.product._id, -1)
                                                         : handleRemoveItem(item.product._id)
                                                 }
-                                                disabled={isLoading}
-                                                size="small"
-                                                className="bg-gray-100 hover:bg-gray-200 text-gray-600"
+                                                disabled={!!loadingState.removingItem || loadingState.updatingQuantity.productId === item.product._id}
                                             >
-                                                <Remove fontSize="small" />
+                                                {loadingState.updatingQuantity.productId === item.product._id &&
+                                                    loadingState.updatingQuantity.quantityChange === -1
+                                                    ? <LoadingAction size={20} />
+                                                    : <Remove fontSize="small" />}
                                             </IconButton>
                                             <span className="px-2 py-0.5 text-sm">
                                                 {item.quantity}
                                             </span>
                                             <IconButton
                                                 onClick={() => handleUpdateQuantity(item.product._id, 1)}
-                                                disabled={isLoading}
-                                                size="small"
-                                                className="bg-gray-100 hover:bg-gray-200 text-gray-600"
+                                                disabled={loadingState.updatingQuantity.productId === item.product._id}
                                             >
-                                                <Add fontSize="small" />
+                                                {loadingState.updatingQuantity.productId === item.product._id &&
+                                                    loadingState.updatingQuantity.quantityChange === 1
+                                                    ? <LoadingAction size={20} />
+                                                    : <Add fontSize="small" />}
                                             </IconButton>
                                         </div>
                                     </div>
                                     <RoundIconButton
                                         onClick={() => handleRemoveItem(item.product._id)}
-                                        disabled={isLoading}
+                                        disabled={!!loadingState.removingItem}
                                     >
-                                        <BrownDeleteOutlinedIcon />
+                                        {loadingState.removingItem === item.product._id
+                                            ? <LoadingAction size={20} />
+                                            : <BrownDeleteOutlinedIcon />}
                                     </RoundIconButton>
                                 </li>
                             ))}
@@ -799,7 +820,7 @@ export const CartDropdown = ({
                                 </span>
                             </div>
                         </div>
-                        <BrownButton onClick={handleGoToCart} disabled={isLoading} fullWidth>
+                        <BrownButton onClick={handleGoToCart} disabled={isAnyLoading} fullWidth>
                             Go to Cart
                         </BrownButton>
                     </>
@@ -810,17 +831,6 @@ export const CartDropdown = ({
 };
 
 const OrderDetailsHeader = ({ order, activeTab, setActiveTab }) => {
-    const statusClasses = {
-        pending: 'text-yellow-500',
-        processed: 'text-cyan-500',
-        shipped: 'text-blue-700',
-        delivered: 'text-green-500',
-        canceled: 'text-red-500',
-        default: 'text-gray-500'
-    };
-
-    const getStatusColor = (status) => `${statusClasses[status] || statusClasses.default} capitalize bg-stone-50 rounded-md px-1.5 py-0.5 text-sm ml-2`;
-
     return (
         <div className="bg-white pb-1 flex-shrink-0">
             <div className="flex justify-between items-start mb-2">
@@ -829,7 +839,9 @@ const OrderDetailsHeader = ({ order, activeTab, setActiveTab }) => {
                         <Typography variant="h6" component="div" className="font-bold">
                             Order #{order.orderId}
                         </Typography>
-                        <span className={getStatusColor(order.status)}>{order.status}</span>
+                        <span className={`${getStatusColor(order.status, 'order')} py-0.5 px-1.5 text-sm ml-2`}>
+                            {order.status}
+                        </span>
                     </div>
                     <Typography variant="body2" color="text.secondary" className="text-sm">
                         {formatFullDate(order.createdAt)}
@@ -1134,11 +1146,29 @@ const EmptyOrderNotifs = ({ activeFilter }) => {
     );
 };
 
-const OrderNotifHeader = ({ notifications, activeFilter, isAllRead, onToggleReadAll, onFilterChange }) => {
-    const handleFilterClick = (filter) => {
-        if (filter !== activeFilter) {
-            onFilterChange(filter);
-        }
+const OrderNotifHeader = ({
+    notifications,
+    activeFilter,
+    isAllRead,
+    onMarkAllReadToggle,
+    onArchiveAllToggle,
+    onFilterChange,
+}) => {
+    const [anchorEl, setAnchorEl] = useState(null);
+    const open = Boolean(anchorEl);
+
+    const handleMenuClick = (e) => setAnchorEl(e.currentTarget);
+    const handleMenuClose = () => setAnchorEl(null);
+    const handleFilterClick = (f) => f !== activeFilter && onFilterChange(f);
+
+    const handleToggleReadClick = () => {
+        onMarkAllReadToggle();
+        handleMenuClose();
+    };
+
+    const handleArchiveAllClick = () => {
+        onArchiveAllToggle();
+        handleMenuClose();
     };
 
     return (
@@ -1148,9 +1178,39 @@ const OrderNotifHeader = ({ notifications, activeFilter, isAllRead, onToggleRead
                     <Typography variant="body2" className="!font-medium">
                         {getNotificationCountText(notifications)}
                     </Typography>
-                    <RoundIconButton onClick={onToggleReadAll}>
-                        {isAllRead ? <MarkAllUnreadIcon /> : <MarkAllReadIcon />}
-                    </RoundIconButton>
+
+                    <IconButton size="small" onClick={handleMenuClick}>
+                        <MoreVert fontSize="small" />
+                    </IconButton>
+
+                    <Menu
+                        anchorEl={anchorEl}
+                        open={open}
+                        onClose={handleMenuClose}
+                        anchorOrigin={{ vertical: 'bottom', horizontal: 'right' }}
+                        transformOrigin={{ vertical: 'top', horizontal: 'right' }}
+                        elevation={1}
+                        disableScrollLock
+                    >
+                        <MenuItem onClick={handleToggleReadClick}>
+                            <ListItemIcon>
+                                {isAllRead ? <MarkAllUnreadIcon /> : <MarkAllReadIcon />}
+                            </ListItemIcon>
+                            <ListItemText
+                                primary={isAllRead ? 'Mark all as unread' : 'Mark all as read'}
+                                primaryTypographyProps={{ fontSize: 15 }}
+                            />
+                        </MenuItem>
+                        <MenuItem onClick={handleArchiveAllClick}>
+                            <ListItemIcon>
+                                {activeFilter === 'archived' ? <UnarchiveAllIcon /> : <ArchiveAllIcon />}
+                            </ListItemIcon>
+                            <ListItemText
+                                primary={activeFilter === 'archived' ? 'Unarchive all' : 'Archive all'}
+                                primaryTypographyProps={{ fontSize: 15 }}
+                            />
+                        </MenuItem>
+                    </Menu>
                 </div>
             )}
 
@@ -1287,7 +1347,8 @@ export const NotificationDropdown = ({
     onToggleRead,
     onArchive,
     onUnarchive,
-    onToggleReadAll,
+    onMarkAllReadToggle,
+    onArchiveAllToggle,
     isAllRead,
     activeFilter,
     onFilterChange,
@@ -1334,7 +1395,8 @@ export const NotificationDropdown = ({
                             notifications={notifications}
                             activeFilter={activeFilter}
                             isAllRead={isAllRead}
-                            onToggleReadAll={onToggleReadAll}
+                            onMarkAllReadToggle={onMarkAllReadToggle}
+                            onArchiveAllToggle={onArchiveAllToggle}
                             onFilterChange={onFilterChange}
                         />
 
@@ -1533,5 +1595,317 @@ export const CustomMenu = ({
                 <span className='ml-2 text-red-500'>Delete</span>
             </MenuItem>
         </Menu>
+    );
+};
+
+export const CartHeader = ({ cart, setOpenModal }) => {
+    return (
+        <>
+            <div className="bg-white p-4 rounded-md shadow-sm mb-3 flex justify-between items-center px-2 md:hidden mt-[72px]">
+                <h1 className="text-2xl font-semilight ml-2">Cart</h1>
+                {cart?.items?.length > 0 && (
+                    <Tooltip title="Clear cart" arrow placement="top">
+                        <RoundIconButton
+                            onClick={() => setOpenModal(true)}
+                            className="cursor-pointer"
+                        >
+                            <DeleteOutline color="primary" />
+                        </RoundIconButton>
+                    </Tooltip>
+                )}
+            </div>
+
+            <h1 className="text-2xl font-semilight mb-2 hidden md:block">Cart</h1>
+        </>
+    );
+};
+
+export const CartProducts = ({
+    cart,
+    productLabel,
+    setOpenModal,
+    updateQuantity,
+    handleRemove,
+    handleProductClick,
+    loadingActions
+}) => {
+    return (
+        <div className="flex-1">
+            <div className="hidden lg:block">
+                <TableContainer className="bg-white rounded-lg shadow">
+                    <Table>
+                        <TableHead>
+                            <TableRow>
+                                <TableCell>{productLabel}</TableCell>
+                                <TableCell align="center">Price</TableCell>
+                                <TableCell align="center">Quantity</TableCell>
+                                <TableCell align="center">Total</TableCell>
+                                <TableCell align="center">
+                                    <Tooltip title="Clear cart" arrow placement="top">
+                                        <RoundIconButton onClick={() => setOpenModal(true)} className="cursor-pointer">
+                                            <DeleteOutline color="primary" />
+                                        </RoundIconButton>
+                                    </Tooltip>
+                                </TableCell>
+                            </TableRow>
+                        </TableHead>
+                        <TableBody className="[&>tr:last-child>td]:border-b-0 [&>tr:last-child>th]:border-b-0">
+                            {cart.items.map(item => {
+                                const itemLoading = loadingActions[item.product._id] || {};
+                                const isIncrementing = itemLoading.update === 'increment';
+                                const isDecrementing = itemLoading.update === 'decrement';
+                                const isRemoving = itemLoading.remove;
+
+                                return (
+                                    <TableRow key={item.product._id}>
+                                        <TableCell component="th" scope="row">
+                                            <div className="flex items-center">
+                                                <a href={`/${item.product.slug}`} rel="noopener noreferrer">
+                                                    <img
+                                                        src={getImageUrl(item.product.image)}
+                                                        alt={item.product.name}
+                                                        className="w-20 h-20 object-contain cursor-pointer rounded mr-4"
+                                                    />
+                                                </a>
+                                                <div>
+                                                    <a
+                                                        href={`/${item.product.slug}`}
+                                                        rel="noopener noreferrer"
+                                                        className="text-base font-normal cursor-pointer hover:underline"
+                                                    >
+                                                        {truncateText(item.product.name, 25)}
+                                                    </a>
+                                                </div>
+                                            </div>
+                                        </TableCell>
+                                        <TableCell align="center">
+                                            {item.product.salePrice ? (
+                                                <>
+                                                    <span className="text-lg font-semibold">
+                                                        € {formatPrice(item.product.salePrice)}
+                                                    </span>
+                                                    <br />
+                                                    <span className="text-sm font-semibold text-stone-600 bg-stone-100 rounded-md px-1">
+                                                        You save € {formatPrice(item.product.price - item.product.salePrice)}
+                                                    </span>
+                                                </>
+                                            ) : (
+                                                <span className="text-lg font-semibold">
+                                                    € {formatPrice(item.product.price)}
+                                                </span>
+                                            )}
+                                        </TableCell>
+                                        <TableCell align="center">
+                                            <div className="flex justify-center items-center">
+                                                {isDecrementing ? (
+                                                    <LoadingAction size={20} />
+                                                ) : (
+                                                    <IconButton
+                                                        onClick={() => updateQuantity(item.product._id, -1)}
+                                                        size="small"
+                                                        disabled={isDecrementing || isIncrementing || isRemoving}
+                                                        className="bg-gray-100 hover:bg-gray-200 text-gray-600"
+                                                    >
+                                                        <Remove fontSize="small" />
+                                                    </IconButton>
+                                                )}
+                                                <span className="px-3 py-1">{item.quantity}</span>
+                                                {isIncrementing ? (
+                                                    <LoadingAction size={20} />
+                                                ) : (
+                                                    <IconButton
+                                                        onClick={() => updateQuantity(item.product._id, 1)}
+                                                        disabled={item.quantity >= item.product.inventoryCount || isIncrementing || isDecrementing || isRemoving}
+                                                        size="small"
+                                                        className={`border rounded-sm px-3 py-1 ${item.quantity >= item.product.inventoryCount ? 'opacity-50 cursor-not-allowed' : ''}`}
+                                                    >
+                                                        <Add fontSize="small" />
+                                                    </IconButton>
+                                                )}
+                                            </div>
+                                        </TableCell>
+                                        <TableCell align="center">
+                                            <h2 className="text-base font-semibold">
+                                                € {formatPrice(item.quantity * (item.product.salePrice || item.product.price))}
+                                            </h2>
+                                        </TableCell>
+                                        <TableCell align="center">
+                                            {isRemoving ? (
+                                                <LoadingAction size={20} />
+                                            ) : (
+                                                <RoundIconButton
+                                                    onClick={() => handleRemove(item.product._id)}
+                                                    disabled={isRemoving || isIncrementing || isDecrementing}
+                                                >
+                                                    <DeleteOutline color="primary" />
+                                                </RoundIconButton>
+                                            )}
+                                        </TableCell>
+                                    </TableRow>
+                                );
+                            })}
+                        </TableBody>
+                    </Table>
+                </TableContainer>
+            </div>
+
+            {/* Mobile Card View */}
+            <div className="lg:hidden space-y-4">
+                {cart.items.map(item => {
+                    const itemLoading = loadingActions[item.product._id] || {};
+                    const isIncrementing = itemLoading.update === 'increment';
+                    const isDecrementing = itemLoading.update === 'decrement';
+                    const isRemoving = itemLoading.remove;
+
+                    return (
+                        <div key={item.product._id} className="bg-white rounded-lg shadow p-4">
+                            <div className="flex gap-4">
+                                <img
+                                    src={getImageUrl(item.product.image)}
+                                    alt={item.product.name}
+                                    onClick={() => handleProductClick(item.product.slug)}
+                                    className="w-16 h-16 object-contain rounded cursor-pointer"
+                                />
+                                <div className="flex-1">
+                                    <div className="flex justify-between items-start">
+                                        <h3
+                                            onClick={() => handleProductClick(item.product.slug)}
+                                            className="font-medium mb-2 cursor-pointer hover:underline"
+                                        >
+                                            {truncateText(item.product.name, 25)}
+                                        </h3>
+                                        {isRemoving ? (
+                                            <LoadingAction size={20} />
+                                        ) : (
+                                            <RoundIconButton
+                                                onClick={() => handleRemove(item.product._id)}
+                                                disabled={isRemoving || isIncrementing || isDecrementing}
+                                                className="h-8 w-8 -mt-1 -mr-1"
+                                            >
+                                                <DeleteOutline fontSize="small" color="primary" />
+                                            </RoundIconButton>
+                                        )}
+                                    </div>
+                                    <div className="mb-3">
+                                        {item.product.salePrice ? (
+                                            <>
+                                                <span className="text-lg font-semibold">
+                                                    € {formatPrice(item.product.salePrice)}
+                                                </span>
+                                                <br />
+                                                <span className="text-sm font-semibold text-stone-600 bg-stone-100 rounded-md px-1">
+                                                    You save € {formatPrice(item.product.price - item.product.salePrice)}
+                                                </span>
+                                            </>
+                                        ) : (
+                                            <span className="text-lg font-semibold">
+                                                {formatPrice(item.product.price)} €
+                                            </span>
+                                        )}
+                                    </div>
+                                    <div className="flex items-center justify-between">
+                                        <div className="flex justify-center items-center">
+                                            {isDecrementing ? (
+                                                <LoadingAction size={20} />
+                                            ) : (
+                                                <IconButton
+                                                    onClick={() => updateQuantity(item.product._id, -1)}
+                                                    size="small"
+                                                    disabled={isDecrementing || isIncrementing || isRemoving}
+                                                    className="bg-gray-100 hover:bg-gray-200 text-gray-600"
+                                                >
+                                                    <Remove fontSize="small" />
+                                                </IconButton>
+                                            )}
+                                            <span className="px-3 py-1">{item.quantity}</span>
+                                            {isIncrementing ? (
+                                                <LoadingAction size={20} />
+                                            ) : (
+                                                <IconButton
+                                                    onClick={() => updateQuantity(item.product._id, 1)}
+                                                    disabled={item.quantity >= item.product.inventoryCount || isIncrementing || isDecrementing || isRemoving}
+                                                    size="small"
+                                                    className={`border rounded-sm px-3 py-1 ${item.quantity >= item.product.inventoryCount ? 'opacity-50 cursor-not-allowed' : ''}`}
+                                                >
+                                                    <Add fontSize="small" />
+                                                </IconButton>
+                                            )}
+                                        </div>
+                                        <span className="font-semibold">
+                                            {formatPrice(item.quantity * (item.product.salePrice || item.product.price))} €
+                                        </span>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    );
+                })}
+            </div>
+        </div>
+    );
+};
+
+export const CartSummary = ({ cart, subtotal, total, shippingCost, handleShowModal }) => {
+    return (
+        <div className="lg:w-80 w-full">
+            <div className="bg-white rounded-lg shadow p-4 sticky top-4">
+                <h2 className="text-xl font-semibold mb-4">Order Summary</h2>
+                <div className="space-y-3">
+                    <div className="flex justify-between py-2 border-b">
+                        <span>Subtotal</span>
+                        <span>
+                            <CountUp
+                                end={subtotal}
+                                duration={0.6}
+                                separator=","
+                                decimals={2}
+                                prefix="€ "
+                            />
+                        </span>
+                    </div>
+                    <div className="flex justify-between py-2 border-b">
+                        <span>Shipping</span>
+                        <span>€ {shippingCost.toFixed(2)}</span>
+                    </div>
+                    {cart.items.some(item => item.product.salePrice) && (
+                        <div className="flex justify-between py-2 border-b">
+                            <span>Total Savings</span>
+                            <span>
+                                - <CountUp
+                                    end={cart.items.reduce((total, item) => {
+                                        if (item.product.salePrice) {
+                                            return total + (item.product.price - item.product.salePrice) * item.quantity;
+                                        }
+                                        return total;
+                                    }, 0)}
+                                    duration={0.6}
+                                    separator=","
+                                    decimals={2}
+                                    prefix="€ "
+                                />
+                            </span>
+                        </div>
+                    )}
+                    <div className="flex justify-between py-2 font-bold !mb-2">
+                        <span>Total</span>
+                        <span>
+                            <CountUp
+                                end={total}
+                                duration={0.6}
+                                separator=","
+                                decimals={2}
+                                prefix="€ "
+                            />
+                        </span>
+                    </div>
+                </div>
+                <CheckoutButton
+                    onClick={handleShowModal}
+                    className="w-full mt-4"
+                >
+                    Proceed to Checkout
+                </CheckoutButton>
+            </div>
+        </div>
     );
 };

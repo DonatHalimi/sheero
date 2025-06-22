@@ -39,8 +39,7 @@ const subscribeForRestock = async (req, res) => {
 
         sendRestockSubscriptionEmail(email, product, subscription);
     } catch (error) {
-        console.error('Error subscribing for restock:', error);
-        res.status(500).json({ message: 'Error creating subscription.', error: error.message });
+        res.status(500).json({ success: false, message: 'Error subscribing for restock', error: error.message });
     }
 };
 
@@ -51,9 +50,9 @@ const getUserRestockSubscription = async (req, res) => {
 
         const subscription = await ProductRestockSubscription.findOne({ email });
 
-        res.json({ isSubscribed: !!subscription });
+        res.json({ success: true, isSubscribed: !!subscription });
     } catch (error) {
-        res.status(500).json({ message: "Server error" });
+        res.status(500).json({ success: false, message: "Error getting user product restock subscription", error: error.message });
     }
 };
 
@@ -66,9 +65,9 @@ const deleteUserRestockSubscription = async (req, res) => {
 
         const subscription = await ProductRestockSubscription.findOneAndDelete({ email: user.email });
 
-        res.json({ isSubscribed: !!subscription, message: "Product restock subscription deleted successfully" });
+        res.json({ success: true, isSubscribed: !!subscription, message: "Product restock subscription deleted successfully" });
     } catch (error) {
-        res.status(500).json({ message: "Server error" });
+        res.status(500).json({ success: false, message: "Error deleting product restock subscription", error: error.message });
     }
 };
 
@@ -80,7 +79,7 @@ const getAllRestockSubscriptions = async (req, res) => {
 
         res.status(200).json(subscriptions);
     } catch (error) {
-        res.status(500).json({ message: 'Error fetching subscriptions.', error: error.message });
+        res.status(500).json({ success: false, message: "Error getting product restock subscriptions", error: error.message });
     }
 };
 
@@ -90,9 +89,9 @@ const deleteRestockSubscription = async (req, res) => {
 
         if (!subscription) return res.status(404).json({ message: 'Subscription not found' });
 
-        res.status(200).json({ message: 'Subscription deleted successfully' });
+        res.status(200).json({ success: true, message: 'Subscription deleted successfully' });
     } catch (error) {
-        res.status(500).json({ message: 'Error deleting subscription.', error: error.message });
+        res.status(500).json({ success: false, message: 'Error deleting subscription', error: error.message });
     }
 };
 
@@ -110,9 +109,9 @@ const deleteRestockSubscriptions = async (req, res) => {
 
         await ProductRestockSubscription.deleteMany({ _id: { $in: ids } });
 
-        res.status(200).json({ message: 'Subscriptions deleted successfully' });
+        res.status(200).json({ success: true, message: 'Subscriptions deleted successfully' });
     } catch (error) {
-        res.status(500).json({ message: 'Error deleting subscriptions.', error: error.message });
+        res.status(500).json({ success: false, message: 'Error deleting subscriptions', error: error.message });
     }
 };
 

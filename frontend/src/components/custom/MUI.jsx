@@ -51,7 +51,7 @@ import { useNavigate } from "react-router-dom";
 import logo from '../../assets/img/brand/logo.png';
 import { boxSx, customBoxSx, customModalSx, deleteModalTypographySx, goBackButtonSx, iconButtonSx, paginationStackSx, paginationStyling, searchBarInputSx, sidebarLayoutSx } from "../../assets/sx";
 import { AccountLinkStatusIcon, BrownShoppingCartIcon, CartIcon, CollapseIcon, DeleteButtonIcon, NotificationIcon, ProfileIcon } from "./Icons";
-import { LoadingLabel } from "./LoadingSkeletons";
+import { LoadingAction, LoadingLabel } from "./LoadingSkeletons";
 import { CartDropdown, NotificationDropdown } from "./Product";
 import { ProfileDropdown } from "./Profile";
 import { getEmptyStateMessage } from "./utils";
@@ -598,37 +598,55 @@ export const CartWishlistButtons = ({ handleAction, isCartLoading, isWishlistLoa
             <AddToCartButton
                 onClick={!isOutOfStock ? handleAction('cart') : null}
                 disabled={isCartLoading || isWishlistLoading || isOutOfStock}
-                className={`${isOutOfStock ? 'cursor-not-allowed' : 'cursor-pointer'}`}
+                className={`${isOutOfStock ? 'cursor-not-allowed' : 'cursor-pointer'} flex items-center justify-center`}
             >
-                <CartButton isOutOfStock={isOutOfStock} />
+                {isCartLoading ? (
+                    <LoadingAction />
+                ) : (
+                    <CartButton isOutOfStock={isOutOfStock} />
+                )}
             </AddToCartButton>
             <WishlistButton
                 onClick={handleAction('wishlist')}
                 disabled={isCartLoading || isWishlistLoading}
-                className="cursor-pointer"
+                className="cursor-pointer flex items-center justify-center"
             >
-                <FavoriteBorderOutlined />
+                {isWishlistLoading ? (
+                    <LoadingAction />
+                ) : (
+                    <FavoriteBorderOutlined />
+                )}
             </WishlistButton>
         </>
     );
 };
 
-export const CartDeleteButtons = ({ handleAddToCart, handleRemove, isActionLoading, inventoryCount }) => {
+export const CartDeleteButtons = ({ handleAddToCart, handleRemove, isCartLoading, isDeleteLoading, inventoryCount }) => {
     const isOutOfStock = inventoryCount === 0;
 
     return (
         <>
             <AddToCartButton
                 onClick={handleAddToCart}
-                disabled={isActionLoading || inventoryCount === 0}
+                disabled={isCartLoading || isDeleteLoading || isOutOfStock}
+                className={`${isOutOfStock ? 'cursor-not-allowed' : 'cursor-pointer'} flex items-center justify-center`}
             >
-                <CartButton isOutOfStock={isOutOfStock} />
+                {isCartLoading ? (
+                    <LoadingAction />
+                ) : (
+                    <CartButton isOutOfStock={isOutOfStock} />
+                )}
             </AddToCartButton>
             <WishlistButton
                 onClick={handleRemove}
-                disabled={isActionLoading}
+                disabled={isDeleteLoading || isCartLoading}
+                className="cursor-pointer flex items-center justify-center"
             >
-                <DeleteButtonIcon />
+                {isDeleteLoading ? (
+                    <LoadingAction />
+                ) : (
+                    <DeleteButtonIcon />
+                )}
             </WishlistButton>
         </>
     );
@@ -643,13 +661,21 @@ export const DetailsCartWishlistButtons = ({ handleAction, isCartLoading, isWish
                 onClick={handleAction('cart')}
                 disabled={isCartLoading || isWishlistLoading || inventoryCount === 0}
             >
-                <DetailsCartButton isOutOfStock={isOutOfStock} />
+                {isCartLoading ? (
+                    <LoadingAction sx={{ color: 'white' }} />
+                ) : (
+                    <DetailsCartButton isOutOfStock={isOutOfStock} />
+                )}
             </DetailsAddToCartButton>
             <DetailsWishlistButton
                 onClick={handleAction('wishlist')}
                 disabled={isCartLoading || isWishlistLoading}
             >
-                <FavoriteBorderOutlined />
+                {isWishlistLoading ? (
+                    <LoadingAction />
+                ) : (
+                    <FavoriteBorderOutlined />
+                )}
             </DetailsWishlistButton>
         </>
     );
@@ -1028,7 +1054,7 @@ export const EmptyState = ({
     context = 'reviews',
     items = [],
     searchTerm = '',
-    statusFilter = 'All',
+    statusFilter = 'all',
     containerClass = 'p-8',
     imageClass = 'w-60 h-60',
 }) => {
@@ -1087,6 +1113,7 @@ export const ProfileMenu = ({
     isAdmin,
     isOrderManager,
     isContentManager,
+    isCustomerSupport,
     isProductManager,
     handleLogout
 }) => {
@@ -1103,6 +1130,7 @@ export const ProfileMenu = ({
                         isAdmin={isAdmin}
                         isOrderManager={isOrderManager}
                         isContentManager={isContentManager}
+                        isCustomerSupport={isCustomerSupport}
                         isProductManager={isProductManager}
                         handleLogout={handleLogout}
                     />
@@ -1123,7 +1151,8 @@ export const CartMenu = ({
     handleClearCart,
     handleUpdateQuantity,
     handleGoToCart,
-    isLoading,
+    isFetchingCart,
+    loadingState,
     handleProductClick
 }) => {
     return (
@@ -1143,7 +1172,8 @@ export const CartMenu = ({
                         handleClearCart={handleClearCart}
                         handleUpdateQuantity={handleUpdateQuantity}
                         handleGoToCart={handleGoToCart}
-                        isLoading={isLoading}
+                        isFetchingCart={isFetchingCart}
+                        loadingState={loadingState}
                         handleProductClick={handleProductClick}
                     />
                 )}
@@ -1160,7 +1190,8 @@ export const NotificationMenu = ({
     isLoading,
     onToggleRead,
     onArchive,
-    onToggleReadAll,
+    onMarkAllReadToggle,
+    onArchiveAllToggle,
     isAllRead,
     unreadCount,
     activeFilter,
@@ -1182,7 +1213,8 @@ export const NotificationMenu = ({
                         isLoading={isLoading}
                         onToggleRead={onToggleRead}
                         onArchive={onArchive}
-                        onToggleReadAll={onToggleReadAll}
+                        onMarkAllReadToggle={onMarkAllReadToggle}
+                        onArchiveAllToggle={onArchiveAllToggle}
                         isAllRead={isAllRead}
                         activeFilter={activeFilter}
                         onFilterChange={onFilterChange}

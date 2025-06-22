@@ -32,8 +32,8 @@ const ProductsBySubcategory = () => {
         setLoadingSubSubcategories(true);
         if (!subsubcategories[subcategorySlug]) {
             try {
-                const { data } = await getSubSubcategoriesBySubcategoryService(subcategorySlug);
-                setSubsubcategories((prev) => ({ ...prev, [subcategorySlug]: data }));
+                const response = await getSubSubcategoriesBySubcategoryService(subcategorySlug);
+                setSubsubcategories((prev) => ({ ...prev, [subcategorySlug]: response.data }));
             } catch (error) {
                 console.error('Error fetching subsubcategories:', error);
             } finally {

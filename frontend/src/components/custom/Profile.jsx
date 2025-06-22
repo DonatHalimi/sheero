@@ -1,4 +1,4 @@
-import { CheckCircle, Download, Facebook, Google, GppGood, InfoOutlined, Lock, Mail, Search } from "@mui/icons-material";
+import { CheckCircle, Download, Facebook, Google, GppGood, InfoOutlined, Lock, Mail, Search, ShoppingCart } from "@mui/icons-material";
 import { Box, Button, Divider, MenuItem, Select, TextField, Typography, useMediaQuery, useTheme } from "@mui/material";
 import { QRCodeSVG } from "qrcode.react";
 import { useEffect, useState } from "react";
@@ -9,8 +9,8 @@ import { headerFilterSx, headerSearchSx, layoutContainerSx, profileDropdownButto
 import ProfileSidebar from "../../pages/Profile/ProfileSidebar";
 import { disable2faService, enable2faService, enableAuthenticator2FAService, getExistingSecretService } from "../../services/authService";
 import { getApiUrl } from "../../utils/config";
-import { StyledDashboardIcon, StyledFavoriteIcon, StyledInboxIcon, StyledLogoutIcon, StyledPersonIcon } from "./Icons";
-import { LoadingOverlay, WaveSkeleton } from "./LoadingSkeletons";
+import { OTPIcon, StyledDashboardIcon, StyledFavoriteIcon, StyledInboxIcon, StyledLogoutIcon, StyledPersonIcon } from "./Icons";
+import { LoadingAction, LoadingLabel, LoadingOverlay, WaveSkeleton } from "./LoadingSkeletons";
 import { BrownButton, ClearWishlist, CustomBox, CustomModal, DropdownAnimation, OutlinedBrownButton, RoundIconButton, ShareWishlist } from "./MUI";
 import { useScrollAwayMenu } from "./Splide";
 import { truncateText } from "./utils";
@@ -30,6 +30,7 @@ export const Header = ({
     handleShareWishlist,
     loading,
     fullName = '',
+    totalWishlistItems,
     searchTerm,
     setSearchTerm,
     showSearch = false,
@@ -49,23 +50,27 @@ export const Header = ({
     onDownloadUserData,
     onDownloadReturn,
     onDownloadAddress,
+    isSharedWishlist = false,
+    onBulkAddToCart,
+    bulkAddLoading = false,
 }) => {
     const { open, menuRef, menuProps, menuHandlers } = useScrollAwayMenu();
-    const isSharedWishlist = fullName.trim() !== '';
+    const isSharedWishlistWithItems = isSharedWishlist && totalWishlistItems > 0;
 
     const getStatusOptions = () => {
         switch (filterType) {
             case 'orders':
                 return [
-                    { value: 'All', label: 'All' },
+                    { value: 'all', label: 'All' },
                     { value: 'pending', label: 'Pending' },
+                    { value: 'processed', label: 'Processed' },
                     { value: 'shipped', label: 'Shipped' },
                     { value: 'delivered', label: 'Delivered' },
                     { value: 'canceled', label: 'Canceled' },
                 ];
             case 'returns':
                 return [
-                    { value: 'All', label: 'All' },
+                    { value: 'all', label: 'All' },
                     { value: 'pending', label: 'Pending' },
                     { value: 'approved', label: 'Approved' },
                     { value: 'processed', label: 'Processed' },
@@ -73,7 +78,7 @@ export const Header = ({
                 ];
             case 'reviews':
                 return [
-                    { value: 'All', label: 'All' },
+                    { value: 'all', label: 'All' },
                     { value: '1', label: '1+' },
                     { value: '2', label: '2+' },
                     { value: '3', label: '3+' },
@@ -83,6 +88,16 @@ export const Header = ({
             default:
                 return [];
         }
+    };
+
+    const handleSearchChange = (e) => {
+        const newValue = e.target.value;
+        setSearchTerm(newValue);
+    };
+
+    const handleFilterChange = (e) => {
+        const newValue = e.target.value;
+        setStatusFilter(newValue);
     };
 
     return (
@@ -100,7 +115,7 @@ export const Header = ({
                 {showSearch && (
                     <TextField
                         value={searchTerm}
-                        onChange={(e) => setSearchTerm(e.target.value)}
+                        onChange={handleSearchChange}
                         placeholder={placeholder}
                         variant="outlined"
                         size="small"
@@ -116,7 +131,7 @@ export const Header = ({
                             open={open}
                             {...menuHandlers}
                             value={statusFilter}
-                            onChange={(e) => setStatusFilter(e.target.value)}
+                            onChange={handleFilterChange}
                             variant="outlined"
                             size="small"
                             sx={headerFilterSx}
@@ -166,6 +181,30 @@ export const Header = ({
                     >
                         Download Address
                     </OutlinedBrownButton>
+                )}
+                {isSharedWishlistWithItems && totalWishlistItems !== undefined && !loading && (
+                    <>
+                        <span className="text-stone-600 font-medium">
+                            {totalWishlistItems} {totalWishlistItems === 1 ? 'product' : 'products'}
+                        </span>
+                        <span className="mx-4 text-[#E0E0E0] select-none">
+                            |
+                        </span>
+                    </>
+                )}
+                {isSharedWishlistWithItems && !loading && (
+                    <Button
+                        variant="outlined"
+                        onClick={onBulkAddToCart}
+                        disabled={bulkAddLoading}
+                        startIcon={bulkAddLoading ? null : <ShoppingCart />}
+                    >
+                        {bulkAddLoading ? (
+                            <LoadingAction />
+                        ) : (
+                            'Add All to Cart'
+                        )}
+                    </Button>
                 )}
                 {wishlistItems && !isSharedWishlist && wishlistItems.length > 0 && (
                     <>
@@ -247,6 +286,7 @@ export const ProfileDropdown = ({
     isAdmin,
     isOrderManager,
     isContentManager,
+    isCustomerSupport,
     isProductManager,
     handleLogout,
 }) => {
@@ -293,7 +333,7 @@ export const ProfileDropdown = ({
         );
     };
 
-    const hasDashboardAccess = isAdmin || isOrderManager || isContentManager || isProductManager;
+    const hasDashboardAccess = isAdmin || isOrderManager || isContentManager || isCustomerSupport || isProductManager;
 
     return (
         <div
@@ -313,6 +353,7 @@ export const ProfileDropdown = ({
                         {isAdmin && renderDashboardButton('/dashboard/users', 'Dashboard', StyledDashboardIcon)}
                         {isOrderManager && renderDashboardButton('/dashboard/orders', 'Orders', StyledDashboardIcon)}
                         {isContentManager && renderDashboardButton('/dashboard/images', 'Images', StyledDashboardIcon)}
+                        {isCustomerSupport && renderDashboardButton('/dashboard/contacts', 'Contacts', StyledDashboardIcon)}
                         {isProductManager && renderDashboardButton('/dashboard/products', 'Products', StyledDashboardIcon)}
                     </>
                 )}
@@ -381,7 +422,7 @@ export const TwoFactorOptions = ({
         : "Receive one-time codes via authenticator app for secure account access";
 
     const getButtonClasses = (isEnabled) =>
-        `w-full border rounded-lg p-4 cursor-pointer transition-all flex flex-col items-center text-center shadow-sm ${isEnabled
+        `w-full border rounded-lg p-4 mt-2 cursor-pointer transition-all flex flex-col items-center text-center shadow-sm ${isEnabled
             ? "hover:border-red-500 hover:bg-red-50 border-gray-200"
             : "hover:border-stone-600 border-gray-200"
         }`;
@@ -527,24 +568,28 @@ export const TwoFactorModal = ({ open, onClose }) => {
         setIsLoading(true);
         try {
             if (hasEmail2FA) {
-                const response = await disable2faService();
+                const response = await disable2faService('email');
                 if (response.data.disableOtpPending) {
+                    toast.info(response.data.message);
                     navigate('/verify-otp', {
                         state: {
                             email: user.email,
                             action: 'disable',
-                            method: 'email'
+                            twoFactorMethods: ['email'],
+                            isAuthenticator: false
                         }
                     });
                 }
             } else {
-                const response = await enable2faService();
+                const response = await enable2faService('email');
                 if (response.data.success) {
+                    toast.info(response.data.message);
                     navigate('/verify-otp', {
                         state: {
                             email: response.data.email,
                             action: 'enable',
-                            method: 'email'
+                            twoFactorMethods: ['email'],
+                            isAuthenticator: false
                         }
                     });
                 }
@@ -561,11 +606,13 @@ export const TwoFactorModal = ({ open, onClose }) => {
         if (hasAuthenticator2FA) {
             setIsLoading(true);
             try {
+                const response = await disable2faService('authenticator');
+                toast.info(response.data.message);
                 navigate('/verify-otp', {
                     state: {
                         email: user.email,
                         action: 'disable',
-                        method: 'authenticator',
+                        twoFactorMethods: ['authenticator'],
                         isAuthenticator: true
                     }
                 });
@@ -573,6 +620,7 @@ export const TwoFactorModal = ({ open, onClose }) => {
                 toast.error(error.response?.data?.message || 'Failed to disable authenticator');
             } finally {
                 setIsLoading(false);
+                onClose();
             }
             return;
         }
@@ -586,6 +634,7 @@ export const TwoFactorModal = ({ open, onClose }) => {
             setQrImageUrl(response.data.imageUrl);
             setSecretKey(response.data.secret);
             setShowQRCode(true);
+            toast.success(response.data.message);
         } catch (error) {
             toast.error(error.response?.data?.message || 'Failed to set up authenticator app.');
         } finally {
@@ -611,12 +660,8 @@ export const TwoFactorModal = ({ open, onClose }) => {
             <CustomBox>
                 {!showQRCode ? (
                     <>
-                        <Box className="flex items-center gap-3">
-                            <Typography
-                                variant={isMobile ? 'subtitle1' : 'h6'}
-                                align="center"
-                                className="!mb-2"
-                            >
+                        <Box className="flex items-center gap-x-2">
+                            <Typography variant={isMobile ? 'subtitle1' : 'h6'}>
                                 {getModalTitle()}
                             </Typography>
                             <p className={`text-sm bg-stone-50 rounded-md px-2 ${is2faEnabled ? 'text-green-500' : 'text-red-500'}`}>
@@ -644,5 +689,109 @@ export const TwoFactorModal = ({ open, onClose }) => {
                 )}
             </CustomBox>
         </CustomModal>
+    );
+};
+
+export const SubmitOTP = ({ loading, otpArray, isSocialLogin, action }) => {
+    return (
+        <BrownButton
+            type="submit"
+            disabled={loading || otpArray.includes('')}
+            className="w-full text-white py-10 h-full px-4 rounded-lg font-medium transition-all duration-200 flex items-center justify-center gap-2 disabled:opacity-50 disabled:cursor-not-allowed"
+        >
+            <LoadingLabel
+                loading={loading}
+                defaultLabel={isSocialLogin ? 'Complete Social Login' : action ? 'Verify' : 'Verify Email'}
+                loadingLabel='Verifying'
+            />
+        </BrownButton>
+    );
+};
+
+export const ResendOTP = ({ twoFactorMethods, action, handleResendOTP, resendLoading }) => {
+    return (
+        <>
+            {(twoFactorMethods.includes('email') || (!action && twoFactorMethods.length === 0)) && (
+                <div className="text-center">
+                    <p className="text-gray-600">
+                        Didn't receive the code?{' '}
+                        <Button
+                            type="button"
+                            onClick={handleResendOTP}
+                            disabled={resendLoading}
+                            className="text-stone-600 hover:text-stone-700 font-medium transition-colors hover:underline"
+                        >
+                            <LoadingLabel loading={resendLoading} defaultLabel='Resend' loadingLabel='Resending' />
+                        </Button>
+                    </p>
+                </div>
+            )}
+        </>
+    );
+};
+
+export const OTPForm = ({
+    otpArray,
+    inputRefs,
+    handleChange,
+    handleKeyDown,
+    handlePaste,
+    handleVerifyOTP,
+    loading,
+    isSocialLogin,
+    action,
+    twoFactorMethods,
+    handleResendOTP,
+    resendLoading
+}) => {
+    return (
+        <form onSubmit={handleVerifyOTP} className="space-y-6">
+            <div className="flex justify-between gap-2">
+                {otpArray.map((digit, idx) => (
+                    <input
+                        key={idx}
+                        ref={el => inputRefs.current[idx] = el}
+                        type="text"
+                        inputMode="text"
+                        maxLength={1}
+                        value={digit}
+                        onChange={e => handleChange(e.target, idx)}
+                        onKeyDown={e => handleKeyDown(e, idx)}
+                        onPaste={idx === 0 ? handlePaste : undefined}
+                        className="w-12 h-14 text-center text-xl font-semibold rounded-lg border-2 border-gray-200 focus:border-stone-500 focus:ring-2 focus:ring-stone-200 transition-all duration-200 outline-none"
+                    />
+                ))}
+            </div>
+
+            <SubmitOTP
+                loading={loading}
+                otpArray={otpArray}
+                isSocialLogin={isSocialLogin}
+                action={action}
+            />
+
+            <ResendOTP
+                twoFactorMethods={twoFactorMethods}
+                action={action}
+                handleResendOTP={handleResendOTP}
+                resendLoading={resendLoading}
+            />
+        </form>
+    );
+};
+
+export const OTPHeader = ({ isAuthenticator, twoFactorMethods, title, body }) => {
+    return (
+        <>
+            <OTPIcon
+                isAuthenticator={isAuthenticator}
+                twoFactorMethods={twoFactorMethods}
+            />
+
+            <div className="text-center mb-8">
+                <h2 className="text-2xl font-bold text-gray-800 mb-2">{title}</h2>
+                <p className="text-stone-600" dangerouslySetInnerHTML={{ __html: body }}></p>
+            </div>
+        </>
     );
 };

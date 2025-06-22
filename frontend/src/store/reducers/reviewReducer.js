@@ -1,7 +1,16 @@
+import { ITEMS_PER_PAGE } from '../../services/reviewService';
 import { DELETE_USER_REVIEW, DELETE_USER_REVIEW_ERROR, EDIT_USER_REVIEW, EDIT_USER_REVIEW_ERROR, GET_USER_REVIEWS, GET_USER_REVIEWS_ERROR } from '../types';
 
 const initialState = {
     reviews: [],
+    pagination: {
+        currentPage: 1,
+        totalPages: 0,
+        totalReviews: 0,
+        hasNextPage: false,
+        hasPreviousPage: false,
+        limit: ITEMS_PER_PAGE,
+    },
     loading: true,
     error: null,
 };
@@ -11,7 +20,8 @@ export default function (state = initialState, action) {
         case GET_USER_REVIEWS:
             return {
                 ...state,
-                reviews: action.payload,
+                reviews: action.payload.reviews || [],
+                pagination: action.payload.pagination || state.pagination,
                 loading: false,
                 error: null,
             };

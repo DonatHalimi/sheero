@@ -8,10 +8,14 @@ export const markNotificationReadService = (id) => axiosInstance.put(`/notificat
 
 export const markNotificationUnreadService = (id) => axiosInstance.put(`/notifications/unread/${id}`);
 
-export const markAllNotificationsReadService = () => axiosInstance.put('/notifications/read-all');
+export const markAllNotificationsReadService = (archived = false) => axiosInstance.put(`/notifications/read-all?archived=${archived}`);
 
-export const markAllNotificationsUnreadService = () => axiosInstance.put('/notifications/unread-all');
+export const markAllNotificationsUnreadService = (archived = false) => axiosInstance.put(`/notifications/unread-all?archived=${archived}`);
 
 export const archiveNotificationService = (id) => axiosInstance.put(`/notifications/archive/${id}`);
 
 export const unarchiveNotificationService = (id) => axiosInstance.put(`/notifications/unarchive/${id}`);
+
+export const archiveAllNotificationsService = (archived = false) => axiosInstance.put(`/notifications/archive-all?archived=${archived}`);
+
+export const unarchiveAllNotificationsService = (archived = false) => axiosInstance.put(`/notifications/unarchive-all?archived=${archived}`);

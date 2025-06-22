@@ -6,9 +6,9 @@ const createFAQ = async (req, res) => {
     try {
         const faq = new FAQ({ question, answer, createdBy: req.user.userId });
         await faq.save();
-        res.status(201).json({ message: 'FAQ item created successfully', faq });
+        res.status(201).json({ success: true, message: 'FAQ item created successfully', faq });
     } catch (error) {
-        res.status(500).json({ message: 'Server error' });
+        res.status(500).json({ success: false, message: 'Error creating FAQ', error: error.message });
     }
 };
 
@@ -19,7 +19,7 @@ const getFAQs = async (req, res) => {
             .populate('updatedBy', 'firstName lastName email');
         res.status(200).json(faqs);
     } catch (error) {
-        res.status(500).json({ message: 'Server error' });
+        res.status(500).json({ success: false, message: 'Error getting FAQs', error: error.message });
     }
 };
 
@@ -28,7 +28,7 @@ const getFAQ = async (req, res) => {
         const faq = await FAQ.findById(req.params.id);
         res.status(200).json(faq);
     } catch (error) {
-        res.status(500).json({ message: 'Server error' });
+        res.status(500).json({ success: false, message: 'Error getting FAQ', error: error.message });
     }
 };
 
@@ -41,18 +41,18 @@ const updateFAQ = async (req, res) => {
             { question, answer, updatedAt: Date.now(), updatedBy: req.user.userId },
             { new: true }
         );
-        res.status(200).json({ message: 'FAQ item updated successfully', faq });
+        res.status(200).json({ success: true, message: 'FAQ item updated successfully', faq });
     } catch (error) {
-        res.status(500).json({ message: 'Server error' });
+        res.status(500).json({ success: false, message: 'Error updating FAQ', error: error.message });
     }
 };
 
 const deleteFAQ = async (req, res) => {
     try {
         await FAQ.findByIdAndDelete(req.params.id);
-        res.status(200).json({ message: 'FAQ deleted successfully' });
+        res.status(200).json({ success: true, message: 'FAQ deleted successfully' });
     } catch (error) {
-        res.status(500).json({ message: 'Server error' });
+        res.status(500).json({ success: false, message: 'Error deleting FAQ', error: error.message });
     }
 };
 
@@ -61,9 +61,9 @@ const deleteFAQs = async (req, res) => {
 
     try {
         await FAQ.deleteMany({ _id: { $in: ids } });
-        res.status(200).json({ message: 'FAQ items deleted successfully' });
+        res.status(200).json({ success: true, message: 'FAQ items deleted successfully' });
     } catch (error) {
-        res.status(500).json({ message: 'Server error', error: error.message });
+        res.status(500).json({ success: false, message: 'Error deleting FAQ items', error: error.message });
     }
 };
 

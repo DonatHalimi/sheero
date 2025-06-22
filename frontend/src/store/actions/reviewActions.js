@@ -1,13 +1,18 @@
-import { deleteUserReviewService, editReviewService, getUserReviewsService } from '../../services/reviewService';
+import { deleteUserReviewService, editReviewService, getUserReviewsService, ITEMS_PER_PAGE } from '../../services/reviewService';
 import { DELETE_USER_REVIEW, DELETE_USER_REVIEW_ERROR, EDIT_USER_REVIEW, EDIT_USER_REVIEW_ERROR, GET_USER_REVIEWS, GET_USER_REVIEWS_ERROR } from '../types';
 
-export const getUserReviews = (userId) => async (dispatch) => {
+export const getUserReviews = (userId, page = 1, limit = ITEMS_PER_PAGE, searchTerm = '', ratingFilter = 'all') => async (dispatch) => {
+    dispatch({ type: 'GET_USER_REVIEWS_REQUEST' });
+
     try {
-        const res = await getUserReviewsService(userId);
+        const res = await getUserReviewsService(userId, page, limit, searchTerm, ratingFilter);
 
         dispatch({
             type: GET_USER_REVIEWS,
-            payload: res.data,
+            payload: {
+                reviews: res.data.reviews,
+                pagination: res.data.pagination
+            },
         });
     } catch (error) {
         dispatch({

@@ -17,6 +17,7 @@ import {
     LocationOn,
     Person,
     PhoneInTalk,
+    Subject,
     Tag
 } from "@mui/icons-material";
 import { InputAdornment, useTheme } from "@mui/material";
@@ -143,6 +144,26 @@ export const CommentAdornment = () => {
         startAdornment: (
             <InputAdornment position="start">
                 <Forum fontSize="10px" />
+            </InputAdornment>
+        ),
+    };
+};
+
+export const SubjectAdornment = () => {
+    return {
+        startAdornment: (
+            <InputAdornment position="start">
+                <Subject fontSize="10px" />
+            </InputAdornment>
+        ),
+    };
+};
+
+export const MessageAdornment = () => {
+    return {
+        startAdornment: (
+            <InputAdornment position="start">
+                <Description fontSize="10px" />
             </InputAdornment>
         ),
     };

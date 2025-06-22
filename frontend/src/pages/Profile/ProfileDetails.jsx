@@ -3,7 +3,6 @@ import { Box, IconButton, InputAdornment, Switch, TextField, Tooltip } from '@mu
 import { useEffect, useState } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 import { toast } from 'react-toastify';
-import 'react-toastify/dist/ReactToastify.css';
 import { profileBoxSx } from '../../assets/sx';
 import { LoadingDetails, LoadingLabel } from '../../components/custom/LoadingSkeletons';
 import { BrownButton, BrownOutlinedTextField, DetailsBox } from '../../components/custom/MUI';
@@ -51,6 +50,7 @@ const ProfileDetails = () => {
             setLastName(user.lastName);
             setEmail(user.email);
             setIs2faOn(user.twoFactorEnabled || false);
+            setLoginNotifications(user.loginNotifications || false);
         }
     }, [user]);
 
@@ -128,16 +128,19 @@ const ProfileDetails = () => {
         }
     };
 
-    const handleToggle = async () => {
+    const handleToggleLoginNotifs = async () => {
         const newValue = !loginNotifications;
         try {
             const response = await toggleLoginNotificationsService(newValue);
             setLoginNotifications(response.data.loginNotifications);
             if (response.data.success) {
+                await dispatch(loadUser());
                 toast.success(response.data.message);
             }
-        } catch (err) {
-            toast.error('Could not update setting');
+        } catch (error) {
+            toast.error('Failed to toggle login notifications');
+        } finally {
+            setIsTogglingNotifications(false);
         }
     };
 
@@ -156,9 +159,7 @@ const ProfileDetails = () => {
     );
 
     const handleDownloadUserData = () => {
-        if (user) {
-            downloadUserData(user);
-        }
+        if (user) downloadUserData(user);
     };
 
     const isGoogleLogin = Boolean(user?.googleId);
@@ -173,9 +174,7 @@ const ProfileDetails = () => {
                 ? 'Facebook'
                 : '';
 
-    const title = isDisabled
-        ? `Profile details cannot be changed because you've logged in using ${provider}`
-        : '';
+    const title = isDisabled ? `Profile details cannot be changed because you've logged in using ${provider}` : '';
 
     const isSubmitDisabled = isFormUnchanged || !isFormValid || isSubmitting;
 
@@ -189,12 +188,14 @@ const ProfileDetails = () => {
                     onDownloadUserData={handleDownloadUserData}
                 />
 
-                <Tooltip title={title} placement="top" arrow>
-                    <DetailsBox hasPadding={false}>
-                        {loading ? (
-                            <LoadingDetails />
-                        ) : (
+                <DetailsBox hasPadding={false}>
+                    {loading ? (
+                        <LoadingDetails />
+                    ) : (
+                        <Tooltip title={title} placement="top" arrow>
+
                             <form onSubmit={handleSubmit}>
+
                                 <Box sx={profileBoxSx}>
                                     <div className="relative flex-grow">
                                         <TextField
@@ -291,6 +292,7 @@ const ProfileDetails = () => {
                                                             aria-label="toggle current password visibility"
                                                             onClick={handleClickShowPassword}
                                                             onMouseDown={handleMouseDownPassword}
+                                                            disabled={isDisabled}
                                                             edge="end"
                                                         >
                                                             {showPassword ? <Visibility className="text-stone-500" /> : <VisibilityOff className="text-stone-500" />}
@@ -330,6 +332,7 @@ const ProfileDetails = () => {
                                                             aria-label="toggle new password visibility"
                                                             onClick={handleClickShowNewPassword}
                                                             onMouseDown={handleMouseDownPassword}
+                                                            disabled={isDisabled}
                                                             edge="end"
                                                         >
                                                             {showNewPassword ? <Visibility className="text-stone-500" /> : <VisibilityOff className="text-stone-500" />}
@@ -347,6 +350,7 @@ const ProfileDetails = () => {
                                             </div>
                                         )}
                                     </div>
+
                                 </Box>
 
                                 <BrownButton
@@ -359,9 +363,9 @@ const ProfileDetails = () => {
                                     <LoadingLabel loading={isSubmitting} defaultLabel="Update" loadingLabel="Updating" />
                                 </BrownButton>
                             </form>
-                        )}
-                    </DetailsBox>
-                </Tooltip>
+                        </Tooltip>
+                    )}
+                </DetailsBox>
 
                 <DetailsBox>
                     {loading ? (
@@ -398,7 +402,7 @@ const ProfileDetails = () => {
                                 </div>
                                 <Switch
                                     checked={loginNotifications}
-                                    onChange={handleToggle}
+                                    onChange={handleToggleLoginNotifs}
                                     color="primary"
                                 />
                             </div>

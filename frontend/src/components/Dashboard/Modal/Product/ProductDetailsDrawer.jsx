@@ -1,9 +1,9 @@
 import { Box, Drawer } from '@mui/material';
 import { drawerPaperSx } from '../../../../assets/sx';
 import { getImageUrl } from '../../../../utils/config';
+import { EuroAdornment, IdAdornment, InventoryAdornment, ShippingAdornment } from '../../../custom/Adornments';
 import { DetailsTitle } from '../../../custom/Dashboard';
 import { BoxBetween, CloseButton, ReadOnlyTextField } from '../../../custom/MUI';
-import { EuroAdornment, IdAdornment, InventoryAdornment, ShippingAdornment } from '../../../custom/Adornments';
 import { formatDimensions, formatProductDetails, formatProductDiscount, formatProductShipping, formatProductVariants } from '../../../custom/utils';
 import { downloadProductData } from '../../../Product/Utils/DataExport';
 

@@ -76,7 +76,7 @@ export const generateOrderPDF = async (order) => {
 
     // Draw other company info with the adjusted Y position
     drawCompanyLine("Phone", '044221112', blankSpace);
-    drawCompanyLine("Email", 'support@sheero.com', blankSpace + lineSpacing);
+    drawCompanyLine("Email", 'sheero.info@gmail.com', blankSpace + lineSpacing);
     drawCompanyLine("Website", 'www.sheero.onrender.com', blankSpace + lineSpacing * 2);
 
     // Order Info      
@@ -180,7 +180,6 @@ export const generateOrderPDF = async (order) => {
     doc.text("Total:", totalsLabelX, finalY + lineSpacing * 3);
     doc.text(`€ ${order.totalAmount?.toFixed(2) || '0.00'}`, totalsValueX, finalY + lineSpacing * 3);
 
-    // Save PDF
     doc.save(`order_${order._id}.pdf`);
 };
 
@@ -233,7 +232,7 @@ export const generateReturnPDF = (returnRequest) => {
 
     // Draw other company info with the adjusted Y position
     drawCompanyLine("Phone", '044221112', blankSpace);
-    drawCompanyLine("Email", 'support@sheero.com', blankSpace + lineSpacing);
+    drawCompanyLine("Email", 'sheero.info@gmail.com', blankSpace + lineSpacing);
     drawCompanyLine("Website", 'www.sheero.onrender.com', blankSpace + lineSpacing * 2);
 
     // Divider line after company info
@@ -283,7 +282,6 @@ export const generateReturnPDF = (returnRequest) => {
         margin: { left: pagePadding, right: pagePadding }
     });
 
-    // Save PDF
     doc.save(`return_${returnRequest._id}.pdf`);
 };
 

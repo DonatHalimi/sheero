@@ -1,29 +1,43 @@
-import { clearWishlistService, getUsersWishlistService, removeFromWishlistService } from '../../services/wishlistService';
+import { clearWishlistService, getUsersWishlistService, ITEMS_PER_PAGE, removeFromWishlistService } from '../../services/wishlistService';
 import { CLEAR_WISHLIST, GET_WISHLIST_COUNT, GET_WISHLIST_ITEMS, GET_WISHLIST_ITEMS_ERROR, REMOVE_FROM_WISHLIST } from '../types';
 
-export const getWishlistItems = () => async (dispatch) => {
+export const getWishlistItems = (page = 1, limit = ITEMS_PER_PAGE) => async (dispatch) => {
     try {
-        const res = await getUsersWishlistService();
+        const res = await getUsersWishlistService(page, limit);
 
         dispatch({
             type: GET_WISHLIST_ITEMS,
-            payload: res.data.items,
+            payload: {
+                wishlistItems: res.data.items,
+                pagination: res.data.pagination,
+            },
         });
+
+        return {
+            items: res.data.items,
+            totalCount: res.data.pagination.totalItems,
+            pagination: res.data.pagination
+        };
     } catch (error) {
         dispatch({
             type: GET_WISHLIST_ITEMS_ERROR,
             payload: error.response?.data?.message || 'Failed to get wishlist items',
         });
+
+        return {
+            items: [],
+            totalCount: 0,
+            pagination: null
+        };
     }
 };
 
 export const getWishlistCount = () => async dispatch => {
     try {
-        const { data } = await getUsersWishlistService();
-        const count = (data.items || []).reduce(
-            (sum, item) => sum + (item.quantity || 1),
-            0
-        );
+        const res = await getUsersWishlistService(1, ITEMS_PER_PAGE);
+
+        const count = res.data.pagination?.totalItems || 0;
+
         dispatch({ type: GET_WISHLIST_COUNT, payload: count });
     } catch (err) {
         console.error('Error fetching wishlist count', err);

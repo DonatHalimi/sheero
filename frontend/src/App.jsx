@@ -39,7 +39,7 @@ import {
 import { LoadingOverlay } from './components/custom/LoadingSkeletons';
 import { ScrollToTop } from './components/custom/utils';
 
-const roles = ['admin', 'orderManager', 'contentManager', 'productManager'];
+const roles = ['admin', 'orderManager', 'contentManager', 'customerSupport', 'productManager'];
 
 const pageRoles = {
   orders: ['admin', 'orderManager'],
@@ -54,6 +54,7 @@ const pageRoles = {
   subSubcategories: ['admin', 'productManager'],
   productRestockSubscriptions: ['admin', 'productManager'],
   suppliers: ['admin', 'productManager'],
+  contacts: ['admin', 'customerSupport'],
 };
 
 const getAllowedRoles = (name) => pageRoles[name] || ['admin'];

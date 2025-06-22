@@ -5,12 +5,15 @@ import { useLocation, useNavigate } from 'react-router-dom';
 import { toast } from 'react-toastify';
 import { io } from 'socket.io-client';
 import { WishlistIcon } from '../../components/custom/Icons';
-import { LoadingOverlay } from '../../components/custom/LoadingSkeletons';
 import { CartMenu, LoginButton, NavbarLogo, NotificationMenu, ProfileMenu } from '../../components/custom/MUI';
 import { clearCartService, getCartService, removeFromCartService, updateQuantityService } from '../../services/cartService';
-import { archiveNotificationService, getArchivedNotificationsService, getNotificationsService, markAllNotificationsReadService, markAllNotificationsUnreadService, markNotificationReadService, markNotificationUnreadService, unarchiveNotificationService } from '../../services/notificationService';
-import { logoutUser, selectIsAdmin, selectIsContentManager, selectIsOrderManager, selectIsProductManager } from '../../store/actions/authActions';
+import {
+    archiveAllNotificationsService, archiveNotificationService, getArchivedNotificationsService, getNotificationsService, markAllNotificationsReadService,
+    markAllNotificationsUnreadService, markNotificationReadService, markNotificationUnreadService, unarchiveAllNotificationsService, unarchiveNotificationService
+} from '../../services/notificationService';
+import { logoutUser, selectIsAdmin, selectIsContentManager, selectIsCustomerSupport, selectIsOrderManager, selectIsProductManager } from '../../store/actions/authActions';
 import { getCartCount } from '../../store/actions/cartActions';
+import { getNotificationCount } from '../../store/actions/orderActions';
 import { getWishlistCount } from '../../store/actions/wishlistActions';
 import { BASE_URL } from '../../utils/config';
 import CategoryNavbar from './CategoryNavbar';
@@ -20,12 +23,14 @@ const Navbar = ({ activeCategory }) => {
     const { isAuthenticated } = useSelector((state) => state.auth);
     const { wishlistCount } = useSelector((state) => state.wishlist);
     const { cartCount } = useSelector((state) => state.cart);
+    const { notifCount } = useSelector((state) => state.orders);
 
     const { user } = useSelector((state) => state.auth);
     const userId = user?.id;
     const isAdmin = useSelector(selectIsAdmin);
     const isOrderManager = useSelector(selectIsOrderManager);
     const isContentManager = useSelector(selectIsContentManager);
+    const isCustomerSupport = useSelector(selectIsCustomerSupport);
     const isProductManager = useSelector(selectIsProductManager);
 
     const [cartItems, setCartItems] = useState([]);
@@ -36,11 +41,16 @@ const Navbar = ({ activeCategory }) => {
     const [isNotifDropdownOpen, setIsNotifDropdownOpen] = useState(false);
     const [isNotifLoading, setIsNotifLoading] = useState(false);
     const [notifFilter, setNotifFilter] = useState('all');
-    const [unreadCount, setUnreadCount] = useState(0);
     const isAllRead = notifications.length > 0 && notifications.every(n => n.isRead);
 
     const [isSidebarOpen, setIsSidebarOpen] = useState(false);
     const [isLoading, setIsLoading] = useState(false);
+    const [loadingState, setLoadingState] = useState({
+        removingItem: null,
+        clearingCart: false,
+        updatingQuantity: { productId: null, quantityChange: null }
+    });
+
     const [isFetchingCart, setIsFetchingCart] = useState(false);
 
     const dispatch = useDispatch();
@@ -75,72 +85,80 @@ const Navbar = ({ activeCategory }) => {
             setIsCartDropdownOpen(true);
         } else if (dropdownType === 'notif' && isAuthenticated && isOrderManager) {
             setIsNotifDropdownOpen(true);
-            fetchNotifications();
+            if (!isNotifDropdownOpen) {
+                fetchNotifications();
+            }
         }
     };
+
     const handleRemoveItem = async (productId) => {
-        setIsLoading(true);
+        setLoadingState(prev => ({ ...prev, removingItem: productId }));
         try {
-            const res = await removeFromCartService(productId);
-            if (res.data.success === true) {
-                toast.success(res.data.message);
+            const response = await removeFromCartService(productId);
+            if (response.data.success) {
+                toast.success(response.data.message);
             }
 
             await fetchCart();
-
-            window.dispatchEvent(new Event('cartUpdate'));
+            document.dispatchEvent(new CustomEvent('cartUpdated'));
             dispatch(getCartCount());
             if (cartItems.length === 1) setIsCartDropdownOpen(false);
         } catch (error) {
             toast.error('Failed to remove item from cart');
         } finally {
-            setIsLoading(false);
+            setLoadingState(prev => ({ ...prev, removingItem: null }));
         }
     };
 
     const handleClearCart = async () => {
-        setIsLoading(true);
+        setLoadingState(prev => ({ ...prev, clearingCart: true }));
         try {
-            const res = await clearCartService();
-            if (res.data.success === true) {
-                toast.success(res.data.message);
+            const response = await clearCartService();
+            if (response.data.success) {
+                toast.success(response.data.message);
             }
 
             await fetchCart();
-            window.dispatchEvent(new Event('cartUpdate'));
+            document.dispatchEvent(new CustomEvent('cartUpdated'));
             dispatch(getCartCount());
             setIsCartDropdownOpen(false);
         } catch (error) {
             console.error('Error clearing cart:', error);
             toast.error('Failed to clear cart');
         } finally {
-            setIsLoading(false);
+            setLoadingState(prev => ({ ...prev, clearingCart: false }));
         }
     };
 
     const handleUpdateQuantity = async (productId, quantityChange) => {
-        setIsLoading(true);
+        setLoadingState(prev => ({
+            ...prev,
+            updatingQuantity: { productId, quantityChange }
+        }));
 
         const cartData = {
             productId,
             quantityChange
         }
         try {
-            const { data } = await updateQuantityService(cartData);
+            const response = await updateQuantityService(cartData);
 
-            setCartItems(data.items);
-            setCartTotal(data.items.reduce((sum, item) => {
+            setCartItems(response.data.items);
+            setCartTotal(response.data.items.reduce((sum, item) => {
                 const price = item.product.salePrice > 0 ? item.product.salePrice : item.product.price;
                 return sum + price * item.quantity;
             }, 0));
             toast.success('Quantity updated successfully');
-            window.dispatchEvent(new Event('cartUpdate'));
+            window.dispatchEvent(new CustomEvent('cartUpdated'));
             dispatch(getCartCount());
         } catch (error) {
             console.error('Error updating quantity:', error);
             toast.error('Failed to update quantity');
         } finally {
-            setIsLoading(false);
+            setLoadingState(prev => ({
+                ...prev,
+                updatingQuantity: { productId: null, quantityChange: null }
+            }));
         }
     };
 
@@ -187,18 +205,14 @@ const Navbar = ({ activeCategory }) => {
         }
     };
 
-    const updateNotificationState = (updatedNotifications) => {
-        setNotifications(updatedNotifications);
-        setUnreadCount(updatedNotifications.filter(n => !n.isRead && !n.isArchived).length);
-    };
-
     const fetchNotifications = async (filter = notifFilter) => {
         setIsNotifLoading(true);
         try {
             const response = filter === 'all'
                 ? await getNotificationsService()
                 : await getArchivedNotificationsService();
-            updateNotificationState(response.data);
+            setNotifications(response.data);
+            dispatch(getNotificationCount());
         } catch (err) {
             console.error(err);
         } finally {
@@ -215,6 +229,7 @@ const Navbar = ({ activeCategory }) => {
         if (!isAuthenticated || !isOrderManager) return;
 
         fetchNotifications();
+        dispatch(getNotificationCount());
 
         const socket = io(BASE_URL, {
             path: '/socket.io',
@@ -223,23 +238,29 @@ const Navbar = ({ activeCategory }) => {
             withCredentials: true,
         });
 
-        socket.on('notification', (notif) => {
-            updateNotificationState([notif, ...notifications]);
-        });
+        const handleNotification = (notif) => {
+            setNotifications(prev => [notif, ...prev]);
+            dispatch(getNotificationCount());
+        };
+
+        socket.on('notification', handleNotification);
 
         return () => {
-            socket.off();
+            socket.off('notification', handleNotification);
             socket.disconnect();
         };
-    }, [isAuthenticated, isOrderManager, userId]);
+    }, [isAuthenticated, isOrderManager, userId, dispatch]);
 
     const handleToggleNotificationRead = async (notification) => {
         try {
             const service = notification.isRead
                 ? markNotificationUnreadService
                 : markNotificationReadService;
-            await service(notification._id);
 
+            const response = await service(notification._id);
+            if (response.data.success) {
+                toast.success(response.data.message);
+            }
             setNotifications(prev => prev.map(n =>
                 n._id === notification._id
                     ? { ...n, isRead: !notification.isRead }
@@ -247,10 +268,7 @@ const Navbar = ({ activeCategory }) => {
             ));
 
             if (!notification.isArchived) {
-                setUnreadCount(prev => {
-                    const newCount = notification.isRead ? 1 : -1;
-                    return Math.max(0, prev + newCount);
-                });
+                dispatch(getNotificationCount());
             }
         } catch (error) {
             toast.error('Failed to update notification');
@@ -264,12 +282,17 @@ const Navbar = ({ activeCategory }) => {
                 : notifications;
 
             const isAllVisibleRead = visibleNotifications.every(n => n.isRead);
+            const archivedFlag = notifFilter === 'archived';
             const service = isAllVisibleRead
                 ? markAllNotificationsUnreadService
                 : markAllNotificationsReadService;
 
-            await service();
-            await fetchNotifications();
+            const response = await service(archivedFlag);
+            if (response.data.success) {
+                toast.success(response.data.message);
+            }
+            await fetchNotifications(notifFilter);
+            dispatch(getNotificationCount());
         } catch (error) {
             toast.error('Failed to update notifications');
         }
@@ -277,11 +300,12 @@ const Navbar = ({ activeCategory }) => {
 
     const handleArchiveNotification = async (id) => {
         try {
-            const res = await archiveNotificationService(id);
-            if (res.data.success === true) {
-                toast.success(res.data.message);
+            const response = await archiveNotificationService(id);
+            if (response.data.success) {
+                toast.success(response.data.message);
             }
             await fetchNotifications(notifFilter);
+            dispatch(getNotificationCount());
         } catch (error) {
             toast.error('Failed to archive notification');
         }
@@ -289,17 +313,33 @@ const Navbar = ({ activeCategory }) => {
 
     const handleUnarchiveNotification = async (id) => {
         try {
-            const res = await unarchiveNotificationService(id);
-            if (res.data.success === true) {
-                toast.success(res.data.message);
+            const response = await unarchiveNotificationService(id);
+            if (response.data.success) {
+                toast.success(response.data.message);
             }
             await fetchNotifications(notifFilter);
+            dispatch(getNotificationCount());
         } catch (err) {
             toast.error('Failed to restore notification');
         }
     };
 
-    console.log(notifications);
+    const handleToggleAllNotificationsArchived = async () => {
+        try {
+            const service = notifFilter === 'all'
+                ? archiveAllNotificationsService
+                : unarchiveAllNotificationsService;
+
+            const response = await service();
+            if (response.data.success) {
+                toast.success(response.data.message);
+            }
+            await fetchNotifications(notifFilter);
+            dispatch(getNotificationCount());
+        } catch (error) {
+            toast.error('Failed to update notifications');
+        }
+    };
 
     const handleProductClick = (slug) => navigate(`/${slug}`);
 
@@ -310,8 +350,6 @@ const Navbar = ({ activeCategory }) => {
 
     return (
         <>
-            {isLoading && <LoadingOverlay />}
-
             <nav className="fixed top-0 left-0 right-0 z-[900] bg-white h-20">
                 <div className="mx-auto max-w-screen-xl">
                     <div className="flex flex-col w-full">
@@ -341,6 +379,7 @@ const Navbar = ({ activeCategory }) => {
                                                 isAdmin={isAdmin}
                                                 isOrderManager={isOrderManager}
                                                 isContentManager={isContentManager}
+                                                isCustomerSupport={isCustomerSupport}
                                                 isProductManager={isProductManager}
                                                 handleLogout={handleLogout}
                                             />
@@ -358,7 +397,8 @@ const Navbar = ({ activeCategory }) => {
                                                 handleClearCart={handleClearCart}
                                                 handleUpdateQuantity={handleUpdateQuantity}
                                                 handleGoToCart={handleGoToCart}
-                                                isLoading={isFetchingCart}
+                                                isFetchingCart={isFetchingCart}
+                                                loadingState={loadingState}
                                                 handleProductClick={handleProductClick}
                                             />
 
@@ -371,9 +411,10 @@ const Navbar = ({ activeCategory }) => {
                                                     isLoading={isNotifLoading}
                                                     onToggleRead={handleToggleNotificationRead}
                                                     onArchive={handleArchiveNotification}
-                                                    onToggleReadAll={handleToggleAllNotificationsRead}
+                                                    onMarkAllReadToggle={handleToggleAllNotificationsRead}
+                                                    onArchiveAllToggle={handleToggleAllNotificationsArchived}
                                                     isAllRead={isAllRead}
-                                                    unreadCount={unreadCount}
+                                                    unreadCount={notifCount}
                                                     activeFilter={notifFilter}
                                                     onFilterChange={handleNotifFilterChange}
                                                     onUnarchive={handleUnarchiveNotification}

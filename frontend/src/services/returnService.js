@@ -2,7 +2,19 @@ import axiosInstance from "../utils/axiosInstance";
 
 export const getReturnRequestsService = () => axiosInstance.get('/returns/get');
 
-export const getUserReturnRequestsService = (userId) => axiosInstance.get(`/returns/user/${userId}`);
+export const ITEMS_PER_PAGE = 8;
+
+export const getUserReturnRequestsService = (userId, page = 1, limit = ITEMS_PER_PAGE, searchTerm = '', statusFilter = 'all') => {
+    const params = new URLSearchParams({
+        page: page.toString(),
+        limit: limit.toString()
+    });
+
+    if (searchTerm && searchTerm.trim()) params.append('search', searchTerm.trim());
+    if (statusFilter && statusFilter !== 'all') params.append('status', statusFilter);
+
+    return axiosInstance.get(`/returns/user/${userId}?${params.toString()}`);
+};
 
 export const getReturnDetailsService = (returnId) => axiosInstance.get(`/returns/${returnId}`);
 

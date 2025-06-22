@@ -1,6 +1,6 @@
 import { Box, Drawer } from '@mui/material';
 import { drawerPaperSx } from '../../../../assets/sx';
-import { IdAdornment } from '../../../custom/Adornments';
+import { DateAdornment, DescriptionAdornment, IdAdornment, PersonAdornment, SubjectAdornment } from '../../../custom/Adornments';
 import { DetailsTitle } from '../../../custom/Dashboard';
 import { BoxBetween, CloseButton, ReadOnlyTextField } from '../../../custom/MUI';
 import { formatDate } from '../../../custom/utils';
@@ -17,6 +17,8 @@ const ContactDetailsDrawer = ({ open, onClose, contact, onDelete }) => {
         onClose();
         onDelete(contact);
     };
+
+    console.log(contact);
 
     return (
         <Drawer
@@ -59,6 +61,7 @@ const ContactDetailsDrawer = ({ open, onClose, contact, onDelete }) => {
                         <ReadOnlyTextField
                             label="Subject"
                             value={contact.subject}
+                            InputProps={SubjectAdornment()}
                         />
 
                         <ReadOnlyTextField
@@ -66,12 +69,14 @@ const ContactDetailsDrawer = ({ open, onClose, contact, onDelete }) => {
                             multiline
                             rows={4}
                             value={contact.message}
+                            InputProps={DescriptionAdornment()}
                         />
 
                         {contact.createdAt &&
                             <ReadOnlyTextField
                                 label="Created At"
                                 value={formatDate(contact.createdAt)}
+                                InputProps={DateAdornment()}
                             />
                         }
 
@@ -79,6 +84,7 @@ const ContactDetailsDrawer = ({ open, onClose, contact, onDelete }) => {
                             <ReadOnlyTextField
                                 label="User"
                                 value={user}
+                                InputProps={PersonAdornment()}
                             />
                         }
                     </>

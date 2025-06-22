@@ -15,9 +15,10 @@ const createAddress = async (req, res) => {
         });
 
         await address.save();
-        res.status(201).json({ message: 'Address created successfully', address });
+
+        res.status(201).json({ success: true, message: 'Address created successfully', address });
     } catch (error) {
-        res.status(500).json({ message: 'Server error' });
+        res.status(500).json({ success: false, message: 'Error creating address', error: error.message });
     }
 };
 
@@ -30,7 +31,7 @@ const getAddresses = async (req, res) => {
 
         res.status(200).json(addresses);
     } catch (error) {
-        res.status(500).json({ message: 'Server error' });
+        res.status(500).json({ success: false, message: 'Error getting addresses', error: error.message });
     }
 };
 
@@ -43,11 +44,11 @@ const getAddress = async (req, res) => {
 
         res.status(200).json(address);
     } catch (error) {
-        res.status(500).json({ message: 'Server error' });
+        res.status(500).json({ success: false, message: 'Error getting address', error: error.message });
     }
 };
 
-const getAddressByUser = async (req, res) => {
+const getUserAddress = async (req, res) => {
     const userId = req.params.userId;
 
     try {
@@ -57,7 +58,7 @@ const getAddressByUser = async (req, res) => {
 
         res.status(200).json(address);
     } catch (error) {
-        res.status(500).json({ message: 'Server error', error: error.message });
+        res.status(500).json({ success: false, message: 'Error getting user address', error: error.message });
     }
 };
 
@@ -79,20 +80,18 @@ const updateAddress = async (req, res) => {
             runValidators: true
         });
 
-        res.status(200).json({ message: 'Address updated successfully', updatedAddress });
+        res.status(200).json({ success: true, message: 'Address updated successfully', updatedAddress });
     } catch (error) {
-        console.error('Error updating address:', error);
-        res.status(500).json({ message: 'Server error', error: error.message });
+        res.status(500).json({ success: false, message: 'Error updating address', error: error.message });
     }
 };
 
 const deleteAddress = async (req, res) => {
     try {
         await Address.findByIdAndDelete(req.params.id);
-        res.status(200).json({ message: 'Address deleted successfully' });
+        res.status(200).json({ success: true, message: 'Address deleted successfully' });
     } catch (error) {
-        console.error('Error deleting address:', error);
-        res.status(500).json({ message: 'Server error', error: error.message });
+        res.status(500).json({ success: false, message: 'Error deleting address', error: error.message });
     }
 };
 
@@ -101,10 +100,10 @@ const deleteAddresses = async (req, res) => {
 
     try {
         await Address.deleteMany({ _id: { $in: ids } });
-        res.status(200).json({ message: 'Addresses deleted successfully' });
+        res.status(200).json({ success: true, message: 'Addresses deleted successfully' });
     } catch (error) {
-        res.status(500).json({ message: 'Server error', error: error.message });
+        res.status(500).json({ success: false, message: 'Error deleting addresses', error: error.message });
     }
 };
 
-module.exports = { createAddress, getAddresses, getAddress, getAddressByUser, updateAddress, deleteAddress, deleteAddresses };
+module.exports = { createAddress, getAddresses, getAddress, getUserAddress, updateAddress, deleteAddress, deleteAddresses };

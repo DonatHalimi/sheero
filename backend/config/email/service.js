@@ -2,8 +2,7 @@ const {
     brandImages, createAttachments, headerMessages,
     orderBodyMessages, orderStatusMessages, returnBodyMessages,
     returnStatusImages, returnStatusMessages, statusImages,
-    formatLoginMethod,
-    loginLocation
+    formatLoginMethod, loginLocation
 } = require('./utils');
 const {
     generateContactHtml, generateContactToCustomerSupportHtml, generateDisable2FAEmailHtml,
@@ -13,11 +12,12 @@ const {
     generateReturnRequestEmailHtml, generateReviewEmailHtml, generateSuccessfulOrderUpdateHtml,
     generateLoginNotificationHtml
 } = require('./content');
-const { NODE_ENV, SMTP_USER } = require('../core/dotenv');
+const { SMTP_USER } = require('../core/dotenv');
 const Role = require('../../models/Role');
 const transporter = require('./mailer');
 const User = require('../../models/User');
 const { parseUserAgent } = require('../auth/loginNotifications');
+const { frontendUrl } = require('../core/utils');
 
 async function sendEmail(userEmail, subject, text, html, attachments = []) {
     const mailOptions = {
@@ -42,7 +42,8 @@ async function sendVerificationEmail(userEmail, otp) {
     const attachments = [...orderAttachments, ...returnRequestAttachments];
 
     const subject = 'OTP Verification Code for sheero';
-    const text = `Hello ${userEmail},\n\nYour OTP is: ${otp}\n\nIt will expire in 2 minutes.`;
+    const text = `Hello ${userEmail},\n\nYour One-Time Password (OTP) for verifying your email is: ${otp}\n\nIt will expire in 2 minutes.`;
+
     const html = generateEmailVerificationHtml(userEmail, otp, {
         brandImages
     });
@@ -82,13 +83,9 @@ async function sendOrderUpdateEmail(order) {
 };
 
 async function sendReturnRequestUpdateEmail(returnRequest) {
-    if (!returnRequest || !returnRequest._id) {
-        throw new Error('Invalid return request object');
-    }
+    if (!returnRequest || !returnRequest._id) throw new Error('Invalid return request object');
 
-    if (!returnRequest.products || !Array.isArray(returnRequest.products)) {
-        returnRequest.products = [];
-    }
+    if (!returnRequest.products || !Array.isArray(returnRequest.products)) returnRequest.products = [];
 
     const { orderAttachments, returnRequestAttachments } = createAttachments(undefined, returnRequest);
     const attachments = [...orderAttachments, ...returnRequestAttachments];
@@ -101,7 +98,7 @@ async function sendReturnRequestUpdateEmail(returnRequest) {
     };
 
     const subject = returnSubjectMessages[returnRequest.status];
-    const text = `Return Request ${returnRequest.status} - ${returnRequest._id}`;
+    const text = `Hello ${returnRequest.user.email},\n\nThe return request #${returnRequest._id} you've made at sheero has been updated to: ${returnRequest.status}.`;
 
     const html = generateReturnRequestEmailHtml(returnRequest, {
         brandImages,
@@ -115,15 +112,13 @@ async function sendReturnRequestUpdateEmail(returnRequest) {
 };
 
 async function sendReviewEmail(review) {
-    if (!review || !review._id) {
-        throw new Error('Invalid review object');
-    }
+    if (!review || !review._id) throw new Error('Invalid review object');
 
     const { orderAttachments, returnRequestAttachments, reviewAttachments } = createAttachments(undefined, undefined, review);
     const attachments = [...orderAttachments, ...returnRequestAttachments, ...reviewAttachments];
 
     const subject = `Review for ${review.product.name} at sheero`;
-    const text = `Review #${review._id}`;
+    const text = `Thank you for reviewing ${review.product.name}! We hope you will enjoy your purchase.`;
 
     const html = generateReviewEmailHtml(review, {
         brandImages,
@@ -145,7 +140,6 @@ async function sendProductInventoryUpdateEmail(order) {
     const text = `\n\Products inventory update for order #${order._id}.`;
 
     try {
-        // Fetch the 'orderManager' role ObjectId
         const orderManagerRole = await Role.findOne({ name: 'orderManager' });
         if (!orderManagerRole) {
             console.error('Order Manager role not found');
@@ -159,7 +153,6 @@ async function sendProductInventoryUpdateEmail(order) {
             return;
         }
 
-        // Send the email to each orderManager user
         for (const orderManager of orderManagerUsers) {
             const html = generateProductInventoryEmailHtml(order, {
                 recipientEmail: orderManager.email,
@@ -181,9 +174,7 @@ async function sendResetPasswordEmail(user, resetToken) {
     const { orderAttachments, returnRequestAttachments } = createAttachments(user, undefined);
     const attachments = [...orderAttachments, ...returnRequestAttachments];
 
-    const frontendURL = NODE_ENV === 'production' ? 'https://sheero.onrender.com' : 'http://localhost:3000';
-
-    const resetUrl = `${frontendURL}/reset-password/${resetToken}`;
+    const resetUrl = `${frontendUrl}/reset-password/${resetToken}`;
     const subject = 'Password Reset Request';
     const text = `Hello ${user.email},\n\nPlease click the following link to reset your password:\n\n${resetUrl}\n\nIf you did not request a password reset, please ignore this email.`;
     const html = generateResetPasswordEmailHtml(user, resetUrl, {
@@ -198,7 +189,7 @@ async function sendPasswordResetSuccessEmail(user) {
     const attachments = [...orderAttachments, ...returnRequestAttachments];
 
     const subject = 'Password Reset Success';
-    const text = `Hello ${user.email},\n\nYour password has been successfully reset.`;
+    const text = `Hello ${user.email},\n\nYour password has been successfully reset. You can now log in with your new password.`;
     const html = generatePasswordResetSuccessEmailHtml(user, {
         brandImages
     });
@@ -274,33 +265,13 @@ async function sendProductRestockSubscriptionEmail(email, product) {
 };
 
 async function sendContactEmail(contact) {
-    if (!contact || !contact._id) {
-        throw new Error('Invalid contact object');
-    }
+    if (!contact || !contact._id) throw new Error('Invalid contact object');
 
     const { orderAttachments, returnRequestAttachments, reviewAttachments, productInventoryAttachments } = createAttachments(undefined, undefined, undefined, contact);
     const attachments = [...orderAttachments, ...returnRequestAttachments, ...reviewAttachments, ...productInventoryAttachments];
 
     const subject = `Thank you for reaching out to sheero!`;
     const text = `Dear ${contact.name},\n\nThank you for taking the time to contact us. We will review your message and get back to you as soon as possible.\n\nBest regards, sheero team`;
-
-    const html = generateContactHtml(contact, {
-        brandImages,
-    });
-
-    await sendEmail(contact.email, subject, text, html, attachments);
-};
-
-async function sendContactEmail(contact) {
-    if (!contact || !contact._id) {
-        throw new Error('Invalid contact object');
-    }
-
-    const { orderAttachments, returnRequestAttachments, reviewAttachments, productInventoryAttachments } = createAttachments(undefined, undefined, undefined, contact);
-    const attachments = [...orderAttachments, ...returnRequestAttachments, ...reviewAttachments, ...productInventoryAttachments];
-
-    const subject = `Thank you for reaching out to sheero!`;
-    const text = `We will read your message and get back to you as soon as possible.\n\nBest regards, sheero`;
 
     const html = generateContactHtml(contact, {
         brandImages,
@@ -317,14 +288,12 @@ async function sendContactEmailToCustomerSupport(contact) {
     const text = `Please get back to ${contact.email} as soon as possible.\n\nBest regards, sheero.`;
 
     try {
-        // Fetch the 'customerSupport' role ObjectId
         const customerSupportRole = await Role.findOne({ name: 'customerSupport' });
         if (!customerSupportRole) {
             console.error('Customer Support role not found');
             return;
         }
 
-        // Fetch all users with the 'customerSupport' role ObjectId
         const customerSupportUsers = await User.find({ role: customerSupportRole._id });
 
         if (customerSupportUsers.length === 0) {
@@ -332,7 +301,6 @@ async function sendContactEmailToCustomerSupport(contact) {
             return;
         }
 
-        // Send the email to each customerSupport user
         for (const supporter of customerSupportUsers) {
             const html = generateContactToCustomerSupportHtml(contact, {
                 recipientEmail: supporter.email,
@@ -364,6 +332,7 @@ async function sendSuccessfulOrderUpdate(order) {
         console.warn(`Order ${order._id} has no updatedBy email associated.`);
     }
 };
+
 async function sendLoginNotificationEmail(user, loginData) {
     const { orderAttachments, returnRequestAttachments, reviewAttachments, productInventoryAttachments } = createAttachments(undefined, undefined, undefined, undefined);
     const attachments = [...orderAttachments, ...returnRequestAttachments, ...reviewAttachments, ...productInventoryAttachments];
@@ -382,14 +351,13 @@ async function sendLoginNotificationEmail(user, loginData) {
 
     let methodDisplay = formatLoginMethod(loginData.method);
 
-    if (loginData.provider && loginData.provider !== loginData.method) {
-        methodDisplay += ` (${formatLoginMethod(loginData.provider)})`;
-    }
+    const hasProvider = loginData.provider && loginData.provider !== loginData.method;
+    if (hasProvider) methodDisplay += ` (${formatLoginMethod(loginData.provider)})`;
 
-    const subject = 'Security Alert: New Login to your sheero Account';
+    const subject = 'Security Alert';
 
     const text = `Hello ${user.firstName},\n\n` +
-        `We detected a ${loginData.isNewDevice ? 'new device ' : ''}login to your sheero account.\n\n` +
+        `We have detected a ${loginData.isNewDevice ? 'new device ' : ''}login to your sheero account.\n\n` +
         `Date & Time: ${new Date(loginData.timestamp).toLocaleString()}\n` +
         `IP Address: ${loginData.ipAddress}\n` +
         `Location: ${loginLocation.city}, ${loginLocation.region}, ${loginLocation.country}\n` +

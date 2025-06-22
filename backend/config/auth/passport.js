@@ -97,8 +97,12 @@ passport.use(
 
 passport.serializeUser((user, done) => done(null, user.id));
 passport.deserializeUser(async (id, done) => {
-    const user = await User.findById(id).populate('role');
-    done(null, user);
+    try {
+        const user = await User.findById(id).populate('role');
+        done(null, user);
+    } catch (error) {
+        done(error, null);
+    }
 });
 
 module.exports = passport;

@@ -1,4 +1,4 @@
-const { NODE_ENV, JWT_SECRET, STRIPE_SECRET_KEY } = require("./dotenv");
+const { NODE_ENV, JWT_SECRET, STRIPE_SECRET_KEY, JWT_REFRESH_SECRET } = require("./dotenv");
 const jwt = require('jsonwebtoken');
 const speakeasy = require('speakeasy');
 const MemoryStore = require("../../models/MemoryStore");
@@ -11,6 +11,12 @@ const frontendUrl = NODE_ENV === 'production'
     : 'http://localhost:3000';
 
 const shuffleOTP = (str) => str.split('').sort(() => Math.random() - 0.5).join('');
+
+function generateCustomId() {
+    const timestamp = Date.now().toString().slice(-5);
+    const randomPart = Math.floor(Math.random() * 100).toString().padStart(2, '0');
+    return timestamp + randomPart;
+};
 
 const generateOTP = () => {
     const secret = speakeasy.generateSecret({ length: 20 }).base32;
@@ -28,11 +34,16 @@ const generateOTP = () => {
     return shuffleOTP(letters + numbers);
 };
 
-const generateAccessToken = (user) => {
+const generateAccessToken = (userId) => {
     return jwt.sign({
-        userId: user._id,
-        role: user.role
-    }, JWT_SECRET, { expiresIn: '7d' });
+        userId: userId
+    }, JWT_SECRET, { expiresIn: '15m' });
+};
+
+const generateRefreshToken = (userId) => {
+    return jwt.sign({
+        userId: userId
+    }, JWT_REFRESH_SECRET, { expiresIn: '7d' });
 };
 
 const verificationCodeStore = new MemoryStore();
@@ -42,6 +53,6 @@ const twoFactorRateLimitStore = new MemoryStore();
 const twoFactorOtpStore = new MemoryStore();
 
 module.exports = {
-    stripe, frontendUrl, generateOTP, generateAccessToken, verificationCodeStore,
-    pendingUsersStore, rateLimitStore, twoFactorRateLimitStore, twoFactorOtpStore
+    stripe, frontendUrl, generateCustomId, generateOTP, generateAccessToken, generateRefreshToken,
+    verificationCodeStore, pendingUsersStore, rateLimitStore, twoFactorRateLimitStore, twoFactorOtpStore
 };

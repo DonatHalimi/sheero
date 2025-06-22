@@ -22,7 +22,7 @@ export const EMAIL_VALIDATION = {
 };
 
 export const PASSWORD_VALIDATION = {
-    regex: /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[@$!%*?&\(\)_\+\-.])[A-Za-z\d@$!%*?&\(\)_\+\-.]{8,}$/,
+    regex: /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[@$!%*?&\(\)_\+\-.^#])[A-Za-z\d@$!%*?&\(\)_\+\-.^#]{8,}$/,
     title: 'Invalid Password',
     message: "Password must contain at least 8 characters, one uppercase letter, one lowercase letter, one number and one special character",
     required: "Password is required"

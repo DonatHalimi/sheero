@@ -7,9 +7,9 @@ const createCountry = async (req, res) => {
     try {
         const country = new Country({ name, countryCode, createdBy: req.user.userId });
         await country.save();
-        res.status(201).json({ message: 'Country created successfully', country });
+        res.status(201).json({ success: true, message: 'Country created successfully', country });
     } catch (error) {
-        res.status(500).json({ message: 'Server error', error: error.message });
+        res.status(500).json({ success: false, message: 'Error creating country', error: error.message });
     }
 };
 
@@ -20,7 +20,7 @@ const getCountries = async (req, res) => {
             .populate('updatedBy', 'firstName lastName email');
         res.status(200).json(countries);
     } catch (error) {
-        res.status(500).json({ message: 'Server error', error: error.message });
+        res.status(500).json({ success: false, message: 'Error getting countries', error: error.message });
     }
 };
 
@@ -29,7 +29,7 @@ const getCountryById = async (req, res) => {
         const country = await Country.findById(req.params.id);
         res.status(200).json(country);
     } catch (error) {
-        res.status(500).json({ message: 'Server error', error: error.message });
+        res.status(500).json({ success: false, message: 'Error getting country', error: error.message });
     }
 };
 
@@ -42,18 +42,18 @@ const updateCountry = async (req, res) => {
             { name, countryCode, updatedAt: Date.now(), updatedBy: req.user.userId },
             { new: true }
         );
-        res.status(200).json({ message: 'Country updated successfully', country });
+        res.status(200).json({ success: true, message: 'Country updated successfully', country });
     } catch (error) {
-        res.status(500).json({ message: 'Server error', error: error.message });
+        res.status(500).json({ success: false, message: 'Error updating country', error: error.message });
     }
 };
 
 const deleteCountry = async (req, res) => {
     try {
         await Country.findByIdAndDelete(req.params.id);
-        res.status(200).json({ message: 'Country deleted successfully' });
+        res.status(200).json({ success: true, message: 'Country deleted successfully' });
     } catch (error) {
-        res.status(500).json({ message: 'Server error', error: error.message });
+        res.status(500).json({ success: false, message: 'Error deleting country', error: error.message });
     }
 };
 
@@ -71,9 +71,9 @@ const deleteCountries = async (req, res) => {
 
         await Country.deleteMany({ _id: { $in: ids } });
 
-        res.status(200).json({ message: 'Countries deleted successfully' });
+        res.status(200).json({ success: true, message: 'Countries deleted successfully' });
     } catch (error) {
-        res.status(500).json({ message: 'Server error', error: error.message });
+        res.status(500).json({ success: false, message: 'Error deleting countries', error: error.message });
     }
 };
 

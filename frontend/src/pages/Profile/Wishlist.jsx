@@ -2,90 +2,112 @@ import { useEffect, useState } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 import { toast } from 'react-toastify';
 import emptyWishlistImage from '../../assets/img/empty/wishlist.png';
-import { LoadingOverlay, LoadingProductItem } from '../../components/custom/LoadingSkeletons';
+import { LoadingProductItem } from '../../components/custom/LoadingSkeletons';
 import { CustomDeleteModal, CustomPagination, EmptyState } from '../../components/custom/MUI';
 import { Header, ProfileLayout } from '../../components/custom/Profile';
-import { calculatePageCount, getPaginatedItems, handlePageChange } from '../../components/custom/utils';
 import Navbar from '../../components/Navbar/Navbar';
 import WishlistItem from '../../components/Product/Items/WishlistItem';
 import Footer from '../../components/Utils/Footer';
+import { ITEMS_PER_PAGE } from '../../services/wishlistService';
 import { clearWishlist, getWishlistCount, getWishlistItems, removeFromWishlist } from '../../store/actions/wishlistActions';
 
-const itemsPerPage = 12;
-
 const Wishlist = () => {
-    const { user, isAuthenticated } = useSelector((state) => state.auth);
-    const { wishlistItems, loading } = useSelector((state) => state.wishlist);
     const dispatch = useDispatch();
+    const { user, isAuthenticated } = useSelector((state) => state.auth);
+    const { wishlistItems, loading, pagination } = useSelector((state) => state.wishlist);
 
-    const [isModalOpen, setIsModalOpen] = useState(false);
     const [currentPage, setCurrentPage] = useState(1);
-    const [isActionLoading, setIsActionLoading] = useState(false);
+    const [pageChanging, setPageChanging] = useState(false);
+    const [isModalOpen, setIsModalOpen] = useState(false);
+    const [isClearing, setIsClearing] = useState(false);
 
     useEffect(() => {
-        if (isAuthenticated) {
-            dispatch(getWishlistItems());
-        }
-    }, [isAuthenticated, dispatch]);
+        if (!isAuthenticated) return;
+        dispatch(getWishlistItems(currentPage, ITEMS_PER_PAGE))
+            .finally(() => setPageChanging(false));
+    }, [isAuthenticated, dispatch, currentPage]);
 
-    const handleRemoveFromWishlist = async (productId) => {
-        setIsActionLoading(true);
+    const refetchWishlist = async () => {
+        try {
+            const result = await dispatch(getWishlistItems(currentPage, ITEMS_PER_PAGE));
+
+            if (result.items.length === 0 && currentPage > 1) {
+                const newPage = Math.max(1, Math.ceil((result.totalCount || 0) / ITEMS_PER_PAGE));
+                setCurrentPage(newPage);
+                await dispatch(getWishlistItems(newPage, ITEMS_PER_PAGE));
+            }
+
+            dispatch(getWishlistCount());
+            document.dispatchEvent(new Event('wishlistUpdated'));
+        } catch (error) {
+            console.error('Error refetching wishlist:', error);
+        }
+    };
+
+    const handleRemove = async (productId) => {
         try {
             await dispatch(removeFromWishlist(productId));
             toast.success('Product removed from wishlist');
-        } catch (error) {
+
+            await refetchWishlist();
+        } catch {
             toast.error('Failed to remove from wishlist');
+        }
+    };
+
+    const handleClear = async () => {
+        setIsClearing(true);
+
+        try {
+            await dispatch(clearWishlist(() => setIsModalOpen(false)));
+            toast.success('Wishlist cleared successfully');
+
+            setCurrentPage(1);
+
+            dispatch(getWishlistCount());
+            document.dispatchEvent(new Event('wishlistUpdated'));
+
+            await refetchWishlist();
+        } catch (error) {
+            toast.error('Failed to clear wishlist');
+            console.error('Error clearing wishlist:', error);
         } finally {
-            setIsActionLoading(false);
+            setIsClearing(false);
         }
     };
 
-    const handleClearWishlist = () => {
-        dispatch(clearWishlist(() => setIsModalOpen(false)));
-        toast.success('Wishlist cleared successfully');
-        dispatch(getWishlistCount());
-        document.dispatchEvent(new CustomEvent('wishlistUpdated'));
+    const handleShare = () => {
+        const url = `${window.location.origin}/wishlist/${user.id}`;
+        navigator.clipboard.writeText(url)
+            .then(() => toast.success('Wishlist link copied! Click to open', {
+                onClick: () => window.open(url, '_blank'),
+                className: 'cursor-pointer'
+            }))
+            .catch(() => toast.error('Failed to copy wishlist link'));
     };
 
-    const handleShareWishlist = () => {
-        const shareUrl = `${window.location.origin}/wishlist/${user.id}`;
-
-        navigator.clipboard.writeText(shareUrl)
-            .then(() => {
-                toast.success(
-                    <div>Wishlist link copied to clipboard! Click here to open it!</div>,
-                    { onClick: () => window.open(shareUrl, '_blank'), className: 'cursor-pointer' }
-                );
-            })
-            .catch(() => {
-                toast.error('Failed to copy wishlist link.');
-            });
+    const handlePageChangeLocal = (e, page) => {
+        setPageChanging(true);
+        setCurrentPage(page);
+        dispatch(getWishlistItems(page, ITEMS_PER_PAGE))
+            .finally(() => setPageChanging(false));
+        window.scrollTo({ top: 0, behavior: 'smooth' });
     };
 
-    const pageCount = calculatePageCount(wishlistItems, itemsPerPage);
-    const currentPageItems = getPaginatedItems(wishlistItems, currentPage, itemsPerPage);
-
-    useEffect(() => {
-        const newPageCount = calculatePageCount(wishlistItems, itemsPerPage);
-        if (currentPage > newPageCount) {
-            setCurrentPage(newPageCount > 0 ? newPageCount : 1);
-        }
-    }, [wishlistItems, currentPage]);
+    const shouldShowPagination = pagination && pagination.totalPages > 1 && wishlistItems.length > 0;
 
     return (
         <>
-            {isActionLoading && <LoadingOverlay />}
-
             <Navbar />
             <ProfileLayout>
                 <Header
                     title="Wishlist"
                     wishlistItems={wishlistItems}
                     setIsModalOpen={setIsModalOpen}
-                    handleShareWishlist={handleShareWishlist}
+                    handleShareWishlist={handleShare}
                 />
 
-                {loading ? (
+                {loading || pageChanging ? (
                     <div className="grid grid-cols-2 sm:grid-cols-2 md:grid-cols-3 gap-6">
                         <LoadingProductItem count={6} />
                     </div>
@@ -94,43 +116,43 @@ const Wishlist = () => {
                 ) : (
                     <>
                         <div className="grid grid-cols-2 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-3 xl:grid-cols-3 gap-4">
-                            {currentPageItems.map(({ product }) => (
+                            {wishlistItems.map(({ product }) => (
                                 <WishlistItem
                                     key={product._id}
                                     product={product}
-                                    onRemove={() => handleRemoveFromWishlist(product._id)}
+                                    onRemove={() => handleRemove(product._id)}
                                 />
                             ))}
                         </div>
 
-                        <div className="flex justify-start">
-                            {!loading && wishlistItems.length > 0 && (
+                        {shouldShowPagination && (
+                            <div className="flex justify-start">
                                 <CustomPagination
-                                    count={pageCount}
+                                    count={pagination.totalPages}
                                     page={currentPage}
-                                    onChange={handlePageChange(setCurrentPage)}
+                                    onChange={handlePageChangeLocal}
                                     size="medium"
                                     sx={{
                                         position: 'relative',
                                         bottom: '-2px',
-                                        '& .MuiPagination-ul': {
-                                            justifyContent: 'flex-start',
-                                        },
+                                        '& .MuiPagination-ul': { justifyContent: 'flex-start' },
                                     }}
                                 />
-                            )}
-                        </div>
+                            </div>
+                        )}
                     </>
                 )}
             </ProfileLayout>
+
             <Footer />
 
             <CustomDeleteModal
                 open={isModalOpen}
                 onClose={() => setIsModalOpen(false)}
-                onDelete={handleClearWishlist}
                 title="Clear Wishlist"
-                message="Are you sure you want to clear the wishlist?"
+                message="Are you sure you want to clear your wishlist?"
+                onDelete={handleClear}
+                loading={isClearing}
             />
         </>
     );

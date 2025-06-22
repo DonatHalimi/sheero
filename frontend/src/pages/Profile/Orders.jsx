@@ -1,103 +1,74 @@
-import { useEffect, useState } from 'react';
+import { debounce } from 'lodash';
+import { useCallback, useEffect, useState } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
-import { Link } from 'react-router-dom';
 import emptyOrdersImage from '../../assets/img/empty/orders.png';
 import { paginationSx } from '../../assets/sx';
 import { LoadingOrderItem } from '../../components/custom/LoadingSkeletons';
 import { CustomPagination, EmptyState } from '../../components/custom/MUI';
 import { Header, ProfileLayout } from '../../components/custom/Profile';
-import { calculatePageCount, getPaginatedItems, handlePageChange } from '../../components/custom/utils';
+import { getStatusColor } from '../../components/custom/utils';
 import Navbar from '../../components/Navbar/Navbar';
 import OrderItem from '../../components/Product/Items/OrderItem';
 import Footer from '../../components/Utils/Footer';
+import { ITEMS_PER_PAGE } from '../../services/orderService';
 import { getUserOrders } from '../../store/actions/orderActions';
-import { getImageUrl } from '../../utils/config';
-
-const itemsPerPage = 8;
 
 const Orders = () => {
     const { user } = useSelector((state) => state.auth);
-    const { orders, loading } = useSelector((state) => state.orders);
+    const { orders, pagination, loading } = useSelector((state) => state.orders);
     const dispatch = useDispatch();
 
     const [currentPage, setCurrentPage] = useState(1);
     const [searchTerm, setSearchTerm] = useState('');
-    const [statusFilter, setStatusFilter] = useState('All');
+    const [statusFilter, setStatusFilter] = useState('all');
+    const [pageChanging, setPageChanging] = useState(false);
+
+    const showBars = pagination.totalOrders > 0;
+
+    const debouncedFetchOrders = useCallback(
+        debounce((userId, page, limit, search, status) => {
+            dispatch(getUserOrders(userId, page, limit, search, status)).finally(() => {
+                setPageChanging(false);
+            });
+        }, 500),
+        [dispatch]
+    );
 
     useEffect(() => {
         if (user?.id) {
-            dispatch(getUserOrders(user.id));
+            dispatch(getUserOrders(user.id, currentPage, ITEMS_PER_PAGE, searchTerm, statusFilter));
         }
-    }, [dispatch, user]);
+    }, [dispatch, user, currentPage, statusFilter]);
 
     useEffect(() => {
+        if (user?.id) {
+            setCurrentPage(1);
+            debouncedFetchOrders(user.id, 1, ITEMS_PER_PAGE, searchTerm, statusFilter);
+        }
+    }, [user?.id, searchTerm, debouncedFetchOrders, statusFilter]);
+
+    const handleStatusFilterChange = (newStatus) => {
+        setStatusFilter(newStatus);
         setCurrentPage(1);
-    }, [searchTerm, statusFilter]);
-
-    const filteredOrders = Array.isArray(orders)
-        ? orders.filter(
-            ({ _id, paymentStatus, paymentMethod, totalAmount, paymentIntentId, status, products }) => {
-                const fields = [
-                    _id,
-                    paymentStatus,
-                    paymentMethod,
-                    totalAmount?.toString(),
-                    paymentIntentId,
-                    status,
-                    ...products.flatMap(({ product }) => [
-                        product?.name?.toLowerCase(),
-                        product?.quantity?.toString(),
-                        product?.price?.toString(),
-                    ]),
-                ];
-
-                const matchesSearchTerm = fields.some((field) =>
-                    field?.toLowerCase().includes(searchTerm.toLowerCase())
-                );
-
-                const matchesStatusFilter = statusFilter === 'All' || status === statusFilter;
-
-                return matchesSearchTerm && matchesStatusFilter;
-            }
-        ) : [];
-
-    const renderProductImages = (products) => {
-        if (!Array.isArray(products)) return null;
-        return products.map(product => {
-            const { _id, image, name, slug } = product.product || {};
-            if (!_id || !image || !name || !slug) return null;
-            return (
-                <Link key={_id} to={`/${slug}`}>
-                    <img
-                        src={getImageUrl(image)}
-                        alt={name}
-                        className="w-20 h-20 object-contain rounded cursor-pointer"
-                    />
-                </Link>
-            );
-        });
     };
 
-    const statusClasses = {
-        pending: 'text-yellow-500',
-        processed: 'text-cyan-500',
-        shipped: 'text-blue-700',
-        delivered: 'text-green-500',
-        canceled: 'text-red-500',
-        default: 'text-gray-500'
+    const handleSearchTermChange = (newSearchTerm) => {
+        setSearchTerm(newSearchTerm);
     };
 
-    const getStatusColor = (status) => `${statusClasses[status] || statusClasses.default} capitalize bg-stone-50 rounded-md px-1`;
+    const handlePageChangeLocal = (e, page) => {
+        setPageChanging(true);
+        setCurrentPage(page);
+        dispatch(getUserOrders(user.id, page, ITEMS_PER_PAGE, searchTerm, statusFilter))
+            .finally(() => setPageChanging(false));
+        window.scrollTo({ top: 0, behavior: 'smooth' });
+    };
 
-    const pageCount = calculatePageCount(filteredOrders, itemsPerPage);
-    const currentPageItems = getPaginatedItems(filteredOrders, currentPage, itemsPerPage);
-
-    useEffect(() => {
-        const newPageCount = calculatePageCount(orders, itemsPerPage);
-        if (currentPage > newPageCount) {
-            setCurrentPage(newPageCount > 0 ? newPageCount : 1);
-        }
-    }, [orders, currentPage]);
+    const showEmptyState = () => {
+        if (loading || pageChanging) return false;
+        if (!Array.isArray(orders) || orders.length === 0) return true;
+        return false;
+    };
 
     return (
         <>
@@ -106,17 +77,17 @@ const Orders = () => {
                 <Header
                     title='Orders'
                     searchTerm={searchTerm}
-                    setSearchTerm={setSearchTerm}
-                    showSearch={orders.length > 0}
-                    showFilter={orders.length > 0}
+                    setSearchTerm={handleSearchTermChange}
+                    showSearch={showBars}
+                    showFilter={showBars}
                     statusFilter={statusFilter}
-                    setStatusFilter={setStatusFilter}
+                    setStatusFilter={handleStatusFilterChange}
                     placeholder='Search orders...'
                 />
 
-                {loading ? (
-                    <LoadingOrderItem />
-                ) : filteredOrders.length === 0 ? (
+                {loading || pageChanging ? (
+                    <LoadingOrderItem length={ITEMS_PER_PAGE} />
+                ) : showEmptyState() ? (
                     <EmptyState
                         imageSrc={emptyOrdersImage}
                         context="orders"
@@ -127,25 +98,26 @@ const Orders = () => {
                 ) : (
                     <div className="flex flex-col">
                         <div className="grid gap-4 mb-3">
-                            {currentPageItems.map(order => (
+                            {orders.map(order => (
                                 <OrderItem
                                     key={order._id}
                                     order={order}
-                                    renderProductImages={renderProductImages}
-                                    getStatusColor={getStatusColor}
+                                    getStatusColor={(status) => getStatusColor(status, 'order')}
                                 />
                             ))}
                         </div>
 
-                        <div className="flex justify-start sm:justify-start">
-                            <CustomPagination
-                                count={pageCount}
-                                page={currentPage}
-                                onChange={handlePageChange(setCurrentPage)}
-                                size="medium"
-                                sx={paginationSx}
-                            />
-                        </div>
+                        {pagination.totalPages > 1 && (
+                            <div className="flex justify-start sm:justify-start">
+                                <CustomPagination
+                                    count={pagination.totalPages}
+                                    page={currentPage}
+                                    onChange={handlePageChangeLocal}
+                                    size="medium"
+                                    sx={paginationSx}
+                                />
+                            </div>
+                        )}
                     </div>
                 )}
             </ProfileLayout>

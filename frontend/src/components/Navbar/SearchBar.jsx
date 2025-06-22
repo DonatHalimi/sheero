@@ -23,8 +23,8 @@ const SearchBar = () => {
             setTimeout(async () => {
                 if (query.length > 2) {
                     try {
-                        const { data } = await fetchSearchResultsService(query);
-                        setSuggestions(data.results);
+                        const response = await fetchSearchResultsService(query);
+                        setSuggestions(response.data.results);
                     } catch (error) {
                         console.error('Error fetching autocomplete results:', error);
                     }

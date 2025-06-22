@@ -22,7 +22,7 @@ const Footer = () => {
             { to: '/profile/wishlist', label: 'Wishlist' },
         ],
         contact: [
-            { linkType: 'external', href: 'mailto:support@sheero.com', icon: <Email />, label: 'Email' },
+            { linkType: 'external', href: 'mailto:sheero.info@gmail.com', icon: <Email />, label: 'Email' },
             { linkType: 'external', href: 'tel:044221112', icon: <Phone />, label: 'Phone' },
             { linkType: 'internal', to: '/contact-us', icon: <ContactMail />, label: 'Contact' },
         ]

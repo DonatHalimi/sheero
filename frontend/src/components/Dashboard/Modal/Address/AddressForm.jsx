@@ -31,8 +31,8 @@ const AddressForm = ({
         setFieldValue('city', null);
         if (newValue) {
             try {
-                const { data } = await getCitiesByCountryService(newValue._id);
-                setCities(data.map(city => ({ ...city, firstLetter: city.name[0].toUpperCase() })));
+                const response = await getCitiesByCountryService(newValue._id);
+                setCities(response.data.map(city => ({ ...city, firstLetter: city.name[0].toUpperCase() })));
             } catch {
                 setCities([]);
             }

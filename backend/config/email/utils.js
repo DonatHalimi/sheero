@@ -135,7 +135,7 @@ const orderBodyMessages = {
   processed: `We will notify you once your order is shipped.`,
   shipped: `If there are any updates, our team will contact you.`,
   delivered: `Thank you for choosing sheero, we appreciate your trust!`,
-  canceled: `If you have any questions, please contact our support team at <a href="mailto:support@sheero.com" style="color: #57534E; text-decoration: underline; font-weight: bold;">support@sheero.com</a>.`,
+  canceled: `If you have any questions, please contact our support team at <a href="mailto:sheero.info@gmail.com" style="color: #57534E; text-decoration: underline; font-weight: bold;">sheero.info@gmail.com</a>.`,
 };
 
 const returnStatusMessages = {
@@ -149,7 +149,7 @@ const returnBodyMessages = {
   pending: `We will notify you once your return request is approved and then you will be able to return your items.`,
   approved: `If there are any updates, our team will contact you.`,
   processed: `Thank you for choosing sheero, we appreciate your trust!`,
-  rejected: `If you have any questions, please contact our support team at <a href="mailto:support@sheero.com" style="color: #57534E; text-decoration: underline; font-weight: bold;">support@sheero.com</a>.`,
+  rejected: `If you have any questions, please contact our support team at <a href="mailto:sheero.info@gmail.com" style="color: #57534E; text-decoration: underline; font-weight: bold;">sheero.info@gmail.com</a>.`,
 };
 
 function getBrandHeaderHtml(brandImages = {}) {
@@ -166,7 +166,7 @@ function getBrandHeaderHtml(brandImages = {}) {
 function getEmailFooterHtml() {
   return `
     <p style="color: #666; font-size: 12px; margin-top: 20px;">
-      If you have any questions, please <a href="https://sheero.onrender.com/contact-us" style="color: #57534E; text-decoration: underline;">contact us</a> through our contact form or through our <a href="mailto:support@sheero.com" style="color: #57534E; text-decoration: underline;">email address</a>.
+      If you have any questions, please <a href="https://sheero.onrender.com/contact-us" style="color: #57534E; text-decoration: underline;">contact us</a> through our contact form or through our <a href="mailto:sheero.info@gmail.com" style="color: #57534E; text-decoration: underline;">email address</a>.
     </p>
 
     <p style="font-size: 14px; color: #333; margin-bottom: 12px;">

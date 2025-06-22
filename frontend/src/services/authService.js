@@ -16,19 +16,19 @@ export const validateResetTokenService = (token) => axiosInstance.get(`/auth/val
 
 export const loginUserService = (email, password) => axiosInstance.post('/auth/login', { email, password });
 
-export const enable2faService = () => axiosInstance.post('/auth/enable-2fa');
+export const enable2faService = (method = 'email') => axiosInstance.post('/auth/enable-2fa', { method });
 
-export const disable2faService = () => axiosInstance.post('/auth/disable-2fa');
+export const disable2faService = (method = 'email') => axiosInstance.post('/auth/disable-2fa', { method });
 
 export const verify2faService = (email, otp, action) => axiosInstance.post('/auth/verify-2fa', { email, otp, action });
 
-export const resend2faService = (email, action) => axiosInstance.post('/auth/resend-2fa', { action, email });
+export const resend2faService = (email, action, method = 'email') => axiosInstance.post('/auth/resend-2fa', { email, action, method });
 
 export const getExistingSecretService = () => axiosInstance.get('/auth/get-existing-secret');
 
 export const enableAuthenticator2FAService = () => axiosInstance.post('/auth/enable-2fa-auth');
 
-export const verify2faAuthService = (email, token, action) => axiosInstance.post('/auth/verify-2fa-auth', { email, token, action, isAuthenticator: true });
+export const verify2faAuthService = (email, token, action, isAuthenticator = true) => axiosInstance.post('/auth/verify-2fa-auth', { email, token, action, isAuthenticator });
 
 export const verifySocialLogin2FAService = (data) => axiosInstance.post('/auth/verify-social-2fa', data);
 

@@ -1,7 +1,7 @@
 const express = require('express');
-const { createProduct, getProducts, getProductBySlug, getProductsByCategory,
-    getProductsBySubCategory, getProductsBySubSubCategory, updateProduct,
-    deleteProduct, deleteProducts, searchProducts, createProductBasic, uploadProductImage, addProductVariantsAndDetails,
+const {
+    createProduct, getProducts, getProductsPaginated, getProductBySlug, updateProduct, getProductsByCategory, getProductsBySubCategory,
+    getProductsBySubSubCategory, deleteProduct, deleteProducts, searchProducts, createProductBasic, uploadProductImage, addProductVariantsAndDetails
 } = require('../controllers/productController');
 const { subscribeForRestock, getUserRestockSubscription, deleteUserRestockSubscription, getAllRestockSubscriptions,
     deleteRestockSubscription, deleteRestockSubscriptions
@@ -13,6 +13,7 @@ const router = express.Router();
 
 router.post('/create', requireAuthAndRole(['admin', 'productManager']), upload.single('image'), createProduct);
 router.get('/get', getProducts);
+router.get('/get/paginated', getProductsPaginated);
 router.get('/get-by-slug/:slug', getProductBySlug);
 router.get('/get-by-category/:id', getProductsByCategory)
 router.get('/get-by-subcategory/:slug', getProductsBySubCategory);

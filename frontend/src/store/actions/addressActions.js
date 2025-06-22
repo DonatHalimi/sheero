@@ -19,7 +19,7 @@ export const getAddress = (addressId) => async (dispatch) => {
     }
 };
 
-export const getAddressByUser = (userId) => async (dispatch) => {
+export const getUserAddress = (userId) => async (dispatch) => {
     try {
         const res = await getAddressByUserService(userId);
 

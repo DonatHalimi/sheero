@@ -1,199 +1,13 @@
-import {
-  AllInbox,
-  AllInboxOutlined,
-  Apartment,
-  ApartmentOutlined,
-  Category,
-  CategoryOutlined,
-  Collections,
-  CollectionsOutlined,
-  Contacts,
-  ContactsOutlined,
-  Dashboard,
-  DashboardCustomize,
-  DashboardCustomizeOutlined,
-  DashboardOutlined,
-  DryCleaning,
-  DryCleaningOutlined,
-  Explore,
-  ExploreOutlined,
-  Flag,
-  FlagOutlined,
-  Help,
-  HelpOutlineOutlined,
-  Inbox,
-  InboxOutlined,
-  Inventory,
-  Inventory2Outlined,
-  Mail,
-  MailOutlined,
-  MoveToInbox,
-  MoveToInboxOutlined,
-  People,
-  PeopleOutlineOutlined,
-  Person,
-  PersonOutline,
-  PrecisionManufacturing,
-  PrecisionManufacturingOutlined,
-  Room,
-  RoomOutlined,
-  Star,
-  StarHalf,
-  Widgets,
-  WidgetsOutlined
-} from '@mui/icons-material';
+import { Dashboard, DashboardCustomize, DashboardCustomizeOutlined, DashboardOutlined, } from '@mui/icons-material';
 import { Tooltip } from '@mui/material';
 import { useEffect, useState } from 'react';
 import { useSelector } from 'react-redux';
-import { useNavigate } from 'react-router-dom';
+import { useLocation, useNavigate } from 'react-router-dom';
 import { DashboardSearchBar } from '../../components/custom/Dashboard';
 import { ActiveListItem, CollapsibleListItem } from '../../components/custom/MUI';
 import { getLocalStorageState, saveLocalStorageState } from '../../components/custom/utils';
-import { selectIsContentManager, selectIsOrderManager, selectIsProductManager } from '../../store/actions/authActions';
-
-// User related pages
-const userMenuItems = [
-  {
-    id: 'users',
-    icon: { active: Person, inactive: PersonOutline },
-    label: 'Users'
-  },
-  {
-    id: 'roles',
-    icon: { active: People, inactive: PeopleOutlineOutlined },
-    label: 'Roles'
-  },
-  {
-    id: 'orders',
-    icon: { active: Inbox, inactive: InboxOutlined },
-    label: 'Orders'
-  },
-  {
-    id: 'returns',
-    icon: { active: MoveToInbox, inactive: MoveToInboxOutlined },
-    label: 'Returns'
-  },
-  {
-    id: 'reviews',
-    icon: { active: Star, inactive: StarHalf },
-    label: 'Reviews'
-  },
-];
-
-// Product related pages
-const productMenuItems = [
-  {
-    id: 'products',
-    icon: { active: DryCleaning, inactive: DryCleaningOutlined },
-    label: 'Products'
-  },
-  {
-    id: 'images',
-    icon: { active: Collections, inactive: CollectionsOutlined },
-    label: 'Images'
-  },
-  {
-    id: 'faqs',
-    icon: { active: Help, inactive: HelpOutlineOutlined },
-    label: 'FAQs'
-  },
-  {
-    id: 'contacts',
-    icon: { active: Contacts, inactive: ContactsOutlined },
-    label: 'Contacts'
-  },
-];
-
-// Newsletter related pages
-const newsLetterMenuItems = [
-  {
-    id: 'productRestockSubscriptions',
-    icon: { active: Inventory, inactive: Inventory2Outlined },
-    label: 'Restock'
-  }
-]
-
-// Category related pages
-const categoryMenuItems = [
-  {
-    id: 'categories',
-    icon: { active: Inbox, inactive: InboxOutlined },
-    label: 'Categories'
-  },
-  {
-    id: 'subcategories',
-    icon: { active: Widgets, inactive: WidgetsOutlined },
-    label: 'Subcategories'
-  },
-  {
-    id: 'subsubcategories',
-    icon: { active: Category, inactive: CategoryOutlined },
-    label: 'Subsubcategories'
-  },
-];
-
-// Address related pages
-const addressMenuItems = [
-  {
-    id: 'countries',
-    icon: { active: Flag, inactive: FlagOutlined },
-    label: 'Countries'
-  },
-  {
-    id: 'cities',
-    icon: { active: Apartment, inactive: ApartmentOutlined },
-    label: 'Cities'
-  },
-  {
-    id: 'addresses',
-    icon: { active: Room, inactive: RoomOutlined },
-    label: 'Addresses'
-  },
-  {
-    id: 'suppliers',
-    icon: { active: PrecisionManufacturing, inactive: PrecisionManufacturingOutlined },
-    label: 'Suppliers'
-  },
-];
-
-// Collapsible sections
-const mainSections = [
-  {
-    id: 'users',
-    icon: { active: People, inactive: PeopleOutlineOutlined },
-    label: 'User',
-    items: userMenuItems,
-    stateKey: 'usersOpen'
-  },
-  {
-    id: 'products',
-    icon: { active: Inventory, inactive: Inventory2Outlined },
-    label: 'Product',
-    items: productMenuItems,
-    stateKey: 'productsOpen'
-  },
-  {
-    id: 'categories',
-    icon: { active: AllInbox, inactive: AllInboxOutlined },
-    label: 'Category',
-    items: categoryMenuItems,
-    stateKey: 'categoriesOpen'
-  },
-  {
-    id: 'newsletters',
-    icon: { active: Mail, inactive: MailOutlined },
-    label: 'Newsletters',
-    items: newsLetterMenuItems,
-    stateKey: 'newslettersOpen'
-  },
-  {
-    id: 'addresses',
-    icon: { active: Explore, inactive: ExploreOutlined },
-    label: 'Address',
-    items: addressMenuItems,
-    stateKey: 'addressesOpen'
-  },
-];
+import { selectIsContentManager, selectIsCustomerSupport, selectIsOrderManager, selectIsProductManager } from '../../store/actions/authActions';
+import { mainSections } from './menuSections';
 
 export const mainListItems = ({ setCurrentView, collapsed }) => {
   const defaultState = {
@@ -209,35 +23,44 @@ export const mainListItems = ({ setCurrentView, collapsed }) => {
   const [menuState, setMenuState] = useState(() => getLocalStorageState('menuState', defaultState));
   const [activeItem, setActiveItem] = useState('');
   const navigate = useNavigate();
+  const location = useLocation();
+
   const isOrderManager = useSelector(selectIsOrderManager);
   const isContentManager = useSelector(selectIsContentManager);
+  const isCustomerSupport = useSelector(selectIsCustomerSupport);
   const isProductManager = useSelector(selectIsProductManager);
 
-  const filterSectionItems = (section, allowedItems) => ({
-    ...section,
-    items: section.items.filter(item => allowedItems.includes(item.id)),
-  });
+  const canSearch = (isOrderManager || isContentManager || isCustomerSupport || isProductManager);
+
+  const userRoles = {
+    isOrderManager,
+    isContentManager,
+    isCustomerSupport,
+    isProductManager,
+  };
+
+  const roleAccessMap = {
+    isOrderManager: ['orders', 'products'],
+    isContentManager: ['faqs', 'images'],
+    isCustomerSupport: ['contacts'],
+    isProductManager: [
+      'reviews', 'products', 'categories',
+      'subcategories', 'subsubcategories',
+      'productRestockSubscriptions', 'suppliers'
+    ],
+  };
+
+  const allowedItems = Object.entries(userRoles)
+    .filter(([_, hasRole]) => hasRole)
+    .flatMap(([role]) => roleAccessMap[role] || []);
 
   const getFilteredSections = () => {
-    let allowedItems;
+    if (allowedItems.length === 0) return mainSections;
 
-    switch (true) {
-      case isOrderManager:
-        allowedItems = ['orders', 'products'];
-        break;
-      case isContentManager:
-        allowedItems = ['faqs', 'images'];
-        break;
-      case isProductManager:
-        allowedItems = ['reviews', 'products', 'categories', 'subcategories', 'subsubcategories', 'productRestockSubscriptions', 'suppliers'];
-        break;
-      default:
-        return mainSections;
-    }
-
-    return mainSections
-      .map(section => filterSectionItems(section, allowedItems))
-      .filter(section => section.items.length > 0);
+    return mainSections.map(section => ({
+      ...section,
+      items: section.items.filter(item => allowedItems.includes(item.id)),
+    })).filter(section => section.items.length > 0);
   };
 
   const handleItemClick = (view) => {
@@ -253,9 +76,9 @@ export const mainListItems = ({ setCurrentView, collapsed }) => {
   };
 
   useEffect(() => {
-    const path = window.location.pathname.split('/')[2];
+    const path = location.pathname.split('/')[2];
     setActiveItem(path || 'users');
-  }, []);
+  }, [location.pathname]);
 
   const renderMenuItem = ({ id, icon, label }) => (
     <div key={id}>
@@ -290,7 +113,7 @@ export const mainListItems = ({ setCurrentView, collapsed }) => {
 
   return (
     <>
-      {!(isOrderManager || isContentManager || isProductManager) && !collapsed && (
+      {!canSearch && !collapsed && (
         <>
           <DashboardSearchBar
             collapsed={collapsed}
@@ -330,29 +153,3 @@ export const mainListItems = ({ setCurrentView, collapsed }) => {
     </>
   );
 };
-
-export const secondaryListItems = (
-  <>
-    {/* <ListSubheader component="div" inset>
-      Saved reports
-    </ListSubheader>
-    <ListItemButton>
-      <ListItemIcon>
-        <AssignmentIcon />
-      </ListItemIcon>
-      <ListItemText primary="Current month" />
-    </ListItemButton>
-    <ListItemButton>
-      <ListItemIcon>
-        <AssignmentIcon />
-      </ListItemIcon>
-      <ListItemText primary="Last quarter" />
-    </ListItemButton>
-    <ListItemButton>
-      <ListItemIcon>
-        <AssignmentIcon />
-      </ListItemIcon>
-      <ListItemText primary="Year-end sale" />
-    </ListItemButton> */}
-  </>
-);

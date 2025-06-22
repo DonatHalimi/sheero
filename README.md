@@ -1,11 +1,10 @@
 ![sheero logo](frontend/src/assets/img/brand/logo.png)
 
-# sheero
-
 ## Table of Contents
 
-- [Overview](#overview)  
 - [Table of Contents](#table-of-contents)  
+- [Overview](#overview)
+- [Features](#features)
 - [Installation](#installation)  
   - [.env explanations](#env-explanations)  
   - [Setting up Google and Facebook OAuth](#setting-up-google-and-facebook-oauth)  
@@ -13,7 +12,6 @@
     - [Facebook App ID and App Secret](#facebook-app-id-and-app-secret)  
   - [Setting Up SMTP with Gmail](#setting-up-smtp-with-gmail)
 - [Usage](#usage)  
-- [Features](#features)  
 - [Technologies Used](#technologies-used)  
   - [Frontend](#frontend)  
   - [Backend](#backend)  
@@ -26,29 +24,72 @@ This is a full-stack e-commerce platform built using the MERN (MongoDB, Express.
 
 You can check out the live demo of sheero [here](https://sheero.onrender.com).
 
+## Features
+
+- **User Authentication and Authorization**:
+  - [Authentication](https://auth0.com/intro-to-iam/what-is-authentication) and [authorization](https://auth0.com/intro-to-iam/what-is-authorization) using [JSON Web Tokens](https://jwt.io/introduction) through [cookies](https://www.cloudflare.com/learning/privacy/what-are-cookies/).
+  - Robust token management using a rotation-based refresh token strategy:
+    - [Access Token](https://auth0.com/docs/secure/tokens/access-tokens): A short-lived token used for authentication and authorization, with a lifespan of 15 minutes.
+    - [Refresh Token](https://auth0.com/docs/secure/tokens/refresh-tokens): A long-lived token used for refreshing the access token when it expires, with a lifespan of 7 days.
+    - [Refresh Token Rotation](https://auth0.com/docs/secure/tokens/refresh-tokens/refresh-token-rotation): On each access token refresh, a new refresh token is generated and the old one is revoked, ensuring that compromised tokens cannot be used for unauthorized access.
+  - [Google](https://developers.google.com) and [Facebook](https://developers.facebook.com) login options for seamless authentication.
+  - [OTP](https://en.wikipedia.org/wiki/One-time_password) account verification through email during the registration process for enhanced security, via local SMTP configuration.
+  - Users can add 2FA to their account for enhanced security. They have two options:  
+    - **Email-based 2FA**: Users will receive a one-time code via email to enable email-based 2FA. A one-time code will be sent to the user's email address on each login. 
+    - **Authenticator app-based 2FA**: Users can scan a QR code or enter a secret key into an authenticator app (e.g., Google Authenticator, Microsoft Authenticator or Authy). A time-based code from the app will be required on each login.
+  - Users can reset their password with a reset link sent through their email.
+
+- **Core Functionality**:
+  - [Redux state management](https://redux.js.org/introduction/getting-started) for handling application state.
+  - Address management for shipping.
+  - Product management with categories.
+  - Wishlist functionality for saving favorite products.
+  - Shopping cart functionality.
+  - Flexible payment options via [Stripe](https://stripe.com) or cash on delivery.
+  - Real-time order tracking to monitor purchase progress.
+  - Ability to submit product reviews and request returns for products in their orders with the status marked as `delivered`.
+  - Personalized email notifications for order status updates, return request status updates and product reviews.
+  - Export user and address data as JSON, order and return request data as PDF and all admin dashboard data as Excel, CSV or JSON.
+  - Users can subscribe to product restock notifications and then will receive an email when the product is restocked.
+  - Automatic email confirmation sent when users submit a message through the contact form.
+
+- **Role-Based Access Control**:
+  - **admin**:
+    - Full access to the admin dashboard.
+  - **user**:
+    - Can browse products, add items to their wishlist and shopping cart, make purchases and view their order history.
+  - **customerSupport**:
+    - Receives the contact details of users who send contact emails through the contact form so that they can reply to them as soon as possible. Can also view or delete contact emails in the admin dashboard.
+  - **orderManager**:
+    - Processes incoming orders through real-time notifications and email alerts, verifying inventory before updating order status.
+  - **contentManager**:
+    - Can create, read, update and delete slideshow images and FAQs in the admin dashboard.
+  - **productManager**:
+    - Can create, read, update and delete products, categories, subcategories, sub-subcategories, reviews, product restock subscriptions and suppliers in the admin dashboard.
+
 ## Installation
 
 To set up the project locally, follow these steps:
 
-1. Clone the repository:
+**1. Clone the repository:**
    ```bash
    git clone repository_url
    cd project_directory
    ```
 
-2. Install the backend dependencies:
+**2. Install the backend dependencies:**
    ```bash
    cd backend
    npm i
    ```
 
-3. Install the frontend dependencies:
+**3. Install the frontend dependencies:**
    ```bash
    cd frontend
    npm i
    ```
 
-4. Create a `.env` file in both the `backend` and `frontend` directories to store environment variables:
+**4. Create a `.env` file in both the `backend` and `frontend` directories to store environment variables:**
 
    **Backend (`backend/.env`)**
    ```bash
@@ -95,7 +136,7 @@ To set up the project locally, follow these steps:
 
 ### **Google Client ID and Client Secret Setup**
 
-Google's OAuth credentials are required for integrating Google login into your application. Follow these steps:
+Google's OAuth credentials are required for integrating Google login into the application. Follow these steps:
 
 1. **Go to Google Cloud Console:**
    - Visit [Google Cloud Console](https://console.cloud.google.com/).
@@ -133,9 +174,9 @@ Google's OAuth credentials are required for integrating Google login into your a
 
 ---
 
-### **Facebook App ID and App Secret**
+### **Facebook App ID and App Secret Setup**
 
-Facebook credentials are needed for enabling Facebook login in your app. Follow these steps.
+Facebook OAuth credentials are required for integrating Facebook login into the application. Follow these steps:
 
 1. **Go to Meta for Developers:**
    - Visit [Meta for Developers](https://developers.facebook.com/).
@@ -244,45 +285,6 @@ After running ``npm start`` in the backend directory, the application will autom
 ## Usage
 
 Once the application is running, you can access it in your web browser at `http://localhost:3000`. You can register a new account, browse products, add an address, add items to your cart and make purchases.
-
-## Features
-
-- **User Authentication and Authorization**:
-  - [Authentication](https://auth0.com/intro-to-iam/what-is-authentication) and [authorization](https://auth0.com/intro-to-iam/what-is-authorization) using [JSON Web Tokens](https://jwt.io/introduction) through [cookies](https://www.cloudflare.com/learning/privacy/what-are-cookies/).
-  - [Google](https://developers.google.com) and [Facebook](https://developers.facebook.com) login options for seamless authentication.
-  - [OTP](https://en.wikipedia.org/wiki/One-time_password) account verification through email during the registration process for enhanced security, via local SMTP configuration.
-  - Users can reset their password with a reset link sent through their email.
-  - Users can add 2FA to their account for enhanced security. They have two options:  
-    - **Email-based 2FA**: A one-time code is sent to their registered email during login.  
-    - **Authenticator app-based 2FA**: Users can scan a QR code or enter a secret key into an authenticator app (e.g., Google Authenticator, Microsoft Authenticator or Authy). A time-based code from the app will be required at each login.
-
-- **Core Functionality**:
-  - [Redux state management](https://redux.js.org/introduction/getting-started) for handling application state.
-  - Address management for shipping.
-  - Product management with categories.
-  - Wishlist for saving your favorite products.
-  - Shopping cart functionality.
-  - Simple payment options with [Stripe](https://stripe.com) or cash.
-  - Real-time order tracking for updates on your purchases.
-  - Users can submit reviews and request returns for products in their orders with the status marked as `delivered`.
-  - Personalized email notifications for order status updates, return request status updates and product reviews.
-  - Export user and address data as JSON, order and return request data as PDF and all admin dashboard data as Excel or JSON.
-  - Users can subscribe to product restock notifications and then will receive an email when the product is restocked.
-  - Users will receive an email when they send a contact email through the contact form.
-
-- **Role-Based Access Control**:
-  - **admin**:
-    - Full access to the admin dashboard.
-  - **user**:
-    - Can browse products, add items to their cart, make purchases and view their order history.
-  - **customerSupport**:
-    - Receives the contact details of users who send contact emails through the contact form so that they can reply to them as soon as possible.
-  - **orderManager**:
-    - Processes incoming orders through real-time notifications and email alerts, verifying inventory before updating order status.
-  - **contentManager**:
-    - Can create, read, update and delete slideshow images and FAQs in the admin dashboard.
-  - **productManager**:
-    - Can create, read, update and delete products, categories, subcategories, sub-subcategories, reviews, product restock subscriptions and suppliers in the admin dashboard.
 
 ### Technologies Used
 

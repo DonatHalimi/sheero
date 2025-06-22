@@ -10,26 +10,21 @@ import { dashboardBoxSx, dashboardDrawerSx } from '../../assets/sx';
 import { DashboardNavbar } from '../../components/custom/Dashboard';
 import { DashboardCollapse, Drawer } from '../../components/custom/MUI';
 import { getLocalStorageState, saveLocalStorageState } from '../../components/custom/utils';
-import { logoutUser, selectIsAdmin, selectIsContentManager, selectIsOrderManager, selectIsProductManager } from '../../store/actions/authActions';
+import { logoutUser, selectIsAdmin, selectIsContentManager, selectIsCustomerSupport, selectIsOrderManager, selectIsProductManager } from '../../store/actions/authActions';
 import { DashboardThemeProvider } from '../../utils/ThemeContext';
-import { mainListItems, secondaryListItems } from './listItems';
+import { mainListItems } from './listItems';
 
 /**
- * A layout component for the dashboard pages. It provides a
- * navigation bar on the left and a main content area for the
- * pages. It also handles the user authentication and provides
- * a logout button in the navigation bar.
+ * A layout component for the dashboard pages. It provides a navigation bar on the left and a main content area for the pages.
  *
- * The component expects the following props:
+ * The component uses the following props from the Redux store:
  *
- * - `isAuthenticated`: a boolean indicating whether the user is
- *   authenticated or not.
- * - `isAdmin`: a boolean indicating whether the user is an admin
- *   or not.
- * - `isOrderManager`: a boolean indicating whether the user is an
- *   order manager or not.
- * - `isContentManager`: a boolean indicating whether the user is a
- *   content manager or not.
+ * - `isAuthenticated`: a boolean indicating whether the user is authenticated or not.
+ * - `isAdmin`: a boolean indicating whether the user is an admin or not.
+ * - `isOrderManager`: a boolean indicating whether the user is an order manager or not.
+ * - `isContentManager`: a boolean indicating whether the user is a content manager or not.
+ * - `isCustomerSupport`: a boolean indicating whether the user is a customer support or not.
+ * - `isProductManager`: a boolean indicating whether the user is a product manager or not.
  *
  * The component returns a JSX element that renders the layout.
  */
@@ -38,6 +33,7 @@ const DashboardLayout = () => {
     const isAdmin = useSelector(selectIsAdmin);
     const isOrderManager = useSelector(selectIsOrderManager);
     const isContentManager = useSelector(selectIsContentManager);
+    const isCustomerSupport = useSelector(selectIsCustomerSupport);
     const isProductManager = useSelector(selectIsProductManager);
 
     const dispatch = useDispatch();
@@ -73,6 +69,7 @@ const DashboardLayout = () => {
                     isAdmin={isAdmin}
                     isOrderManager={isOrderManager}
                     isContentManager={isContentManager}
+                    isCustomerSupport={isCustomerSupport}
                     isProductManager={isProductManager}
                 />
                 <Drawer
@@ -85,7 +82,6 @@ const DashboardLayout = () => {
                     <div className="custom-scrollbar">
                         <List component="nav">
                             {mainListItems({ setCurrentView: () => { }, collapsed: !open })}
-                            {secondaryListItems}
                         </List>
                     </div>
                 </Drawer>

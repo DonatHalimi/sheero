@@ -1070,7 +1070,7 @@ function generateLoginNotificationHtml(user, loginData, options = {}) {
           <p style="font-size: 18px; color: #57534E; margin-bottom: 16px;">Hello <strong>${user.firstName} ${user.lastName}</strong>,</p>
           
           <p style="font-size: 16px; color: #57534E; line-height: 1.5; margin-bottom: 20px;">
-              We detected a recent login to your sheero account with the email address <strong>${user.email}</strong>. If this was you, no action is needed.
+              We have detected a recent login to your sheero account with the email address <strong>${user.email}</strong>. If this was you, no action is needed.
               If this isn't you, please change your password as soon as possible.
           </p>
 

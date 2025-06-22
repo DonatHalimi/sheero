@@ -3,7 +3,6 @@ import { useDispatch, useSelector } from 'react-redux';
 import { useNavigate } from 'react-router-dom';
 import { toast } from 'react-toastify';
 import NoImage from '../../../assets/img/errors/product-not-found.png';
-import { LoadingOverlay } from '../../../components/custom/LoadingSkeletons';
 import { CartWishlistButtons } from '../../../components/custom/MUI';
 import { DiscountPercentage, OutOfStock } from '../../../components/custom/Product';
 import { formatPrice } from '../../../components/custom/utils';
@@ -83,7 +82,6 @@ const ProductItem = ({ product }) => {
 
     return (
         <>
-            {(isLoading.cart || isLoading.wishlist) && <LoadingOverlay />}
             <div onClick={handleClick} className="bg-white rounded-md shadow-sm p-4 flex flex-col cursor-pointer transition-shadow duration-300 hover:shadow-md" >
                 <div className="relative mb-2">
                     <img
@@ -96,16 +94,16 @@ const ProductItem = ({ product }) => {
                     <div className="absolute inset-0 rounded transition-opacity duration-300 hover:opacity-20 opacity-0 bg-white" />
 
                     <OutOfStock inventoryCount={inventoryCount} />
-
-                    <DiscountPercentage discountPercentage={discountPercentage} />
                 </div>
 
                 <h2 className="font-semibold text-sm sm:text-base h-6 sm:h-8 overflow-hidden whitespace-nowrap text-ellipsis w-full hover:underline">
                     {name}
                 </h2>
-
-                <div className="flex flex-col mb-2">
-                    <span className="font-bold text-base sm:text-lg">{formattedFinalPrice} €</span>
+                <div className="flex flex-col gap-1 mb-2">
+                    <div className="flex items-center gap-2">
+                        <span className="font-bold text-base sm:text-lg">{formattedFinalPrice} €</span>
+                        <DiscountPercentage discountPercentage={discountPercentage} />
+                    </div>
                     {discountPercentage > 0 && (
                         <span className="text-gray-500 line-through text-xs sm:text-sm">{formattedPrice} €</span>
                     )}

@@ -1,7 +1,6 @@
 import { LinearProgress, Table, TableBody, TableCell, TableContainer, TableHead, TableRow, Typography } from '@mui/material';
 import { useEffect, useState } from 'react';
 import { Link, useParams } from 'react-router-dom';
-import 'react-toastify/dist/ReactToastify.css';
 import emptyOrdersImage from '../../assets/img/empty/orders.png';
 import { LoadingOrderDetails } from '../../components/custom/LoadingSkeletons';
 import { EmptyState } from '../../components/custom/MUI';

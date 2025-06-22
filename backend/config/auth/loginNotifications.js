@@ -12,10 +12,9 @@ function getClientUserAgent(req) {
 function getLocationFromIP(ip) {
     if (!ip || ip === '127.0.0.1' || ip === '::1' || ip.startsWith('192.168.') || ip.startsWith('10.')) {
         return {
-            country: 'Development',
-            city: 'Local Environment',
-            region: 'Port 5000',
-            isDevelopment: true
+            country: 'Port 5000',
+            city: 'Localhost',
+            region: 'Local Environment',
         };
     }
 
@@ -26,7 +25,6 @@ function getLocationFromIP(ip) {
                 country: geo.country || 'Unknown',
                 city: geo.city || 'Unknown',
                 region: geo.region || 'Unknown',
-                isDevelopment: false
             };
         }
     } catch (error) {
@@ -37,7 +35,6 @@ function getLocationFromIP(ip) {
         country: 'Unknown',
         city: 'Unknown',
         region: 'Unknown',
-        isDevelopment: false
     };
 };
 

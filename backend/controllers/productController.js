@@ -19,16 +19,50 @@ const createProduct = async (req, res) => {
         await product.save();
         res.status(201).json(product);
     } catch (error) {
-        res.status(500).json({ message: 'Server error', error: error.message });
+        res.status(500).json({ success: false, message: 'Error creating product', error: error.message });
     }
 };
 
 const getProducts = async (req, res) => {
     try {
         const products = await Product.find().populate('category subcategory subSubcategory supplier');
-        res.status(200).json({ products });
+        res.status(200).json({ success: true, products });
     } catch (error) {
-        res.status(500).json({ message: 'Server error', error: error.message });
+        res.status(500).json({ success: false, message: 'Error getting products', error: error.message });
+    }
+};
+
+const getProductsPaginated = async (req, res) => {
+    try {
+        const page = parseInt(req.query.page) || 1;
+        const limit = parseInt(req.query.limit) || 10;
+        const skip = (page - 1) * limit;
+
+        const products = await Product.find()
+            .populate('category subcategory subSubcategory supplier')
+            .skip(skip)
+            .limit(limit);
+
+        const totalProducts = await Product.countDocuments();
+        const totalPages = Math.ceil(totalProducts / limit);
+        const hasNextPage = page < totalPages;
+        const hasPrevPage = page > 1;
+
+        res.status(200).json({
+            success: true,
+            products,
+            pagination: {
+                currentPage: page,
+                totalPages,
+                totalProducts,
+                hasNextPage,
+                hasPrevPage,
+                limit,
+                skip
+            }
+        });
+    } catch (error) {
+        res.status(500).json({ success: false, message: 'Error fetching products', error: error.message });
     }
 };
 
@@ -38,7 +72,7 @@ const getProductBySlug = async (req, res) => {
         if (!product) return res.status(404).json({ message: 'Product not found' });
         res.status(200).json(product);
     } catch (error) {
-        res.status(500).json({ message: 'Server error' });
+        res.status(500).json({ success: false, message: 'Error getting product by slug', error: error.message });
     }
 };
 
@@ -51,7 +85,7 @@ const getProductsByCategory = async (req, res) => {
         if (!products || products.length === 0) {
             return res.status(404).json({ message: `No products found with category: ${category.name}` });
         }
-        res.status(200).json({ products });
+        res.status(200).json({ success: true, products });
     } catch (error) {
         res.status(500).json({ message: 'Server error', error: error.message });
     }
@@ -70,9 +104,9 @@ const getProductsBySubCategory = async (req, res) => {
             return res.status(404).json({ message: `No products found for subcategory: ${subcategory.name}` });
         }
 
-        res.status(200).json({ products });
+        res.status(200).json({ success: true, products });
     } catch (error) {
-        res.status(500).json({ message: 'Server error', error: error.message });
+        res.status(500).json({ success: false, message: 'Error getting products by subcategory', error: error.message });
     }
 };
 
@@ -87,9 +121,9 @@ const getProductsBySubSubCategory = async (req, res) => {
         if (!products || products.length === 0) {
             return res.status(404).json({ message: `No products found for subsubcategory: ${subSubcategory.name}` });
         }
-        res.status(200).json({ products });
+        res.status(200).json({ success: true, products });
     } catch (error) {
-        res.status(500).json({ message: 'Server error', error: error.message });
+        res.status(500).json({ success: false, message: 'Error getting products by subSubcategory', error: error.message });
     }
 };
 
@@ -141,7 +175,7 @@ const updateProduct = async (req, res) => {
 
         res.status(200).json(product);
     } catch (error) {
-        res.status(500).json({ message: 'Server error', error: error.message });
+        res.status(500).json({ success: false, message: 'Error updating product', error: error.message });
     }
 };
 
@@ -164,9 +198,9 @@ const deleteProduct = async (req, res) => {
         }
         await Product.findByIdAndDelete(req.params.id);
 
-        res.status(200).json({ message: 'Product and associated reviews deleted successfully' });
+        res.status(200).json({ success: true, message: 'Product and associated reviews deleted successfully' });
     } catch (error) {
-        res.status(500).json({ message: 'Server error', error: error.message });
+        res.status(500).json({ success: false, message: 'Error deleting product', error: error.message });
     }
 };
 
@@ -201,9 +235,9 @@ const deleteProducts = async (req, res) => {
 
         await Product.deleteMany({ _id: { $in: ids } });
 
-        res.status(200).json({ message: 'Products and associated reviews deleted successfully' });
+        res.status(200).json({ success: true, message: 'Products and associated reviews deleted successfully' });
     } catch (error) {
-        res.status(500).json({ message: 'Server error', error: error.message });
+        res.status(500).json({ success: false, message: 'Error deleting products', error: error.message });
     }
 };
 
@@ -243,10 +277,9 @@ const searchProducts = async (req, res) => {
             },
         ]);
 
-        res.status(200).json({ results });
+        res.status(200).json({ success: true, results });
     } catch (error) {
-        console.error('Atlas Search error:', error);
-        res.status(500).json({ message: 'Server error', error: error.message });
+        res.status(500).json({ success: false, message: 'Error searching products', error: error.message });
     }
 };
 
@@ -278,9 +311,9 @@ const createProductBasic = async (req, res) => {
             details: []
         });
         await product.save();
-        res.status(201).json({ productId: product._id, message: 'Basic product created' });
+        res.status(201).json({ success: true, productId: product._id, message: 'Basic product created' });
     } catch (error) {
-        res.status(500).json({ message: 'Server error', error: error.message });
+        res.status(500).json({ success: false, message: 'Error creating product basic', error: error.message });
     }
 };
 
@@ -300,9 +333,9 @@ const uploadProductImage = async (req, res) => {
         product.image = image;
         await product.save();
 
-        res.status(200).json({ message: 'Image uploaded successfully', image });
+        res.status(200).json({ success: true, message: 'Image uploaded successfully', image });
     } catch (error) {
-        res.status(500).json({ message: 'Server error', error: error.message });
+        res.status(500).json({ success: false, message: 'Error uploading product image', error: error.message });
     }
 };
 
@@ -327,13 +360,13 @@ const addProductVariantsAndDetails = async (req, res) => {
 
         await product.save();
 
-        res.status(200).json({ message: 'Variants, dimensions and details added successfully', product });
+        res.status(200).json({ success: true, message: 'Variants, dimensions and details added successfully', product });
     } catch (error) {
-        res.status(500).json({ message: 'Server error', error: error.message });
+        res.status(500).json({ success: false, message: 'Error creating product variants and details', error: error.message });
     }
 };
 
 module.exports = {
-    createProduct, getProducts, getProductBySlug, updateProduct, getProductsByCategory, getProductsBySubCategory,
+    createProduct, getProducts, getProductsPaginated, getProductBySlug, updateProduct, getProductsByCategory, getProductsBySubCategory,
     getProductsBySubSubCategory, deleteProduct, deleteProducts, searchProducts, createProductBasic, uploadProductImage, addProductVariantsAndDetails
 };

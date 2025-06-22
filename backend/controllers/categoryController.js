@@ -8,9 +8,9 @@ const createCategory = async (req, res) => {
     try {
         const category = new Category({ name, image, createdBy: req.user.userId });
         await category.save();
-        res.status(201).json({ message: 'Category created successfully', category });
+        res.status(201).json({ success: true, message: 'Category created successfully', category });
     } catch (error) {
-        res.status(500).json({ message: 'Server error' });
+        res.status(500).json({ success: false, message: 'Error creating category', error: error.message });
     }
 };
 
@@ -21,7 +21,7 @@ const getCategories = async (req, res) => {
             .populate('updatedBy', 'firstName lastName email');
         res.status(200).json(categories);
     } catch (error) {
-        res.status(500).json({ message: 'Server error' });
+        res.status(500).json({ success: false, message: 'Error getting categories', error: error.message });
     }
 };
 
@@ -31,7 +31,7 @@ const getCategoryBySlug = async (req, res) => {
         if (!category) return res.status(404).json({ message: 'Category not found' });
         res.status(200).json(category);
     } catch (error) {
-        res.status(500).json({ message: 'Server error' });
+        res.status(500).json({ success: false, message: 'Error getting category', error: error.message });
     }
 };
 
@@ -63,9 +63,9 @@ const updateCategory = async (req, res) => {
             { name, image, updatedAt: Date.now(), updatedBy: req.user.userId },
             { new: true }
         );
-        res.status(200).json({ message: 'Category updated successfully', category });
+        res.status(200).json({ success: true, message: 'Category updated successfully', category });
     } catch (error) {
-        res.status(500).json({ message: 'Server error' });
+        res.status(500).json({ success: false, message: 'Error updating category', error: error.message });
     }
 };
 
@@ -80,9 +80,9 @@ const deleteCategory = async (req, res) => {
         }
 
         await Category.findByIdAndDelete(req.params.id);
-        res.status(200).json({ message: 'Category deleted successfully' });
+        res.status(200).json({ success: true, message: 'Category deleted successfully' });
     } catch (error) {
-        res.status(500).json({ message: 'Server error' });
+        res.status(500).json({ success: false, message: 'Error deleting category', error: error.message });
     }
 };
 
@@ -102,9 +102,9 @@ const deleteCategories = async (req, res) => {
 
         await Category.deleteMany({ _id: { $in: ids } });
 
-        res.status(200).json({ message: 'Categories deleted successfully' });
+        res.status(200).json({ success: true, message: 'Categories deleted successfully' });
     } catch (error) {
-        res.status(500).json({ message: 'Server error', error: error.message });
+        res.status(500).json({ success: false, message: 'Error deleting categories', error: error.message });
     }
 };
 

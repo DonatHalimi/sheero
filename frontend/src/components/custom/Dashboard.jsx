@@ -338,7 +338,7 @@ export const DashboardHeader = ({
         if (!mainContent) return;
 
         animate(mainContent.scrollTop, 0, {
-            duration: 0.8,
+            duration: 0.9,
             ease: [0.22, 1, 0.36, 1],
             onUpdate(latest) {
                 mainContent.scrollTop = latest;
@@ -779,6 +779,7 @@ export const AuthActions = ({
     isAdmin,
     isOrderManager,
     isContentManager,
+    isCustomerSupport,
     isProductManager,
 }) => {
     const handleClickAway = () => {
@@ -806,6 +807,7 @@ export const AuthActions = ({
                                     isAdmin={isAdmin}
                                     isOrderManager={isOrderManager}
                                     isContentManager={isContentManager}
+                                    isCustomerSupport={isCustomerSupport}
                                     isProductManager={isProductManager}
                                     handleLogout={handleLogout}
                                 />
@@ -1261,6 +1263,7 @@ export const DashboardNavbar = ({
     isAdmin,
     isOrderManager,
     isContentManager,
+    isCustomerSupport,
     isProductManager,
 }) => {
     const [isProfileDropdownOpen, setIsProfileDropdownOpen] = useState(false);
@@ -1286,6 +1289,7 @@ export const DashboardNavbar = ({
                             isAdmin={isAdmin}
                             isOrderManager={isOrderManager}
                             isContentManager={isContentManager}
+                            isCustomerSupport={isCustomerSupport}
                             isProductManager={isProductManager}
                         />
 

@@ -94,8 +94,8 @@ const getByIdSchema = yup.object({
         }),
 });
 
-const getByUserSchema = yup.object({
-    getAddressByUser: yup
+const getUserAddressSchema = yup.object({
+    getUserAddress: yup
         .string()
         .test('address-exists', 'No address found for the current user', async function (value) {
             const user = this.options?.context?.user;
@@ -215,4 +215,4 @@ const deleteBulkSchema = yup.object({
         }),
 });
 
-module.exports = { createSchema, getByIdSchema, getByUserSchema, updateSchema, deleteSchema, deleteBulkSchema };
+module.exports = { createSchema, getByIdSchema, getUserAddressSchema, updateSchema, deleteSchema, deleteBulkSchema };

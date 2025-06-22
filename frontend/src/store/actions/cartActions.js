@@ -3,8 +3,8 @@ import { GET_CART_COUNT } from "../types";
 
 export const getCartCount = () => async dispatch => {
     try {
-        const { data } = await getCartService();
-        const count = (data.items || []).reduce(
+        const res = await getCartService();
+        const count = (res.data.items || []).reduce(
             (sum, item) => sum + (item.quantity || 1),
             0
         );

@@ -105,15 +105,15 @@ export const formatProductShipping = (shipping) => {
 };
 
 export const getEmptyStateMessage = (context, items, searchTerm, statusFilter) => {
-    const entity = context === 'reviews' ? 'reviews' : context === 'orders' ? 'orders' : context === 'wishlist' ? 'wishlist item' : 'returns';
+    const entity = context === 'reviews' ? 'reviews' : context === 'orders' ? 'orders' : context === 'wishlist' ? 'wishlist item' : context === 'sharedWishlist' ? 'wishlist item' : 'returns';
 
     if (items.length === 0 && !searchTerm) return context === 'wishlist' ? "Your wishlist is empty." : `No ${entity} found.`;
     if (items.length === 0 && searchTerm) return `No ${entity} match your search term!`;
 
     if (items.length === 0) return `You haven't placed any ${entity} yet!`;
-    if (searchTerm && statusFilter !== 'All') return `No ${entity} match your search and selected filters.`;
+    if (searchTerm && statusFilter !== 'all') return `No ${entity} match your search and selected filters.`;
     if (searchTerm) return `No ${entity} match your search term.`;
-    if (statusFilter !== 'All') return `No ${entity} match the selected filters.`;
+    if (statusFilter !== 'all') return `No ${entity} match the selected filters.`;
     return `No ${entity} found.`;
 };
 
@@ -230,6 +230,29 @@ export const formatProducts = (order) => order.products.map(item => item.product
 export const formatQuantity = (order) => order.products.map(item => item.quantity).join(', ');
 export const formatTotalAmount = (order) => `€  ${order.totalAmount.toFixed(2)}`;
 export const formatAddress = (order) => `${order?.address?.street}, ${order?.address?.city?.name}, ${order?.address?.country?.name}, ${order?.address?.phoneNumber}`;
+
+export const STATUS_CLASSES = {
+    order: {
+        pending: 'text-yellow-500',
+        processed: 'text-cyan-500',
+        shipped: 'text-blue-700',
+        delivered: 'text-green-500',
+        canceled: 'text-red-500',
+        default: 'text-gray-500',
+    },
+    return: {
+        pending: 'text-yellow-500',
+        approved: 'text-blue-500',
+        rejected: 'text-red-500',
+        processed: 'text-green-500',
+        default: 'text-gray-500',
+    }
+};
+
+export const getStatusColor = (status, type = 'order') => {
+    const classes = STATUS_CLASSES[type] || {};
+    return `${classes[status] || classes.default} capitalize bg-stone-50 rounded-md px-1`;
+};
 
 export const knownEmailProviders = [
     'gmail.com',

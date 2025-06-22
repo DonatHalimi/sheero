@@ -12,7 +12,7 @@ const createUser = async (req, res) => {
     const validRole = role ? await Role.findById(role) : await Role.findOne({ name: 'user' });
 
     if (!validRole) {
-        return res.status(400).json({ message: 'Role does not exist' });
+        return res.status(400).json({ success: false, message: 'Role does not exist' });
     }
 
     try {
@@ -25,9 +25,9 @@ const createUser = async (req, res) => {
         });
 
         await newUser.save();
-        res.status(201).json({ message: 'User created successfully', newUser });
+        res.status(201).json({ success: true, message: 'User created successfully', newUser });
     } catch (error) {
-        res.status(500).json({ message: 'Server error', error: error.message });
+        res.status(500).json({ success: false, message: 'Error creating user', error: error.message });
     }
 };
 
@@ -36,7 +36,7 @@ const getUsers = async (req, res) => {
         const users = await User.find().populate('role', 'name');
         res.status(200).json({ users });
     } catch (error) {
-        res.status(500).json({ message: 'Server error' });
+        res.status(500).json({ success: false, message: 'Error getting users', error: error.message });
     }
 };
 
@@ -45,8 +45,7 @@ const getUserById = async (req, res) => {
         const user = await User.findById(req.params.id);
         res.status(200).json(user);
     } catch (error) {
-        console.error('Error fetching user:', error);
-        res.status(500).json({ message: 'Server error', error: error.message });
+        res.status(500).json({ success: false, message: 'Error getting user', error: error.message });
     }
 };
 
@@ -75,19 +74,18 @@ const updateUser = async (req, res) => {
         await user.save();
         await user.populate('role');
 
-        res.status(200).json({ message: 'User updated successfully', updatedUser: user });
+        res.status(200).json({ success: true, message: 'User updated successfully', updatedUser: user });
     } catch (error) {
-        res.status(500).json({ message: 'Server error' });
+        res.status(500).json({ success: false, message: 'Error updating user', error: error.message });
     }
 };
 
 const deleteUser = async (req, res) => {
     try {
         await User.findByIdAndDelete(req.params.id);
-        res.status(200).json({ message: 'User deleted successfully' });
+        res.status(200).json({ success: true, message: 'User deleted successfully' });
     } catch (error) {
-        console.error('Error deleting user:', error);
-        res.status(500).json({ message: 'Server error', error: error.message });
+        res.status(500).json({ success: false, message: 'Error deleting user', error: error.message });
     }
 };
 
@@ -103,9 +101,9 @@ const deleteUsers = async (req, res) => {
             Review.deleteMany({ user: { $in: ids } })
         ]);
 
-        res.status(200).json({ message: 'Users and related data deleted successfully' });
+        res.status(200).json({ success: true, message: 'Users and related data deleted successfully' });
     } catch (error) {
-        res.status(500).json({ message: 'Server error', error: error.message });
+        res.status(500).json({ success: false, message: 'Error deleting users', error: error.message });
     }
 };
 

@@ -6,9 +6,9 @@ const createSupplier = async (req, res) => {
     try {
         const supplier = new Supplier({ name, contactInfo, createdBy: req.user.userId });
         await supplier.save();
-        res.status(201).json({ message: 'Supplier created successfully', supplier });
+        res.status(201).json({ success: true, message: 'Supplier created successfully', supplier });
     } catch (error) {
-        res.status(500).json({ message: 'Server error', error: error.message });
+        res.status(500).json({ success: false, message: 'Error creating supplier', error: error.message });
     }
 };
 
@@ -19,7 +19,7 @@ const getSuppliers = async (req, res) => {
             .populate('updatedBy', 'firstName lastName email');
         res.status(200).json(suppliers);
     } catch (error) {
-        res.status(500).json({ message: 'Server error', error: error.message });
+        res.status(500).json({ success: false, message: 'Error getting suppliers', error: error.message });
     }
 };
 
@@ -29,7 +29,7 @@ const getSupplierById = async (req, res) => {
         if (!supplier) return res.status(404).json({ message: 'Supplier not found' });
         res.status(200).json(supplier);
     } catch (error) {
-        res.status(500).json({ message: 'Server error', error: error.message });
+        res.status(500).json({ success: false, message: 'Error getting supplier', error: error.message });
     }
 };
 
@@ -42,9 +42,9 @@ const updateSupplier = async (req, res) => {
             { new: true, runValidators: true }
         );
 
-        res.status(200).json({ message: 'Supplier updated successfully', supplier });
+        res.status(200).json({ success: true, message: 'Supplier updated successfully', supplier });
     } catch (error) {
-        res.status(500).json({ message: 'Server error', error: error.message });
+        res.status(500).json({ success: false, message: 'Error updating supplier', error: error.message });
     }
 };
 
@@ -52,10 +52,9 @@ const deleteSupplier = async (req, res) => {
     try {
         const supplier = await Supplier.findByIdAndDelete(req.params.id);
         if (!supplier) return res.status(404).json({ message: 'Supplier not found' });
-        res.status(200).json({ message: 'Supplier deleted successfully' });
+        res.status(200).json({ success: true, message: 'Supplier deleted successfully' });
     } catch (error) {
-        console.error('Error deleting supplier:', error);
-        res.status(500).json({ message: 'Server error', error: error.message });
+        res.status(500).json({ success: false, message: 'Error deleting supplier', error: error.message });
     }
 };
 
@@ -73,9 +72,9 @@ const deleteSuppliers = async (req, res) => {
 
         await Supplier.deleteMany({ _id: { $in: ids } });
 
-        res.status(200).json({ message: 'Suppliers deleted successfully' });
+        res.status(200).json({ success: true, message: 'Suppliers deleted successfully' });
     } catch (error) {
-        res.status(500).json({ message: 'Server error', error: error.message });
+        res.status(500).json({ success: false, message: 'Error deleting suppliers', error: error.message });
     }
 };
 

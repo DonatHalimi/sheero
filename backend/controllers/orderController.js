@@ -102,8 +102,7 @@ const payWithStripe = async (req, res) => {
 
         res.json({ url: session.url });
     } catch (error) {
-        console.error('Error creating Stripe session or saving order', error);
-        res.status(500).json({ error: 'Server error', details: error.message });
+        res.status(500).json({ success: false, error: 'Error processing stripe payment', error: error.message });
     }
 };
 
@@ -153,7 +152,6 @@ const notifyOrderManagers = async (io, order) => {
         });
 
         io.to(`user:${mgr._id}`).emit('notification', notif);
-        console.log(`New order notification sent to ${mgr._id}: ${mgr.email}`);
     }
 };
 
@@ -192,14 +190,9 @@ const verifyOrder = async (req, res) => {
 
         await notifyOrderManagers(io, updatedOrder);
 
-        return res.json({
-            success: true,
-            sessionValid: true,
-            message: 'Payment completed successfully',
-            order: updatedOrder
-        });
+        return res.json({ success: true, sessionValid: true, message: 'Payment completed successfully', order: updatedOrder });
     } catch (error) {
-        return res.status(500).json({ success: false, sessionValid: false, message: 'Server error', error: error.message });
+        return res.status(500).json({ success: false, sessionValid: false, message: 'Error verifying payment', error: error.message });
     }
 };
 
@@ -263,13 +256,9 @@ const payWithCash = async (req, res) => {
 
         await notifyOrderManagers(io, populatedOrder);
 
-        res.json({
-            success: true,
-            message: 'Order created successfully. Please pay with cash on delivery',
-            order: populatedOrder,
-        });
+        res.status(200).json({ success: true, message: 'Order created successfully. Please pay with cash on delivery', order: populatedOrder });
     } catch (error) {
-        res.status(500).json({ error: 'Server error', details: error.message });
+        res.status(500).json({ success: false, error: 'Error creating order', error: error.message });
     }
 };
 
@@ -298,30 +287,114 @@ const getAllOrders = async (req, res) => {
 
         res.json(orders);
     } catch (error) {
-        console.error('Error fetching orders', error);
-        res.status(500).send('Server error');
+        res.status(500).json({ success: false, message: 'Error fetching orders', error: error.message });
     }
 };
 
 const getUserOrders = async (req, res) => {
     const userId = req.params.userId;
+    const page = parseInt(req.query.page) || 1;
+    const limit = parseInt(req.query.limit) || 8;
+    const skip = (page - 1) * limit;
+    const searchTerm = req.query.search || '';
+    const statusFilter = req.query.status || '';
 
     try {
-        const orders = await Order.find({ user: userId })
-            .lean()
+        const user = await User.findById(userId);
+        if (!user) return res.status(404).json({ success: false, message: 'User not found' });
+
+        const authUserId = req.user.userId.toString();
+        const requestedUserId = userId.toString();
+        const userRole = req.user.role;
+
+        if (requestedUserId !== authUserId && userRole !== 'admin') return res.status(403).json({ success: false, message: 'Unauthorized access to user orders' });
+
+        let query = { user: userId };
+
+        if (statusFilter && statusFilter !== 'all') query.status = statusFilter;
+
+        if (searchTerm) {
+            const orders = await Order.find(query)
+                .populate('products.product', 'name price image slug')
+                .populate('address', 'name street phoneNumber city country')
+                .lean()
+                .exec();
+
+            const filteredOrders = orders.filter(order => {
+                const searchLower = searchTerm.toLowerCase();
+
+                const orderFieldsMatch = (
+                    order._id.toString().toLowerCase().includes(searchLower) ||
+                    order.paymentStatus?.toLowerCase().includes(searchLower) ||
+                    order.paymentMethod?.toLowerCase().includes(searchLower) ||
+                    order.paymentIntentId?.toLowerCase().includes(searchLower) ||
+                    order.status?.toLowerCase().includes(searchLower) ||
+                    order.totalAmount?.toString().includes(searchTerm)
+                );
+
+                const productFieldsMatch = order.products.some(({ product, quantity, price }) => {
+                    if (!product) return false;
+                    return (
+                        product.name?.toLowerCase().includes(searchLower) ||
+                        quantity?.toString().includes(searchTerm) ||
+                        price?.toString().includes(searchTerm)
+                    );
+                });
+
+                return orderFieldsMatch || productFieldsMatch;
+            });
+
+            const sortedOrders = filteredOrders.sort((a, b) => new Date(b.createdAt) - new Date(a.createdAt));
+            const totalOrders = sortedOrders.length;
+            const paginatedOrders = sortedOrders.slice(skip, skip + limit);
+
+            const totalPages = Math.ceil(totalOrders / limit);
+            const hasNextPage = page < totalPages;
+            const hasPreviousPage = page > 1;
+
+            return res.json({
+                success: true,
+                orders: paginatedOrders,
+                pagination: {
+                    currentPage: page,
+                    totalPages,
+                    totalOrders,
+                    hasNextPage,
+                    hasPreviousPage,
+                    limit
+                }
+            });
+        }
+
+        const totalOrders = await Order.countDocuments(query);
+
+        const orders = await Order.find(query)
             .populate('products.product', 'name price image slug')
             .populate('address', 'name street phoneNumber city country')
+            .skip(skip)
+            .limit(limit)
+            .lean()
             .sort({ createdAt: -1 })
             .exec();
 
-        if (!orders.length) {
-            return res.json({ success: false, message: 'No orders found for this user.' });
-        }
+        const totalPages = Math.ceil(totalOrders / limit);
+        const hasNextPage = page < totalPages;
+        const hasPreviousPage = page > 1;
 
-        res.json(orders);
+        res.json({
+            success: true,
+            orders,
+            pagination: {
+                currentPage: page,
+                totalPages,
+                totalOrders,
+                hasNextPage,
+                hasPreviousPage,
+                limit
+            }
+        });
     } catch (error) {
-        console.error('Error fetching user orders:', error);
-        res.status(500).json({ success: false, message: 'Error fetching orders.' });
+        res.status(500).json({ success: false, message: 'Error fetching user orders', error: error.message });
     }
 };
 
@@ -347,9 +420,9 @@ const getOrderById = async (req, res) => {
 
         if (orderUserId !== authUserId) return res.status(403).json({ success: false, message: 'Unauthorized access to order details' });
 
-        res.json({ success: true, data: order });
+        res.status(200).json({ success: true, data: order });
     } catch (error) {
-        res.status(500).json({ success: false, message: 'Error fetching order.' });
+        res.status(500).json({ success: false, message: 'Error fetching order', error: error.message });
     }
 };
 
@@ -459,17 +532,20 @@ const updateDeliveryStatus = async (req, res) => {
             console.warn(`Order ${orderId} has no user email associated.`);
         }
     } catch (error) {
-        console.error('Error updating order:', error);
-        res.status(500).json({ success: false, message: 'Error updating order.' });
+        res.status(500).json({ success: false, message: 'Error updating order', error: error.message });
     }
 };
 
 const deleteOrder = async (req, res) => {
     try {
-        await Order.findByIdAndDelete(req.params.id);
-        res.status(200).json({ message: 'Order deleted successfully' });
+        const orderId = req.params.id;
+        await Order.findByIdAndDelete(orderId);
+
+        await Notification.deleteMany({ 'data.orderId': orderId });
+
+        res.status(200).json({ success: true, message: 'Order deleted successfully' });
     } catch (error) {
-        res.status(500).json({ message: 'Server error' });
+        res.status(500).json({ success: false, message: 'Error deleting order', error: error.message });
     }
 };
 
@@ -485,9 +561,11 @@ const deleteOrders = async (req, res) => {
 
         await Order.deleteMany({ _id: { $in: ids } });
 
-        res.status(200).json({ message: 'Orders deleted successfully' });
+        await Notification.deleteMany({ 'data.orderId': { $in: ids } });
+
+        res.status(200).json({ success: true, message: 'Orders deleted successfully' });
     } catch (error) {
-        res.status(500).json({ message: 'Server error', error: error.message });
+        res.status(500).json({ success: false, message: 'Error deleting orders', error: error.message });
     }
 };
 

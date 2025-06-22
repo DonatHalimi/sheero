@@ -9,7 +9,7 @@ import { Header, ProfileLayout } from '../../components/custom/Profile';
 import Navbar from '../../components/Navbar/Navbar';
 import { downloadAddress } from '../../components/Product/Utils/DataExport';
 import Footer from '../../components/Utils/Footer';
-import { addAddress, getAddressByUser, getCities, getCountries, updateAddress } from '../../store/actions/addressActions';
+import { addAddress, getCities, getCountries, getUserAddress, updateAddress } from '../../store/actions/addressActions';
 import { COMMENT_VALIDATION, NAME_VALIDATION, PHONE_NUMBER_VALIDATION, STREET_VALIDATION } from '../../utils/constants/validations/address';
 
 const AddressDetails = () => {
@@ -37,7 +37,7 @@ const AddressDetails = () => {
 
     useEffect(() => {
         if (user && user.id) {
-            dispatch(getAddressByUser(user.id));
+            dispatch(getUserAddress(user.id));
         }
         dispatch(getCountries());
     }, [dispatch, user]);
@@ -101,11 +101,11 @@ const AddressDetails = () => {
                 await dispatch(updateAddress(address._id, updatedAddress));
                 toast.success('Address updated successfully');
                 setOriginalAddress(updatedAddress);
-                await dispatch(getAddressByUser(user.id));
+                await dispatch(getUserAddress(user.id));
             } else {
                 await dispatch(addAddress(updatedAddress));
                 toast.success('Address added successfully');
-                await dispatch(getAddressByUser(user.id));
+                await dispatch(getUserAddress(user.id));
             }
         } catch (error) {
             toast.error('Error saving address');

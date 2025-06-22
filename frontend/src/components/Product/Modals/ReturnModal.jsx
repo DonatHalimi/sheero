@@ -90,7 +90,7 @@ const ReturnModal = ({ open, onClose }) => {
                         onSubmit={handleSubmit}
                         enableReinitialize
                     >
-                        {({ values, errors, touched, dirty, handleChange, handleBlur, isValid, setFieldValue }) => {
+                        {({ values, errors, touched, dirty, handleChange, handleBlur, isValid }) => {
                             const isDisabled = !isValid || !dirty || submitLoading;
 
                             return (
@@ -169,6 +169,8 @@ const ReturnModal = ({ open, onClose }) => {
                                             <CustomTextField
                                                 name="customReason"
                                                 label="Please specify a reason"
+                                                multiline
+                                                rows={3}
                                                 variant="outlined"
                                             />
                                         </div>

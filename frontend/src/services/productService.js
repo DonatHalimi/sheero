@@ -2,6 +2,10 @@ import axiosInstance from "../utils/axiosInstance";
 
 export const getProductsService = () => axiosInstance.get('/products/get');
 
+export const ITEMS_PER_PAGE = 49;
+
+export const getProductsPaginatedService = (page = 1, limit = ITEMS_PER_PAGE) => axiosInstance.get(`/products/get/paginated?page=${page}&limit=${limit}`);
+
 export const getProductDetails = (slug) => axiosInstance.get(`/products/get-by-slug/${slug}`);
 
 export const fetchSearchResultsService = (query) => axiosInstance.get('/products/search', { params: { query } });

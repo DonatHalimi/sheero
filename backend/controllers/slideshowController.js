@@ -10,7 +10,7 @@ const createImage = async (req, res) => {
         await slideshowImage.save();
         res.status(201).json({ message: 'Slideshow image created successfully', slideshowImage });
     } catch (error) {
-        res.status(500).json({ message: 'Server error' });
+        res.status(500).json({ success: false, message: 'Error creating slideshow image', error: error.message });
     }
 };
 
@@ -21,7 +21,7 @@ const getImages = async (req, res) => {
             .populate('updatedBy', 'firstName lastName email');
         res.status(200).json(images);
     } catch (error) {
-        res.status(500).json({ message: 'Server error' });
+        res.status(500).json({ success: false, message: 'Error getting slideshow images', error: error.message });
     }
 };
 
@@ -30,7 +30,7 @@ const getImageById = async (req, res) => {
         const image = await SlideshowImage.findById(req.params.id);
         res.status(200).json(image);
     } catch (error) {
-        res.status(500).json({ message: 'Server error' });
+        res.status(500).json({ success: false, message: 'Error getting slideshow image', error: error.message });
     }
 };
 
@@ -64,7 +64,7 @@ const updateImage = async (req, res) => {
         );
         res.status(200).json({ message: 'Slideshow image updated successfully', updatedImage });
     } catch (error) {
-        res.status(500).json({ message: 'Server error' });
+        res.status(500).json({ success: false, message: 'Error updating slideshow image', error: error.message });
     }
 };
 
@@ -81,7 +81,7 @@ const deleteImage = async (req, res) => {
         await SlideshowImage.findByIdAndDelete(req.params.id);
         res.status(200).json({ message: 'Image deleted successfully' });
     } catch (error) {
-        res.status(500).json({ message: 'Server error' });
+        res.status(500).json({ success: false, message: 'Error deleting image', error: error.message });
     }
 };
 
@@ -103,7 +103,7 @@ const deleteImages = async (req, res) => {
 
         res.status(200).json({ message: 'Images deleted successfully' });
     } catch (error) {
-        res.status(500).json({ message: 'Server error', error: error.message });
+        res.status(500).json({ success: false, message: 'Error deleting images', error: error.message });
     }
 };
 

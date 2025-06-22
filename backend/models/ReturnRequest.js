@@ -1,4 +1,5 @@
 const mongoose = require('mongoose');
+const { generateCustomId } = require('../config/core/utils');
 
 // Enum for predefined reasons
 const reasons = [
@@ -10,12 +11,6 @@ const reasons = [
 ];
 
 const status = ['pending', 'approved', 'processed', 'rejected'];
-
-function generateCustomId() {
-    const timestamp = Date.now().toString().slice(-5);
-    const randomPart = Math.floor(Math.random() * 100).toString().padStart(2, '0');
-    return timestamp + randomPart;
-};
 
 const returnRequestSchema = new mongoose.Schema({
     _id: { type: String, default: generateCustomId },

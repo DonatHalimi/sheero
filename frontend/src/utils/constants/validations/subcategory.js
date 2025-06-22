@@ -10,4 +10,4 @@ export const IMAGE_VALIDATION = {
 
 export const CATEGORY_VALIDATION = {
     required: "Category is required"
-}
+};
