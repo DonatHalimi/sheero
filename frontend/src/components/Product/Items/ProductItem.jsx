@@ -9,7 +9,7 @@ import { formatPrice } from '../../../components/custom/utils';
 import { addToCartService } from '../../../services/cartService';
 import { addToWishlistService } from '../../../services/wishlistService';
 import { getCartCount } from '../../../store/actions/cartActions';
-import { getImageUrl } from '../../../utils/config';
+import { getImageUrl } from '../../../utils/config/config';
 
 const ProductItem = ({ product }) => {
     const { isAuthenticated } = useSelector(state => state.auth) || {};

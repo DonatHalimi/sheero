@@ -1,6 +1,6 @@
 import { Link } from 'react-router-dom';
 import { formatDate, formatPrice } from '../../../components/custom/utils';
-import { getImageUrl } from '../../../utils/config';
+import { getImageUrl } from '../../../utils/config/config';
 
 const OrderItem = ({ order, getStatusColor }) => {
     const { _id: id, createdAt, status, totalAmount, products } = order;

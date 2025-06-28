@@ -1,5 +1,5 @@
 import * as yup from "yup";
-import { COUNTRY_VALIDATION, NAME_VALIDATION, ZIP_CODE_VALIDATION } from "../constants/validations/city";
+import { COUNTRY_VALIDATION, NAME_VALIDATION, ZIP_CODE_VALIDATION } from "../constants/city";
 
 export const initialValues = (city = null) => ({
     name: city?.name || "",

@@ -7,8 +7,8 @@ import { LoadingLabel, LoadingReturn } from '../../../components/custom/LoadingS
 import { BrownButton, CustomBox, CustomModal, CustomTextField } from '../../../components/custom/MUI';
 import { getOrderDetailsService } from '../../../services/orderService';
 import { addReturnRequestService } from '../../../services/returnService';
-import { getImageUrl } from '../../../utils/config';
-import { reasons } from '../../../utils/constants/validations/return';
+import { getImageUrl } from '../../../utils/config/config';
+import { reasons } from '../../../utils/constants/return';
 import { returnModalInitialValues, returnModalValidationSchema } from '../../../utils/validations/return';
 
 const ReturnModal = ({ open, onClose }) => {

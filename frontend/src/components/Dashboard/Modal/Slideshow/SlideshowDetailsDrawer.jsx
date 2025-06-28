@@ -1,12 +1,14 @@
-import { Box, Drawer } from '@mui/material';
-import { drawerPaperSx } from '../../../../assets/sx';
-import { getImageUrl } from '../../../../utils/config';
+import { Box, Drawer, useTheme } from '@mui/material';
+import { paperPropsSx } from '../../../../assets/sx';
+import { getImageUrl } from '../../../../utils/config/config';
 import { IdAdornment, PersonAdornment } from '../../../custom/Adornments';
 import { DetailsTitle } from '../../../custom/Dashboard';
 import { CloseButton, ReadOnlyTextField } from '../../../custom/MUI';
 import { downloadImageData } from '../../../Product/Utils/DataExport';
 
 const SlideshowDetailsDrawer = ({ open, onClose, slideshow, onEdit, onDelete }) => {
+    const theme = useTheme();
+
     const handleEdit = () => {
         onClose();
         onEdit(slideshow);
@@ -26,7 +28,7 @@ const SlideshowDetailsDrawer = ({ open, onClose, slideshow, onEdit, onDelete }) 
             anchor="right"
             open={open}
             onClose={onClose}
-            PaperProps={drawerPaperSx}
+            PaperProps={paperPropsSx(theme)}
             sx={{ zIndex: 9999 }}
         >
             <CloseButton onClose={onClose} />

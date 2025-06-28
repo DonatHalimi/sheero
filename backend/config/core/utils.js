@@ -1,8 +1,8 @@
 const { NODE_ENV, JWT_SECRET, STRIPE_SECRET_KEY, JWT_REFRESH_SECRET } = require("./dotenv");
 const jwt = require('jsonwebtoken');
-const speakeasy = require('speakeasy');
 const MemoryStore = require("../../models/MemoryStore");
 const Stripe = require('stripe');
+const otpGenerator = require('otp-generator');
 
 const stripe = Stripe(STRIPE_SECRET_KEY);
 
@@ -13,23 +13,28 @@ const frontendUrl = NODE_ENV === 'production'
 const shuffleOTP = (str) => str.split('').sort(() => Math.random() - 0.5).join('');
 
 function generateCustomId() {
-    const timestamp = Date.now().toString().slice(-5);
-    const randomPart = Math.floor(Math.random() * 100).toString().padStart(2, '0');
-    return timestamp + randomPart;
+    return otpGenerator.generate(7, {
+        digits: true,
+        lowerCaseAlphabets: false,
+        upperCaseAlphabets: false,
+        specialChars: false
+    });
 };
 
-const generateOTP = () => {
-    const secret = speakeasy.generateSecret({ length: 20 }).base32;
-    const token = speakeasy.totp({
-        secret,
-        encoding: 'base32',
-        digits: 3
+function generateOTP() {
+    const letters = otpGenerator.generate(3, {
+        digits: false,
+        lowerCaseAlphabets: false,
+        upperCaseAlphabets: true,
+        specialChars: false
     });
 
-    const numbers = token.padStart(3, '0');
-    const letters = Array.from({ length: 3 }, () =>
-        String.fromCharCode(65 + Math.floor(Math.random() * 26))
-    ).join('');
+    const numbers = otpGenerator.generate(3, {
+        digits: true,
+        lowerCaseAlphabets: false,
+        upperCaseAlphabets: false,
+        specialChars: false
+    });
 
     return shuffleOTP(letters + numbers);
 };

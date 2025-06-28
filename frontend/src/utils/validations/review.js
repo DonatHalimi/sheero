@@ -1,5 +1,5 @@
 import * as yup from "yup";
-import { COMMENT_VALIDATION, RATING_VALIDATION, TITLE_VALIDATION } from "../constants/validations/review";
+import { COMMENT_VALIDATION, RATING_VALIDATION, TITLE_VALIDATION } from "../constants/review";
 
 export const initialValues = (review = null) => ({
     product: review?.product?._id || "",

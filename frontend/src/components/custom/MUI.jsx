@@ -49,7 +49,7 @@ import PropTypes from 'prop-types';
 import { forwardRef, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import logo from '../../assets/img/brand/logo.png';
-import { boxSx, customBoxSx, customModalSx, deleteModalTypographySx, goBackButtonSx, iconButtonSx, paginationStackSx, paginationStyling, searchBarInputSx, sidebarLayoutSx } from "../../assets/sx";
+import { boxSx, customBoxSx, customModalSx, deleteModalTypographySx, getScrollbarStyles, goBackButtonSx, iconButtonSx, paginationStackSx, paginationStyling, searchBarInputSx, sidebarLayoutSx } from "../../assets/sx";
 import { AccountLinkStatusIcon, BrownShoppingCartIcon, CartIcon, CollapseIcon, DeleteButtonIcon, NotificationIcon, ProfileIcon } from "./Icons";
 import { LoadingAction, LoadingLabel } from "./LoadingSkeletons";
 import { CartDropdown, NotificationDropdown } from "./Product";
@@ -467,9 +467,14 @@ export const CustomTypography = (props) => {
 export const CustomBox = ({ isScrollable, children, ...props }) => {
     const theme = useTheme();
 
+    const scrollbarStyles = getScrollbarStyles(theme);
+
     return (
         <Box
-            sx={customBoxSx(theme, isScrollable)}
+            sx={{
+                ...customBoxSx(theme, isScrollable),
+                ...scrollbarStyles,
+            }}
             className="p-3 sm:p-4 rounded-lg w-full !outline-none !focus:outline-none"
             {...props}
         >
@@ -995,12 +1000,13 @@ export const CustomDeleteModal = ({ open, onClose, onDelete, loading, title, mes
                     <OutlinedBrownButton onClick={onClose} className="!mr-3">
                         Cancel
                     </OutlinedBrownButton>
-                    <BrownButton
+                    <Button
+                        variant="contained"
                         onClick={onDelete}
                         disabled={loading}
                     >
                         <LoadingLabel loading={loading} defaultLabel="Delete" loadingLabel="Deleting" />
-                    </BrownButton>
+                    </Button>
                 </div>
             </CustomBox>
         </CustomModal>

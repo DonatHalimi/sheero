@@ -600,3 +600,46 @@ export const orderDetailsBoxSx = {
     display: "flex",
     flexDirection: "column",
 };
+
+export const paperPropsSx = (theme) => ({
+    ...drawerPaperSx,
+    sx: {
+        ...drawerPaperSx.sx,
+        ...getScrollbarStyles(theme),
+    }
+});
+
+export const getScrollbarStyles = (theme) => {
+    return {
+        '&::-webkit-scrollbar': {
+            width: '7px',
+        },
+        '&::-webkit-scrollbar-thumb': {
+            backgroundColor: theme.palette.mode === 'dark' ? '#6A6A6A' : '#CACFCD',
+            borderRadius: '6px',
+            transition: 'all 0.3s',
+            '&:hover': {
+                backgroundColor: theme.palette.mode === 'dark' ? '#878787' : '#acb2b0',
+                transition: 'all 0.3s',
+            },
+        },
+        '&::-webkit-scrollbar-track': {
+            backgroundColor: theme.palette.mode === 'dark' ? '#2D2D2D' : '#F8F9FA',
+        },
+        '&::-webkit-scrollbar-corner': {
+            backgroundColor: theme.palette.mode === 'dark' ? '#1E1E1E' : '#FFFFFF',
+        },
+        '& *::-webkit-scrollbar': {
+            width: '7px',
+        },
+        '& *::-webkit-scrollbar-thumb': {
+            backgroundColor: theme.palette.mode === 'dark' ? '#6A6A6A' : '#CACFCD',
+            borderRadius: '6px',
+            transition: 'all 0.3s',
+            '&:hover': {
+                backgroundColor: theme.palette.mode === 'dark' ? '#878787' : '#acb2b0',
+                transition: 'all 0.3s',
+            },
+        },
+    };
+};

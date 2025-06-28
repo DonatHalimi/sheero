@@ -79,7 +79,7 @@ import {
 } from "../../assets/sx";
 import ProductItem from "../../components/Product/Items/ProductItem";
 import FilterSidebar from "../../components/Product/Utils/FilterSidebar";
-import { getImageUrl } from "../../utils/config";
+import { getImageUrl } from "../../utils/config/config";
 import { ArchiveAllIcon, BrownDeleteOutlinedIcon, CartIcon, HomeBreadCrumbIcon, HomeIcon, MarkAllReadIcon, MarkAllUnreadIcon, UnarchiveAllIcon, WishlistIcon } from "./Icons";
 import { LoadingAction, LoadingCartDropdown, LoadingCategoryDropdown, LoadingLabel, LoadingProductItem, LoadingRestock, WaveSkeleton } from "./LoadingSkeletons";
 import { BrownButton, CheckoutButton, CustomBox, CustomModal, CustomTab, DropdownAnimation, NotFound, ReviewCard, RoundIconButton } from "./MUI";

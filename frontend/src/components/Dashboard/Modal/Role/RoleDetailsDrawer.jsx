@@ -1,5 +1,5 @@
-import { Box, Drawer } from '@mui/material';
-import { drawerPaperSx } from '../../../../assets/sx';
+import { Box, Drawer, useTheme } from '@mui/material';
+import { paperPropsSx } from '../../../../assets/sx';
 import { DateAdornment, IdAdornment, PersonAdornment } from '../../../custom/Adornments';
 import { DetailsTitle } from '../../../custom/Dashboard';
 import { BoxBetween, CloseButton, ReadOnlyTextField } from '../../../custom/MUI';
@@ -7,6 +7,8 @@ import { formatDate } from '../../../custom/utils';
 import { downloadRoleData } from '../../../Product/Utils/DataExport';
 
 const RoleDetailsDrawer = ({ open, onClose, role, onEdit, onDelete }) => {
+    const theme = useTheme();
+
     const handleEdit = () => {
         onClose();
         onEdit(role);
@@ -26,7 +28,7 @@ const RoleDetailsDrawer = ({ open, onClose, role, onEdit, onDelete }) => {
             anchor="right"
             open={open}
             onClose={onClose}
-            PaperProps={drawerPaperSx}
+            PaperProps={paperPropsSx(theme)}
             sx={{ zIndex: 9999 }}
         >
             <CloseButton onClose={onClose} />

@@ -4,7 +4,7 @@ import { toast } from 'react-toastify';
 import { LoadingLabel } from '../../components/custom/LoadingSkeletons';
 import { BrownButton, BrownOutlinedTextField, CustomBox, CustomModal } from '../../components/custom/MUI';
 import { forgotPasswordService } from '../../services/authService';
-import { EMAIL_VALIDATION } from '../../utils/constants/validations/user';
+import { EMAIL_VALIDATION } from '../../utils/constants/user';
 
 const ForgotPassword = ({ open, onClose }) => {
     const [email, setEmail] = useState('');

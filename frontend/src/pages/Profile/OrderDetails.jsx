@@ -11,7 +11,7 @@ import ReturnModal from '../../components/Product/Modals/ReturnModal';
 import { generateOrderPDF } from '../../components/Product/Utils/DataExport';
 import Footer from '../../components/Utils/Footer';
 import { getOrderDetailsService } from '../../services/orderService';
-import { getImageUrl } from '../../utils/config';
+import { getImageUrl } from '../../utils/config/config';
 
 const OrderDetails = () => {
     const { orderId } = useParams();

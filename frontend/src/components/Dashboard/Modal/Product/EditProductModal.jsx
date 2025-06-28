@@ -2,8 +2,8 @@ import { ArrowBack } from '@mui/icons-material';
 import { Autocomplete, Box, MenuItem, Modal, TextField } from '@mui/material';
 import { useEffect, useState } from 'react';
 import { toast } from 'react-toastify';
-import axiosInstance from '../../../../utils/axiosInstance';
-import { getImageUrl } from '../../../../utils/config';
+import axiosInstance from '../../../../utils/api/axiosInstance';
+import { getImageUrl } from '../../../../utils/config/config';
 import { ImageUploadBox } from '../../../custom/Dashboard';
 import { BrownButton, BrownOutlinedTextField, CustomBox, CustomPaper, CustomTypography, OutlinedBrownButton, OutlinedBrownFormControl } from '../../../custom/MUI';
 

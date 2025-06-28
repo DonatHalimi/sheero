@@ -1,5 +1,5 @@
-import { Box, Drawer, Typography } from '@mui/material';
-import { drawerPaperSx } from '../../../../assets/sx';
+import { Box, Drawer, Typography, useTheme } from '@mui/material';
+import { paperPropsSx } from '../../../../assets/sx';
 import { DateAdornment, DescriptionAdornment, IdAdornment, PersonAdornment, ReturnStatusAdornment } from '../../../custom/Adornments';
 import { CollapsibleProductList, TitleActions } from '../../../custom/Dashboard';
 import { BoxBetween, CloseButton, ReadOnlyTextField } from '../../../custom/MUI';
@@ -7,6 +7,8 @@ import { formatDate } from '../../../custom/utils';
 import { downloadReturnRequestData } from '../../../Product/Utils/DataExport';
 
 const ReturnRequestDetailsDrawer = ({ open, onClose, returnRequest, onEdit, onDelete }) => {
+    const theme = useTheme();
+
     const header = `Return Request for Order #<strong>${returnRequest?.order}</strong>`;
     const user = `${returnRequest?.user.firstName} ${returnRequest?.user.lastName} - ${returnRequest?.user.email}`;
 
@@ -37,7 +39,7 @@ const ReturnRequestDetailsDrawer = ({ open, onClose, returnRequest, onEdit, onDe
             anchor="right"
             open={open}
             onClose={onClose}
-            PaperProps={drawerPaperSx}
+            PaperProps={paperPropsSx(theme)}
             sx={{ zIndex: 9999 }}
         >
             <CloseButton onClose={onClose} />

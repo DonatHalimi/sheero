@@ -8,7 +8,7 @@ import { DiscountPercentage, OutOfStock } from '../../../components/custom/Produ
 import { formatPrice } from '../../../components/custom/utils';
 import { addToCartService } from '../../../services/cartService';
 import { getCartCount } from '../../../store/actions/cartActions';
-import { getImageUrl } from '../../../utils/config';
+import { getImageUrl } from '../../../utils/config/config';
 
 const WishlistItem = ({ product, onRemove }) => {
     const { isAuthenticated } = useSelector(state => state.auth);

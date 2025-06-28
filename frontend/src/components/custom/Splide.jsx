@@ -2,7 +2,7 @@ import { ArrowBackIosNew, ArrowForwardIos } from "@mui/icons-material";
 import { FormControl, IconButton, InputLabel, MenuItem, Select } from "@mui/material";
 import { Splide, SplideSlide } from "@splidejs/react-splide";
 import { useEffect, useRef, useState } from "react";
-import { getImageUrl } from "../../utils/config";
+import { getImageUrl } from "../../utils/config/config";
 import { LoadingSplide } from "../custom/LoadingSkeletons";
 import { truncateText } from "./utils";
 

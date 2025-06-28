@@ -6,7 +6,7 @@ import { toast } from 'react-toastify';
 import { LoadingLabel } from '../../../components/custom/LoadingSkeletons';
 import { BrownButton, BrownOutlinedTextField, CustomBox, CustomModal, CustomTypography } from '../../../components/custom/MUI';
 import { addReviewService, checkReviewEligibilityService } from '../../../services/reviewService';
-import { COMMENT_VALIDATION, TITLE_VALIDATION } from '../../../utils/constants/validations/review';
+import { COMMENT_VALIDATION, TITLE_VALIDATION } from '../../../utils/constants/review';
 
 const AddReviewModal = ({ open, onClose, product, onReviewSuccess }) => {
     const { isAuthenticated } = useSelector((state) => state.auth);

@@ -8,7 +8,7 @@ import { toast } from "react-toastify";
 import { headerFilterSx, headerSearchSx, layoutContainerSx, profileDropdownButtonSx, profileDropdownContainerSx, profileLayoutSx } from "../../assets/sx";
 import ProfileSidebar from "../../pages/Profile/ProfileSidebar";
 import { disable2faService, enable2faService, enableAuthenticator2FAService, getExistingSecretService } from "../../services/authService";
-import { getApiUrl } from "../../utils/config";
+import { getApiUrl } from "../../utils/config/config";
 import { OTPIcon, StyledDashboardIcon, StyledFavoriteIcon, StyledInboxIcon, StyledLogoutIcon, StyledPersonIcon } from "./Icons";
 import { LoadingAction, LoadingLabel, LoadingOverlay, WaveSkeleton } from "./LoadingSkeletons";
 import { BrownButton, ClearWishlist, CustomBox, CustomModal, DropdownAnimation, OutlinedBrownButton, RoundIconButton, ShareWishlist } from "./MUI";

@@ -1,7 +1,7 @@
 import { CenteredMoreVertIcon } from '../../../components/custom/Icons';
 import { RatingStars } from '../../../components/custom/Product';
 import { truncateText } from '../../../components/custom/utils';
-import { getImageUrl } from '../../../utils/config';
+import { getImageUrl } from '../../../utils/config/config';
 
 const ReviewItem = ({ review, onImageClick, onMenuClick, onCardClick }) => {
     const handleProductClick = (event) => {

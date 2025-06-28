@@ -1,6 +1,6 @@
 import { Check, Clear } from '@mui/icons-material';
-import { Box, Chip, Drawer, Typography } from '@mui/material';
-import { drawerPaperSx } from '../../../../assets/sx';
+import { Box, Chip, Drawer, Typography, useTheme } from '@mui/material';
+import { paperPropsSx } from '../../../../assets/sx';
 import { IdAdornment } from '../../../custom/Adornments';
 import { DetailsTitle } from '../../../custom/Dashboard';
 import { AccountLinkStatus, BoxBetween, CloseButton, ReadOnlyTextField } from '../../../custom/MUI';
@@ -8,6 +8,8 @@ import { formatDateTime } from '../../../custom/utils';
 import { downloadUserDetails } from '../../../Product/Utils/DataExport';
 
 const UserDetailsDrawer = ({ open, onClose, user, onEdit, onDelete }) => {
+    const theme = useTheme();
+
     const handleEdit = () => {
         onClose();
         onEdit(user);
@@ -27,7 +29,7 @@ const UserDetailsDrawer = ({ open, onClose, user, onEdit, onDelete }) => {
             anchor="right"
             open={open}
             onClose={onClose}
-            PaperProps={drawerPaperSx}
+            PaperProps={paperPropsSx(theme)}
             sx={{ zIndex: 9999 }}
         >
             <CloseButton onClose={onClose} />

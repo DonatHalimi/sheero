@@ -1,5 +1,5 @@
 import * as yup from "yup";
-import { CHECKBOX_VALIDATION, CUSTOM_REASON_VALIDATION, REASON_VALIDATION, SELECTED_PRODUCTS_VALIDATION, STATUS_VALIDATION } from "../constants/validations/return";
+import { CHECKBOX_VALIDATION, CUSTOM_REASON_VALIDATION, REASON_VALIDATION, SELECTED_PRODUCTS_VALIDATION, STATUS_VALIDATION } from "../constants/return";
 
 export const initialValues = (returnRequest = null) => ({
     status: returnRequest?.status || '',

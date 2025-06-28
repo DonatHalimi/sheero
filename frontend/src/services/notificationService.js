@@ -1,4 +1,4 @@
-import axiosInstance from "../utils/axiosInstance";
+import axiosInstance from "../utils/api/axiosInstance";
 
 export const getNotificationsService = () => axiosInstance.get('/notifications/get');
 

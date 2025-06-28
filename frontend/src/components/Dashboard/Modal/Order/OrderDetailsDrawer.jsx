@@ -1,5 +1,6 @@
 import { Box, Drawer, Typography } from '@mui/material';
-import { drawerPaperSx } from '../../../../assets/sx';
+import { useTheme } from '@mui/material/styles';
+import { paperPropsSx } from '../../../../assets/sx';
 import { CityAdornment, CommentAdornment, CountryAdornment, DateAdornment, DeliveryStatusAdornment, EuroAdornment, IdAdornment, PaymentMethodAdornment, PaymentStatusAdornment, PersonAdornment, PhoneAdornment, StreetAdornment } from '../../../custom/Adornments';
 import { CollapsibleProductList, TitleActions } from '../../../custom/Dashboard';
 import { BoxBetween, CloseButton, ReadOnlyTextField } from '../../../custom/MUI';
@@ -7,6 +8,8 @@ import { formatDate } from '../../../custom/utils';
 import { downloadOrderData } from '../../../Product/Utils/DataExport';
 
 const OrderDetailsDrawer = ({ open, onClose, order, onEdit, onDelete }) => {
+    const theme = useTheme();
+
     const productLabel = order?.products?.length > 1 ? 'Products' : 'Product';
     const header = `Order for <strong>${order?.products.length} ${productLabel}</strong>`;
     const user = `${order?.user.firstName} ${order?.user.lastName} - ${order?.user.email}`;
@@ -26,7 +29,7 @@ const OrderDetailsDrawer = ({ open, onClose, order, onEdit, onDelete }) => {
             anchor="right"
             open={open}
             onClose={onClose}
-            PaperProps={drawerPaperSx}
+            PaperProps={paperPropsSx(theme)}
             sx={{ zIndex: 9999 }}
         >
             <CloseButton onClose={onClose} />
@@ -98,6 +101,7 @@ const OrderDetailsDrawer = ({ open, onClose, order, onEdit, onDelete }) => {
                                 InputProps={CityAdornment()}
                             />
                         </BoxBetween>
+
                         <ReadOnlyTextField
                             label="Street"
                             value={order.address.street}

@@ -15,7 +15,7 @@ import { logoutUser, selectIsAdmin, selectIsContentManager, selectIsCustomerSupp
 import { getCartCount } from '../../store/actions/cartActions';
 import { getNotificationCount } from '../../store/actions/orderActions';
 import { getWishlistCount } from '../../store/actions/wishlistActions';
-import { BASE_URL } from '../../utils/config';
+import { BASE_URL } from '../../utils/config/config';
 import CategoryNavbar from './CategoryNavbar';
 import SearchBar from './SearchBar';
 

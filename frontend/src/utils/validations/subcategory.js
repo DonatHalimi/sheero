@@ -1,5 +1,5 @@
 import * as yup from "yup";
-import { CATEGORY_VALIDATION, IMAGE_VALIDATION, NAME_VALIDATION } from "../constants/validations/subcategory";
+import { CATEGORY_VALIDATION, IMAGE_VALIDATION, NAME_VALIDATION } from "../constants/subcategory";
 
 export const initialValues = (subcategory = null) => ({
     name: subcategory?.name || "",

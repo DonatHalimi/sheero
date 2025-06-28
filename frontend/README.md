@@ -22,6 +22,7 @@ The frontend serves as the user interface layer of the application, interacting 
 │   ├── src/
 │   │   ├── assets/
 │   │   ├── components/
+│   │   ├── hooks/
 │   │   ├── pages/
 │   │   ├── services/
 │   │   ├── store/
@@ -29,10 +30,13 @@ The frontend serves as the user interface layer of the application, interacting 
 │   ├── App.jsx
 │   ├── index.css
 │   ├── main.jsx
-│   └── index.html
+│   ├── index.html
 │   ├── package-lock.json
 │   ├── package.json
-└── README.md
+│   ├── postcss.config.json
+│   ├── README.md
+│   ├── tailwind.config.js
+│   └── vite.config.js
 ```
 
 ### **Folder and File Explanations**
@@ -49,14 +53,15 @@ The frontend serves as the user interface layer of the application, interacting 
     - **imports.js**: Includes modules or files that are imported and shared across multiple components or views.
     - **sx.js**: Exports **sx** (style) classes for styling components, typically using the `sx` prop from the [MUI](https://mui.com/system/the-sx-prop/) library for consistent styling.
 
-  - **components/**  
-    Contains reusable React components. These components are the building blocks of the application, such as product cards, dashboard action modals, navbar components, etc.
+  - **components/**: Contains reusable React components. These components are the building blocks of the application, such as product cards, dashboard action modals, navbar components, etc.
 
-  - **pages/**  
-    Contains React components representing the main views or pages of the app, such as Home, Product Details, Orders, etc.
+  - **hooks/**
+    - **useDashboardPage.js**: Manages full-page state for dashboard views—handling modals, pagination, selections, exports and CRUD operations in a reusable approach.
+    - **useKeyboardShortcuts.js**: Adds advanced keyboard navigation and shortcut controls (e.g., add/edit/delete/view/select items) to improve dashboard productivity without relying solely on mouse interaction.
 
-  - **services/**  
-    Contains helper functions for interacting with the backend API.
+  - **pages/**: Contains React components representing the main views or pages of the app, such as Home, Product Details, Orders, etc.
+
+  - **services/**: Contains helper functions for interacting with the backend API.
 
   - **store/**  
     This folder contains the Redux-related files for managing the global application state. It ensures consistent and predictable state management across the app. Key components include:
@@ -66,14 +71,29 @@ The frontend serves as the user interface layer of the application, interacting 
     - **store.js**: Central configuration for the Redux store, integrating the root reducer, middleware and other Redux settings to manage the app’s state.
     - **types.js**: Defines constants for action types to ensure consistency and prevent typo-related bugs in action names and reducers.
 
-  - **utils/**  
-    Contains utility functions and helper methods used throughout the application. Key files include:
-    - **constants/validations/**: Contains objects with REGEX patterns, title and message for each module ensuring consistency and centrality of validation.
-    - **validations/**: Contains validation schemas for different modules.
-    - **axiosInstance.js**: Configures and exports an Axios instance for making API requests, with cookie-based authentication.
-    - **checkEnv.js**: Verifies that all required environment variables are set, ensuring the app runs with the correct configuration.
+  - **utils/**
+
+    Contains utility functions and helper methods used throughout the application. Structure:
+
+  - **api/**
+
+    * **axiosInstance.js**: Configures and exports an Axios instance for making API requests with cookie-based authentication.
+    * **getApiEndpoint.js**: Dynamically generates API endpoints based on environment and context.
+
+  - **config/**
+
     - **config.js**: Centralized configuration file for setting base URLs and other global settings across the app.
-    - **theme.js**: Defines and exports the app’s theme settings, such as colors and typography, to maintain a consistent design.
+    - **checkEnv.js**: Verifies that all required environment variables are set, ensuring the app runs with the correct configuration.
+
+  - **constants/**: Contains objects with REGEX patterns, title and message for each module ensuring consistency and centrality of validation.
+
+  - **theme/**
+
+    - **dashboardTheme.js**: Creates and exports the MUI theme dynamically based on light or dark mode.
+    - **theme.js**: Contains shared color palettes and theme constants.
+    - **ThemeContext.js**: Provides React context for managing theme mode across the app.
+
+  - **validations/**: Contains Yup schemas and other validation logic for various modules and forms.
 
 - **App.jsx**  
   The root React component that defines the overall structure and routes of the application.
@@ -132,6 +152,7 @@ The frontend serves as the user interface layer of the application, interacting 
     "react-swipeable": "^7.0.1",
     "react-toastify": "^10.0.5",
     "redux": "^5.0.1",
+    "socket.io-client": "^4.8.1",
     "tailwindcss": "^3.4.4",
     "vite": "^5.3.1",
     "xlsx": "^0.18.5",
@@ -158,6 +179,7 @@ The frontend serves as the user interface layer of the application, interacting 
 - **[Yup](https://www.npmjs.com/package/yup):** For form validation schema.
 - **[React Router DOM](https://www.npmjs.com/package/react-router-dom):** Used for routing between different pages of the app.
 - **[React Redux](https://www.npmjs.com/package/react-redux):** Provides bindings to manage state with Redux in React apps.
+- **[Socket.IO Client](https://www.npmjs.com/package/socket.io-client):** Used for real-time communication with the backend for the live order notifications.
 - **[React Intersection Observer](https://www.npmjs.com/package/react-intersection-observer):** Detects when elements (like products) are visible in the viewport, useful for infinite scroll.
 - **[React Hotkeys](https://www.npmjs.com/package/react-hotkeys-hook):** For adding keyboard shortcuts to the app.
 - **[Tailwind CSS](https://tailwindcss.com):** A utility-first CSS framework for fast and responsive UI design.

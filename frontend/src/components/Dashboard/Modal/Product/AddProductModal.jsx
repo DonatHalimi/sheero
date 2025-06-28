@@ -2,7 +2,7 @@ import { Autocomplete, Box, InputLabel, MenuItem, Modal, Select, TextField } fro
 import { useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { toast } from 'react-toastify';
-import axiosInstance from '../../../../utils/axiosInstance';
+import axiosInstance from '../../../../utils/api/axiosInstance';
 import { ImageUploadBox } from '../../../custom/Dashboard';
 import { BrownButton, BrownOutlinedTextField, CustomBox, CustomPaper, CustomTypography, OutlinedBrownButton, OutlinedBrownFormControl } from '../../../custom/MUI';
 

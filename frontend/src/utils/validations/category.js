@@ -1,5 +1,5 @@
 import * as yup from "yup";
-import { IMAGE_VALIDATION, NAME_VALIDATION } from "../constants/validations/category";
+import { IMAGE_VALIDATION, NAME_VALIDATION } from "../constants/category";
 
 export const initialValues = (category = null) => ({
     name: category?.name || "",

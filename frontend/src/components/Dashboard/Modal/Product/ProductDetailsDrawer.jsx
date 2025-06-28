@@ -1,6 +1,6 @@
-import { Box, Drawer } from '@mui/material';
-import { drawerPaperSx } from '../../../../assets/sx';
-import { getImageUrl } from '../../../../utils/config';
+import { Box, Drawer, useTheme } from '@mui/material';
+import { paperPropsSx } from '../../../../assets/sx';
+import { getImageUrl } from '../../../../utils/config/config';
 import { EuroAdornment, IdAdornment, InventoryAdornment, ShippingAdornment } from '../../../custom/Adornments';
 import { DetailsTitle } from '../../../custom/Dashboard';
 import { BoxBetween, CloseButton, ReadOnlyTextField } from '../../../custom/MUI';
@@ -8,6 +8,8 @@ import { formatDimensions, formatProductDetails, formatProductDiscount, formatPr
 import { downloadProductData } from '../../../Product/Utils/DataExport';
 
 const ProductDetailsDrawer = ({ open, onClose, product, onEdit, onDelete }) => {
+    const theme = useTheme();
+
     const handleEdit = () => {
         onClose();
         onEdit(product);
@@ -27,7 +29,7 @@ const ProductDetailsDrawer = ({ open, onClose, product, onEdit, onDelete }) => {
             anchor="right"
             open={open}
             onClose={onClose}
-            PaperProps={drawerPaperSx}
+            PaperProps={paperPropsSx(theme)}
             sx={{ zIndex: 9999 }}
         >
             <CloseButton onClose={onClose} />

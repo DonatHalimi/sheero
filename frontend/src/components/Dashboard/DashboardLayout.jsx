@@ -11,7 +11,7 @@ import { DashboardNavbar } from '../../components/custom/Dashboard';
 import { DashboardCollapse, Drawer } from '../../components/custom/MUI';
 import { getLocalStorageState, saveLocalStorageState } from '../../components/custom/utils';
 import { logoutUser, selectIsAdmin, selectIsContentManager, selectIsCustomerSupport, selectIsOrderManager, selectIsProductManager } from '../../store/actions/authActions';
-import { DashboardThemeProvider } from '../../utils/ThemeContext';
+import { DashboardThemeProvider } from '../../utils/theme/ThemeContext';
 import { mainListItems } from './listItems';
 
 /**

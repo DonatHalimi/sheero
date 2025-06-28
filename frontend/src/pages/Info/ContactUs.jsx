@@ -7,7 +7,7 @@ import { BrownButton, ErrorTooltip } from '../../components/custom/MUI';
 import Navbar from '../../components/Navbar/Navbar';
 import Footer from '../../components/Utils/Footer';
 import { addContactService } from '../../services/contactService';
-import { EMAIL_VALIDATION, MESSAGE_VALIDATION, NAME_VALIDATION, SUBJECT_VALIDATION } from '../../utils/constants/validations/contact';
+import { EMAIL_VALIDATION, MESSAGE_VALIDATION, NAME_VALIDATION, SUBJECT_VALIDATION } from '../../utils/constants/contact';
 
 const ContactUs = () => {
     const { user } = useSelector((state) => state.auth);

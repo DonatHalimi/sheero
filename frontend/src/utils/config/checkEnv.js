@@ -11,7 +11,7 @@ if (process.env.NODE_ENV === 'production') {
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
 
-const envFilePath = path.resolve(__dirname, '../../.env');
+const envFilePath = path.resolve(__dirname, '../../../.env');
 
 if (!fs.existsSync(envFilePath)) {
     console.error(`⚠️  .env file not found at: ${envFilePath}`);

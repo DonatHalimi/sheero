@@ -45,25 +45,27 @@ The backend provides APIs that are documented and accessible through Postman. Yo
   - `db.js`: Establishes and manages the MongoDB database connection.
   - `dotenv.js`: Loads and validates environment variables from the `.env` file for secure configuration.
   - `server.js`: Handles Express server initialization and startup.
+  - `utils.js`: Utility functions supporting core application operations.
 
 - **`email/`**
   - `content/`: Contains all HTML email templates and generators.
-  - `service.js`: Main service for sending various types of emails.
-  - `utils.js`: Utility functions supporting email operations.
   - `mailer.js`: Configures the SMTP transporter using [nodemailer](https://www.npmjs.com/package/nodemailer) for email delivery.
   - `queues.js`: Centralized queue manager using [Bull](https://github.com/OptimalBits/bull) and [Redis](https://redis.io) to manage and process all email-related background jobs efficiently.
+  - `service.js`: Main service for sending various types of emails.
+  - `utils.js`: Utility functions supporting email operations.
 
 #### `controllers/`
 - Contains the core business logic for each API endpoint, with each controller corresponding to specific route definitions.
 
 #### `middleware/`
-- Houses middleware functions that process requests before reaching controllers, including:
+- Contains middleware functions that process requests before reaching controllers, including:
   - Authentication verification
+  - Database seeding logic
   - File upload handling
   - Request data validation
 
 #### `models/`
-- Defines MongoDB schemas and models for all application entities (Users, Products, etc.), establishing the data structure and relationships.
+- Defines MongoDB schemas and models for all application entities, establishing the data structure and relationships.
 
 #### `routes/`
 - Maps API endpoints to their corresponding controller functions and applies route-specific middleware (authentication, validation).
@@ -73,6 +75,9 @@ The backend provides APIs that are documented and accessible through Postman. Yo
 
 #### `validations/`
 - Contains Yup validation schemas that ensure incoming request data meets required formats and constraints improving reliability and security for API endpoints.
+
+#### `index.js`
+- Main entry point of the application, where the server is initialized and started.
 
 ---
 
@@ -102,11 +107,13 @@ The backend provides APIs that are documented and accessible through Postman. Yo
     "mongoose": "^8.5.1",
     "multer": "^1.4.5-lts.1",
     "nodemailer": "^6.10.0",
+    "otp-generator": "^4.0.1",
     "passport": "^0.7.0",
     "passport-facebook": "^3.0.0",
     "passport-google-oauth20": "^2.0.0",
     "qrcode": "^1.5.4",
     "slugify": "^1.6.6",
+    "socket.io": "^4.8.1",
     "speakeasy": "^2.0.0",
     "stripe": "^16.12.0",
     "yup": "^1.4.0"
@@ -136,12 +143,14 @@ The backend provides APIs that are documented and accessible through Postman. Yo
 - **[Mongoose](https://www.npmjs.com/package/mongoose)**: An Object Document Mapper (ODM) that simplifies interactions with MongoDB by providing schema-based models for documents.
 - **[Multer](https://www.npmjs.com/package/multer)**: Middleware used for handling multipart form data, commonly used for handling file uploads (like images).
 - **[Nodemailer](https://www.npmjs.com/package/nodemailer)**: A library for sending emails using a SMTP transport, allowing the backend to send verification emails and other notifications.
+- **[OTP Generator](https://www.npmjs.com/package/otp-generator)**: A library for generating One-Time Passwords (OTP) for user authentication.
 - **[Nodemon](https://www.npmjs.com/package/nodemon)**: A development utility that automatically restarts the server when changes are detected in the source code.
 - **[Passport](https://www.npmjs.com/package/passport)**: A middleware for handling authentication strategies, including Facebook and Google OAuth.
 - **[Passport-Facebook](https://www.npmjs.com/package/passport-facebook)**: A strategy for authenticating users using Facebook OAuth.
 - **[Passport-Google-OAuth20](https://www.npmjs.com/package/passport-google-oauth20)**: A strategy for authenticating users using Google OAuth.
 - **[Qrcode](https://www.npmjs.com/package/qrcode)**: A library for generating QR codes, used for generating QR codes for 2FA user authentication.
 - **[Slugify](https://www.npmjs.com/package/slugify)**: A library for generating slugs (URL-friendly strings) from text, ensuring URLs are user-friendly and SEO-friendly.
+- **[Socket.io](https://www.npmjs.com/package/socket.io)**: A library for real-time communication, used for live updates on order notifications in the frontend.
 - **[Speakeasy](https://www.npmjs.com/package/speakeasy)**: A library for generating and verifying one-time passwords (OTPs), used for 2FA in user authentication with authenticator applications.
 - **[Stripe](https://www.npmjs.com/package/stripe)**: A library for integrating with the Stripe payment system, allowing the backend to handle payments securely.
 - **[Yup](https://www.npmjs.com/package/yup)**: A JavaScript schema validator used for validating and parsing data to ensure it conforms to expected structures.

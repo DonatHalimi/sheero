@@ -10,7 +10,7 @@ import { handleFacebookLogin, handleGoogleLogin, SocialLoginButtons } from '../.
 import Navbar from '../../components/Navbar/Navbar';
 import Footer from '../../components/Utils/Footer';
 import { registerUser } from '../../store/actions/authActions';
-import { EMAIL_VALIDATION, FIRST_NAME_VALIDATION, LAST_NAME_VALIDATION, PASSWORD_VALIDATION } from '../../utils/constants/validations/user';
+import { EMAIL_VALIDATION, FIRST_NAME_VALIDATION, LAST_NAME_VALIDATION, PASSWORD_VALIDATION } from '../../utils/constants/user';
 
 const Register = () => {
     const dispatch = useDispatch();

@@ -10,7 +10,7 @@ import Navbar from '../../components/Navbar/Navbar';
 import { generateReturnPDF } from '../../components/Product/Utils/DataExport';
 import Footer from '../../components/Utils/Footer';
 import { getReturnDetailsService } from '../../services/returnService';
-import { getImageUrl } from '../../utils/config';
+import { getImageUrl } from '../../utils/config/config';
 
 const ReturnDetails = () => {
     const { returnId } = useParams();

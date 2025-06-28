@@ -1,7 +1,7 @@
 import { jsPDF } from "jspdf";
 import "jspdf-autotable";
 import * as XLSX from 'xlsx';
-import { getImageUrl } from "../../../utils/config";
+import { getImageUrl } from "../../../utils/config/config";
 
 const createDownloadLink = (data, fileName) => {
     const link = document.createElement('a');
@@ -480,9 +480,10 @@ export const downloadOrderData = (order) => {
             },
             products: order.products.map(product => ({
                 name: product.product?.name || 'Unknown Product',
-                quantity: product.quantity || 0
+                quantity: product.quantity || 0,
+                price: product.price || 0
             })),
-            totalAmount: order.totalAmount,
+            totalAmount: order.totalAmount.toFixed(2),
             paymentMethod: order.paymentMethod,
             paymentStatus: order.paymentStatus,
             paymentIntentId: order.paymentIntentId || 'N/A',

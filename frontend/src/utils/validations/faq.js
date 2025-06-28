@@ -1,5 +1,5 @@
 import * as yup from "yup";
-import { ANSWER_VALIDATION, QUESTION_VALIDATION } from "../constants/validations/faq";
+import { ANSWER_VALIDATION, QUESTION_VALIDATION } from "../constants/faq";
 
 export const initialValues = (faq = null) => ({
     question: faq?.question || "",

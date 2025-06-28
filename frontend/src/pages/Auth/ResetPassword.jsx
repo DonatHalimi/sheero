@@ -6,7 +6,7 @@ import { toast } from 'react-toastify';
 import { LoadingLabel, LoadingOverlay } from '../../components/custom/LoadingSkeletons';
 import { BrownButton, BrownOutlinedTextField } from '../../components/custom/MUI';
 import { resetPasswordService, validateResetTokenService } from '../../services/authService';
-import { PASSWORD_VALIDATION } from '../../utils/constants/validations/user';
+import { PASSWORD_VALIDATION } from '../../utils/constants/user';
 
 const ResetPassword = () => {
     const { token } = useParams();

@@ -4,7 +4,7 @@
   "version": "0.0.0",
   "type": "module",
   "scripts": {
-    "check-env": "node ./src/utils/checkEnv.js",
+    "check-env": "node ./src/utils/config/checkEnv.js",
     "dev": "npm run check-env && vite --port 3000 --open",
     "build": "npm run check-env && vite build",
     "lint": "eslint . --ext js,jsx --report-unused-disable-directives --max-warnings 0",

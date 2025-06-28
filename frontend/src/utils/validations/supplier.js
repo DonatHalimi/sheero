@@ -1,5 +1,5 @@
 import * as yup from "yup";
-import { EMAIL_VALIDATION, NAME_VALIDATION, PHONE_NUMBER_VALIDATION } from "../constants/validations/supplier";
+import { EMAIL_VALIDATION, NAME_VALIDATION, PHONE_NUMBER_VALIDATION } from "../constants/supplier";
 
 export const initialValues = (supplier = null) => ({
     name: supplier?.name || "",

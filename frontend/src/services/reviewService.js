@@ -1,4 +1,4 @@
-import axiosInstance from "../utils/axiosInstance";
+import axiosInstance from "../utils/api/axiosInstance";
 
 export const checkReviewEligibilityService = (productId) => axiosInstance.get(`/reviews/orders/check-review/${productId}`);
 

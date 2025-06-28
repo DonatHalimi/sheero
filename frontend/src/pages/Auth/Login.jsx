@@ -10,7 +10,7 @@ import { handleFacebookLogin, handleGoogleLogin, SocialLoginButtons } from '../.
 import Navbar from '../../components/Navbar/Navbar';
 import Footer from '../../components/Utils/Footer';
 import { loginUser } from '../../store/actions/authActions';
-import { EMAIL_VALIDATION, PASSWORD_VALIDATION } from '../../utils/constants/validations/user';
+import { EMAIL_VALIDATION, PASSWORD_VALIDATION } from '../../utils/constants/user';
 import ForgotPassword from './ForgotPassword';
 
 const Login = () => {

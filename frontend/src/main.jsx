@@ -11,7 +11,7 @@ import { getCategories } from './store/actions/categoryActions';
 import { getProducts } from './store/actions/productActions';
 import { getImages } from './store/actions/slideshowActions';
 import store from './store/store';
-import theme from './utils/theme';
+import theme from './utils/theme/theme';
 
 const Main = () => {
   const dispatch = useDispatch();

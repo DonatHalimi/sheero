@@ -4,7 +4,7 @@
   "description": "",
   "main": "index.js",
   "scripts": {
-    "check-frontend-env": "node frontend/src/utils/checkEnv.js",
+    "check-frontend-env": "node frontend/src/utils/config/checkEnv.js",
     "check-backend-env": "node backend/config/core/checkEnv.js",
     "start": "npm run check-frontend-env && npm run check-backend-env && concurrently --kill-others \"npm run start-frontend\" \"npm run start-backend\"",
     "start-frontend": "cd frontend && npm run dev",

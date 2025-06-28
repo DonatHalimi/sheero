@@ -2,7 +2,7 @@ import { Box, MenuItem, Typography } from '@mui/material';
 import { Form, Formik } from 'formik';
 import { toast } from 'react-toastify';
 import { editReturnRequestStatusService } from '../../../../services/returnService';
-import { statusOptions } from '../../../../utils/constants/validations/return';
+import { statusOptions } from '../../../../utils/constants/return';
 import { initialValues, validationSchema } from '../../../../utils/validations/return';
 import { DescriptionAdornment, IdAdornment, PersonAdornment, ReturnStatusAdornment } from '../../../custom/Adornments';
 import { ActionButtons, CollapsibleProductList } from '../../../custom/Dashboard';

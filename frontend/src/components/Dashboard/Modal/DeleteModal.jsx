@@ -1,7 +1,7 @@
 import { useState } from 'react';
 import { toast } from 'react-toastify';
 import { CustomDeleteModal } from '../../../components/custom/MUI';
-import axiosInstance from '../../../utils/axiosInstance';
+import axiosInstance from '../../../utils/api/axiosInstance';
 
 const DeleteModal = ({ open, onClose, deletionContext, onDeleteSuccess, title, message }) => {
     const [loading, setLoading] = useState(false);

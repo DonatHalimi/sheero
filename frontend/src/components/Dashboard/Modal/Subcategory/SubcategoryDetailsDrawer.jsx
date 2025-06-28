@@ -1,6 +1,6 @@
-import { Box, Drawer } from '@mui/material';
-import { drawerPaperSx } from '../../../../assets/sx';
-import { getImageUrl } from '../../../../utils/config';
+import { Box, Drawer, useTheme } from '@mui/material';
+import { paperPropsSx } from '../../../../assets/sx';
+import { getImageUrl } from '../../../../utils/config/config';
 import { DateAdornment, IdAdornment, PersonAdornment } from '../../../custom/Adornments';
 import { DetailsTitle } from '../../../custom/Dashboard';
 import { BoxBetween, CloseButton, ReadOnlyTextField } from '../../../custom/MUI';
@@ -8,6 +8,8 @@ import { formatDate } from '../../../custom/utils';
 import { downloadSubcategoryData } from '../../../Product/Utils/DataExport';
 
 const SubcategoryDetailsDrawer = ({ open, onClose, subcategory, onEdit, onDelete }) => {
+    const theme = useTheme();
+
     const handleEdit = () => {
         onClose();
         onEdit(subcategory);
@@ -27,7 +29,7 @@ const SubcategoryDetailsDrawer = ({ open, onClose, subcategory, onEdit, onDelete
             anchor="right"
             open={open}
             onClose={onClose}
-            PaperProps={drawerPaperSx}
+            PaperProps={paperPropsSx(theme)}
             sx={{ zIndex: 9999 }}
         >
             <CloseButton onClose={onClose} />

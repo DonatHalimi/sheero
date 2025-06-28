@@ -256,6 +256,31 @@ Follow these steps to generate an App Password:
    npm start
    ```
 
+### **File Structure of Root**
+
+```bash
+├── backend/
+├── frontend/
+├── ERD.drawio
+├── README.md
+├── package.json
+├── package-lock.json
+```
+
+### **Folder and File Explanations**
+
+* **backend/**
+  Contains all the server-side code, business logic, API routes, authentication, and database interactions. It manages user sessions, processes requests, and enforces security and validation. To learn more about the structure of the backend, refer to the [backend/README.md](backend/README.md) file.
+
+* **frontend/**
+  Contains the client-side React application. This folder includes UI components, styles, services, state management logic, and all the necessary tools to interact with the backend APIs. To learn more about the structure of the frontend, refer to the [frontend/README.md](frontend/README.md) file.
+
+* **ERD.drawio**
+  Entity Relationship Diagram (ERD) for the database schema. Used to visualize how different entities in the application relate to one another. Can be opened using [draw.io](https://draw.io) or any compatible tool.
+
+* **README.md**
+  The main documentation file for the repository. Provides an overview of the project, setup instructions, usage and additional resources like Postman documentation links.
+
 The root `package.json` should look like this:
 
 ```json
@@ -265,7 +290,7 @@ The root `package.json` should look like this:
   "description": "",
   "main": "index.js",
   "scripts": {
-    "check-frontend-env": "node frontend/src/utils/checkEnv.js",
+    "check-frontend-env": "node frontend/src/utils/config/checkEnv.js",
     "check-backend-env": "node backend/config/core/checkEnv.js",
     "start": "npm run check-frontend-env && npm run check-backend-env && concurrently --kill-others \"npm run start-frontend\" \"npm run start-backend\"",
     "start-frontend": "cd frontend && npm run dev",

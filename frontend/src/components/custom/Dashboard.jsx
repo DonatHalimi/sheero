@@ -54,8 +54,8 @@ import {
     formSubmitSx,
     keyboardKeySx
 } from "../../assets/sx";
-import { getImageUrl } from "../../utils/config";
-import { useDashboardTheme } from "../../utils/ThemeContext";
+import { getImageUrl } from "../../utils/config/config";
+import { useDashboardTheme } from "../../utils/theme/ThemeContext";
 import {
     CreateIcon,
     DataObjectIcon,
@@ -113,10 +113,9 @@ export const ActionButtons = ({
                 {secondaryButtonLabel}
             </OutlinedBrownButton>
 
-            <BrownButton
+            <Button
                 onClick={onPrimaryClick}
                 variant="contained"
-                color="primary"
                 isFormValid={isFormValid}
                 style={{ width: `${width}px` }}
                 disabled={loading}
@@ -127,7 +126,7 @@ export const ActionButtons = ({
                     defaultLabel={primaryButtonLabel}
                     loadingLabel={'Saving'}
                 />
-            </BrownButton>
+            </Button>
         </Box>
     );
 };

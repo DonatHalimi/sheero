@@ -12,7 +12,7 @@ import { downloadUserData } from '../../components/Product/Utils/DataExport';
 import Footer from '../../components/Utils/Footer';
 import { toggleLoginNotificationsService } from '../../services/authService';
 import { loadUser, updateUserProfile } from '../../store/actions/authActions';
-import { EMAIL_VALIDATION, FIRST_NAME_VALIDATION, LAST_NAME_VALIDATION, LOGIN_NOTIFICATIONS_VALIDATION, PASSWORD_VALIDATION, TWO_FACTOR_VALIDATION } from '../../utils/constants/validations/user';
+import { EMAIL_VALIDATION, FIRST_NAME_VALIDATION, LAST_NAME_VALIDATION, LOGIN_NOTIFICATIONS_VALIDATION, PASSWORD_VALIDATION, TWO_FACTOR_VALIDATION } from '../../utils/constants/user';
 
 const ProfileDetails = () => {
     const { user, loading } = useSelector(state => state.auth);

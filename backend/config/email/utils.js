@@ -164,6 +164,8 @@ function getBrandHeaderHtml(brandImages = {}) {
 };
 
 function getEmailFooterHtml() {
+  const currentYear = new Date().getFullYear();
+
   return `
     <p style="color: #666; font-size: 12px; margin-top: 20px;">
       If you have any questions, please <a href="https://sheero.onrender.com/contact-us" style="color: #57534E; text-decoration: underline;">contact us</a> through our contact form or through our <a href="mailto:sheero.info@gmail.com" style="color: #57534E; text-decoration: underline;">email address</a>.
@@ -175,7 +177,7 @@ function getEmailFooterHtml() {
     </p>
 
     <p style="font-size: 12px; color: #888; margin-top: 20px; text-align: center;">
-      &copy; 2025 <a href="https://sheero.onrender.com" style="color: #57534E; text-decoration: underline;">sheero</a>. All rights reserved.
+      &copy; 2024 - ${currentYear} <a href="https://sheero.onrender.com" style="color: #57534E; text-decoration: underline;">sheero</a>. All rights reserved.
     </p>
   `;
 };

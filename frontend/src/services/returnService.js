@@ -1,4 +1,4 @@
-import axiosInstance from "../utils/axiosInstance";
+import axiosInstance from "../utils/api/axiosInstance";
 
 export const getReturnRequestsService = () => axiosInstance.get('/returns/get');
 

@@ -1,5 +1,5 @@
 import * as yup from "yup";
-import { EMAIL_VALIDATION, MESSAGE_VALIDATION, NAME_VALIDATION, SUBJECT_VALIDATION } from "../constants/validations/contact";
+import { EMAIL_VALIDATION, MESSAGE_VALIDATION, NAME_VALIDATION, SUBJECT_VALIDATION } from "../constants/contact";
 
 export const initialValues = (contact = null) => ({
     name: contact?.name || "",

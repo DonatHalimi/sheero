@@ -5,7 +5,7 @@ import { toast } from 'react-toastify';
 import { LoadingLabel } from '../../../components/custom/LoadingSkeletons';
 import { BrownButton, BrownOutlinedTextField, CustomBox, CustomModal, CustomTypography, ReadOnlyTextField } from '../../../components/custom/MUI';
 import { editUserReview, getUserReviews } from '../../../store/actions/reviewActions';
-import { COMMENT_VALIDATION, TITLE_VALIDATION } from '../../../utils/constants/validations/review';
+import { COMMENT_VALIDATION, TITLE_VALIDATION } from '../../../utils/constants/review';
 
 const EditReviewModal = ({ open, onClose, review, onEditSuccess }) => {
     const [title, setTitle] = useState('');

@@ -1,4 +1,4 @@
-import { knownEmailProviders } from "../../../components/custom/utils";
+import { knownEmailProviders } from "../../components/custom/utils";
 
 export const NAME_VALIDATION = {
     regex: /^[A-ZÇ][a-zA-ZëËçÇ\s]{3,15}$/,

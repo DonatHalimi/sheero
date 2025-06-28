@@ -52,8 +52,8 @@
 }
 
 .dashboard-container[data-theme="dark"] {
-    --scrollbar-thumb-color: #4A4A4A;
-    --scrollbar-thumb-hover-color: #6A6A6A;
+    --scrollbar-thumb-color: #6A6A6A;
+    --scrollbar-thumb-hover-color: #878787;
     --scrollbar-track-color: #2D2D2D;
     --scrollbar-corner-color: #1E1E1E;
 }

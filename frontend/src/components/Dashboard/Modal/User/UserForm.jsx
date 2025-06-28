@@ -76,7 +76,7 @@ const UserForm = ({
 
                 <Formik
                     initialValues={initialValues(user)}
-                    validationSchema={validationSchema}
+                    validationSchema={validationSchema(isEdit)}
                     enableReinitialize
                     onSubmit={handleSubmit}
                 >
@@ -95,6 +95,7 @@ const UserForm = ({
                                     name="password"
                                     label="Password"
                                     type={showPassword ? "text" : "password"}
+                                    placeholder="Leave blank to keep current password"
                                     InputProps={{
                                         endAdornment: (
                                             <InputAdornment position="end">

@@ -1,7 +1,7 @@
 import { Form, Formik } from 'formik';
 import { toast } from 'react-toastify';
 import { addSlideshowService, editSlideshowService } from '../../../../services/slideshowService';
-import { getImageUrl } from '../../../../utils/config';
+import { getImageUrl } from '../../../../utils/config/config';
 import { initialValues, validationSchema } from '../../../../utils/validations/slideshow';
 import { FormSubmitButtons, ImageUploadBox } from '../../../custom/Dashboard';
 import { CustomBox, CustomModal, CustomTextField, CustomTypography } from '../../../custom/MUI';

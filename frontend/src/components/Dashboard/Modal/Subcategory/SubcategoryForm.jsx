@@ -4,7 +4,7 @@ import { useEffect, useState } from 'react';
 import { toast } from 'react-toastify';
 import { getCategoriesService } from '../../../../services/categoryService';
 import { addSubcategoryService, editSubcategoryService } from '../../../../services/subcategoryService';
-import { getImageUrl } from '../../../../utils/config';
+import { getImageUrl } from '../../../../utils/config/config';
 import { initialValues, validationSchema } from '../../../../utils/validations/subcategory';
 import { FormSubmitButtons, ImageUploadBox } from '../../../custom/Dashboard';
 import { CustomBox, CustomModal, CustomPaper, CustomTextField, CustomTypography } from '../../../custom/MUI';

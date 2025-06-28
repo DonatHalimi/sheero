@@ -1,5 +1,5 @@
 import * as yup from "yup";
-import { DESCRIPTION_VALIDATION, IMAGE_VALIDATION, TITLE_VALIDATION } from "../constants/validations/slideshow";
+import { DESCRIPTION_VALIDATION, IMAGE_VALIDATION, TITLE_VALIDATION } from "../constants/slideshow";
 
 export const initialValues = (slideshow = null) => ({
     title: slideshow?.title || "",

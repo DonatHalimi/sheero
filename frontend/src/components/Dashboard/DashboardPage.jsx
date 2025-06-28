@@ -2,7 +2,7 @@ import { useSelector } from 'react-redux';
 import DashboardTable from '../../components/Dashboard/DashboardTable';
 import DeleteModal from '../../components/Dashboard/Modal/DeleteModal';
 import useDashboardPage from '../../hooks/useDashboardPage';
-import { getApiEndpoint } from '../../utils/getApiEndpoint';
+import { getApiEndpoint } from '../../utils/api/getApiEndpoint';
 import { DashboardHeader, exportOptions } from '../custom/Dashboard';
 import { LoadingDataGrid } from '../custom/LoadingSkeletons';
 

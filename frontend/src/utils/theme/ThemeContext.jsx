@@ -1,7 +1,7 @@
 import { ThemeProvider as MuiThemeProvider } from '@mui/material/styles';
 import { createContext, useContext, useEffect, useMemo, useState } from 'react';
 import { useHotkeys } from 'react-hotkeys-hook';
-import { getLocalStorageState, saveLocalStorageState } from '../components/custom/utils';
+import { getLocalStorageState, saveLocalStorageState } from '../../components/custom/utils';
 import { getDashboardTheme } from './dashboardTheme';
 
 const ThemeContext = createContext();

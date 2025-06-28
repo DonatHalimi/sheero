@@ -1,5 +1,5 @@
 import * as yup from "yup";
-import { STATUS_VALIDATION } from "../constants/validations/order";
+import { STATUS_VALIDATION } from "../constants/order";
 
 export const initialValues = (order = null) => ({
     status: order?.status || '',

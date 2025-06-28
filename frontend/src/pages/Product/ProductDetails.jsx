@@ -17,7 +17,7 @@ import { addToCartService } from '../../services/cartService';
 import { checkUserRestockSubscriptionService, deleteUserRestockSubscriptionService, getProductDetails, subscribeForRestockService } from '../../services/productService';
 import { addToWishlistService } from '../../services/wishlistService';
 import { getCartCount } from '../../store/actions/cartActions';
-import { getImageUrl } from '../../utils/config';
+import { getImageUrl } from '../../utils/config/config';
 
 const ProductDetails = () => {
     const { isAuthenticated } = useSelector((state) => state.auth);

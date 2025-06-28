@@ -10,7 +10,7 @@ import Navbar from '../../components/Navbar/Navbar';
 import { downloadAddress } from '../../components/Product/Utils/DataExport';
 import Footer from '../../components/Utils/Footer';
 import { addAddress, getCities, getCountries, getUserAddress, updateAddress } from '../../store/actions/addressActions';
-import { COMMENT_VALIDATION, NAME_VALIDATION, PHONE_NUMBER_VALIDATION, STREET_VALIDATION } from '../../utils/constants/validations/address';
+import { COMMENT_VALIDATION, NAME_VALIDATION, PHONE_NUMBER_VALIDATION, STREET_VALIDATION } from '../../utils/constants/address';
 
 const AddressDetails = () => {
     const { user } = useSelector((state) => state.auth);

@@ -1,5 +1,5 @@
 import * as yup from "yup";
-import { DESCRIPTION_VALIDATION, NAME_VALIDATION } from "../constants/validations/role";
+import { DESCRIPTION_VALIDATION, NAME_VALIDATION } from "../constants/role";
 
 export const initialValues = (role = null) => ({
     name: role?.name || "",
