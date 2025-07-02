@@ -1,5 +1,5 @@
 import { Box, Chip, Drawer, Typography, useTheme } from '@mui/material';
-import { chipSx, paperPropsSx } from '../../../../assets/sx';
+import { chipBoxSx, paperPropsSx } from '../../../../assets/sx';
 import { getImageUrl } from '../../../../utils/config/config';
 import { DateAdornment, IdAdornment, PersonAdornment } from '../../../custom/Adornments';
 import { DetailsTitle } from '../../../custom/Dashboard';
@@ -68,7 +68,7 @@ const ReviewDetailsDrawer = ({ open, onClose, review, onEdit, onDelete }) => {
                             <DrawerTypography theme={theme}>
                                 Product
                             </DrawerTypography>
-                            <Box sx={chipSx}>
+                            <Box sx={chipBoxSx}>
                                 <Chip
                                     label={
                                         <Box display="flex" alignItems="center" gap={1}>
@@ -96,7 +96,7 @@ const ReviewDetailsDrawer = ({ open, onClose, review, onEdit, onDelete }) => {
                             </Box>
                         </Box>
 
-                        <Box sx={chipSx} className="flex flex-col gap-1">
+                        <Box sx={chipBoxSx} className="flex flex-col gap-1">
                             <DrawerTypography theme={theme}>
                                 Rating
                             </DrawerTypography>

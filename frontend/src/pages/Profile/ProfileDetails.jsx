@@ -39,6 +39,9 @@ const ProfileDetails = () => {
 
     const [focusedField, setFocusedField] = useState(null);
 
+    const isOAuthUser = Boolean(user?.googleId || user?.facebookId);
+    const hasPassword = user?.hasSetProfilePassword;
+
     useEffect(() => {
         if (user) {
             setInitialData({
@@ -103,7 +106,9 @@ const ProfileDetails = () => {
         if (lastName !== initialData.lastName) updatedData.lastName = lastName;
         if (email !== initialData.email) updatedData.email = email;
         if (newPassword) updatedData.newPassword = newPassword;
-        if (password) updatedData.password = password;
+        if (!(isOAuthUser && !hasPassword) && password) {
+            updatedData.password = password;
+        }
 
         if (Object.keys(updatedData).length === 0) {
             toast.info('No changes detected');
@@ -111,15 +116,12 @@ const ProfileDetails = () => {
         }
 
         try {
-            const result = await dispatch(updateUserProfile(updatedData));
-
-            if (result.success) {
-                toast.success('Profile updated successfully!');
-                if (updatedData.firstName) {
-                    await dispatch(loadUser());
-                }
+            const response = await dispatch(updateUserProfile(updatedData));
+            if (response.data.success) {
+                toast.success(response.data.message);
+                await dispatch(loadUser());
             } else {
-                toast.error(result.error || 'Profile update failed');
+                toast.error(response.data.error || 'Profile update failed');
             }
         } catch (error) {
             toast.error('Profile update failed');
@@ -144,27 +146,12 @@ const ProfileDetails = () => {
         }
     };
 
-    const isFormValid = (
-        firstNameValid && lastNameValid && emailValid &&
-        (password ? passwordValid : true) &&
-        (newPassword ? newPasswordValid : true)
-    );
-
-    const isFormUnchanged = (
-        firstName === initialData.firstName &&
-        lastName === initialData.lastName &&
-        email === initialData.email &&
-        !newPassword &&
-        !password
-    );
-
-    const handleDownloadUserData = () => {
-        if (user) downloadUserData(user);
-    };
-
     const isGoogleLogin = Boolean(user?.googleId);
     const isFacebookLogin = Boolean(user?.facebookId);
-    const isDisabled = isGoogleLogin || isFacebookLogin;
+    const hasSetProfilePassword = Boolean(user?.hasSetProfilePassword);
+    const isDisabled = isOAuthUser && !hasSetProfilePassword;
+
+    const needsPasswordSetup = isOAuthUser && !hasPassword && !user?.hasSetProfilePassword;
 
     const provider = isGoogleLogin && isFacebookLogin
         ? 'Google or Facebook'
@@ -174,9 +161,47 @@ const ProfileDetails = () => {
                 ? 'Facebook'
                 : '';
 
-    const title = isDisabled ? `Profile details cannot be changed because you've logged in using ${provider}` : '';
+    const title = isDisabled ? `You're currently logged in with ${provider}. Set a password to enable email/password login as an alternative` : '';
 
-    const isSubmitDisabled = isFormUnchanged || !isFormValid || isSubmitting;
+    const isFormUnchanged = (
+        firstName === initialData.firstName &&
+        lastName === initialData.lastName &&
+        email === initialData.email &&
+        !newPassword &&
+        !password
+    );
+
+    const isFormValid = (
+        firstNameValid &&
+        lastNameValid &&
+        emailValid &&
+        (isOAuthUser && !hasSetProfilePassword ?
+            (newPassword ? newPasswordValid : true) :
+            ((firstName !== initialData.firstName ||
+                lastName !== initialData.lastName ||
+                email !== initialData.email ||
+                newPassword) ?
+                (password ? passwordValid : false) :
+                true
+            ) &&
+            (newPassword ? newPasswordValid : true)
+        )
+    );
+
+    const isSubmitDisabled =
+        isFormUnchanged ||
+        !isFormValid ||
+        isSubmitting ||
+        (!isOAuthUser && hasSetProfilePassword &&
+            (firstName !== initialData.firstName ||
+                lastName !== initialData.lastName ||
+                email !== initialData.email ||
+                newPassword) &&
+            !password);
+
+    const handleDownloadUserData = () => {
+        if (user) downloadUserData(user);
+    };
 
     return (
         <>
@@ -193,9 +218,7 @@ const ProfileDetails = () => {
                         <LoadingDetails />
                     ) : (
                         <Tooltip title={title} placement="top" arrow>
-
                             <form onSubmit={handleSubmit}>
-
                                 <Box sx={profileBoxSx}>
                                     <div className="relative flex-grow">
                                         <TextField
@@ -269,88 +292,127 @@ const ProfileDetails = () => {
                                 </Box>
 
                                 <Box sx={profileBoxSx}>
-                                    <div className="relative flex-grow">
-                                        <BrownOutlinedTextField
-                                            variant="outlined"
-                                            margin="normal"
-                                            required
-                                            fullWidth
-                                            name="password"
-                                            label="Current Password"
-                                            placeholder='Required to save changes'
-                                            type={showPassword ? 'text' : 'password'}
-                                            id="password"
-                                            autoComplete="current-password"
-                                            value={password}
-                                            onChange={handlePasswordChange}
-                                            onFocus={() => setFocusedField('password')}
-                                            onBlur={() => setFocusedField(null)}
-                                            InputProps={{
-                                                endAdornment: (
-                                                    <InputAdornment position="end">
-                                                        <IconButton
-                                                            aria-label="toggle current password visibility"
-                                                            onClick={handleClickShowPassword}
-                                                            onMouseDown={handleMouseDownPassword}
-                                                            disabled={isDisabled}
-                                                            edge="end"
-                                                        >
-                                                            {showPassword ? <Visibility className="text-stone-500" /> : <VisibilityOff className="text-stone-500" />}
-                                                        </IconButton>
-                                                    </InputAdornment>
-                                                ),
-                                            }}
-                                            disabled={isDisabled}
-                                        />
-                                        {focusedField === 'password' && !passwordValid && (
-                                            <div className="absolute left-0 bottom-[-90px] bg-white text-red-500 text-sm p-2 rounded-lg shadow-md w-full z-10">
-                                                <span className="block text-xs font-semibold mb-1">{PASSWORD_VALIDATION.title}</span>
-                                                {PASSWORD_VALIDATION.message}
-                                                <div className="absolute top-[-5px] left-[20px] w-0 h-0 border-l-[5px] border-r-[5px] border-b-[5px] border-transparent border-b-white"></div>
+                                    {needsPasswordSetup ? (
+                                        <div className="relative flex-grow">
+                                            <BrownOutlinedTextField
+                                                variant="outlined"
+                                                margin="normal"
+                                                fullWidth
+                                                name="newPassword"
+                                                label="Set Password"
+                                                placeholder="Create a password to enable email/password login"
+                                                type={showNewPassword ? 'text' : 'password'}
+                                                id="new-password"
+                                                value={newPassword}
+                                                onChange={handleNewPasswordChange}
+                                                onFocus={() => setFocusedField('newPassword')}
+                                                onBlur={() => setFocusedField(null)}
+                                                InputProps={{
+                                                    endAdornment: (
+                                                        <InputAdornment position="end">
+                                                            <IconButton
+                                                                aria-label="toggle password visibility"
+                                                                onClick={handleClickShowNewPassword}
+                                                                onMouseDown={handleMouseDownPassword}
+                                                                edge="end"
+                                                            >
+                                                                {showNewPassword ? <Visibility className="text-stone-500" /> : <VisibilityOff className="text-stone-500" />}
+                                                            </IconButton>
+                                                        </InputAdornment>
+                                                    ),
+                                                }}
+                                            />
+                                            {focusedField === 'newPassword' && !newPasswordValid && (
+                                                <div className="absolute left-0 bottom-[-50px] bg-white text-red-500 text-sm p-2 rounded-lg shadow-md w-full z-10">
+                                                    <span className="block text-xs font-semibold mb-1">{PASSWORD_VALIDATION.title}</span>
+                                                    {PASSWORD_VALIDATION.message}
+                                                    <div className="absolute top-[-5px] left-[20px] w-0 h-0 border-l-[5px] border-r-[5px] border-b-[5px] border-transparent border-b-white"></div>
+                                                </div>
+                                            )}
+                                        </div>
+                                    ) : (
+                                        <>
+                                            <div className="relative flex-grow">
+                                                <BrownOutlinedTextField
+                                                    variant="outlined"
+                                                    margin="normal"
+                                                    required
+                                                    fullWidth
+                                                    name="password"
+                                                    label={hasSetProfilePassword ? "Current Password" : "Set Password"}
+                                                    placeholder={hasSetProfilePassword ? 'Required to save changes' : 'Create a password'}
+                                                    type={showPassword ? 'text' : 'password'}
+                                                    id="password"
+                                                    autoComplete="current-password"
+                                                    value={password}
+                                                    onChange={handlePasswordChange}
+                                                    onFocus={() => setFocusedField('password')}
+                                                    onBlur={() => setFocusedField(null)}
+                                                    InputProps={{
+                                                        endAdornment: (
+                                                            <InputAdornment position="end">
+                                                                <IconButton
+                                                                    aria-label="toggle current password visibility"
+                                                                    onClick={handleClickShowPassword}
+                                                                    onMouseDown={handleMouseDownPassword}
+                                                                    edge="end"
+                                                                >
+                                                                    {showPassword ? <Visibility className="text-stone-500" /> : <VisibilityOff className="text-stone-500" />}
+                                                                </IconButton>
+                                                            </InputAdornment>
+                                                        ),
+                                                    }}
+                                                />
+                                                {focusedField === 'password' && !passwordValid && (
+                                                    <div className="absolute left-0 bottom-[-90px] bg-white text-red-500 text-sm p-2 rounded-lg shadow-md w-full z-10">
+                                                        <span className="block text-xs font-semibold mb-1">{PASSWORD_VALIDATION.title}</span>
+                                                        {PASSWORD_VALIDATION.message}
+                                                        <div className="absolute top-[-5px] left-[20px] w-0 h-0 border-l-[5px] border-r-[5px] border-b-[5px] border-transparent border-b-white"></div>
+                                                    </div>
+                                                )}
                                             </div>
-                                        )}
-                                    </div>
 
-                                    <div className="relative flex-grow">
-                                        <BrownOutlinedTextField
-                                            variant="outlined"
-                                            margin="normal"
-                                            fullWidth
-                                            name="newPassword"
-                                            label="New Password"
-                                            placeholder='Leave blank to keep current password'
-                                            type={showNewPassword ? 'text' : 'password'}
-                                            id="new-password"
-                                            value={newPassword}
-                                            onChange={handleNewPasswordChange}
-                                            onFocus={() => setFocusedField('newPassword')}
-                                            onBlur={() => setFocusedField(null)}
-                                            InputProps={{
-                                                endAdornment: (
-                                                    <InputAdornment position="end">
-                                                        <IconButton
-                                                            aria-label="toggle new password visibility"
-                                                            onClick={handleClickShowNewPassword}
-                                                            onMouseDown={handleMouseDownPassword}
-                                                            disabled={isDisabled}
-                                                            edge="end"
-                                                        >
-                                                            {showNewPassword ? <Visibility className="text-stone-500" /> : <VisibilityOff className="text-stone-500" />}
-                                                        </IconButton>
-                                                    </InputAdornment>
-                                                ),
-                                            }}
-                                            disabled={isDisabled}
-                                        />
-                                        {focusedField === 'newPassword' && !newPasswordValid && (
-                                            <div className="absolute left-0 bottom-[-90px] bg-white text-red-500 text-sm p-2 rounded-lg shadow-md w-full z-10">
-                                                <span className="block text-xs font-semibold mb-1">{PASSWORD_VALIDATION.title}</span>
-                                                {PASSWORD_VALIDATION.message}
-                                                <div className="absolute top-[-5px] left-[20px] w-0 h-0 border-l-[5px] border-r-[5px] border-b-[5px] border-transparent border-b-white"></div>
-                                            </div>
-                                        )}
-                                    </div>
-
+                                            {hasSetProfilePassword && (
+                                                <div className="relative flex-grow">
+                                                    <BrownOutlinedTextField
+                                                        variant="outlined"
+                                                        margin="normal"
+                                                        fullWidth
+                                                        name="newPassword"
+                                                        label="New Password"
+                                                        placeholder='Leave blank to keep current password'
+                                                        type={showNewPassword ? 'text' : 'password'}
+                                                        id="new-password"
+                                                        value={newPassword}
+                                                        onChange={handleNewPasswordChange}
+                                                        onFocus={() => setFocusedField('newPassword')}
+                                                        onBlur={() => setFocusedField(null)}
+                                                        InputProps={{
+                                                            endAdornment: (
+                                                                <InputAdornment position="end">
+                                                                    <IconButton
+                                                                        aria-label="toggle new password visibility"
+                                                                        onClick={handleClickShowNewPassword}
+                                                                        onMouseDown={handleMouseDownPassword}
+                                                                        edge="end"
+                                                                    >
+                                                                        {showNewPassword ? <Visibility className="text-stone-500" /> : <VisibilityOff className="text-stone-500" />}
+                                                                    </IconButton>
+                                                                </InputAdornment>
+                                                            ),
+                                                        }}
+                                                    />
+                                                    {focusedField === 'newPassword' && !newPasswordValid && (
+                                                        <div className="absolute left-0 bottom-[-90px] bg-white text-red-500 text-sm p-2 rounded-lg shadow-md w-full z-10">
+                                                            <span className="block text-xs font-semibold mb-1">{PASSWORD_VALIDATION.title}</span>
+                                                            {PASSWORD_VALIDATION.message}
+                                                            <div className="absolute top-[-5px] left-[20px] w-0 h-0 border-l-[5px] border-r-[5px] border-b-[5px] border-transparent border-b-white"></div>
+                                                        </div>
+                                                    )}
+                                                </div>
+                                            )}
+                                        </>
+                                    )}
                                 </Box>
 
                                 <BrownButton

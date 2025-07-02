@@ -4,7 +4,7 @@ import { paperPropsSx } from '../../../../assets/sx';
 import { CityAdornment, CommentAdornment, CountryAdornment, DateAdornment, DeliveryStatusAdornment, EuroAdornment, IdAdornment, PaymentMethodAdornment, PaymentStatusAdornment, PersonAdornment, PhoneAdornment, StreetAdornment } from '../../../custom/Adornments';
 import { CollapsibleProductList, TitleActions } from '../../../custom/Dashboard';
 import { BoxBetween, CloseButton, ReadOnlyTextField } from '../../../custom/MUI';
-import { formatDate } from '../../../custom/utils';
+import { formatDate, formatDateTime } from '../../../custom/utils';
 import { downloadOrderData } from '../../../Product/Utils/DataExport';
 
 const OrderDetailsDrawer = ({ open, onClose, order, onEdit, onDelete }) => {
@@ -133,6 +133,12 @@ const OrderDetailsDrawer = ({ open, onClose, order, onEdit, onDelete }) => {
                                 InputProps={IdAdornment()}
                             />
                         )}
+
+                        <ReadOnlyTextField
+                            label="Created At"
+                            value={formatDateTime(order.createdAt)}
+                            InputProps={DateAdornment()}
+                        />
 
                         <BoxBetween>
                             <ReadOnlyTextField

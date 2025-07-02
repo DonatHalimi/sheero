@@ -103,6 +103,7 @@ const registerUser = async (req, res) => {
             email,
             password: hashedPassword,
             role: validRole._id,
+            hasSetProfilePassword: true,
             createdAt: Date.now()
         });
 
@@ -620,6 +621,7 @@ const getCurrentUser = async (req, res) => {
             firstName: user.firstName,
             lastName: user.lastName,
             email: user.email,
+            hasSetProfilePassword: user.hasSetProfilePassword,
             role: user.role.name,
             profilePicture: user.profilePicture,
             googleId: user.googleId,
@@ -640,24 +642,46 @@ const updateUserProfile = async (req, res) => {
         const user = await User.findById(req.user.userId);
         if (!user) return res.status(404).json({ success: false, message: 'User not found' });
 
-        if ((email || newPassword) && !await bcrypt.compare(password, user.password)) {
-            return res.status(400).json({ success: false, message: 'Incorrect current password' });
+        const isOAuthUser = Boolean(user.googleId || user.facebookId);
+
+        const canSetPassword = isOAuthUser && !user.hasSetProfilePassword;
+
+        if (email || newPassword) {
+            if (canSetPassword) {
+                if (!newPassword) {
+                    return res.status(400).json({ success: false, message: 'New password is required' });
+                }
+            } else {
+                if (!password) return res.status(400).json({ success: false, message: 'Current password is required' });
+
+                const isPasswordValid = await bcrypt.compare(password, user.password);
+                if (!isPasswordValid) return res.status(400).json({ success: false, message: 'Incorrect current password' });
+            }
         }
 
         if (firstName) user.firstName = firstName;
         if (lastName) user.lastName = lastName;
         if (email) user.email = email;
         if (role) user.role = role;
-        if (newPassword) user.password = await bcrypt.hash(newPassword, 10);
+        if (newPassword) {
+            user.password = await bcrypt.hash(newPassword, 10);
+            if (isOAuthUser) user.hasSetProfilePassword = true;
+        }
 
         await user.save();
         await user.populate('role');
 
+        const successMessage = canSetPassword && newPassword ? 'Password set successfully' : 'Profile updated successfully';
+
         res.json({
-            firstName: user.firstName,
-            lastName: user.lastName,
-            email: user.email,
-            role: user.role.name,
+            success: true,
+            message: successMessage,
+            user: {
+                firstName: user.firstName,
+                lastName: user.lastName,
+                email: user.email,
+                role: user.role.name,
+            }
         });
     } catch (error) {
         res.status(500).json({ success: false, message: 'Error updating user profile', error: error.message });

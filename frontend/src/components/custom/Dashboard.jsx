@@ -38,6 +38,7 @@ import { useHotkeys } from "react-hotkeys-hook";
 import { useLocation } from "react-router-dom";
 import {
     addItemSx,
+    chipBoxSx,
     chipSx,
     customBoxSx,
     dashboardAppBarSx,
@@ -323,7 +324,7 @@ export const DashboardHeader = ({
     itemName,
     showAddButton = true,
 }) => {
-    const { theme } = useDashboardTheme();
+    const theme = useTheme();
 
     const isMultipleSelected = selectedItems.length > 1;
     const itemNamePlural = pluralize(itemName, selectedItems.length);
@@ -633,9 +634,69 @@ export const ActionsCell = ({ row, theme, onViewDetails, onEdit, onDelete, showE
     );
 };
 
+const ProductChipLabel = ({ item, theme, isOrder }) => {
+    const handleClick = () => window.open(`/${item.product.slug}`, '_blank');
+
+    return (
+        <Box display="flex" alignItems="center" gap={1}>
+            <Box onClick={() => handleClick()} className="flex align-center gap-3 cursor-pointer">
+                <img
+                    src={getImageUrl(item.product?.image)}
+                    alt={item.product.name}
+                    className="w-10 h-10 object-contain"
+                />
+                <div className="flex flex-col">
+                    <Typography
+                        variant="body2"
+                        style={{ color: theme.palette.text.primary }}
+                        className="!font-semibold hover:underline"
+                    >
+                        {`${item.product.name}`}
+                    </Typography>
+                    {isOrder && (
+                        <Typography variant="caption">
+                            Qty: {item.quantity}
+                        </Typography>
+                    )}
+                </div>
+            </Box>
+        </Box>
+    );
+};
+
+const ShowMoreButton = ({ showAll, toggleShowAll, products, initialDisplayCount }) => {
+    return (
+        <motion.div
+            layout
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            transition={{ delay: 0.2 }}
+        >
+            <OutlinedBrownButton
+                onClick={toggleShowAll}
+                variant="text"
+                size="small"
+                fullWidth
+                startIcon={
+                    <motion.div
+                        animate={{ rotate: showAll ? 180 : 0 }}
+                        transition={{ duration: 0.3 }}
+                        className="flex items-center justify-center"
+                    >
+                        <ExpandMore />
+                    </motion.div>
+                }
+                className='mt-2'
+            >
+                {showAll ? `Show Less` : `Show ${products.length - initialDisplayCount} More`}
+            </OutlinedBrownButton>
+        </motion.div>
+    );
+};
+
 export const CollapsibleProductList = ({ products, label, isOrder = true }) => {
-    const [showAll, setShowAll] = useState(false);
     const theme = useTheme();
+    const [showAll, setShowAll] = useState(false);
 
     const initialDisplayCount = 3;
     const hasMoreProducts = products.length > initialDisplayCount;
@@ -678,9 +739,7 @@ export const CollapsibleProductList = ({ products, label, isOrder = true }) => {
 
     return (
         <Box>
-            <DrawerTypography theme={theme}>
-                {label} {isOrder ? '+ (Quantity)' : ''}
-            </DrawerTypography>
+            <DrawerTypography theme={theme}>{label}</DrawerTypography>
 
             {products && products.length > 0 ? (
                 <>
@@ -695,33 +754,11 @@ export const CollapsibleProductList = ({ products, label, isOrder = true }) => {
                                 variants={itemVariants}
                                 layout
                             >
-                                <Box sx={chipSx} className="mb-1">
+                                <Box sx={chipBoxSx} className="mb-1">
                                     <Chip
-                                        label={
-                                            <Box display="flex" alignItems="center" gap={1}>
-                                                <Box
-                                                    onClick={() => window.open(`/${item.product.slug}`, '_blank')}
-                                                    display="flex"
-                                                    alignItems="center"
-                                                    gap={1}
-                                                    sx={{ cursor: 'pointer' }}
-                                                >
-                                                    <img
-                                                        src={getImageUrl(item.product?.image)}
-                                                        alt={item.product.name}
-                                                        className="w-10 h-10 object-contain"
-                                                    />
-                                                    <Typography
-                                                        variant="body2"
-                                                        style={{ color: theme.palette.text.primary }}
-                                                        className="!font-semibold hover:underline"
-                                                    >
-                                                        {`${item.product.name} ${isOrder ? `+ (${item.quantity})` : ''}`}
-                                                    </Typography>
-                                                </Box>
-                                            </Box>
-                                        }
+                                        label={ProductChipLabel({ item, theme, isOrder })}
                                         variant="outlined"
+                                        sx={chipSx}
                                         className="w-full !justify-start"
                                     />
                                 </Box>
@@ -730,35 +767,12 @@ export const CollapsibleProductList = ({ products, label, isOrder = true }) => {
                     </motion.div>
 
                     {hasMoreProducts && (
-                        <motion.div
-                            layout
-                            initial={{ opacity: 0 }}
-                            animate={{ opacity: 1 }}
-                            transition={{ delay: 0.2 }}
-                        >
-                            <OutlinedBrownButton
-                                onClick={toggleShowAll}
-                                variant="text"
-                                size="small"
-                                fullWidth
-                                startIcon={
-                                    <motion.div
-                                        animate={{ rotate: showAll ? 180 : 0 }}
-                                        transition={{ duration: 0.3 }}
-                                        style={{
-                                            display: "flex",
-                                            alignItems: "center",
-                                            justifyContent: "center"
-                                        }}
-                                    >
-                                        <ExpandMore />
-                                    </motion.div>
-                                }
-                                className='mt-2'
-                            >
-                                {showAll ? `Show Less` : `Show ${products.length - initialDisplayCount} More`}
-                            </OutlinedBrownButton>
-                        </motion.div>
+                        <ShowMoreButton
+                            showAll={showAll}
+                            toggleShowAll={toggleShowAll}
+                            products={products}
+                            initialDisplayCount={initialDisplayCount}
+                        />
                     )}
                 </>
             ) : (
@@ -782,9 +796,7 @@ export const AuthActions = ({
     isProductManager,
 }) => {
     const handleClickAway = () => {
-        if (isDropdownOpen) {
-            setIsProfileDropdownOpen(false);
-        }
+        if (isDropdownOpen) setIsProfileDropdownOpen(false);
     };
 
     return (
@@ -1222,7 +1234,7 @@ export const DashboardImage = ({ item, handleImageClick }) => {
 };
 
 export const DashboardAppBar = ({ open, children }) => {
-    const { theme } = useDashboardTheme();
+    const theme = useTheme();
 
     return (
         <AppBar
@@ -1236,7 +1248,7 @@ export const DashboardAppBar = ({ open, children }) => {
 };
 
 export const DashboardToolbar = ({ children }) => {
-    const { theme } = useDashboardTheme();
+    const theme = useTheme();
 
     return (
         <Toolbar sx={dashboardToolBarSx(theme)} >
@@ -1309,5 +1321,52 @@ export const RenderOrderPaymentInfo = (order) => {
                 {paymentMethod} - {paymentStatus}
             </span>
         </div>
+    );
+};
+
+export const RenderOrderQuantity = (order) => {
+    const products = order?.products || [];
+    const total = products.reduce((s, p) => s + p.quantity, 0);
+
+    const handleNavigate = (slug) => window.open(`/${slug}`, '_blank', 'noopener,noreferrer');
+
+    const tooltipContent = (
+        <div className="dark-scrollbar overflow-y-auto max-h-[250px] px-1 py-0.5">
+            {products.map(({ product, quantity }, i) => (
+                <div key={i} className="flex items-center gap-3 py-1">
+                    <img
+                        src={getImageUrl(product?.image)}
+                        alt={product?.name}
+                        onClick={() => handleNavigate(product?.slug)}
+                        className="w-10 h-10 object-contain cursor-pointer"
+                    />
+                    <div className="flex-1">
+                        <Typography
+                            variant="body2"
+                            fontWeight={500}
+                            onClick={() => handleNavigate(product?.slug)}
+                            className="cursor-pointer hover:underline"
+                        >
+                            {product?.name}
+                        </Typography>
+                        <Typography variant="caption" color="white">
+                            Qty: {quantity}
+                        </Typography>
+                    </div>
+                </div>
+            ))}
+        </div>
+    );
+
+    return (
+        <Tooltip title={tooltipContent} placement="right" componentsProps={{ tooltip: { sx: { maxWidth: 300 } } }}>
+            <Chip
+                label={total}
+                size="small"
+                color="primary"
+                variant="outlined"
+                sx={{ fontWeight: 600 }}
+            />
+        </Tooltip>
     );
 };

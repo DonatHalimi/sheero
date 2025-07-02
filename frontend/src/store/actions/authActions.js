@@ -115,14 +115,14 @@ export const updateUserProfile = (userData) => async (dispatch) => {
     dispatch({ type: AUTH_LOADING });
 
     try {
-        const response = await editUserService(userData);
+        const res = await editUserService(userData);
 
         dispatch({
             type: SET_USER,
-            payload: response.data,
+            payload: res.data,
         });
 
-        return { success: true };
+        return { data: res.data };
     } catch (error) {
         dispatch({
             type: AUTH_ERROR,

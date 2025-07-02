@@ -1,5 +1,5 @@
 import { Box, Chip, Drawer, Typography, useTheme } from '@mui/material';
-import { chipSx, paperPropsSx } from '../../../../assets/sx';
+import { chipBoxSx, paperPropsSx } from '../../../../assets/sx';
 import { getImageUrl } from '../../../../utils/config/config';
 import { IdAdornment } from '../../../custom/Adornments';
 import { DetailsTitle } from '../../../custom/Dashboard';
@@ -57,7 +57,7 @@ const SubscriptionDetailsDrawer = ({ open, onClose, subscription, onDelete }) =>
 
                         <Box>
                             <DrawerTypography theme={theme}>Product</DrawerTypography>
-                            <Box sx={chipSx}>
+                            <Box sx={chipBoxSx}>
                                 <Chip
                                     label={
                                         <Box display="flex" alignItems="center" gap={1}>

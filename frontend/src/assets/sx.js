@@ -536,7 +536,7 @@ export const iconButtonSx = {
     right: 10,
 };
 
-export const chipSx = {
+export const chipBoxSx = {
     width: '100%',
     padding: '4px 0',
     '& .MuiChip-root': {
@@ -553,6 +553,11 @@ export const chipSx = {
             textAlign: 'left',
         },
     },
+};
+
+export const chipSx = {
+    transition: 'border-color .2s',
+    '&:hover': { borderColor: theme => theme.palette.mode === 'dark' ? '#ffffff' : '#6b7280' }
 };
 
 export const customModalSx = {

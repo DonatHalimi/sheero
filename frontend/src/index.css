@@ -81,6 +81,26 @@
     background-color: var(--scrollbar-corner-color);
 }
 
+.dark-scrollbar::-webkit-scrollbar {
+    width: 7px;
+}
+
+.dark-scrollbar::-webkit-scrollbar-thumb {
+    background-color: #4a4a4a;
+}
+
+.dark-scrollbar::-webkit-scrollbar-thumb:hover {
+    background-color: #424141;
+}
+
+.dark-scrollbar::-webkit-scrollbar-track {
+    background-color: #565555;
+}
+
+.dark-scrollbar::-webkit-scrollbar-corner {
+    background-color: #2D2D2D;
+}
+
 .custom-textarea::-webkit-scrollbar {
     width: 6px;
 }

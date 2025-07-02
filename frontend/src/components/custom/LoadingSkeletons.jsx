@@ -577,7 +577,7 @@ export const LoadingCartDropdown = () => {
             <div className="space-y-4">
                 {[...Array(2)].map((_, index) => (
                     <div key={index} className="flex justify-between items-center">
-                        <WaveSkeleton variant="rectangular" width={48} height={48} />
+                        <WaveSkeleton variant="rectangular" width={48} height={48} className="rounded-md" />
                         <div className="ml-2 flex-grow space-y-1">
                             <WaveSkeleton variant="text" width="80%" height={20} />
                             <WaveSkeleton variant="text" width="50%" height={16} />

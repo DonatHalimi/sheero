@@ -1,6 +1,6 @@
 import { RenderOrderDelStatus } from '../../components/custom/Adornments';
-import { RenderOrderPaymentInfo } from '../../components/custom/Dashboard';
-import { formatAddress, formatArrivalDateRange, formatProducts, formatQuantity, formatTotalAmount, formatUser } from '../../components/custom/utils';
+import { RenderOrderPaymentInfo, RenderOrderQuantity } from '../../components/custom/Dashboard';
+import { formatAddress, formatArrivalDateRange, formatFullDate, formatProducts, formatQuantity, formatTotalAmount, formatUser } from '../../components/custom/utils';
 import DashboardPage from '../../components/Dashboard/DashboardPage';
 import OrderDetailsDrawer from '../../components/Dashboard/Modal/Order/OrderDetailsDrawer';
 import OrderForm from '../../components/Dashboard/Modal/Order/OrderForm';
@@ -13,15 +13,14 @@ const OrdersPage = () => {
     const columns = [
         { key: '_id', label: 'Order ID' },
         { key: 'user.email', label: 'User' },
-        { key: 'products', label: 'Products', render: formatProducts },
-        { key: 'quantity', label: 'Quantity', render: formatQuantity },
+        { key: 'quantity', label: 'Quantity', render: RenderOrderQuantity },
         { key: 'totalAmount', label: 'Total Amount', render: formatTotalAmount },
         {
             key: 'paymentInfo',
             label: 'Payment Info',
             render: RenderOrderPaymentInfo,
         },
-        { key: 'arrivalDateRange', label: 'Delivery Date', render: formatArrivalDateRange },
+        { key: 'createdAt', label: 'Order Date', render: (order) => formatFullDate(order.createdAt, { dateOnly: true }) },
         {
             key: 'status',
             label: 'Delivery Status',

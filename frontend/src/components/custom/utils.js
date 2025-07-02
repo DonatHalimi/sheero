@@ -179,7 +179,7 @@ export const formatDateTime = (dateString) => {
     return `${d} at ${t}`;
 };
 
-export const formatFullDate = (dateInput) => {
+export const formatFullDate = (dateInput, { dateOnly } = {}) => {
     const date = new Date(dateInput);
 
     const dateOptions = {
@@ -197,7 +197,7 @@ export const formatFullDate = (dateInput) => {
     const dateStr = date.toLocaleDateString('en-US', dateOptions);
     const timeStr = date.toLocaleTimeString('en-US', timeOptions);
 
-    return `${dateStr} at ${timeStr}`;
+    return dateOnly ? dateStr : `${dateStr} at ${timeStr}`;
 };
 
 export const formatTimeAgo = (dateString) => {
