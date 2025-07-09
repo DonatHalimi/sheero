@@ -1079,7 +1079,7 @@ function generateLoginNotificationHtml(user, loginData, options = {}) {
               <ul style="color: #57534E; padding-left: 20px;">
                   <li><strong>Date & Time:</strong> ${date}</li>
                   <li><strong>IP Address:</strong> ${loginData.ipAddress}</li>
-                  <li><strong>Location:</strong> ${loginData.location.city || 'Unknown'}, ${loginData.location.region || ''}, ${loginData.location.country || 'Unknown'}</li>
+                  <li><strong>Location:</strong> ${loginData.location.city || 'Unknown'}, ${loginData.location.country || 'Unknown'}</li>
                   <li><strong>Device:</strong> ${deviceInfo}</li>
                   <li><strong>Login Method:</strong> ${methodDisplay}</li>
               </ul>

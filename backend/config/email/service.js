@@ -345,7 +345,6 @@ async function sendLoginNotificationEmail(user, loginData) {
         loginData.location = {
             country: 'Unknown',
             city: 'Unknown',
-            region: 'Unknown'
         };
     }
 
@@ -360,7 +359,7 @@ async function sendLoginNotificationEmail(user, loginData) {
         `We have detected a ${loginData.isNewDevice ? 'new device ' : ''}login to your sheero account.\n\n` +
         `Date & Time: ${new Date(loginData.timestamp).toLocaleString()}\n` +
         `IP Address: ${loginData.ipAddress}\n` +
-        `Location: ${loginLocation.city}, ${loginLocation.region}, ${loginLocation.country}\n` +
+        `Location: ${loginLocation.city}, ${loginLocation.country}\n` +
         `Device: ${parseUserAgent(loginData.userAgent)}\n` +
         `Login Method: ${methodDisplay}\n\n` +
         `If this wasn't you, please change your password immediately and contact support.\n\n`;

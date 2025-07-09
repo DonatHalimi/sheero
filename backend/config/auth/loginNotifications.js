@@ -14,7 +14,6 @@ function getLocationFromIP(ip) {
         return {
             country: 'Port 5000',
             city: 'Localhost',
-            region: 'Local Environment',
         };
     }
 
@@ -24,7 +23,6 @@ function getLocationFromIP(ip) {
             return {
                 country: geo.country || 'Unknown',
                 city: geo.city || 'Unknown',
-                region: geo.region || 'Unknown',
             };
         }
     } catch (error) {
@@ -34,7 +32,6 @@ function getLocationFromIP(ip) {
     return {
         country: 'Unknown',
         city: 'Unknown',
-        region: 'Unknown',
     };
 };
 

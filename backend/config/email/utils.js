@@ -185,7 +185,6 @@ function getEmailFooterHtml() {
 const loginLocation = (loginData) => ({
   country: loginData.country || 'Unknown',
   city: loginData.city || 'Unknown',
-  region: loginData.region || 'Unknown'
 });
 
 const formatLoginMethod = (method) => {

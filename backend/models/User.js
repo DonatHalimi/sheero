@@ -8,7 +8,6 @@ const loginHistorySchema = new mongoose.Schema({
     location: {
         country: { type: String, default: null },
         city: { type: String, default: null },
-        region: { type: String, default: null }
     },
     status: { type: String, enum: ['success', 'failed', '2fa_required'], default: 'success' },
     method: { type: String, enum: ['password', 'google', 'facebook', 'otp', 'authenticator'], required: true }
@@ -67,7 +66,6 @@ userSchema.methods.addLoginAttempt = async function (data) {
         location: {
             country: data.country || null,
             city: data.city || null,
-            region: data.region || null
         },
         status: data.status || 'success',
         method: data.method || 'password'
