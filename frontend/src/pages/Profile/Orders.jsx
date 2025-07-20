@@ -23,7 +23,9 @@ const Orders = () => {
     const [statusFilter, setStatusFilter] = useState('all');
     const [pageChanging, setPageChanging] = useState(false);
 
-    const showBars = pagination.totalOrders > 0;
+    const hasActiveFilters = searchTerm.trim() !== '' || statusFilter !== 'all';
+
+    const showBars = pagination.totalOrders > 0 || hasActiveFilters;
 
     const debouncedFetchOrders = useCallback(
         debounce((userId, page, limit, search, status) => {

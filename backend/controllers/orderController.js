@@ -446,75 +446,69 @@ const updateDeliveryStatus = async (req, res) => {
 
         if (!order) return res.status(404).json({ success: false, message: 'Order not found' });
 
-        const previousStatus = order.status;
+        const prevStatus = order.status;
+        const isProcessed = status === 'processed' && prevStatus !== 'processed';
+        const isCanceled = status === 'canceled' && prevStatus !== 'canceled';
 
-        // Update inventory count only when status changes to processed and hasn't been updated before
-        if (status === 'processed' && previousStatus !== 'processed') {
+        if (isProcessed || isCanceled) {
             await Promise.all(order.products.map(async (orderProduct) => {
-                if (!orderProduct.inventoryUpdated) {
-                    const product = await Product.findById(orderProduct.product._id);
-                    if (product) {
-                        product.inventoryCount -= orderProduct.quantity;
-                        await product.save();
+                const product = await Product.findById(orderProduct.product._id);
+                if (!product) return;
 
-                        orderProduct.inventoryUpdated = true;
-                    }
+                if (isProcessed && !orderProduct.inventoryUpdated) {
+                    product.inventoryCount -= orderProduct.quantity;
+                    orderProduct.inventoryUpdated = true;
+                } else if (isCanceled && orderProduct.inventoryUpdated) {
+                    product.inventoryCount += orderProduct.quantity;
+                    orderProduct.inventoryUpdated = false;
                 }
+
+                await product.save();
             }));
         }
 
         order.status = status;
         order.updatedBy = req.user.userId;
-
-        if (paymentStatus) {
-            order.paymentStatus = paymentStatus;
-        }
+        if (paymentStatus) order.paymentStatus = paymentStatus;
 
         if (status === 'delivered') {
-            const currentDate = new Date();
-            order.arrivalDateRange.start = currentDate;
-            order.arrivalDateRange.end = currentDate;
-        }
-
-        if (status === 'canceled') {
-            order.arrivalDateRange.start = null;
-            order.arrivalDateRange.end = null;
+            const now = new Date();
+            order.arrivalDateRange = { start: now, end: now };
+        } else if (status === 'canceled') {
+            order.arrivalDateRange = { start: null, end: null };
         }
 
         await order.save();
         await order.populate({
             path: 'updatedBy',
             select: 'firstName lastName role email',
-            populate: {
-                path: 'role',
-                select: 'name'
-            }
+            populate: { path: 'role', select: 'name' }
         });
 
-        if (status !== previousStatus) {
+        if (status !== prevStatus) {
             const role = await Role.findOne({ name: 'orderManager' });
             if (role) {
                 const managers = await User.find({ role: role._id });
 
                 for (const mgr of managers) {
-                    const existingNotification = await Notification.findOneAndUpdate(
+                    const updatedNotif = await Notification.findOneAndUpdate(
                         {
                             'data.orderId': order._id.toString(),
-                            'user': mgr._id,
-                            'type': 'newOrder'
+                            user: mgr._id,
+                            type: 'newOrder'
                         },
                         {
                             $set: {
                                 'data.orderStatus': status,
                                 'data.updatedAt': new Date(),
-                                'isRead': false
+                                isRead: false
                             }
                         },
                         { new: true }
                     );
 
-                    if (existingNotification) {
-                        io.to(`user:${mgr._id}`).emit('notification', existingNotification);
+                    if (updatedNotif) {
+                        io.to(`user:${mgr._id}`).emit('notification', updatedNotif);
                     }
                 }
             }
@@ -522,7 +516,7 @@ const updateDeliveryStatus = async (req, res) => {
 
         res.json({
             success: true,
-            message: `The status of order #${orderId} has been successfully updated from '${previousStatus}' to '${status}'. Click to copy the order ID`,
+            message: `The status of order #${orderId} has been successfully updated from '${prevStatus}' to '${status}'. Click to copy the order ID`,
             order,
         });
 

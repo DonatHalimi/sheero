@@ -99,10 +99,6 @@ To set up the project locally, follow these steps:
    STRIPE_SECRET_KEY=sk_test_XXXXXXXXXXXXXXXX
    NODE_ENV=development
    SEED_DB=true
-   ADMIN_FIRST_NAME=Admin
-   ADMIN_LAST_NAME=User
-   ADMIN_EMAIL=admin@gmail.com
-   ADMIN_PASSWORD=WqFpq%!QLsQt4
    SESSION_SECRET=your_session_secret
    GOOGLE_CLIENT_ID=your_google_client_id
    GOOGLE_CLIENT_SECRET=your_google_client_secret
@@ -111,6 +107,36 @@ To set up the project locally, follow these steps:
    SMTP_USER=your_smtp_user
    SMTP_PASS=your_smtp_pass
    REDIS_URL=your_redis_url
+
+   ADMIN_FIRST_NAME=Admin
+   ADMIN_LAST_NAME=User
+   ADMIN_EMAIL=admin@gmail.com
+   ADMIN_PASSWORD=WqFpq%!QLsQt4
+
+   USER_FIRST_NAME=Normal
+   USER_LAST_NAME=User
+   USER_EMAIL=user@gmail.com
+   USER_PASSWORD=8K!P6VV6sANTS
+
+   CUSTOMER_SUPPORT_FIRST_NAME=Customer
+   CUSTOMER_SUPPORT_LAST_NAME=Support
+   CUSTOMER_SUPPORT_EMAIL=customerSupport@gmail.com
+   CUSTOMER_SUPPORT_PASSWORD=S!!G2OFXsX2F
+
+   ORDER_MANAGER_FIRST_NAME=Order
+   ORDER_MANAGER_LAST_NAME=Manager
+   ORDER_MANAGER_EMAIL=orderManager@gmail.com
+   ORDER_MANAGER_PASSWORD=7kEs!X!fAYZF1
+
+   CONTENT_MANAGER_FIRST_NAME=Content
+   CONTENT_MANAGER_LAST_NAME=Manager
+   CONTENT_MANAGER_EMAIL=contentManager@gmail.com
+   CONTENT_MANAGER_PASSWORD=L1!7FxrX5BZ2!
+
+   PRODUCT_MANAGER_FIRST_NAME=Product
+   PRODUCT_MANAGER_LAST_NAME=Manager
+   PRODUCT_MANAGER_EMAIL=productManager@gmail.com
+   PRODUCT_MANAGER_PASSWORD=FDc!2bVk!P4D4
    ```
 
    **Frontend (`frontend/.env`)**
@@ -124,8 +150,8 @@ To set up the project locally, follow these steps:
   - **JWT_SECRET**: A secret key used for signing JSON Web Tokens.
   - **STRIPE_SECRET_KEY**: Your Stripe API secret key for payment processing.
   - **NODE_ENV**: The environment in which the app is running (`development` or `production`).
-  - **SEED_DB**: Set to `true` to enable initial database seeding (e.g., creating the default roles and the admin user). Useful for the first-time setup or resetting the database. Leave it empty or set to `false` to skip seeding.
-  - **ADMIN_FIRST_NAME**, **ADMIN_LAST_NAME**, **ADMIN_EMAIL**, **ADMIN_PASSWORD**: Credentials for the default admin user to be created during database seeding.
+  - **SEED_DB**: Set to `true` to enable initial database seeding (e.g., creating all roles and a default user for each role based on the environment variables). Leave it empty or set to `false` to skip seeding.
+  - **{ROLE}_FIRST_NAME**, **{ROLE}_LAST_NAME**, **{ROLE}_EMAIL**, **{ROLE}_PASSWORD**: Credentials for each default user seeded during database initialization. Replace `{ROLE}` with `ADMIN`, `USER`, `CUSTOMER_SUPPORT`, `ORDER_MANAGER`, `CONTENT_MANAGER`, `PRODUCT_MANAGER`.
   - **SESSION_SECRET**: A secret key used for signing session cookies for google and facebook login.
   - **GOOGLE_CLIENT_ID**, **GOOGLE_CLIENT_SECRET**: Client IDs and secrets for Google OAuth integration - follow the **Google Client ID and Client Secret** section for detailed instructions.
   - **FACEBOOK_CLIENT_ID**, **FACEBOOK_CLIENT_SECRET**: Client IDs and secrets for Facebook OAuth integration - follow the **Facebook App ID and App Secret** section for detailed instructions.

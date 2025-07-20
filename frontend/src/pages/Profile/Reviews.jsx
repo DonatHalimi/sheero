@@ -34,7 +34,9 @@ const Reviews = () => {
     const [openReviewModal, setOpenReviewModal] = useState(false);
     const [loadingOverlay, setLoadingOverlay] = useState(false);
 
-    const showBars = pagination.totalReviews > 0;
+    const hasActiveFilters = searchTerm.trim() !== '' || ratingFilter !== 'all';
+
+    const showBars = pagination.totalReviews > 0 || hasActiveFilters;
 
     const debouncedFetchReviews = useCallback(
         debounce((userId, page, limit, search, rating) => {

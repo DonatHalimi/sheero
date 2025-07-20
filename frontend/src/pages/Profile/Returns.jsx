@@ -22,7 +22,9 @@ const Returns = () => {
     const [statusFilter, setStatusFilter] = useState('all');
     const [pageChanging, setPageChanging] = useState(false);
 
-    const showBars = pagination.totalReturns > 0;
+    const hasActiveFilters = searchTerm.trim() !== '' || statusFilter !== 'all';
+
+    const showBars = pagination.totalReturns > 0 || hasActiveFilters;
 
     const debouncedFetchReturns = useCallback(
         debounce((userId, page, limit, search, status) => {

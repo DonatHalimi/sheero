@@ -1,76 +1,85 @@
 const bcrypt = require('bcryptjs');
 const Role = require('../models/Role');
 const User = require('../models/User');
-const { ADMIN_FIRST_NAME, ADMIN_LAST_NAME, ADMIN_EMAIL, ADMIN_PASSWORD, SEED_DB } = require('../config/core/dotenv');
+const { SEED_DB } = require('../config/core/dotenv');
 
-const seedRoles = async () => {
-    const roles = ['user', 'admin'];
+const roles = [
+  { name: 'admin', description: 'Full access to everything.' },
+  { name: 'user', description: 'Default role for all registered users.' },
+  { name: 'productManager', description: 'Manages reviews, products, categories, subcategories, product restock subscriptions and suppliers. Can create, read, update and delete each one of them.' },
+  { name: 'contentManager', description: 'Manages slideshow images and FAQs. Can create, read, update and delete each one of them.' },
+  { name: 'orderManager', description: 'Manages all orders. Can view and update order statuses in the dashboard page. Receives email notifications and real-time system notifications whenever a new order is placed.' },
+  { name: 'customerSupport', description: `Receives emails from the 'Contact Us' form. Can view and delete contact messages in the dashboard page.` },
+];
 
-    for (const roleName of roles) {
-        const existingRole = await Role.findOne({ name: roleName });
-
-        if (!existingRole) {
-            const newRole = new Role({ name: roleName });
-            await newRole.save();
-            console.log(`✓ Role "${roleName}" seeded successfully!`);
-        } else {
-            console.log(`✓ Role "${roleName}" already exists!`);
-        }
-    }
+const getUserEnvVars = (role) => {
+  const prefix = role.replace(/([A-Z])/g, '_$1').toUpperCase();
+  return {
+    firstName: process.env[`${prefix}_FIRST_NAME`],
+    lastName: process.env[`${prefix}_LAST_NAME`],
+    email: process.env[`${prefix}_EMAIL`],
+    password: process.env[`${prefix}_PASSWORD`]
+  };
 };
 
-const seedAdminUser = async () => {
-    const requiredEnvVars = [
-        'ADMIN_FIRST_NAME',
-        'ADMIN_LAST_NAME',
-        'ADMIN_EMAIL',
-        'ADMIN_PASSWORD'
-    ];
-
-    const missingVars = [];
-
-    for (let varName of requiredEnvVars) {
-        if (!process.env[varName]) {
-            missingVars.push(varName);
-        }
-    }
-
-    if (missingVars.length > 0) {
-        console.error(`⚠️  Missing environment variables: ${missingVars.join(', ')}`);
-        return;
-    }
-
-    const adminRole = await Role.findOne({ name: 'admin' });
-    if (!adminRole) {
-        console.error('⚠️  Admin role not found! Ensure roles are seeded first.');
-        return;
-    }
-
-    const existingAdmin = await User.findOne({ email: ADMIN_EMAIL });
-    if (!existingAdmin) {
-        const hashedPassword = await bcrypt.hash(ADMIN_PASSWORD, 10);
-        const adminUser = new User({
-            firstName: ADMIN_FIRST_NAME,
-            lastName: ADMIN_LAST_NAME,
-            email: ADMIN_EMAIL,
-            password: hashedPassword,
-            role: adminRole._id,
-        });
-
-        await adminUser.save();
-        console.log('✓ Admin user seeded successfully!');
+const seedRoles = async () => {
+  for (const roleData of roles) {
+    const existingRole = await Role.findOne({ name: roleData.name });
+    if (!existingRole) {
+      const newRole = new Role({
+        name: roleData.name,
+        description: roleData.description
+      });
+      await newRole.save();
+      console.log(`☑ Role "${roleData.name}" seeded successfully`);
     } else {
-        console.log('✓ Admin user already exists!');
+      console.log(`✓ Role "${roleData.name}" already exists`);
     }
+  }
+};
+
+const seedUsers = async () => {
+  for (const roleData of roles) {
+    const { firstName, lastName, email, password } = getUserEnvVars(roleData.name);
+
+    if (!firstName || !lastName || !email || !password) {
+      console.warn(`⚠️  Missing .env values for ${roleData.name} user`);
+      continue;
+    }
+
+    const existingUser = await User.findOne({ email });
+    if (existingUser) {
+      console.log(`✓ ${roleData.name} user already exists`);
+      continue;
+    }
+
+    const roleDoc = await Role.findOne({ name: roleData.name });
+    if (!roleDoc) {
+      console.warn(`⚠️  Role "${roleData.name}" not found`);
+      continue;
+    }
+
+    const hashedPassword = await bcrypt.hash(password, 10);
+    const newUser = new User({
+      firstName,
+      lastName,
+      email,
+      password: hashedPassword,
+      role: roleDoc._id,
+    });
+
+    await newUser.save();
+    console.log(`☑ ${roleData.name} user created successfully`);
+  }
 };
 
 const seedDB = async () => {
-    if (SEED_DB === 'true') {
-        console.log('🌱 Seeding database...');
-        await seedRoles();
-        await seedAdminUser();
-        console.log('🌳 Database seeding completed.');
-    }
+  if (SEED_DB === 'true') {
+    console.log('🌱 Seeding database...');
+    await seedRoles();
+    await seedUsers();
+    console.log('🌳 Database seeding completed.');
+  }
 };
 
-module.exports = { seedRoles, seedAdminUser, seedDB };
+module.exports = { seedDB };
